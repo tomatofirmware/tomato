@@ -34,7 +34,8 @@
 /* For ERR_PTR().  Yeah, I know... --RR */
 #include <linux/fs.h>
 
-//	#define TEST_JHASH		// test jhash from 2.4.33	-- zzz
+/* SpeedMod: uncommented test jhash (was removed in Tomato 1.23ND) */
+#define TEST_JHASH		// test jhash from 2.4.33	-- zzz
 
 #ifdef TEST_JHASH
 #include <linux/jhash.h>
@@ -145,7 +146,9 @@ hash_conntrack(const struct ip_conntrack_tuple *tuple)
 	return (jhash_3words(tuple->src.ip,
 	                     (tuple->dst.ip ^ tuple->dst.protonum),
 	                     (tuple->src.u.all | (tuple->dst.u.all << 16)),
-	                     ip_conntrack_hash_rnd) % ip_conntrack_htable_size);
+	                     /* SpeedMod: Change modulo to AND */
+	                     //ip_conntrack_hash_rnd) % ip_conntrack_htable_size);
+	                     ip_conntrack_hash_rnd) & (ip_conntrack_htable_size - 1));
 #else
 	/* ntohl because more differences in low bits. */
 	/* To ensure that halves of the same connection don't hash
@@ -154,7 +157,9 @@ hash_conntrack(const struct ip_conntrack_tuple *tuple)
 		     + tuple->src.u.all + tuple->dst.u.all
 		     + tuple->dst.protonum)
 		+ ntohs(tuple->src.u.all))
-		% ip_conntrack_htable_size;
+		/* SpeedMod: Change modulo to AND */
+		//% ip_conntrack_htable_size;
+		& (ip_conntrack_htable_size - 1);
 #endif
 }
 
@@ -1501,15 +1506,20 @@ int __init ip_conntrack_init(void)
 
 */
 
+/*
 #ifdef TEST_JHASH
- 	if (hashsize) ip_conntrack_htable_size = hashsize;
+	if (hashsize) ip_conntrack_htable_size = hashsize;
 		else ip_conntrack_htable_size = 4096;
 	ip_conntrack_max = 2048;
 #else
- 	if (hashsize) ip_conntrack_htable_size = hashsize;
+	if (hashsize) ip_conntrack_htable_size = hashsize;
 		else ip_conntrack_htable_size = 4099;
 	ip_conntrack_max = 2048;
 #endif
+*/
+	/* SpeedMod: Hashtable size */
+	ip_conntrack_htable_size = 16384;
+	ip_conntrack_max = ip_conntrack_htable_size / 2;
 
 #endif
 

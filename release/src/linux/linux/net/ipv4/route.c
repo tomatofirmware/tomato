@@ -113,7 +113,9 @@ int ip_rt_redirect_load		= HZ / 50;
 int ip_rt_redirect_silence	= ((HZ / 50) << (9 + 1));
 int ip_rt_error_cost		= HZ;
 int ip_rt_error_burst		= 5 * HZ;
-int ip_rt_gc_elasticity		= 8;
+/* SpeedMod: Tune ip_rt_gc_elasticity */
+//int ip_rt_gc_elasticity		= 8;
+int ip_rt_gc_elasticity		= 1;
 int ip_rt_mtu_expires		= 10 * 60 * HZ;
 int ip_rt_min_pmtu		= 512 + 20 + 20;
 int ip_rt_min_advmss		= 256;
@@ -2464,7 +2466,9 @@ void __init ip_rt_init(void)
 	if (!ipv4_dst_ops.kmem_cachep)
 		panic("IP: failed to allocate ip_dst_cache\n");
 
-	goal = num_physpages >> (26 - PAGE_SHIFT);
+	/* SpeedMod: goal=32 gives 16384 buckets for 4K page size */
+	//goal = num_physpages >> (26 - PAGE_SHIFT);
+	goal = 32;
 //	goal = num_physpages >> (21 - PAGE_SHIFT);
 
 	for (order = 0; (1UL << order) < goal; order++)
@@ -2498,8 +2502,13 @@ void __init ip_rt_init(void)
 //	ip_rt_max_size = (rt_hash_mask + 1) * 2;
 //	ipv4_dst_ops.gc_thresh = (ip_rt_max_size / 4);
 
+	/* SpeedMod: Tuning */
+/*
 	ipv4_dst_ops.gc_thresh = (rt_hash_mask + 1);
 	ip_rt_max_size = (rt_hash_mask + 1) * 16;
+*/
+	ipv4_dst_ops.gc_thresh = (rt_hash_mask + 1);
+	ip_rt_max_size = (rt_hash_mask + 1) * 2;
 
 //	printk("gc_thresh=%d\n", ipv4_dst_ops.gc_thresh);
 //	printk("ip_rt_max_size=%d\n", ip_rt_max_size);
