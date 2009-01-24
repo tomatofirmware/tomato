@@ -13,7 +13,6 @@
 
 include common.mak
 
-
 #
 #
 #
@@ -53,6 +52,11 @@ obj-y += rstats
 
 obj-y += mssl
 obj-y += mdu
+
+# !!TB - updated Broadcom Wireless driver 4.150.10.5
+obj-y += et
+obj-y += libbcmcrypto
+obj-y += wlconf
 
 ifeq ($(TEST_MINIUPNPD),1)
 obj-y += miniupnpd
@@ -121,7 +125,6 @@ install package: $(obj-install) $(LINUXDIR)/.config
 # kernel modules
 	$(MAKE) -C $(LINUXDIR) modules_install DEPMOD=/bin/true INSTALL_MOD_PATH=$(TARGETDIR)
 	find $(TARGETDIR)/lib/modules -name *.o -exec mipsel-linux-strip --strip-unneeded {} \;
-
 	-cd $(TARGETDIR)/lib/modules/2.4.20/kernel/drivers/net && mv diag/* . && rm -rf diag
 
 # nice and clean
@@ -282,7 +285,7 @@ busybox-test: dummy
 #	busybox-install:
 #		rm -rf $(INSTALLDIR)/busybox
 #		$(MAKE) -C busybox install PREFIX=$(INSTALLDIR)/busybox
-	
+
 httpd: matrixssl shared nvram mssl
 	@$(SEP)
 	@$(MAKE) -C httpd
@@ -357,7 +360,7 @@ iptables-clean:
 
 ppp:
 	@$(SEP)
-	$(MAKE) -C ppp/pppoecd $* INSTALLDIR=$(INSTALLDIR)/ppp 
+	$(MAKE) -C ppp/pppoecd $* INSTALLDIR=$(INSTALLDIR)/ppp
 #	$(MAKE) -C ppp/pppoecd $* INSTALLDIR=$(INSTALLDIR)/ppp DFLAGS="-DDEBUG -DDEBUGALL"
 
 ppp-%:
@@ -489,12 +492,9 @@ ebtables-install: dummy
 	mkdir -p $(INSTALLDIR)/ebtables/usr/lib/
 	cp ebtables/*.so $(INSTALLDIR)/ebtables/usr/lib/
 	cp ebtables/extensions/*.so $(INSTALLDIR)/ebtables/usr/lib/
-	
+
 ebtables-clean:
 	make -C ebtables clean
-
-
-
 
 #
 # Generic rules

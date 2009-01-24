@@ -1,7 +1,7 @@
 #
 # Makefile for Broadcom BCM947XX boards
 #
-# Copyright 2006, Broadcom Corporation
+# Copyright 2007, Broadcom Corporation
 # All Rights Reserved.
 # 
 # THIS SOFTWARE IS OFFERED "AS IS", AND BROADCOM GRANTS NO WARRANTIES OF ANY
@@ -24,7 +24,7 @@ vpath %.S $(SRCBASE)/shared
 vpath %.lds.in $(SRCBASE)/shared
 
 ASFLAGS		+= -D__ASSEMBLY__ -DLOADADDR=$(LOADADDR)
-CFLAGS		+= -DLOADADDR=$(LOADADDR)
+CFLAGS		+= -DLOADADDR=$(LOADADDR) -DBCM5354
 # The self-decompresor is standalone, get rid of the linux flags
 CFLAGS		:= $(subst -Dlinux,,$(CFLAGS))
 CFLAGS		+= -Ulinux -D_MINOSL_ -ffreestanding
@@ -34,8 +34,9 @@ endif
 CFLAGS		+= -ffunction-sections $(call check_gcc, -fvtable-gc, )
 
 SYSTEM		?= $(TOPDIR)/vmlinux
-OBJECTS		:= boot.o sbsdram.o load.o sflash.o hndmips.o hndchipc.o sbutils.o \
-		   min_osl.o bcmutils.o sromstubs.o nvramstubs.o bcmstdlib.o
+OBJECTS		:= boot.o sbsdram.o load.o sflash.o hndmips.o hndchipc.o \
+		sbutils.o hndpmu.o \
+		min_osl.o bcmutils.o sromstubs.o nvramstubs.o bcmstdlib.o
 
 # Default to bzip2
 COMPRESS	?= bzip2 -c
@@ -86,4 +87,4 @@ piggy: $(SYSTEM)
 mrproper: clean
 
 clean:
-	rm -f vmlinux vmlinuz zImage piggz piggy *.lds loader.gz piggy.o
+	rm -f vmlinux vmlinuz zImage piggz piggy *.lds *.o

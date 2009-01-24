@@ -1,7 +1,7 @@
 /*
  * Linux OS Independent Layer
  *
- * Copyright 2006, Broadcom Corporation
+ * Copyright 2007, Broadcom Corporation
  * All Rights Reserved.
  * 
  * THIS SOFTWARE IS OFFERED "AS IS", AND BROADCOM GRANTS NO WARRANTIES OF ANY
@@ -75,8 +75,8 @@ extern uint osl_pci_slot(osl_t *osh);
 /* Pkttag flag should be part of public information */
 typedef struct {
 	bool pkttag;
-	uint pktalloced; /* Number of allocated packet buffers */
-	bool mmbus;		/* bus supports memory-mapped register accesses */
+	uint pktalloced; 	/* Number of allocated packet buffers */
+	bool mmbus;		/* Bus supports memory-mapped register accesses */
 	pktfree_cb_fn_t tx_fn;  /* Callback function for PKTFREE */
 	void *tx_ctx;		/* Context to the callback function */
 } osl_pubinfo_t;
@@ -147,8 +147,8 @@ extern void osl_dma_unmap(osl_t *osh, uint pa, uint size, int direction);
 /* register access macros */
 #if defined(BCMJTAG)
 #include <bcmjtag.h>
-#define OSL_WRITE_REG(osh, r, v) (bcmjtag_write(NULL, (uint32)r, (v), sizeof(*(r))))
-#define OSL_READ_REG(osh, r) (bcmjtag_read(NULL, (uint32)r, sizeof(*(r))))
+#define OSL_WRITE_REG(osh, r, v) (bcmjtag_write(NULL, (uintptr)(r), (v), sizeof(*(r))))
+#define OSL_READ_REG(osh, r) (bcmjtag_read(NULL, (uintptr)(r), sizeof(*(r))))
 #endif
 
 #if defined(BCMJTAG)
@@ -191,22 +191,34 @@ extern void osl_dma_unmap(osl_t *osh, uint pa, uint size, int direction);
 		(OSL_WRITE_REG(osh, r, v))); \
 	} while (0)
 #else	/* IL_BIGENDIAN */
-#define R_REG(osh, r) ({ \
-	__typeof(*(r)) __osl_v; \
-	switch (sizeof(*(r))) { \
-	case sizeof(uint8):	__osl_v = readb((volatile uint8*)((uint32)(r)^3)); break; \
-	case sizeof(uint16):	__osl_v = readw((volatile uint16*)((uint32)(r)^2)); break; \
-	case sizeof(uint32):	__osl_v = readl((volatile uint32*)(r)); break; \
-	} \
-	__osl_v; \
-})
+#define R_REG(osh, r) (\
+	SELECT_BUS_READ(osh, \
+		({ \
+			__typeof(*(r)) __osl_v; \
+			switch (sizeof(*(r))) { \
+				case sizeof(uint8):	__osl_v = \
+					readb((volatile uint8*)((uintptr)(r)^3)); break; \
+				case sizeof(uint16):	__osl_v = \
+					readw((volatile uint16*)((uintptr)(r)^2)); break; \
+				case sizeof(uint32):	__osl_v = \
+					readl((volatile uint32*)(r)); break; \
+			} \
+			__osl_v; \
+		}), \
+		OSL_READ_REG(osh, r)) \
+)
 #define W_REG(osh, r, v) do { \
-	switch (sizeof(*(r))) { \
-	case sizeof(uint8):	writeb((uint8)(v), (volatile uint8*)((uint32)(r)^3)); break; \
-	case sizeof(uint16):	writew((uint16)(v), (volatile uint16*)((uint32)(r)^2)); break; \
-	case sizeof(uint32):	writel((uint32)(v), (volatile uint32*)(r)); break; \
-	} \
-} while (0)
+	SELECT_BUS_WRITE(osh,  \
+		switch (sizeof(*(r))) { \
+			case sizeof(uint8):	writeb((uint8)(v), \
+					(volatile uint8*)((uintptr)(r)^3)); break; \
+			case sizeof(uint16):	writew((uint16)(v), \
+					(volatile uint16*)((uintptr)(r)^2)); break; \
+			case sizeof(uint32):	writel((uint32)(v), \
+					(volatile uint32*)(r)); break; \
+		}, \
+		(OSL_WRITE_REG(osh, r, v))); \
+	} while (0)
 #endif /* IL_BIGENDIAN */
 
 #define	AND_REG(osh, r, v)		W_REG(osh, (r), R_REG(osh, r) & (v))
@@ -336,6 +348,10 @@ osl_pkt_tonative(osl_pubinfo_t *osh, void *pkt)
 #define	PKTSETLINK(skb, x)		(((struct sk_buff*)(skb))->prev = (struct sk_buff*)(x))
 #define	PKTPRIO(skb)			(((struct sk_buff*)(skb))->priority)
 #define	PKTSETPRIO(skb, x)		(((struct sk_buff*)(skb))->priority = (x))
+#define PKTSUMNEEDED(skb)		(((struct sk_buff*)(skb))->ip_summed == CHECKSUM_HW)
+#define PKTSETSUMGOOD(skb, x)		(((struct sk_buff*)(skb))->ip_summed = \
+						((x) ? CHECKSUM_UNNECESSARY : CHECKSUM_NONE))
+/* PKTSETSUMNEEDED and PKTSUMGOOD are not possible because skb->ip_summed is overloaded */
 #define PKTSHARED(skb)                  (((struct sk_buff*)(skb))->cloned)
 
 extern void *osl_pktget(osl_t *osh, uint len);

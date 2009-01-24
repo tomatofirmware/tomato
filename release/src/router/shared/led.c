@@ -13,18 +13,177 @@
 #include <fcntl.h>
 #include <bcmnvram.h>
 
+//!!TB
+#include <sys/ioctl.h>
+#include <linux_gpio.h>
+
 #include "utils.h"
 #include "shared.h"
-
+#include "shutils.h"
 
 const char *led_names[] = { "wlan", "diag", "white", "amber", "dmz", "aoss", "bridge", "mystery" };
 
-
 // --- move begin ---
-#if TOMATO_N
 
-#else
+//!!TB - changed gpio_write and gpio_read to work with newer driver
 
+/* Global containing information about each GPIO pin */
+
+/* GPIO registers */
+#define BCMGPIO_REG_IN          0
+#define BCMGPIO_REG_OUT         1
+#define BCMGPIO_REG_OUTEN       2
+#define BCMGPIO_REG_RESERVE     3
+#define BCMGPIO_REG_RELEASE     4
+
+/* Generic functions to read/write Chip Common core's GPIO registers on the AP */
+
+int tgpio_fd_init()
+{
+	return open("/dev/gpio", O_RDWR);
+}
+
+void tgpio_fd_cleanup(int fd)
+{
+	if (fd != -1) close (fd);
+}
+
+uint32_t tgpio_ioctl(int fd, int gpioreg, uint32_t mask, uint32_t val)
+{
+        struct gpio_ioctl gpio;
+        int type;
+
+        gpio.val = val;
+        gpio.mask = mask;
+
+        switch (gpioreg) {
+                case BCMGPIO_REG_IN:
+                        type = GPIO_IOC_IN;
+                        break;
+                case BCMGPIO_REG_OUT:
+                        type = GPIO_IOC_OUT;
+                        break;
+                case BCMGPIO_REG_OUTEN:
+                        type = GPIO_IOC_OUTEN;
+                        break;
+                case BCMGPIO_REG_RESERVE:
+                        type = GPIO_IOC_RESERVE;
+                        break;
+                case BCMGPIO_REG_RELEASE:
+                        type = GPIO_IOC_RELEASE;
+                        break;
+                default:
+                        //printf("invalid gpioreg %d\n", gpioreg);
+                        return ~0;
+        }
+        if (ioctl(fd, type, &gpio) < 0) {
+                //printf("invalid gpioreg %d\n", gpioreg);
+                return ~0;
+        }
+        return (gpio.val);
+}
+
+void __gpio_write(char *dev, uint32_t gpio, int val)
+{
+	unsigned int gpio_type = 0;
+
+	if (strcmp(dev, "/dev/gpio/in") == 0)
+		gpio_type = BCMGPIO_REG_IN;
+	else if (strcmp(dev, "/dev/gpio/out") == 0)
+		gpio_type = BCMGPIO_REG_OUT;
+	else if (strcmp(dev, "/dev/gpio/outen") == 0)
+		gpio_type = BCMGPIO_REG_OUTEN;
+	//else
+	//	printf("ERROR GPIO NAME %s\n", dev);
+
+	int fd = tgpio_fd_init();
+
+	if (fd >= 0) {
+		tgpio_ioctl(fd, BCMGPIO_REG_RESERVE, gpio, gpio);
+
+		if (val > 0)
+			tgpio_ioctl(fd, gpio_type, gpio, gpio);
+		else
+			tgpio_ioctl(fd, gpio_type, gpio, 0);
+
+		tgpio_fd_cleanup(fd);
+	}
+}
+
+void gpio_write(uint32_t bit, int en)
+{
+	__gpio_write("/dev/gpio/out", bit, en);
+}
+
+uint32_t __gpio_read(char *dev, uint32_t gpio)
+{
+	unsigned int gpio_type = 0;
+	uint32_t ret;
+
+	if (strcmp(dev, "/dev/gpio/in") == 0)
+		gpio_type = BCMGPIO_REG_IN;
+	else if (strcmp(dev, "/dev/gpio/out") == 0)
+		gpio_type = BCMGPIO_REG_OUT;
+	else if (strcmp(dev, "/dev/gpio/outen") == 0)
+		gpio_type = BCMGPIO_REG_OUTEN;
+	//else
+	//	printf("ERROR GPIO NAME %s\n", dev);
+
+	int fd = tgpio_fd_init();
+	if (fd >= 0) {
+		/* read the value of GPIO */
+		ret = tgpio_ioctl(fd, gpio_type, gpio, 0);
+		tgpio_fd_cleanup(fd);
+		return (ret & gpio);
+	}
+
+	return ~0;
+}
+
+uint32_t gpio_read_bit(int bit)
+{
+	return __gpio_read("/dev/gpio/in", 1 << bit);
+}
+
+uint32_t gpio_read_in(int fd)
+{
+	if (fd >= 0)
+		return tgpio_ioctl(fd, BCMGPIO_REG_IN, 0, 0);
+	else
+		return ~0;
+}
+
+uint32_t gpio_read(void)
+{
+	int i;
+	uint32_t v, val = 0;
+
+	for (i = 15; i >= 0; --i) {
+		v = __gpio_read("/dev/gpio/in", 1 << i);
+		val |= (v) ? (1 << i) : 0;
+	}
+	return val;
+}
+
+void gpio_connect(int fd, int gpio_pin)
+{
+	uint32_t bitmask = ((unsigned int) 1 << gpio_pin);
+
+	/* reserve the pin */
+	tgpio_ioctl(fd, BCMGPIO_REG_RESERVE, bitmask, bitmask);
+
+	tgpio_ioctl(fd, BCMGPIO_REG_OUTEN, bitmask, 0);
+}
+
+void gpio_disconnect(int fd, int gpio_pin)
+{
+	uint32_t bitmask = ((unsigned int) 1 << gpio_pin);
+
+	/* release the pin */
+	tgpio_ioctl(fd, BCMGPIO_REG_RELEASE, bitmask, 0);
+}
+
+#if 0 // old functions
 void gpio_write(uint32_t bit, int en)
 {
 	int f;
@@ -60,8 +219,7 @@ uint32_t gpio_read(void)
 	close(f);
 	return r;
 }
-
-#endif
+#endif //0
 
 int nvget_gpio(const char *name, int *gpio, int *inv)
 {
@@ -138,7 +296,7 @@ int led(int which, int mode)
 	case MODEL_WHR3AG54:
 		b = wzrg54[which];
 		break;
-/*		
+/*
 	case MODEL_WHR2A54G54:
 		if (which != LED_DIAG) return 0;
 		b = 7;
