@@ -54,6 +54,9 @@ obj-y += rstats
 obj-y += mssl
 obj-y += mdu
 
+# !!TB
+obj-y += p910nd
+
 ifeq ($(TEST_MINIUPNPD),1)
 obj-y += miniupnpd
 else
@@ -372,6 +375,9 @@ upnp: nvram shared iptables
 #		$(STRIP) $(INSTALLDIR)/miniupnpd/usr/sbin/miniupnpd
 
 nvram: shared
+
+# !!TB
+p910nd: shared
 
 vlan:
 	@$(SEP)
