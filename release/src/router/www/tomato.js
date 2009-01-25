@@ -1951,7 +1951,7 @@ function navi()
 		['Access Restriction',	'restrict.asp'],
 // ---- !!TB - USB
 		['USB',			'nas', 0, [
-			['USB Support',		'usb.asp'],
+			['USB Support',		'usb.asp']
 			] ],
 		null,
 		['Administration',		'admin', 0, [
