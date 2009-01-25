@@ -35,6 +35,7 @@ enum {
 	IDLE,
 	REBOOT,
 	HALT,
+	TIMER, //!!TB
 	INIT
 };
 
@@ -283,13 +284,16 @@ static void handle_initsigs(int sig)
 		signaled = START;
 		break;
 	case SIGINT:
-        signaled = STOP;
+	        signaled = STOP;
 		break;
 	case SIGTERM:
 		signaled = REBOOT;
 		break;
 	case SIGQUIT:
 		signaled = HALT;
+		break;
+	case SIGALRM:	//!!TB
+		signaled = TIMER;
 		break;
 	}
 }
@@ -405,7 +409,7 @@ static int init_nvram(void)
 	model = get_model();
 	sprintf(s, "%d", model);
 	nvram_set("t_model", s);
-	
+
 	mfr = "Broadcom";
 	name = NULL;
 	features = 0;
@@ -802,6 +806,29 @@ static void sysinit(void)
 	led(LED_DIAG, 1);
 }
 
+/* !!TB - Timer procedures */
+static void handle_timer(int sig);
+
+static void set_timer(void)
+{
+	signal(SIGALRM, handle_timer); /* reset signal handler */
+	alarm(5);
+}
+
+static void handle_timer(int sig)
+{
+	if (state == IDLE)
+		signaled = TIMER;
+	else /* if we're busy, just reset the timer */
+		set_timer();
+}
+
+void do_timer(void)
+{
+	check_usb_event();
+	set_timer();
+}
+
 int init_main(int argc, char *argv[])
 {
 	pid_t shell_pid = 0;
@@ -826,6 +853,10 @@ int init_main(int argc, char *argv[])
 			exec_service();
 			state = IDLE;
 			break;
+		case TIMER:	//!!TB
+			do_timer();
+			state = IDLE;
+			break;
 		case RESTART:
 		case STOP:
 		case HALT:
@@ -838,6 +869,11 @@ int init_main(int argc, char *argv[])
 			stop_wan();
 			stop_lan();
 			stop_vlan();
+
+			// !!TB - USB Support
+			signal(SIGALRM, SIG_IGN);
+			remove_storage_main();
+			stop_usb();
 
 			if ((state == REBOOT) || (state == HALT)) {
 				shutdn(state == REBOOT);
@@ -853,13 +889,16 @@ int init_main(int argc, char *argv[])
 		case START:
 			SET_LED(RELEASE_WAN_CONTROL);
 
+			start_usb(); // !!TB - USB Support
+
 			run_nvscript("script_init", NULL, 2);
 
 			start_vlan();
 			start_lan();			
 			start_wan(BOOT);
 			start_services();
-			
+			set_timer();	//!!TB
+
 			syslog(LOG_INFO, "Tomato %s", tomato_version);
 			syslog(LOG_INFO, "%s", nvram_safe_get("t_model_name"));
 

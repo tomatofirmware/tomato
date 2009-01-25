@@ -208,7 +208,7 @@ const struct mime_handler mime_handlers[] = {
 	{ "logout.cgi",		NULL,	   		 			0,	wi_generic,			wo_logout,		0 },
 	{ "shutdown.cgi",	mime_html,					0,	wi_generic,			wo_shutdown,	1 },
 
-
+	{ "usbcmd.cgi",			mime_javascript,			0,	wi_generic,		wo_usbcommand,		1 },	//!!TB - USB
 #if TOMATO_SL
 	{ "usb.cgi",		NULL,						0,	wi_generic,			wo_usb,			1 },
 	{ "umount.cgi",		NULL,						0,	wi_generic,			wo_umount,		1 },
@@ -263,6 +263,7 @@ const aspapi_t aspapi[] = {
 #if TOMATO_SL
 	{ "sharelist",			asp_sharelist		},
 #endif
+	{ "usbdevices",			asp_usbdevices	},	//!!TB - USB Support
 	{ NULL,					NULL				}
 };
 
@@ -645,6 +646,21 @@ static const nvset_t nvset_list[] = {
 	{ "jffs2_on",			V_01				},
 	{ "jffs2_exec",			V_LENGTH(0, 64)		},
 	{ "jffs2_format",		V_01				},
+
+// admin-usb - !!TB
+	{ "usb_enable",			V_01				},
+	{ "usb_uhci",			V_01				},
+	{ "usb_ohci",			V_01				},
+	{ "usb_usb2",			V_01				},
+	{ "usb_storage",		V_01				},
+	{ "usb_printer",		V_01				},
+	{ "usb_printer_bidirect",	V_01				},
+	{ "usb_fs_ext3",		V_01				},
+	{ "usb_fs_fat",			V_01				},
+	{ "usb_automount",		V_01				},
+	{ "script_usbhotplug", 		V_TEXT(0, 2048)			},
+	{ "script_usbmount", 		V_TEXT(0, 2048)			},
+	{ "script_usbumount", 		V_TEXT(0, 2048)			},
 
 //	qos
 	{ "qos_enable",			V_01				},
