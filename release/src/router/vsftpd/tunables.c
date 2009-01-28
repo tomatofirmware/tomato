@@ -16,6 +16,7 @@ int tunable_write_enable = 0;
 int tunable_anon_upload_enable = 0;
 int tunable_anon_mkdir_write_enable = 0;
 int tunable_anon_other_write_enable = 0;
+int tunable_anon_allow_writable_root = 0;
 int tunable_chown_uploads = 0;
 int tunable_connect_from_port_20 = 0;
 int tunable_xferlog_enable = 0;
@@ -71,6 +72,7 @@ int tunable_force_anon_data_ssl = 0;
 int tunable_mdtm_write = 1;
 int tunable_lock_upload_files = 1;
 int tunable_pasv_addr_resolve = 0;
+int tunable_utf8 = 0;
 int tunable_debug_ssl = 0;
 int tunable_require_cert = 0;
 int tunable_validate_cert = 0;
@@ -104,7 +106,8 @@ unsigned int tunable_max_login_fails = 3;
 /* -rw------- */
 unsigned int tunable_chown_upload_mode = 0600;
 
-const char* tunable_secure_chroot_dir = "/usr/share/empty";
+//!!TB - const char* tunable_secure_chroot_dir = "/usr/share/empty";
+const char* tunable_secure_chroot_dir = "/var/run/vsftpd";
 const char* tunable_ftp_username = "ftp";
 const char* tunable_chown_username = "root";
 const char* tunable_xferlog_file = "/var/log/xferlog";
@@ -135,4 +138,5 @@ const char* tunable_ssl_ciphers = "DES-CBC3-SHA";
 const char* tunable_rsa_private_key_file = 0;
 const char* tunable_dsa_private_key_file = 0;
 const char* tunable_ca_certs_file = 0;
+const char* tunable_passwd_file = 0;
 

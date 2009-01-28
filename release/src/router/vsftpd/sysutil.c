@@ -2222,6 +2222,36 @@ vsf_sysutil_getpwuid(const int uid)
   return (struct vsf_sysutil_user*) getpwuid((unsigned int) uid);
 }
 
+/* hack to reload getpwnam -- uClibc implementation alike */
+struct passwd *getpwnam(const char *name)
+{
+    FILE *f;
+    static char line_buff[256 /*PWD_BUFFER_SIZE*/];
+    static struct passwd pwd;
+
+    if (tunable_passwd_file == NULL)
+    {
+        if (getpwnam_r(name, &pwd, line_buff, sizeof(line_buff), NULL) != -1) {
+            return &pwd;
+        }
+        return NULL;
+    }
+
+    f = fopen(tunable_passwd_file, "r");
+    if (f != NULL)
+    {
+        while (fgetpwent_r(f, &pwd, line_buff, sizeof(line_buff), NULL) != -1)
+            if (!strcmp(pwd.pw_name, name)) {
+                fclose(f);
+                return &pwd;
+            }
+    
+        fclose(f);
+    }
+
+    return NULL;
+}
+
 struct vsf_sysutil_user*
 vsf_sysutil_getpwnam(const char* p_user)
 {
@@ -2593,17 +2623,21 @@ vsf_sysutil_openlog(void)
 #ifdef LOG_FTP
   facility = LOG_FTP;
 #endif
-  openlog("vsftpd", LOG_NDELAY, facility);
+  openlog("vsftpd", LOG_NDELAY | LOG_PID, facility);
 }
 
 void
 vsf_sysutil_syslog(const char* p_text, int severe)
 {
+  char *text;
   int prio = LOG_INFO;
   if (severe)
   {
     prio = LOG_WARNING;
   }
+  /* skip date & pid */
+  if ((text = strstr(p_text, "[pid ")) && (text = strchr(text, ']')) && (text[1] == ' '))
+    p_text = text + 2;
   syslog(prio, "%s", p_text);
 }
 
