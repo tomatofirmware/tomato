@@ -1198,12 +1198,16 @@ static int sanitise(unsigned char *opt, char *buf)
 static void log_packet(char *type, void *addr, unsigned char *ext_mac, 
 		       int mac_len, char *interface, char *string)
 {
+  /* !!TB - reduce excessive logging for DHCP packets */
+  if ((type) && !(daemon->options & OPT_LOG_OPTS))
+    return;
+  
   struct in_addr a;
 
   /* addr may be misaligned */
   if (addr)
     memcpy(&a, addr, sizeof(a));
-  
+
   my_syslog(LOG_INFO, "%s%s(%s) %s%s%s %s",
 	    type ? "DHCP" : "BOOTP",
 	    type ? type : "",
