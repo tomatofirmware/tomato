@@ -57,7 +57,7 @@ obj-y += mdu
 ifeq ($(TEST_MINIUPNPD),1)
 obj-y += miniupnpd
 else
-obj-y += upnp
+obj-y += miniupnpd	# !!TB
 endif
 
 

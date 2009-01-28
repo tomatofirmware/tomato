@@ -338,7 +338,7 @@ static void nat_table(void)
 			ipt_triggered(IPT_TABLE_NAT);
 		}
 
-		if (nvram_match("upnp_enable", "1")) {
+		if (nvram_match("upnp_enable", "1") || nvram_match("upnp_nat_pmp_enable", "1")) {	//!!TB - miniupnpd
 			ipt_write(
 				":upnp - [0:0]\n"
 				"-A PREROUTING -i %s -j upnp\n",
@@ -468,11 +468,11 @@ static void filter_forward(void)
 		"-A FORWARD -i %s -j %s\n",										// from lan
 		wanface, wanface, lanface, chain_out_accept);
 
-	if (nvram_match("upnp_enable", "1")) {
+	if (nvram_match("upnp_enable", "1") || nvram_match("upnp_nat_pmp_enable", "1")) {	//!!TB - miniupnpd
 		ipt_write(
 			":upnp - [0:0]\n"
-			"-A FORWARD -i %s -j upnp\n",
-				wanface);
+			"-A FORWARD -i %s -o ! %s -j upnp\n",	//!!TB - miniupnpd
+				wanface, wanface);		//!!TB - miniupnpd
 	}
 
 	if (wanup) {	
@@ -671,11 +671,15 @@ int start_firewall(void)
 		*/
 	}
 
-	if (nvram_match("upnp_enable", "1")) {
+	//!!TB - miniupnpd
+	if (nvram_match("upnp_enable", "1") || nvram_match("upnp_nat_pmp_enable", "1")) {
+		// flush all upnp rules
+		eval("iptables", "-t", "nat", "-F", "upnp");
+		eval("iptables", "-t", "filter", "-F", "upnp");
 #ifdef TEST_MINIUPNP
-		system("/tmp/upnptest post");
+//		system("/tmp/upnptest post");
 #else
-		killall("upnp", SIGHUP);
+//		killall("upnp", SIGHUP);
 #endif
 	}
 

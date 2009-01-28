@@ -352,8 +352,34 @@ void stop_httpd(void)
 
 // -----------------------------------------------------------------------------
 
+//!!TB - miniupnpd - most of the code is stolen from Tarifa 034RC1 sources
+
+#if 0	// read UUID from /proc/sys/kernel/random/uuid instead
+void uuidstr_create(char *str)
+{
+	typedef unsigned int u_int32;
+	typedef unsigned short u_int16;
+	typedef unsigned char u_int8;
+
+	static int uuid_count = 0;
+	u_int d[16];
+
+	sscanf(nvram_safe_get("lan_hwaddr"), "%x:%x:%x:%x:%x:%x",
+		&d[0], &d[1], &d[2], &d[3], &d[4], &d[5]);
+	sscanf(nvram_safe_get("lan_hwaddr"), "%x:%x:%x:%x:%x:%x",
+		&d[6], &d[7], &d[8], &d[9], &d[10], &d[11]);
+	*((int *)&d[12]) = uuid_count++;
+
+	sprintf(str, "fc4ec57e-b051-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",
+		(u_int8)d[6], (u_int8)d[7], (u_int8)d[8], (u_int8)d[9], (u_int8)d[10],
+		(u_int8)d[11], (u_int8)d[12], (u_int8)d[13], (u_int8)d[14], (u_int8)d[15]);
+}
+#endif //0
+
 void start_upnp(void)
 {
+//!!TB - miniupnpd
+#if 0
 	if ((nvram_match("upnp_enable", "1")) && (get_wan_proto() != WP_DISABLED)) {
 #ifdef TEST_MINIUPNP
 		xstart("miniupnpd",
@@ -368,17 +394,86 @@ void start_upnp(void)
 			"-W", nvram_safe_get("wan_iface"),
 			"-I", nvram_safe_get("upnp_ssdp_interval"),
 			"-A", nvram_safe_get("upnp_max_age"));
-#endif
 	}
+#endif
+#else //0
+	char uuid[45];
+	char fname[] = "/etc/miniupnpd.conf";
+	int interval, r;
+	FILE *fp = NULL;
+
+	if ((!nvram_invmatch("upnp_enable", "0")) & (!nvram_invmatch("upnp_nat_pmp_enable", "0")) || (get_wan_proto() == WP_DISABLED))
+		return;
+
+	fp = fopen(fname, "w");
+	if(NULL == fp)
+		return;
+
+	fprintf(fp, "ext_ifname=%s\n", nvram_safe_get("wan_iface"));
+	fprintf(fp, "listening_ip=%s\n", nvram_safe_get("lan_ipaddr"));
+	fprintf(fp, "port=%s\n", nvram_safe_get("upnp_port"));
+	fprintf(fp, "upnp_forward_chain=upnp\n");
+	fprintf(fp, "upnp_nat_chain=upnp\n");
+	fprintf(fp, "enable_upnp=%s\n", nvram_match("upnp_enable", "1") ? "yes" : "no");
+	fprintf(fp, "enable_natpmp=%s\n", nvram_match("upnp_nat_pmp_enable", "1") ? "yes" : "no");
+	fprintf(fp, "secure_mode=%s\n", nvram_match("upnp_secure_mode", "1") ? "yes" : "no");
+	fprintf(fp, "system_uptime=no\n");
+	fprintf(fp, "notify_interval=%d\n", nvram_get_int("upnp_ssdp_interval"));
+
+	r = nvram_get_int("upnp_bitrate_up");
+	if (r > 0) fprintf(fp, "bitrate_up=%d\n", r);
+	r = nvram_get_int("upnp_bitrate_down");
+	if (r > 0) fprintf(fp, "bitrate_down=%d\n", r);
+
+	if (nvram_match("upnp_clean_ruleset_enable", "1")) {
+		interval = nvram_get_int("upnp_clean_ruleset_interval");
+		if (interval < 60) interval = 60;
+		fprintf(fp, "clean_ruleset_interval=%d\n", interval);
+		fprintf(fp, "clean_ruleset_threshold=%d\n", nvram_get_int("upnp_clean_ruleset_threshold"));
+	}
+	else 
+		fprintf(fp,"clean_ruleset_interval=0\n");
+
+	f_read_string("/proc/sys/kernel/random/uuid", uuid, sizeof(uuid));
+	fprintf(fp, "uuid=%s\n", uuid);
+
+	if ((nvram_get_int("upnp_min_port_int") > 0) &&
+		(nvram_get_int("upnp_max_port_int") > 0) &&
+		(nvram_get_int("upnp_min_port_ext") > 0) &&
+		(nvram_get_int("upnp_max_port_ext") > 0)) {
+
+		fprintf(fp, "allow %s", nvram_safe_get("upnp_min_port_int"));
+		fprintf(fp, "-%s", nvram_safe_get("upnp_max_port_int"));
+		fprintf(fp, " %s/24", nvram_safe_get("lan_ipaddr"));
+		fprintf(fp, " %s", nvram_safe_get("upnp_min_port_ext"));
+		fprintf(fp, "-%s\n", nvram_safe_get("upnp_max_port_ext"));
+	}
+	else {
+		// by default allow only redirection of ports above 1024
+		fprintf(fp, "allow 1024-65535 %s/24 1024-65535\n", nvram_safe_get("lan_ipaddr"));
+	}
+	fprintf(fp, "deny 0-65535 0.0.0.0/0 0-65535\n");
+
+	fclose(fp);
+	
+	xstart("miniupnpd", "-f", fname);
+#endif //0
 }
 
 void stop_upnp(void)
 {
+#if 0
+//!!TB - miniupnpd
 #ifdef TEST_MINIUPNP
 	killall_tk("miniupnpd");
 #else
 	killall_tk("upnp");
 #endif
+#else //0
+	killall_tk("miniupnpd");
+	unlink("/var/run/miniupnpd.pid");
+	unlink("/etc/miniupnpd.conf");
+#endif //0
 }
 
 // -----------------------------------------------------------------------------

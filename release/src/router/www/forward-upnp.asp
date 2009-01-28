@@ -37,7 +37,10 @@
 
 <script type='text/javascript'>
 
-//	<% nvram("upnp_enable,upnp_mnp"); %>
+/* REMOVE-BEGIN
+	!!TB - added miniupnpd settings, removed upnp_mnp
+REMOVE-END */
+//	<% nvram("upnp_enable,upnp_nat_pmp_enable,upnp_clean_ruleset_enable,upnp_secure_mode,upnp_clean_ruleset_interval,upnp_clean_ruleset_threshold"); %>
 // <% upnpinfo(); %>
 
 function submitDelete(proto, port)
@@ -74,7 +77,7 @@ ug.setup = function() {
 ug.populate = function() {
 	var i, j, r, row;
 
-	if (nvram.upnp_enable != 0) {
+	if ((nvram.upnp_enable != 0) || (nvram.upnp_nat_pmp_enable != 0)) {
 		for (i = 0; i < upnp_data.length; ++i) {
 			r = upnp_data[i];
 			if (r.length != 6) continue;
@@ -101,16 +104,52 @@ function deleteAll()
 
 function verifyFields(focused, quiet)
 {
+/* REMOVE-BEGIN
+	!!TB - miniupnp
+REMOVE-END */
+	var enable = E('_f_upnp_enable').checked ||
+		E('_f_upnp_nat_pmp_enable').checked;
+	var bc = E('_f_upnp_clean_ruleset_enable').checked;
+
+	E('_f_upnp_clean_ruleset_enable').disabled = (enable == 0);
+	E('_f_upnp_secure_mode').disabled = (enable == 0);
+	E('_upnp_clean_ruleset_interval').disabled = (enable == 0) || (bc == 0);
+	E('_upnp_clean_ruleset_threshold').disabled = (enable == 0) || (bc == 0);
+	elem.display(PR(E('_upnp_clean_ruleset_interval')), (enable != 0) && (bc != 0));
+	elem.display(PR(E('_upnp_clean_ruleset_threshold')), (enable != 0) && (bc != 0));
+
+	if ((enable != 0) && (bc != 0)) {
+		if (!v_range('_upnp_clean_ruleset_interval', quiet, 60, 65535)) return 0;
+		if (!v_range('_upnp_clean_ruleset_threshold', quiet, 0, 9999)) return 0;
+	}
+	else {
+		ferror.clear(E('_upnp_clean_ruleset_interval'));
+		ferror.clear(E('_upnp_clean_ruleset_threshold'));
+	}
+	
 	return 1;
 }
 
 function save()
 {
+/* REMOVE-BEGIN
+	!!TB - miniupnp
+REMOVE-END */
+	if (!verifyFields(null, 0)) return;
+
 	var fom = E('_fom');
 	var enable = E('_f_upnp_enable').checked;
 	fom.upnp_enable.value = enable ? 1 : 0;
+
+/* REMOVE-BEGIN
+	!!TB - miniupnp
 	fom.upnp_mnp.value = E('_f_upnp_mnp').checked ? 1 : 0;
-	form.submit(fom, (enable == (nvram.upnp_enable != '0')));
+REMOVE-END */
+	fom.upnp_nat_pmp_enable.value = E('_f_upnp_nat_pmp_enable').checked ? 1 : 0;
+	fom.upnp_clean_ruleset_enable.value = E('_f_upnp_clean_ruleset_enable').checked ? 1 : 0;
+	fom.upnp_secure_mode.value = E('_f_upnp_secure_mode').checked ? 1 : 0;
+
+	form.submit(fom, (enable == ((nvram.upnp_enable != '0') || (nvram.upnp_nat_pmp_enable != '0'))));
 }
 
 function init()
@@ -140,7 +179,14 @@ function init()
 <input type='hidden' name='_service' value='upnp-restart'>
 
 <input type='hidden' name='upnp_enable'>
+
+/* REMOVE-BEGIN
+	!!TB - miniupnp
 <input type='hidden' name='upnp_mnp'>
+REMOVE-END */
+<input type='hidden' name='upnp_nat_pmp_enable'>
+<input type='hidden' name='upnp_clean_ruleset_enable'>
+<input type='hidden' name='upnp_secure_mode'>
 
 <div class='section-title'>UPnP Forwarded Ports</div>
 <div class='section'>
@@ -153,7 +199,20 @@ function init()
 <script type='text/javascript'>
 createFieldTable('', [
 	{ title: 'Enable UPnP', name: 'f_upnp_enable', type: 'checkbox', value: (nvram.upnp_enable == '1') },
+
+/* REMOVE-BEGIN
+	!!TB - miniupnp
 	{ title: 'Show In My Network Places',  name: 'f_upnp_mnp',  type: 'checkbox',  value: (nvram.upnp_mnp == '1') }
+REMOVE-END */
+	{ title: 'Enable NAT-PMP', name: 'f_upnp_nat_pmp_enable', type: 'checkbox', value: (nvram.upnp_nat_pmp_enable == '1') },
+	{ title: 'Inactive Rules Cleaning', name: 'f_upnp_clean_ruleset_enable', type: 'checkbox', value: (nvram.upnp_clean_ruleset_enable == '1') },
+	{ title: 'Cleaning Interval', indent: 2, name: 'upnp_clean_ruleset_interval', type: 'text', maxlen: 5, size: 7,
+		suffix: ' <small>seconds</small>', value: nvram.upnp_clean_ruleset_interval },
+	{ title: 'Cleaning Threshold', indent: 2, name: 'upnp_clean_ruleset_threshold', type: 'text', maxlen: 4, size: 7,
+		suffix: ' <small>redirections</small>', value: nvram.upnp_clean_ruleset_threshold },
+	{ title: 'Secure Mode', name: 'f_upnp_secure_mode', type: 'checkbox',
+		suffix: ' <small>(when enabled, UPnP clients are allowed to add mappings only to their IP)</small>',
+		value: (nvram.upnp_secure_mode == '1') }
 ]);
 </script>
 </div>
@@ -169,6 +228,9 @@ createFieldTable('', [
 </td></tr>
 </table>
 </form>
-<script type='text/javascript'>ug.setup();</script>
+/* REMOVE-BEGIN
+	!!TB - added verifyFields
+REMOVE-END */
+<script type='text/javascript'>ug.setup();verifyFields(null, 1);</script>
 </body>
 </html>

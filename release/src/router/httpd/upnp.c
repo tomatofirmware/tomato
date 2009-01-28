@@ -7,11 +7,13 @@
 
 #include "tomato.h"
 
+//!!TB - changed for miniupnpd
+
 void asp_upnpinfo(int argc, char **argv)
 {
 	unlink("/var/spool/upnp.js");
-	if (nvram_match("upnp_enable", "1")) {
-		if (killall("upnp", SIGUSR2) == 0) {
+	if (nvram_match("upnp_enable", "1") || nvram_match("upnp_nat_pmp_enable", "1")) {
+		if (killall("miniupnpd", SIGUSR2) == 0) {
 			wait_file_exists("/var/spool/upnp.js", 5, 0);
 		}
 	}
@@ -28,13 +30,13 @@ void wo_upnp(char *url)
 	const char *proto;
 	const char *port;
 
-	if (nvram_match("upnp_enable", "1")) {
+	if (nvram_match("upnp_enable", "1") || nvram_match("upnp_nat_pmp_enable", "1")) {
 		if (((proto = webcgi_get("remove_ext_proto")) != NULL) && (*proto) &&
 			((port = webcgi_get("remove_ext_port")) != NULL) && (*port)) {
 
 			sprintf(s, "%s %s\n", proto, port);
 			f_write_string("/var/spool/upnp.delete", s, 0, 0);
-			if (killall("upnp", SIGUSR2) == 0) {
+			if (killall("miniupnpd", SIGUSR2) == 0) {
 				wait_file_exists("/var/spool/upnp.delete", 5, 1);
 			}
 		}
