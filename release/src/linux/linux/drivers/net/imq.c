@@ -67,7 +67,7 @@ static struct nf_hook_ops imq_egress_ipv6 = {
 };
 #endif
 
-static unsigned int numdevs = 2;
+static unsigned int numdevs = 16;
 
 MODULE_PARM(numdevs, "i");
 MODULE_PARM_DESC(numdevs, "number of imq devices");
