@@ -537,7 +537,7 @@ CONFIG_UMOUNT=y
 #
 # Common options for mount/umount
 #
-# CONFIG_FEATURE_MOUNT_LOOP is not set
+CONFIG_FEATURE_MOUNT_LOOP=y
 # CONFIG_FEATURE_MTAB_SUPPORT is not set
 
 #
@@ -563,7 +563,7 @@ CONFIG_CROND=y
 # CONFIG_DEVFSD_MODLOAD is not set
 # CONFIG_DEVFSD_FG_NP is not set
 # CONFIG_DEVFSD_VERBOSE is not set
-# CONFIG_FEATURE_DEVFS is not set
+CONFIG_FEATURE_DEVFS=y
 # CONFIG_EJECT is not set
 # CONFIG_FEATURE_EJECT_SCSI is not set
 # CONFIG_FBSPLASH is not set
