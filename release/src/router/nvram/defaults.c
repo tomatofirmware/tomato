@@ -32,6 +32,7 @@
 #include <string.h>
 #include <bcmnvram.h>
 
+#include <tomato_config.h>	//!!TB
 #include "tomato_profile.h"
 #include "defaults.h"
 
@@ -496,7 +497,7 @@ const defaults_t defaults[] = {
 	{ "smbd_enable",		"0"				},
 	{ "smbd_wgroup",		"WORKGROUP"			},
 	{ "smbd_cpage",			""				},
-	{ "smbd_cset",			""				},
+	{ "smbd_cset",			"utf8"				},
 	{ "smbd_loglevel",		"0"				},
 	{ "smbd_custom",		""				},
 	{ "smbd_autoshare",		"1"				},
