@@ -553,7 +553,7 @@ static const nvset_t nvset_list[] = {
 	{ "upnp_secure_mode",		V_01				},
 	{ "upnp_clean_ruleset_interval",V_RANGE(60, 65535)		},
 	{ "upnp_clean_ruleset_threshold",V_RANGE(0, 9999)		},
-	{ "upnp_port",			V_PORT				},
+	{ "upnp_port",			V_RANGE(0, 65535)		},
 	{ "upnp_bitrate_up",		V_RANGE(10, 100000000)		},
 	{ "upnp_bitrate_down",		V_RANGE(10, 100000000)		},
 	{ "upnp_min_port_int",		V_PORT				},
