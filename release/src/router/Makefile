@@ -56,6 +56,10 @@ obj-y += mdu
 
 # !!TB
 obj-y += p910nd
+#obj-y += sendmail
+obj-$(TCONFIG_FTP) += vsftpd
+obj-$(TCONFIG_SAMBASRV) += samba
+
 
 ifeq ($(TEST_MINIUPNPD),1)
 obj-y += miniupnpd
@@ -123,7 +127,10 @@ install package: $(obj-install) $(LINUXDIR)/.config
 
 # kernel modules
 	$(MAKE) -C $(LINUXDIR) modules_install DEPMOD=/bin/true INSTALL_MOD_PATH=$(TARGETDIR)
-	find $(TARGETDIR)/lib/modules -name *.o -exec mipsel-linux-strip --strip-unneeded {} \;
+##!!TB	find $(TARGETDIR)/lib/modules -name *.o -exec mipsel-linux-strip --strip-unneeded {} \;
+##!!TB - do not strip ftp nat/conntrack kernel modules (needed for vsftpd)
+	find $(TARGETDIR)/lib/modules ! \( -name *ftp.o -prune \) -a -name *.o -exec mipsel-linux-strip --strip-unneeded {} \;
+
 	-cd $(TARGETDIR)/lib/modules/2.4.20/kernel/drivers/net && mv diag/* . && rm -rf diag
 
 # nice and clean
@@ -387,6 +394,18 @@ nvram: shared
 
 # !!TB
 p910nd: shared
+sendmail: shared
+samba: shared
+miniupnpd: iptables
+
+# !!TB
+vsftpd: shared
+	@$(SEP)
+	$(MAKE) -C vsftpd
+
+vsftpd-install:
+	install -D vsftpd/vsftpd $(INSTALLDIR)/vsftpd/usr/sbin/vsftpd
+	$(STRIP) $(INSTALLDIR)/vsftpd/usr/sbin/vsftpd
 
 vlan:
 	@$(SEP)
