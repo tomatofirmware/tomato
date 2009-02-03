@@ -99,24 +99,24 @@ early_nvram_init(void)
 		/* Windowed flash access */
 		header = (struct nvram_header *) KSEG1ADDR(base + off - NVRAM_SPACE);
 		if (header->magic == NVRAM_MAGIC)
-			if (nvram_calc_crc(header) == (uint8) header->crc_ver_init) {
+//zzz			if (nvram_calc_crc(header) == (uint8) header->crc_ver_init) {
 				goto found;
-			}
+//zzz			}
 		off <<= 1;
 	}
 
 	/* Try embedded NVRAM at 4 KB and 1 KB as last resorts */
 	header = (struct nvram_header *) KSEG1ADDR(base + 4 KB);
 	if (header->magic == NVRAM_MAGIC)
-		if (nvram_calc_crc(header) == (uint8) header->crc_ver_init) {
+//zzz		if (nvram_calc_crc(header) == (uint8) header->crc_ver_init) {
 			goto found;
-		}
+//zzz		}
 
 	header = (struct nvram_header *) KSEG1ADDR(base + 1 KB);
 	if (header->magic == NVRAM_MAGIC)
-		if (nvram_calc_crc(header) == (uint8) header->crc_ver_init) {
+//zzz		if (nvram_calc_crc(header) == (uint8) header->crc_ver_init) {
 			goto found;
-		}
+//zzz		}
 
 	printk("early_nvram_init: NVRAM not found\n");
 	return;

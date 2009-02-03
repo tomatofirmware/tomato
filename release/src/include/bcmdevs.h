@@ -13,6 +13,7 @@
 
 #ifndef	_BCMDEVS_H
 #define	_BCMDEVS_H
+#include "bcm4710.h"
 
 /* PCI vendor IDs */
 #define	VENDOR_EPIGRAM		0xfeda

@@ -17,7 +17,7 @@ O_TARGET	:= bcm947xx.o
 export-objs	:= nvram_linux.o setup.o
 obj-y		:= prom.o setup.o time.o irq.o
 #obj-y		+= hndmips.o hndchipc.o perfcntr.o linux_gpio.o
-obj-y		+= hndmips.o hndchipc.o perfcntr.o linux_gpio.o # hndpmu.o # gpio.o 
+obj-y		+= hndmips.o hndchipc.o perfcntr.o gpio.o
 obj-y		+= sflash.o nvram.o nvram_linux.o
 obj-$(CONFIG_PCI) += hndpci.o pcibios.o
 

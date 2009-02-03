@@ -21,53 +21,21 @@
 
 static int gf;
 
-//!!TB - new gpio routines
-
-extern int tgpio_fd_init();
-extern void tgpio_fd_cleanup(int fd);
-extern void gpio_connect(int fd, int gpio_pin);
-extern void gpio_disconnect(int fd, int gpio_pin);
-extern uint32_t gpio_read_in(int fd);
-
-static void gpio_connect_mask(uint32_t *mask)
-{
-	int gpio_pin = 0;
-	uint32_t gpio_mask = 1;
-
-	gf = tgpio_fd_init();
-
-	if (gf >= 0) {
-		for (; gpio_mask; gpio_mask <<= 1, gpio_pin++) {
-			if (*mask & gpio_mask) gpio_connect(gf, gpio_pin);
-		}
-	}
-}
-
-static void gpio_disconnect_mask(uint32_t mask)
-{
-	int gpio_pin = 0;
-	uint32_t gpio_mask = 1;
-
-	if (gf >= 0) {
-		for (; gpio_mask; gpio_mask <<= 1, gpio_pin++) {
-			if (mask & gpio_mask) gpio_disconnect(gf, gpio_pin);
-		}
-		tgpio_fd_cleanup(gf);
-	}
-	gf = -1;
-}
-
 static uint32_t _gpio_read(void)
 {
-	return gpio_read_in(gf);
+#if TOMATO_N
+	// !
+#else
+	uint32_t v;
+	return (read(gf, &v, sizeof(v)) == sizeof(v)) ? v : ~0;
+#endif
 }
-//---------------------------------------------------------------------------------
 
 static int get_btn(const char *name, uint32_t *bit, uint32_t *pushed)
 {
 	int gpio;
 	int inv;
-
+	
 	if (nvget_gpio(name, &gpio, &inv)) {
 		*bit = 1 << gpio;
 		*pushed = inv ? 0 : *bit;
@@ -107,7 +75,7 @@ int buttons_main(int argc, char *argv[])
 		ses_mask = 1 << 4;
 		ses_led = LED_DMZ;
 		break;
-/*
+/*		
 	case MODEL_WRH54G:
 		reset_mask = 1 << 6;
 		break;
@@ -151,7 +119,7 @@ int buttons_main(int argc, char *argv[])
 	case MODEL_WL520GU:
 		reset_mask = 1 << 2;
 		ses_mask = 1 << 3;
-		break;
+		break;		
 //	case MODEL_MN700:
 //?		reset_mask = reset_pushed = 1 << 7;
 //		break;
@@ -166,7 +134,7 @@ int buttons_main(int argc, char *argv[])
 	mask = reset_mask | ses_mask | brau_mask;
 
 #ifdef DEBUG_TEST
-	cprintf("reset_mask=0x%X reset_pushed=0x%X\n", reset_mask, reset_pushed);
+	cprintf("reset_mask=0x%X reset_pushed=%0x%X\n", reset_mask, reset_pushed);
 	cprintf("ses_mask=0x%X\n", ses_mask);
 	cprintf("brau_mask=0x%X\n", brau_mask);
 	cprintf("ses_led=%d\n", ses_led);
@@ -176,14 +144,12 @@ int buttons_main(int argc, char *argv[])
 #endif
 
 	signal(SIGCHLD, handle_reap);
-/* !!TB
+
 #if TOMATO_N
 	// !
 #else
 	if ((gf = open("/dev/gpio/in", O_RDONLY|O_SYNC)) < 0) return 1;
 #endif
-*/
-	gpio_connect_mask(&mask); //!!TB
 
 	last = 0;
 	while (1) {
@@ -297,6 +263,5 @@ int buttons_main(int argc, char *argv[])
 		last = gpio;
 	}
 
-	gpio_disconnect_mask(mask); //!!TB
 	return 0;
 }
