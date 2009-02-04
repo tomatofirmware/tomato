@@ -399,6 +399,7 @@ void start_upnp(void)
 #else //0
 	char uuid[45];
 	char fname[] = "/etc/miniupnpd.conf";
+	char *lanip;
 	int interval, r;
 	FILE *fp = NULL;
 
@@ -409,8 +410,10 @@ void start_upnp(void)
 	if(NULL == fp)
 		return;
 
+	lanip = nvram_safe_get("lan_ipaddr");
+
 	fprintf(fp, "ext_ifname=%s\n", nvram_safe_get("wan_iface"));
-	fprintf(fp, "listening_ip=%s\n", nvram_safe_get("lan_ipaddr"));
+	fprintf(fp, "listening_ip=%s\n", lanip);
 	fprintf(fp, "port=%s\n", nvram_safe_get("upnp_port"));
 	fprintf(fp, "upnp_forward_chain=upnp\n");
 	fprintf(fp, "upnp_nat_chain=upnp\n");
@@ -434,6 +437,11 @@ void start_upnp(void)
 	else 
 		fprintf(fp,"clean_ruleset_interval=0\n");
 
+	int https = nvram_match("https_enable", "1");
+	fprintf(fp, "presentation_url=http%s://%s:%s/forward-upnp.asp\n",
+		https ? "s" : "", lanip,
+		nvram_safe_get(https ? "https_lanport" : "http_lanport"));
+
 	f_read_string("/proc/sys/kernel/random/uuid", uuid, sizeof(uuid));
 	fprintf(fp, "uuid=%s\n", uuid);
 
@@ -444,13 +452,13 @@ void start_upnp(void)
 
 		fprintf(fp, "allow %s", nvram_safe_get("upnp_min_port_int"));
 		fprintf(fp, "-%s", nvram_safe_get("upnp_max_port_int"));
-		fprintf(fp, " %s/24", nvram_safe_get("lan_ipaddr"));
+		fprintf(fp, " %s/24", lanip);
 		fprintf(fp, " %s", nvram_safe_get("upnp_min_port_ext"));
 		fprintf(fp, "-%s\n", nvram_safe_get("upnp_max_port_ext"));
 	}
 	else {
 		// by default allow only redirection of ports above 1024
-		fprintf(fp, "allow 1024-65535 %s/24 1024-65535\n", nvram_safe_get("lan_ipaddr"));
+		fprintf(fp, "allow 1024-65535 %s/24 1024-65535\n", lanip);
 	}
 	fprintf(fp, "deny 0-65535 0.0.0.0/0 0-65535\n");
 
