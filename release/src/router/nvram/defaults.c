@@ -489,7 +489,7 @@ const defaults_t defaults[] = {
 	{ "ftp_pvtroot",		""				},
 	{ "ftp_users",			""				},
 	{ "ftp_custom",			""				},
-	{ "log_ftp",			"1"				},
+	{ "log_ftp",			"0"				},
 #endif
 
 #ifdef TCONFIG_SAMBASRV
