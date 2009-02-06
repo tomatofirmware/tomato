@@ -153,7 +153,7 @@ REMOVE-END */
 	!!TB - miniupnp
 	form.submit(fom, (enable == (nvram.upnp_enable != '0')));
 REMOVE-END */
-	form.submit(fom, (enable == (enable || E('_f_upnp_nat_pmp_enable').checked)));
+	form.submit(fom, (!enable && !E('_f_upnp_nat_pmp_enable').checked));
 }
 
 function init()
