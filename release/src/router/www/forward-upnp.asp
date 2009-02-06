@@ -149,7 +149,11 @@ REMOVE-END */
 	fom.upnp_clean_ruleset_enable.value = E('_f_upnp_clean_ruleset_enable').checked ? 1 : 0;
 	fom.upnp_secure_mode.value = E('_f_upnp_secure_mode').checked ? 1 : 0;
 
-	form.submit(fom, (enable == ((nvram.upnp_enable != '0') || (nvram.upnp_nat_pmp_enable != '0'))));
+/* REMOVE-BEGIN
+	!!TB - miniupnp
+	form.submit(fom, (enable == (nvram.upnp_enable != '0')));
+REMOVE-END */
+	form.submit(fom, (enable == (enable || E('_f_upnp_nat_pmp_enable').checked)));
 }
 
 function init()
@@ -158,6 +162,14 @@ function init()
 	if (ug.getDataCount() == 0) {
 		E('upnp-delete-all').disabled = true;
 	}
+}
+
+/* REMOVE-BEGIN
+	!!TB - miniupnp
+REMOVE-END */
+function submit_complete()
+{
+	reloadPage();
 }
 </script>
 
