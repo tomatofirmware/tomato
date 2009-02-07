@@ -47,6 +47,7 @@ endif
 ifeq ($(WLVX),1)
 	WLFILES += wl_vx.c
 	WLFILES += bcmstdlib.c
+	WLFLAGS += -DWSEC_TXC_ENABLED
 endif
 
 ifeq ($(WLBSD),1)
@@ -76,11 +77,6 @@ ifeq ($(WLRTE),1)
 	WLFILES += wl_rte.c
 endif
 
-#ifdef __IOPOS__
-ifeq ($(WLIOPOS), 1)
-WLFILES += wl_iopos.c nvramstubs.c iopos_osl.c
-endif
-#endif /* def __IOPOS__ */
 
 ## wl special
 # oids
@@ -99,7 +95,7 @@ ifeq ($(AP),1)
 	WLFILES += wlc_apcs.c
 	WLFLAGS += -DAP
 	WLFLAGS += -DMBSS
-	WLFLAGS += -DWME_PER_AC_TX_PARAMS
+	WLFLAGS += -DWME_PER_AC_TX_PARAMS -DWME_PER_AC_TUNING
 endif
 
 # sta
@@ -122,6 +118,13 @@ endif
 # mac spoof
 ifeq ($(MAC_SPOOF),1)
 	WLFLAGS += -DMAC_SPOOF
+endif
+
+# IBSS Security Support
+ifeq ($(IBSS_WPA2_SUPPORT),1)
+	WLFLAGS += -DIBSS_PEER_GROUP_KEY
+	WLFLAGS += -DIBSS_WPA2_PSK
+	WLFLAGS += -DIBSS_PEER_DISCOVERY_EVENT
 endif
 
 # led
@@ -181,6 +184,11 @@ endif
 # WLCNT
 ifeq ($(WLCNT),1)
 	WLFLAGS += -DWLCNT
+endif
+
+# WLCNTSCB
+ifeq ($(WLCNTSCB),1)
+	WLFLAGS += -DWLCNTSCB
 endif
 
 ## wl security
@@ -274,6 +282,12 @@ endif
 
 
 # sdio
+
+
+# AP with SDSTD
+ifeq ($(WLAPSDSTD),1)
+	WLFILES += sbutils.c nvramstubs.c bcmsrom.c
+endif
 
 ## --- basic shared files
 
@@ -374,6 +388,7 @@ endif
 ifeq ($(DSLCPE),1)
 	WLFILES += wl_linux_dslcpe.c
 	WLFLAGS += -DDSLCPE
+	WLFLAGS += -DDSLCPE_DELAY
 endif
 
 ifeq ($(WLDIAG),1)

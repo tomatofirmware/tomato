@@ -148,8 +148,11 @@ sub fixDyn
 #	fixDynDep("libbcm.so", "libc.so.0");
 
 #!!TB - Updated Broadcom WL driver
+	fixDynDep("libbcmcrypto.so", "libc.so.0");
 	fixDynDep("nas", "libbcmcrypto.so");
 	fixDynDep("wl", "libbcmcrypto.so");
+	fixDynDep("nas", "libc.so.0");
+	fixDynDep("wl", "libc.so.0");
 }
 
 sub usersOf

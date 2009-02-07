@@ -10,7 +10,7 @@ CFLAGS	+= -s -O2
 LDFLAGS	+= -L$(TOP)/nvram -L$(INSTALLDIR)/nvram/usr/lib -lnvram -L$(TOP)/shared -L$(INSTALLDIR)/shared/usr/lib -lshared
 
 OBJS := et.o
-vpath %.c $(SRCBASE)/et/linux
+#vpath %.c $(SRCBASE)/et/linux
 
 all: et
 
