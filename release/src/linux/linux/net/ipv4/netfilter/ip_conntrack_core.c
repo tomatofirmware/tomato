@@ -72,8 +72,8 @@ static LIST_HEAD(unconfirmed);
 #define DAYS  * 24 HOURS
 
 int sysctl_ip_conntrack_tcp_timeouts[10] = {
-       30 MINS,        /*      TCP_CONNTRACK_NONE,             */
-       4 HOURS,        /*      TCP_CONNTRACK_ESTABLISHED,      */		// was 5 days	zzz
+       3 MINS,         /*      TCP_CONNTRACK_NONE,             */
+       20 MINS,        /*      TCP_CONNTRACK_ESTABLISHED,      */		// was 5 days	zzz
        2 MINS,         /*      TCP_CONNTRACK_SYN_SENT,         */
        60 SECS,        /*      TCP_CONNTRACK_SYN_RECV,         */
        2 MINS,         /*      TCP_CONNTRACK_FIN_WAIT,         */
