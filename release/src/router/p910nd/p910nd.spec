@@ -1,6 +1,6 @@
 Summary: p910nd is a small daemon that copies any data received to the corresponding printer port.
 Name: p910nd
-Version: 0.92
+Version: 0.93
 Release: 1
 URL: http://etherboot.sourceforge.net/p910nd
 Vendor: Ken Yap
@@ -52,3 +52,5 @@ rm -fr %{buildroot}
 %changelog
 * Fri Jan 04 2008 Ken Yap <greenpossum@users.sourceforge.net>
 - 0.92: First spec file
+* Mon Feb 09 2009 Ken Yap <greenpossum@users.sourceforge.net>
+- 0.93: Fix up open with mode for call with O_CREAT

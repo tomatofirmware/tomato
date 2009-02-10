@@ -16,6 +16,9 @@
  *	Port 9100+n will then be passively opened
  *	n defaults to 0
  *
+ *	Version 0.93
+ *	Fix open call to include mode, required for O_CREAT
+ *
  *	Version 0.92
  *	Patches by Dave Brown.  Use raw I/O syscalls instead of
  *	stdio buffering.  Buffer system to handle talkative bidi
@@ -131,7 +134,7 @@ typedef struct {
 } Buffer_t;
 
 static char *progname;
-static char version[] = "Version 0.92";
+static char version[] = "Version 0.93";
 static char copyright[] = "Copyright (c) 2008 Ken Yap, GPLv2";
 static int lockfd = -1;
 static char *device = 0;
@@ -176,7 +179,7 @@ int get_lock(int lpnumber)
 	struct flock lplock;
 
 	(void)snprintf(lockname, sizeof(lockname), LOCKFILE, lpnumber);
-	if ((lockfd = open(lockname, O_CREAT | O_RDWR)) < 0) {
+	if ((lockfd = open(lockname, O_CREAT | O_RDWR, 0666)) < 0) {
 		syslog(LOGOPTS, "%s: %m\n", lockname);
 		return (0);
 	}
