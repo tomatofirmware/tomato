@@ -13,6 +13,16 @@ CFLAGS	=	-O2 -Wall -W -Wshadow #-pedantic -Werror -Wconversion
 LIBS	=	-lcrypt -lnsl
 LINK	=	
 
+CFLAGS	+=	-I../shared
+ifeq ($(TCONFIG_FTP_SSL),y)
+LIBS	=	-lnsl
+OPENSSLDIR = ../openssl
+OPENSSLINC = $(OPENSSLDIR)/include
+LIBS	+=	-L$(OPENSSLDIR)/ -lssl -lcrypto
+CFLAGS	+=	-I$(OPENSSLINC)
+endif
+
+
 OBJS	=	main.o utility.o prelogin.o ftpcmdio.o postlogin.o privsock.o \
 		tunables.o ftpdataio.o secbuf.o ls.o \
 		postprivparent.o logging.o str.o netstr.o sysstr.o strlist.o \

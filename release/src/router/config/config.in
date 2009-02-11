@@ -55,6 +55,11 @@ config TCONFIG_FTP
 	bool "FTP Server"
 	default y
 
+config TCONFIG_FTP_SSL
+	bool "FTP SSL Support"
+	depends on TCONFIG_L7
+	default n
+
 config TCONFIG_SAMBASRV
 	bool "Samba File Sharing"
 	default y
