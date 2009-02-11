@@ -9,7 +9,7 @@
 #define USE_NETFILTER 1
 #define OS_NAME		"Tomato"
 #define OS_VERSION	"Linux Mips 2.4.20"
-#define OS_URL		"http:/polarcloud.com/tomato"
+#define OS_URL		"http://www.polarcloud.com/tomato"
 
 /* syslog facility to be used by miniupnpd */
 #define LOG_MINIUPNPD		 LOG_DAEMON
