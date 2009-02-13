@@ -200,7 +200,7 @@ int buttons_main(int argc, char *argv[])
 				led(ses_led, LED_OFF);
 				usleep(500000);
 				++count;
-			} while (((gpio = _gpio_read()) != ~0) && ((gpio & ses_mask) == 0));
+			} while (((gpio = _gpio_read()) != ~0) && ((gpio & ses_mask) == ses_pushed /*!!TB - was 0*/));
 			gpio &= mask;
 
 			if ((ses_led == LED_DMZ) && (nvram_match("dmz_enable", "1"))) led(LED_DMZ, 1);
