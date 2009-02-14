@@ -1,4 +1,4 @@
-/* $Id: minissdp.c,v 1.14 2008/10/06 23:08:39 nanard Exp $ */
+/* $Id: minissdp.c,v 1.15 2008/11/24 09:48:00 nanard Exp $ */
 /* MiniUPnP project
  * http://miniupnp.free.fr/ or http://miniupnp.tuxfamily.org/
  * (c) 2006 Thomas Bernard
@@ -338,8 +338,11 @@ ProcessSSDPRequest(int s, unsigned short port)
 			{
 				st = bufr+i+3;
 				st_len = 0;
-				while(*st == ' ' || *st == '\t') st++;
-				while(st[st_len]!='\r' && st[st_len]!='\n') st_len++;
+				while((*st == ' ' || *st == '\t') && (st < bufr + n))
+					st++;
+				while(st[st_len]!='\r' && st[st_len]!='\n'
+				     && (st + st_len < bufr + n))
+					st_len++;
 				/*syslog(LOG_INFO, "ST: %.*s", st_len, st);*/
 				/*j = 0;*/
 				/*while(bufr[i+j]!='\r') j++;*/

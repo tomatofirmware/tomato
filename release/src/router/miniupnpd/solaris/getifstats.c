@@ -25,6 +25,9 @@ getifstats(const char * ifname, struct ifdata * data)
 	uint32_t cnt32;
 	void *ptr;
 
+	if (data == NULL)
+		goto error;
+
 	if (ifname == NULL || *ifname == '\0')
 		goto error;
 

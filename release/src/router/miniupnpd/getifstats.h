@@ -1,6 +1,6 @@
 /* MiniUPnP project
  * http://miniupnp.free.fr/ or http://miniupnp.tuxfamily.org/
- * (c) 2006 Thomas Bernard 
+ * (c) 2006-2008 Thomas Bernard 
  * This software is subject to the conditions detailed
  * in the LICENCE file provided within the distribution */
 
@@ -15,6 +15,9 @@ struct ifdata {
 	unsigned long baudrate;
 };
 
+/* getifstats()
+ * Fill the ifdata structure with statistics for network interface ifname.
+ * Return 0 in case of success, -1 for bad arguments or any error */
 int
 getifstats(const char * ifname, struct ifdata * data);
 

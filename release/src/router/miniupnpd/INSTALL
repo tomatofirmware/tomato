@@ -1,5 +1,5 @@
 MiniUPnP project.
-(c) 2006-2008 Thomas Bernard
+(c) 2006-2009 Thomas Bernard
 Homepage : http://miniupnp.free.fr/
 Mirror: http://miniupnp.tuxfamily.org/
 
@@ -50,7 +50,7 @@ To Build and install :
 - make sure you have libiptc available on your system :
   if you are using debian, "apt-get install iptables-dev"
   In anycase, libiptc is available in iptables sources packages
-  from netfilter.org
+  from http://netfilter.org
 - edit and run netfilter/iptables_init.sh shell script.
   This script must allways be run before the daemon
   to set up intial rules and chains.
@@ -59,6 +59,8 @@ To Build and install :
   > vi config.h
 - Build the daemon
   > make -f Makefile.linux
+  If not using uptables from your system, 
+  > IPTABLESPATH=/path/to/iptables-1.4.1 make -f Makefile.linux
 - install as root using :
   > make -f Makefile.linux install
 - A miniupnpd script should be installed to /etc/init.d
@@ -101,6 +103,9 @@ a "uuid" tool :
 http://www.openbsd.org/4.0_packages/i386/uuid-1.5.0.tgz-long.html
 An web based uuid generator is also available :
 http://kruithof.xs4all.nl/uuid/uuidgen
+
+On linux systems, one could also use the command
+'cat /proc/sys/kernel/random/uuid' to generate an uuid.
 
 To stop the daemon use :
   # kill `cat /var/run/miniupnpd.pid`

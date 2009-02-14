@@ -1,15 +1,16 @@
-# $Id: Makefile,v 1.47 2008/10/09 11:33:43 nanard Exp $
+# $Id: Makefile,v 1.49 2009/01/29 18:21:05 nanard Exp $
 # MiniUPnP project
 # http://miniupnp.free.fr/
 # Author: Thomas Bernard
 # This Makefile should work for *BSD and SunOS/Solaris
 # Linux users, please use Makefile.linux
-#CFLAGS = -Wall -Os
-CFLAGS = -Wall -O -g -DDEBUG
-CC = gcc
+CFLAGS ?= -Wall -Os
+#CFLAGS = -Wall -O -g -DDEBUG
+CC ?= gcc
 RM = rm -f
 MV = mv
 INSTALL = install
+STRIP = strip
 
 # OSNAME and FWNAME are used for building OS or FW dependent code.
 OSNAME != uname -s
@@ -85,6 +86,8 @@ LIBS += -lsocket -lnsl -lkstat -lresolv
 
 INSTALLBINDIR = $(PREFIX)/sbin
 INSTALLETCDIR = $(PREFIX)/etc
+# INSTALLMANDIR = $(PREFIX)/man
+INSTALLMANDIR = /usr/share/man
 
 all:	$(EXECUTABLES)
 
@@ -96,9 +99,10 @@ clean:
 	$(PFOBJS) $(IPFOBJS)
 
 install:	miniupnpd genuuid
-	strip miniupnpd
+	$(STRIP) miniupnpd
 	$(INSTALL) -m 555 miniupnpd $(INSTALLBINDIR)
-	$(INSTALL) miniupnpd.conf $(INSTALLETCDIR)
+	$(INSTALL) -b miniupnpd.conf $(INSTALLETCDIR)
+	$(INSTALL) miniupnpd.1 $(INSTALLMANDIR)
 
 # genuuid is using the uuid cli tool available under OpenBSD 4.0 in
 # the uuid-1.5.0 package

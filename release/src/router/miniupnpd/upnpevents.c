@@ -1,4 +1,4 @@
-/* $Id: upnpevents.c,v 1.9 2008/07/10 09:18:35 nanard Exp $ */
+/* $Id: upnpevents.c,v 1.10 2009/01/23 10:05:24 nanard Exp $ */
 /* MiniUPnP project
  * http://miniupnp.free.fr/ or http://miniupnp.tuxfamily.org/
  * (c) 2008 Thomas Bernard
@@ -132,7 +132,7 @@ renewSubscription(const char * sid, int sidlen, int timeout)
 {
 	struct subscriber * sub;
 	for(sub = subscriberlist.lh_first; sub != NULL; sub = sub->entries.le_next) {
-		if(memcmp(sid, sub->uuid, 41)) {
+		if(memcmp(sid, sub->uuid, 41) == 0) {
 			sub->timeout = (timeout ? time(NULL) + timeout : 0);
 			return 0;
 		}

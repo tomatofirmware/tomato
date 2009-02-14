@@ -1,4 +1,4 @@
-/* $Id: natpmp.c,v 1.12 2008/01/27 22:33:50 nanard Exp $ */
+/* $Id: natpmp.c,v 1.13 2008/10/17 16:44:37 nanard Exp $ */
 /* MiniUPnP project
  * (c) 2007 Thomas Bernard
  * http://miniupnp.free.fr/ or http://miniupnp.tuxfamily.org/
@@ -101,10 +101,16 @@ void ProcessIncomingNATPMPPacket(int s)
 		if(use_ext_ip_addr) {
                inet_pton(AF_INET, use_ext_ip_addr, resp+8);
 		} else {
-			if(getifaddr(ext_if_name, tmp, INET_ADDRSTRLEN) < 0) {
+			if(!ext_if_name || ext_if_name[0]=='\0') {
+				resp[3] = 3;	/* Network Failure (e.g. NAT box itself
+				                 * has not obtained a DHCP lease) */
+			} else if(getifaddr(ext_if_name, tmp, INET_ADDRSTRLEN) < 0) {
 				syslog(LOG_ERR, "Failed to get IP for interface %s", ext_if_name);
+				resp[3] = 3;	/* Network Failure (e.g. NAT box itself
+				                 * has not obtained a DHCP lease) */
+			} else {
+				inet_pton(AF_INET, tmp, resp+8);
 			}
-			inet_pton(AF_INET, tmp, resp+8);
 		}
 #else
 		for(i = 0; i<n_lan_addr; i++) {

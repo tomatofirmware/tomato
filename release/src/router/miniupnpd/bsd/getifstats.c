@@ -51,11 +51,15 @@ getifstats(const char * ifname, struct ifdata * data)
 	static struct ifdata cache_data;
 	time_t current_time;
 #endif
+	if(!data)
+		return -1;
 	data->baudrate = 4200000;
 	data->opackets = 0;
 	data->ipackets = 0;
 	data->obytes = 0;
 	data->ibytes = 0;
+	if(!ifname || ifname[0]=='\0')
+		return -1;
 #ifdef ENABLE_GETIFSTATS_CACHING
 	current_time = time(NULL);
 	if(current_time == ((time_t)-1)) {

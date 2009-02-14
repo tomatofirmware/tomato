@@ -1,8 +1,9 @@
-# $Id: Makefile.linux,v 1.41 2008/10/09 11:28:44 nanard Exp $
+# $Id: Makefile.linux,v 1.43 2009/01/29 19:57:21 nanard Exp $
 # MiniUPnP project
 # http://miniupnp.free.fr/ or http://miniupnp.tuxfamily.org/
 # Author : Thomas Bernard
 # for use with GNU Make
+#
 # To install use :
 # $ PREFIX=/dummyinstalldir make -f Makefile.linux install
 # or :
@@ -10,11 +11,17 @@
 # or :
 # $ make -f Makefile.linux install
 #
+# if your system hasn't iptables libiptc headers and binary correctly
+# installed, you need to get iptables sources from http://netfilter.org/
+# ./configure them and build them then miniupnpd will build using :
+# $ IPTABLESPATH=/path/to/iptables-1.4.1 make -f Makefile.linux
+#
 #CFLAGS = -Wall -O -D_GNU_SOURCE -g -DDEBUG
 CFLAGS = -Wall -Os -D_GNU_SOURCE
 CC = gcc
 RM = rm -f
 INSTALL = install
+STRIP = strip
 
 INSTALLPREFIX ?= $(PREFIX)/usr
 SBININSTALLDIR = $(INSTALLPREFIX)/sbin
@@ -33,6 +40,12 @@ ALLOBJS = $(BASEOBJS) $(LNXOBJS) $(NETFILTEROBJS)
 
 LIBS = -liptc
 
+ifdef IPTABLESPATH
+CFLAGS := $(CFLAGS) -I$(IPTABLESPATH)/include/
+LDFLAGS := $(LDFLAFGS) -L$(IPTABLESPATH)/libiptc/
+LIBS = $(IPTABLESPATH)/libiptc/libiptc.a
+endif
+
 TESTUPNPDESCGENOBJS = testupnpdescgen.o upnpdescgen.o
 
 EXECUTABLES = miniupnpd testupnpdescgen testgetifstats \
@@ -50,12 +63,13 @@ clean:
 	$(RM) miniupnpdctl.o
 
 install:	miniupnpd genuuid
+	$(STRIP) miniupnpd
 	$(INSTALL) -d $(SBININSTALLDIR)
 	$(INSTALL) miniupnpd $(SBININSTALLDIR)
 	$(INSTALL) -d $(ETCINSTALLDIR)
 	$(INSTALL) netfilter/iptables_init.sh $(ETCINSTALLDIR)
 	$(INSTALL) netfilter/iptables_removeall.sh $(ETCINSTALLDIR)
-	$(INSTALL) --mode=0644 miniupnpd.conf $(ETCINSTALLDIR)
+	$(INSTALL) --mode=0644 -b miniupnpd.conf $(ETCINSTALLDIR)
 	$(INSTALL) -d $(PREFIX)/etc/init.d
 	$(INSTALL) linux/miniupnpd.init.d.script $(PREFIX)/etc/init.d/miniupnpd
 

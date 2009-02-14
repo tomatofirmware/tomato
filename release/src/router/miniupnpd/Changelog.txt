@@ -1,4 +1,18 @@
-$Id: Changelog.txt,v 1.160 2008/10/09 12:12:19 nanard Exp $
+$Id: Changelog.txt,v 1.164 2009/01/29 19:22:51 nanard Exp $
+
+2009/01/29:
+  Some minor changes to Makefile
+  improving Makefile.linux in order to build with iptables not properly 
+  installed on the system.
+
+2009/01/23:
+  Fixing upnpevents thanks to Justin Maggard
+
+2008/10/15:
+  getifstats() return -1 when supplied with bad arguments
+
+2008/10/11:
+  Fixed NAT-PMP response when IP not allocated to external interface
 
 2008/10/09:
   adding testgetifaddr

@@ -1,7 +1,7 @@
-/* $Id: getifaddr.c,v 1.8 2007/10/06 10:46:25 nanard Exp $ */
+/* $Id: getifaddr.c,v 1.9 2008/10/15 10:16:28 nanard Exp $ */
 /* MiniUPnP project
  * http://miniupnp.free.fr/ or http://miniupnp.tuxfamily.org/
- * (c) 2006 Thomas Bernard 
+ * (c) 2006-2008 Thomas Bernard 
  * This software is subject to the conditions detailed
  * in the LICENCE file provided within the distribution */
 
@@ -29,6 +29,8 @@ getifaddr(const char * ifname, char * buf, int len)
 	int ifrlen;
 	struct sockaddr_in * addr;
 	ifrlen = sizeof(ifr);
+	if(!ifname || ifname[0]=='\0')
+		return -1;
 	s = socket(PF_INET, SOCK_DGRAM, 0);
 	if(s < 0)
 	{
