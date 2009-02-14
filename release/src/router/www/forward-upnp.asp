@@ -38,9 +38,9 @@
 <script type='text/javascript'>
 
 /* REMOVE-BEGIN
-	!!TB - added miniupnpd settings, removed upnp_mnp
+	!!TB - added miniupnpd settings
 REMOVE-END */
-//	<% nvram("upnp_enable,upnp_nat_pmp_enable,upnp_clean_ruleset_enable,upnp_secure_mode,upnp_clean_ruleset_interval,upnp_clean_ruleset_threshold"); %>
+//	<% nvram("upnp_enable,upnp_mnp,upnp_nat_pmp_enable,upnp_clean_ruleset_enable,upnp_secure_mode,upnp_clean_ruleset_interval,upnp_clean_ruleset_threshold"); %>
 // <% upnpinfo(); %>
 
 function submitDelete(proto, port)
@@ -141,9 +141,9 @@ REMOVE-END */
 	var enable = E('_f_upnp_enable').checked;
 	fom.upnp_enable.value = enable ? 1 : 0;
 
+	fom.upnp_mnp.value = E('_f_upnp_mnp').checked ? 1 : 0;
 /* REMOVE-BEGIN
 	!!TB - miniupnp
-	fom.upnp_mnp.value = E('_f_upnp_mnp').checked ? 1 : 0;
 REMOVE-END */
 	fom.upnp_nat_pmp_enable.value = E('_f_upnp_nat_pmp_enable').checked ? 1 : 0;
 	fom.upnp_clean_ruleset_enable.value = E('_f_upnp_clean_ruleset_enable').checked ? 1 : 0;
@@ -192,9 +192,9 @@ function submit_complete()
 
 <input type='hidden' name='upnp_enable'>
 
+<input type='hidden' name='upnp_mnp'>
 /* REMOVE-BEGIN
 	!!TB - miniupnp
-<input type='hidden' name='upnp_mnp'>
 REMOVE-END */
 <input type='hidden' name='upnp_nat_pmp_enable'>
 <input type='hidden' name='upnp_clean_ruleset_enable'>
@@ -214,7 +214,6 @@ createFieldTable('', [
 
 /* REMOVE-BEGIN
 	!!TB - miniupnp
-	{ title: 'Show In My Network Places',  name: 'f_upnp_mnp',  type: 'checkbox',  value: (nvram.upnp_mnp == '1') }
 REMOVE-END */
 	{ title: 'Enable NAT-PMP', name: 'f_upnp_nat_pmp_enable', type: 'checkbox', value: (nvram.upnp_nat_pmp_enable == '1') },
 	{ title: 'Inactive Rules Cleaning', name: 'f_upnp_clean_ruleset_enable', type: 'checkbox', value: (nvram.upnp_clean_ruleset_enable == '1') },
@@ -224,7 +223,9 @@ REMOVE-END */
 		suffix: ' <small>redirections</small>', value: nvram.upnp_clean_ruleset_threshold },
 	{ title: 'Secure Mode', name: 'f_upnp_secure_mode', type: 'checkbox',
 		suffix: ' <small>(when enabled, UPnP clients are allowed to add mappings only to their IP)</small>',
-		value: (nvram.upnp_secure_mode == '1') }
+		value: (nvram.upnp_secure_mode == '1') },
+	null,
+	{ title: 'Show In My Network Places',  name: 'f_upnp_mnp',  type: 'checkbox',  value: (nvram.upnp_mnp == '1') }
 ]);
 </script>
 </div>
