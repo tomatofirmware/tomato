@@ -564,6 +564,8 @@ static int init_nvram(void)
 			nvram_set("wan_ifnames", "vlan1");	// default: eth0
 			nvram_set("lan_ifnames", "vlan0 eth1 eth2 eth3");	// set to "vlan0 eth2" by DD-WRT; default: vlan0 eth1
 		}
+		// !!TB - WLAN LED fix
+		nvram_set("wl0gpio0", "136");
 		break;
 	case MODEL_WL500GE:
 		mfr = "Asus";
