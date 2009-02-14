@@ -20,6 +20,7 @@
 #include <sys/time.h>
 #include <time.h>
 #include <signal.h>
+#include <setjmp.h>	//!!TB
 #include <sys/param.h>
 #if defined(sun)
 #include <kstat.h>
@@ -181,11 +182,28 @@ write_option_list(int fd)
 
 #endif
 
-/* Handler for the SIGTERM signal (kill) 
+//!!TB - begin
+extern void pmap_user2(void);
+static int got_user2 = 0;
+static int can_jump = 0;
+static sigjmp_buf env_user2;
+//!!TB - end
+
+/* Handler for the SIGTERM signal (kill)
  * SIGINT is also handled */
 static void
 sigterm(int sig)
 {
+//!!TB - begin
+	/* Handler for the SIGUSR2 signal */
+	if (sig == SIGUSR2) {
+		syslog(LOG_DEBUG, "received signal SIGUSR2");
+		got_user2 = 1;
+		if (can_jump) siglongjmp(env_user2, 1);
+		return;
+	}
+//!!TB - end
+
 	/*int save_errno = errno;*/
 	signal(sig, SIG_IGN);	/* Ignore this signal while we are quitting */
 
@@ -748,6 +766,12 @@ init(int argc, char * * argv, struct runtime_vars * v)
 		return 1;
 	}
 
+	//!!TB
+	sa.sa_flags = SA_RESTART;
+	if (sigaction(SIGUSR2, &sa, NULL)) {
+		syslog(LOG_ERR, "Failed to set %s handler", "SIGUSR2");
+	}
+
 	if(signal(SIGPIPE, SIG_IGN) == SIG_ERR) {
 		syslog(LOG_ERR, "Failed to ignore SIGPIPE signals");
 	}
@@ -956,6 +980,16 @@ main(int argc, char * * argv)
 		}
 #endif
 
+		/* !!TB - process custom signals from the UI */
+sig_user2:
+		sigsetjmp(env_user2, 1);
+		can_jump = 1;
+		if (got_user2) {
+			pmap_user2();
+			got_user2 = 0;
+		}
+		//!!TB - end
+
 		/* select open sockets (SSDP, HTTP listen, and all HTTP soap sockets) */
 		FD_ZERO(&readset);
 
@@ -1021,6 +1055,7 @@ main(int argc, char * * argv)
 #endif
 		{
 			if(quitting) goto shutdown;
+			else if (got_user2) goto sig_user2;	//!!TB
 			syslog(LOG_ERR, "select(all): %m");
 			syslog(LOG_ERR, "Failed to select open sockets. EXITING");
 			return 1;	/* very serious cause of error */

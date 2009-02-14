@@ -1,0 +1,39 @@
+*************** static int lease_file_remove( unsigned short eport, int proto)
+*** 104,121 ****
+  	}
+  	fclose(fdt);
+  	fclose(fd);
+- 	
+  	if (rename( tmpfilename, lease_file) < 0) {
+  		syslog(LOG_ERR, "could not rename temporary lease file to %s", lease_file);
+  		remove( tmpfilename);
+  	}
+- 	
+  	return 0;
+- 	
+  }
+  #endif
+  
+- /* proto_atoi() 
+   * convert the string "UDP" or "TCP" to IPPROTO_UDP and IPPROTO_UDP */
+  static int
+  proto_atoi(const char * protocol)
+--- 104,121 ----
+  	}
+  	fclose(fdt);
+  	fclose(fd);
++ 
+  	if (rename( tmpfilename, lease_file) < 0) {
+  		syslog(LOG_ERR, "could not rename temporary lease file to %s", lease_file);
+  		remove( tmpfilename);
+  	}
++ 
+  	return 0;
++ 
+  }
+  #endif
+  
++ /* proto_atoi()
+   * convert the string "UDP" or "TCP" to IPPROTO_UDP and IPPROTO_UDP */
+  static int
+  proto_atoi(const char * protocol)
