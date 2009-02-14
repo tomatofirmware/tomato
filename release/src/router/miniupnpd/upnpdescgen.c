@@ -1,4 +1,4 @@
-/* $Id: upnpdescgen.c,v 1.49 2008/07/10 09:18:35 nanard Exp $ */
+/* $Id: upnpdescgen.c,v 1.50 2009/02/12 23:12:38 nanard Exp $ */
 /* MiniUPnP project
  * http://miniupnp.free.fr/ or http://miniupnp.tuxfamily.org/
  * (c) 2006-2008 Thomas Bernard 
@@ -494,14 +494,17 @@ genXML(char * str, int * len, int * tmplen,
 			return str;
 		if(eltname[0] == '/')
 		{
-			/*printf("<%s>%s<%s>\n", eltname+1, p[i].data, eltname); */
-			str = strcat_char(str, len, tmplen, '<');
-			str = strcat_str(str, len, tmplen, eltname+1);
-			str = strcat_char(str, len, tmplen, '>');
-			str = strcat_str(str, len, tmplen, p[i].data);
-			str = strcat_char(str, len, tmplen, '<');
-			str = strcat_str(str, len, tmplen, eltname);
-			str = strcat_char(str, len, tmplen, '>');
+			if(p[i].data && p[i].data[0])
+			{
+				/*printf("<%s>%s<%s>\n", eltname+1, p[i].data, eltname); */
+				str = strcat_char(str, len, tmplen, '<');
+				str = strcat_str(str, len, tmplen, eltname+1);
+				str = strcat_char(str, len, tmplen, '>');
+				str = strcat_str(str, len, tmplen, p[i].data);
+				str = strcat_char(str, len, tmplen, '<');
+				str = strcat_str(str, len, tmplen, eltname);
+				str = strcat_char(str, len, tmplen, '>');
+			}
 			for(;;)
 			{
 				if(top < 0)

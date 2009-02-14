@@ -1,4 +1,12 @@
-$Id: Changelog.txt,v 1.164 2009/01/29 19:22:51 nanard Exp $
+$Id: Changelog.txt,v 1.166 2009/02/14 11:01:12 nanard Exp $
+
+2009/02/14:
+  added reload_from_lease_file()
+
+2009/02/13:
+  Changes in upnpdescgen.c to allow to remove empty elements
+  strcasecmp instead of strcmp on path comparaisons to allow
+  bugged clients to work
 
 2009/01/29:
   Some minor changes to Makefile

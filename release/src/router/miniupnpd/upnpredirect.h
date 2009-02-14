@@ -1,4 +1,4 @@
-/* $Id: upnpredirect.h,v 1.14 2008/04/25 16:25:14 nanard Exp $ */
+/* $Id: upnpredirect.h,v 1.15 2009/02/14 11:01:14 nanard Exp $ */
 /* MiniUPnP project
  * http://miniupnp.free.fr/ or http://miniupnp.tuxfamily.org/
  * (c) 2006 Thomas Bernard 
@@ -7,6 +7,12 @@
 
 #ifndef __UPNPREDIRECT_H__
 #define __UPNPREDIRECT_H__
+
+#include "config.h"
+
+#ifdef ENABLE_LEASEFILE
+int reload_from_lease_file();
+#endif
 
 /* upnp_redirect() 
  * calls OS/fw dependant implementation of the redirection.

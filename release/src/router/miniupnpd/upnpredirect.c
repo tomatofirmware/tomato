@@ -1,4 +1,4 @@
-/* $Id: upnpredirect.c,v 1.38 2008/04/25 17:17:29 nanard Exp $ */
+/* $Id: upnpredirect.c,v 1.40 2009/02/14 11:24:39 nanard Exp $ */
 /* MiniUPnP project
  * http://miniupnp.free.fr/ or http://miniupnp.tuxfamily.org/
  * (c) 2006-2007 Thomas Bernard 
@@ -51,8 +51,7 @@ FILE* fd;
 		return -1;
 	}
 
-	/* FIXME: what if desc contains ':'? */
-	fprintf( fd, "%s:%u:%s:%u:%s\n", ((proto==IPPROTO_TCP)?"TCP":"UDP"), eport, iaddr, iport, desc);
+	fprintf( fd, "%s:%hu:%s:%hu:%s\n", ((proto==IPPROTO_TCP)?"TCP":"UDP"), eport, iaddr, iport, desc);
 	fclose(fd);
 	
 	return 0;
@@ -113,6 +112,66 @@ static int lease_file_remove( unsigned short eport, int proto)
 	
 	return 0;
 	
+}
+
+/* reload_from_lease_file()
+ * read lease_file and add the rules contained
+ */
+int reload_from_lease_file()
+{
+	FILE * fd;
+	char * p;
+	unsigned short eport, iport;
+	char * proto;
+	char * iaddr;
+	char * desc;
+	char line[128];
+
+	if(!lease_file) return -1;
+	fd = fopen( lease_file, "r");
+	if (fd==NULL) {
+		syslog(LOG_ERR, "could not open lease file: %s", lease_file);
+		return -1;
+	}
+
+	while(fgets(line, sizeof(line), fd)) {
+		syslog(LOG_DEBUG, "parsing lease file line '%s'", line);
+		proto = line;
+		p = strchr(line, ':');
+		if(!p) {
+			syslog(LOG_ERR, "unrecognized data in lease file");
+			continue;
+		}
+		*(p++) = '\0';
+		iaddr = strchr(p, ':');
+		if(!iaddr) {
+			syslog(LOG_ERR, "unrecognized data in lease file");
+			continue;
+		}
+		*(iaddr++) = '\0';
+		eport = (unsigned short)atoi(p);
+		p = strchr(iaddr, ':');
+		if(!p) {
+			syslog(LOG_ERR, "unrecognized data in lease file");
+			continue;
+		}
+		*(p++) = '\0';
+		desc = strchr(p, ':');
+		if(!desc) {
+			syslog(LOG_ERR, "unrecognized data in lease file");
+			continue;
+		}
+		*(desc++) = '\0';
+		iport = (unsigned short)atoi(p);
+		
+		if(upnp_redirect(eport, iaddr, iport, proto, desc) == -1) {
+			syslog(LOG_ERR, "Failed to redirect %hu -> %s:%hu protocol %s",
+			       eport, iaddr, iport, proto);
+		}
+	}
+	fclose(fd);
+	
+	return 0;
 }
 #endif
 

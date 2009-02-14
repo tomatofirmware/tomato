@@ -1,4 +1,4 @@
-/* $Id: miniupnpd.c,v 1.111 2008/10/06 13:22:59 nanard Exp $ */
+/* $Id: miniupnpd.c,v 1.112 2009/02/14 11:01:13 nanard Exp $ */
 /* MiniUPnP project
  * http://miniupnp.free.fr/ or http://miniupnp.tuxfamily.org/
  * (c) 2006-2008 Thomas Bernard
@@ -484,7 +484,6 @@ init(int argc, char * * argv, struct runtime_vars * v)
 #ifdef ENABLE_LEASEFILE
 			case UPNPLEASEFILE:
 				lease_file = ary_options[i].value;
-				remove(lease_file);
 				break;
 #endif
 			case UPNPMINISSDPDSOCKET:
@@ -760,6 +759,12 @@ init(int argc, char * * argv, struct runtime_vars * v)
 	}
 
 	writepidfile(pidfilename, pid);
+
+#ifdef ENABLE_LEASEFILE
+	/*remove(lease_file);*/
+	syslog(LOG_INFO, "Reloading rules from lease file");
+	reload_from_lease_file();
+#endif
 
 	return 0;
 }

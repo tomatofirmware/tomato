@@ -1,4 +1,4 @@
-/* $Id: upnphttp.c,v 1.56 2008/04/26 22:37:29 nanard Exp $ */
+/* $Id: upnphttp.c,v 1.57 2009/02/12 23:38:40 nanard Exp $ */
 /* Project :  miniupnp
  * Website :  http://miniupnp.free.fr/ or http://miniupnp.tuxfamily.org/
  * Author :   Thomas Bernard
@@ -405,26 +405,26 @@ ProcessHttpQuery_upnphttp(struct upnphttp * h)
 	else if(strcmp("GET", HttpCommand) == 0)
 	{
 		h->req_command = EGet;
-		if(strcmp(ROOTDESC_PATH, HttpUrl) == 0)
+		if(strcasecmp(ROOTDESC_PATH, HttpUrl) == 0)
 		{
 			sendXMLdesc(h, genRootDesc);
 		}
-		else if(strcmp(WANIPC_PATH, HttpUrl) == 0)
+		else if(strcasecmp(WANIPC_PATH, HttpUrl) == 0)
 		{
 			sendXMLdesc(h, genWANIPCn);
 		}
-		else if(strcmp(WANCFG_PATH, HttpUrl) == 0)
+		else if(strcasecmp(WANCFG_PATH, HttpUrl) == 0)
 		{
 			sendXMLdesc(h, genWANCfg);
 		}
 #ifdef HAS_DUMMY_SERVICE
-		else if(strcmp(DUMMY_PATH, HttpUrl) == 0)
+		else if(strcasecmp(DUMMY_PATH, HttpUrl) == 0)
 		{
 			sendDummyDesc(h);
 		}
 #endif
 #ifdef ENABLE_L3F_SERVICE
-		else if(strcmp(L3F_PATH, HttpUrl) == 0)
+		else if(strcasecmp(L3F_PATH, HttpUrl) == 0)
 		{
 			sendXMLdesc(h, genL3F);
 		}
