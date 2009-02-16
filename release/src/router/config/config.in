@@ -57,7 +57,7 @@ config TCONFIG_FTP
 
 config TCONFIG_FTP_SSL
 	bool "FTP SSL Support"
-	depends on TCONFIG_L7
+	depends on TCONFIG_FTP
 	default n
 
 config TCONFIG_SAMBASRV
