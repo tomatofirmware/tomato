@@ -134,7 +134,7 @@ int buttons_main(int argc, char *argv[])
 	mask = reset_mask | ses_mask | brau_mask;
 
 #ifdef DEBUG_TEST
-	cprintf("reset_mask=0x%X reset_pushed=%0x%X\n", reset_mask, reset_pushed);
+	cprintf("reset_mask=0x%X reset_pushed=0x%X\n", reset_mask, reset_pushed);
 	cprintf("ses_mask=0x%X\n", ses_mask);
 	cprintf("brau_mask=0x%X\n", brau_mask);
 	cprintf("ses_led=%d\n", ses_led);
