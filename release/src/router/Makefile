@@ -91,7 +91,7 @@ endif
 obj-$(NEED_PPPD) += pppd
 
 
-obj-clean := $(foreach obj,$(obj-y) $(obj-n),$(obj)-clean)
+obj-clean := $(foreach obj, $(obj-y) $(obj-n) $(obj-), $(obj)-clean)
 obj-install := $(foreach obj,$(obj-y),$(obj)-install)
 
 
@@ -100,7 +100,7 @@ obj-install := $(foreach obj,$(obj-y),$(obj)-install)
 # Basic rules
 #
 
-all: clean-build $(obj-y) kernel
+all: clean-build libc $(obj-y) kernel
 
 
 kernel: $(LINUXDIR)/.config
@@ -218,7 +218,7 @@ ifeq ($(TCONFIG_L7PAT),y)
 endif
 
 	@$(MAKE) -C $(SRCBASE)/linux/linux/scripts/squashfs mksquashfs-lzma
-	@$(SRCBASE)/linux/linux/scripts/squashfs/mksquashfs-lzma $(TARGETDIR) $(PLATFORMDIR)/target.image
+	@$(SRCBASE)/linux/linux/scripts/squashfs/mksquashfs-lzma $(TARGETDIR) $(PLATFORMDIR)/target.image | tee target.info
 
 #	Package kernel and filesystem
 #	if grep -q "CONFIG_EMBEDDED_RAMDISK=y" $(LINUXDIR)/.config ; then \
@@ -236,6 +236,10 @@ endif
 #	cat $(PLATFORMDIR)/target.image >> $(PLATFORMDIR)/linux.bin
 
 
+libc:	$(LIBDIR)/ld-uClibc.so.0
+	$(MAKE) -C ../../../tools-src/uClibc all
+	$(MAKE) -C ../../../tools-src/uClibc install
+
 
 #
 # cleaners
@@ -243,6 +247,7 @@ endif
 
 clean: clean-build $(obj-clean)
 	rm -rf layer7/squished
+	make -C config clean
 
 clean-build: dummy
 	rm -rf $(TARGETDIR)
@@ -254,6 +259,7 @@ distclean: clean
 ifneq ($(INSIDE_MAK),1)
 	$(MAKE) -C .. $@ INSIDE_MAK=1
 endif
+	-rm -f $(LIBDIR)/*.so.0  $(LIBDIR)/*.so
 
 #
 # configuration
