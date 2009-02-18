@@ -199,6 +199,10 @@ const defaults_t defaults[] = {
 	{ "wl_unit",			"0"				},	// Last configured interface
 	{ "wl_mac_deny",		""				},	// filter MAC	// Add
 
+	{ "wl_leddc",			"0x640000"		},	// !!TB - 100% duty cycle for LED on router (WLAN LED fix for some routers)
+	{ "wl_bss_enabled",		"1"			},	// !!TB - If not present the new versions of wlconf may not bring up wlan
+	{ "wl_reg_mode",		"off"			},	// !!TB - Regulatory: 802.11H(h)/802.11D(d)/off(off)
+
 	{ "pptp_server_ip",		""				},	// as same as WAN gateway
 	{ "pptp_get_ip",		""				},	// IP Address assigned by PPTP server
 
