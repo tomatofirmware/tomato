@@ -392,7 +392,7 @@ static void load(int new)
 			}
 		}
 		else {
-			i = 0;
+			i = 1;
 			while (1) {
 				if (wait_action_idle(10)) {
 
@@ -405,8 +405,12 @@ static void load(int new)
 					}
 				}
 				
-				// not ready...
-				sleep(2);
+				// not ready.  Or file doesn't exist anymore!
+				// Do exponential backoff, max time 68 minutes.
+				// That's better than retrying every 2 seconds forever.
+				sleep(i);
+				if ((i *= 2) > 4096)
+					i = 4096;
 
 				if (gotterm) {
 					save_path[0] = 0;
@@ -414,9 +418,7 @@ static void load(int new)
 				}
 
 				_dprintf("%s: not ready i=%d\n", __FUNCTION__, i);
-				if ((++i % 600) == 90) {	// aprox. every 20m, 3m into it
-					syslog(LOG_ERR, "Problem loading %s. Still trying...", save_path);
-				}
+				syslog(LOG_ERR, "Problem loading %s. Still trying...", save_path);
 			}
 		}
 	}

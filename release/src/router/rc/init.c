@@ -564,6 +564,8 @@ static int init_nvram(void)
 			nvram_set("wan_ifnames", "vlan1");	// default: eth0
 			nvram_set("lan_ifnames", "vlan0 eth1 eth2 eth3");	// set to "vlan0 eth2" by DD-WRT; default: vlan0 eth1
 		}
+		// !!TB - WLAN LED fix
+		nvram_set("wl0gpio0", "136");
 		break;
 	case MODEL_WL500GE:
 		mfr = "Asus";
@@ -624,6 +626,11 @@ static int init_nvram(void)
 			nvram_set("t_fix1", name);
 			nvram_set("vlan1ports", "0 5");
 		}
+		// !!TB - LED fix
+		nvram_set("wl0gpio0", "0");
+		nvram_set("wl0gpio1", "136");
+		nvram_set("wl0gpio2", "0");
+		nvram_set("wl0gpio3", "0");
 		break;
 #endif
 #if TOMATO_N

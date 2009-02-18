@@ -134,7 +134,7 @@ int buttons_main(int argc, char *argv[])
 	mask = reset_mask | ses_mask | brau_mask;
 
 #ifdef DEBUG_TEST
-	cprintf("reset_mask=0x%X reset_pushed=%0x%X\n", reset_mask, reset_pushed);
+	cprintf("reset_mask=0x%X reset_pushed=0x%X\n", reset_mask, reset_pushed);
 	cprintf("ses_mask=0x%X\n", ses_mask);
 	cprintf("brau_mask=0x%X\n", brau_mask);
 	cprintf("ses_led=%d\n", ses_led);
@@ -200,7 +200,7 @@ int buttons_main(int argc, char *argv[])
 				led(ses_led, LED_OFF);
 				usleep(500000);
 				++count;
-			} while (((gpio = _gpio_read()) != ~0) && ((gpio & ses_mask) == 0));
+			} while (((gpio = _gpio_read()) != ~0) && ((gpio & ses_mask) == ses_pushed /*!!TB - was 0*/));
 			gpio &= mask;
 
 			if ((ses_led == LED_DMZ) && (nvram_match("dmz_enable", "1"))) led(LED_DMZ, 1);

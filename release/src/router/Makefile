@@ -165,7 +165,11 @@ endif
 	install $(LIBDIR)/libc.so.0 $(TARGETDIR)/lib/
 	install $(LIBDIR)/libdl.so.0 $(TARGETDIR)/lib/
 	install $(LIBDIR)/libm.so.0 $(TARGETDIR)/lib/
+ifeq ($(TCONFIG_SSH),y)
+	# libutil is not used when excluding SSH, and libfoo.pl goes into
+	# an infinite loop if it is included. So only include it when using SSH.
 	install $(LIBDIR)/libutil.so.0 $(TARGETDIR)/lib/
+endif
 	install $(LIBDIR)/libnsl.so.0 $(TARGETDIR)/lib/
 
 	@cd $(TARGETDIR) && $(TOP)/others/rootprep.sh

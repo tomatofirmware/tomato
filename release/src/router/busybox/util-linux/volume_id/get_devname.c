@@ -27,7 +27,7 @@ static struct uuidCache_s {
 #define get_label_uuid(device, label, uuid, iso_only) \
 	get_label_uuid(device, label, uuid)
 #endif
-static int
+int
 get_label_uuid(const char *device, char **label, char **uuid, int iso_only)
 {
 	int rv = 1;
@@ -394,20 +394,23 @@ static int display_uuid_cache(void)
 
 
 /* Used by mount and findfs */
-
+/* If spec is NULL, just display the labels. */
 char *get_devname_from_label(const char *spec)
 {
 	struct uuidCache_s *uc;
-	int spec_len = strlen(spec);
+	int spec_len = spec? strlen(spec): -1;
 
 	uuidcache_init();
-	uc = uuidCache;
-	while (uc) {
-// FIXME: empty label ("LABEL=") matches anything??!
-		if (uc->label[0] && strncmp(spec, uc->label, spec_len) == 0) {
-			return xstrdup(uc->device);
+
+	for (uc = uuidCache; uc; uc = uc->next) {
+		if (spec_len <= 0) {
+			if (uc->label[0])
+				printf("   LABEL '%s' on %s\n", uc->label, uc->device);
 		}
-		uc = uc->next;
+		else {
+			if (uc->label[0] && strncmp(spec, uc->label, spec_len) == 0)
+				return xstrdup(uc->device);
+		}
 	}
 	return NULL;
 }
@@ -417,13 +420,14 @@ char *get_devname_from_uuid(const char *spec)
 	struct uuidCache_s *uc;
 
 	uuidcache_init();
-	uc = uuidCache;
-	while (uc) {
-		/* case of hex numbers doesn't matter */
-		if (strcasecmp(spec, uc->uc_uuid) == 0) {
-			return xstrdup(uc->device);
+	for (uc = uuidCache; uc; uc = uc->next) {
+		if (spec && *spec) {
+			/* case of hex numbers doesn't matter */
+			if (strcasecmp(spec, uc->uc_uuid) == 0)
+				return xstrdup(uc->device);
 		}
-		uc = uc->next;
+		else
+			printf("   UUID  '%s' on %s\n", uc->uc_uuid, uc->device);
 	}
 	return NULL;
 }
