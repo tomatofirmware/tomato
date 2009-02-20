@@ -5,7 +5,7 @@
 #ifndef __CONFIG_H__
 #define __CONFIG_H__
 
-#define UPNP_VERSION	"20090121"
+#define UPNP_VERSION	"20090214"
 #define USE_NETFILTER 1
 #define OS_NAME		"Tomato"
 #define OS_VERSION	"Linux Mips 2.4.20"
