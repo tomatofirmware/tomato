@@ -35,9 +35,13 @@
 #include <sys/param.h>
 #include <sys/uio.h>
 
+#include <sys/prctl.h>
+#include <signal.h>
+
 /* Configuration.. here are the possibilities */
 #undef VSF_SYSDEP_HAVE_CAPABILITIES
 #undef VSF_SYSDEP_HAVE_SETKEEPCAPS
+#undef VSF_SYSDEP_HAVE_SETPDEATHSIG
 #undef VSF_SYSDEP_HAVE_LINUX_SENDFILE
 #undef VSF_SYSDEP_HAVE_FREEBSD_SENDFILE
 #undef VSF_SYSDEP_HAVE_HPUX_SENDFILE
@@ -64,11 +68,12 @@
   #include <linux/version.h>
   #if defined(LINUX_VERSION_CODE) && defined(KERNEL_VERSION)
     #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,2,0))
-//      #define VSF_SYSDEP_HAVE_CAPABILITIES
       #define VSF_SYSDEP_HAVE_LINUX_SENDFILE
-//      #include <sys/prctl.h>
       #ifdef PR_SET_KEEPCAPS
         #define VSF_SYSDEP_HAVE_SETKEEPCAPS
+      #endif
+      #ifdef PR_SET_PDEATHSIG
+        #define VSF_SYSDEP_HAVE_SETPDEATHSIG
       #endif
     #endif
   #endif
@@ -159,7 +164,10 @@
 #include <linux/capability.h>
 #include <errno.h>
 #include <syscall.h>
-_syscall2(int, capset, cap_user_header_t, header, const cap_user_data_t, data)
+int capset(cap_user_header_t header, const cap_user_data_t data)
+{
+  return syscall(__NR_capset, header, data);
+}
 /* Gross HACK to avoid warnings - linux headers overlap glibc headers */
 #undef __NFDBITS
 #undef __FDMASK
@@ -308,7 +316,7 @@ vsf_sysdep_check_auth(const struct mystr* p_user_str,
   retval = pam_set_item(s_pamh, PAM_RHOST, str_getbuf(p_remote_host));
   if (retval != PAM_SUCCESS)
   {
-    (void) pam_end(s_pamh, 0);
+    (void) pam_end(s_pamh, retval);
     s_pamh = 0;
     return 0;
   }
@@ -317,7 +325,7 @@ vsf_sysdep_check_auth(const struct mystr* p_user_str,
   retval = pam_set_item(s_pamh, PAM_TTY, "ftp");
   if (retval != PAM_SUCCESS)
   {
-    (void) pam_end(s_pamh, 0);
+    (void) pam_end(s_pamh, retval);
     s_pamh = 0;
     return 0;
   }
@@ -326,7 +334,7 @@ vsf_sysdep_check_auth(const struct mystr* p_user_str,
   retval = pam_set_item(s_pamh, PAM_RUSER, str_getbuf(p_user_str));
   if (retval != PAM_SUCCESS)
   {
-    (void) pam_end(s_pamh, 0);
+    (void) pam_end(s_pamh, retval);
     s_pamh = 0;
     return 0;
   }
@@ -334,28 +342,28 @@ vsf_sysdep_check_auth(const struct mystr* p_user_str,
   retval = pam_authenticate(s_pamh, 0);
   if (retval != PAM_SUCCESS)
   {
-    (void) pam_end(s_pamh, 0);
+    (void) pam_end(s_pamh, retval);
     s_pamh = 0;
     return 0;
   }
   retval = pam_acct_mgmt(s_pamh, 0);
   if (retval != PAM_SUCCESS)
   {
-    (void) pam_end(s_pamh, 0);
+    (void) pam_end(s_pamh, retval);
     s_pamh = 0;
     return 0;
   }
   retval = pam_setcred(s_pamh, PAM_ESTABLISH_CRED);
   if (retval != PAM_SUCCESS)
   {
-    (void) pam_end(s_pamh, 0);
+    (void) pam_end(s_pamh, retval);
     s_pamh = 0;
     return 0;
   }
   if (!tunable_session_support)
   {
     /* You're in already! */
-    (void) pam_end(s_pamh, 0);
+    (void) pam_end(s_pamh, retval);
     s_pamh = 0;
     return 1;
   }
@@ -366,7 +374,7 @@ vsf_sysdep_check_auth(const struct mystr* p_user_str,
   {
     vsf_remove_uwtmp();
     (void) pam_setcred(s_pamh, PAM_DELETE_CRED);
-    (void) pam_end(s_pamh, 0);
+    (void) pam_end(s_pamh, retval);
     s_pamh = 0;
     return 0;
   }
@@ -387,7 +395,7 @@ vsf_auth_shutdown(void)
   }
   (void) pam_close_session(s_pamh, 0);
   (void) pam_setcred(s_pamh, PAM_DELETE_CRED);
-  (void) pam_end(s_pamh, 0);
+  (void) pam_end(s_pamh, PAM_SUCCESS);
   s_pamh = 0;
   vsf_remove_uwtmp();
 }
@@ -1190,3 +1198,24 @@ vsf_remove_uwtmp(void)
 
 #endif /* !VSF_SYSDEP_HAVE_UTMPX */
 
+void
+vsf_set_die_if_parent_dies()
+{
+#ifdef VSF_SYSDEP_HAVE_SETPDEATHSIG
+  if (prctl(PR_SET_PDEATHSIG, SIGKILL, 0, 0, 0) != 0)
+  {
+    die("prctl");
+  }
+#endif
+}
+
+void
+vsf_set_term_if_parent_dies()
+{
+#ifdef VSF_SYSDEP_HAVE_SETPDEATHSIG
+  if (prctl(PR_SET_PDEATHSIG, SIGTERM, 0, 0, 0) != 0)
+  {
+    die("prctl");
+  }
+#endif
+}

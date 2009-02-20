@@ -7,10 +7,38 @@ struct vsf_session;
 /* priv_sock_init()
  * PURPOSE
  * Initialize the priv_sock system, by opening the communications sockets.
+ *
  * PARAMETERS
  * p_sess       - the current session object
  */
 void priv_sock_init(struct vsf_session* p_sess);
+
+/* priv_sock_close()
+ * PURPOSE
+ * Closes any open file descriptors relating to the priv_sock system.
+ *
+ * PARAMETERS
+ * p_sess       - the current session object
+ */
+void priv_sock_close(struct vsf_session* p_sess);
+
+/* priv_sock_set_parent_context()
+ * PURPOSE
+ * Closes the child's fd, e.g. p_sess->child_fd.
+ *
+ * PARAMETERS
+ * p_sess       - the current session object
+ */
+void priv_sock_set_parent_context(struct vsf_session* p_sess);
+
+/* priv_sock_set_child_context()
+ * PURPOSE
+ * Closes the parent's fd, e.g. p_sess->parent_fd.
+ *
+ * PARAMETERS
+ * p_sess       - the current session object
+ */
+void priv_sock_set_child_context(struct vsf_session* p_sess);
 
 /* priv_sock_send_cmd()
  * PURPOSE
@@ -29,6 +57,28 @@ void priv_sock_send_cmd(int fd, char cmd);
  * p_str        - the string to send
  */
 void priv_sock_send_str(int fd, const struct mystr* p_str);
+
+/* priv_sock_send_buf()
+ * PURPOSE
+ * Sends a buffer to the other side of the channel. The protocol used is the
+ * same as priv_sock_send_str()
+ * PARAMETERS
+ * fd           - the fd on which to send the buffer
+ * p_buf        - the buffer to send
+ * len          - length of the buffer
+ */
+void priv_sock_send_buf(int fd, const char* p_buf, unsigned int len);
+
+/* priv_sock_recv_buf()
+ * PURPOSE
+ * Receives a buffer from the other side of the channel. The protocol used is
+ * the same as priv_sock_recv_str()
+ * PARAMETERS
+ * fd           - the fd on which to receive the buffer
+ * p_buf        - the buffer to write into
+ * len          - length of the buffer
+ */
+void priv_sock_recv_buf(int fd, char* p_buf, unsigned int len);
 
 /* priv_sock_get_result()
  * PURPOSE
@@ -111,6 +161,10 @@ int priv_sock_get_int(int fd);
 #define PRIV_SOCK_GET_DATA_SOCK     3
 #define PRIV_SOCK_GET_USER_CMD      4
 #define PRIV_SOCK_WRITE_USER_RESP   5
+#define PRIV_SOCK_DO_SSL_HANDSHAKE  6
+#define PRIV_SOCK_DO_SSL_CLOSE      7
+#define PRIV_SOCK_DO_SSL_READ       8
+#define PRIV_SOCK_DO_SSL_WRITE      9
 
 #define PRIV_SOCK_RESULT_OK         1
 #define PRIV_SOCK_RESULT_BAD        2

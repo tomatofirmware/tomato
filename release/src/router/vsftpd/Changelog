@@ -992,3 +992,108 @@ agonizing because clients are so broken in this area.
 
 At this point: v2.0.7 released!
 ===============================
+
+- Remove .postlogin.c.swp (thanks Kaibin Li <kbli@fortinet.com>)!
+- findlibs repairs for libcap; builds on my Ubuntu 6.06 again.
+- Apply patch to fix "error: assignment of read-only member '__in'" build
+error on broken systems where the WIFEXITED() etc. macros write to their
+argument. Thanks Ingo Terpelle <it@exanto.de>.
+- Replace spaces in xferlog with underscores, report from
+Michael Wittauer <michael.wittauer@sonydadc.com>.
+- Reload default config values before re-parsing config file on SIGHUP. This
+makes the values correct in the case a setting was removed from the file.
+- Do not issue an FTP response for a blank line on the control channel. Fixes
+issues with some broken NAT devices. ProFTPd does the same, so hopefully
+nothing will break. Report from Frank Bulk <fbulk@mypremieronline.com>.
+- Replace usage of broken _syscall() with syscall(). Fixes build errors for
+those without libcap-devel installed.
+- Add implicit SSL support with implicit_ssl option.
+- Remove arbitrary restriction on one process model + SSL.
+- Set a session ID on the SSL context.
+- Add the skeleton of a built-in ptrace sandbox. Not yet useful for anything
+other than catching compile errors. Yes, I'm crazy :P
+- Use PR_SET_PDEATHSIG all over the place so that when the listener is killed,
+existing sessions are booted too.
+- Use SSL_peek; makes SSL pipelining work. Note that I never found any SSL
+client that need it, but still a nice code clean-up.
+- Change ASCII download behaviour so \r\n does not become \r\r\n. This mirrors
+proftpd behaviour instead of wu-ftpd. Thanks Paul Abel <pabel@fexcodcc.com>.
+- Switch all sighandlers to the synchronous ones. Prevents us having to
+block and unblock signals all the time.
+- Add a "use alarm" option to synchronous signal handlers, to ensure the race
+condition against a blocking call does not result in a permanent
+non-delivery.
+- Use SIGTERM for privileged parent process shutdown, so they can still update
+u/wtmp properly.
+- Do RAND_load_file from /dev/urandom in the child context because I don't
+trust the OpenSSL API vs. fork(). Different children do have different RNG
+state; this is defense in depth.
+- More thoroughly close the remote ends of the priv_sock, ensuring that child
+death results in no blocking in the parent. This is a matter of tidyness; the
+SIGCHLD handler will reliably tear down the parent.
+- Do the same for the SSL slave / consumer channels.
+- Fix OpenBSD build.
+- Move SSL data handling into the SSL slave process. Incurs some extra
+overhead in terms of context switches and copies, but it enables this next
+item:
+- By default, require SSL data connections to exhibit SSL session re-use of
+the control channel. Unlike the cert thing, this _is_ something we can turn
+on by default as most clients seem to do reuse. Yay.
+- Change 522 response for SSL connection fail to note when session reuse is
+required.
+(v2.1.0pre1 here)
+- More work on the inbuilt ptrace()-sandbox support.
+- Clear the idle alarm when starting data transfer if there is no data alarm.
+- Fix syslog format; don't embed 2nd copy of date, pid. Thanks to
+René Berber <r.berber@computer.org>.
+- Lock file before truncating it for upload. Fixes various simultaneous
+upload corruption issues.
+- Make sure to give 426 error code on uploads if ABOR was received.
+- Add cmds_denied option to complement cmds_allowed.
+- Ignore lines in config file containing only white space.
+- Require write_enable / anon_upload_enable / etc. to process STOU.
+- FC10 patch (vsftpd-1.0.1-missingok.patch): tweak to logrotate file.
+- FC10 patch (vsftpd-1.2.1-nonrootconf.patch): bail if the config file is not
+owned by the currently running user.
+- FC10 patch (vsftpd-2.0.1-tcp_wrappers.patch): explicitly call openlog() to
+avoid syslog() bug where some settings are not initialized.
+- FC10 patch (vsftpd-2.0.3-daemonize_fds.patch): when backgrounding, replace
+fd 0,1,2 with /dev/null fd.
+- FC10 patch (vsftpd-2.0.5-correct_comments.patch): comment tweaks in the
+sample config file.
+- FC10 patch (vsftpd-2.0.5-fix_unique.patch): use the default filename given
+by STOU if it is available.
+- FC10 patch (vsftpd-2.0.5-pam_end.patch): call pam_end() properly so modules
+can act on errors if they want.
+- FC10 patch (vsftpd-2.0.5-pasv_dot.patch): Strict RFC compliance for PASV
+command; add a trailing period.
+- FC10 patch (vsftpd-2.0.5-uname_size.patch): allow longer usernames. It's not
+1990 any more, so trust PAM etc. to not stack-buffer-overflow.
+- FC10 patch (vsftpd-2.0.5-underscore_uname.patch): permit username to start
+with underscore or period.
+- FC10 patch (vsftpd-2.0.6-listen.patch): default listen to YES.
+- Fix crash on SIGHUP introduced in 2.1.0pre1. Oops.
+- FC10 patch (vsftpd-2.0.5-bind_denied.patch): retry PASV bind() on EACCES
+too, which can happen on SELinux systems.
+- Default resource limit for child processes: 100MB address space.
+- Finishing touches to the initial sandbox policy; only permit connect() to
+the host on the control channel being the nicest touch.
+(v2.1.0pre2 here)
+- Fix 64-bit build (oops)! Thanks Martin Nagy <mnagy@redhat.com>.
+- Fix config of SSL built in; not enabled; two process model. Report from
+Martin.
+- Shutdown the command connection in the priv parent's SIGTERM handler; kills
+of children where the PR_SET_PDEATHSIG cannot due to different user ids.
+(v2.1.0pre3 here)
+- Fix build on FC10.
+- Some FAQ tweaks.
+- Permit fcntl(F_GETFD) in sandbox policy. Needed for FC10. Not sure where it
+comes from but it is harmless. (My guess would be glibc-2.9's new support for
+using O_CLOEXEC more).
+- Fix build warning on 64-bit.
+- Fix build on OpenBSD again.
+(v2.1.0pre4 here)
+- Bring userlist_deny handling inside the max_login_fail accounting.
+
+At this point: v2.1.0 released!
+===============================

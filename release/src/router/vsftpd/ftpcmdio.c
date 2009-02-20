@@ -155,8 +155,10 @@ vsf_cmdio_set_alarm(struct vsf_session* p_sess)
 {
   if (tunable_idle_session_timeout > 0)
   {
-    vsf_sysutil_install_sighandler(kVSFSysUtilSigALRM, handle_alarm_timeout,
-                                   p_sess);
+    vsf_sysutil_install_sighandler(kVSFSysUtilSigALRM,
+                                   handle_alarm_timeout,
+                                   p_sess,
+                                   1);
     vsf_sysutil_set_alarm(tunable_idle_session_timeout);
   }
 }
@@ -172,7 +174,17 @@ vsf_cmdio_get_cmd_and_arg(struct vsf_session* p_sess, struct mystr* p_cmd_str,
   }
   /* Blocks */
   control_getline(p_cmd_str, p_sess);
-  str_split_char(p_cmd_str, p_arg_str, ' ');
+  /* View a single space as a command of " ", which although a useless command,
+   * permits the caller to distinguish input of "" from " ".
+   */
+  if (str_getlen(p_cmd_str) == 1 && str_get_char_at(p_cmd_str, 0) == ' ')
+  {
+    str_empty(p_arg_str);
+  }
+  else
+  {
+    str_split_char(p_cmd_str, p_arg_str, ' ');
+  }
   str_upper(p_cmd_str);
   if (tunable_log_ftp_protocol)
   {

@@ -30,10 +30,12 @@ static void die_unless_privileged(void);
 static void do_sanity_checks(void);
 static void session_init(struct vsf_session* p_sess);
 static void env_init(void);
+static void limits_init(void);
 
 int
 main(int argc, const char* argv[])
 {
+  tunables_load_defaults();
   struct vsf_session the_session =
   {
     /* Control connection */
@@ -160,6 +162,8 @@ main(int argc, const char* argv[])
   session_init(&the_session);
   /* Set up "environment", e.g. process group etc. */
   env_init();
+  /* Set up resource limits. */
+  limits_init();
   /* Set up logging - must come after global init because we need the remote
    * address to convert into text
    */
@@ -180,6 +184,7 @@ main(int argc, const char* argv[])
   if (tunable_ssl_enable)
   {
     ssl_init(&the_session);
+    ssl_add_entropy(&the_session);
   }
   if (tunable_deny_email_enable)
   {
@@ -270,10 +275,6 @@ do_sanity_checks(void)
     {
       die("vsftpd: security: 'one_process_model' needs a better OS");
     }
-    if (tunable_ssl_enable)
-    {
-      die("vsftpd: SSL mode not compatible with 'one_process_model'");
-    }
   }
   if (!tunable_local_enable && !tunable_anonymous_enable)
   {
@@ -291,6 +292,12 @@ env_init(void)
   vsf_sysutil_tzset();
   /* Signals. We'll always take -EPIPE rather than a rude signal, thanks */
   vsf_sysutil_install_null_sighandler(kVSFSysUtilSigPIPE);
+}
+
+static void
+limits_init(void)
+{
+  vsf_sysutil_set_address_space_limit(VSFTP_AS_LIMIT);
 }
 
 static void

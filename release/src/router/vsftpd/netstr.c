@@ -16,8 +16,13 @@
 #include "sysutil.h"
 
 void
-str_netfd_alloc(struct mystr* p_str, int fd, char term, char* p_readbuf,
-                unsigned int maxlen)
+str_netfd_alloc(struct vsf_session* p_sess,
+                struct mystr* p_str,
+                char term,
+                char* p_readbuf,
+                unsigned int maxlen,
+                str_netfd_read_t p_peekfunc,
+                str_netfd_read_t p_readfunc)
 {
   int retval;
   unsigned int bytes_read;
@@ -36,7 +41,7 @@ str_netfd_alloc(struct mystr* p_str, int fd, char term, char* p_readbuf,
       str_empty(p_str);
       return;
     }
-    retval = vsf_sysutil_recv_peek(fd, p_readpos, left);
+    retval = (*p_peekfunc)(p_sess, p_readpos, left);
     if (vsf_sysutil_retval_is_error(retval))
     {
       die("vsf_sysutil_recv_peek");
@@ -52,7 +57,7 @@ str_netfd_alloc(struct mystr* p_str, int fd, char term, char* p_readbuf,
       if (p_readpos[i] == term)
       {
         /* Got it! */
-        retval = vsf_sysutil_read_loop(fd, p_readpos, i + 1);
+        retval = (*p_readfunc)(p_sess, p_readpos, i + 1);
         if (vsf_sysutil_retval_is_error(retval) ||
             (unsigned int) retval != i + 1)
         {
@@ -72,7 +77,7 @@ str_netfd_alloc(struct mystr* p_str, int fd, char term, char* p_readbuf,
       bug("bytes_read > left in str_netfd_alloc");
     }
     left -= bytes_read;
-    retval = vsf_sysutil_read_loop(fd, p_readpos, bytes_read);
+    retval = (*p_readfunc)(p_sess, p_readpos, bytes_read);
     if (vsf_sysutil_retval_is_error(retval) ||
         (unsigned int) retval != bytes_read)
     {

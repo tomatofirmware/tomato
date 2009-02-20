@@ -33,7 +33,7 @@ vsf_log_init(struct vsf_session* p_sess)
   int retval;
   if (tunable_syslog_enable || tunable_tcp_wrappers)
   {
-    vsf_sysutil_openlog();
+    vsf_sysutil_openlog(1);
   }
   if (!tunable_xferlog_enable && !tunable_dual_log_enable)
   {
@@ -174,6 +174,7 @@ static void
 vsf_log_do_log_wuftpd_format(struct vsf_session* p_sess, struct mystr* p_str,
                              int succeeded)
 {
+  static struct mystr s_filename_str;
   long delta_sec;
   enum EVSFLogEntryType what = (enum EVSFLogEntryType) p_sess->log_type;
   /* Date - vsf_sysutil_get_current_date updates cached time */
@@ -194,7 +195,9 @@ vsf_log_do_log_wuftpd_format(struct vsf_session* p_sess, struct mystr* p_str,
   str_append_filesize_t(p_str, p_sess->transfer_size);
   str_append_char(p_str, ' ');
   /* Filename */
-  str_append_str(p_str, &p_sess->log_str);
+  str_copy(&s_filename_str, &p_sess->log_str);
+  str_replace_char(&s_filename_str, ' ', '_');
+  str_append_str(p_str, &s_filename_str);
   str_append_char(p_str, ' ');
   /* Transfer type (ascii/binary) */
   if (p_sess->is_ascii)
@@ -253,12 +256,16 @@ vsf_log_do_log_vsftpd_format(struct vsf_session* p_sess, struct mystr* p_str,
                              int succeeded, enum EVSFLogEntryType what,
                              const struct mystr* p_log_str)
 {
-  /* Date - vsf_sysutil_get_current_date updates cached time */
-  str_alloc_text(p_str, vsf_sysutil_get_current_date());
-  /* Pid */
-  str_append_text(p_str, " [pid ");
-  str_append_ulong(p_str, vsf_sysutil_getpid());
-  str_append_text(p_str, "] ");
+  str_empty(p_str);
+  if (!tunable_syslog_enable)
+  {
+    /* Date - vsf_sysutil_get_current_date updates cached time */
+    str_append_text(p_str, vsf_sysutil_get_current_date());
+    /* Pid */
+    str_append_text(p_str, " [pid ");
+    str_append_ulong(p_str, vsf_sysutil_getpid());
+    str_append_text(p_str, "] ");
+  }
   /* User */
   if (!str_isempty(&p_sess->user_str))
   {

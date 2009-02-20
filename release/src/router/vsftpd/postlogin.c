@@ -95,7 +95,7 @@ process_post_login(struct vsf_session* p_sess)
   }
   if (tunable_async_abor_enable)
   {
-    vsf_sysutil_install_sighandler(kVSFSysUtilSigURG, handle_sigurg, p_sess);
+    vsf_sysutil_install_sighandler(kVSFSysUtilSigURG, handle_sigurg, p_sess, 0);
     vsf_sysutil_activate_sigurg(VSFTP_COMMAND_FD);
   }
   /* Handle any login message */
@@ -125,7 +125,7 @@ process_post_login(struct vsf_session* p_sess)
       vsf_sysutil_setproctitle_str(&proctitle_str);
       str_free(&proctitle_str);
     }
-    /* Test command against the allowed list.. */
+    /* Test command against the allowed lists.. */
     if (tunable_cmds_allowed)
     {
       static struct mystr s_src_str;
@@ -141,6 +141,26 @@ process_post_login(struct vsf_session* p_sess)
         }
         else if (str_equal(&s_src_str, &p_sess->ftp_cmd_str))
         {
+          break;
+        }
+        str_copy(&s_src_str, &s_rhs_str);
+      }
+    }
+    if (tunable_cmds_denied)
+    {
+      static struct mystr s_src_str;
+      static struct mystr s_rhs_str;
+      str_alloc_text(&s_src_str, tunable_cmds_denied);
+      while (1)
+      {
+        str_split_char(&s_src_str, &s_rhs_str, ',');
+        if (str_isempty(&s_src_str))
+        {
+          break;
+        }
+        else if (str_equal(&s_src_str, &p_sess->ftp_cmd_str))
+        {
+          cmd_ok = 0;
           break;
         }
         str_copy(&s_src_str, &s_rhs_str);
@@ -317,7 +337,9 @@ process_post_login(struct vsf_session* p_sess)
         vsf_cmdio_write(p_sess, FTP_BADMODE, "Bad MODE command.");
       }
     }
-    else if (str_equal_text(&p_sess->ftp_cmd_str, "STOU"))
+    else if (tunable_write_enable &&
+             (tunable_anon_upload_enable || !p_sess->is_anonymous) &&
+             str_equal_text(&p_sess->ftp_cmd_str, "STOU"))
     {
       handle_stou(p_sess);
     }
@@ -400,6 +422,11 @@ process_post_login(struct vsf_session* p_sess)
              str_equal_text(&p_sess->ftp_cmd_str, "PROT"))
     {
       vsf_cmdio_write(p_sess, FTP_NOPERM, "Permission denied.");
+    }
+    else if (str_isempty(&p_sess->ftp_cmd_str) &&
+             str_isempty(&p_sess->ftp_arg_str))
+    {
+      // Deliberately ignore to avoid NAT device bugs. ProFTPd does the same.
     }
     else
     {
@@ -574,7 +601,9 @@ handle_pasv(struct vsf_session* p_sess, int is_epsv)
         break;
       }
     }
-    if (vsf_sysutil_get_error() == kVSFSysUtilErrADDRINUSE)
+    /* SELinux systems can give you an inopportune EACCES, it seems. */
+    if (vsf_sysutil_get_error() == kVSFSysUtilErrADDRINUSE ||
+        vsf_sysutil_get_error() == kVSFSysUtilErrACCES)
     {
       continue;
     }
@@ -588,7 +617,7 @@ handle_pasv(struct vsf_session* p_sess, int is_epsv)
   {
     str_alloc_text(&s_pasv_res_str, "Entering Extended Passive Mode (|||");
     str_append_ulong(&s_pasv_res_str, (unsigned long) the_port);
-    str_append_text(&s_pasv_res_str, "|)");
+    str_append_text(&s_pasv_res_str, "|).");
     vsf_cmdio_write_str(p_sess, FTP_EPSVOK, &s_pasv_res_str);
     return;
   }
@@ -622,7 +651,7 @@ handle_pasv(struct vsf_session* p_sess, int is_epsv)
   str_append_ulong(&s_pasv_res_str, the_port >> 8);
   str_append_text(&s_pasv_res_str, ",");
   str_append_ulong(&s_pasv_res_str, the_port & 255);
-  str_append_text(&s_pasv_res_str, ")");
+  str_append_text(&s_pasv_res_str, ").");
   vsf_cmdio_write_str(p_sess, FTP_PASVOK, &s_pasv_res_str);
 }
 
@@ -983,6 +1012,7 @@ handle_upload_common(struct vsf_session* p_sess, int is_append, int is_unique)
   int remote_fd;
   int success = 0;
   int created = 0;
+  int do_truncate = 0;
   filesize_t offset = p_sess->restart_pos;
   p_sess->restart_pos = 0;
   if (!data_transfer_checks_ok(p_sess))
@@ -1015,13 +1045,10 @@ handle_upload_common(struct vsf_session* p_sess, int is_append, int is_unique)
   else
   {
     /* For non-anonymous, allow open() to overwrite or append existing files */
+    new_file_fd = str_create_append(p_filename);
     if (!is_append && offset == 0)
     {
-      new_file_fd = str_create_overwrite(p_filename);
-    }
-    else
-    {
-      new_file_fd = str_create_append(p_filename);
+      do_truncate = 1;
     }
   }
   if (vsf_sysutil_retval_is_error(new_file_fd))
@@ -1056,9 +1083,19 @@ handle_upload_common(struct vsf_session* p_sess, int is_append, int is_unique)
   {
     vsf_sysutil_lock_file_write(new_file_fd);
   }
+  /* Must truncate the file AFTER locking it! */
+  if (do_truncate)
+  {
+    vsf_sysutil_ftruncate(new_file_fd);
+    vsf_sysutil_lseek_to(new_file_fd, 0);
+  }
   if (!is_append && offset != 0)
   {
     /* XXX - warning, allows seek past end of file! Check for seek > size? */
+    /* XXX - also, currently broken as the O_APPEND flag will always write
+     * at the end of file. No known complaints yet; can easily fix if one
+     * comes in.
+     */
     vsf_sysutil_lseek_to(new_file_fd, offset);
   }
   if (is_unique)
@@ -1101,7 +1138,7 @@ handle_upload_common(struct vsf_session* p_sess, int is_append, int is_unique)
   {
     vsf_cmdio_write(p_sess, FTP_BADSENDFILE, "Failure writing to local file.");
   }
-  else if (trans_ret.retval == -2)
+  else if (trans_ret.retval == -2 || p_sess->abor_received)
   {
     vsf_cmdio_write(p_sess, FTP_BADSENDNET, "Failure reading network stream.");
   }
@@ -1727,7 +1764,13 @@ get_unique_filename(struct mystr* p_outstr, const struct mystr* p_base_str)
    */
   static struct vsf_sysutil_statbuf* s_p_statbuf;
   unsigned int suffix = 1;
-  int retval;
+  /* Do not add any suffix at all if the name is not taken. */
+  int retval = str_stat(p_base_str, &s_p_statbuf);
+  if (vsf_sysutil_retval_is_error(retval))
+  {
+    str_copy(p_outstr, p_base_str);
+    return;
+  }
   while (1)
   {
     str_copy(p_outstr, p_base_str);

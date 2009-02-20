@@ -264,13 +264,20 @@ displayed as "ftp".
 
 Default: NO
 .TP
+.B implicit_ssl
+If enabled, an SSL handshake is the first thing expect on all connections
+(the FTPS protocol). To support explicit SSL and/or plain text too, a
+separate vsftpd listener process should be run.
+
+Default: NO
+.TP
 .B listen
 If enabled, vsftpd will run in standalone mode. This means that vsftpd must
 not be run from an inetd of some kind. Instead, the vsftpd executable is
 run once directly. vsftpd itself will then take care of listening for and
 handling incoming connections.
 
-Default: NO
+Default: YES
 .TP
 .B listen_ipv6
 Like the listen parameter, except vsftpd will listen on an IPv6 socket instead
@@ -390,6 +397,13 @@ controlled by
 (Added in v2.0.6).
 
 Default: NO
+.TP
+.B require_ssl_reuse
+If set to yes, all SSL data connections are required to exhibit SSL session
+reuse (which proves that they know the same master secret as the control
+channel). (Added in v2.1.0).
+
+Default: YES
 .TP
 .B run_as_launching_user
 Set to YES if you want vsftpd to run as the user which launched vsftpd. This is
@@ -788,9 +802,18 @@ Default: /etc/vsftpd.chroot_list
 .TP
 .B cmds_allowed
 This options specifies a comma separated list of allowed FTP commands (post
-login. USER, PASS and QUIT are always allowed pre-login). Other
+login. USER, PASS and QUIT and others are always allowed pre-login). Other
 commands are rejected. This is a powerful method of really locking down an
 FTP server. Example: cmds_allowed=PASV,RETR,QUIT
+
+Default: (none)
+.TP
+.B cmds_denied
+This options specifies a comma separated list of denied FTP commands (post
+login. USER, PASS, QUIT and others are always allowed pre-login). If a command
+appears on both this and
+.BR cmds_allowed
+then the denial takes precedence. (Added in v2.1.0).
 
 Default: (none)
 .TP

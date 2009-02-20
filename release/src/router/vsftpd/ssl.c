@@ -41,6 +41,11 @@ static int ssl_cert_digest(
   SSL* p_ssl, struct vsf_session* p_sess, struct mystr* p_str);
 static void maybe_log_shutdown_state(struct vsf_session* p_sess);
 static void maybe_log_ssl_error_state(struct vsf_session* p_sess, int ret);
+static int ssl_read_common(struct vsf_session* p_sess,
+                           SSL* p_ssl,
+                           char* p_buf,
+                           unsigned int len,
+                           int (*p_ssl_func)(SSL*, void*, int));
 
 static int ssl_inited;
 static struct mystr debug_str;
@@ -133,9 +138,29 @@ ssl_init(struct vsf_session* p_sess)
         }
       }
     }
+    {
+      char* p_ctx_id = "vsftpd";
+      SSL_CTX_set_session_id_context(p_ctx, (void*) p_ctx_id,
+                                     vsf_sysutil_strlen(p_ctx_id));
+    }
     p_sess->p_ssl_ctx = p_ctx;
     ssl_inited = 1;
   }
+}
+
+void
+ssl_control_handshake(struct vsf_session* p_sess)
+{
+  if (!ssl_session_init(p_sess))
+  {
+    struct mystr err_str = INIT_MYSTR;
+    str_alloc_text(&err_str, "Negotiation failed: ");
+    /* Technically, we shouldn't leak such detailed error messages. */
+    str_append_text(&err_str, get_ssl_error());
+    vsf_cmdio_write_str(p_sess, FTP_TLS_FAIL, &err_str);
+    vsf_sysutil_exit(0);
+  }
+  p_sess->control_use_ssl = 1;
 }
 
 void
@@ -148,16 +173,7 @@ handle_auth(struct vsf_session* p_sess)
       str_equal_text(&p_sess->ftp_arg_str, "TLS-P"))
   {
     vsf_cmdio_write(p_sess, FTP_AUTHOK, "Proceed with negotiation.");
-    if (!ssl_session_init(p_sess))
-    {
-      struct mystr err_str = INIT_MYSTR;
-      str_alloc_text(&err_str, "Negotiation failed: ");
-      /* Technically, we shouldn't leak such detailed error messages. */
-      str_append_text(&err_str, get_ssl_error());
-      vsf_cmdio_write_str(p_sess, FTP_TLS_FAIL, &err_str);
-      vsf_sysutil_exit(0);
-    }
-    p_sess->control_use_ssl = 1;
+    ssl_control_handshake(p_sess);
     if (str_equal_text(&p_sess->ftp_arg_str, "SSL") ||
         str_equal_text(&p_sess->ftp_arg_str, "TLS-P"))
     {
@@ -212,50 +228,31 @@ handle_prot(struct vsf_session* p_sess)
   }
 }
 
-void
-ssl_getline(const struct vsf_session* p_sess, struct mystr* p_str,
-            char end_char, char* p_buf, unsigned int buflen)
+int
+ssl_read(struct vsf_session* p_sess, void* p_ssl, char* p_buf, unsigned int len)
 {
-  char* p_buf_start;
-  if (buflen == 0)
-  {
-    return;
-  }
-  p_buf_start = p_buf;
-  p_buf[buflen - 1] = end_char;
-  buflen--;
-  while (1)
-  {
-    /* Should I use SSL_peek here? Won't lack of it break pipelining? (SSL
-     * clients seem to work just fine, mind you, so maybe pipelining is banned
-     * over SSL connections. Also note that OpenSSL didn't always have
-     * SSL_peek).
-     */
-    int retval = SSL_read(p_sess->p_control_ssl, p_buf, buflen);
-    if (retval <= 0)
-    {
-      die("SSL_read");
-    }
-    p_buf[retval] = end_char;
-    buflen -= retval;
-    if (p_buf[retval - 1] == end_char || buflen == 0)
-    {
-      break;
-    }
-    p_buf += retval;
-  }
-  str_alloc_alt_term(p_str, p_buf_start, end_char);
+  return ssl_read_common(p_sess, (SSL*) p_ssl, p_buf, len, SSL_read);
 }
 
 int
-ssl_read(struct vsf_session* p_sess, char* p_buf, unsigned int len)
+ssl_peek(struct vsf_session* p_sess, void* p_ssl, char* p_buf, unsigned int len)
+{
+  return ssl_read_common(p_sess, (SSL*) p_ssl, p_buf, len, SSL_peek);
+}
+
+static int
+ssl_read_common(struct vsf_session* p_sess,
+                SSL* p_void_ssl,
+                char* p_buf,
+                unsigned int len,
+                int (*p_ssl_func)(SSL*, void*, int))
 {
   int retval;
   int err;
-  SSL* p_ssl = p_sess->p_data_ssl;
+  SSL* p_ssl = (SSL*) p_void_ssl;
   do
   {
-    retval = SSL_read(p_ssl, p_buf, len);
+    retval = (*p_ssl_func)(p_ssl, p_buf, len);
     err = SSL_get_error(p_ssl, retval);
   }
   while (retval < 0 && (err == SSL_ERROR_WANT_READ ||
@@ -300,6 +297,22 @@ ssl_write_str(void* p_ssl, const struct mystr* p_str)
     return -1;
   }
   return 0;
+}
+
+int
+ssl_read_into_str(struct vsf_session* p_sess, void* p_ssl, struct mystr* p_str)
+{
+  unsigned int len = str_getlen(p_str);
+  int ret = ssl_read(p_sess, p_ssl, (char*) str_getbuf(p_str), len);
+  if (ret >= 0)
+  {
+    str_trunc(p_str, (unsigned int) ret);
+  }
+  else
+  {
+    str_empty(p_str);
+  }
+  return ret;
 }
 
 static void
@@ -399,6 +412,7 @@ ssl_accept(struct vsf_session* p_sess, int fd)
    * we can check for a match between the control and data connections.
    */
   SSL* p_ssl;
+  int reused;
   if (p_sess->p_data_ssl != NULL)
   {
     die("p_data_ssl should be NULL.");
@@ -410,26 +424,28 @@ ssl_accept(struct vsf_session* p_sess, int fd)
   }
   p_sess->p_data_ssl = p_ssl;
   setup_bio_callbacks(p_ssl);
+  reused = SSL_session_reused(p_ssl);
+  if (tunable_require_ssl_reuse && !reused)
+  {
+    str_alloc_text(&debug_str, "No SSL session reuse on data channel.");
+    vsf_log_line(p_sess, kVSFLogEntryDebug, &debug_str);
+    ssl_data_close(p_sess);
+    return 0;
+  }
   if (str_getlen(&p_sess->control_cert_digest) > 0)
   {
     static struct mystr data_cert_digest;
     if (!ssl_cert_digest(p_ssl, p_sess, &data_cert_digest))
     {
-      if (tunable_debug_ssl)
-      {
-        str_alloc_text(&debug_str, "Missing cert on data channel.");
-        vsf_log_line(p_sess, kVSFLogEntryDebug, &debug_str);
-      }
+      str_alloc_text(&debug_str, "Missing cert on data channel.");
+      vsf_log_line(p_sess, kVSFLogEntryDebug, &debug_str);
       ssl_data_close(p_sess);
       return 0;
     }
     if (str_strcmp(&p_sess->control_cert_digest, &data_cert_digest))
     {
-      if (tunable_debug_ssl)
-      {
-        str_alloc_text(&debug_str, "DIFFERENT cert on data channel.");
-        vsf_log_line(p_sess, kVSFLogEntryDebug, &debug_str);
-      }
+      str_alloc_text(&debug_str, "DIFFERENT cert on data channel.");
+      vsf_log_line(p_sess, kVSFLogEntryDebug, &debug_str);
       ssl_data_close(p_sess);
       return 0;
     }
@@ -445,10 +461,40 @@ ssl_accept(struct vsf_session* p_sess, int fd)
 void
 ssl_comm_channel_init(struct vsf_session* p_sess)
 {
+  if (p_sess->ssl_consumer_fd != -1)
+  {
+    bug("ssl_consumer_fd active");
+  }
+  if (p_sess->ssl_slave_fd != -1)
+  {
+    bug("ssl_slave_fd active");
+  }
   const struct vsf_sysutil_socketpair_retval retval =
     vsf_sysutil_unix_stream_socketpair();
   p_sess->ssl_consumer_fd = retval.socket_one;
   p_sess->ssl_slave_fd = retval.socket_two;
+}
+
+void
+ssl_comm_channel_set_consumer_context(struct vsf_session* p_sess)
+{
+  if (p_sess->ssl_slave_fd == -1)
+  {
+    bug("ssl_slave_fd already closed");
+  }
+  vsf_sysutil_close(p_sess->ssl_slave_fd);
+  p_sess->ssl_slave_fd = -1;
+}
+
+void
+ssl_comm_channel_set_producer_context(struct vsf_session* p_sess)
+{
+  if (p_sess->ssl_consumer_fd == -1)
+  {
+    bug("ssl_consumer_fd already closed");
+  }
+  vsf_sysutil_close(p_sess->ssl_consumer_fd);
+  p_sess->ssl_consumer_fd = -1;
 }
 
 static SSL*
@@ -483,17 +529,18 @@ get_ssl(struct vsf_session* p_sess, int fd)
       str_append_text(&debug_str, p_err);
       vsf_log_line(p_sess, kVSFLogEntryDebug, &debug_str);
     }
+    /* The RFC is quite clear that we can just close the control channel
+     * here.
+     */
     die(p_err);
-    SSL_free(p_ssl);
-    return NULL;
   }
   if (tunable_debug_ssl)
   {
     const char* p_ssl_version = SSL_get_cipher_version(p_ssl);
     SSL_CIPHER* p_ssl_cipher = SSL_get_current_cipher(p_ssl);
     const char* p_cipher_name = SSL_CIPHER_get_name(p_ssl_cipher);
-    int reused = SSL_session_reused(p_ssl);
     X509* p_ssl_cert = SSL_get_peer_certificate(p_ssl);
+    int reused = SSL_session_reused(p_ssl);
     str_alloc_text(&debug_str, "SSL version: ");
     str_append_text(&debug_str, p_ssl_version);
     str_append_text(&debug_str, ", SSL cipher: ");
@@ -613,6 +660,22 @@ ssl_verify_callback(int verify_ok, X509_STORE_CTX* p_ctx)
   return 1;
 }
 
+void
+ssl_add_entropy(struct vsf_session* p_sess)
+{
+  /* Although each child does seem to have its different pool of entropy, I
+   * don't trust the interaction of OpenSSL's opaque RAND API and fork(). So
+   * throw a bit more in (only works on systems with /dev/urandom for now).
+   */
+  int ret = RAND_load_file("/dev/urandom", 16);
+  if (ret != 16)
+  {
+    str_alloc_text(&debug_str, "Couldn't add extra OpenSSL entropy: ");
+    str_append_ulong(&debug_str, (unsigned long) ret);
+    vsf_log_line(p_sess, kVSFLogEntryDebug, &debug_str);
+  }
+}
+
 #else /* VSF_BUILD_SSL */
 
 void
@@ -620,6 +683,12 @@ ssl_init(struct vsf_session* p_sess)
 {
   (void) p_sess;
   die("SSL: ssl_enable is set but SSL support not compiled in");
+}
+
+void
+ssl_control_handshake(struct vsf_session* p_sess)
+{
+  (void) p_sess;
 }
 
 void
@@ -640,21 +709,21 @@ handle_prot(struct vsf_session* p_sess)
   (void) p_sess;
 }
 
-void
-ssl_getline(const struct vsf_session* p_sess, struct mystr* p_str,
-            char end_char, char* p_buf, unsigned int buflen)
+int
+ssl_read(struct vsf_session* p_sess, void* p_ssl, char* p_buf, unsigned int len)
 {
   (void) p_sess;
-  (void) p_str;
-  (void) end_char;
+  (void) p_ssl;
   (void) p_buf;
-  (void) buflen;
+  (void) len;
+  return -1;
 }
 
 int
-ssl_read(struct vsf_session* p_sess, char* p_buf, unsigned int len)
+ssl_peek(struct vsf_session* p_sess, void* p_ssl, char* p_buf, unsigned int len)
 {
   (void) p_sess;
+  (void) p_ssl;
   (void) p_buf;
   (void) len;
   return -1;
@@ -696,6 +765,33 @@ void
 ssl_comm_channel_init(struct vsf_session* p_sess)
 {
   (void) p_sess;
+}
+
+void
+ssl_comm_channel_set_consumer_context(struct vsf_session* p_sess)
+{
+  (void) p_sess;
+}
+
+void
+ssl_comm_channel_set_producer_context(struct vsf_session* p_sess)
+{
+  (void) p_sess;
+}
+
+void
+ssl_add_entropy(struct vsf_session* p_sess)
+{
+  (void) p_sess;
+}
+
+int
+ssl_read_into_str(struct vsf_session* p_sess, void* p_ssl, struct mystr* p_str)
+{
+  (void) p_sess;
+  (void) p_ssl;
+  (void) p_str;
+  return -1;
 }
 
 #endif /* VSF_BUILD_SSL */

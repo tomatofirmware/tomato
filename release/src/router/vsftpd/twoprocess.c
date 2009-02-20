@@ -26,11 +26,12 @@
 #include "readwrite.h"
 #include "sysutil.h"
 #include "sysdeputil.h"
+#include "sslslave.h"
 
 static void drop_all_privs(void);
-static void handle_sigchld(int duff);
+static void handle_sigchld(void* duff);
+static void handle_sigterm(void* duff);
 static void process_login_req(struct vsf_session* p_sess);
-static void process_ssl_slave_req(struct vsf_session* p_sess);
 static void common_do_login(struct vsf_session* p_sess,
                             const struct mystr* p_user_str, int do_chroot,
                             int anon);
@@ -42,8 +43,9 @@ static void calculate_chdir_dir(int anon, struct mystr* p_userdir_str,
                                 const struct mystr* p_orig_user_str);
 
 static void
-handle_sigchld(int duff)
+handle_sigchld(void* duff)
 {
+
   struct vsf_sysutil_wait_retval wait_retval = vsf_sysutil_wait();
   (void) duff;
   /* Child died, so we'll do the same! Report it as an error unless the child
@@ -61,9 +63,22 @@ handle_sigchld(int duff)
   }
 }
 
+static void
+handle_sigterm(void* duff)
+{
+  (void) duff;
+  /* Blow away the connection to make sure no process lingers. */
+  vsf_sysutil_shutdown_failok(VSFTP_COMMAND_FD);
+  /* Will call the registered exit function to clean up u/wtmp if needed. */
+  vsf_sysutil_exit(1);
+}
+
 void
 vsf_two_process_start(struct vsf_session* p_sess)
 {
+  vsf_sysutil_install_sighandler(kVSFSysUtilSigTERM, handle_sigterm, 0, 1);
+  /* Overrides the SIGKILL setting set by the standalone listener. */
+  vsf_set_term_if_parent_dies();
   /* Create the comms channel between privileged parent and no-priv child */
   priv_sock_init(p_sess);
   if (tunable_ssl_enable)
@@ -73,11 +88,16 @@ vsf_two_process_start(struct vsf_session* p_sess)
      */
     ssl_comm_channel_init(p_sess);
   }
-  vsf_sysutil_install_async_sighandler(kVSFSysUtilSigCHLD, handle_sigchld);
+  vsf_sysutil_install_sighandler(kVSFSysUtilSigCHLD, handle_sigchld, 0, 1);
   {
     int newpid = vsf_sysutil_fork();
     if (newpid != 0)
     {
+      priv_sock_set_parent_context(p_sess);
+      if (tunable_ssl_enable)
+      {
+        ssl_comm_channel_set_consumer_context(p_sess);
+      }
       /* Parent - go into pre-login parent process mode */
       while (1)
       {
@@ -88,10 +108,11 @@ vsf_two_process_start(struct vsf_session* p_sess)
   /* Child process - time to lose as much privilege as possible and do the
    * login processing
    */
-  vsf_sysutil_close(p_sess->parent_fd);
+  vsf_set_die_if_parent_dies();
+  priv_sock_set_child_context(p_sess);
   if (tunable_ssl_enable)
   {
-    vsf_sysutil_close(p_sess->ssl_consumer_fd);
+    ssl_comm_channel_set_producer_context(p_sess);
   }
   if (tunable_local_enable && tunable_userlist_enable)
   {
@@ -153,13 +174,7 @@ vsf_two_process_login(struct vsf_session* p_sess,
     }
     else
     {
-      vsf_sysutil_clear_alarm();
-      vsf_sysutil_close(p_sess->child_fd);
-      if (tunable_setproctitle_enable)
-      {
-        vsf_sysutil_setproctitle("SSL handler");
-      }
-      process_ssl_slave_req(p_sess);
+      ssl_slave(p_sess);
     }
     /* NOTREACHED */
   }
@@ -205,10 +220,8 @@ process_login_req(struct vsf_session* p_sess)
 {
   enum EVSFPrivopLoginResult e_login_result = kVSFLoginNull;
   char cmd;
-  vsf_sysutil_unblock_sig(kVSFSysUtilSigCHLD);
   /* Blocks */
   cmd = priv_sock_get_cmd(p_sess->parent_fd);
-  vsf_sysutil_block_sig(kVSFSysUtilSigCHLD);
   if (cmd != PRIV_SOCK_LOGIN)
   {
     die("bad request");
@@ -280,32 +293,6 @@ process_login_req(struct vsf_session* p_sess)
 }
 
 static void
-process_ssl_slave_req(struct vsf_session* p_sess)
-{
-  priv_sock_send_str(p_sess->ssl_slave_fd, &p_sess->control_cert_digest);
-  while (1)
-  {
-    char cmd = priv_sock_get_cmd(p_sess->ssl_slave_fd);
-    int retval;
-    if (cmd == PRIV_SOCK_GET_USER_CMD)
-    {
-      ftp_getline(p_sess, &p_sess->ftp_cmd_str, p_sess->p_control_line_buf);
-      priv_sock_send_str(p_sess->ssl_slave_fd, &p_sess->ftp_cmd_str);
-    }
-    else if (cmd == PRIV_SOCK_WRITE_USER_RESP)
-    {
-      priv_sock_get_str(p_sess->ssl_slave_fd, &p_sess->ftp_cmd_str);
-      retval = ftp_write_str(p_sess, &p_sess->ftp_cmd_str, kVSFRWControl);
-      priv_sock_send_int(p_sess->ssl_slave_fd, retval);
-    }
-    else
-    {
-      die("bad request in process_ssl_slave_req");
-    }
-  }
-}
-
-static void
 common_do_login(struct vsf_session* p_sess, const struct mystr* p_user_str,
                 int do_chroot, int anon)
 {
@@ -323,13 +310,13 @@ common_do_login(struct vsf_session* p_sess, const struct mystr* p_user_str,
   {
     p_sess->ssl_slave_active = 1;
   }
-  /* Absorb the SIGCHLD */
-  vsf_sysutil_unblock_sig(kVSFSysUtilSigCHLD);
   /* Handle loading per-user config options */
   handle_per_user_config(p_user_str);
   /* Set this before we fork */
   p_sess->is_anonymous = anon;
-  vsf_sysutil_install_async_sighandler(kVSFSysUtilSigCHLD, handle_sigchld);
+  priv_sock_close(p_sess);
+  priv_sock_init(p_sess);
+  vsf_sysutil_install_sighandler(kVSFSysUtilSigCHLD, handle_sigchld, 0, 1);
   newpid = vsf_sysutil_fork(); 
   if (newpid == 0)
   {
@@ -339,16 +326,12 @@ common_do_login(struct vsf_session* p_sess, const struct mystr* p_user_str,
     struct mystr userdir_str = INIT_MYSTR;
     unsigned int secutil_option = VSF_SECUTIL_OPTION_USE_GROUPS;
     /* Child - drop privs and start proper FTP! */
-    vsf_sysutil_close(p_sess->parent_fd);
-    if (tunable_ssl_enable)
-    {
-      vsf_sysutil_close(p_sess->ssl_slave_fd);
-      if (p_sess->ssl_slave_active)
-      {
-        priv_sock_get_str(p_sess->ssl_consumer_fd,
-                          &p_sess->control_cert_digest);
-      }
-    }
+    /* This PR_SET_PDEATHSIG doesn't work for all possible process tree setups.
+     * The other cases are taken care of by a shutdown() of the command
+     * connection in our SIGTERM handler.
+     */
+    vsf_set_die_if_parent_dies();
+    priv_sock_set_child_context(p_sess);
     if (tunable_guest_enable && !anon)
     {
       p_sess->is_guest = 1;
@@ -393,10 +376,10 @@ common_do_login(struct vsf_session* p_sess, const struct mystr* p_user_str,
     bug("should not get here: common_do_login");
   }
   /* Parent */
+  priv_sock_set_parent_context(p_sess);
   if (tunable_ssl_enable)
   {
-    vsf_sysutil_close(p_sess->ssl_consumer_fd);
-    /* Keep the SSL slave fd around so we can shutdown() upon exit */
+    ssl_comm_channel_set_producer_context(p_sess);
   }
   vsf_priv_parent_postlogin(p_sess);
   bug("should not get here in common_do_login");
@@ -423,12 +406,8 @@ handle_per_user_config(const struct mystr* p_user_str)
   str_append_char(&filename_str, '/');
   str_append_str(&filename_str, p_user_str);
   retval = str_stat(&filename_str, &p_statbuf);
-  /* Security - ignore unless owned by root */
-  if (!vsf_sysutil_retval_is_error(retval) &&
-      vsf_sysutil_statbuf_get_uid(p_statbuf) == VSFTP_ROOT_UID)
-  {
-    vsf_parseconf_load_file(str_getbuf(&filename_str), 1);
-  }
+  /* Security - file ownership check now in vsf_parseconf_load_file() */
+  vsf_parseconf_load_file(str_getbuf(&filename_str), 1);
   str_free(&filename_str);
   vsf_sysutil_free(p_statbuf);
 }

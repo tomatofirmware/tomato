@@ -102,10 +102,6 @@ vsf_privop_do_login(struct vsf_session* p_sess,
   if (result == kVSFLoginFail)
   {
     vsf_log_do_log(p_sess, 0);
-    if (tunable_delay_failed_login)
-    {
-      vsf_sysutil_sleep((double) tunable_delay_failed_login);
-    }
   }
   else
   {
@@ -126,13 +122,17 @@ handle_login(struct vsf_session* p_sess, const struct mystr* p_user_str,
    * almost certainly can.
    */
   int anonymous_login = 0;
+  char first_char;
   unsigned int len = str_getlen(p_user_str);
   if (len == 0 || len > VSFTP_USERNAME_MAX)
   {
     return kVSFLoginFail;
   }
   /* Throw out dodgy start characters */
-  if (!vsf_sysutil_isalnum(str_get_char_at(p_user_str, 0)))
+  first_char = str_get_char_at(p_user_str, 0);
+  if (!vsf_sysutil_isalnum(first_char) &&
+      first_char != '_' &&
+      first_char != '.')
   {
     return kVSFLoginFail;
   }

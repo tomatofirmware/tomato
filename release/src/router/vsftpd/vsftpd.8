@@ -28,7 +28,8 @@ binary will then launch the FTP service ready for immediate client connections.
 .Sh OPTIONS
 An optional
 .Op configuration file
-may be given on the command line.  The default configuration file is
+may be given on the command line. This file must be owned as root if running as
+root. The default configuration file is
 .Pa /etc/vsftpd.conf .
 .Sh SEE ALSO
 .Xr vsftpd.conf 5

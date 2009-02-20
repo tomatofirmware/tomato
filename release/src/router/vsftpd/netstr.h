@@ -2,6 +2,11 @@
 #define VSFTP_NETSTR_H
 
 struct mystr;
+struct vsf_session;
+
+typedef int (*str_netfd_read_t)(struct vsf_session*
+                                p_sess, char*,
+                                unsigned int);
 
 /* str_netfd_alloc()
  * PURPOSE
@@ -11,17 +16,24 @@ struct mystr;
  * will exit the program.
  * This method avoids reading one character at a time from the network.
  * PARAMETERS
+ * p_sess       - the session object, used for passing into the I/O callbacks
  * p_str        - the destination string object
- * fd           - the file descriptor of the remote network socket
  * term         - the character which will terminate the string. This character
  *                is included in the returned string.
  * p_readbuf    - pointer to a scratch buffer into which to read from the
  *                network. This buffer must be at least "maxlen" characters!
  * maxlen       - maximum length of string to return. If this limit is passed,
  *                an empty string will be returned.
+ * p_peekfunc   - a function called to peek data from the network
+ * p_readfunc   - a function called to read data from the network
  */
-void str_netfd_alloc(struct mystr* p_str, int fd, char term,
-                     char* p_readbuf, unsigned int maxlen);
+void str_netfd_alloc(struct vsf_session* p_sess,
+                     struct mystr* p_str,
+                     char term,
+                     char* p_readbuf,
+                     unsigned int maxlen,
+                     str_netfd_read_t p_peekfunc,
+                     str_netfd_read_t p_readfunc);
 
 /* str_netfd_read()
  * PURPOSE

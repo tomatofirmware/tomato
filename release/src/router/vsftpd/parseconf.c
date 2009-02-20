@@ -17,14 +17,11 @@
 #include "utility.h"
 
 static const char* s_p_saved_filename;
-static int s_strings_copied;
 
 /* File local functions */
 static void handle_config_setting(struct mystr* p_setting_str,
                                   struct mystr* p_value_str,
                                   int errs_fatal);
-
-static void copy_string_settings(void);
 
 /* Tables mapping setting names to runtime variables */
 /* Boolean settings */
@@ -108,6 +105,9 @@ parseconf_bool_array[] =
   { "strict_ssl_write_shutdown", &tunable_strict_ssl_write_shutdown },
   { "ssl_request_cert", &tunable_ssl_request_cert },
   { "delete_failed_uploads", &tunable_delete_failed_uploads },
+  { "implicit_ssl", &tunable_implicit_ssl },
+  { "sandbox", &tunable_sandbox },
+  { "require_ssl_reuse", &tunable_require_ssl_reuse },
   { 0, 0 }
 };
 
@@ -179,6 +179,7 @@ parseconf_str_array[] =
   { "rsa_private_key_file", &tunable_rsa_private_key_file },
   { "dsa_private_key_file", &tunable_dsa_private_key_file },
   { "ca_certs_file", &tunable_ca_certs_file },
+  { "cmds_denied", &tunable_cmds_denied },
   { "passwd_file", &tunable_passwd_file },
   { 0, 0 }
 };
@@ -207,15 +208,6 @@ vsf_parseconf_load_file(const char* p_filename, int errs_fatal)
   {
     bug("null filename in vsf_parseconf_load_file");
   }
-  if (!s_strings_copied)
-  {
-    s_strings_copied = 1;
-    /* A minor hack to make sure all strings are malloc()'ed so we can free
-     * them at some later date. Specifically handles strings embedded in the
-     * binary.
-     */
-    copy_string_settings();
-  }
   retval = str_fileread(&config_file_str, p_filename, VSFTP_CONF_FILE_MAX);
   if (vsf_sysutil_retval_is_error(retval))
   {
@@ -225,13 +217,29 @@ vsf_parseconf_load_file(const char* p_filename, int errs_fatal)
     }
     else
     {
+      str_free(&config_file_str);
       return;
     }
+  }
+  {
+    struct vsf_sysutil_statbuf* p_statbuf = 0;
+    retval = vsf_sysutil_stat(p_filename, &p_statbuf);
+    /* Security: check current user owns the config file. This is a sanity
+     * check for the admin, and is NOT designed to be a check safe from
+     * race conditions.
+     */
+    if (vsf_sysutil_retval_is_error(retval) ||
+        vsf_sysutil_statbuf_get_uid(p_statbuf) != vsf_sysutil_getuid())
+    {
+      die("config file not owned by correct user");
+    }
+    vsf_sysutil_free(p_statbuf);
   }
   while (str_getline(&config_file_str, &config_setting_str, &str_pos))
   {
     if (str_isempty(&config_setting_str) ||
-        str_get_char_at(&config_setting_str, 0) == '#')
+        str_get_char_at(&config_setting_str, 0) == '#' ||
+        str_all_space(&config_setting_str))
     {
       continue;
     }
@@ -344,19 +352,3 @@ handle_config_setting(struct mystr* p_setting_str, struct mystr* p_value_str,
     die2("unrecognised variable in config file: ", str_getbuf(p_setting_str));
   }
 }
-
-static void
-copy_string_settings(void)
-{
-  const struct parseconf_str_setting* p_str_setting = parseconf_str_array;
-  while (p_str_setting->p_setting_name != 0)
-  {
-    if (*p_str_setting->p_variable != 0)
-    {
-      *p_str_setting->p_variable =
-          vsf_sysutil_strdup(*p_str_setting->p_variable);
-    }
-    p_str_setting++;
-  }
-}
-

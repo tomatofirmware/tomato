@@ -55,5 +55,10 @@ void* vsf_sysutil_map_anon_pages(unsigned int length);
 void vsf_sysutil_send_fd(int sock_fd, int send_fd);
 int vsf_sysutil_recv_fd(int sock_fd);
 
+/* If supported, arrange for current process to die when parent dies. */
+void vsf_set_die_if_parent_dies();
+/* Or a softer version delivering SIGTERM. */
+void vsf_set_term_if_parent_dies();
+
 #endif /* VSF_SYSDEPUTIL_H */
 

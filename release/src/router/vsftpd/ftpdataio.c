@@ -29,6 +29,7 @@
 #include "ls.h"
 #include "ssl.h"
 #include "readwrite.h"
+#include "privsock.h"
 
 static void init_data_sock_params(struct vsf_session* p_sess, int sock_fd);
 static filesize_t calc_num_send(int file_fd, filesize_t init_offset);
@@ -63,7 +64,17 @@ vsf_ftpdataio_dispose_transfer_fd(struct vsf_session* p_sess)
   /* Reset the data connection alarm so it runs anew with the blocking close */
   start_data_alarm(p_sess);
   vsf_sysutil_uninstall_io_handler();
-  if (p_sess->p_data_ssl != 0)
+  if (p_sess->data_use_ssl && p_sess->ssl_slave_active)
+  {
+    char result;
+    priv_sock_send_cmd(p_sess->ssl_consumer_fd, PRIV_SOCK_DO_SSL_CLOSE);
+    result = priv_sock_get_result(p_sess->ssl_consumer_fd);
+    if (result != PRIV_SOCK_RESULT_OK)
+    {
+      dispose_ret = 0;
+    }
+  }
+  else if (p_sess->p_data_ssl)
   {
     dispose_ret = ssl_data_close(p_sess);
   }
@@ -75,7 +86,10 @@ vsf_ftpdataio_dispose_transfer_fd(struct vsf_session* p_sess)
     vsf_sysutil_deactivate_linger_failok(p_sess->data_fd);
     (void) vsf_sysutil_close_failok(p_sess->data_fd);
   }
-  vsf_sysutil_clear_alarm();
+  if (tunable_data_connection_timeout > 0)
+  {
+    vsf_sysutil_clear_alarm();
+  }
   p_sess->data_fd = -1;
   return dispose_ret;
 }
@@ -158,16 +172,37 @@ vsf_ftpdataio_get_port_fd(struct vsf_session* p_sess)
 int
 vsf_ftpdataio_post_mark_connect(struct vsf_session* p_sess)
 {
-  if (p_sess->data_use_ssl)
+  int ret = 0;
+  if (!p_sess->data_use_ssl)
   {
-    if (!ssl_accept(p_sess, p_sess->data_fd))
+    return 1;
+  }
+  if (!p_sess->ssl_slave_active)
+  {
+    ret = ssl_accept(p_sess, p_sess->data_fd);
+  }
+  else
+  {
+    int sock_ret;
+    priv_sock_send_cmd(p_sess->ssl_consumer_fd, PRIV_SOCK_DO_SSL_HANDSHAKE);
+    priv_sock_send_fd(p_sess->ssl_consumer_fd, p_sess->data_fd);
+    sock_ret = priv_sock_get_result(p_sess->ssl_consumer_fd);
+    if (sock_ret == PRIV_SOCK_RESULT_OK)
     {
-      vsf_cmdio_write(
-        p_sess, FTP_DATATLSBAD, "Secure connection negotiation failed.");
-      return 0;
+      ret = 1;
     }
   }
-  return 1;
+  if (ret != 1)
+  {
+    static struct mystr s_err_msg;
+    str_alloc_text(&s_err_msg, "SSL connection failed");
+    if (tunable_require_ssl_reuse)
+    {
+      str_append_text(&s_err_msg, "; session reuse required");
+    }
+    vsf_cmdio_write_str(p_sess, FTP_DATATLSBAD, &s_err_msg);
+  }
+  return ret;
 }
 
 static void
@@ -188,8 +223,15 @@ start_data_alarm(struct vsf_session* p_sess)
 {
   if (tunable_data_connection_timeout > 0)
   {
-    vsf_sysutil_install_sighandler(kVSFSysUtilSigALRM, handle_sigalrm, p_sess);
+    vsf_sysutil_install_sighandler(kVSFSysUtilSigALRM,
+                                   handle_sigalrm,
+                                   p_sess,
+                                   1);
     vsf_sysutil_set_alarm(tunable_data_connection_timeout);
+  }
+  else if (tunable_idle_session_timeout > 0)
+  {
+    vsf_sysutil_clear_alarm();
   }
 }
 
@@ -440,16 +482,20 @@ do_file_send_rwloop(struct vsf_session* p_sess, int file_fd, int is_ascii)
   struct vsf_transfer_ret ret_struct = { 0, 0 };
   unsigned int chunk_size = get_chunk_size();
   char* p_writefrom_buf;
+  int prev_cr = 0;
   if (p_readbuf == 0)
   {
-    /* NOTE!! * 2 factor because we can double the data by doing our ASCII
-     * linefeed mangling
-     */
-    vsf_secbuf_alloc(&p_asciibuf, VSFTP_DATA_BUFSIZE * 2);
     vsf_secbuf_alloc(&p_readbuf, VSFTP_DATA_BUFSIZE);
   }
   if (is_ascii)
   {
+    if (p_asciibuf == 0)
+    {
+      /* NOTE!! * 2 factor because we can double the data by doing our ASCII
+       * linefeed mangling
+       */
+      vsf_secbuf_alloc(&p_asciibuf, VSFTP_DATA_BUFSIZE * 2);
+    }
     p_writefrom_buf = p_asciibuf;
   }
   else
@@ -472,8 +518,13 @@ do_file_send_rwloop(struct vsf_session* p_sess, int file_fd, int is_ascii)
     }
     if (is_ascii)
     {
-      num_to_write = vsf_ascii_bin_to_ascii(p_readbuf, p_asciibuf,
-                                            (unsigned int) retval);
+      struct bin_to_ascii_ret ret =
+          vsf_ascii_bin_to_ascii(p_readbuf,
+                                 p_asciibuf,
+                                 (unsigned int) retval,
+                                 prev_cr);
+      num_to_write = ret.stored;
+      prev_cr = ret.last_was_cr;
     }
     else
     {

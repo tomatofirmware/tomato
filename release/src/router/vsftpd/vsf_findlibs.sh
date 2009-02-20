@@ -43,9 +43,12 @@ locate_library /usr/lib/libutil.so && echo "-lutil";
 locate_library /usr/lib/libsec.sl && echo "-lsec";
 
 # Look for libcap (capabilities)
-locate_library /lib/libcap.so.1 && echo "/lib/libcap.so.1";
-locate_library /usr/lib/libcap.so && echo "-lcap";
-locate_library /lib/libcap.so && echo "-lcap";
+if locate_library /lib/libcap.so.1; then
+  echo "/lib/libcap.so.1";
+else
+  locate_library /usr/lib/libcap.so && echo "-lcap";
+  locate_library /lib/libcap.so && echo "-lcap";
+fi
 
 # Solaris needs this for nanosleep()..
 locate_library /lib/libposix4.so && echo "-lposix4";

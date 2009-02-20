@@ -53,6 +53,7 @@
 #include <syslog.h>
 #include <utime.h>
 #include <netdb.h>
+#include <sys/resource.h>
 
 /* Private variables to this file */
 /* Current umask() */
@@ -73,6 +74,7 @@ static struct vsf_sysutil_sig_details
   void* p_private;
   int pending;
   int running;
+  int use_alarm;
 } s_sig_details[NSIG];
 
 static vsf_context_io_t s_io_handler;
@@ -91,6 +93,7 @@ struct vsf_sysutil_sockaddr
 
 /* File locals */
 static void vsf_sysutil_common_sighandler(int signum);
+static void vsf_sysutil_alrm_sighandler(int signum);
 static int vsf_sysutil_translate_sig(const enum EVSFSysUtilSignal sig);
 static void vsf_sysutil_set_sighandler(int sig, void (*p_handlefunc)(int));
 static int vsf_sysutil_translate_memprot(
@@ -102,15 +105,32 @@ void vsf_sysutil_sockaddr_alloc(struct vsf_sysutil_sockaddr** p_sockptr);
 static int lock_internal(int fd, int lock_type);
 
 static void
+vsf_sysutil_alrm_sighandler(int signum)
+{
+  (void) signum;
+  alarm(1);
+}
+
+static void
 vsf_sysutil_common_sighandler(int signum)
 {
   if (signum < 0 || signum >= NSIG)
   {
+    // bug() is not async safe but this check really is a "cannot happen"
+    // debug aid.
     bug("signal out of range in vsf_sysutil_common_sighandler");
   }
   if (s_sig_details[signum].sync_sig_handler)
   {
     s_sig_details[signum].pending = 1;
+    /* Since this synchronous signal framework has a small race (signal coming
+     * in just before we start a blocking call), there's the option to fire an
+     * alarm repeatedly until the signal is handled.
+     */
+    if (s_sig_details[signum].use_alarm)
+    {
+      alarm(1);
+    }
   }
 }
 
@@ -143,6 +163,10 @@ vsf_sysutil_check_pending_actions(
     if (s_sig_details[i].pending && !s_sig_details[i].running)
     {
       s_sig_details[i].running = 1;
+      if (s_sig_details[i].use_alarm)
+      {
+        alarm(0);
+      }
       if (s_sig_details[i].sync_sig_handler)
       {
         s_sig_details[i].pending = 0;
@@ -190,12 +214,19 @@ vsf_sysutil_translate_sig(const enum EVSFSysUtilSignal sig)
 
 void
 vsf_sysutil_install_sighandler(const enum EVSFSysUtilSignal sig,
-                               vsf_sighandle_t handler, void* p_private)
+                               vsf_sighandle_t handler,
+                               void* p_private,
+                               int use_alarm)
 {
   int realsig = vsf_sysutil_translate_sig(sig);
   s_sig_details[realsig].p_private = p_private;
   s_sig_details[realsig].sync_sig_handler = handler;
+  s_sig_details[realsig].use_alarm = use_alarm;
   vsf_sysutil_set_sighandler(realsig, vsf_sysutil_common_sighandler);
+  if (use_alarm && realsig != SIGALRM)
+  {
+    vsf_sysutil_set_sighandler(SIGALRM, vsf_sysutil_alrm_sighandler);
+  }
 }
 
 void
@@ -601,17 +632,20 @@ int
 vsf_sysutil_wait_exited_normally(
   const struct vsf_sysutil_wait_retval* p_waitret)
 {
-  return WIFEXITED(p_waitret->exit_status);
+  int status = ((struct vsf_sysutil_wait_retval*) p_waitret)->exit_status;
+  return WIFEXITED(status);
 }
 
 int
 vsf_sysutil_wait_get_exitcode(const struct vsf_sysutil_wait_retval* p_waitret)
 {
+  int status;
   if (!vsf_sysutil_wait_exited_normally(p_waitret))
   {
     bug("not a normal exit in vsf_sysutil_wait_get_exitcode");
   }
-  return WEXITSTATUS(p_waitret->exit_status);
+  status = ((struct vsf_sysutil_wait_retval*) p_waitret)->exit_status;
+  return WEXITSTATUS(status);
 }
 
 void
@@ -1561,6 +1595,9 @@ vsf_sysutil_get_error(void)
     case EOPNOTSUPP:
       retval = kVSFSysUtilErrOPNOTSUPP;
       break;
+    case EACCES:
+      retval = kVSFSysUtilErrOPNOTSUPP;
+      break;
   }
   return retval;
 }
@@ -2483,6 +2520,28 @@ vsf_sysutil_make_session_leader(void)
 }
 
 void
+vsf_sysutil_reopen_standard_fds(void)
+{
+  /* This reopens STDIN, STDOUT and STDERR to /dev/null */
+  int fd;
+  if ((fd = open("/dev/null", O_RDWR, 0)) < 0)
+  {
+    goto error;
+  }
+  vsf_sysutil_dupfd2(fd, STDIN_FILENO);
+  vsf_sysutil_dupfd2(fd, STDOUT_FILENO);
+  vsf_sysutil_dupfd2(fd, STDERR_FILENO);
+  if ( fd > 2 )
+  {
+    vsf_sysutil_close(fd);
+  }
+  return;
+
+error:
+  die("reopening standard file descriptors to /dev/null failed");
+}
+
+void
 vsf_sysutil_tzset(void)
 {
   int retval;
@@ -2617,27 +2676,34 @@ vsf_sysutil_getenv(const char* p_var)
 }
 
 void
-vsf_sysutil_openlog(void)
+vsf_sysutil_openlog(int force)
 {
   int facility = LOG_DAEMON;
+  int option = LOG_PID;
+  if (!force)
+  {
+    option |= LOG_NDELAY;
+  }
 #ifdef LOG_FTP
   facility = LOG_FTP;
 #endif
-  openlog("vsftpd", LOG_NDELAY | LOG_PID, facility);
+  openlog("vsftpd", option, facility);
+}
+
+void
+vsf_sysutil_closelog(void)
+{
+  closelog();
 }
 
 void
 vsf_sysutil_syslog(const char* p_text, int severe)
 {
-  char *text;
   int prio = LOG_INFO;
   if (severe)
   {
     prio = LOG_WARNING;
   }
-  /* skip date & pid */
-  if ((text = strstr(p_text, "[pid ")) && (text = strchr(text, ']')) && (text[1] == ' '))
-    p_text = text + 2;
   syslog(prio, "%s", p_text);
 }
 
@@ -2688,3 +2754,39 @@ vsf_sysutil_setmodtime(const char* p_file, long the_time, int is_localtime)
   return utime(p_file, &new_times);
 }
 
+void
+vsf_sysutil_ftruncate(int fd)
+{
+  int ret = ftruncate(fd, 0);
+  if (ret != 0)
+  {
+    die("ftruncate");
+  }
+}
+
+int
+vsf_sysutil_getuid(void)
+{
+  return getuid();
+}
+
+void
+vsf_sysutil_set_address_space_limit(long bytes)
+{
+  /* Unfortunately, OpenBSD is missing RLIMIT_AS. */
+#ifdef RLIMIT_AS
+  int ret;
+  struct rlimit rlim;
+  rlim.rlim_cur = bytes;
+  rlim.rlim_max = bytes;
+  ret = setrlimit(RLIMIT_AS, &rlim);
+  /* Permit EPERM as this could indicate that the shell launching vsftpd already
+   * has a lower limit.
+   */
+  if (ret != 0 && errno != EPERM)
+  {
+    die("setrlimit");
+  }
+#endif /* RLIMIT_AS */
+  (void) bytes;
+}

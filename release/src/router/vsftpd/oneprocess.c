@@ -22,10 +22,47 @@
 #include "utility.h"
 #include "sysstr.h"
 #include "sysdeputil.h"
+#include "sysutil.h"
+#include "ptracesandbox.h"
+#include "ftppolicy.h"
+
+static void one_process_start(void* p_arg);
 
 void
 vsf_one_process_start(struct vsf_session* p_sess)
 {
+  if (tunable_sandbox)
+  {
+    struct pt_sandbox* p_sandbox = ptrace_sandbox_alloc();
+    if (p_sandbox == 0)
+    {
+      die("could not allocate sandbox");
+    }
+    policy_setup(p_sandbox, p_sess);
+    if (ptrace_sandbox_launch_process(p_sandbox,
+                                      one_process_start,
+                                      (void*) p_sess) <= 0)
+    {
+      die("could not launch sandboxed child");
+    }
+    /* TODO - could drop privs here. For now, run as root as the attack surface
+     * is negligible, and running as root permits us to correctly deliver the
+     * parent death signal upon unexpected crash.
+     */
+    (void) ptrace_sandbox_run_processes(p_sandbox);
+    ptrace_sandbox_free(p_sandbox);
+    vsf_sysutil_exit(0);
+  }
+  else
+  {
+    one_process_start((void*) p_sess);
+  }
+}
+
+static void
+one_process_start(void* p_arg)
+{
+  struct vsf_session* p_sess = (struct vsf_session*) p_arg;
   unsigned int caps = 0;
   if (tunable_chown_uploads)
   {
@@ -57,6 +94,10 @@ vsf_one_process_start(struct vsf_session* p_sess)
     }
     str_free(&user_name);
     str_free(&chdir_str);
+  }
+  if (tunable_sandbox)
+  {
+    ptrace_sandbox_attach_point();
   }
   init_connection(p_sess);
 }

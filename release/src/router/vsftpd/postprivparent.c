@@ -42,10 +42,8 @@ static void
 process_post_login_req(struct vsf_session* p_sess)
 {
   char cmd;
-  vsf_sysutil_unblock_sig(kVSFSysUtilSigCHLD);
   /* Blocks */
   cmd = priv_sock_get_cmd(p_sess->parent_fd);
-  vsf_sysutil_block_sig(kVSFSysUtilSigCHLD);
   if (tunable_chown_uploads && cmd == PRIV_SOCK_CHOWN)
   {
     cmd_process_chown(p_sess);
@@ -66,21 +64,12 @@ minimize_privilege(struct vsf_session* p_sess)
   /* So, we logged in and forked a totally unprivileged child. Our job
    * now is to minimize the privilege we need in order to act as a helper
    * to the child.
-   *
-   * In some happy circumstances, we can exit and be done with root
-   * altogether.
    */
   if (!p_sess->is_anonymous && tunable_session_support)
   {
     /* Need to hang around to update logs, utmp, wtmp etc. on logout.
      * Need to keep privs to do this. */
     return;
-  }
-  if (!tunable_chown_uploads && !tunable_connect_from_port_20 &&
-      !tunable_max_per_ip && !tunable_max_clients)
-  {
-    /* Cool. We're outta here. */
-    vsf_sysutil_exit(0);
   }
   {
     unsigned int caps = 0;

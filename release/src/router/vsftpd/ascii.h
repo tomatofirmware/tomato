@@ -38,11 +38,21 @@ struct ascii_to_bin_ret vsf_ascii_ascii_to_bin(
  * p_out        - the output buffer, which MUST BE at least TWICE as big as
  *                "in_len"
  * in_len       - the length in bytes of the input buffer
+ * prev_cr      - set to non-zero if this buffer fragment was immediately
+ *                preceeded by a '\r'.
  * RETURNS
- * The number of characters stored in the output buffer
+ * The number of characters stored in the output buffer, and whether the last
+ * character stored was '\r'.
  */
-unsigned int vsf_ascii_bin_to_ascii(const char* p_in, char* p_out,
-                                    unsigned int in_len);
+struct bin_to_ascii_ret
+{
+  unsigned int stored;
+  int last_was_cr;
+};
+struct bin_to_ascii_ret vsf_ascii_bin_to_ascii(const char* p_in,
+                                               char* p_out,
+                                               unsigned int in_len,
+                                               int prev_cr);
 
 #endif /* VSFTP_ASCII_H */
 

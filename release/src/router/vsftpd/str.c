@@ -574,6 +574,20 @@ str_contains_space(const struct mystr* p_str)
 }
 
 int
+str_all_space(const struct mystr* p_str)
+{
+  unsigned int i;
+  for (i=0; i < p_str->len; i++)
+  {
+    if (!vsf_sysutil_isspace(p_str->p_buf[i]))
+    {
+      return 0;
+    }
+  }
+  return 1;
+}
+
+int
 str_contains_unprintable(const struct mystr* p_str)
 {
   unsigned int i;

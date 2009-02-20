@@ -16,7 +16,8 @@ enum EVSFSysUtilError
   kVSFSysUtilErrNOSYS,
   kVSFSysUtilErrINTR,
   kVSFSysUtilErrINVAL,
-  kVSFSysUtilErrOPNOTSUPP
+  kVSFSysUtilErrOPNOTSUPP,
+  kVSFSysUtilErrACCES
 };
 enum EVSFSysUtilError vsf_sysutil_get_error(void);
 
@@ -41,7 +42,9 @@ typedef void (*vsf_context_io_t)(int, int, void*);
 
 void vsf_sysutil_install_null_sighandler(const enum EVSFSysUtilSignal sig);
 void vsf_sysutil_install_sighandler(const enum EVSFSysUtilSignal,
-                                    vsf_sighandle_t handler, void* p_private);
+                                    vsf_sighandle_t handler,
+                                    void* p_private,
+                                    int use_alarm);
 void vsf_sysutil_install_async_sighandler(const enum EVSFSysUtilSignal sig,
                                           vsf_async_sighandle_t handler);
 void vsf_sysutil_default_sig(const enum EVSFSysUtilSignal sig);
@@ -90,6 +93,7 @@ void vsf_sysutil_close(int fd);
 int vsf_sysutil_close_failok(int fd);
 int vsf_sysutil_unlink(const char* p_dead);
 int vsf_sysutil_write_access(const char* p_filename);
+void vsf_sysutil_ftruncate(int fd);
 
 /* Reading and writing */
 void vsf_sysutil_lseek_to(const int fd, filesize_t seek_pos);
@@ -293,6 +297,7 @@ unsigned char vsf_sysutil_get_random_byte(void);
 unsigned int vsf_sysutil_get_umask(void);
 void vsf_sysutil_set_umask(unsigned int umask);
 void vsf_sysutil_make_session_leader(void);
+void vsf_sysutil_reopen_standard_fds(void);
 void vsf_sysutil_tzset(void);
 const char* vsf_sysutil_get_current_date(void);
 void vsf_sysutil_qsort(void* p_base, unsigned int num_elem,
@@ -301,10 +306,12 @@ void vsf_sysutil_qsort(void* p_base, unsigned int num_elem,
 char* vsf_sysutil_getenv(const char* p_var);
 typedef void (*exitfunc_t)(void);
 void vsf_sysutil_set_exit_func(exitfunc_t exitfunc);
+int vsf_sysutil_getuid(void);
 
 /* Syslogging (bah) */
-void vsf_sysutil_openlog(void);
+void vsf_sysutil_openlog(int force);
 void vsf_sysutil_syslog(const char* p_text, int severe);
+void vsf_sysutil_closelog(void);
 
 /* Credentials handling */
 int vsf_sysutil_running_as_root(void);
@@ -329,6 +336,9 @@ long vsf_sysutil_get_cached_time_usec(void);
 long vsf_sysutil_parse_time(const char* p_text);
 void vsf_sysutil_sleep(double seconds);
 int vsf_sysutil_setmodtime(const char* p_file, long the_time, int is_localtime);
+
+/* Limits */
+void vsf_sysutil_set_address_space_limit(long bytes);
 
 #endif /* VSF_SYSUTIL_H */
 

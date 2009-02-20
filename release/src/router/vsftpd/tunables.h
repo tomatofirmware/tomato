@@ -1,6 +1,12 @@
 #ifndef VSF_TUNABLES_H
 #define VSF_TUNABLES_H
 
+/* tunables_load_defaults()
+ * PURPOSE
+ * Load the default values into the global settings variables.
+ */
+void tunables_load_defaults();
+
 /* Configurable preferences */
 /* Booleans */
 extern int tunable_anonymous_enable;          /* Allow anon logins */
@@ -76,6 +82,9 @@ extern int tunable_strict_ssl_read_eof;       /* Need SSL_shutdown() on read */
 extern int tunable_strict_ssl_write_shutdown; /* Need SSL_shutdown() on write */
 extern int tunable_ssl_request_cert;          /* Ask client for cert */
 extern int tunable_delete_failed_uploads;     /* Delete an upload that failed */
+extern int tunable_implicit_ssl;              /* Use implicit SSL protocol */
+extern int tunable_sandbox;                   /* Deploy ptrace sandbox */
+extern int tunable_require_ssl_reuse;         /* Require re-used data conn */
 
 /* Integer/numeric defines */
 extern unsigned int tunable_accept_timeout;
@@ -131,6 +140,7 @@ extern const char* tunable_ssl_ciphers;
 extern const char* tunable_rsa_private_key_file;
 extern const char* tunable_dsa_private_key_file;
 extern const char* tunable_ca_certs_file;
+extern const char* tunable_cmds_denied;
 extern const char* tunable_passwd_file;
 
 #endif /* VSF_TUNABLES_H */

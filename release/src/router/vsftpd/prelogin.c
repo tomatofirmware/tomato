@@ -26,10 +26,13 @@
 #include "opts.h"
 
 /* Functions used */
+static void check_limits(struct vsf_session* p_sess);
 static void emit_greeting(struct vsf_session* p_sess);
 static void parse_username_password(struct vsf_session* p_sess);
 static void handle_user_command(struct vsf_session* p_sess);
 static void handle_pass_command(struct vsf_session* p_sess);
+static void check_login_delay();
+static void check_login_fails(struct vsf_session* p_sess);
 
 void
 init_connection(struct vsf_session* p_sess)
@@ -42,12 +45,21 @@ init_connection(struct vsf_session* p_sess)
    * writing the initial greetings should block.
    */
   vsf_cmdio_set_alarm(p_sess);
+  /* Check limits before doing an implicit SSL handshake, to avoid DoS
+   * attacks. This will result in plain text messages being sent to the SSL
+   * client, but we can live with that.
+   */
+  check_limits(p_sess);
+  if (tunable_ssl_enable && tunable_implicit_ssl)
+  {
+    ssl_control_handshake(p_sess);
+  }
   emit_greeting(p_sess);
   parse_username_password(p_sess);
 }
 
 static void
-emit_greeting(struct vsf_session* p_sess)
+check_limits(struct vsf_session* p_sess)
 {
   struct mystr str_log_line = INIT_MYSTR;
   /* Check for client limits (standalone mode only) */
@@ -76,6 +88,11 @@ emit_greeting(struct vsf_session* p_sess)
     vsf_cmdio_write_exit(p_sess, FTP_IP_DENY, "Service not available.");
   }
   vsf_log_line(p_sess, kVSFLogEntryConnection, &str_log_line);
+}
+
+static void
+emit_greeting(struct vsf_session* p_sess)
+{
   if (!str_isempty(&p_sess->banner_str))
   {
     vsf_banner_write(p_sess, &p_sess->banner_str, FTP_GREET);
@@ -121,7 +138,9 @@ parse_username_password(struct vsf_session* p_sess)
     {
       handle_opts(p_sess);
     }
-    else if (tunable_ssl_enable && str_equal_text(&p_sess->ftp_cmd_str, "AUTH"))
+    else if (tunable_ssl_enable &&
+             str_equal_text(&p_sess->ftp_cmd_str, "AUTH") &&
+             !p_sess->control_use_ssl)
     {
       handle_auth(p_sess);
     }
@@ -132,6 +151,11 @@ parse_username_password(struct vsf_session* p_sess)
     else if (tunable_ssl_enable && str_equal_text(&p_sess->ftp_cmd_str, "PROT"))
     {
       handle_prot(p_sess);
+    }
+    else if (str_isempty(&p_sess->ftp_cmd_str) &&
+             str_isempty(&p_sess->ftp_arg_str))
+    {
+      // Deliberately ignore to avoid NAT device bugs. ProFTPd does the same.
     }
     else
     {
@@ -194,6 +218,7 @@ handle_user_command(struct vsf_session* p_sess)
         (!located && !tunable_userlist_deny))
     {
       vsf_cmdio_write(p_sess, FTP_LOGINERR, "Permission denied.");
+      check_login_fails(p_sess);
       str_empty(&p_sess->user_str);
       return;
     }
@@ -227,12 +252,25 @@ handle_pass_command(struct vsf_session* p_sess)
   {
     vsf_two_process_login(p_sess, &p_sess->ftp_arg_str);
   }
+  check_login_delay();
   vsf_cmdio_write(p_sess, FTP_LOGINERR, "Login incorrect.");
-  if (++p_sess->login_fails >= tunable_max_login_fails)
-  {
-    vsf_sysutil_exit(0);
-  }
+  check_login_fails(p_sess);
   str_empty(&p_sess->user_str);
   /* FALLTHRU if login fails */
 }
 
+static void check_login_delay()
+{
+  if (tunable_delay_failed_login)
+  {
+    vsf_sysutil_sleep((double) tunable_delay_failed_login);
+  }
+}
+
+static void check_login_fails(struct vsf_session* p_sess)
+{
+  if (++p_sess->login_fails >= tunable_max_login_fails)
+  {
+    vsf_sysutil_exit(0);
+  }
+}
