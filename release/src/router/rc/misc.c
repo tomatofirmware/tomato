@@ -99,7 +99,7 @@ void run_userfile (char *folder, char *extension, const char *arg1, int wtime)
 {
 	struct dirent *entry;
 	DIR *directory;
-	unsigned char buf[1024];
+	unsigned char buf[128];
 	char *argv[3];
 
 	//printf("run_userfile: check %s for *%s\n", folder, extension);
@@ -110,7 +110,6 @@ void run_userfile (char *folder, char *extension, const char *arg1, int wtime)
 	while ((entry = readdir (directory)) != NULL) {
 		if (endswith (entry->d_name, extension)) {
 			sprintf (buf, "%s/%s", folder, entry->d_name);
-			//printf("run_userfile execute: '%s'\n", buf);
 			argv[0] = buf;
 			argv[1] = (char *)arg1;
 			argv[2] = NULL;

@@ -48,7 +48,11 @@
 #define _dprintf(args...) do { } while(0)
 #endif
 
-
+#define MOUNT_ROOT	"/tmp/mnt"
+#define DEV_DISCS_ROOT	"/dev/discs"
+#define PROC_SCSI_ROOT	"/proc/scsi"
+#define USB_STORAGE	"usb-storage"
+ 
 #define BOOT		0
 #define REDIAL		1
 #define CONNECTING	2
@@ -174,7 +178,12 @@ extern void start_service(const char *name);
 extern void stop_service(const char *name);
 extern void start_services(void);
 extern void stop_services(void);
+// !!TB - USB and NAS
+extern int mkdir_if_none(char *dir);
+extern void restart_nas_services(int start);
+
 // !!TB - USB Support
+// usb.c
 extern void start_usb(void);
 extern void stop_usb(void);
 extern void hotplug_usb(void);
