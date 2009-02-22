@@ -520,7 +520,7 @@ int local_bind(int fd, union mysockaddr *addr, char *intname, int is_tcp)
     
 #if defined(SO_BINDTODEVICE)
   if (strlen(intname) != 0 &&
-      setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE, intname, sizeof(intname)) == -1)
+      setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE, intname, strlen(intname)) == -1)
     return 0;
 #endif
 
