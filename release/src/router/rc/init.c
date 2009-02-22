@@ -35,7 +35,6 @@ enum {
 	IDLE,
 	REBOOT,
 	HALT,
-	TIMER, //!!TB
 	INIT
 };
 
@@ -291,9 +290,6 @@ static void handle_initsigs(int sig)
 		break;
 	case SIGQUIT:
 		signaled = HALT;
-		break;
-	case SIGALRM:	//!!TB
-		signaled = TIMER;
 		break;
 	}
 }
@@ -827,29 +823,6 @@ static void sysinit(void)
 	led(LED_DIAG, 1);
 }
 
-/* !!TB - Timer procedures */
-static void handle_timer(int sig);
-
-static void set_timer(void)
-{
-	signal(SIGALRM, handle_timer); /* reset signal handler */
-	alarm(5);
-}
-
-static void handle_timer(int sig)
-{
-	if (state == IDLE)
-		signaled = TIMER;
-	else /* if we're busy, just reset the timer */
-		set_timer();
-}
-
-void do_timer(void)
-{
-	check_usb_event();
-	set_timer();
-}
-
 int init_main(int argc, char *argv[])
 {
 	pid_t shell_pid = 0;
@@ -874,10 +847,6 @@ int init_main(int argc, char *argv[])
 			exec_service();
 			state = IDLE;
 			break;
-		case TIMER:	//!!TB
-			do_timer();
-			state = IDLE;
-			break;
 		case RESTART:
 		case STOP:
 		case HALT:
@@ -892,7 +861,6 @@ int init_main(int argc, char *argv[])
 			stop_vlan();
 
 			// !!TB - USB Support
-			signal(SIGALRM, SIG_IGN);
 			remove_storage_main();
 			stop_usb();
 
@@ -921,7 +889,6 @@ int init_main(int argc, char *argv[])
 			start_lan();			
 			start_wan(BOOT);
 			start_services();
-			set_timer();	//!!TB
 
 			led(LED_DIAG, 0);
 
