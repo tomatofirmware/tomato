@@ -292,6 +292,7 @@ const defaults_t defaults[] = {
 	{ "block_wan",			"1"				},	// block inbound icmp
 	{ "multicast_pass",		"0"				},	// enable multicast proxy
 	{ "ne_syncookies",		"0"				},	// tcp_syncookies
+	{ "ne_snat",			"0"				},	// use SNAT instead of MASQUERADE
 
 // advanced-routing
 	{ "routes_static",		""				},
