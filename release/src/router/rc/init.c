@@ -877,10 +877,15 @@ int init_main(int argc, char *argv[])
 
 		case START:
 			SET_LED(RELEASE_WAN_CONTROL);
-			syslog(LOG_INFO, "Tomato %s", tomato_version);
-			syslog(LOG_INFO, "%s", nvram_safe_get("t_model_name"));
 
-			start_usb(); // !!TB - USB Support
+			// !!TB - USB Support
+			int automnt = nvram_get_int("usb_automount");
+			/* Temporarily disable automount during startup
+			 * so we get a chance to load config files from nvram,
+			 * and Init script can override default mountpoints etc.
+			 */
+			nvram_set("usb_automount", "0");
+			start_usb();
 
 			load_files_from_nvram();
 			run_nvscript("script_init", NULL, 2);
@@ -889,6 +894,20 @@ int init_main(int argc, char *argv[])
 			start_lan();			
 			start_wan(BOOT);
 			start_services();
+
+			syslog(LOG_INFO, "Tomato %s", tomato_version);
+			syslog(LOG_INFO, "%s", nvram_safe_get("t_model_name"));
+
+			// !!TB - USB Support
+			// now restore automount setting, and mount attached USB drives
+			if (automnt) {
+				nvram_set("usb_automount", "1");
+				if (nvram_match("usb_enable", "1") && nvram_match("usb_storage", "1")) {
+					key_t semid = hp_lock();
+					hotplug_usb_mass(NULL);
+					hp_unlock(semid);
+				}
+			}
 
 			led(LED_DIAG, 0);
 
