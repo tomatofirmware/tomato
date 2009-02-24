@@ -319,11 +319,25 @@ const defaults_t defaults[] = {
 	{ "dmz_sip",			""				},
 
 // forward-upnp
-	{ "upnp_enable",		"1"				},
+	{ "upnp_enable",		"0"				},	// !!TB - disabled by default
 	{ "upnp_ssdp_interval",	"60"			},	// SSDP interval
 	{ "upnp_max_age",		"180"			},	// Max age
 	{ "upnp_mnp",			"0"				},
 	{ "upnp_config",		"0"				},
+
+//!!TB - miniupnpd
+	{ "upnp_nat_pmp_enable",	"0"				},	/* 0:Disable 1:Enable */
+	{ "upnp_clean_ruleset_enable",	"1"				},	/* 0:Disable 1:Enable */
+	{ "upnp_secure_mode",		"1"				},	/* 0:Disable 1:Enable */
+	{ "upnp_clean_ruleset_interval",	"600"			},	/* Cleaning interval in seconds */
+	{ "upnp_clean_ruleset_threshold",	"20"			},	/* Threshold for cleaning unused rules */
+	{ "upnp_port",			"0"				},	/* port for HTTP traffic (0 - autoselect) */
+	{ "upnp_bitrate_up",		"10000000"			},	/* Bitrate upstream */
+	{ "upnp_bitrate_down",		"100000000"			},	/* Bitrate downstream*/
+	{ "upnp_min_port_int",		"1024"				},	/* MIN PORT internal */
+	{ "upnp_max_port_int",		"65535"				},	/* MAX PORT internal */
+	{ "upnp_min_port_ext",		"1024"				},	/* MIN PORT external */
+	{ "upnp_max_port_ext",		"65535"				},	/* MAX PORT external */
 
 // qos
 	{ "qos_enable",			"0"				},

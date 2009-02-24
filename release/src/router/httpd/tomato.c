@@ -622,6 +622,20 @@ static const nvset_t nvset_list[] = {
 	{ "upnp_ssdp_interval", V_RANGE(10, 9999)	},
 	{ "upnp_max_age",		V_RANGE(5, 9999)	},
 
+//!!TB - miniupnpd
+	{ "upnp_nat_pmp_enable",	V_01				},
+	{ "upnp_clean_ruleset_enable",	V_01				},
+	{ "upnp_secure_mode",		V_01				},
+	{ "upnp_clean_ruleset_interval",V_RANGE(60, 65535)		},
+	{ "upnp_clean_ruleset_threshold",V_RANGE(0, 9999)		},
+	{ "upnp_port",			V_RANGE(0, 65535)		},
+	{ "upnp_bitrate_up",		V_RANGE(10, 100000000)		},
+	{ "upnp_bitrate_down",		V_RANGE(10, 100000000)		},
+	{ "upnp_min_port_int",		V_PORT				},
+	{ "upnp_max_port_int",		V_PORT				},
+	{ "upnp_min_port_ext",		V_PORT				},
+	{ "upnp_max_port_ext",		V_PORT				},
+
 // forward-basic
 	{ "portforward",		V_LENGTH(0, 4096)	},
 
