@@ -297,6 +297,19 @@ typedef struct	SHT
      * Name of proc directory
      */
     char *proc_name;
+    
+    /*
+     * Once the device has responded to an INQUIRY and we know the
+     * device is online, we call into the low level driver with the
+     * struct scsi_device *.  If the low level device driver implements
+     * this function, it *must* perform the task of setting the queue
+     * depth on the device.  All other tasks are optional and depend
+     * on what the driver supports and various implementation details.
+     *
+     * Status: OPTIONAL
+     */
+    int (* slave_configure)(Scsi_Device *dev);
+
 
 } Scsi_Host_Template;
 
@@ -531,6 +544,13 @@ void  scsi_initialize_queue(Scsi_Device * SDpnt, struct Scsi_Host * SHpnt);
 
 int scsi_register_device(struct Scsi_Device_Template * sdpnt);
 void scsi_deregister_device(struct Scsi_Device_Template * tpnt);
+
+/* Support for hot plugging and unplugging devices -- safe for
+ * ieee1394 or USB devices, but probably not for normal SCSI... */
+extern int scsi_add_single_device(struct Scsi_Host *shpnt,
+	int channel, int id, int lun);
+extern int scsi_remove_single_device(struct Scsi_Host *shpnt,
+	int channel, int id, int lun);
 
 /* These are used by loadable modules */
 extern int scsi_register_module(int, void *);
