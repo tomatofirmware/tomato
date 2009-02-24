@@ -12,3 +12,5 @@
 #define TCONFIG_L7 1
 #define TCONFIG_L7PAT 1
 #define TCONFIG_IPP2P 1
+#define TCONFIG_FTP 1
+#define TCONFIG_SAMBASRV 1

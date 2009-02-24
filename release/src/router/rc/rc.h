@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <ctype.h> // !!TB
 #include <string.h>
 #include <signal.h>
 #include <syslog.h>
@@ -47,7 +48,11 @@
 #define _dprintf(args...) do { } while(0)
 #endif
 
-
+#define MOUNT_ROOT	"/tmp/mnt"
+#define DEV_DISCS_ROOT	"/dev/discs"
+#define PROC_SCSI_ROOT	"/proc/scsi"
+#define USB_STORAGE	"usb-storage"
+ 
 #define BOOT		0
 #define REDIAL		1
 #define CONNECTING	2
@@ -55,12 +60,12 @@
 #define PPPOE0		0
 #define PPPOE1		1
 
-#define GOT_IP				0x01
-#define RELEASE_IP			0x02
+#define GOT_IP			0x01
+#define RELEASE_IP		0x02
 #define	GET_IP_ERROR		0x03
 #define RELEASE_WAN_CONTROL	0x04
 #define USB_DATA_ACCESS		0x05	//For WRTSL54GS
-#define USB_CONNECT			0x06	//For WRTSL54GS
+#define USB_CONNECT		0x06	//For WRTSL54GS
 #define USB_DISCONNECT		0x07	//For WRTSL54GS
 
 /*
@@ -173,6 +178,20 @@ extern void start_service(const char *name);
 extern void stop_service(const char *name);
 extern void start_services(void);
 extern void stop_services(void);
+// !!TB - USB and NAS
+extern int mkdir_if_none(char *dir);
+extern void restart_nas_services(int start);
+
+// !!TB - USB Support
+// usb.c
+extern void start_usb(void);
+extern void stop_usb(void);
+extern key_t hp_lock(void);
+extern void hp_unlock(key_t semid);
+extern void hotplug_usb(void);
+extern void probe_usb_mass(char *product, int connected_only);
+extern void hotplug_usb_mass(char *product);
+extern void remove_storage_main(void);
 
 // wnas.c
 extern void start_nas(void);

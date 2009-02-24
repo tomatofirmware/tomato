@@ -59,6 +59,14 @@ obj-y += wlconf
 obj-y += mssl
 obj-y += mdu
 
+# !!TB
+obj-y += p910nd
+obj-y += scsi-idle
+#obj-y += sendmail
+obj-$(TCONFIG_FTP) += vsftpd
+obj-$(TCONFIG_SAMBASRV) += samba
+
+
 ifeq ($(TEST_MINIUPNPD),1)
 obj-y += miniupnpd
 else
@@ -88,7 +96,7 @@ endif
 obj-$(NEED_PPPD) += pppd
 
 
-obj-clean := $(foreach obj,$(obj-y) $(obj-n),$(obj)-clean)
+obj-clean := $(foreach obj, $(obj-y) $(obj-n) $(obj-), $(obj)-clean)
 obj-install := $(foreach obj,$(obj-y),$(obj)-install)
 
 
@@ -97,7 +105,7 @@ obj-install := $(foreach obj,$(obj-y),$(obj)-install)
 # Basic rules
 #
 
-all: clean-build $(obj-y) kernel
+all: clean-build libc $(obj-y) kernel
 
 
 kernel: $(LINUXDIR)/.config
@@ -125,7 +133,9 @@ install package: $(obj-install) $(LINUXDIR)/.config
 
 # kernel modules
 	$(MAKE) -C $(LINUXDIR) modules_install DEPMOD=/bin/true INSTALL_MOD_PATH=$(TARGETDIR)
-	find $(TARGETDIR)/lib/modules -name *.o -exec mipsel-linux-strip --strip-unneeded {} \;
+##!!TB	find $(TARGETDIR)/lib/modules -name *.o -exec mipsel-linux-strip --strip-unneeded {} \;
+##!!TB - do not strip ftp nat/conntrack, imq and loop kernel modules (needed to keep parameters)
+	find $(TARGETDIR)/lib/modules ! \( -name imq.o -prune \) ! \( -name *ftp.o -prune \) ! \( -name loop.o -prune \) -a -name *.o -exec mipsel-linux-strip --strip-unneeded {} \;
 
 	-cd $(TARGETDIR)/lib/modules/2.4.20/kernel/drivers/net && mv diag/* . && rm -rf diag
 
@@ -139,6 +149,21 @@ install package: $(obj-install) $(LINUXDIR)/.config
 	cd $(TARGETDIR)/lib/modules/2.4.20/kernel/lib && mv zlib_inflate/* . && rm -rf zlib_inflate
 	cd $(TARGETDIR)/lib/modules/2.4.20/kernel/lib && mv zlib_deflate/* . && rm -rf zlib_deflate
 	rm -rf $(TARGETDIR)/lib/modules/2.4.20/pcmcia
+
+##!!TB
+	cd $(TARGETDIR)/lib/modules/2.4.20/kernel/fs && mv ext2/* . && rm -rf ext2 || true
+	cd $(TARGETDIR)/lib/modules/2.4.20/kernel/fs && mv ext3/* . && rm -rf ext3 || true
+	cd $(TARGETDIR)/lib/modules/2.4.20/kernel/fs && mv jbd/* . && rm -rf jbd || true
+	cd $(TARGETDIR)/lib/modules/2.4.20/kernel/fs && mv fat/* . && rm -rf fat || true
+	cd $(TARGETDIR)/lib/modules/2.4.20/kernel/fs && mv vfat/* . && rm -rf vfat || true
+	cd $(TARGETDIR)/lib/modules/2.4.20/kernel/fs && mv ntfs/* . && rm -rf ntfs || true
+ifneq ($(TCONFIG_SAMBASRV),y)
+	rm -rf $(TARGETDIR)/lib/modules/2.4.20/kernel/fs/nls || true
+endif
+	cd $(TARGETDIR)/lib/modules/2.4.20/kernel/fs && mv nls/* . && rm -rf nls || true
+	cd $(TARGETDIR)/lib/modules/2.4.20/kernel/drivers/usb && mv hcd/* . && rm -rf hcd || true
+	cd $(TARGETDIR)/lib/modules/2.4.20/kernel/drivers/usb && mv host/* . && rm -rf host || true
+	cd $(TARGETDIR)/lib/modules/2.4.20/kernel/drivers/usb && mv storage/* . && rm -rf storage || true
 
 # misc
 	for dir in $(wildcard $(patsubst %,$(INSTALLDIR)/%,$(obj-y))) ; do \
@@ -165,6 +190,12 @@ endif
 	@mkdir $(PLATFORMDIR)/extras
 	@mv $(TARGETDIR)/lib/modules/2.4.20/kernel/net/ipv4/ip_gre.o $(PLATFORMDIR)/extras/
 	@mv $(TARGETDIR)/lib/modules/2.4.20/kernel/drivers/net/tun.o $(PLATFORMDIR)/extras/
+#!!TB
+	@mv $(TARGETDIR)/lib/modules/2.4.20/kernel/fs/ntfs.o $(PLATFORMDIR)/extras/ || true
+ifneq ($(TCONFIG_USB_EXTRAS),y)
+	@mv $(TARGETDIR)/lib/modules/2.4.20/kernel/drivers/block/loop.o $(PLATFORMDIR)/extras/ || true
+	@rm -rf $(TARGETDIR)/lib/modules/2.4.20/kernel/drivers/block || true
+endif
 
 # uClibc
 	install $(LIBDIR)/ld-uClibc.so.0 $(TARGETDIR)/lib/
@@ -198,7 +229,7 @@ ifeq ($(TCONFIG_L7PAT),y)
 endif
 
 	@$(MAKE) -C $(SRCBASE)/linux/linux/scripts/squashfs mksquashfs-lzma
-	@$(SRCBASE)/linux/linux/scripts/squashfs/mksquashfs-lzma $(TARGETDIR) $(PLATFORMDIR)/target.image
+	@$(SRCBASE)/linux/linux/scripts/squashfs/mksquashfs-lzma $(TARGETDIR) $(PLATFORMDIR)/target.image | tee target.info
 
 #	Package kernel and filesystem
 #	if grep -q "CONFIG_EMBEDDED_RAMDISK=y" $(LINUXDIR)/.config ; then \
@@ -216,6 +247,10 @@ endif
 #	cat $(PLATFORMDIR)/target.image >> $(PLATFORMDIR)/linux.bin
 
 
+libc:	$(LIBDIR)/ld-uClibc.so.0
+	$(MAKE) -C ../../../tools-src/uClibc all
+	$(MAKE) -C ../../../tools-src/uClibc install
+
 
 #
 # cleaners
@@ -223,6 +258,7 @@ endif
 
 clean: clean-build $(obj-clean)
 	rm -rf layer7/squished
+	make -C config clean
 
 clean-build: dummy
 	rm -rf $(TARGETDIR)
@@ -234,6 +270,7 @@ distclean: clean
 ifneq ($(INSIDE_MAK),1)
 	$(MAKE) -C .. $@ INSIDE_MAK=1
 endif
+	-rm -f $(LIBDIR)/*.so.0  $(LIBDIR)/*.so
 
 #
 # configuration
@@ -274,12 +311,14 @@ oldconfig oldconf: roldconf koldconf
 #
 
 busybox: dummy
-	$(MAKE) -C busybox CFLAGS="-Os"
+	$(MAKE) -C busybox CFLAGS_busybox="-Os"
+#!!TB CFLAGS = "-Os"
 # V=1
 
 busybox-install:
 	rm -rf $(INSTALLDIR)/busybox
-	$(MAKE) -C busybox install CONFIG_PREFIX=$(INSTALLDIR)/busybox CFLAGS="-Os"
+	$(MAKE) -C busybox install CONFIG_PREFIX=$(INSTALLDIR)/busybox CFLAGS_busybox="-Os"
+#!!TB CFLAGS = "-Os"
 
 busybox-test: dummy
 	$(MAKE) -C busybox objsizes CFLAGS="-Os"
@@ -322,8 +361,11 @@ openssl-install:
 #	perl -e 'while (<>) { s/.SECS/time()-(24*60*60)/e; print; }' < httpd/gencert.sh > $(INSTALLDIR)/openssl/usr/sbin/gencert.sh
 #	chmod 0500 $(INSTALLDIR)/openssl/usr/sbin/gencert.sh
 
-#	install -D openssl/libssl.so $(INSTALLDIR)/openssl/usr/lib/libssl.so
-#	$(STRIP) $(INSTALLDIR)/openssl/usr/lib/libssl.so
+ifeq ($(TCONFIG_FTP_SSL),y)
+# !!TB
+	install -D openssl/libssl.so $(INSTALLDIR)/openssl/usr/lib/libssl.so
+	$(STRIP) $(INSTALLDIR)/openssl/usr/lib/libssl.so
+endif
 
 mssl:	matrixssl
 
@@ -384,12 +426,28 @@ upnp: nvram shared iptables
 
 nvram: shared
 
+# !!TB
+p910nd: shared
+sendmail: shared
+samba: shared
+miniupnpd: iptables
+
+# !!TB
+vsftpd: shared openssl
+	@$(SEP)
+	$(MAKE) -C vsftpd
+
+vsftpd-install:
+	install -D vsftpd/vsftpd $(INSTALLDIR)/vsftpd/usr/sbin/vsftpd
+	$(STRIP) -s $(INSTALLDIR)/vsftpd/usr/sbin/vsftpd
+
 vlan:
 	@$(SEP)
-	@$(MAKE) -C vlan CROSS=$(CROSS_COMPILE) STRIPTOOL=$(STRIP)
+	@$(MAKE) -C vlan CROSS=$(CROSS_COMPILE)	# STRIPTOOL=$(STRIP)
 
 vlan-install:
-	$(MAKE) -C vlan CROSS=$(CROSS_COMPILE) STRIPTOOL=$(STRIP) INSTALLDIR=$(INSTALLDIR) install
+	$(MAKE) -C vlan CROSS=$(CROSS_COMPILE) INSTALLDIR=$(INSTALLDIR) install	# STRIPTOOL=$(STRIP)
+	$(STRIP) $(INSTALLDIR)/vlan/usr/sbin/vconfig
 
 
 pptp-client-install:
@@ -503,9 +561,6 @@ ebtables-install: dummy
 	
 ebtables-clean:
 	make -C ebtables clean
-
-
-
 
 #
 # Generic rules
