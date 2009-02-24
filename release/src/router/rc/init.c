@@ -283,7 +283,7 @@ static void handle_initsigs(int sig)
 		signaled = START;
 		break;
 	case SIGINT:
-        signaled = STOP;
+	        signaled = STOP;
 		break;
 	case SIGTERM:
 		signaled = REBOOT;
@@ -405,7 +405,7 @@ static int init_nvram(void)
 	model = get_model();
 	sprintf(s, "%d", model);
 	nvram_set("t_model", s);
-	
+
 	mfr = "Broadcom";
 	name = NULL;
 	features = 0;
@@ -711,7 +711,9 @@ static void sysinit(void)
 	static const char *mkd[] = {
 		"/tmp/etc", "/tmp/var", "/tmp/home", "/tmp/mnt",
 		"/var/log", "/var/run", "/var/tmp", "/var/lib", "/var/lib/misc",
-		"/var/spool", "/var/spool/cron", "/var/spool/cron/crontabs", NULL
+		"/var/spool", "/var/spool/cron", "/var/spool/cron/crontabs",
+		"/tmp/var/wwwext", "/tmp/var/wwwext/cgi-bin",	// !!TB - CGI support
+		NULL
 	};
 	umask(0);
 	for (i = 0; mkd[i]; ++i) {
