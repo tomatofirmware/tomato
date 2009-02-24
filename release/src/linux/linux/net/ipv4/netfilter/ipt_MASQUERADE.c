@@ -127,9 +127,9 @@ static int masq_device_event(struct notifier_block *this,
 	struct net_device *dev = ptr;
 
 	if (event == NETDEV_DOWN) {
-		/* Device was downed.  Search entire table for
-		   conntracks which were associated with that device,
-		   and forget them. */
+		/* Device was downed or IP address was deleted.
+		   Search entire table for conntracks which were
+		   associated with that device, and forget them. */
 		IP_NF_ASSERT(dev->ifindex != 0);
 
 		ip_ct_selective_cleanup(device_cmp, (void *)(long)dev->ifindex);
@@ -143,17 +143,7 @@ static int masq_inet_event(struct notifier_block *this,
 			   void *ptr)
 {
 	struct net_device *dev = ((struct in_ifaddr *)ptr)->ifa_dev->dev;
-
-	if (event == NETDEV_DOWN) {
-		/* IP address was deleted.  Search entire table for
-		   conntracks which were associated with that device,
-		   and forget them. */
-		IP_NF_ASSERT(dev->ifindex != 0);
-
-		ip_ct_selective_cleanup(device_cmp, (void *)(long)dev->ifindex);
-	}
-
-	return NOTIFY_DONE;
+	return masq_device_event(this, event, dev);
 }
 
 static struct notifier_block masq_dev_notifier = {
