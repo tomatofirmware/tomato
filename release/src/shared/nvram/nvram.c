@@ -1,7 +1,7 @@
 /*
  * NVRAM variable manipulation (common)
  *
- * Copyright 2006, Broadcom Corporation
+ * Copyright 2007, Broadcom Corporation
  * All Rights Reserved.
  * 
  * THIS SOFTWARE IS OFFERED "AS IS", AND BROADCOM GRANTS NO WARRANTIES OF ANY
@@ -122,7 +122,7 @@ BCMINITFN(nvram_rehash)(struct nvram_header *header)
 
 /* Get the value of an NVRAM variable. Should be locked. */
 char *
-BCMINITFN(_nvram_get)(const char *name)
+_nvram_get(const char *name)
 {
 	uint i;
 	struct nvram_tuple *t;
@@ -207,7 +207,7 @@ BCMINITFN(_nvram_unset)(const char *name)
 
 /* Get all NVRAM variables. Should be locked. */
 int
-BCMINITFN(_nvram_getall)(char *buf, int count)
+_nvram_getall(char *buf, int count)
 {
 	uint i;
 	struct nvram_tuple *t;
@@ -302,7 +302,6 @@ BCMINITFN(_nvram_init)(void *sb)
 		nvram_rehash(header);
 
 	MFREE(sb_osh(sb), header, NVRAM_SPACE);
-	bcm_nvram_cache(sb);
 	return ret;
 }
 

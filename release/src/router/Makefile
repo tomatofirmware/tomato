@@ -51,6 +51,11 @@ obj-y += rstats
 #	obj-y += nas
 #	obj-y += wlconf
 
+# !!TB - updated Broadcom Wireless driver 4.150.10.X
+obj-y += et
+obj-y += libbcmcrypto
+obj-y += wlconf
+
 obj-y += mssl
 obj-y += mdu
 

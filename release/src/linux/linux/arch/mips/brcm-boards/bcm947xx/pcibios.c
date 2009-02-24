@@ -1,7 +1,7 @@
 /*
  * Low-Level PCI and SB support for BCM47xx (Linux support code)
  *
- * Copyright 2006, Broadcom Corporation
+ * Copyright 2007, Broadcom Corporation
  * All Rights Reserved.
  * 
  * THIS SOFTWARE IS OFFERED "AS IS", AND BROADCOM GRANTS NO WARRANTIES OF ANY
@@ -127,7 +127,6 @@ static struct pci_ops pcibios_ops = {
 	sbpci_write_config_dword
 };
 
-
 void __init
 pcibios_init(void)
 {
@@ -145,7 +144,6 @@ pcibios_init(void)
 
 	/* Scan the SB bus */
 	pci_scan_bus(0, &pcibios_ops, NULL);
-
 }
 
 char * __init
@@ -183,10 +181,8 @@ pcibios_fixup_bus(struct pci_bus *b)
 			d->irq = irq + 2;
 			pci_write_config_byte(d, PCI_INTERRUPT_LINE, d->irq);
 		}
-	}
-
-	/* Fix up external PCI */
-	else {
+	} else {
+		/* Fix up external PCI */
 		for (ln = b->devices.next; ln != &b->devices; ln = ln->next) {
 			d = pci_dev_b(ln);
 			/* Fix up resource bases */
@@ -212,6 +208,7 @@ pcibios_fixup_bus(struct pci_bus *b)
 				d->irq = (pci_find_device(VENDOR_BROADCOM, SB_PCI, NULL))->irq;
 			pci_write_config_byte(d, PCI_INTERRUPT_LINE, d->irq);
 		}
+		sbpci_arb_park(sbh, PCI_PARK_NVRAM);
 	}
 }
 
@@ -306,7 +303,7 @@ pcibios_enable_device(struct pci_dev *dev, int mask)
 	else if (sb_coreid(sbh) == SB_USB20H) {
 		if (!sb_iscoreup(sbh)) {
 			sb_core_reset(sbh, 0, 0);
-			writel(0x7FF, (ulong)regs + 0x200);
+			writel(0x7ff, (uintptr)regs + 0x200);
 			udelay(1);
 		}
 	} else
