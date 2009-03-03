@@ -192,6 +192,11 @@ static void update(int num, int *dirty, int force)
 	if (n) {
 		if ((n < 0) || (n > 90)) n = 28;
 		t += (n * 86400);	// refresh every n days
+		//!!TB - fix: if time is in the past, make it current
+		time_t now;
+		time(&now);
+		if (t < now + 60) t = now + 60;
+		//!!TB - end
 		tm = localtime(&t);
 		sprintf(s, "cru a ddnsf%d \"%d %d %d %d * ddns-update %d force\"", num,
 			tm->tm_min, tm->tm_hour, tm->tm_mday, tm->tm_mon + 1, num);
