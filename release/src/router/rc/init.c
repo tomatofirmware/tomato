@@ -690,6 +690,26 @@ static int init_nvram(void)
 	return 0;
 }
 
+/* Get the special files from nvram and copy them to disc.
+ * These were files saved with "nvram setfile2nvram <filename>".
+ * Better hope that they were saved with full pathname.
+*/
+static void load_files_from_nvram(void)
+{
+	char *name, *cp, buf[NVRAM_SPACE];
+
+	nvram_getall(buf, sizeof(buf));
+	for (name = buf; *name; name += strlen(name) + 1) {
+		if (strncmp(name, "FILE:", 5) == 0) { /* This special name marks a file to get. */
+			if ((cp = strchr(name, '=')) == NULL)
+				continue;
+			*cp = 0;
+			syslog(LOG_INFO, "Loading file %s from nvram", name);
+			nvram_nvram2file(name, name+5);
+		}
+	}
+}
+
 static void sysinit(void)
 {
 	static const time_t tm = 0;
@@ -710,6 +730,7 @@ static void sysinit(void)
 	
 	static const char *mkd[] = {
 		"/tmp/etc", "/tmp/var", "/tmp/home", "/tmp/mnt",
+		"/tmp/share",	// !!TB
 		"/var/log", "/var/run", "/var/tmp", "/var/lib", "/var/lib/misc",
 		"/var/spool", "/var/spool/cron", "/var/spool/cron/crontabs",
 		"/tmp/var/wwwext", "/tmp/var/wwwext/cgi-bin",	// !!TB - CGI support
@@ -848,6 +869,10 @@ int init_main(int argc, char *argv[])
 			stop_lan();
 			stop_vlan();
 
+			// !!TB - USB Support
+			remove_storage_main();
+			stop_usb();
+
 			if ((state == REBOOT) || (state == HALT)) {
 				shutdn(state == REBOOT);
 				exit(0);
@@ -862,15 +887,34 @@ int init_main(int argc, char *argv[])
 		case START:
 			SET_LED(RELEASE_WAN_CONTROL);
 
+			// !!TB - USB Support
+			int automnt = nvram_get_int("usb_automount");
+			/* Temporarily disable automount during startup
+			 * so we get a chance to load config files from nvram,
+			 * and Init script can override default mountpoints etc.
+			 */
+			nvram_set("usb_automount", "0");
+			start_usb();
+
+			load_files_from_nvram();
 			run_nvscript("script_init", NULL, 2);
 
 			start_vlan();
 			start_lan();			
 			start_wan(BOOT);
 			start_services();
-			
+
 			syslog(LOG_INFO, "Tomato %s", tomato_version);
 			syslog(LOG_INFO, "%s", nvram_safe_get("t_model_name"));
+
+			// !!TB - USB Support
+			// now restore automount setting, and mount attached USB drives
+			if (automnt) {
+				nvram_set("usb_automount", "1");
+				if (nvram_match("usb_enable", "1") && nvram_match("usb_storage", "1")) {
+					hotplug_usb_mass(NULL);
+				}
+			}
 
 			led(LED_DIAG, 0);
 

@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <ctype.h> // !!TB
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <stdarg.h>
@@ -86,7 +87,7 @@ void notice_set(const char *path, const char *format, ...)
 	mkdir("/var/notice", 0755);
 	snprintf(p, sizeof(p), "/var/notice/%s", path);
 	f_write_string(p, buf, 0, 0);
-	if (buf[0]) syslog(LOG_INFO, "notice: %s", buf);
+	if (buf[0]) syslog(LOG_INFO, "notice[%s]: %s", path, buf);
 }
 
 
@@ -407,3 +408,134 @@ int time_ok(void)
 	return time(0) > Y2K;
 }
 */
+
+// -----------------------------------------------------------------------------
+//!!TB - USB Support
+
+/* stolen from the e2fsprogs/ismounted.c */
+ /* Find wherever 'file' (actually: device) is mounted.
+  * Either the exact same device-name, or another device-name.
+  * The latter is detected by comparing the rdev or dev&inode.
+  * So aliasing won't fool us---we'll still find if it's mounted.
+  * Return its mnt entry.
+  * In particular, the caller would look at the mnt->mountpoint.
+  * If "file" is an empty string, return the mntent of the first
+  * mount that is for a USB disc that is no longer accessible.
+  */
+struct mntent *findmntent(char *file)
+{
+	struct mntent 	*mnt;
+	struct stat	st_buf;
+	dev_t		file_dev=0, file_rdev=0;
+	ino_t		file_ino=0;
+	FILE 		*f;
+	
+	if ((f = setmntent("/proc/mounts", "r")) == NULL)
+		return NULL;
+
+	if (stat(file, &st_buf) == 0) {
+		if (S_ISBLK(st_buf.st_mode)) {
+			file_rdev = st_buf.st_rdev;
+		} else {
+			file_dev = st_buf.st_dev;
+			file_ino = st_buf.st_ino;
+		}
+	}
+	while ((mnt = getmntent(f)) != NULL) {
+		if (*file == 0 && strncmp(mnt->mnt_fsname, "/dev/discs/", 11) == 0) {
+			if (stat(mnt->mnt_fsname, &st_buf) != 0)
+				break;	/* Device is no longer valid. */
+		}
+
+		if (strcmp(file, mnt->mnt_fsname) == 0)
+			break;
+		if (stat(mnt->mnt_fsname, &st_buf) == 0) {
+			if (S_ISBLK(st_buf.st_mode)) {
+				if (file_rdev && (file_rdev == st_buf.st_rdev))
+					break;
+			} else {
+				if (file_dev && ((file_dev == st_buf.st_dev) &&
+						 (file_ino == st_buf.st_ino)))
+					break;
+			}
+		}
+	}
+
+	fclose(f);
+	return mnt;
+}
+
+/* Figure out the volume label. */
+/* If we found it, return Non-Zero and store it at the_label. */
+#define USE_BB	0	/* Use the actual busybox .a file. */
+
+#if USE_BB
+char applet_name[] = "hotplug";	/* Needed to satisfy a reference. */
+int find_label(char *mnt_dev, char *the_label)
+{
+	char *uuid, *label;
+	int i;
+   
+	*the_label = 0;
+	/* heuristic: partition name ends in a digit */
+	if ( !isdigit(mnt_dev[strlen(mnt_dev) - 1]))
+		return(0);
+
+	cprintf("\n\nGetting volume label for '%s'\n", mnt_dev);
+
+	/* it's in get_devname.c  */
+	i = get_label_uuid(mnt_dev, &label, &uuid, 0);
+	cprintf("get_label_uuid= %d\n", i);
+	if (i == 0) {
+		cprintf(" label= %s uuid = %s\n", label, uuid);
+		strcpy(the_label, label);
+		return(1);
+	}
+	return (0);
+}
+#else
+int find_label(char *mnt_dev, char *the_label)
+{
+	char *label, *p;
+	FILE *mfp;
+	char buf[128];
+	struct stat st_arg, st_mou;
+
+	*the_label = 0;
+	/* heuristic: partition name ends in a digit */
+	if ( !isdigit(mnt_dev[strlen(mnt_dev) - 1]))
+		return(0);
+
+	mfp = popen("mount LABEL= /no-such-label", "r");
+	if (mfp == NULL) {
+		_dprintf("Cannot popen mount!!\n");
+		return(0);
+	}
+
+	while (fgets(buf, sizeof(buf), mfp)) {
+		if ((p = strchr(buf, '\n')))
+			*p = 0;
+		if ((p = strstr(buf, "LABEL "))) {	/* Isolate the label. */
+			if ((label=strchr(p+6, '\''))) {
+				++label;
+				if ((p = strchr(label, '\''))) {
+					*p++ = 0;
+					if ((p = strchr(p, '/'))) {	/* Isolate the device. */
+						/* See if the argument is the same as what mount gives. */
+						if (stat(mnt_dev, &st_arg) == 0 && stat(p, &st_mou) == 0) {
+							if (S_ISBLK(st_arg.st_mode) && S_ISBLK(st_mou.st_mode) &&
+									st_arg.st_rdev == st_mou.st_rdev) {
+								strcpy(the_label, label);
+								fclose(mfp);
+								return(1);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	fclose(mfp);
+	return(0);
+}
+#endif
