@@ -39,7 +39,7 @@ void start_usb(void)
 		}
 
 		/* mount usb device filesystem */
-        	mount("usbdevfs", "/proc/bus/usb", "usbdevfs", MS_MGC_VAL, NULL);
+		mount("usbdevfs", "/proc/bus/usb", "usbdevfs", MS_MGC_VAL, NULL);
 
 		if (nvram_match("usb_storage", "1")) {
 			modprobe("scsi_mod");
