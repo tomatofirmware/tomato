@@ -85,10 +85,10 @@ void start_sshd(void)
 	}
 
 /*
-	xstart("dropbear", "-p", nvram_safe_get("sshd_port"), nvram_get_int("sshd_pass") ? "" : "-s");
+	xstart("dropbear", "-a", "-p", nvram_safe_get("sshd_port"), nvram_get_int("sshd_pass") ? "" : "-s");
 */
 
-	char *argv[8];
+	char *argv[9];
 	int argc;
 	char *p;
 	
@@ -98,6 +98,8 @@ void start_sshd(void)
 	argc = 3;
 
 	if (!nvram_get_int("sshd_pass")) argv[argc++] = "-s";
+	
+	if (nvram_get_int("sshd_forwarding")) argv[argc++] = "-a";
 	
 	if (((p = nvram_get("sshd_rwb")) != NULL) && (*p)) {
 		argv[argc++] = "-W";
