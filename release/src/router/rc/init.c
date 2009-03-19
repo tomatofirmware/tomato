@@ -879,8 +879,7 @@ int init_main(int argc, char *argv[])
 			SET_LED(RELEASE_WAN_CONTROL);
 
 			// !!TB - USB Support
-			usb_lock_init();
-			usb_lock();	// hold off automount processing
+			int fd = usb_lock();	// hold off automount processing
 			start_usb();
 
 			load_files_from_nvram();
@@ -895,7 +894,7 @@ int init_main(int argc, char *argv[])
 			syslog(LOG_INFO, "%s", nvram_safe_get("t_model_name"));
 
 			// !!TB - USB Support
-			usb_unlock();	// allow to process usb hotplug events
+			usb_unlock(fd);	// allow to process usb hotplug events
 
 			led(LED_DIAG, 0);
 
