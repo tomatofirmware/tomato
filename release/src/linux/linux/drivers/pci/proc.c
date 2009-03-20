@@ -47,7 +47,8 @@ proc_bus_pci_read(struct file *file, char *buf, size_t nbytes, loff_t *ppos)
 	const struct inode *ino = file->f_dentry->d_inode;
 	const struct proc_dir_entry *dp = ino->u.generic_ip;
 	struct pci_dev *dev = dp->data;
-	unsigned int pos = *ppos;
+	loff_t n = *ppos;
+	unsigned pos = n;
 	unsigned int cnt, size;
 
 	/*
@@ -63,7 +64,7 @@ proc_bus_pci_read(struct file *file, char *buf, size_t nbytes, loff_t *ppos)
 	else
 		size = 64;
 
-	if (pos >= size)
+	if (pos != n || pos >= size)
 		return 0;
 	if (nbytes >= size)
 		nbytes = size;
@@ -129,10 +130,11 @@ proc_bus_pci_write(struct file *file, const char *buf, size_t nbytes, loff_t *pp
 	const struct inode *ino = file->f_dentry->d_inode;
 	const struct proc_dir_entry *dp = ino->u.generic_ip;
 	struct pci_dev *dev = dp->data;
-	int pos = *ppos;
+	loff_t n = *ppos;
+	unsigned pos = n;
 	int cnt;
 
-	if (pos >= PCI_CFG_SPACE_SIZE)
+	if (pos != n || pos >= PCI_CFG_SPACE_SIZE)
 		return 0;
 	if (nbytes >= PCI_CFG_SPACE_SIZE)
 		nbytes = PCI_CFG_SPACE_SIZE;
