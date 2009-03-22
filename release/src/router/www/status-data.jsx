@@ -7,7 +7,7 @@
 	No part of this file may be used without permission.
 */
 
-//<% nvram("l2tp_get_ip,pptp_get_ip,pptp_server_ip,router_name,wan_domain,wan_gateway,wan_get_domain,wan_hostname,wan_hwaddr,wan_ipaddr,wan_netmask,wan_proto,wan_run_mtu,et0macaddr,lan_proto,lan_ipaddr,dhcp_start,dhcp_num,dhcpd_startip,dhcpd_endip,lan_netmask,security_mode2,wl_crypto,wl_mode,wds_enable,wl0_hwaddr,wl_net_mode,wl_radio,wl_channel,lan_gateway,wl_ssid,t_model_name"); %>
+//<% nvram("clkfreq,l2tp_get_ip,pptp_get_ip,pptp_server_ip,router_name,wan_domain,wan_gateway,wan_get_domain,wan_hostname,wan_hwaddr,wan_ipaddr,wan_netmask,wan_proto,wan_run_mtu,et0macaddr,lan_proto,lan_ipaddr,dhcp_start,dhcp_num,dhcpd_startip,dhcpd_endip,lan_netmask,security_mode2,wl_crypto,wl_mode,wds_enable,wl0_hwaddr,wl_net_mode,wl_radio,wl_channel,lan_gateway,wl_ssid,t_model_name"); %>
 //<% uptime(); %>
 //<% sysinfo(); %>
 //<% wlradio(); %>
@@ -15,7 +15,7 @@
 stats = { };
 
 do {
-	var a, b, i;
+	var a, b, c, d, i;
 
 	if (typeof(last_wan_proto) == 'undefined') {
 		last_wan_proto = nvram.wan_proto;
@@ -27,11 +27,16 @@ do {
 	stats.cpuload = ((sysinfo.loads[0] / 65536.0).toFixed(2) + '<small> / </small> ' +
 		(sysinfo.loads[1] / 65536.0).toFixed(2) + '<small> / </small>' +
 		(sysinfo.loads[2] / 65536.0).toFixed(2));
+	stats.cpufreq = nvram.clkfreq + ' MHz';
 	stats.uptime = sysinfo.uptime_s;
 
 	a = sysinfo.totalram + sysinfo.totalswap;
 	b = sysinfo.totalfreeram + sysinfo.freeswap;
 	stats.memory = scaleSize(a) + ' / ' + scaleSize(b) + ' <small>(' + (b / a * 100.0).toFixed(2) + '%)</small>';
+	c = sysinfo.bufferram;
+	d = sysinfo.cached;
+	stats.memorybuffers = scaleSize(c);
+	stats.memorycached = scaleSize(d);
 
 	stats.time = '<% time(); %>';
 	stats.wanup = '<% wanup(); %>' == '1';

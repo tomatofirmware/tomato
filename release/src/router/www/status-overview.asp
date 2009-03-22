@@ -92,6 +92,7 @@ function c(id, htm)
 function show()
 {
 	c('cpu', stats.cpuload);
+	c('cpufreq', stats.cpufreq);
 	c('uptime', stats.uptime);
 	c('time', stats.time);
 	c('wanip', stats.wanip);
@@ -99,6 +100,8 @@ function show()
 	c('wangateway', stats.wangateway);
 	c('dns', stats.dns);
 	c('memory', stats.memory);
+	c('memorybuffers', stats.memorybuffers);
+	c('memorycached', stats.memorycached);
 
 	c('wanstatus', stats.wanstatus);
 	c('wanuptime', stats.wanuptime);
@@ -160,8 +163,11 @@ createFieldTable('', [
 	null,
 	{ title: 'Time', rid: 'time', text: stats.time },
 	{ title: 'Uptime', rid: 'uptime', text: stats.uptime },
+	{ title: 'CPU Frequency', rid: 'cpufreq', text: stats.cpufreq },
 	{ title: 'CPU Load <small>(1 / 5 / 15 mins)</small>', rid: 'cpu', text: stats.cpuload },
-	{ title: 'Total / Free Memory', rid: 'memory', text: stats.memory }
+	{ title: 'Total / Free Memory', rid: 'memory', text: stats.memory },
+	{ title: 'Buffers', rid: 'memorybuffers', text: stats.memorybuffers },
+	{ title: 'Cached', rid: 'memorycached', text: stats.memorycached }
 ]);
 </script>
 </div>
