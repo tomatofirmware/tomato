@@ -419,6 +419,8 @@ sendmail: shared
 samba: shared
 miniupnpd: iptables
 
+shared: busybox
+
 # !!TB
 vsftpd: shared openssl
 	@$(SEP)
