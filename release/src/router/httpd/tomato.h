@@ -82,6 +82,7 @@ extern void wo_resolve(char *url);
 //!!TB
 extern void asp_usbdevices(int argc, char **argv);
 extern void wo_usbcommand(char *url);
+extern void asp_wlchannels(int argc, char **argv);
 
 // devlist.c
 extern void asp_arplist(int argc, char **argv);
