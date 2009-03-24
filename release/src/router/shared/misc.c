@@ -15,9 +15,11 @@
 #include <syslog.h>
 #include <sys/ioctl.h>
 #include <net/if.h>
+#include <dirent.h> //!!TB
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <sys/sysinfo.h>
+#include <sys/types.h>
 
 #include <bcmnvram.h>
 #include <bcmdevs.h>
@@ -412,16 +414,243 @@ int time_ok(void)
 // -----------------------------------------------------------------------------
 //!!TB - USB Support
 
-/* stolen from the e2fsprogs/ismounted.c */
- /* Find wherever 'file' (actually: device) is mounted.
-  * Either the exact same device-name, or another device-name.
-  * The latter is detected by comparing the rdev or dev&inode.
-  * So aliasing won't fool us---we'll still find if it's mounted.
-  * Return its mnt entry.
-  * In particular, the caller would look at the mnt->mountpoint.
-  * If "file" is an empty string, return the mntent of the first
-  * mount that is for a USB disc that is no longer accessible.
-  */
+/* Serialize using fcntl() calls 
+ */
+int usb_lock(void)
+{
+	const char fn[] = "/var/lock/usb.lock";
+	struct flock lock;
+	int lockfd = -1;
+	
+	if ((lockfd = open(fn, O_CREAT | O_RDWR, 0666)) < 0)
+		goto lock_error;
+
+	memset(&lock, 0, sizeof(lock));
+	lock.l_type = F_WRLCK;
+	lock.l_pid = getpid();
+	if (fcntl(lockfd, F_SETLKW, &lock) < 0)
+		goto lock_error;
+
+	return lockfd;
+lock_error:
+	// No proper error processing
+	syslog(LOG_DEBUG, "Error %d locking %s, proceeding anyway", errno, fn);
+	return -1;
+}
+
+void usb_unlock(int lockfd)
+{
+	if (lockfd >= 0) {
+		close(lockfd);
+	}
+}
+
+char *detect_fs_type(char *device)
+{
+	int fd;
+	unsigned char buf[4096];
+	
+	if ((fd = open(device, O_RDONLY)) < 0)
+		return NULL;
+		
+	if (read(fd, buf, sizeof(buf)) != sizeof(buf))
+	{
+		close(fd);
+		return NULL;
+	}
+	
+	close(fd);
+	
+	/* first check for mbr */
+	if (*device && device[strlen(device) - 1] > '9' &&
+		buf[510] == 0x55 && buf[511] == 0xAA && /* signature */
+		((buf[0x1be] | buf[0x1ce] | buf[0x1de] | buf[0x1ee]) & 0x7f) == 0) /* boot flags */ 
+	{
+		return "mbr";
+	} 
+	/* detect swap */
+	else if (memcmp(buf + 4086, "SWAPSPACE2", 10) == 0 ||
+		memcmp(buf + 4086, "SWAP-SPACE", 10) == 0)
+	{
+		return "swap";
+	}
+	/* detect ext2/3 */
+	else if (buf[0x438] == 0x53 && buf[0x439] == 0xEF)
+	{
+		return ((buf[0x460] & 0x0008 /* JOURNAL_DEV */) != 0 ||
+			(buf[0x45c] & 0x0004 /* HAS_JOURNAL */) != 0) ? "ext3" : "ext2";
+	}
+	/* detect ntfs */
+	else if (buf[510] == 0x55 && buf[511] == 0xAA && /* signature */
+		memcmp(buf + 3, "NTFS    ", 8) == 0)
+	{
+		return "ntfs";
+	}
+	/* detect vfat */
+	else if (buf[510] == 0x55 && buf[511] == 0xAA && /* signature */
+		buf[11] == 0 && buf[12] >= 1 && buf[12] <= 8 /* sector size 512 - 4096 */ &&
+		buf[13] != 0 && (buf[13] & (buf[13] - 1)) == 0) /* sectors per cluster */
+	{
+		return "vfat";
+	}
+
+	return NULL;
+}
+
+
+/* Execute a function for each disc partition on the specified controller.
+ *
+ * Directory /dev/discs/ looks like this:
+ * disc0 -> ../scsi/host0/bus0/target0/lun0/
+ * disc1 -> ../scsi/host1/bus0/target0/lun0/
+ * disc2 -> ../scsi/host2/bus0/target0/lun0/
+ * disc3 -> ../scsi/host2/bus0/target0/lun1/
+ *
+ * Scsi host 2 supports multiple drives.
+ * Scsi host 0 & 1 support one drive.
+ *
+ * For attached drives, like this.  If not attached, there is no "part#" item.
+ * Here, only one drive, with 2 partitions, is plugged in.
+ * /dev/discs/disc0/disc
+ * /dev/discs/disc0/part1
+ * /dev/discs/disc0/part2
+ * /dev/discs/disc1/disc
+ * /dev/discs/disc2/disc
+ *
+ * Which is the same as:
+ * /dev/scsi/host0/bus0/target0/lun0/disc
+ * /dev/scsi/host0/bus0/target0/lun0/part1
+ * /dev/scsi/host0/bus0/target0/lun0/part2
+ * /dev/scsi/host1/bus0/target0/lun0/disc
+ * /dev/scsi/host2/bus0/target0/lun0/disc
+ * /dev/scsi/host2/bus0/target0/lun1/disc
+ *
+ * Implementation notes:
+ * Various mucking about with a disc that just got plugged in or unplugged
+ * will make the scsi subsystem try a re-validate, and read the partition table of the disc.
+ * This will make sure the partitions show up.
+ *
+ * It appears to try to do the revalidate and re-read & update the partition
+ * information when this code does the "readdir of /dev/discs/disc0/?".  If the
+ * disc has any mounted partitions the revalidate will be rejected.  So the
+ * current partition info will remain.  On an unplug event, when it is doing the
+ * readdir's, it will try to do the revalidate as we are doing the readdir's.
+ * But luckily they'll be rejected, otherwise the later partitions will disappear as
+ * soon as we get the first one.
+ * But be very careful!  If something goes not exactly right, the partition entries
+ * will disappear before we've had a chance to unmount from them.
+ *
+ * To avoid this automatic revalidation, we go through /proc/partitions looking for the partitions
+ * that /dev/discs point to.  That will avoid the implicit revalidate attempt.
+ * Which means that we had better do it ourselves.  An ioctl BLKRRPART does just that.
+ * 
+ * 
+ * If host < 0, do all hosts.   If >= 0, it is the host number to do.
+ * When_to_update, flags:
+ *	0x01 = before reading partition info
+ *	0x02 = after reading partition info
+ *
+ */
+
+/* So as not to include linux/fs.h, let's explicitly do this here. */
+#ifndef BLKRRPART
+#define BLKRRPART	_IO(0x12,95)	/* re-read partition table */
+#endif
+
+int exec_for_host(int host, int when_to_update, uint flags, host_exec func)
+{
+	DIR *usb_dev_disc;
+	char bfr[128];	/* Will be: /dev/discs/disc#					*/
+	char link[256];	/* Will be: ../scsi/host#/bus0/target0/lun#  that bfr links to. */
+			/* When calling the func, will be: /dev/discs/disc#/part#	*/
+	char bfr2[128];	/* Will be: /dev/discs/disc#/disc     for the BLKRRPART.	*/
+	int fd;
+	char *cp;
+	int len;
+	int host_no;	/* SCSI controller/host # */
+	int disc_num;	/* Disc # */
+	int part_num;	/* Parition # */
+	struct dirent *dp;
+	FILE *prt_fp;
+	char *mp;	/* Ptr to after any leading ../ path */
+	int siz;
+	char line[256];
+	int result = 0;
+
+	flags |= EFH_1ST_HOST;
+	if ((usb_dev_disc = opendir(DEV_DISCS_ROOT))) {
+		while ((dp = readdir(usb_dev_disc))) {
+			sprintf(bfr, "%s/%s", DEV_DISCS_ROOT, dp->d_name);
+			if (strncmp(dp->d_name, "disc", 4) != 0)
+				continue;
+
+			disc_num = atoi(dp->d_name + 4);
+			len = readlink(bfr, link, sizeof(link) - 1);
+			if (len < 0)
+				continue;
+
+			link[len] = 0;
+			cp = strstr(link, "/scsi/host");
+			if (!cp)
+				continue;
+
+			host_no = atoi(cp + 10);
+			if (host >= 0 && host_no != host)
+				continue;
+
+			/* We have found a disc that is on this controller.
+			 * Loop thru all the partitions on this disc.
+			 * The new way, reading thru /proc/partitions.
+			 */
+			mp = link;
+			if ((cp = strstr(link, "../")) != NULL)
+				mp = cp + 3;
+			siz = strlen(mp);
+
+			if (when_to_update & 0x01) {
+				sprintf(bfr2, "%s/disc", bfr);	/* Prepare for BLKRRPART */
+				if ((fd = open(bfr2, O_RDONLY | O_NONBLOCK)) >= 0) {
+					ioctl(fd, BLKRRPART);
+					close(fd);
+				}
+			}
+
+			flags |= EFH_1ST_DISC;
+			if (func && (prt_fp = fopen("/proc/partitions", "r"))) {
+				while (fgets(line, sizeof(line) - 2, prt_fp)) {
+					if (sscanf(line, " %*s %*s %*s %s", bfr2) == 1) {
+						if ((cp = strstr(bfr2, "/part")) && strncmp(bfr2, mp, siz) == 0) {
+							part_num = atoi(cp + 5);
+							sprintf(line, "%s/part%d", bfr, part_num);
+							result = (*func)(line, host_no, disc_num, part_num, flags) || result;
+							flags &= ~(EFH_1ST_HOST | EFH_1ST_DISC);
+						}
+					}
+				}
+				fclose(prt_fp);
+			}
+
+			if (when_to_update & 0x02) {
+				sprintf(bfr2, "%s/disc", bfr);	/* Prepare for BLKRRPART */
+				if ((fd = open(bfr2, O_RDONLY | O_NONBLOCK)) >= 0) {
+					ioctl(fd, BLKRRPART);
+					close(fd);
+				}
+			}
+		}
+		closedir(usb_dev_disc);
+	}
+	return result;
+}
+
+/* Stolen from the e2fsprogs/ismounted.c.
+ * Find wherever 'file' (actually: device) is mounted.
+ * Either the exact same device-name, or another device-name.
+ * The latter is detected by comparing the rdev or dev&inode.
+ * So aliasing won't fool us---we'll still find if it's mounted.
+ * Return its mnt entry.
+ * In particular, the caller would look at the mnt->mountpoint.
+ */
 struct mntent *findmntent(char *file)
 {
 	struct mntent 	*mnt;
@@ -442,13 +671,9 @@ struct mntent *findmntent(char *file)
 		}
 	}
 	while ((mnt = getmntent(f)) != NULL) {
-		if (*file == 0 && strncmp(mnt->mnt_fsname, "/dev/discs/", 11) == 0) {
-			if (stat(mnt->mnt_fsname, &st_buf) != 0)
-				break;	/* Device is no longer valid. */
-		}
-
 		if (strcmp(file, mnt->mnt_fsname) == 0)
 			break;
+
 		if (stat(mnt->mnt_fsname, &st_buf) == 0) {
 			if (S_ISBLK(st_buf.st_mode)) {
 				if (file_rdev && (file_rdev == st_buf.st_rdev))
@@ -465,77 +690,64 @@ struct mntent *findmntent(char *file)
 	return mnt;
 }
 
-/* Figure out the volume label. */
-/* If we found it, return Non-Zero and store it at the_label. */
-#define USE_BB	0	/* Use the actual busybox .a file. */
 
-#if USE_BB
-char applet_name[] = "hotplug";	/* Needed to satisfy a reference. */
-int find_label(char *mnt_dev, char *the_label)
+/****************************************************/
+/* Use busybox routines to get labels for fat & ext */
+/* Probe for label the same way that mount does.    */
+/****************************************************/
+
+#define VOLUME_ID_LABEL_SIZE            64
+#define VOLUME_ID_UUID_SIZE             36
+
+struct volume_id {
+	char            label[VOLUME_ID_LABEL_SIZE+1];
+	char            uuid[VOLUME_ID_UUID_SIZE+1];
+	int             fd;
+	uint8_t         *sbbuf;
+	uint8_t         *seekbuf;
+	size_t          sbbuf_len;
+	uint64_t        seekbuf_off;
+	size_t          seekbuf_len;
+};
+extern void volume_id_free_buffer(struct volume_id *id);
+extern int volume_id_probe_ext(struct volume_id *id, uint64_t off);
+extern int volume_id_probe_vfat(struct volume_id *id, uint64_t off);
+extern int volume_id_probe_linux_swap(struct volume_id *id, uint64_t off);
+
+/* Put the label in *label.
+ * Return 0 if no label found, NZ if there is a label.
+ */
+int find_label(char *dev_name, char *label)
 {
-	char *uuid, *label;
-	int i;
-   
-	*the_label = 0;
-	/* heuristic: partition name ends in a digit */
-	if ( !isdigit(mnt_dev[strlen(mnt_dev) - 1]))
-		return(0);
+	struct volume_id id = {{0}};
 
-	cprintf("\n\nGetting volume label for '%s'\n", mnt_dev);
+	label[0] = 0;
+	if ((id.fd = open(dev_name, O_RDONLY)) < 0)
+		return 0;
 
-	/* it's in get_devname.c  */
-	i = get_label_uuid(mnt_dev, &label, &uuid, 0);
-	cprintf("get_label_uuid= %d\n", i);
-	if (i == 0) {
-		cprintf(" label= %s uuid = %s\n", label, uuid);
-		strcpy(the_label, label);
-		return(1);
-	}
-	return (0);
+	if (volume_id_probe_vfat(&id, 0) == 0 ||
+	    volume_id_probe_ext(&id, 0) == 0 ||
+	    volume_id_probe_linux_swap(&id, 0) == 0)
+		strcpy(label, id.label);
+	close(id.fd);
+	volume_id_free_buffer(&id);
+	return(label[0] != 0);
 }
-#else
-int find_label(char *mnt_dev, char *the_label)
+
+void *xmalloc(size_t siz)
 {
-	char *label, *p;
-	FILE *mfp;
-	char buf[128];
-	struct stat st_arg, st_mou;
-
-	*the_label = 0;
-	/* heuristic: partition name ends in a digit */
-	if ( !isdigit(mnt_dev[strlen(mnt_dev) - 1]))
-		return(0);
-
-	mfp = popen("mount LABEL= /no-such-label", "r");
-	if (mfp == NULL) {
-		_dprintf("Cannot popen mount!!\n");
-		return(0);
-	}
-
-	while (fgets(buf, sizeof(buf), mfp)) {
-		if ((p = strchr(buf, '\n')))
-			*p = 0;
-		if ((p = strstr(buf, "LABEL "))) {	/* Isolate the label. */
-			if ((label=strchr(p+6, '\''))) {
-				++label;
-				if ((p = strchr(label, '\''))) {
-					*p++ = 0;
-					if ((p = strchr(p, '/'))) {	/* Isolate the device. */
-						/* See if the argument is the same as what mount gives. */
-						if (stat(mnt_dev, &st_arg) == 0 && stat(p, &st_mou) == 0) {
-							if (S_ISBLK(st_arg.st_mode) && S_ISBLK(st_mou.st_mode) &&
-									st_arg.st_rdev == st_mou.st_rdev) {
-								strcpy(the_label, label);
-								fclose(mfp);
-								return(1);
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	fclose(mfp);
-	return(0);
+	return (malloc(siz));
 }
-#endif
+
+typedef long long off64_t;
+off64_t xlseek(int fd, off64_t offset, int whence)
+{
+	return lseek(fd, offset, whence);
+}
+
+void volume_id_set_uuid() {}
+
+ssize_t full_read(int fd, void *buf, size_t len)
+{
+	return read(fd, buf, len);
+}

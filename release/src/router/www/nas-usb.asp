@@ -163,7 +163,10 @@ dg.sortCompare = function(a, b) {
 
 	switch (col) {
 	case 1:
-		r = cmpInt(ra.host, rb.host);
+		if (ra.type == 'Storage' && ra.type == rb.type)
+			r = cmpInt(ra.host, rb.host);
+		else
+			r = cmpText(ra.host, rb.host);
 		break;
 	default:
 		r = cmpText(a.cells[col].innerHTML, b.cells[col].innerHTML);
@@ -222,7 +225,8 @@ dg.populate = function()
 				for (k = 0; k <= parts.length - 1; ++k) {
 					p = parts[k];
 					if (p) {
-						desc = desc + '<br>Partition \'' + p[0] + '\'' + (p[3] != '' ? ' ' : '') + p[3] +
+						desc = desc + '<br>Partition \'' + p[0] + '\'' + (p[3] != '' ? ' ' + p[3] : '') +
+							(p[5] != '0' && p[5] != '' ? ' (' + p[5] + ' MB)' : '') +
 							((p[1] != 0) ? ' is mounted ' +  ((p[2] != '') ? 'on ' : '') : ' is not mounted ') + p[2];
 					}
 				}

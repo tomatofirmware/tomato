@@ -311,14 +311,12 @@ oldconfig oldconf: roldconf koldconf
 #
 
 busybox: dummy
-	$(MAKE) -C busybox CFLAGS_busybox="-Os"
-#!!TB CFLAGS = "-Os"
+	$(MAKE) -C busybox
 # V=1
 
 busybox-install:
 	rm -rf $(INSTALLDIR)/busybox
-	$(MAKE) -C busybox install CONFIG_PREFIX=$(INSTALLDIR)/busybox CFLAGS_busybox="-Os"
-#!!TB CFLAGS = "-Os"
+	$(MAKE) -C busybox install CONFIG_PREFIX=$(INSTALLDIR)/busybox
 
 busybox-test: dummy
 	$(MAKE) -C busybox objsizes CFLAGS="-Os"
@@ -431,6 +429,8 @@ p910nd: shared
 sendmail: shared
 samba: shared
 miniupnpd: iptables
+
+shared: busybox
 
 # !!TB
 vsftpd: shared openssl

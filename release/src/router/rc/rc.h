@@ -49,7 +49,6 @@
 #endif
 
 #define MOUNT_ROOT	"/tmp/mnt"
-#define DEV_DISCS_ROOT	"/dev/discs"
 #define PROC_SCSI_ROOT	"/proc/scsi"
 #define USB_STORAGE	"usb-storage"
  
@@ -187,8 +186,6 @@ extern void restart_nas_services(int start);
 extern void start_usb(void);
 extern void stop_usb(void);
 extern void hotplug_usb(void);
-extern void probe_usb_mass(char *product, int connected_only);
-extern void hotplug_usb_mass(char *product);
 extern void remove_storage_main(void);
 
 // wnas.c
