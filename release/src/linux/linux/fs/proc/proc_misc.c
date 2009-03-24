@@ -36,6 +36,7 @@
 #include <linux/init.h>
 #include <linux/smp_lock.h>
 #include <linux/seq_file.h>
+#include <linux/sysrq.h>
 
 #include <asm/uaccess.h>
 #include <asm/pgtable.h>
@@ -344,7 +345,7 @@ static int kstat_read_proc(char *page, char **start, off_t off,
 			kstat.pswpout,
 			sum
 	);
-#if !defined(CONFIG_ARCH_S390)
+#if !defined(CONFIG_ARCH_S390) && !defined(CONFIG_ALPHA)
 	for (i = 0 ; i < NR_IRQS ; i++)
 		proc_sprintf(page, &off, &len,
 			     " %u", kstat_irqs(i));
@@ -469,6 +470,28 @@ static int memory_read_proc(char *page, char **start, off_t off,
 	return proc_calc_metrics(page, start, off, count, eof, len);
 }
 
+#ifdef CONFIG_MAGIC_SYSRQ
+/*
+ * writing 'C' to /proc/sysrq-trigger is like sysrq-C
+ */
+static ssize_t write_sysrq_trigger(struct file *file, const char *buf,
+				     size_t count, loff_t *ppos)
+{
+	if (count) {
+		char c;
+
+		if (get_user(c, buf))
+			return -EFAULT;
+		handle_sysrq(c, NULL, NULL, NULL);
+	}
+	return count;
+}
+
+static struct file_operations proc_sysrq_trigger_operations = {
+	.write		= write_sysrq_trigger,
+};
+#endif
+
 struct proc_dir_entry *proc_root_kcore;
 
 static void create_seq_entry(char *name, mode_t mode, struct file_operations *f)
@@ -538,6 +561,11 @@ void __init proc_misc_init(void)
 		proc_root_kcore->size =
 				(size_t)high_memory - PAGE_OFFSET + PAGE_SIZE;
 	}
+#ifdef CONFIG_MAGIC_SYSRQ
+	entry = create_proc_entry("sysrq-trigger", S_IWUSR, NULL);
+	if (entry)
+		entry->proc_fops = &proc_sysrq_trigger_operations;
+#endif
 #ifdef CONFIG_PPC32
 	{
 		extern struct file_operations ppc_htab_operations;
