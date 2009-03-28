@@ -12,6 +12,7 @@ enum km_type {
 	KM_USER0,
 	KM_USER1,
 	KM_BH_IRQ,
+	KM_BIO_IRQ,
 	KM_TYPE_NR
 };
 
