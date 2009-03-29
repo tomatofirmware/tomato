@@ -102,9 +102,9 @@ inline void make_le_item_head (struct item_head * ih, const struct cpu_key * key
 }
 
 static void add_to_flushlist(struct inode *inode, struct buffer_head *bh) {
-    struct inode *jinode = &(SB_JOURNAL(inode->i_sb)->j_dummy_inode) ;
+    struct reiserfs_journal *j = SB_JOURNAL(inode->i_sb) ;
 
-    buffer_insert_inode_queue(bh, jinode) ;
+    buffer_insert_list(bh, &j->j_dirty_buffers) ;
 }
 
 //

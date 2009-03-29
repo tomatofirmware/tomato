@@ -262,6 +262,7 @@ struct file_system_type *get_fs_type(const char *name)
  */
 static struct super_block *alloc_super(void)
 {
+	static struct super_operations empty_sops = {};
 	struct super_block *s = kmalloc(sizeof(struct super_block),  GFP_USER);
 	if (s) {
 		memset(s, 0, sizeof(struct super_block));
@@ -279,6 +280,7 @@ static struct super_block *alloc_super(void)
 		sema_init(&s->s_dquot.dqio_sem, 1);
 		sema_init(&s->s_dquot.dqoff_sem, 1);
 		s->s_maxbytes = MAX_NON_LFS;
+		s->s_op = &empty_sops;
 	}
 	return s;
 }
