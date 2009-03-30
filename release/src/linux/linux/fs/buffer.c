@@ -1026,6 +1026,7 @@ void balance_dirty(void)
 		write_some_buffers(NODEV);
 	}
 }
+EXPORT_SYMBOL(balance_dirty);
 
 inline void __mark_dirty(struct buffer_head *bh)
 {
