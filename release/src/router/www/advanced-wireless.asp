@@ -120,7 +120,7 @@ REMOVE-END */
 		options: [['off', 'Off *'],['d', '802.11d'],['h', '802.11h']],
 		value: nvram.wl_reg_mode },
 	{ title: 'Country / Region', name: 'wl_country_code', type: 'select',
-		options: [['US','U.S. / Americas, FCC'],['CN','China'],['DE','Europe'],['IL','Israel'],['JP','Japan'],['JO','Jordan'],['SG','Singapore'],['TW','Taiwan'],['TH','Thailand'],['AU','Worldwide']],
+		options: [['CN','China'],['DE','Europe'],['IL','Israel'],['JP','Japan'],['JO','Jordan'],['SG','Singapore'],['TW','Taiwan'],['TH','Thailand'],['US','U.S. / Americas, FCC'],['AU','Worldwide']],
 		value: nvram.wl_country_code },
 	{ title: 'Distance / ACK Timing', name: 'f_distance', type: 'text', maxlen: 5, size: 7,
 		suffix: ' <small>meters</small>&nbsp;&nbsp;<small>(range: 0 - 99999; 0 = use default)</small>',
