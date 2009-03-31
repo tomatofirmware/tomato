@@ -495,8 +495,8 @@ static const nvset_t nvset_list[] = {
 	{ "dr_wan_rx",			V_LENGTH(0, 32)		},
 
 // advanced-wireless
-	{ "wl_country",			V_LENGTH(2, 4)		},	// !!TB - Country code
-	{ "wl_country_code",		V_LENGTH(2, 4)		},	// !!TB - Country code
+	{ "wl_country",			V_LENGTH(0, 64)		},	// !!TB - Country code
+	{ "wl_country_code",		V_LENGTH(0, 4)		},	// !!TB - Country code
 	{ "wl_afterburner",		V_LENGTH(2, 4)		},	// off, on, auto
 	{ "wl_auth",			V_01				},
 	{ "wl_rateset",			V_LENGTH(2, 7)		},	// all, default, 12
