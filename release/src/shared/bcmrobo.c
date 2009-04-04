@@ -83,7 +83,9 @@
 #define REG_VLAN_CTRL4	0x04	/* VLAN Control 4 register */
 #define REG_VLAN_CTRL5	0x05	/* VLAN Control 5 register */
 #define REG_VLAN_ACCESS	0x06	/* VLAN Table Access register */
+#define REG_VLAN_ACCESS_5365	0x08	/* 5365 VLAN Table Access register */
 #define REG_VLAN_WRITE	0x08	/* VLAN Write register */
+#define REG_VLAN_WRITE_5365	0x0A	/* 5365 VLAN Write register */
 #define REG_VLAN_READ	0x0C	/* VLAN Read register */
 #define REG_VLAN_PTAG0	0x10	/* VLAN Default Port Tag register - port 0 */
 #define REG_VLAN_PTAG1	0x12	/* VLAN Default Port Tag register - port 1 */
@@ -1005,7 +1007,21 @@ vlan_setup:
 
 		val32 = (untag |			/* untag enable */
 		         member);			/* vlan members */
-		if (robo->devid == DEVID5325) {
+		if (sb_chip(robo->sbh) == BCM5365_CHIP_ID) 
+		{
+			/* VLAN Write Register (Page 0x34, Address 0x0A) */
+			val32 = ((1 << 14) |	/* valid write */
+				 (untag << 1) |	/* untag enable */
+				 member);		/* vlan members */
+			robo->ops->write_reg(robo, PAGE_VLAN, REG_VLAN_WRITE_5365, &val32,
+			                     sizeof(val32));
+			/* VLAN Table Access Register (Page 0x34, Address 0x08) */
+			val16 = ((1 << 13) | 	/* start command */
+				 (1 << 12) |	/* write state */
+				 vid);		/* vlan id */
+			robo->ops->write_reg(robo, PAGE_VLAN, REG_VLAN_ACCESS_5365, &val16,
+			                     sizeof(val16));
+		} else if (robo->devid == DEVID5325) {
 			val32 |= ((1 << 20) |		/* valid write */
 			          ((vid >> 4) << 12));	/* vlan id bit[11:4] */
 			/* VLAN Write Register (Page 0x34, Address 0x08-0x0B) */
@@ -1104,6 +1120,10 @@ bcm_robo_enable_switch(robo_info_t *robo)
 			robo->ops->write_reg(robo, PAGE_CTRL, i, &val8, sizeof(val8));
 		}
 	}
+
+	/* Enable WAN port (#0) on the asus wl-500g deluxe boxes */
+	val8 = 0;
+	robo->ops->write_reg(robo, PAGE_CTRL, REG_CTRL_PORT0, &val8, sizeof(val8));
 
 	/* Disable management interface access */
 	if (robo->ops->disable_mgmtif)
