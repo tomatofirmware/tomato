@@ -2229,7 +2229,7 @@ static int ext3_do_update_inode(handle_t *handle,
 			}
 		}
 	}
-	raw_inode->i_generation = le32_to_cpu(inode->i_generation);
+	raw_inode->i_generation = cpu_to_le32(inode->i_generation);
 	if (S_ISCHR(inode->i_mode) || S_ISBLK(inode->i_mode))
 		raw_inode->i_block[0] =
 			cpu_to_le32(kdev_t_to_nr(inode->i_rdev));
@@ -2512,7 +2512,7 @@ void ext3_dirty_inode(struct inode *inode)
 	handle_t *handle;
 
 	lock_kernel();
-	handle = ext3_journal_start(inode, 1);
+	handle = ext3_journal_start(inode, 2);
 	if (IS_ERR(handle))
 		goto out;
 	if (current_handle &&

@@ -585,37 +585,29 @@ struct buffer_head * get_hash_table(kdev_t dev, int block, int size)
 	return bh;
 }
 
-void buffer_insert_inode_queue(struct buffer_head *bh, struct inode *inode)
+void buffer_insert_list(struct buffer_head *bh, struct list_head *list)
 {
 	spin_lock(&lru_list_lock);
-	if (bh->b_inode)
+	if (buffer_attached(bh))
 		list_del(&bh->b_inode_buffers);
-	bh->b_inode = inode;
-	list_add(&bh->b_inode_buffers, &inode->i_dirty_buffers);
+	set_buffer_attached(bh);
+	list_add(&bh->b_inode_buffers, list);
 	spin_unlock(&lru_list_lock);
 }
 
-void buffer_insert_inode_data_queue(struct buffer_head *bh, struct inode *inode)
-{
-	spin_lock(&lru_list_lock);
-	if (bh->b_inode)
-		list_del(&bh->b_inode_buffers);
-	bh->b_inode = inode;
-	list_add(&bh->b_inode_buffers, &inode->i_dirty_data_buffers);
-	spin_unlock(&lru_list_lock);
-}
-
-/* The caller must have the lru_list lock before calling the 
-   remove_inode_queue functions.  */
+/*
+ * The caller must have the lru_list lock before calling the 
+ * remove_inode_queue functions.
+ */
 static void __remove_inode_queue(struct buffer_head *bh)
 {
-	bh->b_inode = NULL;
 	list_del(&bh->b_inode_buffers);
+	clear_buffer_attached(bh);
 }
 
 static inline void remove_inode_queue(struct buffer_head *bh)
 {
-	if (bh->b_inode)
+	if (buffer_attached(bh))
 		__remove_inode_queue(bh);
 }
 
@@ -833,10 +825,10 @@ inline void set_buffer_async_io(struct buffer_head *bh)
 int fsync_buffers_list(struct list_head *list)
 {
 	struct buffer_head *bh;
-	struct inode tmp;
+	struct list_head tmp;
 	int err = 0, err2;
 	
-	INIT_LIST_HEAD(&tmp.i_dirty_buffers);
+	INIT_LIST_HEAD(&tmp);
 	
 	spin_lock(&lru_list_lock);
 
@@ -844,10 +836,10 @@ int fsync_buffers_list(struct list_head *list)
 		bh = BH_ENTRY(list->next);
 		list_del(&bh->b_inode_buffers);
 		if (!buffer_dirty(bh) && !buffer_locked(bh))
-			bh->b_inode = NULL;
+			clear_buffer_attached(bh);
 		else {
-			bh->b_inode = &tmp;
-			list_add(&bh->b_inode_buffers, &tmp.i_dirty_buffers);
+			set_buffer_attached(bh);
+			list_add(&bh->b_inode_buffers, &tmp);
 			if (buffer_dirty(bh)) {
 				get_bh(bh);
 				spin_unlock(&lru_list_lock);
@@ -867,8 +859,8 @@ int fsync_buffers_list(struct list_head *list)
 		}
 	}
 
-	while (!list_empty(&tmp.i_dirty_buffers)) {
-		bh = BH_ENTRY(tmp.i_dirty_buffers.prev);
+	while (!list_empty(&tmp)) {
+		bh = BH_ENTRY(tmp.prev);
 		remove_inode_queue(bh);
 		get_bh(bh);
 		spin_unlock(&lru_list_lock);
@@ -1034,6 +1026,7 @@ void balance_dirty(void)
 		write_some_buffers(NODEV);
 	}
 }
+EXPORT_SYMBOL(balance_dirty);
 
 inline void __mark_dirty(struct buffer_head *bh)
 {
@@ -1140,7 +1133,7 @@ struct buffer_head * bread(kdev_t dev, int block, int size)
  */
 static void __put_unused_buffer_head(struct buffer_head * bh)
 {
-	if (bh->b_inode)
+	if (unlikely(buffer_attached(bh)))
 		BUG();
 	if (nr_unused_buffer_heads >= MAX_UNUSED_BUFFERS) {
 		kmem_cache_free(bh_cachep, bh);

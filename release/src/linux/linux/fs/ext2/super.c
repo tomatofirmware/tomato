@@ -427,7 +427,7 @@ struct super_block * ext2_read_super (struct super_block * sb, void * data,
 	unsigned short resuid = EXT2_DEF_RESUID;
 	unsigned short resgid = EXT2_DEF_RESGID;
 	unsigned long block;
-	unsigned long logic_sb_block = 1;
+	unsigned long logic_sb_block;
 	unsigned long offset = 0;
 	kdev_t dev = sb->s_dev;
 	int blocksize = BLOCK_SIZE;
@@ -460,6 +460,8 @@ struct super_block * ext2_read_super (struct super_block * sb, void * data,
 	if (blocksize != BLOCK_SIZE) {
 		logic_sb_block = (sb_block*BLOCK_SIZE) / blocksize;
 		offset = (sb_block*BLOCK_SIZE) % blocksize;
+	} else {
+		logic_sb_block = sb_block;
 	}
 
 	if (!(bh = sb_bread(sb, logic_sb_block))) {

@@ -535,6 +535,7 @@ int ext2_make_empty(struct inode *inode, struct inode *parent)
 
 	base = page_address(page);
 
+	memset(base, 0, chunk_size);
 	de = (struct ext2_dir_entry_2 *) base;
 	de->name_len = 1;
 	de->rec_len = cpu_to_le16(EXT2_DIR_REC_LEN(1));
