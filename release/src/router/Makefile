@@ -65,6 +65,7 @@ obj-y += scsi-idle
 #obj-y += sendmail
 obj-$(TCONFIG_FTP) += vsftpd
 obj-$(TCONFIG_SAMBASRV) += samba
+obj-$(TCONFIG_USB_EXTRAS) += mkdosfs
 
 
 ifeq ($(TEST_MINIUPNPD),1)
@@ -185,18 +186,6 @@ ifneq ($(TCONFIG_L7),y)
 	rm -f $(TARGETDIR)/usr/lib/iptables/libipt_layer7.so
 endif
 
-# separated extra stuff
-	@rm -rf $(PLATFORMDIR)/extras
-	@mkdir $(PLATFORMDIR)/extras
-	@mv $(TARGETDIR)/lib/modules/2.4.20/kernel/net/ipv4/ip_gre.o $(PLATFORMDIR)/extras/
-	@mv $(TARGETDIR)/lib/modules/2.4.20/kernel/drivers/net/tun.o $(PLATFORMDIR)/extras/
-#!!TB
-	@mv $(TARGETDIR)/lib/modules/2.4.20/kernel/fs/ntfs.o $(PLATFORMDIR)/extras/ || true
-ifneq ($(TCONFIG_USB_EXTRAS),y)
-	@mv $(TARGETDIR)/lib/modules/2.4.20/kernel/drivers/block/loop.o $(PLATFORMDIR)/extras/ || true
-	@rm -rf $(TARGETDIR)/lib/modules/2.4.20/kernel/drivers/block || true
-endif
-
 # uClibc
 	install $(LIBDIR)/ld-uClibc.so.0 $(TARGETDIR)/lib/
 	install $(LIBDIR)/libcrypt.so.0 $(TARGETDIR)/lib/
@@ -221,6 +210,19 @@ endif
 	@../btools/libfoo.pl
 	@chmod 0555 $(TARGETDIR)/lib/*.so*
 
+# separated extra stuff
+# !!TB - moved to run after libfoo.pl - to make sure shared libs include all symbols needed by extras
+	@rm -rf $(PLATFORMDIR)/extras
+	@mkdir $(PLATFORMDIR)/extras
+	@mv $(TARGETDIR)/lib/modules/2.4.20/kernel/net/ipv4/ip_gre.o $(PLATFORMDIR)/extras/
+	@mv $(TARGETDIR)/lib/modules/2.4.20/kernel/drivers/net/tun.o $(PLATFORMDIR)/extras/
+#!!TB
+	@mv $(TARGETDIR)/lib/modules/2.4.20/kernel/fs/ntfs.o $(PLATFORMDIR)/extras/ || true
+	@mv $(TARGETDIR)/lib/modules/2.4.20/kernel/drivers/usb/scanner.o $(PLATFORMDIR)/extras/ || true
+ifneq ($(TCONFIG_USB_EXTRAS),y)
+	@mv $(TARGETDIR)/lib/modules/2.4.20/kernel/drivers/block/loop.o $(PLATFORMDIR)/extras/ || true
+	@rm -rf $(TARGETDIR)/lib/modules/2.4.20/kernel/drivers/block || true
+endif
 
 	@mkdir -p $(TARGETDIR)/rom/etc/l7-protocols
 ifeq ($(TCONFIG_L7PAT),y)
