@@ -183,9 +183,15 @@ int nvram_commit(void)
 	return r;
 }
 
-/* Preserve mode (permissions) of the file.
+/*
+ * Write a file to an NVRAM variable.
+ * @param	name	name of variable to get
+ * @param	filenname	name of file to write
+ * @return	return code
+ *
+ * Preserve mode (permissions) of the file.
  * Create the output directory.
-*/
+ */
 #define MAX_FS 4096
 #define MAGICNUM 0x12161770	/* Ludwig van Beethoven's birthdate. */
 int nvram_file2nvram(const char *varname, const char *filename)
@@ -232,6 +238,14 @@ int nvram_file2nvram(const char *varname, const char *filename)
 	return 0;
 }
 
+/*
+ * Get the value of an NVRAM variable and write it to a file.
+ * It must have been written with nvram_file2nvram.
+ * Directory path(s) are created, and permissions are preserved.
+ * @param	name	name of variable to get
+ * @param	filenname	name of file to write
+ * @return	return code
+ */
 int nvram_nvram2file(const char *varname, const char *filename)
 {
 	int fnum;

@@ -60,24 +60,6 @@ extern void nvram_exit(void *sbh);
  */
 extern char * nvram_get(const char *name);
 
-/*
- * Write a file to an NVRAM variable.
- * @param	name	name of variable to get
- * @param	filenname	name of file to write
- * @return	return code
- */
-extern int nvram_file2nvram(const char *name, const char *filename);
-
-/*
- * Get the value of an NVRAM variable and write it to a file.
- * It must have been written with nvram_file2nvram.
- * Directory path(s) are created, and permissions are preserved.
- * @param	name	name of variable to get
- * @param	filenname	name of file to write
- * @return	return code
- */
-extern int nvram_nvram2file(const char *name, const char *filename);
-
 /* 
  * Read the reset GPIO value from the nvram and set the GPIO
  * as input
