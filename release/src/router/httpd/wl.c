@@ -26,19 +26,11 @@ void asp_wlscan(int argc, char **argv)
 
 	wif = nvram_safe_get("wl_ifname");
 
-	memset(&sp, 0 /*!!TB 0xff*/, sizeof(sp));		// most default to -1
+	memset(&sp, 0xff, sizeof(sp));		// most default to -1
 	memset(&sp.bssid, 0xff, sizeof(sp.bssid));		//!!TB
-
 	sp.ssid.SSID_len = 0;
 	sp.bss_type = DOT11_BSSTYPE_ANY;	// =2
 	sp.channel_num = 0;
-
-	//!!TB
-	sp.scan_type = -1;
-	sp.nprobes = -1;
-	sp.active_time = -1;
-	sp.passive_time = -1;
-	sp.home_time = -1;
 
 	if (wl_ioctl(wif, WLC_GET_AP, &ap, sizeof(ap)) < 0) {
 		web_puts("[null,'Unable to get AP mode.']];\n");
@@ -87,7 +79,7 @@ void asp_wlscan(int argc, char **argv)
 		eval("wl", "up"); //!!TB - without this the router may reboot
 #if WL_BSS_INFO_VERSION >= 108
 		//!!TB - it seems that the new WL driver needs another voodoo sequence
-		eval("wl", "ssid", "_$");
+		eval("wl", "ssid", "");
 
 		// no idea why this voodoo sequence works to wake up wl	-- zzz
 		eval("wl", "ssid", nvram_safe_get("wl_ssid"));
@@ -244,7 +236,7 @@ void wo_wlmnoise(char *url)
 	if (!radio) set_radio(1);
 	eval("wl", "up");
 #if WL_BSS_INFO_VERSION >= 108
-	eval("wl", "ssid", "_$");
+	eval("wl", "ssid", "");
 	eval("wl", "ssid", nvram_safe_get("wl_ssid"));
 #endif
 	set_radio(radio);
