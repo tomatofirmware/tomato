@@ -53,7 +53,7 @@ Number.prototype.hex = function(min)
 
 // -----------------------------------------------------------------------------
 
-//	Element.protoype. doesn't work with all browsers
+// ---- Element.protoype. doesn't work with all browsers
 
 var elem = {
 	getOffset: function(e) {
@@ -498,7 +498,7 @@ function aton(ip)
 {
 	var o, x, i;
 
-	// this is goofy because << mangles numbers as signed
+	// ---- this is goofy because << mangles numbers as signed
 	o = ip.split('.');
 	x = '';
 	for (i = 0; i < 4; ++i) x += (o[i] * 1).hex(2);
@@ -510,7 +510,7 @@ function ntoa(ip)
 	return ((ip >> 24) & 255) + '.' + ((ip >> 16) & 255) + '.' + ((ip >> 8) & 255) + '.' + (ip & 255);
 }
 
-// 1.2.3.4, 1.2.3.4/24, 1.2.3.4/255.255.255.0, 1.2.3.4-1.2.3.5
+// ---- 1.2.3.4, 1.2.3.4/24, 1.2.3.4/255.255.255.0, 1.2.3.4-1.2.3.5
 function v_iptip(e, quiet)
 {
 	var ip, ma, x, y, z;
@@ -800,7 +800,7 @@ function cmpDate(a, b)
 
 // -----------------------------------------------------------------------------
 
-// todo: cleanup this mess
+// ---- todo: cleanup this mess
 
 function TGO(e)
 {
@@ -813,7 +813,7 @@ function tgHideIcons()
 	while ((e = document.getElementById('tg-row-panel')) != null) e.parentNode.removeChild(e);
 }
 
-// options = sort, move, delete
+// ---- options = sort, move, delete
 function TomatoGrid(tb, options, maxAdd, editorFields)
 {
 	this.init(tb, options, maxAdd, editorFields);
@@ -863,7 +863,7 @@ TomatoGrid.prototype = {
 		return tr;
 	},
 
-	// header
+	// ---- header
 
 	headerClick: function(cell) {
 		if (this.canSort) {
@@ -885,7 +885,7 @@ TomatoGrid.prototype = {
 		return e;
 	},
 
-	// footer
+	// ---- footer
 
 	footerClick: function(cell) {
 	},
@@ -903,7 +903,7 @@ TomatoGrid.prototype = {
 		return e;
 	},
 
-	//
+	// ----
 
 	rpUp: function(e) {
 		var i;
@@ -994,7 +994,7 @@ TomatoGrid.prototype = {
 	
 	rpHide: tgHideIcons,
 
-	//
+	// ----
 
 	onClick: function(cell) {
 		if (this.canEdit) {
@@ -1033,14 +1033,14 @@ TomatoGrid.prototype = {
 
 		if ((this.canMove) || (this.canEdit) || (this.canDelete)) {
 			e.onmouseover = this.rpMouIn;
-//			e.onmouseout = this.rpMouOut;
+// ----			e.onmouseout = this.rpMouOut;
 			if (this.canEdit) e.title = 'Click to edit';
 		}
 
 		return e;
 	},
 
-	//
+	// ----
 
 	insertData: function(at, data) {
 		return this.insert(at, data, this.dataToView(data), false);
@@ -1066,7 +1066,7 @@ TomatoGrid.prototype = {
 		return data;
 	},
 
-	//
+	// ----
 
 	edit: function(cell) {
 		var sr, er, e, c;
@@ -1761,7 +1761,7 @@ var cookie = {
 function checkEvent(evt)
 {
 	if (typeof(evt) == 'undefined') {
-		// IE
+		// ---- IE
 		evt = event;
 		evt.target = evt.srcElement;
 		evt.relatedTarget = evt.toElement;
@@ -2003,7 +2003,7 @@ function navi()
 		}
 		
 		if (m[1] == 'javascript:logout()') {
-			// can't logout in IE...
+			// ---- can't logout in IE...
 			try {
 				if (navigator.userAgent.match(/MSIE\s+(\d+)/)) {
 					continue;
@@ -2169,7 +2169,7 @@ function logout()
 
 
 
-// debug
+// ---- debug
 
 function isLocal()
 {
