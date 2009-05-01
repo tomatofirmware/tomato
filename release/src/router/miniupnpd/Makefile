@@ -10,11 +10,14 @@ include ../common.mak
 CP = cp
 RM = rm -f
 
-CFLAGS += -O -Wall -D_GNU_SOURCE
-IPTABLESDIR = ../iptables
-IPTABLESINC = $(IPTABLESDIR)/include
-LIBS = $(IPTABLESDIR)/libiptc/libiptc.a
+CFLAGS += -Os -Wall -D_GNU_SOURCE
+IPTABLESPATH = ../iptables
+LIBS = -L$(IPTABLESPATH)/ -liptc
 BINDIR = /usr/sbin
+CFLAGS += -I$(IPTABLESPATH)/include/
+
+#Uncomment next line if using IPTABLES ver. 1.4.3 or later
+#CFLAGS += -DIPTABLES_143
 
 BASEOBJS = miniupnpd.o upnphttp.o upnpdescgen.o upnpsoap.o \
            upnpreplyparse.o minixml.o \
@@ -54,16 +57,16 @@ install:	miniupnpd
 genuuid:
 	sed -i -e "s/^uuid=[-0-9a-f]*/uuid=`(genuuid||uuidgen) 2>/dev/null`/" miniupnpd.conf
 
-miniupnpd:	$(BASEOBJS) $(LNXOBJS) $(NETFILTEROBJS) #$(LIBS)
+miniupnpd:	$(BASEOBJS) $(LNXOBJS) $(NETFILTEROBJS)
 	@echo " [miniupnpd] CC -o $@"
-	@$(CC) $(CFLAGS) -I$(IPTABLESINC) -s -o $@ $^ -L$(IPTABLESDIR)/ -liptc
+	@$(CC) $(CFLAGS) -s -o $@ $^ $(LIBS)
 	$(SIZECHECK)
 	$(CPTMP)
 
 testupnpdescgen:	$(TESTUPNPDESCGENOBJS)
 
 netfilter/iptcrdr.o: netfilter/iptcrdr.c
-	$(CC) $(CFLAGS) -I$(IPTABLESINC) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 testgetifstats:	testgetifstats.o linux/getifstats.o
 
