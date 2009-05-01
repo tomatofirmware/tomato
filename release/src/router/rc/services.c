@@ -292,7 +292,8 @@ void stop_dnsmasq(void)
 		stop_service("dnsmasq");
 		return;
 	}
-
+	
+	killall("dnsmasq", SIGUSR1);	//!!TB - write dnsmasq stats to the system log before stopping
 	pid_dnsmasq = -1;
 
 	unlink("/etc/resolv.conf");

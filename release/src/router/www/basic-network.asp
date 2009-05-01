@@ -87,9 +87,9 @@ function scan()
 				}
 			}
 			var e = E('_wl_channel');
-			for (i = 0; i < ghz.length; ++i) {
+			for (i = 1; i < ghz.length; ++i) {
 				var s = ghz[i][1];
-				var u = wscan.inuse[i + 1];
+				var u = wscan.inuse[i];
 				if (u) s += ' (' + u.count + ' AP' + (u.count == 1 ? '' : 's') + ' / strongest: "' + ellipsis(u.ssid, 15) + '" ' + u.rssi + ' dBm)';
 				e.options[i].innerHTML = s;
 			}
