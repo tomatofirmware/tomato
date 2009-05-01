@@ -1969,7 +1969,7 @@ function navi()
 /* CIFS-END */
 			['Configuration',	'config.asp'],
 			['Debugging',		'debug.asp'],
-			['JFFS2',			'jffs2.asp'],
+			['JFFS',			'jffs2.asp'],
 			['Logging',			'log.asp'],
 			['Scheduler',		'sched.asp'],
 			['Scripts',			'scripts.asp'],
