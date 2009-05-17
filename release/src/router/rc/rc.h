@@ -339,6 +339,7 @@ extern void start_vpn_eas();
 extern void run_vpn_firewall_scripts();
 extern void write_vpn_dnsmasq_config(FILE*);
 #else
+/*
 static inline void start_vpnclient(int clientNum) {}
 static inline void stop_vpnclient(int clientNum) {}
 static inline void start_vpnserver(int serverNum) {}
@@ -346,6 +347,7 @@ static inline void stop_vpnserver(int serverNum) {}
 static inline void start_vpn_eas() {}
 static inline void run_vpn_firewall_scripts() {}
 static inline void write_vpn_dnsmasq_config(FILE*) {}
+*/
 #endif
 
 #endif

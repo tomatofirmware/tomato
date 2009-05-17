@@ -254,7 +254,9 @@ void start_dnsmasq()
 
 	//
 
+#ifdef TCONFIG_OPENVPN
 	write_vpn_dnsmasq_config(f);
+#endif
 
 	fprintf(f, "%s\n\n", nvram_safe_get("dnsmasq_custom"));
 
@@ -1152,7 +1154,9 @@ void start_services(void)
 #endif
 	start_samba();		// !!TB - Samba
 	start_ftpd();		// !!TB - FTP Server
+#ifdef TCONFIG_OPENVPN
 	start_vpn_eas();
+#endif
 }
 
 void stop_services(void)
@@ -1526,6 +1530,7 @@ TOP:
 	}
 #endif
 
+#ifdef TCONFIG_OPENVPN
 	if (strncmp(service, "vpnclient", 9) == 0) {
 		if (action & A_STOP) stop_vpnclient(atoi(&service[9]));
 		if (action & A_START) start_vpnclient(atoi(&service[9]));
@@ -1537,7 +1542,7 @@ TOP:
 		if (action & A_START) start_vpnserver(atoi(&service[9]));
 		goto CLEAR;
 	}
-
+#endif
 
 CLEAR:
 	if (next) goto TOP;
