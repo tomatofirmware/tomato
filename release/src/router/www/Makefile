@@ -49,7 +49,6 @@ ifneq ($(TCONFIG_CIFS),y)
 	rm -f $(INSTALLDIR)/www/admin-cifs.asp
 	sed -i $(INSTALLDIR)/www/tomato.js -e "/CIFS-BEGIN/,/CIFS-END/d"
 endif
-
 # Only include extra themes if USB Extras are configured in.
 ifneq ($(TCONFIG_USB_EXTRAS),y)
 	rm -f $(INSTALLDIR)/www/usbred.css
@@ -57,6 +56,14 @@ ifneq ($(TCONFIG_USB_EXTRAS),y)
 	rm -f $(INSTALLDIR)/www/tomatousb.png
 	rm -f $(INSTALLDIR)/www/tomatousb_bg.png
 	sed -i $(INSTALLDIR)/www/admin-access.asp -e "/THEMES-BEGIN/,/THEMES-END/d"
+endif
+
+# Only include the vpn pages in the navigation if OpenVPN is compiled in
+ifneq ($(TCONFIG_OPENVPN),y)
+	sed -i $(INSTALLDIR)/www/tomato.js -e "/VPN-BEGIN/,/VPN-END/d"
+	rm -f $(INSTALLDIR)/www/vpn.js
+	rm -f $(INSTALLDIR)/www/vpn-client.asp
+	rm -f $(INSTALLDIR)/www/vpn-server.asp
 endif
 
 # make sure old and debugging crap is gone
