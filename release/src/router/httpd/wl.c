@@ -1,7 +1,7 @@
 /*
 
 	Tomato Firmware
-	Copyright (C) 2006-2008 Jonathan Zarate
+	Copyright (C) 2006-2009 Jonathan Zarate
 
 */
 
@@ -39,10 +39,10 @@ void asp_wlscan(int argc, char **argv)
 	if (ap > 0) {
 		wl_ioctl(wif, WLC_SET_AP, &zero, sizeof(zero));
 	}
-	
+
 	radio = get_radio();
 	if (!radio) set_radio(1);
-	
+
 	if (wl_ioctl(wif, WLC_SCAN, &sp, WL_SCAN_PARAMS_FIXED_SIZE) < 0) {
 		if (ap > 0) wl_ioctl(wif, WLC_SET_AP, &ap, sizeof(ap));
 		if (!radio) set_radio(0);
@@ -106,7 +106,7 @@ void asp_wlscan(int argc, char **argv)
 	char mac[32];
 	char *ssidj;
 	int channel;
-	
+
 	bssi = &results->bss_info[0];
 	for (i = 0; i < results->count; ++i) {
 
@@ -116,24 +116,28 @@ void asp_wlscan(int argc, char **argv)
 		channel = bssi->channel;
 #endif
 
-		// scrub ssid
 		j = bssi->SSID_len;
 		if (j < 0) j = 0;
 		if (j > 32) j = 32;
-		for (k = j - 1; k >= 0; --k) {
-			c = bssi->SSID[k];
-			if (!isprint(c)) c = '?';
-			ssid[k] = c;
+		if (nvram_get_int("wlx_scrubssid")) {
+			for (k = j - 1; k >= 0; --k) {
+				c = bssi->SSID[k];
+				if (!isprint(c)) c = '?';
+				ssid[k] = c;
+			}
+		}
+		else {
+			memcpy(ssid, bssi->SSID, j);
 		}
 		ssid[j] = 0;
-		
 		ssidj = js_string(ssid);
+
 		web_printf("%s['%s','%s',%u,%u,%d,%d,[", (i > 0) ? "," : "",
 			ether_etoa(bssi->BSSID.octet, mac), ssidj ? ssidj : "",
 			channel,
 			bssi->capability, bssi->RSSI, bssi->phy_noise);
 		free(ssidj);
-		
+
 		for (j = 0; j < bssi->rateset.count; ++j) {
 			web_printf("%s%u", j ? "," : "", bssi->rateset.rates[j]);
 		}
@@ -155,7 +159,7 @@ void asp_wlradio(int argc, char **argv)
 void wo_wlradio(char *url)
 {
 	char *enable;
-	
+
 	parse_asp("saved.asp");
 	if (nvram_match("wl_radio", "1")) {
 		if ((enable = webcgi_get("enable")) != NULL) {
@@ -196,7 +200,7 @@ void asp_wlcrssi(int argc, char **argv)
 void asp_wlnoise(int argc, char **argv)
 {
 	int v;
-	
+
 	if (wl_client()) {
 		v = read_noise();
 	}
@@ -212,7 +216,7 @@ void wo_wlmnoise(char *url)
 	int ap;
 	int i;
 	char *wif;
-	
+
 	parse_asp("mnoise.asp");
 	web_close();
 	sleep(3);
@@ -224,7 +228,7 @@ void wo_wlmnoise(char *url)
 
 	i = 0;
 	wl_ioctl(wif, WLC_SET_AP, &i, sizeof(i));
-	
+
 	for (i = 10; i > 0; --i) {
 		sleep(1);
 		read_noise();
@@ -250,7 +254,7 @@ void asp_wlclient(int argc, char **argv)
 void asp_wlchannel(int argc, char **argv)
 {
 	channel_info_t ch;
-	
+
 	if (wl_ioctl(nvram_safe_get("wl_ifname"), WLC_GET_CHANNEL, &ch, sizeof(ch)) < 0) {
 		web_puts(nvram_safe_get("wl_channel"));
 	}
