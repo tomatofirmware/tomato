@@ -1513,9 +1513,9 @@ int __init ip_conntrack_init(void)
 
 /* - SpeedMod
 #ifdef TEST_JHASH
-	if (hashsize) ip_conntrack_htable_size = hashsize;
-		else ip_conntrack_htable_size = 4096;
-	ip_conntrack_max = 2048;
+ 	if (hashsize) ip_conntrack_htable_size = hashsize;
+		else ip_conntrack_htable_size = 8092;
+	ip_conntrack_max = 4096;
 #else
 	if (hashsize) ip_conntrack_htable_size = hashsize;
 		else ip_conntrack_htable_size = 4099;
