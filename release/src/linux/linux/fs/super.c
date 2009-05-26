@@ -262,6 +262,7 @@ struct file_system_type *get_fs_type(const char *name)
  */
 static struct super_block *alloc_super(void)
 {
+	static struct super_operations empty_sops = {};
 	struct super_block *s = kmalloc(sizeof(struct super_block),  GFP_USER);
 	if (s) {
 		memset(s, 0, sizeof(struct super_block));
@@ -279,6 +280,7 @@ static struct super_block *alloc_super(void)
 		sema_init(&s->s_dquot.dqio_sem, 1);
 		sema_init(&s->s_dquot.dqoff_sem, 1);
 		s->s_maxbytes = MAX_NON_LFS;
+		s->s_op = &empty_sops;
 	}
 	return s;
 }
@@ -445,7 +447,7 @@ static inline void write_super(struct super_block *sb)
  * hold up the sync while mounting a device. (The newly
  * mounted device won't need syncing.)
  */
-void sync_supers(kdev_t dev)
+void sync_supers(kdev_t dev, int wait)
 {
 	struct super_block * sb;
 
@@ -454,6 +456,8 @@ void sync_supers(kdev_t dev)
 		if (sb) {
 			if (sb->s_dirt)
 				write_super(sb);
+			if (wait && sb->s_op && sb->s_op->sync_fs)
+				sb->s_op->sync_fs(sb);
 			drop_super(sb);
 		}
 		return;
@@ -467,6 +471,8 @@ restart:
 			spin_unlock(&sb_lock);
 			down_read(&sb->s_umount);
 			write_super(sb);
+			if (wait && sb->s_op && sb->s_op->sync_fs)
+				sb->s_op->sync_fs(sb);
 			drop_super(sb);
 			goto restart;
 		} else

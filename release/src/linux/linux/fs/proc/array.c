@@ -568,6 +568,8 @@ static int proc_pid_maps_get_line (char *buf, struct vm_area_struct *map)
 		line = d_path(map->vm_file->f_dentry,
 			      map->vm_file->f_vfsmnt,
 			      buf, PAGE_SIZE);
+		if (IS_ERR(line))
+			return PTR_ERR(line);
 		buf[PAGE_SIZE-1] = '\n';
 		line -= MAPS_LINE_MAX;
 		if(line < buf)
@@ -641,6 +643,8 @@ ssize_t proc_pid_read_maps (struct task_struct *task, struct file * file, char *
 			goto next;
 		}
 		len = proc_pid_maps_get_line(tmp, map);
+		if (len < 0)
+			goto out_unlock;
 		len -= off;
 		if (len > 0) {
 			if (retval+len > count) {
@@ -662,6 +666,8 @@ next:
 		if (loff) BUG();
 		map = map->vm_next;
 	}
+
+out_unlock:
 	up_read(&mm->mmap_sem);
 	mmput(mm);
 

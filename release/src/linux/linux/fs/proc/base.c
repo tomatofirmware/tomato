@@ -298,6 +298,7 @@ static ssize_t proc_info_read(struct file * file, char * buf,
 	ssize_t length;
 	ssize_t end;
 	struct task_struct *task = inode->u.proc_i.task;
+	loff_t pos = *ppos;
 
 	if (count > PROC_BLOCK_SIZE)
 		count = PROC_BLOCK_SIZE;
@@ -311,14 +312,14 @@ static ssize_t proc_info_read(struct file * file, char * buf,
 		return length;
 	}
 	/* Static 4kB (or whatever) block capacity */
-	if (*ppos >= length) {
+	if (pos < 0 || pos >= length) {
 		free_page(page);
 		return 0;
 	}
-	if (count + *ppos > length)
-		count = length - *ppos;
-	end = count + *ppos;
-	copy_to_user(buf, (char *) page + *ppos, count);
+	if (count > length - pos)
+		count = length - pos;
+	end = count + pos;
+	copy_to_user(buf, (char *) page + pos, count);
 	*ppos = end;
 	free_page(page);
 	return count;
@@ -360,12 +361,15 @@ static ssize_t mem_read(struct file * file, char * buf,
 	if (mm)
 		atomic_inc(&mm->mm_users);
 	task_unlock(task);
-	if (!mm)
-		return 0;
+	if (!mm){
+		copied = 0;
+		goto out_free;
+	}
 
 	if (file->private_data != (void*)((long)current->self_exec_id) ) {
 		mmput(mm);
-		return -EIO;
+		copied = -EIO;
+		goto out_free;
 	}
 		
 
@@ -390,6 +394,8 @@ static ssize_t mem_read(struct file * file, char * buf,
 	}
 	*ppos = src;
 	mmput(mm);
+
+out_free:
 	free_page((unsigned long) page);
 	return copied;
 }
@@ -480,6 +486,10 @@ static int do_proc_readlink(struct dentry *dentry, struct vfsmount *mnt,
 		
 	inode = dentry->d_inode;
 	path = d_path(dentry, mnt, tmp, PAGE_SIZE);
+	if (IS_ERR(path)) {
+		free_page((unsigned long)tmp);
+		return PTR_ERR(path);
+	}
 	len = tmp + PAGE_SIZE - 1 - path;
 
 	if (len < buflen)
@@ -720,6 +730,7 @@ out:
 	return inode;
 
 out_unlock:
+	inode->u.generic_ip = NULL;
 	iput(inode);
 	return NULL;
 }
@@ -824,8 +835,8 @@ static struct dentry *proc_lookupfd(struct inode * dir, struct dentry * dentry)
 	return NULL;
 
 out_unlock2:
-	put_files_struct(files);
 	read_unlock(&files->file_lock);
+	put_files_struct(files);
 out_unlock:
 	iput(inode);
 out:
