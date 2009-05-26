@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Broadcom Corporation
+ * Copyright 2007, Broadcom Corporation
  * All Rights Reserved.
  * 
  * THIS SOFTWARE IS OFFERED "AS IS", AND BROADCOM GRANTS NO WARRANTIES OF ANY
@@ -69,14 +69,21 @@ typedef	unsigned char	bool;			/* consistent w/BOOL */
 #endif	/* ! __cplusplus */
 
 /* use the Windows ULONG_PTR type when compiling for 64 bit */
-#if defined(_WIN64)
+#if defined(_WIN64) && !defined(EFI)
 #include <basetsd.h>
 #define TYPEDEF_UINTPTR
-typedef ULONG_PTR	uintptr;
+typedef ULONG_PTR uintptr;
+#elif defined(__x86_64__)
+#define TYPEDEF_UINTPTR
+typedef unsigned long long int uintptr;
 #endif
 
 
 #if defined(_MINOSL_)
+#define _NEED_SIZE_T_
+#endif
+
+#if defined(EFI) && !defined(_WIN64)
 #define _NEED_SIZE_T_
 #endif
 
@@ -104,14 +111,20 @@ typedef unsigned __int64 uint64;
 #endif
 
 
-#if defined(linux)
+#ifdef	linux
 #define TYPEDEF_UINT
 #define TYPEDEF_USHORT
 #define TYPEDEF_ULONG
-#endif
+#ifdef __KERNEL__
+#include <linux/version.h>
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 19))
+#define TYPEDEF_BOOL
+#endif	/* >= 2.6.19 */
+#endif	/* __KERNEL__ */
+#endif	/* linux */
 
 #if !defined(linux) && !defined(_WIN32) && !defined(_CFE_) && \
-	!defined(_HNDRTE_) && !defined(_MINOSL_) && !defined(__DJGPP__)
+	!defined(_HNDRTE_) && !defined(_MINOSL_) && !defined(__DJGPP__) && !defined(__IOPOS__)
 #define TYPEDEF_UINT
 #define TYPEDEF_USHORT
 #endif
@@ -137,7 +150,7 @@ typedef unsigned __int64 uint64;
 #endif /* __ICL */
 
 #if !defined(_WIN32) && !defined(_CFE_) && !defined(_MINOSL_) && \
-	!defined(__DJGPP__)
+	!defined(__DJGPP__) && !defined(__IOPOS__)
 
 /* pick up ushort & uint from standard types.h */
 #if defined(linux) && defined(__KERNEL__)
