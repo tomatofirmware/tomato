@@ -965,6 +965,12 @@ enum {
 	/* How long the longest ESC sequence we know? */
 	KEYCODE_BUFFER_SIZE = 4
 };
+/* Note: fd may be in blocking or non-blocking mode, both make sense.
+ * For one, less uses non-blocking mode.
+ * Only the first read syscall inside read_key may block indefinitely
+ * (unless fd is in non-blocking mode),
+ * subsequent reads will time out after a few milliseconds.
+ */
 int read_key(int fd, smalluint *nbuffered, char *buffer) FAST_FUNC;
 
 
@@ -1423,7 +1429,7 @@ extern const char bb_busybox_exec_path[];
  * but I want to save a few bytes here */
 extern const char bb_PATH_root_path[]; /* "PATH=/sbin:/usr/sbin:/bin:/usr/bin" */
 #define bb_default_root_path (bb_PATH_root_path + sizeof("PATH"))
-#define bb_default_path      (bb_PATH_root_path + sizeof("PATH=/sbin:/usr/sbin"))
+#define bb_default_path      (bb_PATH_root_path + sizeof("PATH=/bin:/usr/bin:/sbin:/usr/sbin"))
 
 extern const int const_int_0;
 extern const int const_int_1;
