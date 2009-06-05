@@ -32,6 +32,7 @@
 #include <string.h>
 #include <bcmnvram.h>
 
+#include <tomato_config.h>	//!!TB
 #include "tomato_profile.h"
 #include "defaults.h"
 
@@ -128,7 +129,8 @@ const defaults_t defaults[] = {
 	{ "wl_phytypes",		""				},	// List of supported wireless bands (e.g. "ga")
 	{ "wl_radioids",		""				},	// List of radio IDs
 	{ "wl_ssid",			"wireless"		},	// Service set ID (network name)
-	{ "wl_country",			"Worldwide"		},	// Country (default obtained from driver)
+	{ "wl_country",			"JP"		},		// Country (default obtained from driver)
+	{ "wl_country_code",		"JP"		},		// !!TB - Country (default to JP to allow all 14 channels)
 	{ "wl_radio",			"1"				},	// Enable (1) or disable (0) radio
 	{ "wl_closed",			"0"				},	// Closed (hidden) network
     { "wl_ap_isolate",		"0"				},	// AP isolate mode
@@ -299,6 +301,7 @@ const defaults_t defaults[] = {
 	{ "block_wan",			"1"				},	// block inbound icmp
 	{ "multicast_pass",		"0"				},	// enable multicast proxy
 	{ "ne_syncookies",		"0"				},	// tcp_syncookies
+	{ "ne_snat",			"0"				},	// use SNAT instead of MASQUERADE
 	{ "ne_shlimit",			"0,3,60"		},
 
 // advanced-routing
@@ -469,6 +472,58 @@ const defaults_t defaults[] = {
 // admin-jffs2
 	{ "jffs2_on",			"0"				},
 	{ "jffs2_exec",			""				},
+
+// nas-usb - !!TB
+	{ "usb_enable",			"0"				},
+	{ "usb_uhci",			"0"				},
+	{ "usb_ohci",			"0"				},
+	{ "usb_usb2",			"0"				},
+	{ "usb_storage",		"0"				},
+	{ "usb_printer",		"0"				},
+	{ "usb_printer_bidirect",	"1"				},
+	{ "usb_fs_ext3",		"0"				},
+	{ "usb_fs_fat",			"0"				},
+	{ "usb_automount",		"0"				},
+	{ "usb_bdflush",		"30 500 0 0 100 100 60 0 0"	},
+	{ "script_usbhotplug", 		""				},
+	{ "script_usbmount", 		""				},
+	{ "script_usbumount", 		""				},
+
+#ifdef TCONFIG_FTP
+// nas-ftp - !!TB
+	{ "ftp_enable",			"0"				},
+	{ "ftp_super",			"0"				},
+	{ "ftp_anonymous",		"0"				},
+	{ "ftp_dirlist",		"0"				},
+	{ "ftp_port",			"21"				},
+	{ "ftp_max",			"0"				},
+	{ "ftp_ipmax",			"0"				},
+	{ "ftp_staytimeout",		"300"				},
+	{ "ftp_rate",			"0"				},
+	{ "ftp_anonrate",		"0"				},
+	{ "ftp_anonroot",		""				},
+	{ "ftp_pubroot",		""				},
+	{ "ftp_pvtroot",		""				},
+	{ "ftp_users",			""				},
+	{ "ftp_custom",			""				},
+	{ "log_ftp",			"0"				},
+#endif
+
+#ifdef TCONFIG_SAMBASRV
+// nas-samba - !!TB
+	{ "smbd_enable",		"0"				},
+	{ "smbd_wgroup",		"WORKGROUP"			},
+	{ "smbd_cpage",			""				},
+	{ "smbd_cset",			"utf8"				},
+	{ "smbd_loglevel",		"0"				},
+	{ "smbd_custom",		""				},
+	{ "smbd_autoshare",		"1"				},
+	{ "smbd_shares",
+		"share</mnt<Default Share<0<0>root$</<Hidden Root<0<1"
+	},
+	{ "smbd_user",			"nas"				},
+	{ "smbd_passwd",		""				},
+#endif
 
 // admin-sch
 	{ "sch_rboot",			""				},

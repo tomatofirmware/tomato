@@ -80,6 +80,10 @@ extern void wo_wakeup(char *url);
 extern void asp_dns(int argc, char **argv);
 extern void wo_resolve(char *url);
 
+//!!TB
+extern void asp_usbdevices(int argc, char **argv);
+extern void wo_usbcommand(char *url);
+
 // devlist.c
 extern void asp_arplist(int argc, char **argv);
 extern void asp_devlist(int argc, char **argv);
@@ -100,6 +104,7 @@ extern void asp_wlcrssi(int argc, char **argv);
 extern void wo_wlmnoise(char *url);
 extern void asp_wlclient(int argc, char **argv);
 extern void asp_wlchannel(int argc, char **argv);
+extern void asp_wlchannels(int argc, char **argv);	//!!TB
 
 // dhcp.c
 extern void asp_dhcpc_time(int argc, char **argv);
