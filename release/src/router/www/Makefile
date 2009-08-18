@@ -63,6 +63,15 @@ ifneq ($(TCONFIG_NTFS),y)
 	sed -i $(INSTALLDIR)/www/nas-usb.asp -e "/NTFS-BEGIN/,/NTFS-END/d"
 endif
 
+# Only include the vpn pages in the navigation if OpenVPN is compiled in
+ifneq ($(TCONFIG_OPENVPN),y)
+	sed -i $(INSTALLDIR)/www/tomato.js -e "/VPN-BEGIN/,/VPN-END/d"
+	rm -f $(INSTALLDIR)/www/vpn.js
+	rm -f $(INSTALLDIR)/www/vpn-client.asp
+	rm -f $(INSTALLDIR)/www/vpn-server.asp
+endif
+
+	
 # make sure old and debugging crap is gone
 	@rm -f $(INSTALLDIR)/www/debug.js
 	@rm -f $(INSTALLDIR)/www/*-x.*

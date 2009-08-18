@@ -232,6 +232,10 @@ void start_dnsmasq()
 
 	//
 
+#ifdef TCONFIG_OPENVPN
+	write_vpn_dnsmasq_config(f);
+#endif
+
 	fprintf(f, "%s\n\n", nvram_safe_get("dnsmasq_custom"));
 
 	fappend(f, "/etc/dnsmasq.custom");
@@ -294,17 +298,20 @@ void dns_to_resolv(void)
 
 	m = umask(022);	// 077 from pppoecd
 	if ((f = fopen(dmresolv, "w")) != NULL) {
-		dns = get_dns();	// static buffer
-		if (dns->count == 0) {
-			// Put a pseudo DNS IP to trigger Connect On Demand
-			if ((nvram_match("ppp_demand", "1")) &&
-				(nvram_match("wan_proto", "pppoe") || nvram_match("wan_proto", "pptp") || nvram_match("wan_proto", "l2tp"))) {
-				fprintf(f, "nameserver 1.1.1.1\n");
+		// Check for VPN DNS entries
+		if (!write_vpn_resolv(f)) {
+			dns = get_dns();	// static buffer
+			if (dns->count == 0) {
+				// Put a pseudo DNS IP to trigger Connect On Demand
+				if ((nvram_match("ppp_demand", "1")) &&
+					(nvram_match("wan_proto", "pppoe") || nvram_match("wan_proto", "pptp") || nvram_match("wan_proto", "l2tp"))) {
+					fprintf(f, "nameserver 1.1.1.1\n");
+				}
 			}
-		}
-		else {
-			for (i = 0; i < dns->count; i++) {
-				fprintf(f, "nameserver %s\n", inet_ntoa(dns->dns[i]));
+			else {
+				for (i = 0; i < dns->count; i++) {
+					fprintf(f, "nameserver %s\n", inet_ntoa(dns->dns[i]));
+				}
 			}
 		}
 		fclose(f);
@@ -1254,6 +1261,9 @@ void start_services(void)
 #endif
 	start_samba();		// !!TB - Samba
 	start_ftpd();		// !!TB - FTP Server
+#ifdef TCONFIG_OPENVPN
+	start_vpn_eas();
+#endif
 }
 
 void stop_services(void)
@@ -1594,7 +1604,7 @@ TOP:
 		}
 		goto CLEAR;
 	}
-	
+
 #ifdef TCONFIG_FTP
 	// !!TB - FTP Server
 	if (strcmp(service, "ftpd") == 0) {
@@ -1615,6 +1625,20 @@ TOP:
 			create_passwd();
 			start_samba();
 		}
+		goto CLEAR;
+	}
+#endif
+
+#ifdef TCONFIG_OPENVPN
+	if (strncmp(service, "vpnclient", 9) == 0) {
+		if (action & A_STOP) stop_vpnclient(atoi(&service[9]));
+		if (action & A_START) start_vpnclient(atoi(&service[9]));
+		goto CLEAR;
+	}
+
+	if (strncmp(service, "vpnserver", 9) == 0) {
+		if (action & A_STOP) stop_vpnserver(atoi(&service[9]));
+		if (action & A_START) start_vpnserver(atoi(&service[9]));
 		goto CLEAR;
 	}
 #endif
