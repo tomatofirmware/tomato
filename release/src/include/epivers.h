@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Broadcom Corporation
+ * Copyright 2004, Broadcom Corporation
  * All Rights Reserved.
  * 
  * THIS SOFTWARE IS OFFERED "AS IS", AND BROADCOM GRANTS NO WARRANTIES OF ANY
@@ -16,20 +16,20 @@
 
 #define	EPI_MAJOR_VERSION	4
 
-#define	EPI_MINOR_VERSION	158
+#define	EPI_MINOR_VERSION	150
 
-#define	EPI_RC_NUMBER		4
+#define	EPI_RC_NUMBER		10
 
-#define	EPI_INCREMENTAL_NUMBER	0
+#define	EPI_INCREMENTAL_NUMBER	29
 
 #define	EPI_BUILD_NUMBER	0
 
-#define	EPI_VERSION		4, 158, 4, 0
+#define	EPI_VERSION		4, 150, 10, 29
 
-#define	EPI_VERSION_NUM		0x049e0400
+#define	EPI_VERSION_NUM		0x04960a1d
 
 /* Driver Version String, ASCII, 32 chars max */
-#define	EPI_VERSION_STR		"4.158.4.0"
-#define	EPI_ROUTER_VERSION_STR	"4.159.4.0"
+#define	EPI_VERSION_STR		"4.150.10.29"
+#define	EPI_ROUTER_VERSION_STR	"4.151.10.29"
 
 #endif /* _epivers_h_ */
