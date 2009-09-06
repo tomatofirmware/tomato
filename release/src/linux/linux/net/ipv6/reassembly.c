@@ -118,27 +118,56 @@ static __inline__ void fq_unlink(struct frag_queue *fq)
 static unsigned int ip6qhashfn(u32 id, struct in6_addr *saddr,
 			       struct in6_addr *daddr)
 {
+/*
+#define __rot(x,k) (((x)<<(k)) | ((x)>>(32-(k))))
+#define __jhash_mix(a,b,c) \
+{ \
+  a -= c;  a ^= __rot(c, 4);  c += b; \
+  b -= a;  b ^= __rot(a, 6);  a += c; \
+  c -= b;  c ^= __rot(b, 8);  b += a; \
+  a -= c;  a ^= __rot(c,16);  c += b; \
+  b -= a;  b ^= __rot(a,19);  a += c; \
+  c -= b;  c ^= __rot(b, 4);  b += a; \
+}
+#define JHASH_GOLDEN_RATIO 0xdeadbeef
+
 	u32 a, b, c;
- 
+
 	a = saddr->s6_addr32[0];
 	b = saddr->s6_addr32[1];
 	c = saddr->s6_addr32[2];
-
+	
 	a += JHASH_GOLDEN_RATIO;
 	b += JHASH_GOLDEN_RATIO;
 	c += ip6_frag_hash_rnd;
-	__jhash_i_mix(a, b, c);
+	__jhash_mix(a, b, c);
 
 	a += saddr->s6_addr32[3];
 	b += daddr->s6_addr32[0];
 	c += daddr->s6_addr32[1];
-	__jhash_i_mix(a, b, c);
+	__jhash_mix(a, b, c);
 
 	a += daddr->s6_addr32[2];
 	b += daddr->s6_addr32[3];
 	c += id;
 	__jhash_mix(a, b, c);
+*/
 
+	u32 c;
+	u32 key[9] = {
+		saddr->s6_addr32[0],
+		saddr->s6_addr32[1],
+		saddr->s6_addr32[2],
+		saddr->s6_addr32[3],
+		daddr->s6_addr32[0],
+		daddr->s6_addr32[1],
+		daddr->s6_addr32[2],
+		daddr->s6_addr32[3],
+		id
+	};
+
+	c = jhash2(key, 9, ip6_frag_hash_rnd);
+	
 	return c & (IP6Q_HASHSZ - 1);
 }
 

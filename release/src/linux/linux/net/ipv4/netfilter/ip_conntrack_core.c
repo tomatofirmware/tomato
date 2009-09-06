@@ -1523,8 +1523,8 @@ int __init ip_conntrack_init(void)
 #endif
 */
 	/* SpeedMod: Hashtable size */
-	ip_conntrack_htable_size = 16384;
-	ip_conntrack_max = ip_conntrack_htable_size / 2;
+	ip_conntrack_htable_size = 32768;
+	ip_conntrack_max = 8192;
 
 #endif
 

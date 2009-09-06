@@ -120,8 +120,7 @@ int ip_rt_gc_elasticity		= 1;
 int ip_rt_mtu_expires		= 10 * 60 * HZ;
 int ip_rt_min_pmtu		= 512 + 20 + 20;
 int ip_rt_min_advmss		= 256;
-//int ip_rt_secret_interval	= 10 * 60 * HZ;
-int ip_rt_secret_interval	= 4320 * 60 * HZ;
+int ip_rt_secret_interval     = 10 * 60 * HZ;
 
 static unsigned long rt_deadline;
 
@@ -2581,13 +2580,12 @@ void __init ip_rt_init(void)
 	if (!ipv4_dst_ops.kmem_cachep)
 		panic("IP: failed to allocate ip_dst_cache\n");
 
-	/* SpeedMod: goal=32 gives 16384 buckets for 4K page size */
-	goal = 32;
-//	goal = num_physpages >> (26 - PAGE_SHIFT);
-//	goal = num_physpages >> (21 - PAGE_SHIFT);
-
+	goal = num_physpages >> (26 - PAGE_SHIFT);
 	for (order = 0; (1UL << order) < goal; order++)
 		/* NOTHING */;
+
+	/* SpeedMod: order=5 gives 16384 buckets */
+	order=5;
 
 	do {
 		rt_hash_mask = (1UL << order) * PAGE_SIZE /
