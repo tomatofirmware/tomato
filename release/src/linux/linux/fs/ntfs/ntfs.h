@@ -47,6 +47,8 @@
 
 #include "kcompat.h"
 
+#include "time.c"
+
 typedef long sector_t;
    
 typedef enum {
@@ -185,10 +187,10 @@ extern int post_read_mst_fixup(NTFS_RECORD *b, const u32 size);
 extern int pre_write_mst_fixup(NTFS_RECORD *b, const u32 size);
 extern void post_write_mst_fixup(NTFS_RECORD *b);
 
-/* From fs/ntfs/time.c */
-extern inline s64 utc2ntfs(const time_t time);
-extern inline s64 get_current_ntfs_time(void);
-extern inline time_t ntfs2utc(const s64 time);
+///* From fs/ntfs/time.c */
+//extern inline s64 utc2ntfs(const time_t time);
+//extern inline s64 get_current_ntfs_time(void);
+//extern inline time_t ntfs2utc(const s64 time);
 
 /* From fs/ntfs/unistr.c */
 extern BOOL ntfs_are_names_equal(const uchar_t *s1, size_t s1_len,

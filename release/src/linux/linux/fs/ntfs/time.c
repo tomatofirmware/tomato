@@ -19,10 +19,13 @@
  * Foundation,Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#ifndef _LINUX_NTFS_TIME_H
+#define _LINUX_NTFS_TIME_H
+
 #include <linux/sched.h>	/* For CURRENT_TIME. */
 #include <asm/div64.h>		/* For do_div(). */
 
-#include "ntfs.h"
+//#include "ntfs.h"
 
 #define NTFS_TIME_OFFSET ((s64)(369 * 365 + 89) * 24 * 3600 * 10000000)
 
@@ -40,7 +43,7 @@
  * measured as the number of 100 nano-second intervals since 1st January 1601,
  * 00:00:00 UTC.
  */
-inline s64 utc2ntfs(const time_t time)
+static inline s64 utc2ntfs(const time_t time)
 {
 	/* Convert to 100ns intervals and then add the NTFS time offset. */
 	return cpu_to_sle64((s64)time * 10000000 + NTFS_TIME_OFFSET);
@@ -52,7 +55,7 @@ inline s64 utc2ntfs(const time_t time)
  * Get the current time from the Linux kernel, convert it to its corresponding
  * NTFS time and return that in little endian format.
  */
-inline s64 get_current_ntfs_time(void)
+static inline s64 get_current_ntfs_time(void)
 {
 	return utc2ntfs(CURRENT_TIME);
 }
@@ -71,7 +74,7 @@ inline s64 get_current_ntfs_time(void)
  * measured as the number of 100 nano-second intervals since 1st January 1601,
  * 00:00:00 UTC.
  */
-inline time_t ntfs2utc(const s64 time)
+static inline time_t ntfs2utc(const s64 time)
 {
 	/* Subtract the NTFS time offset, then convert to 1s intervals. */
 	s64 t = sle64_to_cpu(time) - NTFS_TIME_OFFSET;
@@ -79,3 +82,4 @@ inline time_t ntfs2utc(const s64 time)
 	return (time_t)t;
 }
 
+#endif /* _LINUX_NTFS_TIME_H */
