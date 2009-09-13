@@ -1,7 +1,7 @@
 /*
  * Linux Broadcom BCM47xx GPIO char driver
  *
- * Copyright 2006, Broadcom Corporation
+ * Copyright 2007, Broadcom Corporation
  * All Rights Reserved.
  * 
  * THIS SOFTWARE IS OFFERED "AS IS", AND BROADCOM GRANTS NO WARRANTIES OF ANY
@@ -67,7 +67,6 @@ gpio_ioctl(struct inode *inode, struct file *file, unsigned int cmd, unsigned lo
 			gpioioc.val = sb_gpiorelease(gpio_sbh, gpioioc.mask, GPIO_APP_PRIORITY);
 			break;
 		case GPIO_IOC_OUT:
-			// printk("GPIO OUTPUT / gpioioc.mask: %d gpioioc.val: %d\n", gpioioc.mask, gpioioc.val);
 			gpioioc.val = sb_gpioout(gpio_sbh, gpioioc.mask, gpioioc.val,
 			                         GPIO_APP_PRIORITY);
 			break;

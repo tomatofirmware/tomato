@@ -19,6 +19,13 @@
 #ifndef	_SBCHIPC_H
 #define	_SBCHIPC_H
 
+#include <linux/version.h>
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 0))
+#include <linux/config.h>
+#else
+#include <linux/autoconf.h>
+#endif
+
 #ifndef _LANGUAGE_ASSEMBLY
 
 /* cpp contortions to concatenate w/arg prescan */
@@ -716,7 +723,7 @@ typedef volatile struct {
  * PMU<rev>_PLL<num>_XXXX where <rev> is PMU corerev and <num> is an arbitary number
  * to differentiate different PLLs controlled by the same PMU rev.
  */
-#if defined(BCM4328) || defined(BCM5354)
+#if defined(CONFIG_BCM4328) || defined(CONFIG_BCM5354)
 /* pllcontrol registers */
 /* PDIV, div_phy, div_arm, div_adc, dith_sel, ioff, kpd_scale, lsb_sel, mash_sel, lf_c & lf_r */
 #define	PMU0_PLL0_PLLCTL0		0
@@ -751,7 +758,7 @@ typedef volatile struct {
 #endif	/* BCM4328 || BCM5354 */
 
 /* Chip specific PMU resources. */
-#if defined(BCM4328)
+#if defined(CONFIG_BCM4328)
 #define RES4328_EXT_SWITCHER_PWM	0	/* 0x00001 */
 #define RES4328_BB_SWITCHER_PWM		1	/* 0x00002 */
 #define RES4328_BB_SWITCHER_BURST	2	/* 0x00004 */
@@ -774,7 +781,7 @@ typedef volatile struct {
 #define RES4328_BB_PLL_PU		19	/* 0x80000 */
 #endif	/* BCM4328 */
 
-#if defined(BCM5354)
+#if defined(CONFIG_BCM5354)
 #define RES5354_EXT_SWITCHER_PWM	0	/* 0x00001 */
 #define RES5354_BB_SWITCHER_PWM		1	/* 0x00002 */
 #define RES5354_BB_SWITCHER_BURST	2	/* 0x00004 */
@@ -797,7 +804,7 @@ typedef volatile struct {
 #define RES5354_BB_PLL_PU		19	/* 0x80000 */
 #endif	/* BCM5354 */
 
-#if defined(BCM4325) || defined(BCM4312)
+#if defined(CONFIG_BCM4325) || defined(CONFIG_BCM4312)
 /* pllcontrol registers */
 /* ndiv_pwrdn, pwrdn_ch<x>, refcomp_pwrdn, dly_ch<x>, p1div, p2div, _bypsss_sdmod */
 #define PMU1_PLL0_PLLCTL0		0
@@ -844,7 +851,7 @@ typedef volatile struct {
 
 #endif	
 
-#if defined(BCM4325)
+#if defined(CONFIG_BCM4325)
 #define RES4325_BUCK_BOOST_BURST	0	/* 0x00000001 */
 #define RES4325_CBUCK_BURST		1	/* 0x00000002 */
 #define RES4325_CBUCK_PWM		2	/* 0x00000004 */
@@ -884,7 +891,7 @@ typedef volatile struct {
 #define CST4325_PMUTOP_2B_SHIFT   	9
 #endif	/* BCM4325 */
 
-#if defined(BCM4312)
+#if defined(CONFIG_BCM4312)
 #define RES4312_SWITCHER_BURST		0	/* 0x00000001 */
 #define RES4312_SWITCHER_PWM    	1	/* 0x00000002 */
 #define RES4312_PA_REF_LDO		2	/* 0x00000004 */

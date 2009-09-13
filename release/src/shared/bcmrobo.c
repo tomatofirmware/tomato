@@ -814,7 +814,7 @@ bcm_robo_config_vlan(robo_info_t *robo, uint8 *mac_addr)
 	uint32 val32;
 	pdesc_t *pdesc;
 	int pdescsz;
-	uint16 vid;
+	uint16 vid, vid0;
 	uint8 arl_entry[8] = { 0 }, arl_entry1[8] = { 0 };
 
 	/* Enable management interface access */
@@ -875,6 +875,8 @@ bcm_robo_config_vlan(robo_info_t *robo, uint8 *mac_addr)
 		pdesc = pdesc97;
 		pdescsz = sizeof(pdesc97) / sizeof(pdesc_t);
 	}
+
+	vid0 = getintvar(robo->vars, "vlan0tag");
 
 	/* setup each vlan. max. 16 vlans. */
 	/* force vlan id to be equal to vlan number */
@@ -945,9 +947,10 @@ bcm_robo_config_vlan(robo_info_t *robo, uint8 *mac_addr)
 #else
 #define	FL	FLAG_UNTAG
 #endif /* _CFE_ */
-			if (!pdesc[pid].cpu || strchr(port, FL)) {
+			if ((!pdesc[pid].cpu && !strchr(port, FLAG_TAGGED)) || 
+			    strchr(port, FL)) {
 				val16 = ((0 << 13) |		/* priority - always 0 */
-				         vid);			/* vlan id */
+				         vid0 | vid);	/* vlan id */
 				robo->ops->write_reg(robo, PAGE_VLAN, pdesc[pid].ptagr,
 				                     &val16, sizeof(val16));
 			}
@@ -1018,19 +1021,19 @@ vlan_setup:
 			/* VLAN Table Access Register (Page 0x34, Address 0x08) */
 			val16 = ((1 << 13) | 	/* start command */
 				 (1 << 12) |	/* write state */
-				 vid);		/* vlan id */
+				 vid0 | vid);	/* vlan id */
 			robo->ops->write_reg(robo, PAGE_VLAN, REG_VLAN_ACCESS_5365, &val16,
 			                     sizeof(val16));
 		} else if (robo->devid == DEVID5325) {
 			val32 |= ((1 << 20) |		/* valid write */
-			          ((vid >> 4) << 12));	/* vlan id bit[11:4] */
+				  ((vid0 >> 4) << 12));	/* vlan id bit[11:4] */
 			/* VLAN Write Register (Page 0x34, Address 0x08-0x0B) */
 			robo->ops->write_reg(robo, PAGE_VLAN, REG_VLAN_WRITE, &val32,
 			                     sizeof(val32));
 			/* VLAN Table Access Register (Page 0x34, Address 0x06-0x07) */
 			val16 = ((1 << 13) |	/* start command */
 			         (1 << 12) |	/* write state */
-			         vid);		/* vlan id */
+			         vid0 | vid);	/* vlan id */
 			robo->ops->write_reg(robo, PAGE_VLAN, REG_VLAN_ACCESS, &val16,
 			                     sizeof(val16));
 		} else {

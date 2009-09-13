@@ -27,7 +27,7 @@
 #define OTP_MSG(x)
 
 
-#if !defined(BCMHNDOTP)	    /* Newer IPX OTP wrapper */
+#if !defined(CONFIG_BCMHNDOTP)	    /* Newer IPX OTP wrapper */
 
 /* OTP layout */
 /* Subregion word offsets in General Use region */
@@ -139,7 +139,7 @@ otp_init(sb_t *sbh)
 	ASSERT(cc);
 
 	switch (sbh->chip) {
-#if defined(BCM4325)
+#if defined(CONFIG_BCM4325)
 	case BCM4325_CHIP_ID:
 		if ((sbh->chipst & CST4325_SPROM_OTP_SEL_MASK) == CST4325_OTP_PWRDN) {
 			OTP_MSG(("%s: OTP is strapped down\n", __FUNCTION__));

@@ -1059,7 +1059,7 @@ hnd_cpu_reset(sb_t *sbh)
 	while (1);
 }
 
-#if defined(BCMPERFSTATS)
+#if defined(CONFIG_BCMPERFSTATS)
 /*
  * CP0 Register 25 supports 4 semi-independent 32bit performance counters.
  * $25 select 0, 1, 2, and 3 are the counters.  The counters *decrement* (who thought this one up?)

@@ -294,7 +294,7 @@ BCMINITFN(sb_attach)(uint devid, osl_t *osh, void *regs,
 
 /* Using sb_kattach depends on SB_BUS support, either implicit  */
 /* no limiting BCMBUSTYPE value) or explicit (value is SB_BUS). */
-#if !defined(BCMBUSTYPE) || (BCMBUSTYPE == SB_BUS)
+#if !defined(CONFIG_BCMBUSTYPE) || (BCMBUSTYPE == SB_BUS)
 
 /* global kernel resource */
 static sb_info_t ksi;
@@ -940,7 +940,7 @@ sb_corereg(sb_t *sbh, uint coreidx, uint regoff, uint mask, uint val)
 	if (regoff >= SBCONFIGOFF)
 		w = R_SBREG(si, r);
 	else {
-#if defined(BCM5354)
+#if defined(CONFIG_BCM5354)
 		if ((si->sb.chip == BCM5354_CHIP_ID) &&
 		    (coreidx == SB_CC_IDX) &&
 		    (regoff == OFFSETOF(chipcregs_t, watchdog))) {
@@ -1388,7 +1388,7 @@ sb_detach(sb_t *sbh)
 				REG_UNMAP(si->regs[idx]);
 				si->regs[idx] = NULL;
 			}
-#if !defined(BCMBUSTYPE) || (BCMBUSTYPE == SB_BUS)
+#if !defined(CONFIG_BCMBUSTYPE) || (BCMBUSTYPE == SB_BUS)
 	if (si != &ksi)
 #endif	/* !BCMBUSTYPE || (BCMBUSTYPE == SB_BUS) */
 		MFREE(si->osh, si, sizeof(sb_info_t));
@@ -1712,7 +1712,7 @@ sb_coreregs(sb_t *sbh)
 	return (si->curmap);
 }
 
-#if defined(BCMDBG_ASSERT)
+#if defined(CONFIG_BCMDBG_ASSERT)
 /* traverse all cores to find and clear source of serror */
 static void
 sb_serr_clear(sb_info_t *si)
@@ -2109,7 +2109,7 @@ sb_watchdog(sb_t *sbh, uint ticks)
 	else
 		sb_clkctl_clk(sbh, CLK_DYNAMIC);
 
-#if defined(BCM4328)
+#if defined(CONFIG_BCM4328)
 	if (sbh->chip == BCM4328_CHIP_ID && ticks != 0)
 		sb_corereg(sbh, SB_CC_IDX, OFFSETOF(chipcregs_t, min_res_mask),
 		           PMURES_BIT(RES4328_ROM_SWITCH),
@@ -2562,6 +2562,10 @@ BCMINITFN(sb_clock)(sb_t *sbh)
 	if (sb_chip(sbh) == BCM5365_CHIP_ID)
 	{
 		rate = 200000000; /* PLL_TYPE3 */
+	} else if (sb_chip(sbh) == BCM5354_CHIP_ID)
+	{
+		/* 5354 has a constant sb clock of 120MHz */
+		rate = 120000000;
 	} else {
 		/* calculate rate */
 		rate = sb_clock_rate(pll_type, n, m);
@@ -3321,7 +3325,7 @@ BCMINITFN(sb_d11_devid)(sb_t *sbh)
 	sb_info_t *si = SB_INFO(sbh);
 	uint16 device;
 
-#if defined(BCM4328)
+#if defined(CONFIG_BCM4328)
 	/* Fix device id for dual band BCM4328 */
 	if (sbh->chip == BCM4328_CHIP_ID &&
 	    (sbh->chippkg == BCM4328USBDUAL_PKG_ID || sbh->chippkg == BCM4328SDIODUAL_PKG_ID))
