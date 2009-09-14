@@ -61,7 +61,7 @@ LIST_HEAD(protocol_list);
 static LIST_HEAD(helpers);
 unsigned int ip_conntrack_htable_size = 0;
 int ip_conntrack_max = 0;
-static atomic_t ip_conntrack_count = ATOMIC_INIT(0);
+atomic_t ip_conntrack_count = ATOMIC_INIT(0);
 struct list_head *ip_conntrack_hash;
 static kmem_cache_t *ip_conntrack_cachep;
 static LIST_HEAD(unconfirmed);
@@ -1415,6 +1415,7 @@ static struct nf_sockopt_ops so_getorigdst
 #define NET_IP_CONNTRACK_MAX 2089
 #define NET_IP_CONNTRACK_TCP_TIMEOUTS  2090
 #define NET_IP_CONNTRACK_UDP_TIMEOUTS  2091
+#define NET_IP_CONNTRACK_COUNT 2092
 #define NET_IP_CONNTRACK_MAX_NAME "ip_conntrack_max"
 
 #ifdef CONFIG_SYSCTL
@@ -1423,6 +1424,8 @@ static struct ctl_table_header *ip_conntrack_sysctl_header;
 static ctl_table ip_conntrack_table[] = {
       { NET_IP_CONNTRACK_MAX, NET_IP_CONNTRACK_MAX_NAME, &ip_conntrack_max,
         sizeof(ip_conntrack_max), 0644,  NULL, proc_dointvec },
+      { NET_IP_CONNTRACK_COUNT, "ip_conntrack_count", &ip_conntrack_count,
+        sizeof(ip_conntrack_count), 0444,  NULL, proc_dointvec },
       { NET_IP_CONNTRACK_TCP_TIMEOUTS, "ip_conntrack_tcp_timeouts",
           &sysctl_ip_conntrack_tcp_timeouts,
           sizeof(sysctl_ip_conntrack_tcp_timeouts),
