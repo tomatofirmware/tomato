@@ -64,14 +64,9 @@ typedef int (make_request_fn) (request_queue_t *q, int rw, struct buffer_head *b
 typedef void (plug_device_fn) (request_queue_t *q, kdev_t device);
 typedef void (unplug_device_fn) (void *q);
 
-/*
- * Default nr free requests per queue, ll_rw_blk will scale it down
- * according to available RAM at init time
- */
-#define QUEUE_NR_REQUESTS	8192
-
 struct request_list {
 	unsigned int count;
+	unsigned int pending[2];
 	struct list_head free;
 };
 
@@ -80,7 +75,7 @@ struct request_queue
 	/*
 	 * the queue request freelist, one for reads and one for writes
 	 */
-	struct request_list	rq[2];
+	struct request_list	rq;
 
 	/*
 	 * The total number of requests on each queue
@@ -91,6 +86,21 @@ struct request_queue
 	 * Batching threshold for sleep/wakeup decisions
 	 */
 	int batch_requests;
+
+	/*
+	 * The total number of 512byte blocks on each queue
+	 */
+	atomic_t nr_sectors;
+
+	/*
+	 * Batching threshold for sleep/wakeup decisions
+	 */
+	int batch_sectors;
+
+	/*
+	 * The max number of 512byte blocks on each queue
+	 */
+	int max_queue_sectors;
 
 	/*
 	 * Together with queue_head for cacheline sharing
@@ -118,13 +128,21 @@ struct request_queue
 	/*
 	 * Boolean that indicates whether this queue is plugged or not.
 	 */
-	char			plugged;
+	int			plugged:1;
 
 	/*
 	 * Boolean that indicates whether current_request is active or
 	 * not.
 	 */
-	char			head_active;
+	int			head_active:1;
+
+	/*
+	 * Boolean that indicates you will use blk_started_sectors
+	 * and blk_finished_sectors in addition to blk_started_io
+	 * and blk_finished_io.  It enables the throttling code to 
+	 * help keep the sectors in flight to a reasonable value
+	 */
+	int			can_throttle:1;
 
 	unsigned long		bounce_pfn;
 
@@ -137,7 +155,7 @@ struct request_queue
 	/*
 	 * Tasks wait here for free read and write requests
 	 */
-	wait_queue_head_t	wait_for_requests[2];
+	wait_queue_head_t	wait_for_requests;
 };
 
 extern unsigned long blk_max_low_pfn, blk_max_pfn;
@@ -205,10 +223,11 @@ extern void blkdev_release_request(struct request *);
 /*
  * Access functions for manipulating queue properties
  */
-extern int blk_grow_request_list(request_queue_t *q, int nr_requests);
+extern int blk_grow_request_list(request_queue_t *q, int nr_requests, int max_queue_sectors);
 extern void blk_init_queue(request_queue_t *, request_fn_proc *);
 extern void blk_cleanup_queue(request_queue_t *);
 extern void blk_queue_headactive(request_queue_t *, int);
+extern void blk_queue_throttle_sectors(request_queue_t *, int);
 extern void blk_queue_make_request(request_queue_t *, make_request_fn *);
 extern void generic_unplug_device(void *);
 extern inline int blk_seg_merge_ok(struct buffer_head *, struct buffer_head *);
@@ -227,6 +246,8 @@ extern int * max_segments[MAX_BLKDEV];
 
 #define MAX_SEGMENTS 128
 #define MAX_SECTORS 255
+#define MAX_QUEUE_SECTORS (4 << (20 - 9)) /* 4 mbytes when full sized */
+#define MAX_NR_REQUESTS 1024 /* 1024k when in 512 units, normally min is 1M in 1k units */
 
 #define PageAlignSize(size) (((size) + PAGE_SIZE -1) & PAGE_MASK)
 
@@ -252,8 +273,57 @@ static inline int get_hardsect_size(kdev_t dev)
 	return retval;
 }
 
+static inline int blk_oversized_queue(request_queue_t * q)
+{
+	if (q->can_throttle)
+		return atomic_read(&q->nr_sectors) > q->max_queue_sectors;
+	return q->rq.count == 0;
+}
+
+static inline int blk_oversized_queue_reads(request_queue_t * q)
+{
+	if (q->can_throttle)
+		return atomic_read(&q->nr_sectors) > q->max_queue_sectors + q->batch_sectors;
+	return q->rq.count == 0;
+}
+
+static inline int blk_oversized_queue_batch(request_queue_t * q)
+{
+	return atomic_read(&q->nr_sectors) > q->max_queue_sectors - q->batch_sectors;
+}
+
 #define blk_finished_io(nsects)	do { } while (0)
 #define blk_started_io(nsects)	do { } while (0)
+
+static inline void blk_started_sectors(struct request *rq, int count)
+{
+	request_queue_t *q = rq->q;
+	if (q && q->can_throttle) {
+		atomic_add(count, &q->nr_sectors);
+		if (atomic_read(&q->nr_sectors) < 0) {
+			printk("nr_sectors is %d\n", atomic_read(&q->nr_sectors));
+			BUG();
+		}
+	}
+}
+
+static inline void blk_finished_sectors(struct request *rq, int count)
+{
+	request_queue_t *q = rq->q;
+	if (q && q->can_throttle) {
+		atomic_sub(count, &q->nr_sectors);
+		
+		smp_mb();
+		if (q->rq.count >= q->batch_requests && !blk_oversized_queue_batch(q)) {
+			if (waitqueue_active(&q->wait_for_requests))
+				wake_up(&q->wait_for_requests);
+		}
+		if (atomic_read(&q->nr_sectors) < 0) {
+			printk("nr_sectors is %d\n", atomic_read(&q->nr_sectors));
+			BUG();
+		}
+	}
+}
 
 static inline unsigned int blksize_bits(unsigned int size)
 {

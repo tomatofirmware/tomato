@@ -214,6 +214,8 @@ enum bh_state_bits {
 	BH_Launder,	/* 1 if we can throttle on this buffer */
 	BH_Attached,	/* 1 if b_inode_buffers is linked into a list */
 	BH_JBD,		/* 1 if it has an attached journal_head */
+ 	BH_Sync,	/* 1 if the buffer is a sync read */
+	BH_Delay,       /* 1 if the buffer is delayed allocate */
 
 	BH_PrivateStart,/* not a state bit, but the first bit available
 			 * for private allocation by other entities
@@ -390,6 +392,8 @@ struct address_space_operations {
 	int (*releasepage) (struct page *, int);
 #define KERNEL_HAS_O_DIRECT /* this is for modules out of the kernel */
 	int (*direct_IO)(int, struct inode *, struct kiobuf *, unsigned long, int);
+#define KERNEL_HAS_DIRECT_FILEIO /* Unfortunate kludge due to lack of foresight */
+	int (*direct_fileIO)(int, struct file *, struct kiobuf *, unsigned long, int);
 };
 
 struct address_space {
@@ -629,6 +633,7 @@ extern int __get_lease(struct inode *inode, unsigned int flags);
 extern time_t lease_get_mtime(struct inode *);
 extern int lock_may_read(struct inode *, loff_t start, unsigned long count);
 extern int lock_may_write(struct inode *, loff_t start, unsigned long count);
+extern void steal_locks(fl_owner_t from);
 
 struct fasync_struct {
 	int	magic;
@@ -1516,6 +1521,9 @@ extern int generic_osync_inode(struct inode *, int);
 
 extern int inode_change_ok(struct inode *, struct iattr *);
 extern int inode_setattr(struct inode *, struct iattr *);
+
+/* kernel/fork.c */
+extern int unshare_files(void);
 
 /*
  * Common dentry functions for inclusion in the VFS

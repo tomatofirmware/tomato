@@ -1787,6 +1787,23 @@ done:
 	return length;
 }
 
+void steal_locks(fl_owner_t from)
+{
+	struct list_head *tmp;
+
+	if (from == current->files)
+		return;
+
+	lock_kernel();
+	list_for_each(tmp, &file_lock_list) {
+		struct file_lock *fl = list_entry(tmp, struct file_lock,
+						  fl_link);
+		if (fl->fl_owner == from)
+			fl->fl_owner = current->files;
+	}
+	unlock_kernel();
+}
+
 #ifdef MSNFS
 /**
  *	lock_may_read - checks that the region is free of locks

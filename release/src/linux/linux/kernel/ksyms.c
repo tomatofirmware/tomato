@@ -296,6 +296,7 @@ EXPORT_SYMBOL(filemap_fdatasync);
 EXPORT_SYMBOL(filemap_fdatawait);
 EXPORT_SYMBOL(lock_page);
 EXPORT_SYMBOL(unlock_page);
+EXPORT_SYMBOL(wakeup_page_waiters);
 
 /* device registration */
 EXPORT_SYMBOL(register_chrdev);
@@ -578,6 +579,11 @@ EXPORT_SYMBOL(init_task_union);
 
 EXPORT_SYMBOL(tasklist_lock);
 EXPORT_SYMBOL(pidhash);
+EXPORT_SYMBOL(unshare_files);
 
 /* debug */
 EXPORT_SYMBOL(dump_stack);
+
+/* To match ksyms with System.map */
+extern const char _end[];
+EXPORT_SYMBOL(_end);

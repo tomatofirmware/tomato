@@ -444,6 +444,7 @@ static int load_elf_binary(struct linux_binprm * bprm, struct pt_regs * regs)
 	struct elfhdr interp_elf_ex;
   	struct exec interp_ex;
 	char passed_fileno[6];
+	struct files_struct *files;
 	
 	/* Get the exec-header */
 	elf_ex = *((struct elfhdr *) bprm->buf);
@@ -475,10 +476,21 @@ static int load_elf_binary(struct linux_binprm * bprm, struct pt_regs * regs)
 	retval = kernel_read(bprm->file, elf_ex.e_phoff, (char *) elf_phdata, size);
 	if (retval < 0)
 		goto out_free_ph;
+		
+	files = current->files;		/* Refcounted so ok */
+	if(unshare_files() < 0)
+		goto out_free_ph;
+	if (files == current->files) {
+		put_files_struct(files);
+		files = NULL;
+	}
 
+	/* exec will make our files private anyway, but for the a.out
+	   loader stuff we need to do it earlier */
+	   
 	retval = get_unused_fd();
 	if (retval < 0)
-		goto out_free_ph;
+		goto out_free_fh;
 	get_file(bprm->file);
 	fd_install(elf_exec_fileno = retval, bprm->file);
 
@@ -593,6 +605,13 @@ static int load_elf_binary(struct linux_binprm * bprm, struct pt_regs * regs)
 	if (retval)
 		goto out_free_dentry;
 
+	/* Discard our unneeded old files struct */
+	if (files) {
+		steal_locks(files);
+		put_files_struct(files);
+		files = NULL;
+	}
+
 	/* OK, This is the point of no return */
 	current->mm->start_data = 0;
 	current->mm->end_data = 0;
@@ -702,17 +721,16 @@ static int load_elf_binary(struct linux_binprm * bprm, struct pt_regs * regs)
 			elf_entry = load_elf_interp(&interp_elf_ex,
 						    interpreter,
 						    &interp_load_addr);
+		if (BAD_ADDR(elf_entry)) {
+			printk(KERN_ERR "Unable to load interpreter\n");
+			send_sig(SIGSEGV, current, 0);
+			retval = -ENOEXEC; /* Nobody gets to see this, but.. */
+			goto out_free_dentry;
+		}
 
 		allow_write_access(interpreter);
 		fput(interpreter);
 		kfree(elf_interpreter);
-
-		if (BAD_ADDR(elf_entry)) {
-			printk(KERN_ERR "Unable to load interpreter\n");
-			kfree(elf_phdata);
-			send_sig(SIGSEGV, current, 0);
-			return 0;
-		}
 	}
 
 	kfree(elf_phdata);
@@ -788,6 +806,11 @@ out_free_interp:
 		kfree(elf_interpreter);
 out_free_file:
 	sys_close(elf_exec_fileno);
+out_free_fh:
+	if (files) {
+		put_files_struct(current->files);
+		current->files = files;
+	}
 out_free_ph:
 	kfree(elf_phdata);
 	goto out;
