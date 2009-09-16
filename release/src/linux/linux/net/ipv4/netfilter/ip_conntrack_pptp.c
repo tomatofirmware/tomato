@@ -69,7 +69,7 @@ DECLARE_LOCK(ip_pptp_lock);
 #define DAYS * 24 HOURS
 
 #define PPTP_GRE_TIMEOUT 		(10 MINS)
-#define PPTP_GRE_STREAM_TIMEOUT 	(5 DAYS)
+#define PPTP_GRE_STREAM_TIMEOUT 	(6 HOURS)
 
 static int pptp_expectfn(struct ip_conntrack *ct)
 {
