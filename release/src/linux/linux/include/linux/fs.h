@@ -614,10 +614,12 @@ extern struct list_head file_lock_list;
 #include <linux/fcntl.h>
 
 extern int fcntl_getlk(unsigned int, struct flock *);
-extern int fcntl_setlk(unsigned int, unsigned int, struct flock *);
+extern int fcntl_setlk(unsigned int fd, struct file *filp, unsigned int cmd,
+		struct flock *l);
 
 extern int fcntl_getlk64(unsigned int, struct flock64 *);
-extern int fcntl_setlk64(unsigned int, unsigned int, struct flock64 *);
+extern int fcntl_setlk64(unsigned int fd, struct file *filp, unsigned int cmd,
+		struct flock64 *l);
 
 /* fs/locks.c */
 extern void locks_init_lock(struct file_lock *);
