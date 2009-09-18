@@ -370,7 +370,7 @@ struct task_struct;
  * do_basic_setup() and the timing is such that free_initmem() has
  * been called already.
  */
-extern int kernel_thread (int (*fn)(void *), void *arg, unsigned long flags);
+extern int arch_kernel_thread (int (*fn)(void *), void *arg, unsigned long flags);
 
 /* Copy and release all segment info associated with a VM */
 #define copy_segments(tsk, mm)			do { } while (0)

@@ -669,7 +669,7 @@ int copy_thread(int nr, unsigned long clone_flags, unsigned long sp,
  * a system call from a "real" process, but the process memory space will
  * not be free'd until both the parent and the child have exited.
  */
-pid_t kernel_thread(int (*fn)(void *), void * arg, unsigned long flags)
+pid_t arch_kernel_thread(int (*fn)(void *), void * arg, unsigned long flags)
 {
 	long retval;
 

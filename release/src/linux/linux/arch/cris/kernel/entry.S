@@ -718,12 +718,12 @@ hw_bp_trig_ptr:
  * the grosser the code, at least with the gcc version in cris-dist-1.13.
  */
 
-/* int kernel_thread(int (*fn)(void *), void * arg, unsigned long flags) */
+/* int arch_kernel_thread(int (*fn)(void *), void * arg, unsigned long flags) */
 /*                   r10                r11         r12  */
 
 	.text
-	.global kernel_thread
-kernel_thread:
+	.global arch_kernel_thread
+arch_kernel_thread:
 
 	/* Save ARG for later.  */
 	move.d $r11, $r13

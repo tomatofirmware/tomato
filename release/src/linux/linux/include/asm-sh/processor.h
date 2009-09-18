@@ -137,7 +137,7 @@ extern void release_thread(struct task_struct *);
 /*
  * create a kernel thread without removing it from tasklists
  */
-extern int kernel_thread(int (*fn)(void *), void * arg, unsigned long flags);
+extern int arch_kernel_thread(int (*fn)(void *), void * arg, unsigned long flags);
 
 /*
  * Bus types

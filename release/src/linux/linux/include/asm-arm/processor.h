@@ -117,7 +117,7 @@ extern void __free_task_struct(struct task_struct *);
 /*
  * Create a new kernel thread
  */
-extern int kernel_thread(int (*fn)(void *), void *arg, unsigned long flags);
+extern int arch_kernel_thread(int (*fn)(void *), void *arg, unsigned long flags);
 
 #endif
 

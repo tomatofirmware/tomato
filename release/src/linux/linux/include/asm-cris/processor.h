@@ -81,7 +81,7 @@ struct thread_struct {
 #define INIT_THREAD  { \
    0, 0, 0x20 }  /* ccr = int enable, nothing else */
 
-extern int kernel_thread(int (*fn)(void *), void * arg, unsigned long flags);
+extern int arch_kernel_thread(int (*fn)(void *), void * arg, unsigned long flags);
 
 /* give the thread a program location
  * set user-mode (The 'U' flag (User mode flag) is CCR/DCCR bit 8) 

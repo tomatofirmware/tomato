@@ -181,7 +181,7 @@ struct thread_struct {
 /* Free all resources held by a thread. */
 #define release_thread(thread) do { } while(0)
 
-extern int kernel_thread(int (*fn)(void *), void * arg, unsigned long flags);
+extern int arch_kernel_thread(int (*fn)(void *), void * arg, unsigned long flags);
 
 /* Copy and release all segment info associated with a VM */
 #define copy_segments(p, mm) do { } while(0)

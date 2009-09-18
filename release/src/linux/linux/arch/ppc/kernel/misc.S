@@ -898,9 +898,9 @@ _GLOBAL(cvt_df)
 
 /*
  * Create a kernel thread
- *   kernel_thread(fn, arg, flags)
+ *   arch_kernel_thread(fn, arg, flags)
  */
-_GLOBAL(kernel_thread)
+_GLOBAL(arch_kernel_thread)
 	mr	r6,r3		/* function */
 	ori	r3,r5,CLONE_VM	/* flags */
 	li	r0,__NR_clone

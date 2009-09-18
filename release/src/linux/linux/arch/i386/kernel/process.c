@@ -485,7 +485,7 @@ void release_segments(struct mm_struct *mm)
 /*
  * Create a kernel thread
  */
-int kernel_thread(int (*fn)(void *), void * arg, unsigned long flags)
+int arch_kernel_thread(int (*fn)(void *), void * arg, unsigned long flags)
 {
 	long retval, d0;
 
@@ -508,6 +508,7 @@ int kernel_thread(int (*fn)(void *), void * arg, unsigned long flags)
 		 "r" (arg), "r" (fn),
 		 "b" (flags | CLONE_VM)
 		: "memory");
+
 	return retval;
 }
 

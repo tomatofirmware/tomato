@@ -105,7 +105,7 @@ void show_regs(struct pt_regs *regs)
 		show_trace((unsigned long *) regs->gprs[15]);
 }
 
-int kernel_thread(int (*fn)(void *), void * arg, unsigned long flags)
+int arch_kernel_thread(int (*fn)(void *), void * arg, unsigned long flags)
 {
         int clone_arg = flags | CLONE_VM;
         int retval;

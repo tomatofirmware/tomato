@@ -27,6 +27,7 @@
 #include <asm/pgalloc.h>
 #include <asm/uaccess.h>
 #include <asm/mmu_context.h>
+#include <asm/processor.h>
 
 /* The idle threads do not count.. */
 int nr_threads;
@@ -595,6 +596,31 @@ static inline void copy_flags(unsigned long clone_flags, struct task_struct *p)
 	if (!(clone_flags & CLONE_PTRACE))
 		p->ptrace = 0;
 	p->flags = new_flags;
+}
+
+long kernel_thread(int (*fn)(void *), void * arg, unsigned long flags)
+{
+	struct task_struct *task = current;
+	unsigned old_task_dumpable;
+	long ret;
+
+	/* lock out any potential ptracer */
+	task_lock(task);
+	if (task->ptrace) {
+		task_unlock(task);
+		return -EPERM;
+	}
+
+	old_task_dumpable = task->task_dumpable;
+	task->task_dumpable = 0;
+	task_unlock(task);
+
+	ret = arch_kernel_thread(fn, arg, flags);
+
+	/* never reached in child process, only in parent */
+	current->task_dumpable = old_task_dumpable;
+
+	return ret;
 }
 
 /*

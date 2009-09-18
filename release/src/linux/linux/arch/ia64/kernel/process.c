@@ -224,7 +224,7 @@ ia64_load_extra (struct task_struct *task)
  *	|                     | <-- sp (lowest addr)
  *	+---------------------+
  *
- * Note: if we get called through kernel_thread() then the memory
+ * Note: if we get called through arch_kernel_thread() then the memory
  * above "(highest addr)" is valid kernel stack memory that needs to
  * be copied as well.
  *
@@ -465,7 +465,7 @@ ia64_set_personality (struct elf64_hdr *elf_ex, int ibcs2_interpreter)
 }
 
 pid_t
-kernel_thread (int (*fn)(void *), void *arg, unsigned long flags)
+arch_kernel_thread (int (*fn)(void *), void *arg, unsigned long flags)
 {
 	struct task_struct *parent = current;
 	int result, tid;

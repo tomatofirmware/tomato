@@ -146,7 +146,7 @@ extern __inline__ void start_thread(struct pt_regs * regs, unsigned long pc,
 
 /* Free all resources held by a thread. */
 #define release_thread(tsk)		do { } while(0)
-extern pid_t kernel_thread(int (*fn)(void *), void * arg, unsigned long flags);
+extern pid_t arch_kernel_thread(int (*fn)(void *), void * arg, unsigned long flags);
 
 
 #define copy_segments(tsk, mm)		do { } while (0)

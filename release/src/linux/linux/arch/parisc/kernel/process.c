@@ -163,7 +163,7 @@ void machine_power_off(void)
  */
 
 extern pid_t __kernel_thread(int (*fn)(void *), void *arg, unsigned long flags);
-pid_t kernel_thread(int (*fn)(void *), void *arg, unsigned long flags)
+pid_t arch_kernel_thread(int (*fn)(void *), void *arg, unsigned long flags)
 {
 
 

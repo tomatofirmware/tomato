@@ -609,7 +609,7 @@ void release_thread(struct task_struct *);
 /*
  * Create a new kernel thread.
  */
-extern long kernel_thread(int (*fn)(void *), void *arg, unsigned long flags);
+extern long arch_kernel_thread(int (*fn)(void *), void *arg, unsigned long flags);
 
 /*
  * Bus types

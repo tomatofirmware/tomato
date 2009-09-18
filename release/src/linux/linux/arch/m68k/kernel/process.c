@@ -124,7 +124,7 @@ void show_regs(struct pt_regs * regs)
 /*
  * Create a kernel thread
  */
-int kernel_thread(int (*fn)(void *), void * arg, unsigned long flags)
+int arch_kernel_thread(int (*fn)(void *), void * arg, unsigned long flags)
 {
 	int pid;
 	mm_segment_t fs;

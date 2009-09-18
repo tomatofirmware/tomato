@@ -341,6 +341,7 @@ struct task_struct {
 	/* ??? */
 	unsigned long personality;
 	int did_exec:1;
+	unsigned task_dumpable:1;
 	pid_t pid;
 	pid_t pgrp;
 	pid_t tty_old_pgrp;
@@ -449,6 +450,8 @@ struct task_struct {
 #define PT_DTRACE	0x00000004	/* delayed trace (used on m68k, i386) */
 #define PT_TRACESYSGOOD	0x00000008
 #define PT_PTRACE_CAP	0x00000010	/* ptracer can follow suid-exec */
+
+#define is_dumpable(tsk)	((tsk)->task_dumpable && (tsk)->mm->dumpable)
 
 /*
  * Limit the stack by to some sane default: root can always
@@ -800,6 +803,8 @@ extern int do_fork(unsigned long, unsigned long, struct pt_regs *, unsigned long
 extern void FASTCALL(add_wait_queue(wait_queue_head_t *q, wait_queue_t * wait));
 extern void FASTCALL(add_wait_queue_exclusive(wait_queue_head_t *q, wait_queue_t * wait));
 extern void FASTCALL(remove_wait_queue(wait_queue_head_t *q, wait_queue_t * wait));
+
+extern long kernel_thread(int (*fn)(void *), void * arg, unsigned long flags);
 
 #define __wait_event(wq, condition) 					\
 do {									\

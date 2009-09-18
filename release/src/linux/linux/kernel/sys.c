@@ -1201,7 +1201,7 @@ asmlinkage long sys_prctl(int option, unsigned long arg2, unsigned long arg3,
 			error = put_user(current->pdeath_signal, (int *)arg2);
 			break;
 		case PR_GET_DUMPABLE:
-			if (current->mm->dumpable)
+			if (is_dumpable(current))
 				error = 1;
 			break;
 		case PR_SET_DUMPABLE:
@@ -1209,7 +1209,8 @@ asmlinkage long sys_prctl(int option, unsigned long arg2, unsigned long arg3,
 				error = -EINVAL;
 				break;
 			}
-			current->mm->dumpable = arg2;
+			if (is_dumpable(current))
+				current->mm->dumpable = arg2;
 			break;
 	        case PR_SET_UNALIGN:
 #ifdef SET_UNALIGN_CTL
