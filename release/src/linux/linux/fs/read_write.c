@@ -218,7 +218,7 @@ static ssize_t do_readv_writev(int type, struct file *file,
 	typedef ssize_t (*io_fn_t)(struct file *, char *, size_t, loff_t *);
 	typedef ssize_t (*iov_fn_t)(struct file *, const struct iovec *, unsigned long, loff_t *);
 
-	ssize_t tot_len;
+	size_t tot_len;
 	struct iovec iovstack[UIO_FASTIOV];
 	struct iovec *iov=iovstack;
 	ssize_t ret, i;
@@ -259,12 +259,19 @@ static ssize_t do_readv_writev(int type, struct file *file,
 	tot_len = 0;
 	ret = -EINVAL;
 	for (i = 0 ; i < count ; i++) {
-		ssize_t tmp = tot_len;
 		ssize_t len = (ssize_t) iov[i].iov_len;
 		if (len < 0)	/* size_t not fitting an ssize_t .. */
 			goto out;
 		tot_len += len;
-		if (tot_len < tmp) /* maths overflow on the ssize_t */
+		/* We must do this work unsigned - signed overflow is
+		   undefined and gcc 3.2 now uses that fact sometimes... 
+		   
+		   FIXME: put in a proper limits.h for each platform */
+#if BITS_PER_LONG==64
+		if (tot_len > 0x7FFFFFFFFFFFFFFFUL)
+#else
+		if (tot_len > 0x7FFFFFFFUL)
+#endif		
 			goto out;
 	}
 
@@ -315,7 +322,7 @@ out_nofree:
 	/* VERIFY_WRITE actually means a read, as we write to user space */
 	if ((ret + (type == VERIFY_WRITE)) > 0)
 		dnotify_parent(file->f_dentry,
-			(type == VERIFY_WRITE) ? DN_MODIFY : DN_ACCESS);
+			(type == VERIFY_WRITE) ? DN_ACCESS : DN_MODIFY);
 	return ret;
 }
 

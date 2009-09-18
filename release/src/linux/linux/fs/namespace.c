@@ -24,12 +24,11 @@
 struct vfsmount *do_kern_mount(const char *type, int flags, char *name, void *data);
 int do_remount_sb(struct super_block *sb, int flags, void * data);
 void kill_super(struct super_block *sb);
+extern int __init init_rootfs(void);
 
 static struct list_head *mount_hashtable;
 static int hash_mask, hash_bits;
 static kmem_cache_t *mnt_cache; 
-
-extern void init_rootfs(void);
 
 static inline unsigned long hash(struct vfsmount *mnt, struct dentry *dentry)
 {
@@ -216,6 +215,10 @@ static int show_vfsmnt(struct seq_file *m, void *v)
 	if (!path_buf)
 		return -ENOMEM;
 	path = d_path(mnt->mnt_root, mnt, path_buf, PAGE_SIZE);
+	if (IS_ERR(path)) {
+		free_page((unsigned long) path_buf);
+		return PTR_ERR(path);
+	}
 
 	mangle(m, mnt->mnt_devname ? mnt->mnt_devname : "none");
 	seq_putc(m, ' ');
@@ -1023,15 +1026,10 @@ void __init mnt_init(unsigned long mempages)
 	if (!mnt_cache)
 		panic("Cannot create vfsmount cache");
 
-	mempages >>= (16 - PAGE_SHIFT);
-	mempages *= sizeof(struct list_head);
-	for (order = 0; ((1UL << order) << PAGE_SHIFT) < mempages; order++)
-		;
-
-	do {
-		mount_hashtable = (struct list_head *)
-			__get_free_pages(GFP_ATOMIC, order);
-	} while (mount_hashtable == NULL && --order >= 0);
+	/* using single pointer list heads would save half of the hash table. */
+	order = 0; 
+	mount_hashtable = (struct list_head *)
+		__get_free_pages(GFP_ATOMIC, order);
 
 	if (!mount_hashtable)
 		panic("Failed to allocate mount hash table\n");
@@ -1055,8 +1053,9 @@ void __init mnt_init(unsigned long mempages)
 	nr_hash = 1UL << hash_bits;
 	hash_mask = nr_hash-1;
 
-	printk("Mount-cache hash table entries: %d (order: %ld, %ld bytes)\n",
-			nr_hash, order, (PAGE_SIZE << order));
+	printk(KERN_INFO "Mount cache hash table entries: %d"
+		" (order: %ld, %ld bytes)\n",
+		nr_hash, order, (PAGE_SIZE << order));
 
 	/* And initialize the newly allocated array */
 	d = mount_hashtable;

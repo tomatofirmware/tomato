@@ -60,11 +60,6 @@ static unsigned long set_grace_period(void)
 	return grace_period + jiffies;
 }
 
-static inline void clear_grace_period(void)
-{
-	nlmsvc_grace_period = 0;
-}
-
 /*
  * This is the lockd kernel thread
  */
@@ -130,10 +125,8 @@ lockd(struct svc_rqst *rqstp)
 		 * (Theoretically, there shouldn't even be blocked locks
 		 * during grace period).
 		 */
-		if (!nlmsvc_grace_period) {
+		if (!nlmsvc_grace_period)
 			timeout = nlmsvc_retry_blocked();
-		} else if (time_before(grace_period_expire, jiffies))
-			clear_grace_period();
 
 		/*
 		 * Find a socket with data available and call its
@@ -163,6 +156,9 @@ lockd(struct svc_rqst *rqstp)
 				nlmsvc_ops->exp_getclient(&rqstp->rq_addr);
 		}
 
+		if (nlmsvc_grace_period &&
+		    time_before(grace_period_expire, jiffies))
+			nlmsvc_grace_period = 0;
 		svc_process(serv, rqstp);
 
 		/* Unlock export hash tables */
