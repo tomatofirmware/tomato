@@ -38,7 +38,7 @@ endif
 #
 GCCFLAGS	:= -I $(TOPDIR)/include/asm/gcc
 GCCFLAGS	+= -G 0 -mno-abicalls -fno-pic -pipe
-LINKFLAGS	+= -G 0 -static # -N
+LINKFLAGS	+= -G 0 -static -n -nostdlib
 MODFLAGS	+= -mlong-calls -fno-common
 
 GCCFLAGS	+= -I $(SRCBASE)/

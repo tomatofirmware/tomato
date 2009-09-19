@@ -88,8 +88,9 @@ export MODLIB
 
 CPPFLAGS := -D__KERNEL__ -I$(HPATH)
 
-CFLAGS := $(CPPFLAGS) -Wall -Wstrict-prototypes -Wno-trigraphs -O2 \
+CFLAGS := $(CPPFLAGS) -Wall -Wstrict-prototypes -Wno-trigraphs -Os \
 	  -fno-strict-aliasing -fno-common
+CFLAGS += -fno-builtin-strpbrk -fno-builtin-sprintf
 
 # Turn on -pg to instrument the kernel with calls to mcount().
 # Unfortunately, gcc won't allow -pg without frame pointers.
@@ -110,6 +111,9 @@ AFLAGS += -I$(SRCBASE)/include
 ASFLAGS += -I$(SRCBASE)/include
 
 CFLAGS += -DBCMDRIVER
+
+check_gcc = $(shell if $(CC) $(1) -S -o /dev/null -xc /dev/null > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi)
+if_gcc4 = $(shell if echo __GNUC__ | $(CC) -E -xc - | grep -q '^4$$' > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi)
 
 #
 # ROOT_DEV specifies the default root-device when making the image.
@@ -279,6 +283,14 @@ include arch/$(ARCH)/Makefile
 # other kernel code should include user space headers, if you need
 # 'kbuild_2_4_nostdinc :=' or -I/usr/include for kernel code and you are not UML
 # then your code is broken!  KAO.
+
+# disable pointer signedness warnings in gcc 4.x
+CFLAGS += $(call check_gcc,-Wno-pointer-sign,)
+
+# disable stupid and dangerous "optimization" in gcc 3.2+
+CFLAGS += $(call check_gcc,-fno-delete-null-pointer-checks,)
+
+CFLAGS += $(call check_gcc, -funit-at-a-time,)
 
 kbuild_2_4_nostdinc	:= -nostdinc -iwithprefix include
 export kbuild_2_4_nostdinc
