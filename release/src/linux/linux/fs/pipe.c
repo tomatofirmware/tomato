@@ -230,8 +230,7 @@ pipe_write(struct file *filp, const char *buf, size_t count, loff_t *ppos)
 	/* Signal readers asynchronously that there is more data.  */
 	wake_up_interruptible(PIPE_WAIT(*inode));
 
-	inode->i_ctime = inode->i_mtime = CURRENT_TIME;
-	mark_inode_dirty(inode);
+	update_mctime(inode);
 
 out:
 	up(PIPE_SEM(*inode));

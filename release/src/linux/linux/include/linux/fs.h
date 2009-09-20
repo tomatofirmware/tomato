@@ -194,6 +194,7 @@ extern int leases_enable, dir_notify_enable, lease_break_time;
 #include <asm/byteorder.h>
 
 extern void update_atime (struct inode *);
+extern void update_mctime (struct inode *);
 #define UPDATE_ATIME(inode) update_atime (inode)
 
 extern void buffer_init(unsigned long);

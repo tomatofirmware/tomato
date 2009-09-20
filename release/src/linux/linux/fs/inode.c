@@ -1186,12 +1186,34 @@ void update_atime (struct inode *inode)
 {
 	if (inode->i_atime == CURRENT_TIME)
 		return;
-	if ( IS_NOATIME (inode) ) return;
-	if ( IS_NODIRATIME (inode) && S_ISDIR (inode->i_mode) ) return;
-	if ( IS_RDONLY (inode) ) return;
+	if (IS_NOATIME(inode))
+		return;
+	if (IS_NODIRATIME(inode) && S_ISDIR(inode->i_mode)) 
+		return;
+	if (IS_RDONLY(inode)) 
+		return;
 	inode->i_atime = CURRENT_TIME;
 	mark_inode_dirty_sync (inode);
-}   /*  End Function update_atime  */
+}
+
+/**
+ *	update_mctime	-	update the mtime and ctime
+ *	@inode: inode accessed
+ *
+ *	Update the modified and changed times on an inode for writes to special
+ *	files such as fifos.  No change is forced if the timestamps are already
+ *	up-to-date or if the filesystem is readonly.
+ */
+ 
+void update_mctime (struct inode *inode)
+{
+	if (inode->i_mtime == CURRENT_TIME && inode->i_ctime == CURRENT_TIME)
+		return;
+	if (IS_RDONLY(inode))
+		return;
+	inode->i_ctime = inode->i_mtime = CURRENT_TIME;
+	mark_inode_dirty (inode);
+}
 
 
 /*
