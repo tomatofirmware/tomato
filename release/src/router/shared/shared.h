@@ -67,10 +67,11 @@ extern void nvram_commit_x(void);
 extern int connect_timeout(int fd, const struct sockaddr *addr, socklen_t len, int timeout);
 //!!TB
 extern char *detect_fs_type(char *device);
-extern struct mntent *findmntent(char *file);
+extern struct mntent *findmntents(char *file, int swp,
+	int (*func)(struct mntent *mnt, uint flags), uint flags);
 extern int find_label(char *mnt_dev, char *the_label);
-extern int usb_lock(void);
-extern void usb_unlock(int lockfd);
+extern int file_lock(char *tag);
+extern void file_unlock(int lockfd);
 
 #define DEV_DISCS_ROOT	"/dev/discs"
 

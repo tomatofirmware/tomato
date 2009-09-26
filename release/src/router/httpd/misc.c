@@ -556,8 +556,7 @@ int is_partition_mounted(char *dev_name, int host_num, int disc_num, int part_nu
 		web_printf("%s['%s',", (flags & EFH_1ST_DISC) ? "" : ",", the_label);
 	}
 
-	mnt = findmntent(dev_name);
-	if (mnt) {
+	if ((mnt = findmntents(dev_name, 0, 0, 0))) {
 		is_mounted = 1;
 		if (flags & EFH_PRINT) {
 			if (statfs(mnt->mnt_dir, &s) == 0) {
@@ -565,6 +564,13 @@ int is_partition_mounted(char *dev_name, int host_num, int disc_num, int part_nu
 			}
 			web_printf("1,'%s','%s','%s','%ld']",
 				mnt->mnt_dir, mnt->mnt_type, mnt->mnt_opts, psize);
+		}
+	}
+	else if ((mnt = findmntents(dev_name, 1, 0, 0))) {
+		is_mounted = 1;
+		if (flags & EFH_PRINT) {
+			web_printf("2,'','%s','','%ld']",
+				"swap", (atoi(mnt->mnt_type) + 1023) / 1024);
 		}
 	}
 	else {
@@ -581,13 +587,13 @@ int is_host_mounted(int host_no, int print_parts)
 {
 	if (print_parts) web_puts("[-1,[");
 
-	int fd = usb_lock();
+	int fd = nvram_get_int("usb_nolock") ? -1 : file_lock("usb");
 	int mounted = exec_for_host(
 		host_no,
 		0x00,
 		print_parts ? EFH_PRINT : 0,
 		is_partition_mounted);
-	usb_unlock(fd);
+	file_unlock(fd);
 	
 	if (print_parts) web_puts("]]");
 
@@ -614,7 +620,7 @@ void asp_usbdevices(int argc, char **argv)
 	int i = 0, attached, mounted;
 	FILE *fp;
 	char line[128];
-	char *tmp=NULL, g_usb_vendor[25], g_usb_product[20], g_usb_serial[20];
+	char *tmp=NULL, g_usb_vendor[30], g_usb_product[30], g_usb_serial[30];
 
 	web_puts("\nusbdev = [");
 
@@ -652,20 +658,20 @@ void asp_usbdevices(int argc, char **argv)
 						else if (strstr(line, "Vendor")) {
 							tmp = strtok(line, " ");
 							tmp = strtok(NULL, "\n");
-							strcpy(g_usb_vendor, tmp);
+							strncpy(g_usb_vendor, tmp, sizeof(g_usb_vendor) - 1);
 							tmp = NULL;
 						}
 						else if (strstr(line, "Product")) {
 							tmp = strtok(line, " ");
 							tmp = strtok(NULL, "\n");
-							strcpy(g_usb_product, tmp);
+							strncpy(g_usb_product, tmp, sizeof(g_usb_product) - 1);
 							tmp = NULL;
 						}
 						else if (strstr(line, "Serial Number")) {
 							tmp = strtok(line, " ");
 							tmp = strtok(NULL, " ");
 							tmp = strtok(NULL, "\n");
-							strcpy(g_usb_serial, tmp);
+							strncpy(g_usb_serial, tmp, sizeof(g_usb_serial) - 1);
 							tmp = NULL;
 						}
 					}
@@ -711,13 +717,13 @@ void asp_usbdevices(int argc, char **argv)
 				if (strstr(line, "Manufacturer")) {
 					tmp = strtok(line, "=");
 					tmp = strtok(NULL, "\n");
-					strcpy(g_usb_vendor, tmp);
+					strncpy(g_usb_vendor, tmp, sizeof(g_usb_vendor) - 1);
 					tmp = NULL;
 				}
 				else if (strstr(line, "Model")) {
 					tmp = strtok(line, "=");
 					tmp = strtok(NULL, "\n");
-					strcpy(g_usb_product, tmp);
+					strncpy(g_usb_product, tmp, sizeof(g_usb_product) - 1);
 					tmp = NULL;
 				}
 			}

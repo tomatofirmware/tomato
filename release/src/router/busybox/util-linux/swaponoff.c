@@ -11,6 +11,10 @@
 #include <mntent.h>
 #include <sys/swap.h>
 
+#if ENABLE_FEATURE_MOUNT_LABEL
+#include "volume_id.h"
+#endif
+
 #if ENABLE_FEATURE_SWAPON_PRI
 struct globals {
 	int flags;
@@ -26,7 +30,21 @@ static int swap_enable_disable(char *device)
 	int status;
 	struct stat st;
 
-	xstat(device, &st);
+#if ENABLE_FEATURE_MOUNT_LABEL
+	char *tmp = NULL;
+
+	if (!strncmp(device, "UUID=", 5))
+		tmp = get_devname_from_uuid(device + 5);
+	else if (!strncmp(device, "LABEL=", 6))
+		tmp = get_devname_from_label(device + 6);
+	if (tmp)
+		device = tmp;
+#endif
+
+	if (stat(device, &st)) {
+		bb_perror_msg("can't stat '%s'", device);
+		return 1;
+	}
 
 #if ENABLE_DESKTOP
 	/* test for holes */

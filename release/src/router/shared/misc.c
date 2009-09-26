@@ -462,34 +462,25 @@ int time_ok(void)
 /* Serialize using fcntl() calls 
  */
 
-#ifndef USB_LOCK_TIMEOUT
-#define USB_LOCK_TIMEOUT 8
-#endif
-
-int usb_lock(void)
+int file_lock(char *tag)
 {
-	if (nvram_get_int("usb_nolock"))
-		return -1;
-
-	const char fn[] = "/var/lock/usb.lock";
+	char fn[64];
 	struct flock lock;
 	int lockfd = -1;
-	
+
+	sprintf(fn, "/var/lock/%s.lock", tag);
 	if ((lockfd = open(fn, O_CREAT | O_RDWR, 0666)) < 0)
 		goto lock_error;
 
 	memset(&lock, 0, sizeof(lock));
 	lock.l_type = F_WRLCK;
 	lock.l_pid = getpid();
-	alarm(USB_LOCK_TIMEOUT);
 
 	if (fcntl(lockfd, F_SETLKW, &lock) < 0) {
 		close(lockfd);
-		alarm(0);
 		goto lock_error;
 	}
 
-	alarm(0);
 	return lockfd;
 lock_error:
 	// No proper error processing
@@ -497,7 +488,7 @@ lock_error:
 	return -1;
 }
 
-void usb_unlock(int lockfd)
+void file_unlock(int lockfd)
 {
 	if (lockfd >= 0) {
 		close(lockfd);
@@ -702,15 +693,41 @@ int exec_for_host(int host, int when_to_update, uint flags, host_exec func)
 	return result;
 }
 
-/* Stolen from the e2fsprogs/ismounted.c.
+/* Concept taken from the e2fsprogs/ismounted.c.
  * Find wherever 'file' (actually: device) is mounted.
  * Either the exact same device-name, or another device-name.
  * The latter is detected by comparing the rdev or dev&inode.
  * So aliasing won't fool us---we'll still find if it's mounted.
  * Return its mnt entry.
  * In particular, the caller would look at the mnt->mountpoint.
+ *
+ * Find the matching devname(s) in mounts or swaps.
+ * If func is supplied, call it for each match.  If not, return mnt on the first match.
  */
-struct mntent *findmntent(char *file)
+
+static inline int is_same_device(char *fsname, dev_t file_rdev, dev_t file_dev, ino_t file_ino)
+{
+	struct stat st_buf;
+
+	if (stat(fsname, &st_buf) == 0) {
+		if (S_ISBLK(st_buf.st_mode)) {
+			if (file_rdev && (file_rdev == st_buf.st_rdev))
+				return 1;
+		}
+		else {
+			if (file_dev && ((file_dev == st_buf.st_dev) &&
+				(file_ino == st_buf.st_ino)))
+				return 1;
+			/* Check for [swap]file being on the device. */
+			if (file_dev == 0 && file_ino == 0 && file_rdev == st_buf.st_dev)
+				return 1;
+		}
+	}
+	return 0;
+}
+
+
+struct mntent *findmntents(char *file, int swp, int (*func)(struct mntent *mnt, uint flags), uint flags)
 {
 	struct mntent 	*mnt;
 	struct stat	st_buf;
@@ -718,30 +735,24 @@ struct mntent *findmntent(char *file)
 	ino_t		file_ino=0;
 	FILE 		*f;
 	
-	if ((f = setmntent("/proc/mounts", "r")) == NULL)
+	if ((f = setmntent(swp? "/proc/swaps": "/proc/mounts", "r")) == NULL)
 		return NULL;
 
 	if (stat(file, &st_buf) == 0) {
 		if (S_ISBLK(st_buf.st_mode)) {
 			file_rdev = st_buf.st_rdev;
-		} else {
+		}
+		else {
 			file_dev = st_buf.st_dev;
 			file_ino = st_buf.st_ino;
 		}
 	}
 	while ((mnt = getmntent(f)) != NULL) {
-		if (strcmp(file, mnt->mnt_fsname) == 0)
-			break;
-
-		if (stat(mnt->mnt_fsname, &st_buf) == 0) {
-			if (S_ISBLK(st_buf.st_mode)) {
-				if (file_rdev && (file_rdev == st_buf.st_rdev))
-					break;
-			} else {
-				if (file_dev && ((file_dev == st_buf.st_dev) &&
-						 (file_ino == st_buf.st_ino)))
-					break;
-			}
+		if (strcmp(file, mnt->mnt_fsname) == 0 ||
+			is_same_device(mnt->mnt_fsname, file_rdev , file_dev, file_ino)) {
+			if (func == NULL)
+				break;
+			(*func)(mnt, flags);
 		}
 	}
 
@@ -775,6 +786,7 @@ extern void *volume_id_get_buffer(struct volume_id *id, uint64_t off, size_t len
 extern void volume_id_free_buffer(struct volume_id *id);
 extern int volume_id_probe_ext(struct volume_id *id);
 extern int volume_id_probe_vfat(struct volume_id *id);
+extern int volume_id_probe_ntfs(struct volume_id *id);
 extern int volume_id_probe_linux_swap(struct volume_id *id);
 
 /* Put the label in *label.
@@ -797,6 +809,8 @@ int find_label(char *dev_name, char *label)
 	if (volume_id_probe_ext(&id) == 0 || id.error)
 		goto ret;
 	if (volume_id_probe_linux_swap(&id) == 0 || id.error)
+		goto ret;
+	if (volume_id_probe_ntfs(&id) == 0 || id.error)
 		goto ret;
 ret:
 	volume_id_free_buffer(&id);

@@ -18,13 +18,14 @@
 #include <mntent.h>
 #include <dirent.h>
 #include <sys/file.h>
-
+#include <sys/swap.h>
 
 /* Adjust bdflush parameters.
  * Do this here, because Tomato doesn't have the sysctl command.
  * With these values, a disk block should be written to disk within 2 seconds.
  */
-#if 0
+#if 1
+#include <sys/kdaemon.h>
 #define SET_PARM(n) (n * 2 | 1)
 
 void tune_bdflush()
@@ -180,7 +181,7 @@ int mount_r(char *mnt_dev, char *mnt_dir, char *type)
 	char flagfn[128];
 	int dir_made;
 	
-	if ((mnt = findmntent(mnt_dev))) {
+	if ((mnt = findmntents(mnt_dev, 0, 0, 0))) {
 		syslog(LOG_INFO, "USB partition at %s already mounted on %s",
 			mnt_dev, mnt->mnt_dir);
 		return MOUNT_VAL_EXIST;
@@ -237,9 +238,12 @@ int mount_r(char *mnt_dev, char *mnt_dir, char *type)
 			}
 
 			ret = mount(mnt_dev, mnt_dir, type, flags, options[0] ? options : "");
+			/* try ntfs-3g in case it's installed */
+			if (ret != 0 && strcmp(type, "ntfs") == 0)
+				ret = eval("ntfs-3g", "-o", "noatime,nodev", mnt_dev, mnt_dir);
 			if (ret != 0) /* give it another try - guess fs */
 				ret = eval("mount", "-o", "noatime,nodev", mnt_dev, mnt_dir);
-			
+
 			if (ret == 0) {
 				syslog(LOG_INFO, "USB %s%s fs at %s mounted on %s",
 					type, (flags & MS_RDONLY) ? " (ro)" : "", mnt_dev, mnt_dir);
@@ -292,15 +296,18 @@ static int usb_ufd_connected(int host_no)
 #ifndef MNT_DETACH
 #define MNT_DETACH	0x00000002      /* from linux/fs.h - just detach from the tree */
 #endif
+int umount_mountpoint(struct mntent *mnt, uint flags);
+int uswap_mountpoint(struct mntent *mnt, uint flags);
 
-/* Unmount this partition.
- * If the special flagfile is now revealed, delete it and [attempt to] delete the directory.
+/* Unmount this partition from all its mountpoints.  Note that it may
+ * actually be mounted several times, either with different names or
+ * with "-o bind" flag.
+ * If the special flagfile is now revealed, delete it and [attempt to] delete
+ * the directory.
  */
 int umount_partition(char *dev_name, int host_num, int disc_num, int part_num, uint flags)
 {
-	struct mntent *mnt;
-	int ret = 1, count;
-	char flagfn[128];
+	sync();	/* This won't matter if the device is unplugged, though. */
 
 	if (flags & EFH_HUNKNOWN) {
 		/* EFH_HUNKNOWN flag is passed if the host was unknown.
@@ -309,11 +316,28 @@ int umount_partition(char *dev_name, int host_num, int disc_num, int part_num, u
 		if (usb_ufd_connected(host_num))
 			return(0);
 	}
- 
-	mnt = findmntent(dev_name);
-	if (mnt) {
-		sync();	/* This won't matter if the device is unplugged, though. */
+
+	/* Find all the active swaps that are on this device and stop them. */
+	findmntents(dev_name, 1, uswap_mountpoint, flags);
+
+	/* Find all the mountpoints that are for this device and unmount them. */
+	findmntents(dev_name, 0, umount_mountpoint, flags);
+	return 0;
+}
+
+int uswap_mountpoint(struct mntent *mnt, uint flags)
+{
+	swapoff(mnt->mnt_fsname);
+	return 0;
+}
+
+int umount_mountpoint(struct mntent *mnt, uint flags)
+{
+	int ret = 1, count;
+	char flagfn[128];
+
 		sprintf(flagfn, "%s/.autocreated-dir", mnt->mnt_dir);
+		run_nvscript("script_autostop", mnt->mnt_dir, 5);
 		count = 0;
 		while ((ret = umount(mnt->mnt_dir)) && (count < 2)) {
 			count++;
@@ -342,7 +366,6 @@ int umount_partition(char *dev_name, int host_num, int disc_num, int part_num, u
 				rmdir(mnt->mnt_dir);
 			}
 		}
-	}
 	return(!ret);
 }
 
@@ -358,37 +381,54 @@ int umount_partition(char *dev_name, int host_num, int disc_num, int part_num, u
  *  We delay invoking mount because mount will probe all the partitions
  *	to read the labels, and we don't want it to do that early on.
  *  We don't invoke swapon until we actually find a swap partition.
+ *
+ * If the mount succeeds, execute the *.autorun scripts in the top
+ * directory of the newly mounted partition.
+ * Returns NZ for success, 0 if we did not mount anything.
  */
 int mount_partition(char *dev_name, int host_num, int disc_num, int part_num, uint flags)
 {
 	char the_label[128], mountpoint[128];
-	int ret = MOUNT_VAL_FAIL;
+	int ret;
 	char *type;
-	char *argv[] = { NULL, "-a", NULL };
+	static char *swp_argv[] = { "swapon", "-a", NULL };
+	static char *mnt_argv[] = { "mount", "-a", NULL };
+	struct mntent *mnt;
 
 	if ((type = detect_fs_type(dev_name)) == NULL)
 		return(0);
 
 	if (f_exists("/etc/fstab")) {
 		if (strcmp(type, "swap") == 0) {
-			argv[0] = "swapon";
-			_eval(argv, NULL, 0, NULL);
+			_eval(swp_argv, NULL, 0, NULL);
 			return(0);
 		}
-		argv[0] = "mount";
-		_eval(argv, NULL, 0, NULL);
+
+		if (mount_r(dev_name, NULL, NULL) == MOUNT_VAL_EXIST)
+			return(0);
+
+		_eval(mnt_argv, NULL, 0, NULL);
+		if ((mnt = findmntents(dev_name, 0, 0, 0))) {
+			run_userfile(mnt->mnt_dir, ".autorun", mnt->mnt_dir, 3);
+			return(1);
+		}
 	}
 
 	if (find_label(dev_name, the_label)) {
 		sprintf(mountpoint, "%s/%s", MOUNT_ROOT, the_label);
-		if ((ret = mount_r(dev_name, mountpoint, type)))
-			return(ret != MOUNT_VAL_EXIST);
+		if ((ret = mount_r(dev_name, mountpoint, type))) {
+			if (ret == MOUNT_VAL_RONLY || ret == MOUNT_VAL_RW)
+				run_userfile(mountpoint, ".autorun", mountpoint, 3);
+			return(ret == MOUNT_VAL_RONLY || ret == MOUNT_VAL_RW);
+		}
 	}
 
 	/* Can't mount to /mnt/LABEL, so try mounting to /mnt/discDN_PN */
 	sprintf(mountpoint, "%s/disc%d_%d", MOUNT_ROOT, disc_num, part_num);
 	ret = mount_r(dev_name, mountpoint, type);
-	return(ret != MOUNT_VAL_FAIL && ret != MOUNT_VAL_EXIST);
+	if (ret == MOUNT_VAL_RONLY || ret == MOUNT_VAL_RW)
+		run_userfile(mountpoint, ".autorun", mountpoint, 3);
+	return(ret == MOUNT_VAL_RONLY || ret == MOUNT_VAL_RW);
 }
 
 
@@ -409,9 +449,10 @@ void hotplug_usb_storage_device(int host_no, int action_add, uint flags)
 			/* Do not probe the device here. It's either initiated by user,
 			 * or hotplug_usb() already did.
 			 */
-			exec_for_host(host_no, 0x00, flags, mount_partition);
-			restart_nas_services(1); // restart all NAS applications
-			run_nvscript("script_usbmount", NULL, 3);
+			if (exec_for_host(host_no, 0x00, flags, mount_partition)) {
+				restart_nas_services(1); // restart all NAS applications
+				run_nvscript("script_usbmount", NULL, 3);
+			}
 		}
 	}
 	else {
@@ -628,7 +669,7 @@ void hotplug_usb(void)
 			device, interface, product);
 		wait_for_stabilize(4, host);
 	}
-	int fd = usb_lock();
+	int fd = nvram_get_int("usb_nolock") ? -1 : file_lock("usb");
 
 	if (strncmp(interface, "TOMATO/", 7) == 0) {	/* web admin */
 		if (scsi_host == NULL)
@@ -654,6 +695,6 @@ void hotplug_usb(void)
 		run_nvscript("script_usbhotplug", NULL, 2);
 	}
 
-	usb_unlock(fd);
+	file_unlock(fd);
 }
 
