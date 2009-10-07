@@ -312,7 +312,7 @@ const struct mime_handler mime_handlers[] = {
 	{ "service.cgi",	NULL,						0,	wi_generic,			wo_service,		1 },
 //	{ "logout.cgi",		NULL,	   		 			0,	wi_generic,			wo_logout,		0 },	// see httpd.c
 	{ "shutdown.cgi",	mime_html,					0,	wi_generic,			wo_shutdown,	1 },
-
+	{ "usbcmd.cgi",			mime_javascript,			0,	wi_generic,		wo_usbcommand,		1 },	//!!TB - USB
 #ifdef BLACKHOLE
 	{ "blackhole.cgi",	NULL,						0,	wi_blackhole,		NULL,			1 },
 #endif
@@ -361,9 +361,11 @@ const aspapi_t aspapi[] = {
 	{ "wlnoise",			asp_wlnoise			},
 	{ "wlradio",			asp_wlradio			},
 	{ "wlscan",				asp_wlscan			},
+	{ "wlchannels",			asp_wlchannels	},	//!!TB
 #if TOMATO_SL
 	{ "sharelist",			asp_sharelist		},
 #endif
+	{ "usbdevices",			asp_usbdevices	},	//!!TB - USB Support
 	{ NULL,					NULL				}
 };
 
@@ -520,7 +522,7 @@ static const nvset_t nvset_list[] = {
 	{ "wl_net_mode",		V_LENGTH(5, 8)		},  // disabled, mixed, b-only, g-only, bg-mixed, n-only [speedbooster]
 	{ "wl_ssid",			V_LENGTH(1, 32)		},
 	{ "wl_closed",			V_01				},
-	{ "wl_channel",			V_RANGE(1, 14)		},
+	{ "wl_channel",			V_RANGE(0, 14)		},	//!!TB - 0=Auto
 #if TOMATO_N
 	// ! update
 #endif
@@ -607,6 +609,9 @@ static const nvset_t nvset_list[] = {
 	{ "dr_wan_rx",			V_LENGTH(0, 32)		},
 
 // advanced-wireless
+	{ "wl_country",			V_LENGTH(0, 64)		},	// !!TB - Country code
+	{ "wl_country_code",		V_LENGTH(0, 4)		},	// !!TB - Country code
+	{ "wl_btc_mode",		V_RANGE(0, 2)		},	// !!TB - BT Coexistence Mode: 0 (disable), 1 (enable), 2 (preemption)
 	{ "wl_afterburner",		V_LENGTH(2, 4)		},	// off, on, auto
 	{ "wl_auth",			V_01				},
 	{ "wl_rateset",			V_LENGTH(2, 7)		},	// all, default, 12
@@ -629,6 +634,7 @@ static const nvset_t nvset_list[] = {
 	{ "wl_distance",		V_LENGTH(0, 5)		},	// "", 1-99999
 	{ "wlx_hpamp",			V_01				},
 	{ "wlx_hperx",			V_01				},
+	{ "wl_reg_mode",		V_LENGTH(1, 3)			},	// !!TB - Regulatory: off, h, d
 
 #if TOMATO_N
 	{ "wl_nmode_protection",V_WORD,				},	// off, auto
@@ -689,6 +695,7 @@ static const nvset_t nvset_list[] = {
 	{ "sshd_pass",			V_01				},
 	{ "sshd_port",			V_PORT				},
 	{ "sshd_remote",		V_01				},
+	{ "sshd_forwarding",		V_01				},
 	{ "sshd_rport", 		V_PORT				},
 	{ "sshd_authkeys",		V_TEXT(0, 4096)		},
 	{ "rmgt_sip",			V_LENGTH(0, 512)	},
@@ -704,10 +711,10 @@ static const nvset_t nvset_list[] = {
 	{ "rstats_bak",			V_01				},
 
 // admin-buttons
-	{ "sesx_b0",			V_RANGE(0, 4)		},	// 0-4: toggle wireless, reboot, shutdown, script
-	{ "sesx_b1",			V_RANGE(0, 4)		},	// "
-	{ "sesx_b2",			V_RANGE(0, 4)		},	// "
-	{ "sesx_b3",			V_RANGE(0, 4)		},	// "
+	{ "sesx_b0",			V_RANGE(0, 5)		},	// 0-5: toggle wireless, reboot, shutdown, script, usb unmount
+	{ "sesx_b1",			V_RANGE(0, 5)		},	// "
+	{ "sesx_b2",			V_RANGE(0, 5)		},	// "
+	{ "sesx_b3",			V_RANGE(0, 5)		},	// "
 	{ "sesx_script",		V_TEXT(0, 1024)		},	//
 
 // admin-debug
@@ -757,6 +764,60 @@ static const nvset_t nvset_list[] = {
 	{ "jffs2_exec",			V_LENGTH(0, 64)		},
 	{ "jffs2_format",		V_01				},
 
+// nas-usb - !!TB
+	{ "usb_enable",			V_01				},
+	{ "usb_uhci",			V_01				},
+	{ "usb_ohci",			V_01				},
+	{ "usb_usb2",			V_01				},
+	{ "usb_storage",		V_01				},
+	{ "usb_printer",		V_01				},
+	{ "usb_printer_bidirect",	V_01				},
+	{ "usb_fs_ext3",		V_01				},
+	{ "usb_fs_fat",			V_01				},
+#ifdef TCONFIG_NTFS
+	{ "usb_fs_ntfs",		V_01				},
+#endif
+	{ "usb_automount",		V_01				},
+	{ "script_usbhotplug", 		V_TEXT(0, 2048)			},
+	{ "script_usbmount", 		V_TEXT(0, 2048)			},
+	{ "script_usbumount", 		V_TEXT(0, 2048)			},
+
+// nas-ftp - !!TB
+#ifdef TCONFIG_FTP
+	{ "ftp_enable",			V_RANGE(0, 2)			},
+	{ "ftp_super",			V_01				},
+	{ "ftp_anonymous",		V_RANGE(0, 3)			},
+	{ "ftp_dirlist",		V_RANGE(0, 2)			},
+	{ "ftp_port",			V_PORT				},
+	{ "ftp_max",			V_RANGE(0, 12)			},
+	{ "ftp_ipmax",			V_RANGE(0, 12)			},
+	{ "ftp_staytimeout",		V_RANGE(0, 65535)		},
+	{ "ftp_rate",			V_RANGE(0, 99999)		},
+	{ "ftp_anonrate",		V_RANGE(0, 99999)		},
+	{ "ftp_anonroot",		V_LENGTH(0, 256)		},
+	{ "ftp_pubroot",		V_LENGTH(0, 256)		},
+	{ "ftp_pvtroot",		V_LENGTH(0, 256)		},
+	{ "ftp_users",			V_LENGTH(0, 4096)		},
+	{ "ftp_custom",			V_TEXT(0, 2048)			},
+	{ "ftp_sip",			V_LENGTH(0, 512)		},
+	{ "ftp_limit",			V_TEXT(1, 50)			},
+	{ "log_ftp",			V_01				},
+#endif
+
+#ifdef TCONFIG_SAMBASRV
+// nas-samba - !!TB
+	{ "smbd_enable",		V_RANGE(0, 2)			},
+	{ "smbd_wgroup",		V_LENGTH(0, 20)			},
+	{ "smbd_cpage",			V_LENGTH(0, 4)			},
+	{ "smbd_cset",			V_LENGTH(0, 20)			},
+	{ "smbd_loglevel",		V_RANGE(0, 100)			},
+	{ "smbd_custom",		V_TEXT(0, 2048)			},
+	{ "smbd_autoshare",		V_RANGE(0, 3)			},
+	{ "smbd_shares",		V_LENGTH(0, 4096)		},
+	{ "smbd_user",			V_LENGTH(0, 50)			},
+	{ "smbd_passwd",		V_LENGTH(0, 50)			},
+#endif
+
 //	qos
 	{ "qos_enable",			V_01				},
 	{ "qos_ack",			V_01				},
@@ -765,6 +826,7 @@ static const nvset_t nvset_list[] = {
 	{ "qos_rst",			V_01				},
 	{ "qos_icmp",			V_01				},
 	{ "qos_reset",			V_01				},
+	{ "qos_pfifo",			V_01				}, // !!TB
 	{ "qos_obw",			V_RANGE(10, 999999)	},
 	{ "qos_ibw",			V_RANGE(10, 999999)	},
 	{ "qos_orules",			V_LENGTH(0, 4096)	},
