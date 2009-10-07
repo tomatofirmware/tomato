@@ -22,7 +22,8 @@ char *post_buf = NULL;
 int rboot = 0;
 extern int post;
 
-void asp_resmsg(int argc, char **argv);
+static void asp_css(int argc, char **argv);
+static void asp_resmsg(int argc, char **argv);
 
 //
 static void wo_tomato(char *url);
@@ -76,7 +77,7 @@ static void wi_generic_noid(char *url, int len, char *boundary)
 			exit(1);
 		}
 
-		if (!post_buf) free(post_buf);
+		if (post_buf) free(post_buf);
 		if ((post_buf = malloc(len + 1)) == NULL) {
 //			syslog(LOG_CRIT, "Unable to allocate post buffer");
 			exit(1);
@@ -353,6 +354,7 @@ const aspapi_t aspapi[] = {
 	{ "version",			asp_version			},
 	{ "wanstatus",			asp_wanstatus		},
 	{ "wanup",				asp_wanup			},
+	{ "css",				asp_css				},
 	{ "wlchannel",			asp_wlchannel		},
 	{ "wlclient",			asp_wlclient		},
 	{ "wlcrssi",			asp_wlcrssi			},
@@ -364,6 +366,17 @@ const aspapi_t aspapi[] = {
 #endif
 	{ NULL,					NULL				}
 };
+
+// -----------------------------------------------------------------------------
+
+static void asp_css(int argc, char **argv)
+{
+	const char *css = nvram_safe_get("web_css");
+	
+	if (strcmp(css, "tomato") != 0) {
+		web_printf("<link rel='stylesheet' type='text/css' href='%s.css'>", css);
+	}
+}
 
 // -----------------------------------------------------------------------------
 
@@ -391,7 +404,7 @@ int resmsg_fread(const char *fname)
 	return 0;
 }
 
-void asp_resmsg(int argc, char **argv)
+static void asp_resmsg(int argc, char **argv)
 {
 	char *p;
 
