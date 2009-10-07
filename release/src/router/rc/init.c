@@ -282,7 +282,7 @@ static void handle_initsigs(int sig)
 		signaled = START;
 		break;
 	case SIGINT:
-        signaled = STOP;
+	        signaled = STOP;
 		break;
 	case SIGTERM:
 		signaled = REBOOT;
@@ -779,6 +779,7 @@ static void sysinit(void)
 
 	static const char *mkd[] = {
 		"/tmp/etc", "/tmp/var", "/tmp/home", "/tmp/mnt",
+		"/tmp/share",	// !!TB
 		"/var/log", "/var/run", "/var/tmp", "/var/lib", "/var/lib/misc",
 		"/var/spool", "/var/spool/cron", "/var/spool/cron/crontabs", NULL
 	};
@@ -791,6 +792,7 @@ static void sysinit(void)
 	mkdir("/home/root", 0700);
 	chmod("/tmp", 0777);
 	f_write("/etc/hosts", NULL, 0, 0, 0644);			// blank
+	f_write("/etc/fstab", NULL, 0, 0, 0644);			// !!TB - blank
 	simple_unlock("cron");
 	simple_unlock("firewall");
 	simple_unlock("restrictions");
@@ -806,6 +808,18 @@ static void sysinit(void)
 		closedir(d);
 	}
 	symlink("/proc/mounts", "/etc/mtab");
+
+#ifdef TCONFIG_SAMBASRV
+	if ((d = opendir("/usr/codepages")) != NULL) {
+		while ((de = readdir(d)) != NULL) {
+			if (de->d_name[0] == '.') continue;
+			snprintf(s, sizeof(s), "/usr/codepages/%s", de->d_name);
+			snprintf(t, sizeof(t), "/usr/share/%s", de->d_name);
+			symlink(s, t);
+		}
+		closedir(d);
+	}
+#endif
 
 	set_action(ACT_IDLE);
 
@@ -910,6 +924,10 @@ int init_main(int argc, char *argv[])
 			stop_lan();
 			stop_vlan();
 
+			// !!TB - USB Support
+			remove_storage_main();
+			stop_usb();
+
 			if ((state == REBOOT) || (state == HALT)) {
 				shutdn(state == REBOOT);
 				exit(0);
@@ -924,8 +942,18 @@ int init_main(int argc, char *argv[])
 		case START:
 			SET_LED(RELEASE_WAN_CONTROL);
 
+			int fd = -1;
+			if (!nvram_get_int("usb_nolock")) {
+				fd = file_lock("usb");	// hold off automount processing
+				start_usb();
+			}
+
 			load_files_from_nvram();
 			run_nvscript("script_init", NULL, 2);
+
+			if (nvram_get_int("usb_nolock"))
+				start_usb();
+			file_unlock(fd);	// allow to process usb hotplug events
 
 			start_vlan();
 			start_lan();
@@ -936,6 +964,7 @@ int init_main(int argc, char *argv[])
 			syslog(LOG_INFO, "%s", nvram_safe_get("t_model_name"));
 
 			led(LED_DIAG, 0);
+			notice_set("sysup", "");
 
 			state = IDLE;
 
