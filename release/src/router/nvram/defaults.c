@@ -308,11 +308,13 @@ const defaults_t defaults[] = {
 // advanced-routing
 	{ "routes_static",		""				},
 	{ "wk_mode",			"gateway"		},	// Network mode [gateway|router]
+#ifdef TCONFIG_ZEBRA
 	{ "dr_setting",			"0"				},	// [ Disable | WAN | LAN | Both ]
 	{ "dr_lan_tx",			"0"				},	// Dynamic-Routing LAN out
 	{ "dr_lan_rx",			"0"				},	// Dynamic-Routing LAN in
 	{ "dr_wan_tx",			"0"				},	// Dynamic-Routing WAN out
 	{ "dr_wan_rx",			"0"				},	// Dynamic-Routing WAN in
+#endif
 
 // advanced-wireless
 	{ "wl_txant",			"3"				},
@@ -475,26 +477,28 @@ const defaults_t defaults[] = {
 	{ "jffs2_on",			"0"				},
 	{ "jffs2_exec",			""				},
 
+#ifdef TCONFIG_USB
 // nas-usb - !!TB
 	{ "usb_enable",			"0"				},
 	{ "usb_uhci",			"0"				},
 	{ "usb_ohci",			"0"				},
-	{ "usb_usb2",			"0"				},
-	{ "usb_storage",		"0"				},
-	{ "usb_printer",		"0"				},
+	{ "usb_usb2",			"1"				},
+	{ "usb_storage",		"1"				},
+	{ "usb_printer",		"1"				},
 	{ "usb_printer_bidirect",	"1"				},
-	{ "usb_fs_ext3",		"0"				},
-	{ "usb_fs_fat",			"0"				},
+	{ "usb_fs_ext3",		"1"				},
+	{ "usb_fs_fat",			"1"				},
 #ifdef TCONFIG_NTFS
-	{ "usb_fs_ntfs",		"0"				},
+	{ "usb_fs_ntfs",		"1"				},
 #endif
-	{ "usb_automount",		"0"				},
+	{ "usb_automount",		"1"				},
 #if 0
 	{ "usb_bdflush",		"30 500 0 0 100 100 60 0 0"	},
 #endif
-	{ "script_usbhotplug", 		""				},
-	{ "script_usbmount", 		""				},
-	{ "script_usbumount", 		""				},
+	{ "script_usbhotplug",		""				},
+	{ "script_usbmount",		""				},
+	{ "script_usbumount",		""				},
+#endif
 
 #ifdef TCONFIG_FTP
 // nas-ftp - !!TB

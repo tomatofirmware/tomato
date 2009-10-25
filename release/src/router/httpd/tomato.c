@@ -312,7 +312,9 @@ const struct mime_handler mime_handlers[] = {
 	{ "service.cgi",	NULL,						0,	wi_generic,			wo_service,		1 },
 //	{ "logout.cgi",		NULL,	   		 			0,	wi_generic,			wo_logout,		0 },	// see httpd.c
 	{ "shutdown.cgi",	mime_html,					0,	wi_generic,			wo_shutdown,	1 },
+#ifdef TCONFIG_USB
 	{ "usbcmd.cgi",			mime_javascript,			0,	wi_generic,		wo_usbcommand,		1 },	//!!TB - USB
+#endif
 #ifdef BLACKHOLE
 	{ "blackhole.cgi",	NULL,						0,	wi_blackhole,		NULL,			1 },
 #endif
@@ -365,7 +367,9 @@ const aspapi_t aspapi[] = {
 #if TOMATO_SL
 	{ "sharelist",			asp_sharelist		},
 #endif
+#ifdef TCONFIG_USB
 	{ "usbdevices",			asp_usbdevices	},	//!!TB - USB Support
+#endif
 	{ NULL,					NULL				}
 };
 
@@ -603,11 +607,13 @@ static const nvset_t nvset_list[] = {
 	{ "routes_static",		V_LENGTH(0, 2048)	},
 	{ "lan_stp",			V_RANGE(0, 1)		},
 	{ "wk_mode",			V_LENGTH(1, 32)		},	// gateway, router
+#ifdef TCONFIG_ZEBRA
 	{ "dr_setting",			V_RANGE(0, 3)		},
 	{ "dr_lan_tx",			V_LENGTH(0, 32)		},
 	{ "dr_lan_rx",			V_LENGTH(0, 32)		},
 	{ "dr_wan_tx",			V_LENGTH(0, 32)		},
 	{ "dr_wan_rx",			V_LENGTH(0, 32)		},
+#endif
 
 // advanced-wireless
 	{ "wl_country",			V_LENGTH(0, 64)		},	// !!TB - Country code
@@ -766,6 +772,7 @@ static const nvset_t nvset_list[] = {
 	{ "jffs2_format",		V_01				},
 
 // nas-usb - !!TB
+#ifdef TCONFIG_USB
 	{ "usb_enable",			V_01				},
 	{ "usb_uhci",			V_01				},
 	{ "usb_ohci",			V_01				},
@@ -782,6 +789,7 @@ static const nvset_t nvset_list[] = {
 	{ "script_usbhotplug", 		V_TEXT(0, 2048)			},
 	{ "script_usbmount", 		V_TEXT(0, 2048)			},
 	{ "script_usbumount", 		V_TEXT(0, 2048)			},
+#endif
 
 // nas-ftp - !!TB
 #ifdef TCONFIG_FTP

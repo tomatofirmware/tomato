@@ -60,23 +60,11 @@ void start_usb(void)
 //		led(LED_AOSS, LED_ON);
 		modprobe("usbcore");
 
-		/* if enabled, force USB2 before USB1.1 */
-		if (nvram_get_int("usb_usb2")) {
-			modprobe("ehci-hcd");
-		}
-
-		if (nvram_get_int("usb_uhci")) {
-			modprobe("usb-uhci");
-		}
-
-		if (nvram_get_int("usb_ohci")) {
-			modprobe("usb-ohci");
-		}
-
 		/* mount usb device filesystem */
         	mount("usbdevfs", "/proc/bus/usb", "usbdevfs", MS_MGC_VAL, NULL);
 
 		if (nvram_get_int("usb_storage")) {
+			/* insert scsi and storage modules before usb drivers */
 			modprobe("scsi_mod");
 			modprobe("sd_mod");
 			modprobe("usb-storage");
@@ -91,23 +79,31 @@ void start_usb(void)
 				modprobe("fat");
 				modprobe("vfat");
 			}
+		}
 
-#ifdef TCONFIG_NTFS
-			if (nvram_get_int("usb_fs_ntfs")) {
-				modprobe("ntfs");
-			}
-#endif
+		/* if enabled, force USB2 before USB1.1 */
+		if (nvram_get_int("usb_usb2")) {
+			modprobe("ehci-hcd");
+		}
+
+		if (nvram_get_int("usb_uhci")) {
+			modprobe("usb-uhci");
+		}
+
+		if (nvram_get_int("usb_ohci")) {
+			modprobe("usb-ohci");
 		}
 
 		if (nvram_get_int("usb_printer")) {
 			modprobe("printer");
-			// start printer server
+			symlink("/dev/usb", "/dev/printers");
+
+			/* start printer server */
 			xstart("p910nd",
 				nvram_get_int("usb_printer_bidirect") ? "-b" : "", //bidirectional
 				"-f", "/dev/usb/lp0", // device
 				"0" // listen port
 			);
-			symlink("/dev/usb/lp0", "/dev/printers/0");
 		}
 	}
 	else {
@@ -144,9 +140,6 @@ void stop_usb(void)
 		modprobe_r("vfat");
 		modprobe_r("fat");
 		modprobe_r("fuse");
-#ifdef TCONFIG_NTFS
-		modprobe_r("ntfs");
-#endif
 #ifdef TCONFIG_SAMBASRV
 		modprobe_r("nls_cp437");
 		modprobe_r("nls_cp850");

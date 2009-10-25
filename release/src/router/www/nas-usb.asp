@@ -50,10 +50,7 @@ textarea {
 
 <script type='text/javascript'>
 
-//	<% nvram("usb_enable,usb_uhci,usb_ohci,usb_usb2,usb_storage,usb_printer,usb_printer_bidirect,usb_automount,usb_fs_ext3,usb_fs_fat,script_usbmount,script_usbumount,script_usbhotplug"); %>
-/* NTFS-BEGIN */
-//	<% nvram("usb_fs_ntfs"); %>
-/* NTFS-END */
+//	<% nvram("usb_enable,usb_uhci,usb_ohci,usb_usb2,usb_storage,usb_printer,usb_printer_bidirect,usb_automount,usb_fs_ext3,usb_fs_fat,usb_fs_ntfs,script_usbmount,script_usbumount,script_usbhotplug"); %>
 //	<% usbdevices(); %>
 
 list = [];
@@ -360,19 +357,23 @@ function submit_complete()
 
 createFieldTable('', [
 	{ title: 'Core USB Support', name: 'f_usb', type: 'checkbox', value: nvram.usb_enable == 1 },
-	{ title: 'USB 1.1 Support (OHCI)', name: 'f_ohci', type: 'checkbox', value: nvram.usb_ohci == 1 },
-	{ title: 'USB 1.1 Support (UHCI)', name: 'f_uhci', type: 'checkbox', value: nvram.usb_uhci == 1 },
-	{ title: 'USB 2.0 Support', name: 'f_usb2', type: 'checkbox', value: nvram.usb_usb2 == 1 },
+	{ title: 'USB 2.0 Support', indent: 2, name: 'f_usb2', type: 'checkbox', value: nvram.usb_usb2 == 1 },
+	{ title: 'USB 1.1 Support', indent: 2, multi: [
+		{ suffix: '&nbsp; OHCI &nbsp;&nbsp;&nbsp;', name: 'f_ohci', type: 'checkbox', value: nvram.usb_ohci == 1 },
+		{ suffix: '&nbsp; UHCI &nbsp;',	name: 'f_uhci', type: 'checkbox', value: nvram.usb_uhci == 1 }
+	] },
 	null,
 	{ title: 'USB Printer Support', name: 'f_print', type: 'checkbox', value: nvram.usb_printer == 1 },
 		{ title: 'Bidirectional copying', indent: 2, name: 'f_bprint', type: 'checkbox', value: nvram.usb_printer_bidirect == 1 },
 	null,
 	{ title: 'USB Storage Support', name: 'f_storage', type: 'checkbox', value: nvram.usb_storage == 1 },
-		{ title: 'Ext2 / Ext3 File System Support', indent: 2, name: 'f_ext3', type: 'checkbox', value: nvram.usb_fs_ext3 == 1 },
-		{ title: 'FAT File System Support', indent: 2, name: 'f_fat', type: 'checkbox', value: nvram.usb_fs_fat == 1 },
+		{ title: 'File Systems Support', indent: 2, multi: [
+			{ suffix: '&nbsp; Ext2 / Ext3 &nbsp;&nbsp;&nbsp;', name: 'f_ext3', type: 'checkbox', value: nvram.usb_fs_ext3 == 1 },
 /* NTFS-BEGIN */
-		{ title: 'NTFS File System Support', indent: 2, name: 'f_ntfs', type: 'checkbox', suffix: ' <small>(limited write support)</small>', value: nvram.usb_fs_ntfs == 1 },
+			{ suffix: '&nbsp; NTFS &nbsp;&nbsp;&nbsp;', name: 'f_ntfs', type: 'checkbox', value: nvram.usb_fs_ntfs == 1 },
 /* NTFS-END */
+			{ suffix: '&nbsp; FAT &nbsp;', name: 'f_fat', type: 'checkbox', value: nvram.usb_fs_fat == 1 }
+		] },
 		{ title: 'Automount', indent: 2, name: 'f_automount', type: 'checkbox',
 			suffix: ' <small>Automatically mount all partitions to sub-directories in <i>/mnt</i>.</small>', value: nvram.usb_automount == 1 },
 	{ title: 'Run after mounting', indent: 2, name: 'script_usbmount', type: 'textarea', value: nvram.script_usbmount },

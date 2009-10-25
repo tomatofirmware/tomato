@@ -50,6 +50,12 @@ ifneq ($(TCONFIG_CIFS),y)
 	rm -f $(INSTALLDIR)/www/admin-cifs.asp
 	sed -i $(INSTALLDIR)/www/tomato.js -e "/CIFS-BEGIN/,/CIFS-END/d"
 endif
+# Only include the Zebra options if Zebra is configured in.
+ifneq ($(TCONFIG_ZEBRA),y)
+	sed -i $(INSTALLDIR)/www/advanced-routing.asp -e "/ZEBRA-BEGIN/,/ZEBRA-END/d"
+endif
+	sed -i "/ZEBRA-BEGIN/d" $(INSTALLDIR)/www/advanced-routing.asp
+	sed -i "/ZEBRA-END/d" $(INSTALLDIR)/www/advanced-routing.asp
 
 # Only include extra themes if USB Extras are configured in.
 ifneq ($(TCONFIG_USB_EXTRAS),y)
@@ -59,10 +65,23 @@ ifneq ($(TCONFIG_USB_EXTRAS),y)
 	rm -f $(INSTALLDIR)/www/tomatousb_bg.png
 	sed -i $(INSTALLDIR)/www/admin-access.asp -e "/THEMES-BEGIN/,/THEMES-END/d"
 endif
+	sed -i "/THEMES-BEGIN/d" $(INSTALLDIR)/www/admin-access.asp
+	sed -i "/THEMES-END/d" $(INSTALLDIR)/www/admin-access.asp
 # Only include NTFS settings if NTFS support is configured in.
 ifneq ($(TCONFIG_NTFS),y)
 	sed -i $(INSTALLDIR)/www/nas-usb.asp -e "/NTFS-BEGIN/,/NTFS-END/d"
 endif
+	sed -i "/NTFS-BEGIN/d" $(INSTALLDIR)/www/nas-usb.asp
+	sed -i "/NTFS-END/d" $(INSTALLDIR)/www/nas-usb.asp
+
+# Only include the USB and NAS pages if USB Support is configured in.
+ifneq ($(TCONFIG_USB),y)
+	rm -f $(INSTALLDIR)/www/nas-*.asp
+	sed -i $(INSTALLDIR)/www/tomato.js -e "/USB-BEGIN/,/USB-END/d"
+	sed -i $(INSTALLDIR)/www/admin-buttons.asp -e "/USB-BEGIN/,/USB-END/d"
+endif
+	sed -i "/USB-BEGIN/d" $(INSTALLDIR)/www/admin-buttons.asp
+	sed -i "/USB-END/d" $(INSTALLDIR)/www/admin-buttons.asp
 
 # make sure old and debugging crap is gone
 	@rm -f $(INSTALLDIR)/www/debug.js
