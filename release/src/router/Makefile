@@ -212,6 +212,7 @@ endif
 
 	@../btools/libfoo.pl
 	@chmod 0555 $(TARGETDIR)/lib/*.so*
+	@chmod 0555 $(TARGETDIR)/usr/lib/*.so*
 
 # separated extra stuff
 # !!TB - moved to run after libfoo.pl - to make sure shared libs include all symbols needed by extras
@@ -374,8 +375,9 @@ openssl-install:
 	install -D openssl/libcrypto.so $(INSTALLDIR)/openssl/usr/lib/libcrypto.so
 	$(STRIP) $(INSTALLDIR)/openssl/usr/lib/libcrypto.so
 
-	install -D -m 500 openssl/apps/openssl $(INSTALLDIR)/openssl/usr/sbin/openssl
+	install -D openssl/apps/openssl $(INSTALLDIR)/openssl/usr/sbin/openssl
 	$(STRIP) $(INSTALLDIR)/openssl/usr/sbin/openssl
+	chmod 0500 $(INSTALLDIR)/openssl/usr/sbin/openssl
 
 	install -D -m 0500 httpd/gencert.sh $(INSTALLDIR)/openssl/usr/sbin/gencert.sh
 
@@ -405,7 +407,7 @@ bridge-install:
 
 dnsmasq:
 	@$(SEP)
-	@$(MAKE) -C dnsmasq COPTS=-DNO_IPV6
+	@$(MAKE) -C dnsmasq COPTS="-DNO_IPV6 -DNO_SCRIPT"
 
 dnsmasq-install:
 	install -D dnsmasq/src/dnsmasq $(INSTALLDIR)/dnsmasq/usr/sbin/dnsmasq
@@ -512,11 +514,11 @@ pppd-install:
 
 zebra:
 	@$(SEP)
-	cd zebra && rm -f config.cache && CC=$(CC) AR=$(AR) RANLIB=$(RANLIB) CFLAGS="-g -Os -Wall" $(CONFIGURE) \
-		--host=mipsel-linux --prefix=/usr/local/zebra \
+	cd zebra && rm -f config.cache && CC=$(CC) AR=$(AR) RANLIB=$(RANLIB) LD=$(LD) CFLAGS="-Os -Wall" $(CONFIGURE) \
+		--host=mipsel-linux --sysconfdir=/etc \
 		--enable-netlink --disable-ipv6 --disable-ripngd --disable-ospfd --disable-doc \
 		--disable-ospf6d --disable-bgpd --disable-bgpd-announce
-	@$(MAKE) -C zebra CC=$(CC) AR=$(AR) RANLIB=$(RANLIB)
+	@$(MAKE) -C zebra CC=$(CC) AR=$(AR) RANLIB=$(RANLIB) LD=$(LD)
 
 zebra-install:
 	install -D zebra/zebra/zebra $(INSTALLDIR)/zebra/usr/sbin/zebra
