@@ -81,7 +81,7 @@ all:
 	@echo "" >>fpkg.log
 	@cat router/target.info >>fpkg.log
 ifeq ($(wildcard include/bcm20xx.h),)
-	@btools/fpkg -i linux/linux/arch/mips/brcm-boards/bcm947xx/compressed/vmlinuz -i router/mipsel-uclibc/target.image \
+	@btools/fpkg -i router/lzma-loader/loader.gz -i linux/linux/arch/mips/brcm-boards/bcm947xx/compressed/vmlinuz -i router/mipsel-uclibc/target.image \
 		-t image/tomato.trx \
 		-l W54G,image/WRT54G_WRT54GL.bin \
 		-l W54S,image/WRT54GS.bin \
@@ -90,7 +90,7 @@ ifeq ($(wildcard include/bcm20xx.h),)
 		-m 0x10577050,image/WR850G.bin \
 		| tee -a fpkg.log
 else
-	@btools/fpkg -i linux/linux/arch/mips/brcm-boards/bcm947xx/compressed/vmlinuz -i router/mipsel-uclibc/target.image \
+	@btools/fpkg -i router/lzma-loader/loader.gz -i linux/linux/arch/mips/brcm-boards/bcm947xx/compressed/vmlinuz -i router/mipsel-uclibc/target.image \
 		-t image/tomato-ND$(current_BUILD_USB)-$(V1)$(V2)-$(current_BUILD_DESC).trx 	| tee -a fpkg.log
 endif
 
@@ -198,6 +198,8 @@ d:
 	@cp router/busybox/config_base router/busybox/config_$@
 	@sed -i "/CONFIG_FEATURE_MOUNT_LOOP/d" router/busybox/config_$@
 	@echo "# CONFIG_FEATURE_MOUNT_LOOP is not set" >>router/busybox/config_$@
+	@sed -i "/CONFIG_AWK/d" router/busybox/config_$@
+	@echo "# CONFIG_AWK is not set" >>router/busybox/config_$@
 	@sed -i "/CONFIG_FEATURE_DEVFS/d" router/busybox/config_$@
 	@echo "# CONFIG_FEATURE_DEVFS is not set" >>router/busybox/config_$@
 	@sed -i "/CONFIG_ARPING/d" router/busybox/config_$@
@@ -226,10 +228,6 @@ m:
 	@cp router/busybox/config_base router/busybox/config_$@
 	@sed -i "/CONFIG_UNZIP/d" router/busybox/config_$@
 	@echo "CONFIG_UNZIP=y" >>router/busybox/config_$@
-	@sed -i "/CONFIG_AWK/d" router/busybox/config_$@
-	@echo "CONFIG_AWK=y" >>router/busybox/config_$@
-	@sed -i "/CONFIG_FEATURE_AWK_LIBM/d" router/busybox/config_$@
-	@echo "CONFIG_FEATURE_AWK_LIBM=y" >>router/busybox/config_$@
 	@sed -i "/CONFIG_FEATURE_LS_COLOR/d" router/busybox/config_$@
 	@echo "CONFIG_FEATURE_LS_COLOR=y" >>router/busybox/config_$@
 	@sed -i "/CONFIG_FEATURE_LS_COLOR_IS_DEFAULT/d" router/busybox/config_$@
@@ -267,10 +265,6 @@ s:
 	@echo "# CONFIG_FEATURE_DEVFS is not set" >>router/busybox/config_$@
 	@sed -i "/CONFIG_UNZIP/d" router/busybox/config_$@
 	@echo "CONFIG_UNZIP=y" >>router/busybox/config_$@
-	@sed -i "/CONFIG_AWK/d" router/busybox/config_$@
-	@echo "CONFIG_AWK=y" >>router/busybox/config_$@
-	@sed -i "/CONFIG_FEATURE_AWK_LIBM/d" router/busybox/config_$@
-	@echo "CONFIG_FEATURE_AWK_LIBM=y" >>router/busybox/config_$@
 	@sed -i "/CONFIG_FEATURE_LS_COLOR/d" router/busybox/config_$@
 	@echo "CONFIG_FEATURE_LS_COLOR=y" >>router/busybox/config_$@
 	@sed -i "/CONFIG_FEATURE_LS_COLOR_IS_DEFAULT/d" router/busybox/config_$@
