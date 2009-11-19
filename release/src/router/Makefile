@@ -201,11 +201,6 @@ endif
 	@cd $(TARGETDIR) && $(TOP)/others/rootprep.sh
 
 	@echo ---
-	busybox/examples/depmod-t.pl -k $(LINUXDIR)/vmlinux -b $(TARGETDIR)/lib/modules/*/
-	@mv $(TARGETDIR)/lib/modules/*/modules.dep $(TARGETDIR)/lib/modules/
-	@echo ---
-
-	@rm -f $(TARGETDIR)/lib/modules/*/build
 
 	@../btools/libfoo.pl
 	@chmod 0555 $(TARGETDIR)/lib/*.so*
@@ -282,6 +277,12 @@ ifeq ($(TCONFIG_L7PAT),y)
 	@cd layer7 && ./squish.sh
 	cp layer7/squished/*.pat $(TARGETDIR)/rom/etc/l7-protocols
 endif
+
+	busybox/examples/depmod-t.pl -k $(LINUXDIR)/vmlinux -b $(TARGETDIR)/lib/modules/*/
+	@mv $(TARGETDIR)/lib/modules/*/modules.dep $(TARGETDIR)/lib/modules/
+	@echo ---
+
+	@rm -f $(TARGETDIR)/lib/modules/*/build
 
 	@$(MAKE) -C $(LINUXDIR)/scripts/squashfs mksquashfs-lzma
 	@$(LINUXDIR)/scripts/squashfs/mksquashfs-lzma $(TARGETDIR) $(PLATFORMDIR)/target.image | tee target.info
@@ -438,7 +439,7 @@ bridge-install:
 
 dnsmasq:
 	@$(SEP)
-	@$(MAKE) -C dnsmasq COPTS="-DNO_IPV6 -DNO_SCRIPT $(EXTRA_CFLAGS)"
+	@$(MAKE) -C dnsmasq COPTS="-DNO_IPV6 -DNO_SCRIPT $(EXTRACFLAGS)"
 
 dnsmasq-install:
 	install -D dnsmasq/src/dnsmasq $(INSTALLDIR)/dnsmasq/usr/sbin/dnsmasq
@@ -446,7 +447,7 @@ dnsmasq-install:
 
 iptables:
 	@$(SEP)
-	$(MAKE) -C iptables BINDIR=/usr/sbin LIBDIR=/usr/lib KERNEL_DIR=$(LINUXDIR) COPT_FLAGS="-Os $(EXTRA_CFLAGS)"
+	$(MAKE) -C iptables BINDIR=/usr/sbin LIBDIR=/usr/lib KERNEL_DIR=$(LINUXDIR) COPT_FLAGS="-Os $(EXTRACFLAGS)"
 
 iptables-install:
 	install -D iptables/iptables $(INSTALLDIR)/iptables/usr/sbin/iptables
@@ -597,7 +598,7 @@ pppd-install:
 
 zebra:
 	@$(SEP)
-	cd zebra && rm -f config.cache && CC=$(CC) AR=$(AR) RANLIB=$(RANLIB) LD=$(LD) CFLAGS="-Os -Wall $(EXTRA_CFLAGS)" $(CONFIGURE) \
+	cd zebra && rm -f config.cache && CC=$(CC) AR=$(AR) RANLIB=$(RANLIB) LD=$(LD) CFLAGS="-Os -Wall $(EXTRACFLAGS)" $(CONFIGURE) \
 		--host=mipsel-linux --sysconfdir=/etc \
 		--enable-netlink --disable-ipv6 --disable-ripngd --disable-ospfd --disable-doc \
 		--disable-ospf6d --disable-bgpd --disable-bgpd-announce
@@ -673,11 +674,11 @@ dropbear-clean:
 	@make -C dropbear clean
 
 dropbear/config.h:
-	cd dropbear && CFLAGS="-O2 -Wall $(EXTRA_CFLAGS)" ac_cv_func_logout=no ac_cv_func_logwtmp=no ./configure --host=mipsel-linux --disable-zlib --enable-syslog --disable-lastlog --disable-utmp --disable-utmpx --disable-wtmp --disable-wtmpx --disable-pututline --disable-pututxline --disable-loginfunc --disable-largefile
+	cd dropbear && CFLAGS="-O2 -Wall $(EXTRACFLAGS)" ac_cv_func_logout=no ac_cv_func_logwtmp=no ./configure --host=mipsel-linux --disable-zlib --enable-syslog --disable-lastlog --disable-utmp --disable-utmpx --disable-wtmp --disable-wtmpx --disable-pututline --disable-pututxline --disable-loginfunc --disable-largefile
 	make -C dropbear clean
 
 igmpproxy/src/Makefile: igmpproxy/src/Makefile.in
-	cd igmpproxy && CFLAGS="-O2 -Wall $(EXTRA_CFLAGS)" \
+	cd igmpproxy && CFLAGS="-O2 -Wall $(EXTRACFLAGS)" \
 	$(CONFIGURE) --prefix=/usr
 
 igmpproxy: igmpproxy/src/Makefile
