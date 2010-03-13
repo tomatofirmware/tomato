@@ -1,1 +1,0 @@
-#define CONFIG_NET_IPGRE_MODULE 1

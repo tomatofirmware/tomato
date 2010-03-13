@@ -2,7 +2,7 @@
 
 	micro_httpd/mini_httpd
 
-	Copyright © 1999,2000 by Jef Poskanzer <jef@acme.com>.
+	Copyright ï¿½ 1999,2000 by Jef Poskanzer <jef@acme.com>.
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -404,6 +404,7 @@ static void handle_request(void)
 
 	if ((cp = strchr(file, '?')) != NULL) {
 		*cp = 0;
+		setenv("QUERY_STRING", cp + 1, 1);
 		webcgi_init(cp + 1);
 	}
 

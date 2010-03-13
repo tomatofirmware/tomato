@@ -127,8 +127,9 @@ const defaults_t defaults[] = {
 	{ "wl_corerev",			""				},	// Current core revision
 	{ "wl_phytypes",		""				},	// List of supported wireless bands (e.g. "ga")
 	{ "wl_radioids",		""				},	// List of radio IDs
-	{ "wl_ssid",			"TomatoRAF"		},	// Service set ID (network name)
-	{ "wl_country",			"Worldwide"		},	// Country (default obtained from driver)
+	{ "wl_ssid",			"Tomato.RAF"			},	// Service set ID (network name)
+	{ "wl_country",			"JP"		},		// Country (default obtained from driver)
+	{ "wl_country_code",		"JP"		},		// !!TB - Country (default to JP to avoid unstable radio behaviour)
 	{ "wl_radio",			"1"				},	// Enable (1) or disable (0) radio
 	{ "wl_closed",			"0"				},	// Closed (hidden) network
     { "wl_ap_isolate",		"0"				},	// AP isolate mode
@@ -264,9 +265,9 @@ const defaults_t defaults[] = {
 	{ "macnames",			""				},
 
 // advanced-ctnf
-	{ "ct_tcp_timeout",		"180 1200 120 60 120 120 10 60 30 120" },
-	{ "ct_udp_timeout",		"30 180"		},
-	{ "ct_max",				"8192"			},
+	{ "ct_tcp_timeout",		"180 1200 120 60 120 120 10 60 30 120"	},
+	{ "ct_udp_timeout",		"30 180"				},
+	{ "ct_max",			"8192"				},
 	{ "nf_ttl",				"0"				},
 	{ "nf_l7in",			"1"				},
 	{ "nf_rtsp",			"1"				},
@@ -324,23 +325,18 @@ const defaults_t defaults[] = {
 	{ "dmz_sip",			""				},
 
 // forward-upnp
-	{ "upnp_enable",		"0"				},
+	{ "upnp_enable",		"1"				},
 	{ "upnp_secure",		"1"				},
-	{ "upnp_port",			"0"				},
-	{ "upnp_ssdp_interval",		"60"				},	// SSDP interval
-	{ "upnp_mnp",			"0"				},
-
-	{ "upnp_clean",			"1"				},	/* 0:Disable 1:Enable */
-	{ "upnp_clean_interval",	"600"				},	/* Cleaning interval in seconds */
-	{ "upnp_clean_threshold",	"20"				},	/* Threshold for cleaning unused rules */
+	{ "upnp_port",			"5000"			},
 #if 0	// disabled for miniupnpd
+	{ "upnp_ssdp_interval",	"60"			},	// SSDP interval
 	{ "upnp_max_age",		"180"			},	// Max age
+	{ "upnp_mnp",			"0"				},
 	{ "upnp_config",		"0"				},
 #endif
 
 // qos
 	{ "qos_enable",			"0"				},
-	{ "qos_pfifo",			"0"				},
 	{ "qos_ack",			"1"				},
 	{ "qos_syn",			"0"				},
 	{ "qos_fin",			"0"				},
@@ -357,8 +353,8 @@ const defaults_t defaults[] = {
 	{ "qos_orates",			"80-100,10-100,5-100,3-100,2-95,1-50,1-40,1-30,1-20,1-10"	},
 
 	{ "ne_vegas",			"0"				},	// TCP Vegas
-	{ "ne_valpha",			"3"				},	// "
-	{ "ne_vbeta",			"3"				},	// "
+	{ "ne_valpha",			"2"				},	// "
+	{ "ne_vbeta",			"6"				},	// "
 	{ "ne_vgamma",			"2"				},	// "
 
 // access restrictions
@@ -392,8 +388,7 @@ const defaults_t defaults[] = {
 	{ "https_crt",			""				},
 	{ "web_wl_filter",		"0"				},	// Allow/Deny Wireless Access Web
 //	{ "web_favicon",		"0"				},
-	{ "web_css",			"tomato"		},
-	{ "web_favicon",		"0"				},
+	{ "web_css",			"absolon"		},
 	{ "web_svg",			"1"				},
 	{ "telnetd_eas",		"1"				},
 	{ "telnetd_port",		"23"			},
@@ -420,6 +415,7 @@ const defaults_t defaults[] = {
 	{ "rstats_bak",			"0"				},
 
 // advanced-buttons
+	{ "sesx_led",			"0"				},
 	{ "sesx_b0",			"1"				},
 	{ "sesx_b1",			"2"				},
 	{ "sesx_b2",			"3"				},
@@ -476,10 +472,10 @@ const defaults_t defaults[] = {
 // admin-sch
 	{ "sch_rboot",			""				},
 	{ "sch_rcon",			""				},
-	{ "sch_c1",				"1,-1440,127"	},
+	{ "sch_c1",				""				},
 	{ "sch_c2",				""				},
 	{ "sch_c3",				""				},
-	{ "sch_c1_cmd",			"service upnp restart" },
+	{ "sch_c1_cmd",			""				},
 	{ "sch_c2_cmd",			""				},
 	{ "sch_c3_cmd",			""				},
 
@@ -572,7 +568,7 @@ const defaults_t defaults[] = {
 	{ "aol_block_traffic2",	"0"				},	// 0:Disable 1:Enable for "Parental control"
 	{ "skip_amd_check",		"0"				},	// 0:Disable 1:Enable
 	{ "skip_intel_check",	"0"				},	// 0:Disable 1:Enable
-
+	
 // advanced-watchdog
 	{ "wd_en",				""				},
 	{ "wd_atp0",			""				},
@@ -585,6 +581,8 @@ const defaults_t defaults[] = {
 	{ "wd_cki",				"300"			},
 	{ "wd_fdm",				""				},
 	{ "wd_aof",				""				},
+
+};
 
 #endif	// 0
 
@@ -617,3 +615,5 @@ const defaults_t if_vlan[] = {
 	{ "wan_ifnames",	"vlan1"					},
 	{ NULL, NULL }
 };
+
+

@@ -28,8 +28,7 @@ textarea {
 <script type='text/javascript' src='debug.js'></script>
 
 <script type='text/javascript'>
-
-//	<% nvram("sesx_led,sesx_b0,sesx_b1,sesx_b2,sesx_b3,sesx_b4,sesx_script,sesx_script_1,sesx_script_2,script_brau,t_model,t_features"); %>
+//	<% nvram("sesx_b0,sesx_b1,sesx_b2,sesx_b3,sesx_b4,sesx_script,sesx_script_1,sesx_script_2,script_brau,t_model,t_features"); %>
 
 var ses = features('ses');
 var brau = features('brau');

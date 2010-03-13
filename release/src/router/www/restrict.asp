@@ -37,7 +37,7 @@
 
 <script type='text/javascript'>
 //	<% nvram(''); %>	// http_id
-//	<% nvramseq("rrules", "rrule%d", 0, 99); %>
+//	<% nvramseq("rrules", "rrule%d", 0, 49); %>
 
 var dowNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 

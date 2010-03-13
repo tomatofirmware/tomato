@@ -1,1 +1,0 @@
-#define CONFIG_NET_SCH_ESFQ_MODULE 1

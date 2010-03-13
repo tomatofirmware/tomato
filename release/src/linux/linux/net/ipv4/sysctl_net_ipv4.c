@@ -27,7 +27,6 @@ extern int sysctl_icmp_ignore_bogus_error_responses;
 extern int sysctl_ipfrag_low_thresh;
 extern int sysctl_ipfrag_high_thresh; 
 extern int sysctl_ipfrag_time;
-extern int sysctl_ipfrag_secret_interval;
 
 /* From ip_output.c */
 extern int sysctl_ip_dynaddr;
@@ -220,9 +219,6 @@ ctl_table ipv4_table[] = {
 	 &sysctl_icmp_ratelimit, sizeof(int), 0644, NULL, &proc_dointvec},
 	{NET_IPV4_ICMP_RATEMASK, "icmp_ratemask",
 	 &sysctl_icmp_ratemask, sizeof(int), 0644, NULL, &proc_dointvec},
-	{NET_IPV4_IPFRAG_SECRET_INTERVAL, "ipfrag_secret_interval",
-	&sysctl_ipfrag_secret_interval, sizeof(int), 0644, NULL, &proc_dointvec_jiffies,
-	&sysctl_jiffies},
 	{NET_TCP_TW_REUSE, "tcp_tw_reuse",
 	 &sysctl_tcp_tw_reuse, sizeof(int), 0644, NULL, &proc_dointvec},
 	{NET_TCP_VEGAS, "tcp_vegas_cong_avoid",

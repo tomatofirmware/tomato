@@ -53,7 +53,7 @@ for (var i = 1; i <= 100; ++i) {
 var qosg = new TomatoGrid();
 
 qosg.setup = function() {
-	this.init('qosg-grid', '', 40, [
+	this.init('qosg-grid', '', 140, [
 		{ type: 'text', maxlen: 2 },
 		{ type: 'text', maxlen: 15 },
 		{ type: 'text', maxlen: 6 },
@@ -142,9 +142,9 @@ qosg.verifyFields = function(row, quiet)
 	var f = fields.getAll(row);
 	var s;
 
-	if (v_range(f[0], quiet, 10, 99)) {
+	if (v_range(f[0], quiet, 10, 199)) {
 		if(this.existID(f[0].value)) {
-			ferror.set(f[0], 'ID must between 10 and 99', quiet);
+			ferror.set(f[0], 'ID must between 10 and 199', quiet);
 			ok = 0;
 		}
 	}

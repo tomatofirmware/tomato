@@ -99,7 +99,7 @@ arpg.resetNewEditor = function() {
 
 arpg.setup = function()
 {
-	this.init('arpg-grid', '', 50,
+	this.init('arpg-grid', '', 140,
 		[{ type: 'text', maxlen: 17 }, { type: 'text', maxlen: 15 }]);
 	this.headerSet(['MAC Address', 'IP Address']);
 	var s = nvram.new_arpbind_list.split('>');
