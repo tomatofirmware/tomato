@@ -92,9 +92,11 @@ function c(id, htm)
 function show()
 {
 	c('cpu', stats.cpuload);
+	c('freqcpu', stats.freqcpu); //Victek
 	c('uptime', stats.uptime);
 	c('time', stats.time);
 	c('wanip', stats.wanip);
+	c('wanprebuf',stats.wanprebuf); //Victek
 	c('wannetmask', stats.wannetmask);
 	c('wangateway', stats.wangateway);
 	c('dns', stats.dns);
@@ -161,7 +163,8 @@ createFieldTable('', [
 	{ title: 'Time', rid: 'time', text: stats.time },
 	{ title: 'Uptime', rid: 'uptime', text: stats.uptime },
 	{ title: 'CPU Load <small>(1 / 5 / 15 mins)</small>', rid: 'cpu', text: stats.cpuload },
-	{ title: 'Total / Free Memory', rid: 'memory', text: stats.memory }
+	{ title: 'Total / Free Memory', rid: 'memory', text: stats.memory },
+	{ title: 'CPU Frequency (MHz)', rid: 'freqcpu', text: stats.freqcpu } //Victek
 ]);
 </script>
 </div>
@@ -173,6 +176,7 @@ createFieldTable('', [
 	{ title: 'MAC Address', text: nvram.wan_hwaddr },
 	{ title: 'Connection Type', text: { 'dhcp':'DHCP', 'static':'Static IP', 'pppoe':'PPPoE', 'pptp':'PPTP', 'l2tp':'L2TP' }[nvram.wan_proto] || '-' },
 	{ title: 'IP Address', rid: 'wanip', text: stats.wanip },
+	{ title: 'Previous WAN IP', rid: 'wanprebuf',text:stats.wanprebuf }, //Victek
 	{ title: 'Subnet Mask', rid: 'wannetmask', text: stats.wannetmask },
 	{ title: 'Gateway', rid: 'wangateway', text: stats.wangateway },
 	{ title: 'DNS', rid: 'dns', text: stats.dns },
