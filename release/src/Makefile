@@ -272,6 +272,39 @@ define KernelConfigMips
 		echo "CONFIG_CPU_MIPS32_R2=y" >>$(1); \
 		sed -i "/CONFIG_CPU_MIPSR1/d" $(1); \
 		echo "CONFIG_CPU_MIPSR2=y" >>$(1); \
+		sed -i "/CONFIG_HIGHMEM=/d" $(1); \
+		echo "CONFIG_HIGHMEM=y" >>$(1); \
+		sed -i "/CONFIG_FLATMEM_MANUAL/d" $(1); \
+		echo "# CONFIG_FLATMEM_MANUAL is not set" >>$(1); \
+		sed -i "/CONFIG_SPARSEMEM_MANUAL/d" $(1); \
+		echo "CONFIG_SPARSEMEM_MANUAL=y" >>$(1); \
+		sed -i "/CONFIG_SPARSEMEM=/d" $(1); \
+		echo "CONFIG_SPARSEMEM=y" >>$(1); \
+		sed -i "/CONFIG_SPARSEMEM_EXTREME/d" $(1); \
+		echo "CONFIG_SPARSEMEM_EXTREME=y" >>$(1); \
+		sed -i "/CONFIG_FLATMEM=/d" $(1); \
+		echo "# CONFIG_FLATMEM is not set" >>$(1); \
+		sed -i "/CONFIG_FLAT_NODE_MEM_MAP/d" $(1); \
+		echo "# CONFIG_FLAT_NODE_MEM_MAP is not set" >>$(1); \
+		sed -i "/CONFIG_HAVE_MEMORY_PRESENT/d" $(1); \
+		echo "CONFIG_HAVE_MEMORY_PRESENT=y" >>$(1); \
+	else \
+		sed -i "/CONFIG_HIGHMEM=/d" $(1); \
+		echo "# CONFIG_HIGHMEM is not set" >>$(1); \
+		sed -i "/CONFIG_FLATMEM_MANUAL/d" $(1); \
+		echo "CONFIG_FLATMEM_MANUAL=y" >>$(1); \
+		sed -i "/CONFIG_SPARSEMEM=/d" $(1); \
+		echo "# CONFIG_SPARSEMEM is not set" >>$(1); \
+		sed -i "/CONFIG_SPARSEMEM_MANUAL/d" $(1); \
+		echo "# CONFIG_SPARSEMEM_MANUAL is not set" >>$(1); \
+		sed -i "/CONFIG_SPARSEMEM_EXTREME/d" $(1); \
+		echo "# CONFIG_SPARSEMEM_EXTREME is not set" >>$(1); \
+		sed -i "/CONFIG_FLATMEM=/d" $(1); \
+		echo "CONFIG_FLATMEM=y" >>$(1); \
+		sed -i "/CONFIG_FLAT_NODE_MEM_MAP/d" $(1); \
+		echo "CONFIG_FLAT_NODE_MEM_MAP=y" >>$(1); \
+		sed -i "/CONFIG_HAVE_MEMORY_PRESENT/d" $(1); \
+		echo "# CONFIG_HAVE_MEMORY_PRESENT is not set" >>$(1); \
 	fi; \
 	if [ "$(BCM57)" = "y" ]; then \
 		sed -i "/CONFIG_BCM57XX/d" $(1); \
@@ -351,6 +384,14 @@ d:
 
 	@sed -i "/TCONFIG_SAMBASRV/d" router/config_$@
 	@echo "# TCONFIG_SAMBASRV is not set" >>router/config_$@
+ifeq ($(CONFIG_LINUX26),y)
+	@sed -i "/TCONFIG_CIFS/d" router/config_$@
+	@echo "# TCONFIG_CIFS is not set" >>router/config_$@
+	@sed -i "/TCONFIG_JFFS2/d" router/config_$@
+	@echo "# TCONFIG_JFFS2 is not set" >>router/config_$@
+	@sed -i "/TCONFIG_ZEBRA/d" router/config_$@
+	@echo "# TCONFIG_ZEBRA is not set" >>router/config_$@
+endif
 
 	$(call RouterOptions, router/config_$@)
 	$(call KernelConfigMips, $(LINUXDIR)/config_$@)
@@ -464,11 +505,11 @@ v:
 
 ## Make Mips32r2 Extras build (Asus RT-N16, Netgear WNR3500L)
 r2m:
-	@$(MAKE) m MIPS32=r2 BCM57=n SAMBA3=y
+	@$(MAKE) m MIPS32=r2 BCM57=y SAMBA3=y
 
 ## Make Mips32r2 USB+VPN build
 r2e:
-	@$(MAKE) e MIPS32=r2 BCM57=n SAMBA3=y
+	@$(MAKE) e MIPS32=r2 BCM57=y SAMBA3=y
 
 ## Make Mips32r2 "no USB" build (Asus RT-N12)
 r2s:
