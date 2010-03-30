@@ -1,23 +1,23 @@
 /*
  * Broadcom SiliconBackplane chipcommon serial flash interface
  *
- * Copyright 2005, Broadcom Corporation      
- * All Rights Reserved.      
- *       
- * THIS SOFTWARE IS OFFERED "AS IS", AND BROADCOM GRANTS NO WARRANTIES OF ANY      
- * KIND, EXPRESS OR IMPLIED, BY STATUTE, COMMUNICATION OR OTHERWISE. BROADCOM      
- * SPECIFICALLY DISCLAIMS ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS      
- * FOR A SPECIFIC PURPOSE OR NONINFRINGEMENT CONCERNING THIS SOFTWARE.      
+ * Copyright 2007, Broadcom Corporation
+ * All Rights Reserved.
+ * 
+ * THIS SOFTWARE IS OFFERED "AS IS", AND BROADCOM GRANTS NO WARRANTIES OF ANY
+ * KIND, EXPRESS OR IMPLIED, BY STATUTE, COMMUNICATION OR OTHERWISE. BROADCOM
+ * SPECIFICALLY DISCLAIMS ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A SPECIFIC PURPOSE OR NONINFRINGEMENT CONCERNING THIS SOFTWARE.
  *
- * $Id: sflash.c,v 1.1.1.11 2005/03/07 07:31:12 kanki Exp $
+ * $Id$
  */
 
 #include <typedefs.h>
 #include <osl.h>
+#include <bcmutils.h>
+#include <sbutils.h>
 #include <sbconfig.h>
 #include <sbchipc.h>
-#include <mipsinc.h>
-#include <bcmutils.h>
 #include <bcmdevs.h>
 #include <sflash.h>
 
@@ -26,28 +26,33 @@ static struct sflash sflash;
 
 /* Issue a serial flash command */
 static INLINE void
-sflash_cmd(chipcregs_t *cc, uint opcode)
+sflash_cmd(osl_t *osh, chipcregs_t *cc, uint opcode)
 {
-	W_REG(&cc->flashcontrol, SFLASH_START | opcode);
-	while (R_REG(&cc->flashcontrol) & SFLASH_BUSY);
+	W_REG(osh, &cc->flashcontrol, SFLASH_START | opcode);
+	while (R_REG(osh, &cc->flashcontrol) & SFLASH_BUSY);
 }
 
 /* Initialize serial flash access */
 struct sflash *
-sflash_init(chipcregs_t *cc)
+sflash_init(sb_t *sbh, chipcregs_t *cc)
 {
 	uint32 id, id2;
+	osl_t *osh;
+
+	ASSERT(sbh);
+
+	osh = sb_osh(sbh);
 
 	bzero(&sflash, sizeof(sflash));
 
-	sflash.type = R_REG(&cc->capabilities) & CAP_FLASH_MASK;
+	sflash.type = sbh->cccaps & CC_CAP_FLASH_MASK;
 
 	switch (sflash.type) {
 	case SFLASH_ST:
 		/* Probe for ST chips */
-		sflash_cmd(cc, SFLASH_ST_DP);
-		sflash_cmd(cc, SFLASH_ST_RES);
-		id = R_REG(&cc->flashdata);
+		sflash_cmd(osh, cc, SFLASH_ST_DP);
+		sflash_cmd(osh, cc, SFLASH_ST_RES);
+		id = R_REG(osh, &cc->flashdata);
 		switch (id) {
 		case 0x11:
 			/* ST M25P20 2 Mbit Serial Flash */
@@ -74,10 +79,15 @@ sflash_init(chipcregs_t *cc)
 			sflash.blocksize = 64 * 1024;
 			sflash.numblocks = 64;
 			break;
+		case 0x16:
+			/* ST M25P64 64 Mbit Serial Flash */
+			sflash.blocksize = 64 * 1024;
+			sflash.numblocks = 128;
+			break;
 		case 0xbf:
-			W_REG(&cc->flashaddress, 1);
-			sflash_cmd(cc, SFLASH_ST_RES);
-			id2 = R_REG(&cc->flashdata);
+			W_REG(osh, &cc->flashaddress, 1);
+			sflash_cmd(osh, cc, SFLASH_ST_RES);
+			id2 = R_REG(osh, &cc->flashdata);
 			if (id2 == 0x44) {
 				/* SST M25VF80 4 Mbit Serial Flash */
 				sflash.blocksize = 64 * 1024;
@@ -89,8 +99,8 @@ sflash_init(chipcregs_t *cc)
 
 	case SFLASH_AT:
 		/* Probe for Atmel chips */
-		sflash_cmd(cc, SFLASH_AT_STATUS);
-		id = R_REG(&cc->flashdata) & 0x3c;
+		sflash_cmd(osh, cc, SFLASH_AT_STATUS);
+		id = R_REG(osh, &cc->flashdata) & 0x3c;
 		switch (id) {
 		case 0xc:
 			/* Atmel AT45DB011 1Mbit Serial Flash */
@@ -137,10 +147,13 @@ sflash_init(chipcregs_t *cc)
 
 /* Read len bytes starting at offset into buf. Returns number of bytes read. */
 int
-sflash_read(chipcregs_t *cc, uint offset, uint len, uchar *buf)
+sflash_read(sb_t *sbh, chipcregs_t *cc, uint offset, uint len, uchar *buf)
 {
-	int cnt;
-	uint32 *from, *to;
+	uint8 *from, *to;
+	int cnt, i;
+	osl_t *osh;
+
+	ASSERT(sbh);
 
 	if (!len)
 		return 0;
@@ -150,21 +163,29 @@ sflash_read(chipcregs_t *cc, uint offset, uint len, uchar *buf)
 
 	if ((len >= 4) && (offset & 3))
 		cnt = 4 - (offset & 3);
-	else if ((len >= 4) && ((uint32)buf & 3))
-		cnt = 4 - ((uint32)buf & 3);
+	else if ((len >= 4) && ((uintptr)buf & 3))
+		cnt = 4 - ((uintptr)buf & 3);
 	else
 		cnt = len;
 
-	from = (uint32 *)KSEG1ADDR(SB_FLASH2 + offset);
-	to = (uint32 *)buf;
+	osh = sb_osh(sbh);
+
+	from = (uint8 *)(uintptr)OSL_UNCACHED(SB_FLASH2 + offset);
+	to = (uint8 *)buf;
 
 	if (cnt < 4) {
-		bcopy(from, to, cnt);
+		for (i = 0; i < cnt; i ++) {
+			*to = R_REG(osh, from);
+			from ++;
+			to ++;
+		}
 		return cnt;
 	}
 
 	while (cnt >= 4) {
-		*to++ = *from++;
+		*(uint32 *)to = R_REG(osh, (uint32 *)from);
+		from += 4;
+		to += 4;
 		cnt -= 4;
 	}
 
@@ -173,20 +194,26 @@ sflash_read(chipcregs_t *cc, uint offset, uint len, uchar *buf)
 
 /* Poll for command completion. Returns zero when complete. */
 int
-sflash_poll(chipcregs_t *cc, uint offset)
+sflash_poll(sb_t *sbh, chipcregs_t *cc, uint offset)
 {
+	osl_t *osh;
+
+	ASSERT(sbh);
+
+	osh = sb_osh(sbh);
+
 	if (offset >= sflash.size)
 		return -22;
 
 	switch (sflash.type) {
 	case SFLASH_ST:
 		/* Check for ST Write In Progress bit */
-		sflash_cmd(cc, SFLASH_ST_RDSR);
-		return R_REG(&cc->flashdata) & SFLASH_ST_WIP;
+		sflash_cmd(osh, cc, SFLASH_ST_RDSR);
+		return R_REG(osh, &cc->flashdata) & SFLASH_ST_WIP;
 	case SFLASH_AT:
 		/* Check for Atmel Ready bit */
-		sflash_cmd(cc, SFLASH_AT_STATUS);
-		return !(R_REG(&cc->flashdata) & SFLASH_AT_READY);
+		sflash_cmd(osh, cc, SFLASH_AT_STATUS);
+		return !(R_REG(osh, &cc->flashdata) & SFLASH_AT_READY);
 	}
 
 	return 0;
@@ -196,12 +223,17 @@ sflash_poll(chipcregs_t *cc, uint offset)
  * written. Caller should poll for completion.
  */
 int
-sflash_write(chipcregs_t *cc, uint offset, uint len, const uchar *buf)
+sflash_write(sb_t *sbh, chipcregs_t *cc, uint offset, uint len, const uchar *buf)
 {
 	struct sflash *sfl;
 	int ret = 0;
 	bool is4712b0;
 	uint32 page, byte, mask;
+	osl_t *osh;
+
+	ASSERT(sbh);
+
+	osh = sb_osh(sbh);
 
 	if (!len)
 		return 0;
@@ -212,34 +244,32 @@ sflash_write(chipcregs_t *cc, uint offset, uint len, const uchar *buf)
 	sfl = &sflash;
 	switch (sfl->type) {
 	case SFLASH_ST:
-		mask = R_REG(&cc->chipid);
-		is4712b0 = (((mask & CID_ID_MASK) == BCM4712_DEVICE_ID) &&
-			    ((mask & CID_REV_MASK) == (3 << CID_REV_SHIFT)));
+		is4712b0 = (sbh->chip == BCM4712_CHIP_ID) && (sbh->chiprev == 3);
 		/* Enable writes */
-		sflash_cmd(cc, SFLASH_ST_WREN);
+		sflash_cmd(osh, cc, SFLASH_ST_WREN);
 		if (is4712b0) {
 			mask = 1 << 14;
-			W_REG(&cc->flashaddress, offset);
-			W_REG(&cc->flashdata, *buf++);
+			W_REG(osh, &cc->flashaddress, offset);
+			W_REG(osh, &cc->flashdata, *buf++);
 			/* Set chip select */
-			OR_REG(&cc->gpioout, mask);
+			OR_REG(osh, &cc->gpioout, mask);
 			/* Issue a page program with the first byte */
-			sflash_cmd(cc, SFLASH_ST_PP);
+			sflash_cmd(osh, cc, SFLASH_ST_PP);
 			ret = 1;
 			offset++;
 			len--;
 			while (len > 0) {
 				if ((offset & 255) == 0) {
 					/* Page boundary, drop cs and return */
-					AND_REG(&cc->gpioout, ~mask);
-					if (!sflash_poll(cc, offset)) {
+					AND_REG(osh, &cc->gpioout, ~mask);
+					if (!sflash_poll(sbh, cc, offset)) {
 						/* Flash rejected command */
 						return -11;
 					}
 					return ret;
 				} else {
 					/* Write single byte */
-					sflash_cmd(cc, *buf++);
+					sflash_cmd(osh, cc, *buf++);
 				}
 				ret++;
 				offset++;
@@ -248,18 +278,69 @@ sflash_write(chipcregs_t *cc, uint offset, uint len, const uchar *buf)
 			/* All done, drop cs if needed */
 			if ((offset & 255) != 1) {
 				/* Drop cs */
-				AND_REG(&cc->gpioout, ~mask);
-				if (!sflash_poll(cc, offset)) {
+				AND_REG(osh, &cc->gpioout, ~mask);
+				if (!sflash_poll(sbh, cc, offset)) {
 					/* Flash rejected command */
 					return -12;
 				}
 			}
+		} else if ( (sbh->ccrev >= 20) && (len != 1) ) {
+		//} else if ( sbh->ccrev >= 20 ) {              /* foxconn modified by EricHuang, 05/24/2007 */
+			W_REG(NULL, &cc->flashaddress, offset);
+			W_REG(NULL, &cc->flashdata, *buf++);
+			/* Issue a page program with CSA bit set */
+			sflash_cmd(osh, cc, SFLASH_ST_CSA | SFLASH_ST_PP);
+			ret = 1;
+			offset++;
+			len--;
+			while (len > 0) {
+				if ((offset & 255) == 0) {
+					/* Page boundary, poll droping cs and return */
+					W_REG(NULL, &cc->flashcontrol, 0);
+					/* wklin added start, 06/08/2007 */
+					W_REG(NULL, &cc->flashcontrol, 0);
+					OSL_DELAY(1);
+					/* wklin added end, 06/08/2007 */
+					/* wklin rmeoved start, 06/08/2007 */
+#if 0
+					if (!sflash_poll(sbh, cc, offset)) {
+						/* Flash rejected command */
+						return -11;
+					}
+#endif					
+                                        /* wklin removed end, 06/08/2007 */
+					return ret;
+				} else {
+					/* Write single byte */
+					sflash_cmd(osh, cc, SFLASH_ST_CSA | *buf++);
+				}
+				ret++;
+				offset++;
+				len--;
+			}
+			/* All done, drop cs if needed */
+			if ((offset & 255) != 1) {
+				/* Drop cs, poll */
+				W_REG(NULL, &cc->flashcontrol, 0);
+				/* wklin added start, 06/08/2007 */
+				W_REG(NULL, &cc->flashcontrol, 0);
+				OSL_DELAY(1);
+				/* wklin added end, 06/08/2007 */
+				/* wklin removed start, 06/08/2007 */
+#if 0				
+				if (!sflash_poll(sbh, cc, offset)) {
+					/* Flash rejected command */
+					return -12;
+				}
+#endif
+                                /* wklin removed end, 06/08/2007 */
+			}
 		} else {
 			ret = 1;
-			W_REG(&cc->flashaddress, offset);
-			W_REG(&cc->flashdata, *buf);
+			W_REG(osh, &cc->flashaddress, offset);
+			W_REG(osh, &cc->flashdata, *buf);
 			/* Page program */
-			sflash_cmd(cc, SFLASH_ST_PP);
+			sflash_cmd(osh, cc, SFLASH_ST_PP);
 		}
 		break;
 	case SFLASH_AT:
@@ -267,22 +348,22 @@ sflash_write(chipcregs_t *cc, uint offset, uint len, const uchar *buf)
 		page = (offset & ~mask) << 1;
 		byte = offset & mask;
 		/* Read main memory page into buffer 1 */
-		if (byte || len < sfl->blocksize) {
-			W_REG(&cc->flashaddress, page);
-			sflash_cmd(cc, SFLASH_AT_BUF1_LOAD);
+		if (byte || (len < sfl->blocksize)) {
+			W_REG(osh, &cc->flashaddress, page);
+			sflash_cmd(osh, cc, SFLASH_AT_BUF1_LOAD);
 			/* 250 us for AT45DB321B */
-			SPINWAIT(sflash_poll(cc, offset), 1000);
-			ASSERT(!sflash_poll(cc, offset));
+			SPINWAIT(sflash_poll(sbh, cc, offset), 1000);
+			ASSERT(!sflash_poll(sbh, cc, offset));
 		}
 		/* Write into buffer 1 */
-		for (ret = 0; ret < len && byte < sfl->blocksize; ret++) {
-			W_REG(&cc->flashaddress, byte++);
-			W_REG(&cc->flashdata, *buf++);
-			sflash_cmd(cc, SFLASH_AT_BUF1_WRITE);
+		for (ret = 0; (ret < (int)len) && (byte < sfl->blocksize); ret++) {
+			W_REG(osh, &cc->flashaddress, byte++);
+			W_REG(osh, &cc->flashdata, *buf++);
+			sflash_cmd(osh, cc, SFLASH_AT_BUF1_WRITE);
 		}
 		/* Write buffer 1 into main memory page */
-		W_REG(&cc->flashaddress, page);
-		sflash_cmd(cc, SFLASH_AT_BUF1_PROGRAM);
+		W_REG(osh, &cc->flashaddress, page);
+		sflash_cmd(osh, cc, SFLASH_AT_BUF1_PROGRAM);
 		break;
 	}
 
@@ -293,9 +374,14 @@ sflash_write(chipcregs_t *cc, uint offset, uint len, const uchar *buf)
  * Caller should poll for completion.
  */
 int
-sflash_erase(chipcregs_t *cc, uint offset)
+sflash_erase(sb_t *sbh, chipcregs_t *cc, uint offset)
 {
 	struct sflash *sfl;
+	osl_t *osh;
+
+	ASSERT(sbh);
+
+	osh = sb_osh(sbh);
 
 	if (offset >= sflash.size)
 		return -22;
@@ -303,13 +389,13 @@ sflash_erase(chipcregs_t *cc, uint offset)
 	sfl = &sflash;
 	switch (sfl->type) {
 	case SFLASH_ST:
-		sflash_cmd(cc, SFLASH_ST_WREN);
-		W_REG(&cc->flashaddress, offset);
-		sflash_cmd(cc, SFLASH_ST_SE);
+		sflash_cmd(osh, cc, SFLASH_ST_WREN);
+		W_REG(osh, &cc->flashaddress, offset);
+		sflash_cmd(osh, cc, SFLASH_ST_SE);
 		return sfl->blocksize;
 	case SFLASH_AT:
-		W_REG(&cc->flashaddress, offset << 1);
-		sflash_cmd(cc, SFLASH_AT_PAGE_ERASE);
+		W_REG(osh, &cc->flashaddress, offset << 1);
+		sflash_cmd(osh, cc, SFLASH_AT_PAGE_ERASE);
 		return sfl->blocksize;
 	}
 
@@ -321,14 +407,18 @@ sflash_erase(chipcregs_t *cc, uint offset)
  * the region of flash
  */
 int
-sflash_commit(chipcregs_t *cc, uint offset, uint len, const uchar *buf)
+sflash_commit(sb_t *sbh, chipcregs_t *cc, uint offset, uint len, const uchar *buf)
 {
 	struct sflash *sfl;
 	uchar *block = NULL, *cur_ptr, *blk_ptr;
 	uint blocksize = 0, mask, cur_offset, cur_length, cur_retlen, remainder;
 	uint blk_offset, blk_len, copied;
 	int bytes, ret = 0;
-	void *osh;
+	osl_t *osh;
+
+	ASSERT(sbh);
+
+	osh = sb_osh(sbh);
 
 	/* Check address range */
 	if (len <= 0)
@@ -340,9 +430,6 @@ sflash_commit(chipcregs_t *cc, uint offset, uint len, const uchar *buf)
 
 	blocksize = sfl->blocksize;
 	mask = blocksize - 1;
-
-	/* get kernel osl handler */
-	osh = osl_attach(NULL);
 
 	/* Allocate a block of mem */
 	if (!(block = MALLOC(osh, blocksize)))
@@ -363,14 +450,14 @@ sflash_commit(chipcregs_t *cc, uint offset, uint len, const uchar *buf)
 		/* buf == NULL means erase only */
 		if (buf) {
 			/* Copy existing data into holding block if necessary */
-			if ((offset & mask)  || (len < blocksize)) {
+			if ((offset & mask) || (len < blocksize)) {
 				blk_offset = cur_offset;
 				blk_len = cur_length;
 				blk_ptr = cur_ptr;
 
 				/* Copy entire block */
-				while(blk_len) {
-					copied = sflash_read(cc, blk_offset, blk_len, blk_ptr); 
+				while (blk_len) {
+					copied = sflash_read(sbh, cc, blk_offset, blk_len, blk_ptr);
 					blk_offset += copied;
 					blk_len -= copied;
 					blk_ptr += copied;
@@ -382,9 +469,9 @@ sflash_commit(chipcregs_t *cc, uint offset, uint len, const uchar *buf)
 		}
 
 		/* Erase block */
-		if ((ret = sflash_erase(cc, (uint) cur_offset)) < 0)
+		if ((ret = sflash_erase(sbh, cc, (uint) cur_offset)) < 0)
 			goto done;
-		while (sflash_poll(cc, (uint) cur_offset));
+		while (sflash_poll(sbh, cc, (uint) cur_offset));
 
 		/* buf == NULL means erase only */
 		if (!buf) {
@@ -395,14 +482,14 @@ sflash_commit(chipcregs_t *cc, uint offset, uint len, const uchar *buf)
 
 		/* Write holding block */
 		while (cur_length > 0) {
-			if ((bytes = sflash_write(cc,
-						  (uint) cur_offset,
-						  (uint) cur_length,
-						  (uchar *) cur_ptr)) < 0) {
+			if ((bytes = sflash_write(sbh, cc,
+			                          (uint) cur_offset,
+			                          (uint) cur_length,
+			                          (uchar *) cur_ptr)) < 0) {
 				ret = bytes;
 				goto done;
 			}
-			while (sflash_poll(cc, (uint) cur_offset));
+			while (sflash_poll(sbh, cc, (uint) cur_offset));
 			cur_offset += bytes;
 			cur_length -= bytes;
 			cur_ptr += bytes;
@@ -419,4 +506,3 @@ done:
 		MFREE(osh, block, blocksize);
 	return ret;
 }
-
