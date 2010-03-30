@@ -96,7 +96,7 @@ Copyright (C) 2006-2009 Jonathan Zarate<br>
 - CPU Info & Overclock | WAN Info | P2P Obfuscation <br>
 - Extended Buttons Script | Additional Skins<br>
 - Conntrack up to 8192 IP's | IP/MAC Limiter | ARP Binding<br>
-- MiniUPnPd | Ethernet & Wireless driver v.3.90.38.0</b><br><br>
+- MiniUPnPd | Ethernet & Wireless driver v.4.158.4.0</b><br><br>
 <a href='http://victek.is-a-geek.com' target='_new'>http://victek.is-a-geek.com</a><br>
 <br>
 Built on <% build_time(); %><br>
