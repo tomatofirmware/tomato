@@ -186,7 +186,7 @@ void start_dnsmasq()
 	p = nvram_safe_get("dhcpd_static");
 	while ((e = strchr(p, '>')) != NULL) {
 		n = (e - p);
-		if (n > 84) {
+		if (n > sizeof(buf)-1) {
 			p = e + 1;
 			continue;
 		}
@@ -345,7 +345,9 @@ void start_upnp(void)
 		else {
 			if ((f = fopen("/etc/upnp/config", "w")) != NULL) {
 				upnp_port = nvram_get_int("upnp_port");
-				if ((upnp_port <= 0) || (upnp_port >= 0xFFFF)) upnp_port = 5000;
+				if ((upnp_port < 0) || (upnp_port >= 0xFFFF)) upnp_port = 0;
+
+				char *lanip = nvram_safe_get("lan_ipaddr");
 				
 				fprintf(f,
 					"ext_ifname=%s\n"
@@ -356,6 +358,7 @@ void start_upnp(void)
 					"secure_mode=%s\n"
 					"upnp_forward_chain=upnp\n"
 					"upnp_nat_chain=upnp\n"
+					"notify_interval=%d\n"
 					"system_uptime=yes\n"
 					"\n"
 					,
@@ -364,9 +367,58 @@ void start_upnp(void)
 					upnp_port,
 					(enable & 1) ? "yes" : "no",						// upnp enable
 					(enable & 2) ? "yes" : "no",						// natpmp enable
-					nvram_get_int("upnp_secure") ? "yes" : "no"			// secure_mode (only forward to self)
+					nvram_get_int("upnp_secure") ? "yes" : "no",			// secure_mode (only forward to self)
+					nvram_get_int("upnp_ssdp_interval")
 				);
+
+				if (nvram_get_int("upnp_clean")) {
+					int interval = nvram_get_int("upnp_clean_interval");
+					if (interval < 60) interval = 60;
+					fprintf(f,
+						"clean_ruleset_interval=%d\n"
+						"clean_ruleset_threshold=%d\n",
+						interval,
+						nvram_get_int("upnp_clean_threshold")
+					);
+				}
+				else
+					fprintf(f,"clean_ruleset_interval=0\n");
+
+				if (nvram_match("upnp_mnp", "1")) {
+					int https = nvram_get_int("https_enable");
+					fprintf(f, "presentation_url=http%s://%s:%s/forward-upnp.asp\n",
+						https ? "s" : "", lanip,
+						nvram_safe_get(https ? "https_lanport" : "http_lanport"));
+				}
+				else {
+					// Empty parameters are not included into XML service description
+					fprintf(f, "presentation_url=\n");
+				}
+
+				char uuid[45];
+				f_read_string("/proc/sys/kernel/random/uuid", uuid, sizeof(uuid));
+				fprintf(f, "uuid=%s\n", uuid);
+
+				if ((nvram_get_int("upnp_min_port_int") > 0) &&
+					(nvram_get_int("upnp_max_port_int") > 0) &&
+					(nvram_get_int("upnp_min_port_ext") > 0) &&
+					(nvram_get_int("upnp_max_port_ext") > 0)) {
+					fprintf(f,
+						"allow %s-%s %s/24 %s-%s\n",
+						nvram_safe_get("upnp_min_port_int"),
+						nvram_safe_get("upnp_max_port_int"),
+						lanip,
+						nvram_safe_get("upnp_min_port_ext"),
+						nvram_safe_get("upnp_max_port_ext")
+					);
+				}
+				else {
+					// by default allow only redirection of ports above 1024
+					fprintf(f, "allow 1024-65535 %s/24 1024-65535\n", lanip);
+				}
+
 				fappend(f, "/etc/upnp/config.custom");
+				fprintf(f, "\ndeny 0-65535 0.0.0.0/0 0-65535\n");
 				fclose(f);
 				
 				xstart("miniupnpd", "-f", "/etc/upnp/config");
@@ -710,7 +762,7 @@ void start_services(void)
 	start_cifs();
 	start_httpd();
 	start_cron();
-	start_upnp();
+	//start_upnp();	//!!TB - already in start_wan_done()
 	start_rstats(0);
 	start_sched();
 #ifdef TCONFIG_SAMBA
@@ -727,7 +779,7 @@ void stop_services(void)
 #endif
 	stop_sched();
 	stop_rstats();
-	stop_upnp();
+	//stop_upnp();	//!!TB - moved to stop_wan()
 	stop_cron();
 	stop_httpd();
 	stop_cifs();
@@ -831,6 +883,23 @@ TOP:
 		goto CLEAR;
 	}
 
+	if (strcmp(service, "qoslimit") == 0) {
+		if (action & A_STOP) {
+			new_qoslimit_stop();
+		}
+		stop_firewall(); start_firewall();		// always restarted
+		if (action & A_START) {
+			new_qoslimit_start();
+		}
+		goto CLEAR;
+	}
+
+	if (strcmp(service, "arpbind") == 0) {
+		if (action & A_STOP) new_arpbind_stop();
+		if (action & A_START) new_arpbind_start();
+		goto CLEAR;
+	}
+	
 	if (strcmp(service, "upnp") == 0) {
 		if (action & A_STOP) {
 			stop_upnp();
@@ -971,23 +1040,6 @@ TOP:
 		}
 		goto CLEAR;
 	}
-
-	if (strcmp(service, "qoslimit") == 0) {
-               if (action & A_STOP) {
-                       new_qoslimit_stop();
-        }
-               stop_firewall(); start_firewall();              // always restarted
-               if (action & A_START) {
-                       new_qoslimit_start();
-        }
-               goto CLEAR;
-        }
- 
-        if (strcmp(service, "arpbind") == 0) {
-               if (action & A_STOP) new_arpbind_stop();
-               if (action & A_START) new_arpbind_start();
-               goto CLEAR;
-        }
 
 	if (strcmp(service, "wan") == 0) {
 		if (action & A_STOP) {

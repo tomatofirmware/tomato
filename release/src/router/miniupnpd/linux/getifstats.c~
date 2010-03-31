@@ -29,7 +29,7 @@ getifstats(const char * ifname, struct ifdata * data)
 #endif
 	if(!data)
 		return -1;
-	data->baudrate = 100000000;
+	data->baudrate = 4200000;
 	data->opackets = 0;
 	data->ipackets = 0;
 	data->obytes = 0;

@@ -2712,14 +2712,6 @@ void ide_delay_50ms (void)
 {
 #ifndef CONFIG_BLK_DEV_IDECS
 	mdelay(50);
-#ifdef CONFIG_BCM4780
-{
-	int i;
-	for (i = 0; i < 10; i++) {
-	    mdelay(50);
-	}
-}
-#endif
 #else
 	__set_current_state(TASK_UNINTERRUPTIBLE);
 	schedule_timeout(HZ/20);

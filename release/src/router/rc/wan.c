@@ -748,14 +748,11 @@ void start_wan_done(char *wan_ifname)
 		}
 	}
 
-
-	stop_dnsmasq();
 	dns_to_resolv();
 	start_dnsmasq();
 
 	start_firewall();
 	start_qos();
-
 	new_qoslimit_start();
 	new_arpbind_start();
 
@@ -810,6 +807,7 @@ void stop_wan(void)
 	new_arpbind_stop();
 	new_qoslimit_stop();
 	stop_qos();
+	stop_upnp();	//!!TB - moved from stop_services()
 	stop_firewall();
 	stop_igmp_proxy();
 	stop_ntpc();

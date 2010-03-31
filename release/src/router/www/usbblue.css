@@ -19,6 +19,7 @@ a:hover {
 	text-decoration:none;
 	color: #fff;
 	background: #405080;
+	padding: 2px;
 	}
 
 input[type='button']:hover {
@@ -108,6 +109,7 @@ input[type='button']:hover {
 .tomato-grid .odd:hover,
 .tomato-grid .even:hover {
 	background: #cfd4e6;
+	color: #fff;
 }
 .tomato-grid a {
 	color: #004584;

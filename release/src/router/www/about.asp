@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
-	Copyright (C) 2006-2008 Jonathan Zarate
+	Copyright (C) 2006-2009 Jonathan Zarate
 	http://www.polarcloud.com/tomato/
 
 	For use with Tomato Firmware only.
@@ -30,13 +30,13 @@ function moo()
 	r += rd;
 	t += (Math.PI / 10);
 	if (t > (2 * Math.PI)) t = 0;
-	
+
 	var x = tux.origX + (r * Math.sin(t));
 	var y = tux.origY + (r * Math.cos(t));
-	
+
 	tux.style.left = x + 'px';
 	tux.style.top = y + 'px';
-	
+
 	if (clicks > 0) setTimeout(moo, 33);
 }
 
@@ -55,15 +55,15 @@ function init()
 {
 	try {
 		tux = E('tux');
-		
+
 		var o = elem.getOffset(tux);
 		tux.origX = o.x;
 		tux.origY = o.y;
-		
+
 		tux.style.position = 'absolute';
 		tux.style.left = o.x + 'px';
 		tux.style.top = o.y + 'px';
-		
+
 		tux.addEventListener('click', onClick, false);
 	}
 	catch (ex) {
@@ -86,26 +86,34 @@ function init()
 <!-- / / / -->
 
 <div style='float:right;margin:20px 20px;text-align:center'>
-<img src='tux.png' alt='Linux &amp; Tomato' id='tux'>
+<img src='kinaree.png' alt='Linux &amp; Tomato' id='kinaree'>
 </div>
 <div style='margin:20px 20px;font-size:14px;color:#555;'>
-Tomato Firmware v<% version(1); %><br>
-Copyright (C) 2006-2009 Jonathan Zarate<br>
-<a href='http://www.polarcloud.com/tomato/' target='_new'>http://www.polarcloud.com/tomato/</a><br><br>
-<b>Addons by Victek@gmail.com<br>
-- CPU Info & Overclock | WAN Info | P2P Obfuscation <br>
-- Extended Buttons Script | Additional Skins<br>
-- Conntrack up to 8192 IP's | IP/MAC Limiter | ARP Binding<br>
-- MiniUPnPd | Ethernet & Wireless driver v.4.158.4.0</b><br><br>
-<a href='http://victek.is-a-geek.com' target='_new'>http://victek.is-a-geek.com</a><br>
+<b>Tomato Firmware v<% version(1); %><br><br>
+Copyright (C) 2006-2008 Jonathan Zarate</b><br>
+<a href='http://www.polarcloud.com/tomato/' target='_new'>http://www.polarcloud.com/tomato/</a><br>
 <br>
-Built on <% build_time(); %><br>
+<b>Compilation by Toastman, Bangkok<br>
+Based on RAF v.8515.2 by Victek<br>
+Wireless Driver 4.158.4.0</b><br><br>
+<b>Victek RAF features:</b><br>
+- CPU Info & Overclock | Previous WAN IP<br>
+- Extended Buttons Script | 8192 Conntrack<br>
+- IP/MAC Bandwidth Limiter | ARP Binding<br>
+- ISP Access Concentrator ID | Additional Themes<br>
+<br>
+<b>Toastman Features:</b><br>
+- QOS class labels<br>
+- 200 users<br>
+- Wireless connection rates<br>
+<br>
+<br><b>Built on <% build_time(); %></b><br>
 <br><br>
 
 <!--
 
 	Please do not remove or change the homepage link or donate button.
-	
+
 	Thanks.
 	- Jon
 

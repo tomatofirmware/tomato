@@ -465,7 +465,7 @@ osl_dma_unmap(osl_t *osh, uint pa, uint size, int direction)
 	pci_unmap_single(osh->pdev, (uint32)pa, size, dir);
 }
 
-#if defined(BINOSL) || defined(CONFIG_BCMDBG_ASSERT)
+#if defined(BINOSL) || defined(BCMDBG_ASSERT)
 void
 osl_assert(char *exp, char *file, int line)
 {

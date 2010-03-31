@@ -38,8 +38,6 @@
 #define IPTOS_PREC_PRIORITY             0x20
 #define IPTOS_PREC_ROUTINE              0x00
 
-#define IPTOS_DSCP_MASK		0xFC
-#define IPTOS_DSCP(tos)		((tos&IPTOS_DSCP_MASK))
 
 /* IP options */
 #define IPOPT_COPY		0x80

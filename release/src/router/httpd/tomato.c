@@ -359,6 +359,8 @@ const aspapi_t aspapi[] = {
 	{ "wlnoise",			asp_wlnoise			},
 	{ "wlradio",			asp_wlradio			},
 	{ "wlscan",				asp_wlscan			},
+	{ "wlchannels",			asp_wlchannels	},	//!!TB
+	{ "wlrate",                     asp_wlrate              },
 #if TOMATO_SL
 	{ "sharelist",			asp_sharelist		},
 #endif
@@ -458,7 +460,7 @@ static const nvset_t nvset_list[] = {
 	{ "ntp_kiss",			V_LENGTH(0, 255)	},
 
 // basic-static
-	{ "dhcpd_static",		V_LENGTH(0, 85*101)	},	// 85 (max chars per entry) x 100 entries
+	{ "dhcpd_static",		V_LENGTH(0, 85*201)	},	// 85 (max chars per entry) x 100 entries
 
 // basic-ddns
 	{ "ddnsx0",				V_LENGTH(0, 2048)	},
@@ -507,7 +509,7 @@ static const nvset_t nvset_list[] = {
 	{ "wl_net_mode",		V_LENGTH(5, 8)		},  // disabled, mixed, b-only, g-only, bg-mixed, n-only [speedbooster]
 	{ "wl_ssid",			V_LENGTH(1, 32)		},
 	{ "wl_closed",			V_01				},
-	{ "wl_channel",			V_RANGE(1, 14)		},
+	{ "wl_channel",			V_RANGE(0, 14)		},	//!!TB - 0=Auto
 #if TOMATO_N
 	// ! update
 #endif
@@ -574,6 +576,7 @@ static const nvset_t nvset_list[] = {
 	{ "block_loopback",		V_01				},
 	{ "nf_loopback",		V_NUM				},
 	{ "ne_syncookies",		V_01				},
+	{ "ne_snat",			V_01				},
 
 // advanced-misc
 	{ "wait_time",			V_RANGE(3, 20)		},
@@ -595,6 +598,8 @@ static const nvset_t nvset_list[] = {
 	{ "dr_wan_rx",			V_LENGTH(0, 32)		},
 
 // advanced-wireless
+	{ "wl_country",			V_LENGTH(0, 64)		},	// !!TB - Country code
+	{ "wl_country_code",		V_LENGTH(0, 4)		},	// !!TB - Country code
 	{ "wl_afterburner",		V_LENGTH(2, 4)		},	// off, on, auto
 	{ "wl_auth",			V_01				},
 	{ "wl_rateset",			V_LENGTH(2, 7)		},	// all, default, 12
@@ -617,6 +622,7 @@ static const nvset_t nvset_list[] = {
 	{ "wl_distance",		V_LENGTH(0, 5)		},	// "", 1-99999
 	{ "wlx_hpamp",			V_01				},
 	{ "wlx_hperx",			V_01				},
+	{ "wl_reg_mode",		V_LENGTH(1, 3)			},	// !!TB - Regulatory: off, h, d
 
 #if TOMATO_N
 	{ "wl_nmode_protection",V_WORD,				},	// off, auto
@@ -630,10 +636,19 @@ static const nvset_t nvset_list[] = {
 
 // forward-upnp
 	{ "upnp_enable",		V_NUM				},
-#ifndef USE_MINIUPNPD
+	{ "upnp_secure",		V_01				},
+	{ "upnp_port",			V_RANGE(0, 65535)		},
+	{ "upnp_ssdp_interval",		V_RANGE(10, 9999)		},
 	{ "upnp_mnp",			V_01				},
+	{ "upnp_clean",			V_01				},
+	{ "upnp_clean_interval",	V_RANGE(60, 65535)		},
+	{ "upnp_clean_threshold",	V_RANGE(0, 9999)		},
+	{ "upnp_min_port_int",		V_PORT				},
+	{ "upnp_max_port_int",		V_PORT				},
+	{ "upnp_min_port_ext",		V_PORT				},
+	{ "upnp_max_port_ext",		V_PORT				},
+#ifndef USE_MINIUPNPD
 //	{ "upnp_config",		V_01				},
-	{ "upnp_ssdp_interval", V_RANGE(10, 9999)	},
 	{ "upnp_max_age",		V_RANGE(5, 9999)	},
 #endif
 
@@ -645,7 +660,7 @@ static const nvset_t nvset_list[] = {
 
 
 // access restriction
-	{ "rruleN",				V_RANGE(0, 139)		},
+	{ "rruleN",				V_RANGE(0, 50)		},
 //	{ "rrule##",			V_LENGTH(0, 2048)	},	// in save_variables()
 
 // admin-access
@@ -668,6 +683,7 @@ static const nvset_t nvset_list[] = {
 	{ "sshd_pass",			V_01				},
 	{ "sshd_port",			V_PORT				},
 	{ "sshd_remote",		V_01				},
+	{ "sshd_forwarding",		V_01				},
 	{ "sshd_rport", 		V_PORT				},
 	{ "sshd_authkeys",		V_TEXT(0, 4096)		},
 	{ "rmgt_sip",			V_LENGTH(0, 512)	},
@@ -683,6 +699,7 @@ static const nvset_t nvset_list[] = {
 	{ "rstats_bak",			V_01				},
 
 // admin-buttons
+	{ "sesx_led",			V_RANGE(0, 255)		},	// amber, white, aoss
 	{ "sesx_b0",			V_RANGE(0, 6)		},	// 0-4: toggle wireless, reboot, shutdown, script
 	{ "sesx_b1",			V_RANGE(0, 6)		},	// "
 	{ "sesx_b2",			V_RANGE(0, 6)		},	// "
@@ -747,13 +764,14 @@ static const nvset_t nvset_list[] = {
 	{ "qos_rst",			V_01				},
 	{ "qos_icmp",			V_01				},
 	{ "qos_reset",			V_01				},
+	{ "qos_pfifo",			V_01				}, // !!TB
 	{ "qos_obw",			V_RANGE(10, 999999)	},
 	{ "qos_ibw",			V_RANGE(10, 999999)	},
 	{ "qos_orules",			V_LENGTH(0, 4096)	},
 	{ "qos_default",		V_RANGE(0, 9)		},
 	{ "qos_irates",			V_LENGTH(0, 128)	},
 	{ "qos_orates",			V_LENGTH(0, 128)	},
-	
+
 	{ "ne_vegas",			V_01				},
 	{ "ne_valpha",			V_NUM				},
 	{ "ne_vbeta",			V_NUM				},

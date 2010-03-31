@@ -205,8 +205,8 @@ configure:4810: Disabling PAM
 configure:4917: Using openpty if available
 configure:4919: checking for library containing openpty
 configure:4960: mipsel-uclibc-gcc -o conftest -O2 -Wall   conftest.c  -lcrypt >&5
-/tmp/ccguBxIB.o: In function `main':
-/tmp/ccguBxIB.o(.text+0x1c): undefined reference to `openpty'
+/tmp/ccCnEbjK.o: In function `main':
+/tmp/ccCnEbjK.o(.text+0x1c): undefined reference to `openpty'
 collect2: ld returned 1 exit status
 configure:4966: $? = 1
 configure: failed program was:
@@ -2975,8 +2975,8 @@ configure:9096: $? = 0
 configure:9114: result: yes
 configure:9132: checking for endutxent
 configure:9188: mipsel-uclibc-gcc -o conftest -O2 -Wall   conftest.c -lutil  -lcrypt >&5
-/tmp/cceD0Xxh.o: In function `main':
-/tmp/cceD0Xxh.o(.text+0x1c): undefined reference to `endutxent'
+/tmp/ccg1cRji.o: In function `main':
+/tmp/ccg1cRji.o(.text+0x1c): undefined reference to `endutxent'
 collect2: ld returned 1 exit status
 configure:9194: $? = 1
 configure: failed program was:
@@ -3091,8 +3091,8 @@ configure: failed program was:
 configure:9212: result: no
 configure:9132: checking for getutxent
 configure:9188: mipsel-uclibc-gcc -o conftest -O2 -Wall   conftest.c -lutil  -lcrypt >&5
-/tmp/ccmY10Jm.o: In function `main':
-/tmp/ccmY10Jm.o(.text+0x1c): undefined reference to `getutxent'
+/tmp/ccCX2z2m.o: In function `main':
+/tmp/ccCX2z2m.o(.text+0x1c): undefined reference to `getutxent'
 collect2: ld returned 1 exit status
 configure:9194: $? = 1
 configure: failed program was:
@@ -3207,8 +3207,8 @@ configure: failed program was:
 configure:9212: result: no
 configure:9132: checking for getutxid
 configure:9188: mipsel-uclibc-gcc -o conftest -O2 -Wall   conftest.c -lutil  -lcrypt >&5
-/tmp/ccwszz5t.o: In function `main':
-/tmp/ccwszz5t.o(.text+0x1c): undefined reference to `getutxid'
+/tmp/ccq2PEWr.o: In function `main':
+/tmp/ccq2PEWr.o(.text+0x1c): undefined reference to `getutxid'
 collect2: ld returned 1 exit status
 configure:9194: $? = 1
 configure: failed program was:
@@ -3323,8 +3323,8 @@ configure: failed program was:
 configure:9212: result: no
 configure:9132: checking for getutxline
 configure:9188: mipsel-uclibc-gcc -o conftest -O2 -Wall   conftest.c -lutil  -lcrypt >&5
-/tmp/ccsU8HLe.o: In function `main':
-/tmp/ccsU8HLe.o(.text+0x1c): undefined reference to `getutxline'
+/tmp/ccAgqHzw.o: In function `main':
+/tmp/ccAgqHzw.o(.text+0x1c): undefined reference to `getutxline'
 collect2: ld returned 1 exit status
 configure:9194: $? = 1
 configure: failed program was:
@@ -3439,8 +3439,8 @@ configure: failed program was:
 configure:9212: result: no
 configure:9132: checking for pututxline
 configure:9188: mipsel-uclibc-gcc -o conftest -O2 -Wall   conftest.c -lutil  -lcrypt >&5
-/tmp/cc0qSZbj.o: In function `main':
-/tmp/cc0qSZbj.o(.text+0x1c): undefined reference to `pututxline'
+/tmp/ccYD3Cfz.o: In function `main':
+/tmp/ccYD3Cfz.o(.text+0x1c): undefined reference to `pututxline'
 collect2: ld returned 1 exit status
 configure:9194: $? = 1
 configure: failed program was:
@@ -3555,8 +3555,8 @@ configure: failed program was:
 configure:9212: result: no
 configure:9227: checking for setutxent
 configure:9283: mipsel-uclibc-gcc -o conftest -O2 -Wall   conftest.c -lutil  -lcrypt >&5
-/tmp/ccoi5Keo.o: In function `main':
-/tmp/ccoi5Keo.o(.text+0x1c): undefined reference to `setutxent'
+/tmp/ccm5iHqE.o: In function `main':
+/tmp/ccm5iHqE.o(.text+0x1c): undefined reference to `setutxent'
 collect2: ld returned 1 exit status
 configure:9289: $? = 1
 configure: failed program was:
@@ -3671,8 +3671,8 @@ configure: failed program was:
 configure:9307: result: no
 configure:9227: checking for utmpxname
 configure:9283: mipsel-uclibc-gcc -o conftest -O2 -Wall   conftest.c -lutil  -lcrypt >&5
-/tmp/ccSQSzjt.o: In function `main':
-/tmp/ccSQSzjt.o(.text+0x1c): undefined reference to `utmpxname'
+/tmp/ccaeES3K.o: In function `main':
+/tmp/ccaeES3K.o(.text+0x1c): undefined reference to `utmpxname'
 collect2: ld returned 1 exit status
 configure:9289: $? = 1
 configure: failed program was:
@@ -4390,8 +4390,8 @@ conftest.c:78:1: warning: "DISABLE_UTMPX" redefined
 conftest.c:73:1: warning: this is the location of the previous definition
 conftest.c:79:1: warning: "DISABLE_WTMPX" redefined
 conftest.c:75:1: warning: this is the location of the previous definition
-/tmp/ccusUqEd.o: In function `main':
-/tmp/ccusUqEd.o(.text+0x1c): undefined reference to `_getpty'
+/tmp/ccY9IzDk.o: In function `main':
+/tmp/ccY9IzDk.o(.text+0x1c): undefined reference to `_getpty'
 collect2: ld returned 1 exit status
 configure:10641: $? = 1
 configure: failed program was:

@@ -8,15 +8,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <ctype.h> // !!TB
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <stdarg.h>
 #include <syslog.h>
 #include <sys/ioctl.h>
 #include <net/if.h>
+#include <dirent.h> //!!TB
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <sys/sysinfo.h>
+#include <sys/types.h>
 
 #include <bcmnvram.h>
 #include <bcmdevs.h>
@@ -80,7 +83,7 @@ void notice_set(const char *path, const char *format, ...)
 	mkdir("/var/notice", 0755);
 	snprintf(p, sizeof(p), "/var/notice/%s", path);
 	f_write_string(p, buf, 0, 0);
-	if (buf[0]) syslog(LOG_INFO, "notice: %s", buf);
+	if (buf[0]) syslog(LOG_INFO, "notice[%s]: %s", path, buf);
 }
 
 

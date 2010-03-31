@@ -129,7 +129,7 @@ const defaults_t defaults[] = {
 	{ "wl_radioids",		""				},	// List of radio IDs
 	{ "wl_ssid",			"Tomato.RAF"			},	// Service set ID (network name)
 	{ "wl_country",			"JP"		},		// Country (default obtained from driver)
-	{ "wl_country_code",		"JP"		},		// !!TB - Country (default to JP to avoid unstable radio behaviour)
+	{ "wl_country_code",		"JP"		},		// !!TB - Country (default to JP to allow all 14 channels)
 	{ "wl_radio",			"1"				},	// Enable (1) or disable (0) radio
 	{ "wl_closed",			"0"				},	// Closed (hidden) network
     { "wl_ap_isolate",		"0"				},	// AP isolate mode
@@ -145,7 +145,7 @@ const defaults_t defaults[] = {
 	{ "wl_key3",			""				},	// 5/13 char ASCII or 10/26 char hex
 	{ "wl_key4",			""				},	// 5/13 char ASCII or 10/26 char hex
 	{ "wl_maclist",			""				},	// xx:xx:xx:xx:xx:xx ...
-	{ "wl_channel",			"10"				},	// Channel number
+	{ "wl_channel",			"6"				},	// Channel number
 	{ "wl_rate",			"0"				},	// Rate (bps, 0 for auto)
 	{ "wl_mrate",			"0"				},	// Mcast Rate (bps, 0 for auto)
 	{ "wl_rateset",			"default"		},	// "default" or "all" or "12"
@@ -300,6 +300,7 @@ const defaults_t defaults[] = {
 	{ "block_wan",			"1"				},	// block inbound icmp
 	{ "multicast_pass",		"0"				},	// enable multicast proxy
 	{ "ne_syncookies",		"0"				},	// tcp_syncookies
+	{ "ne_snat",			"0"				},	// use SNAT instead of MASQUERADE
 	{ "ne_shlimit",			"0,3,60"		},
 
 // advanced-routing
@@ -325,13 +326,17 @@ const defaults_t defaults[] = {
 	{ "dmz_sip",			""				},
 
 // forward-upnp
-	{ "upnp_enable",		"1"				},
+	{ "upnp_enable",		"0"				},
 	{ "upnp_secure",		"1"				},
-	{ "upnp_port",			"5000"			},
-#if 0	// disabled for miniupnpd
-	{ "upnp_ssdp_interval",	"60"			},	// SSDP interval
-	{ "upnp_max_age",		"180"			},	// Max age
+	{ "upnp_port",			"0"				},
+	{ "upnp_ssdp_interval",		"60"				},	// SSDP interval
 	{ "upnp_mnp",			"0"				},
+
+	{ "upnp_clean",			"1"				},	/* 0:Disable 1:Enable */
+	{ "upnp_clean_interval",	"600"				},	/* Cleaning interval in seconds */
+	{ "upnp_clean_threshold",	"20"				},	/* Threshold for cleaning unused rules */
+#if 0	// disabled for miniupnpd
+	{ "upnp_max_age",		"180"			},	// Max age
 	{ "upnp_config",		"0"				},
 #endif
 
@@ -399,6 +404,7 @@ const defaults_t defaults[] = {
 	{ "sshd_rport",			"2222"			},
 	{ "sshd_authkeys",		""				},
 	{ "sshd_hostkey",		""				},
+	{ "sshd_forwarding",		"1"				},
 	{ "rmgt_sip",			""				},	// remote management: source ip address
 
 	{ "http_id",			""				},
@@ -485,17 +491,6 @@ const defaults_t defaults[] = {
 	{ "script_fire",		""				},
 	{ "script_wanup",		""				},
 
-// new_qoslimit
-	{ "new_qoslimit_enable",		"0"			},
-	{ "new_qoslimit_obw",			""			},
-	{ "new_qoslimit_ibw",			""			},
-	{ "new_qoslimit_rules",			"" 			},
-
-// new_arpbind
-	{ "new_arpbind_enable",			"0"			},
-	{ "new_arpbind_only",			"0"			},
-	{ "new_arpbind_list",			"" 			},
-
 #if 0
 // safe to remove?
 	{ "QoS",					"0"			},
@@ -579,7 +574,7 @@ const defaults_t defaults[] = {
 	{ "aol_block_traffic2",	"0"				},	// 0:Disable 1:Enable for "Parental control"
 	{ "skip_amd_check",		"0"				},	// 0:Disable 1:Enable
 	{ "skip_intel_check",	"0"				},	// 0:Disable 1:Enable
-	
+
 // advanced-watchdog
 	{ "wd_en",				""				},
 	{ "wd_atp0",			""				},
@@ -592,7 +587,21 @@ const defaults_t defaults[] = {
 	{ "wd_cki",				"300"			},
 	{ "wd_fdm",				""				},
 	{ "wd_aof",				""				},
+	
+#endif	// 0
 
+// new_qoslimit
+	{ "new_qoslimit_enable",		"0"			},
+	{ "new_qoslimit_obw",			""			},
+	{ "new_qoslimit_ibw",			""			},
+	{ "new_qoslimit_rules",			"" 			},
+
+// new_arpbind
+	{ "new_arpbind_enable",			"0"			},
+	{ "new_arpbind_only",			"0"			},
+	{ "new_arpbind_list",			"" 			},
+
+	{ NULL, NULL	}
 };
 
 const defaults_t if_generic[] = {

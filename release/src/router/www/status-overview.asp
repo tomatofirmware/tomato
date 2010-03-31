@@ -96,7 +96,7 @@ function show()
 	c('uptime', stats.uptime);
 	c('time', stats.time);
 	c('wanip', stats.wanip);
-	c('wanprebuf', stats.wanprebuf); //Victek
+	c('wanprebuf',stats.wanprebuf); //Victek
 	c('wannetmask', stats.wannetmask);
 	c('wangateway', stats.wangateway);
 	c('ispconid', stats.ispconid); //Victek
@@ -240,6 +240,7 @@ createFieldTable('', [
 	{ title: 'SSID', text: nvram.wl_ssid },
 	{ title: 'Security', text: sec },
 	{ title: 'Channel', rid: 'channel', text: stats.channel },
+	{ title: 'Rate', rid: 'rate', text: stats.rate },
 	{ title: 'RSSI', rid: 'rssi', text: wlcrssi, ignore: !isClient },
 	{ title: 'Noise', rid: 'noise', text: wlnoise, ignore: !isClient },
 	{ title: 'Signal Quality', rid: 'qual', text: stats.qual, ignore: !isClient }

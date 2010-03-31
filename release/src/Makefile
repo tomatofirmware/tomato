@@ -52,13 +52,13 @@ ifeq ($(wildcard include/bcm20xx.h),)
 		| tee fpkg.log
 else
 	@btools/fpkg -i linux/linux/arch/mips/brcm-boards/bcm947xx/compressed/vmlinuz -i router/mipsel-uclibc/target.image \
-		-t image/tomato-ND.trx
+		-t image/tomato-RAF-ND.trx
 endif
 
 
 	@echo ""
 	@echo "-----------------"
-	@echo `cat router/shared/tomato_version` " ready"
+	@echo `cat router/shared/tomato_version` "RAF ND ready"
 	@echo "-----------------"
 
 ifneq ($(NOVERSION),1)	

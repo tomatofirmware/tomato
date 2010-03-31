@@ -199,9 +199,7 @@ if [ "$CONFIG_BCM947XX" = "y" ] ; then
    if [ "$CONFIG_BCM4704" = "y" ] ; then
       bool '     Support for performance profiling' CONFIG_HND_BMIPS3300_PROF
    fi
-   bool '    Support for Broadcom BCM5354' CONFIG_BCM5354
    bool '    Support for Broadcom BCM5365' CONFIG_BCM5365
-   bool '    Support for Using DSCP based IP forwarding' CONFIG_BCMIPDSCP
 fi
 bool 'Support for SNI RM200 PCI' CONFIG_SNI_RM200_PCI
 dep_bool 'Support for Toshiba JMR-TX3927 board' CONFIG_TOSHIBA_JMR3927 $CONFIG_MIPS32

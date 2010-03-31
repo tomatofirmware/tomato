@@ -53,7 +53,7 @@ for (var i = 1; i <= 100; ++i) {
 var qosg = new TomatoGrid();
 
 qosg.setup = function() {
-	this.init('qosg-grid', '', 40, [
+	this.init('qosg-grid', '', 100, [
 		{ type: 'text', maxlen: 2 },
 		{ type: 'text', maxlen: 15 },
 		{ type: 'text', maxlen: 6 },

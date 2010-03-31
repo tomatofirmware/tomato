@@ -28,7 +28,7 @@
 #include <bcmnvram.h>
 #include <bcmotp.h>
 
-#if defined(CONFIG_BCMUSBDEV)
+#if defined(BCMUSBDEV)
 #include <sbsdio.h>
 #include <sbhnddma.h>
 #include <sbsdpcmdev.h>
@@ -58,7 +58,7 @@ static int initvars_srom_sb(sb_t *sbh, osl_t *osh, void *curmap, char **vars, ui
 static void _initvars_srom_pci(uint8 sromrev, uint16 *srom, uint off, varbuf_t *b);
 static int initvars_srom_pci(sb_t *sbh, void *curmap, char **vars, uint *count);
 static int initvars_cis_pcmcia(sb_t *sbh, osl_t *osh, char **vars, uint *count);
-#if !defined(CONFIG_BCMUSBDEV) && !defined(CONFIG_BCMSDIODEV)
+#if !defined(BCMUSBDEV) && !defined(BCMSDIODEV)
 static int initvars_flash_sb(sb_t *sbh, char **vars, uint *count);
 #endif	/* !BCMUSBDEV && !BCMSDIODEV */
 static int sprom_cmd_pcmcia(osl_t *osh, uint8 cmd);
@@ -840,7 +840,7 @@ srom_parsecis(osl_t *osh, uint8 *pcis[], uint ciscnt, char **vars, uint *count)
 					              (cis[i + 2] << 8) + cis[i + 1]);
 					break;
 
-#if defined(CONFIG_BCMCCISSR3)
+#if defined(BCMCCISSR3)
 				case HNBU_SROM3SWRGN: {
 					uint16 srom[35];
 					uint8 srev = cis[i + 1 + 70];
@@ -1099,7 +1099,7 @@ exit:	MFREE(osh, flash, NVRAM_SPACE);
 	return err;
 }
 
-#if !defined(CONFIG_BCMUSBDEV) && !defined(CONFIG_BCMSDIODEV)
+#if !defined(BCMUSBDEV) && !defined(BCMSDIODEV)
 /*
  * Initialize nonvolatile variable table from flash.
  * Return 0 on success, nonzero on error.
@@ -1813,10 +1813,10 @@ initvars_cis_pcmcia(sb_t *sbh, osl_t *osh, char **vars, uint *count)
 static int
 BCMINITFN(initvars_srom_sb)(sb_t *sbh, osl_t *osh, void *curmap, char **vars, uint *varsz)
 {
-#if defined(CONFIG_BCMSDIODEV)
+#if defined(BCMSDIODEV)
 	/* CIS is read and supplied by the host */
 	return BCME_OK;
-#elif defined(CONFIG_BCMUSBDEV)
+#elif defined(BCMUSBDEV)
 	static bool srvars = FALSE;	/* Use OTP/SPROM as global variables */
 
 	int sel = 0;	/* where to read the srom. 0 - nowhere, 1 - otp, 2 - sprom */
@@ -1828,7 +1828,7 @@ BCMINITFN(initvars_srom_sb)(sb_t *sbh, osl_t *osh, void *curmap, char **vars, ui
 	if (srvars)
 		return 0;
 
-#if defined(CONFIG_BCM4328)
+#if defined(BCM4328)
 	if (sbh->chip == BCM4328_CHIP_ID) {
 		/* Access the SPROM if it is present */
 		if ((sz = srom_size(sbh, osh)) != 0) {
@@ -1837,7 +1837,7 @@ BCMINITFN(initvars_srom_sb)(sb_t *sbh, osl_t *osh, void *curmap, char **vars, ui
 		}
 	}
 #endif
-#if defined(CONFIG_BCM4325)
+#if defined(BCM4325)
 	if (sbh->chip == BCM4325_CHIP_ID) {
 		uint32 cst = sbh->chipst & CST4325_SPROM_OTP_SEL_MASK;
 

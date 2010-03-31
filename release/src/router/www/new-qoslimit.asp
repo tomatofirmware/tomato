@@ -46,7 +46,7 @@
 var class_prio = [['0','Highest'],['1','High'],['2','Normal'],['3','Low'],['4','Lowest']];
 var class_tcp = [['0','nolimit']];
 var class_udp = [['0','nolimit']];
-for (var i = 1; i <= 100; ++i) {
+for (var i = 1; i <= 140; ++i) {
 	class_tcp.push([i*10, i*10+'']);
 	class_udp.push([i, i + '/s']);
 }
@@ -142,9 +142,9 @@ qosg.verifyFields = function(row, quiet)
 	var f = fields.getAll(row);
 	var s;
 
-	if (v_range(f[0], quiet, 10, 199)) {
+	if (v_range(f[0], quiet, 10, 149)) {
 		if(this.existID(f[0].value)) {
-			ferror.set(f[0], 'ID must between 10 and 199', quiet);
+			ferror.set(f[0], 'ID must between 10 and 149', quiet);
 			ok = 0;
 		}
 	}

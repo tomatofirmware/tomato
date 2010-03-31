@@ -69,9 +69,6 @@ BCMINITFN(sb_serial_init)(sb_t *sbh, sb_serial_init_fn add)
 	cc = (chipcregs_t *)sb_setcore(sbh, SB_CC, 0);
 	ASSERT(cc);
 
-	/* Default value */
-	div = 48;
-
 	/* Determine core revision and capabilities */
 	rev = sbh->ccrev;
 	cap = sbh->cccaps;
@@ -87,14 +84,8 @@ BCMINITFN(sb_serial_init)(sb_t *sbh, sb_serial_init_fn add)
 		                          R_REG(osh, &cc->clockcontrol_m2));
 		div = 1;
 	} else {
-		/* 5354 chip common uart uses a constant clock
-		 * frequency of 25MHz */
-		if (sb_corerev(sbh) == 20) {
-			/* Set the override bit so we don't divide it */
-			W_REG(osh, &cc->corecontrol, CC_UARTCLKO);
-			baud_base = 25000000;
-		} else if (rev >= 11 && rev != 15) {
 		/* Fixed ALP clock */
+		if (rev >= 11 && rev != 15) {
 			baud_base = sb_alp_clock(sbh);
 			div = 1;
 			/* Turn off UART clock before switching clock source */
