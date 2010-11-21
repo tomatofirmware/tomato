@@ -379,6 +379,7 @@ const defaults_t defaults[] = {
 	{ "dhcpc_requestip",		""				},
 	{ "dns_norebind",		"1"				},
 	{ "dnsmasq_custom",		""				},
+	{ "hosts_custom",		""				},
 //	{ "dnsmasq_norw",		"0"				},
 
 // advanced-firewall

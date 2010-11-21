@@ -282,8 +282,11 @@ void start_dnsmasq()
 			fprintf(f, "dhcp-host=%s,%s,%s\n", mac, ip, sdhcp_lease);
 		}
 	}
-
-	if (hf) fclose(hf);
+	
+	if (hf) {
+		fprintf(hf, "%s\n\n", nvram_safe_get("hosts_custom"));
+		fclose(hf);
+	}
 
 	//
 

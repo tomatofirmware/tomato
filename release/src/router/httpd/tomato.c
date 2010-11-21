@@ -624,6 +624,7 @@ static const nvset_t nvset_list[] = {
 	{ "dhcpc_requestip",		V_LENGTH(0, 16)			},
 	{ "dns_norebind",		V_01				},
 	{ "dnsmasq_custom",		V_TEXT(0, 2048)		},
+	{ "hosts_custom",		V_TEXT(0, 2048)		},
 //	{ "dnsmasq_norw",		V_01				},
 
 // advanced-firewall

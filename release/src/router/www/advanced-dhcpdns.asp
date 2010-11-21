@@ -29,7 +29,7 @@ textarea {
 
 <script type='text/javascript'>
 
-//	<% nvram("dhcpd_dmdns,dns_addget,dhcpd_gwmode,dns_intcpt,dhcpd_slt,dhcpc_minpkt,dnsmasq_custom,dnsmasq_norw,dhcpd_lmax,dhcpc_vendorclass,dhcpc_requestip,dns_norebind"); %>
+//	<% nvram("dhcpd_dmdns,dns_addget,dhcpd_gwmode,dns_intcpt,dhcpd_slt,dhcpc_minpkt,dnsmasq_custom,dnsmasq_norw,dhcpd_lmax,dhcpc_vendorclass,dhcpc_requestip,dns_norebind,hosts_custom"); %>
 
 if ((isNaN(nvram.dhcpd_lmax)) || ((nvram.dhcpd_lmax *= 1) < 1)) nvram.dhcpd_lmax = 255;
 
@@ -39,6 +39,7 @@ function verifyFields(focused, quiet)
 	elem.display('_dhcpd_sltman', b);
 	if ((b) && (!v_range('_f_dhcpd_slt', quiet, 1, 43200))) return 0;
 	if (!v_length('_dnsmasq_custom', quiet, 0, 2048)) return 0;
+	if (!v_length('_hosts_custom', quiet, 0, 2048)) return 0;
 	if (!v_range('_dhcpd_lmax', quiet, 1, 0xFFFF)) return 0;
 	if (!v_ipz('_dhcpc_requestip', quiet)) return 0;
 	return 1;
@@ -126,7 +127,8 @@ createFieldTable('', [
 			value: (nvram.dhcpd_slt < 1) ? nvram.dhcpd_slt : 1 },
 		{ name: 'f_dhcpd_slt', type: 'text', maxlen: 5, size: 8, prefix: '<span id="_dhcpd_sltman"> ', suffix: ' <i>(minutes)</i></span>',
 			value: (nvram.dhcpd_slt >= 1) ? nvram.dhcpd_slt : 3600 } ] },
-	{ title: '<a href="http://www.thekelleys.org.uk/" target="_new">Dnsmasq</a><br>Custom configuration', name: 'dnsmasq_custom', type: 'textarea', value: nvram.dnsmasq_custom }
+	{ title: '<a href="http://www.thekelleys.org.uk/" target="_new">Dnsmasq</a><br>Custom configuration', name: 'dnsmasq_custom', type: 'textarea', value: nvram.dnsmasq_custom },
+	{ title: 'Custom additional<br>/etc/hosts.dnsmasq entries', name: 'hosts_custom', type: 'textarea', value: nvram.hosts_custom }
 ]);
 </script>
 <br>
