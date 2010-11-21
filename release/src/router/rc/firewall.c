@@ -54,6 +54,11 @@ const char *chain_out_reject;
 const char ipt_fname[] = "/etc/iptables";
 FILE *ipt_file;
 
+#ifdef TCONFIG_IPV6
+const char ip6t_fname[] = "/etc/ip6tables";
+FILE *ip6t_file;
+#endif
+
 
 /*
 struct {
@@ -153,6 +158,17 @@ void ipt_write(const char *format, ...)
 	va_start(args, format);
 	vfprintf(ipt_file, format, args);
 	va_end(args);
+}
+
+void ip6t_write(const char *format, ...)
+{
+#ifdef TCONFIG_IPV6
+	va_list args;
+
+	va_start(args, format);
+	vfprintf(ip6t_file, format, args);
+	va_end(args);
+#endif
 }
 
 // -----------------------------------------------------------------------------
@@ -320,12 +336,16 @@ static void mangle_table(void)
 	int ttl;
 	char *p;
 
-	ipt_write(
+	ip46t_write(
 		"*mangle\n"
 		":PREROUTING ACCEPT [0:0]\n"
 		":OUTPUT ACCEPT [0:0]\n");
 
 	if (wanup) {
+		
+#ifdef TCONFIG_IPV6
+		modprobe("nf_conntrack_ipv6");
+#endif		
 		ipt_qos();
 
 		p = nvram_safe_get("nf_ttl");
@@ -352,7 +372,7 @@ static void mangle_table(void)
 #else
 			modprobe("ipt_TTL");
 #endif
-			ipt_write(
+			ip46t_write(
 				"-I PREROUTING -i %s -j TTL --ttl-%s %d\n"
 				"-I POSTROUTING -o %s -j TTL --ttl-%s %d\n",
 					wanface, p, ttl,
@@ -360,7 +380,7 @@ static void mangle_table(void)
 		}
 	}
 
-	ipt_write("COMMIT\n");
+	ip46t_write("COMMIT\n");
 }
 
 
@@ -790,6 +810,9 @@ int start_firewall(void)
 	int n;
 	int wanproto;
 	char *iptrestore_argv[] = { "iptables-restore", (char *)ipt_fname, NULL };
+#ifdef TCONFIG_IPV6	
+	char *ip6trestore_argv[] = { "ip6tables-restore", (char *)ip6t_fname, NULL };
+#endif
 
 	simple_lock("firewall");
 	simple_lock("restrictions");
@@ -906,6 +929,14 @@ int start_firewall(void)
 		simple_unlock("firewall");
 		return 0;
 	}
+	
+#ifdef TCONFIG_IPV6
+	if ((ip6t_file = fopen(ip6t_fname, "w")) == NULL) {
+		notice_set("ip6tables", "Unable to create ip6tables restore file");
+		simple_unlock("firewall");
+		return 0;
+	}
+#endif
 
 	mangle_table();
 	nat_table();
@@ -913,6 +944,11 @@ int start_firewall(void)
 
 	fclose(ipt_file);
 	ipt_file = NULL;
+	
+#ifdef TCONFIG_IPV6
+	fclose(ip6t_file);
+	ip6t_file = NULL;
+#endif
 
 #ifdef DEBUG_IPTFILE
 	if (debug_only) {
@@ -956,6 +992,22 @@ int start_firewall(void)
 
 		*/
 	}
+	
+#ifdef TCONFIG_IPV6
+	if (nvram_get_int("ipv6_enable")) {
+		notice_set("ip6tables", "");
+		if (_eval(ip6trestore_argv, ">/var/notice/ip6tables", 0, NULL) == 0) {
+			led(LED_DIAG, 0);
+			notice_set("ip6tables", "");
+		}
+		else {
+			sprintf(s, "%s.error", ip6t_fname);
+			rename(ip6t_fname, s);
+			syslog(LOG_CRIT, "Error while loading rules. See %s file.", s);
+			led(LED_DIAG, 1);
+		}
+	}
+#endif
 
 	if (nvram_get_int("upnp_enable") & 3) {
 		f_write("/etc/upnp/load", NULL, 0, 0, 0);
