@@ -52,7 +52,7 @@ function resolve()
 			if (lock == 0) grid.setName(r[0], r[1]);
 		}
 		if (queue.length == 0) {
-			if ((lock == 0) && (resolveCB) && (grid.sortColumn == 3)) grid.resort();
+			if ((lock == 0) && (resolveCB) && (grid.sortColumn == 4)) grid.resort();
 		}
 		else setTimeout(resolve, 500);
 		xob = null;
@@ -90,17 +90,20 @@ grid.sortCompare = function(a, b) {
 	switch (col) {
 	case 2:
 	case 4:
+	case 6:
+	case 7:
 		r = cmpInt(da[col], db[col]);
 		break;
+/*
 	case 1:
-	case 3:
+	case 4:
 		var a = fixIP(da[col]);
 		var b = fixIP(db[col]);
 		if ((a != null) && (b != null)) {
 			r = aton(a) - aton(b);
 			break;
 		}
-		// fall
+*/		// fall
 	default:
 		r = cmpText(da[col], db[col]);
 		break;
@@ -161,7 +164,7 @@ grid.setName = function(ip, name) {
 
 grid.setup = function() {
 	this.init('grid', 'sort');
-	this.headerSet(['Proto', 'Source', 'S Port', 'Destination', 'D Port', 'Class']);
+	this.headerSet(['Proto', 'Source', 'S Port', 'Destination', 'D Port', 'Class', 'Bytes Out', 'Bytes In']);
 }
 
 var ref = new TomatoRefresh('update.cgi', '', 0, 'qos_detailed');
@@ -206,7 +209,7 @@ ref.refresh = function(text)
 			}
 			else cursor = null;
 		}
-		d = [protocols[b[0]] || b[0], b[2], b[4], b[3], b[5], abc[b[6]] || ('' + b[6])];
+		d = [protocols[b[0]] || b[0], b[2], b[4], b[3], b[5], abc[b[8]] || ('' + b[8]), b[6], b[7]];
 		var row = grid.insert(-1, d, d, false);
 		if (cursor) row.style.cursor = cursor;
 	}
