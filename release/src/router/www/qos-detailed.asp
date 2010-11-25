@@ -129,18 +129,21 @@ grid.onClick = function(cell) {
 
 grid.resolveAll = function()
 {
-	var i, ip, row, q;
+	var i, ip, row, q, cols, j;
 
 	q = [];
+	cols = [1, 3];
 	for (i = 1; i < this.tb.rows.length; ++i) {
 		row = this.tb.rows[i];
-		ip = row.getRowData()[3];
-		if (ip.indexOf('<') == -1) {
-			if (!q[ip]) {
-				q[ip] = 1;
-				queue.push(ip);
+		for (j = cols.length-1; j >= 0; j--) {
+			ip = row.getRowData()[cols[j]];
+			if (ip.indexOf('<') == -1) {
+				if (!q[ip]) {
+					q[ip] = 1;
+					queue.push(ip);
+				}
+				row.style.cursor = 'wait';
 			}
-			row.style.cursor = 'wait';
 		}
 	}
 	q = null;
@@ -148,16 +151,19 @@ grid.resolveAll = function()
 }
 
 grid.setName = function(ip, name) {
-	var i, row, data;
+	var i, row, data, cols, j;
 
+	cols = [1, 3];
 	for (i = this.tb.rows.length - 1; i > 0; --i) {
 		row = this.tb.rows[i];
 		data = row.getRowData();
-		if (data[3] == ip) {
-			data[3] = name + ' <small>(' + ip + ')</small>';
-			row.setRowData(data);
-			row.cells[3].innerHTML = data[3];
-			row.style.cursor = 'default';
+		for (j = cols.length-1; j >= 0; j--) {
+			if (data[cols[j]] == ip) {
+				data[cols[j]] = name + ' <small>(' + ip + ')</small>';
+				row.setRowData(data);
+				row.cells[cols[j]].innerHTML = data[cols[j]];
+				row.style.cursor = 'default';
+			}
 		}
 	}
 }
@@ -171,7 +177,7 @@ var ref = new TomatoRefresh('update.cgi', '', 0, 'qos_detailed');
 
 ref.refresh = function(text)
 {
-	var i, b, d;
+	var i, b, d, cols, j;
 
 	++lock;
 
@@ -191,25 +197,29 @@ ref.refresh = function(text)
 	var cursor;
 	var ip;
 
+	cols = [2, 3];
+
 	for (i = 0; i < ctdump.length; ++i) {
 		b = ctdump[i];
-		ip = b[3];
-		if (cache[ip] != null) {
-			c[ip] = cache[ip];
-			b[3] = cache[ip] + ' <small>(' + ip + ')</small>';
-			cursor = 'default';
-		}
-		else {
-			if (resolveCB) {
-				if (!q[ip]) {
-					q[ip] = 1;
-					queue.push(ip);
-				}
-				cursor = 'wait';
+		for (j = cols.length-1; j >= 0; j--) {
+			ip = b[cols[j]];
+			if (cache[ip] != null) {
+				c[ip] = cache[ip];
+				b[cols[j]] = cache[ip] + ' <small>(' + ip + ')</small>';
+				cursor = 'default';
 			}
-			else cursor = null;
+			else {
+				if (resolveCB) {
+					if (!q[ip]) {
+						q[ip] = 1;
+						queue.push(ip);
+					}
+					cursor = 'wait';
+				}
+				else cursor = null;
+			}
 		}
-		d = [protocols[b[0]] || b[0], b[2], b[4], b[3], b[5], abc[b[8]] || ('' + b[8]), b[6], b[7]];
+		d = [protocols[b[0]] || b[0], b[2], b[4], b[3], b[5], b[8] + (abc[b[8]] ? (': ' + abc[b[8]]) : ''), b[6], b[7]];
 		var row = grid.insert(-1, d, d, false);
 		if (cursor) row.style.cursor = cursor;
 	}

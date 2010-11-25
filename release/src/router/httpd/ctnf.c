@@ -20,6 +20,8 @@
 #include <time.h>
 #include <dirent.h>
 
+#define IP6_PREFIX_NOT_MATCH( a, b, bits ) (memcmp(&a.s6_addr[0], &b.s6_addr[0], bits/8) != 0 || ( bits % 8 && (a.s6_addr[bits/8] ^ b.s6_addr[bits/8]) >> (8-(bits % 8)) ))
+
 
 static void ctvbuf(FILE *f)
 {
@@ -182,11 +184,16 @@ void asp_ctdump(int argc, char **argv)
 	FILE *f;
 	char s[512];
 	char *p, *q;
+	int x;
 	int mark;
 	int findmark;
 	unsigned int proto;
 	unsigned int time;
+#ifdef LINUX26
 	unsigned int family;
+#else
+	const unsigned int family = 2;
+#endif
 	char src[INET6_ADDRSTRLEN];
 	char dst[INET6_ADDRSTRLEN];
 	char sport[16];
@@ -194,13 +201,7 @@ void asp_ctdump(int argc, char **argv)
 	char byteso[16];
 	char bytesi[16];
 	int dir_reply;
-#ifdef TCONFIG_IPV6
-	struct in6_addr rip6;
-	struct in6_addr lan6;
-	int lan6_prefix_bytes;
-	int lan6_prefix_bits;
-	struct in6_addr in6;
-#endif
+
 	unsigned long rip;
 	unsigned long lan;
 	unsigned long mask;
@@ -215,12 +216,15 @@ void asp_ctdump(int argc, char **argv)
 	lan = rip & mask;
 	
 #ifdef TCONFIG_IPV6
+	struct in6_addr rip6;
+	struct in6_addr lan6;
+	struct in6_addr in6;
+	int lan6_prefix_len;
+
 	if (!nvram_match("ipv6_enable", "0")) {
 		inet_pton(AF_INET6, nvram_safe_get("ipv6_rtr_addr"), &rip6);
 		inet_pton(AF_INET6, nvram_safe_get("ipv6_prefix"), &lan6);
-		int lan6_prefix_len = nvram_get_int("ipv6_prefix_length");
-		lan6_prefix_bytes = lan6_prefix_len / 8;
-		lan6_prefix_bits  = lan6_prefix_len % 8;
+		lan6_prefix_len = nvram_get_int("ipv6_prefix_length");
 	}
 #endif
 	
@@ -237,7 +241,7 @@ add bytes out/in to table
 
 	web_puts("\nctdump = [");
 	comma = ' ';
-#ifdef TCONFIG_IPV6
+#ifdef LINUX26
 	if ((f = fopen("/proc/net/nf_conntrack", "r")) != NULL) {
 #else
 	if ((f = fopen("/proc/net/ip_conntrack", "r")) != NULL) {
@@ -248,64 +252,67 @@ add bytes out/in to table
 			if ((p = strstr(s, " mark=")) == NULL) continue;
 			if ((mark = (atoi(p + 6) & 0xFF)) > 10) mark = 0;
 			if ((findmark != -1) && (mark != findmark)) continue;
-#ifdef TCONFIG_IPV6
+#ifdef LINUX26
 			if (sscanf(s, "%*s %u %*s %u %u", &family, &proto, &time) != 3) continue;
-			if ((p = strstr(s + 25, "src=")) == NULL) continue;		// DIR_ORIGINAL
+			if ((p = strstr(s + 25, "src=")) == NULL) continue;
 #else
 			if (sscanf(s, "%*s %u %u", &proto, &time) != 2) continue;
-			if ((p = strstr(s + 14, "src=")) == NULL) continue;		// DIR_ORIGINAL
+			if ((p = strstr(s + 14, "src=")) == NULL) continue;
 #endif
-
-#ifdef TCONFIG_IPV6
-			switch (family) {
-			case 2:
-#endif
-				if ((inet_addr(p + 4) & mask) != lan) {
-					dir_reply = 1;
-				}
-				else if (rip != 0) {
-					if ((q = strstr(p + 13, "dst=")) == NULL) continue;
-//					cprintf("%lx=%lx\n", inet_addr(q + 4), rip);
-					if (inet_addr(q + 4) == rip) continue;
-				}
-#ifdef TCONFIG_IPV6
-				break;
-			case 10:
-				if (sscanf(p + 4, "%s ", src) != 1) continue;
-				if (inet_pton(AF_INET6, src, &in6) <= 0) continue;
-				if (rip != 0 && (IN6_ARE_ADDR_EQUAL(&rip6, &in6))) continue;
-				else if (memcmp(&lan6.s6_addr[0], &in6.s6_addr[0], lan6_prefix_bytes) != 0 || ( lan6_prefix_bits && 
-					(lan6.s6_addr[lan6_prefix_bytes] ^ in6.s6_addr[lan6_prefix_bytes]) >> (8-lan6_prefix_bits) )) {
-					dir_reply = 1;
-				}
-				break;
-			}
-#endif
-			if (dir_reply) {
-				// make sure we're seeing int---ext if possible
-				if ((q = strstr(p + 13, "bytes=")) == NULL) continue;
-				if (sscanf(q + 6, "%s", bytesi) != 1) continue;
-				if ((p = strstr(p + 41, "src=")) == NULL) continue;
-			}
-			else {
-				if ((q = strstr(p + 41, "src=")) == NULL) continue;
-				if ((q = strstr(q + 13, "bytes=")) == NULL) continue;
-				if (sscanf(q + 6, "%s", bytesi) != 1) continue;
-			}
-
+			if (sscanf(p, "src=%s dst=%s %n", src, dst, &x) != 2) continue;
+			p += x;
 
 			if ((proto == 6) || (proto == 17)) {
-				if (sscanf(p + 4, "%s dst=%s sport=%s dport=%s %*s bytes=%s", src, dst, sport, dport, byteso) != 5) continue;
+				if (sscanf(p, "sport=%s dport=%s %*s bytes=%s %n", sport, dport, byteso, &x) != 3) continue;
+				p += x;
+				if ((q = strstr(p, "bytes=")) == NULL) continue;
+				if (sscanf(q, "bytes=%s", bytesi) != 1) continue;
 			}
 			else {
-				if (sscanf(p + 4, "%s dst=%s", src, dst) != 2) continue;
-				if ((q = strstr(p + 13, "bytes=")) == NULL) continue;
-				if (sscanf(q + 6, "%s", byteso) != 1) continue;
 				sport[0] = 0;
 				dport[0] = 0;
+				byteso[0] = 0;
+				bytesi[0] = 0;
 			}
 
-			web_printf("%c[%u,%u,'%s','%s','%s','%s','%s','%s',%d]", comma, proto, time, src, dst, sport, dport, byteso, bytesi, mark );
+			switch (family) {
+			case 2:
+				if ((inet_addr(src) & mask) != lan) {
+					dir_reply = 1;
+					// de-nat
+					if ((p = strstr(p, "src=")) == NULL) continue;
+					if ((proto == 6) || (proto == 17)) {
+						if (sscanf(p, "src=%s dst=%s sport=%s dport=%s", dst, src, dport, sport) != 4) continue; // intentionally backwards
+					}
+					else {
+						if (sscanf(p, "src=%s dst=%s", dst, src) != 2) continue;
+					}
+				}
+				else if (rip != 0 && inet_addr(dst) == rip) continue; 
+				break;
+#ifdef TCONFIG_IPV6
+			case 10:
+				if (inet_pton(AF_INET6, src, &in6) <= 0) continue;
+				inet_ntop(AF_INET6, &in6, src, sizeof src);
+
+				if (IP6_PREFIX_NOT_MATCH(rip6, in6, lan6_prefix_len))
+					dir_reply = 1;
+
+				if (inet_pton(AF_INET6, dst, &in6) <= 0) continue;
+				inet_ntop(AF_INET6, &in6, dst, sizeof dst);
+				
+				if (dir_reply == 0 && rip != 0 && (IN6_ARE_ADDR_EQUAL(&rip6, &in6)))
+					continue;
+				break;
+#endif
+			}
+
+			if (dir_reply == 1) {
+				web_printf("%c[%u,%u,'%s','%s','%s','%s','%s','%s',%d]", comma, proto, time, dst, src, dport, sport, bytesi, byteso, mark );
+			}
+			else {
+				web_printf("%c[%u,%u,'%s','%s','%s','%s','%s','%s',%d]", comma, proto, time, src, dst, sport, dport, byteso, bytesi, mark );
+			} 
 			comma = ',';
 		}
 	}
