@@ -26,7 +26,7 @@
 
 #include <ip6tables.h>
 #include <linux/netfilter_ipv6/ip6_tables.h>
-#include <../include/linux/netfilter_ipv4/ipt_CONNMARK.h>
+#include <linux/netfilter_ipv4/ipt_CONNMARK.h>
 
 #if 0
 struct markinfo {
@@ -66,6 +66,7 @@ init(struct ip6t_entry_target *t, unsigned int *nfcache)
 		= (struct ipt_connmark_target_info *)t->data;
 
 	markinfo->mask = 0xffffffffUL;
+
 }
 
 /* Function which parses command options; returns true if it
@@ -83,7 +84,6 @@ parse(int c, char **argv, int invert, unsigned int *flags,
 	case '1':
 	case '9':
 		markinfo->mode = (c == '1') ? IPT_CONNMARK_SET : IPT_CONNMARK_SET_RETURN;
-//		markinfo->mode = IPT_CONNMARK_SET;
 
 		markinfo->mark = strtoul(optarg, &end, 0);
 		if (*end == '/' && end[1] != '\0')
@@ -161,7 +161,6 @@ print(const struct ip6t_ip6 *ip,
 	case IPT_CONNMARK_SET_RETURN:
 	    printf("CONNMARK set%s ", (markinfo->mode == IPT_CONNMARK_SET_RETURN) ? "-return" : "");
 
-//	    printf("CONNMARK set ");
 	    print_mark(markinfo->mark);
 	    print_mask("/", markinfo->mask);
 	    printf(" ");
@@ -193,7 +192,6 @@ save(const struct ip6t_ip6 *ip, const struct ip6t_entry_target *target)
 	case IPT_CONNMARK_SET_RETURN:
 	    printf("--set-%s ", (markinfo->mode == IPT_CONNMARK_SET_RETURN) ? "return" : "mark");
 
-//	    printf("--set-mark ");
 	    print_mark(markinfo->mark);
 	    print_mask("/", markinfo->mask);
 	    printf(" ");

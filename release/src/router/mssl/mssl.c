@@ -86,7 +86,7 @@ static ssize_t mssl_read(void *cookie, char *buf, size_t len)
 			if (total == 0) total = -1;
 			goto OUT;
 		}
-	} while (SSL_pending(kuki->ssl));
+	} while ((len - total > 0) && SSL_pending(kuki->ssl));
 
 OUT:
 	_dprintf("%s() returns %d\n", __FUNCTION__, total);
@@ -227,7 +227,7 @@ int mssl_init(char *cert, char *priv)
 	SSLeay_add_ssl_algorithms();
 #endif
 
-	ctx = SSL_CTX_new(server ? SSLv23_server_method() : SSLv23_client_method());
+	ctx = SSL_CTX_new(server ? TLSv1_server_method() : TLSv1_client_method());
 	if (!ctx) {
 		_dprintf("SSL_CTX_new() failed\n");
 		mssl_print_err(NULL);
