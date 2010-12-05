@@ -343,10 +343,10 @@ static void mangle_table(void)
 		":OUTPUT ACCEPT [0:0]\n");
 
 	if (wanup) {
-		
-#ifdef TCONFIG_IPV6
+
+#if defined(TCONFIG_IPV6) && defined(LINUX26)
 		modprobe("nf_conntrack_ipv6");
-#endif		
+#endif
 		ipt_qos();
 
 		p = nvram_safe_get("nf_ttl");
@@ -820,7 +820,7 @@ int start_firewall(void)
 	int n;
 	int wanproto;
 	char *iptrestore_argv[] = { "iptables-restore", (char *)ipt_fname, NULL };
-#ifdef TCONFIG_IPV6	
+#if defined(TCONFIG_IPV6) && defined(LINUX26)
 	char *ip6trestore_argv[] = { "ip6tables-restore", (char *)ip6t_fname, NULL };
 #endif
 
@@ -940,7 +940,7 @@ int start_firewall(void)
 		return 0;
 	}
 	
-#ifdef TCONFIG_IPV6
+#if defined(TCONFIG_IPV6) && defined(LINUX26)
 	if ((ip6t_file = fopen(ip6t_fname, "w")) == NULL) {
 		notice_set("ip6tables", "Unable to create ip6tables restore file");
 		simple_unlock("firewall");
@@ -955,7 +955,7 @@ int start_firewall(void)
 	fclose(ipt_file);
 	ipt_file = NULL;
 	
-#ifdef TCONFIG_IPV6
+#if defined(TCONFIG_IPV6) && defined(LINUX26)
 	fclose(ip6t_file);
 	ip6t_file = NULL;
 #endif
@@ -1003,8 +1003,8 @@ int start_firewall(void)
 		*/
 	}
 	
-#ifdef TCONFIG_IPV6
-	if (nvram_get_int("ipv6_enable")) {
+#if defined(TCONFIG_IPV6) && defined(LINUX26)
+	if (nvram_invmatch("ipv6_service", "")) {
 		notice_set("ip6tables", "");
 		if (_eval(ip6trestore_argv, ">/var/notice/ip6tables", 0, NULL) == 0) {
 			led(LED_DIAG, 0);

@@ -127,8 +127,7 @@ const defaults_t defaults[] = {
 
 #ifdef TCONFIG_IPV6
 	// IPv6 parameters
-	{ "ipv6_enable",		"0"				},	// Enable IPv6
-	{ "ipv6_service",		"native"		},	// [native|sit]
+	{ "ipv6_service",		""				},	// [''|native|sit]
 	{ "ipv6_prefix",		""				},	// The global-scope IPv6 prefix to route/advertise
 	{ "ipv6_prefix_length",	"64"			},	// The bit length of the prefix. Currently mostly ignored: for radvd, /64 is always assumed.
 	{ "ipv6_rtr_addr",		""				},	// defaults to $ipv6_prefix::1

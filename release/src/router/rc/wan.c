@@ -357,7 +357,7 @@ void start_pppoe(int num)
 	}
 
 #ifdef TCONFIG_IPV6
-	if (nvram_get_int("ipv6_enable") && nvram_match("ipv6_service", "native")) {
+	if (nvram_match("ipv6_service", "native")) {
 		*arg++ = "-6";		// enables IPv6CP
 	}
 #endif
@@ -893,7 +893,7 @@ void start_wan_done(char *wan_ifname)
 	}
 	
 #ifdef TCONFIG_IPV6
-	if ((wanup) && nvram_get_int("ipv6_enable")) {
+	if (wanup) {
 	 	if (nvram_match("ipv6_service", "native")) {
 			eval("ip", "route", "add", "::/0", "dev", nvram_safe_get("wan_iface"));
 		}

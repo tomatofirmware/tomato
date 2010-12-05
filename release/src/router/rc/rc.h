@@ -231,7 +231,7 @@ extern char **layer7_in;
 extern void enable_ip_forward(void);
 extern void ipt_write(const char *format, ...);
 extern void ip6t_write(const char *format, ...);
-#ifdef TCONFIG_IPV6
+#if defined(TCONFIG_IPV6) && defined(LINUX26)
 #define ip46t_write(args...) do { ipt_write(args); ip6t_write(args); } while(0)
 #define ip46t_flagged_write(do_ip6t, args...) do { ipt_write(args); if (do_ip6t) ip6t_write(args); } while(0)
 #else

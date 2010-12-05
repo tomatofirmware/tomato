@@ -602,7 +602,6 @@ static const nvset_t nvset_list[] = {
 
 #ifdef TCONFIG_IPV6
 // basic-ipv6
-	{ "ipv6_enable",		V_01				},
 	{ "ipv6_prefix",		V_IPV6				},
 	{ "ipv6_prefix_length",	V_RANGE(3, 127)		},
 	{ "ipv6_rtr_addr",		V_IPV6				},

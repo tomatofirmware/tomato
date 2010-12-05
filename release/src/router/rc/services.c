@@ -387,14 +387,14 @@ void start_httpd(void)
 	if (!nvram_match("http_enable", "0")) {
 		xstart("httpd"
 #ifdef TCONFIG_IPV6
-		, nvram_match("ipv6_enable", "0") ? "" : "-6"
+		, nvram_invmatch("ipv6_service", "") ? "-6" : ""
 #endif
 		);
 	}
 	if (!nvram_match("https_enable", "0")) {
 		xstart("httpd", "-s"
 #ifdef TCONFIG_IPV6
-		, nvram_match("ipv6_enable", "0") ? "" : "-6"
+		, nvram_invmatch("ipv6_service", "") ? "-6" : ""
 #endif
 		);
 	}
@@ -414,7 +414,7 @@ void start_ipv6_sit_tunnel(void)
 	char *tun_dev = nvram_safe_get("ipv6_tun_dev");
 	char ip[INET6_ADDRSTRLEN + 4];
 
-	if (nvram_get_int("ipv6_enable") && nvram_match("ipv6_service", "sit")) {
+	if (nvram_match("ipv6_service", "sit")) {
 		modprobe("sit");
 		strcpy(ip, nvram_get("ipv6_tun_addr"));
 		strcat(ip, "/");
@@ -437,33 +437,29 @@ void stop_ipv6_sit_tunnel(void)
 void start_radvd(void)
 {
 	FILE *f;
-	char *p;
 
-	// Check if turned on
-	if (nvram_get_int("ipv6_enable") && !nvram_match("ipv6_prefix", "")) {
-		if ((p = nvram_safe_get("ipv6_prefix")) && (*p)) {
-			// Create radvd.conf
-			if ((f = fopen("/etc/radvd.conf", "w")) == NULL) return;
-			fprintf(f,
-				"interface %s\n"
-				"{\n"
-				"\tAdvSendAdvert on;\n"
-				"\tMaxRtrAdvInterval 60;\n"
-				"\tAdvHomeAgentFlag off;\n"
-				"\tAdvManagedFlag off;\n"
-				"\tprefix %s/64 \n"
-				"\t{\n"
-				"\t\tAdvOnLink on;\n"
-				"\t\tAdvAutonomous on;\n"
-				"\t\tAdvRouterAddr off;\n"
-				"\t};\n"
-				"};\n",
-				nvram_safe_get("lan_ifname"), p);
-			fclose(f);
+	if (nvram_invmatch("ipv6_prefix", "")) {
+		// Create radvd.conf
+		if ((f = fopen("/etc/radvd.conf", "w")) == NULL) return;
+		fprintf(f,
+			"interface %s\n"
+			"{\n"
+			"\tAdvSendAdvert on;\n"
+			"\tMaxRtrAdvInterval 60;\n"
+			"\tAdvHomeAgentFlag off;\n"
+			"\tAdvManagedFlag off;\n"
+			"\tprefix %s/64 \n"
+			"\t{\n"
+			"\t\tAdvOnLink on;\n"
+			"\t\tAdvAutonomous on;\n"
+			"\t\tAdvRouterAddr off;\n"
+			"\t};\n"
+			"};\n",
+			nvram_safe_get("lan_ifname"), nvram_safe_get("ipv6_prefix"));
+		fclose(f);
 
-			// Start radvd
-			eval("radvd");
-		}
+		// Start radvd
+		eval("radvd");
 	}
 }
 
@@ -478,18 +474,18 @@ void start_ipv6(void)
 	char ip[INET6_ADDRSTRLEN + 4];
 
 	// Check if turned on
-	if (nvram_get_int("ipv6_enable")) {
-		if (!nvram_match("ipv6_rtr_addr", "") && (p = nvram_safe_get("ipv6_rtr_addr")) && (*p)) {
+	if (nvram_match("ipv6_service", "native") || nvram_match("ipv6_service", "sit")) {
+		if ((p = nvram_get("ipv6_rtr_addr")) && (*p)) {
 			strcpy(ip, p);
 			strcat(ip, "/");
-			if (!nvram_match("ipv6_prefix_length", "") && (p = nvram_safe_get("ipv6_prefix_length")) && (*p))
+			if ((p = nvram_get("ipv6_prefix_length")) && (atoi(p) > 0))
 				strcat(ip, p);
 			else
 				strcat(ip, "64");
 			eval("ip", "-6", "addr", "add", ip, "dev", nvram_safe_get("lan_ifname"));
 		}
+		start_radvd();
 	}
-	start_radvd();
 }
 
 void stop_ipv6(void)

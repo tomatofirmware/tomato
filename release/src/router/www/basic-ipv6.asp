@@ -21,7 +21,7 @@
 <script type='text/javascript' src='debug.js'></script>
 
 <script type='text/javascript'>
-//	<% nvram("ipv6_enable,ipv6_prefix,ipv6_prefix_length,ipv6_rtr_addr,ipv6_service,ipv6_tun_addr,ipv6_tun_addrlen,ipv6_tun_dev,ipv6_tun_v4end"); %>
+//	<% nvram("ipv6_prefix,ipv6_prefix_length,ipv6_rtr_addr,ipv6_service,ipv6_tun_addr,ipv6_tun_addrlen,ipv6_tun_dev,ipv6_tun_v4end"); %>
 
 function verifyFields(focused, quiet)
 {
@@ -32,7 +32,6 @@ function verifyFields(focused, quiet)
 	// --- visibility ---
 
 	var vis = {
-		_f_ipv6_enable: 1,
 		_ipv6_service: 1,
 		_ipv6_prefix: 1,
 		_ipv6_prefix_length: 1,
@@ -43,25 +42,18 @@ function verifyFields(focused, quiet)
 		_ipv6_tun_addrlen: 1
 	};
 
-	if (E('_f_ipv6_enable').checked) {
-		switch(E('_ipv6_service').value) {
+	switch(E('_ipv6_service').value) {
+		case '':
+			vis._ipv6_prefix = 0;
+			vis._ipv6_prefix_length = 0;
+			vis._f_ipv6_rtr_addr = 0;
 		case 'native':
+		case 'other':
 			vis._ipv6_tun_v4end = 0;
 			vis._ipv6_tun_dev = 0;
 			vis._ipv6_tun_addr = 0;
 			vis._ipv6_tun_addrlen = 0;
 			break;
-		}
-	}
-	else {
-		vis._ipv6_service = 0;
-		vis._ipv6_prefix = 0;
-		vis._ipv6_prefix_length = 0;
-		vis._f_ipv6_rtr_addr = 0;
-		vis._ipv6_tun_v4end = 0;
-		vis._ipv6_tun_dev = 0;
-		vis._ipv6_tun_addr = 0;
-		vis._ipv6_tun_addrlen = 0;
 	}
 	
 	for (a in vis) {
@@ -107,7 +99,6 @@ function save()
 
 	var fom = E('_fom');
 
-	fom.ipv6_enable.value = fom.f_ipv6_enable.checked ? 1 : 0;
 	fom.ipv6_rtr_addr.value = fom.f_ipv6_rtr_addr.value;
 
 	form.submit(fom, 1);
@@ -133,7 +124,6 @@ function save()
 <input type='hidden' name='_nextwait' value='10'>
 <input type='hidden' name='_service' value='*'>
 
-<input type='hidden' name='ipv6_enable'>
 <input type='hidden' name='ipv6_rtr_addr'>
 
 
@@ -141,8 +131,8 @@ function save()
 <div class='section'>
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: 'Enable IPv6', name: 'f_ipv6_enable', type: 'checkbox', value: (nvram.ipv6_enable == 1)},
-	{ title: 'IPv6 service type', name: 'ipv6_service', type: 'select', options: [['native','Native IPv6 from ISP'],['sit','6in4 static tunnel']],
+	{ title: 'IPv6 service type', name: 'ipv6_service', type: 'select', 
+		options: [['', 'Disabled'],['native','Native IPv6 from ISP'],['sit','6in4 static tunnel'],['other','Other (manually configured)']],
 		value: nvram.ipv6_service },
 	{ title: 'Assigned IPv6 Prefix (and prefix length)', indent: 2, multi: [
 		{ name: 'ipv6_prefix', type: 'text', maxlen: 46, size: 48, value: nvram.ipv6_prefix, suffix: ' / ' },

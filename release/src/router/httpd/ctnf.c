@@ -89,7 +89,7 @@ void asp_ctcount(int argc, char **argv)
 
 	memset(count, 0, sizeof(count));
 
-#ifdef TCONFIG_IPV6
+#if defined(TCONFIG_IPV6) && defined(LINUX26)
 	if ((f = fopen("/proc/net/nf_conntrack", "r")) != NULL) {
 #else
 	if ((f = fopen("/proc/net/ip_conntrack", "r")) != NULL) {
@@ -106,7 +106,7 @@ void asp_ctcount(int argc, char **argv)
 		}
 
 		while (fgets(s, sizeof(s), f)) {
-#ifdef TCONFIG_IPV6
+#if defined(TCONFIG_IPV6) && defined(LINUX26)
 			if (strncmp(s, "ipv4", 4) == 0) {
 				t = s + 11;
 #else
@@ -121,7 +121,7 @@ void asp_ctcount(int argc, char **argv)
 						if (inet_addr(p + 4) == rip) continue;
 					}
 				}
-#ifdef TCONFIG_IPV6
+#if defined(TCONFIG_IPV6) && defined(LINUX26)
 			}
 			else if (strncmp(s, "ipv6", 4) == 0) {
 				t = s + 12;
@@ -215,13 +215,13 @@ void asp_ctdump(int argc, char **argv)
 	rip = inet_addr(nvram_safe_get("lan_ipaddr"));
 	lan = rip & mask;
 	
-#ifdef TCONFIG_IPV6
+#if defined(TCONFIG_IPV6) && defined(LINUX26)
 	struct in6_addr rip6;
 	struct in6_addr lan6;
 	struct in6_addr in6;
 	int lan6_prefix_len;
 
-	if (!nvram_match("ipv6_enable", "0")) {
+	if (nvram_invmatch("ipv6_service", "")) {
 		inet_pton(AF_INET6, nvram_safe_get("ipv6_rtr_addr"), &rip6);
 		inet_pton(AF_INET6, nvram_safe_get("ipv6_prefix"), &lan6);
 		lan6_prefix_len = nvram_get_int("ipv6_prefix_length");
@@ -290,7 +290,7 @@ add bytes out/in to table
 				}
 				else if (rip != 0 && inet_addr(dst) == rip) continue; 
 				break;
-#ifdef TCONFIG_IPV6
+#if defined(TCONFIG_IPV6) && defined(LINUX26)
 			case 10:
 				if (inet_pton(AF_INET6, src, &in6) <= 0) continue;
 				inet_ntop(AF_INET6, &in6, src, sizeof src);
@@ -361,13 +361,13 @@ void asp_ctrate(int argc, char **argv)
 	rip = inet_addr(nvram_safe_get("lan_ipaddr"));
 	lan = rip & mask;
 	
-#ifdef TCONFIG_IPV6
+#if defined(TCONFIG_IPV6) && defined(LINUX26)
 	struct in6_addr rip6;
 	struct in6_addr lan6;
 	struct in6_addr in6;
 	int lan6_prefix_len;
 
-	if (!nvram_match("ipv6_enable", "0")) {
+	if (nvram_invmatch("ipv6_service", "")) {
 		inet_pton(AF_INET6, nvram_safe_get("ipv6_rtr_addr"), &rip6);
 		inet_pton(AF_INET6, nvram_safe_get("ipv6_prefix"), &lan6);
 		lan6_prefix_len = nvram_get_int("ipv6_prefix_length");

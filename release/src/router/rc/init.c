@@ -1270,7 +1270,7 @@ static void sysinit(void)
 	check_bootnv();
 
 #ifdef TCONFIG_IPV6
-	if (nvram_get_int("ipv6_enable")) {
+	if (nvram_invmatch("ipv6_service", "")) {
 		f_write_string("/proc/sys/net/ipv6/conf/all/forwarding", "1", 0, 0);
 	}
 	else {
