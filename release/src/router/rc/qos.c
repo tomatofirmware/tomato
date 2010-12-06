@@ -218,11 +218,19 @@ void ipt_qos(void)
 	i = nvram_get_int("qos_default");
 	if ((i < 0) || (i > 9)) i = 3;	// "low"
 	class_num = i + 1;
-	ip46t_write(
-		"-A QOSO -j CONNMARK --set-return 0x%x\n"
+	ip46t_write("-A QOSO -j CONNMARK --set-return 0x%x\n", class_num);
+	
+	ipt_write(
 		"-A FORWARD -o %s -j QOSO\n"
 		"-A OUTPUT -o %s -j QOSO\n",
-			class_num, wanface, wanface);
+			wanface, wanface);
+
+#ifdef TCONFIG_IPV6
+	ip6t_write(
+		"-A FORWARD -o %s -j QOSO\n"
+		"-A OUTPUT -o %s -j QOSO\n",
+			wan6face, wan6face);
+#endif
 
 	inuse |= (1 << i) | 1;	// default and highest are always built
 	sprintf(s, "%d", inuse);
@@ -234,7 +242,10 @@ void ipt_qos(void)
 		if ((!g) || ((p = strsep(&g, ",")) == NULL)) continue;
 		if ((inuse & (1 << i)) == 0) continue;
 		if (atoi(p) > 0) {
-			ip46t_write("-A PREROUTING -i %s -j CONNMARK --restore-mark --mask 0xff\n", wanface);
+			ipt_write("-A PREROUTING -i %s -j CONNMARK --restore-mark --mask 0xff\n", wanface);
+#ifdef TCONFIG_IPV6
+			ip6t_write("-A PREROUTING -i %s -j CONNMARK --restore-mark --mask 0xff\n", wan6face);
+#endif
 			break;
 		}
 	}
