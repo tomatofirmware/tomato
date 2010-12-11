@@ -19,9 +19,13 @@
 <!-- / / / -->
 <style type='text/css'>
 #grid .co7 {
-	text-align: right;
+	text-align: center;
+	width: 20px;
 }
 #grid .co8 {
+	text-align: right;
+}
+#grid .co9 {
 	text-align: right;
 }
 </style>
@@ -97,10 +101,11 @@ grid.sortCompare = function(a, b) {
 	var r;
 
 	switch (col) {
-	case 2:
-	case 4:
-	case 6:
-	case 7:
+	case 2:		// S port
+	case 4:		// D port
+	case 5:		// Rule #
+	case 7:		// Bytes out
+	case 8:		// Bytes in
 		r = cmpInt(da[col], db[col]);
 		break;
 /*
@@ -168,7 +173,7 @@ grid.setName = function(ip, name) {
 		data = row.getRowData();
 		for (j = cols.length-1; j >= 0; j--) {
 			if (data[cols[j]] == ip) {
-				data[cols[j]] = name + ' <small>(' + ip + ')</small>';
+				data[cols[j]] = name + '<br><small>(' + ip + ')</small>';
 				row.setRowData(data);
 				row.cells[cols[j]].innerHTML = data[cols[j]];
 				row.style.cursor = 'default';
@@ -179,7 +184,7 @@ grid.setName = function(ip, name) {
 
 grid.setup = function() {
 	this.init('grid', 'sort');
-	this.headerSet(['Proto', 'Source', 'S Port', 'Destination', 'D Port', 'Class', 'Bytes Out', 'Bytes In']);
+	this.headerSet(['Proto', 'Source', 'S Port', 'Destination', 'D Port', 'Class', 'R#', 'Bytes Out', 'Bytes In']);
 }
 
 var ref = new TomatoRefresh('update.cgi', '', 0, 'qos_detailed');
@@ -228,7 +233,7 @@ ref.refresh = function(text)
 				else cursor = null;
 			}
 		}
-		d = [protocols[b[0]] || b[0], b[2], b[4], b[3], b[5], abc[b[8]] || ('' + b[8]), b[6], b[7]];
+		d = [protocols[b[0]] || b[0], b[2], b[4], b[3], b[5], abc[b[8]] || ('' + b[8]), ('' + b[9]), b[6], b[7]];
 		var row = grid.insert(-1, d, d, false);
 		if (cursor) row.style.cursor = cursor;
 	}

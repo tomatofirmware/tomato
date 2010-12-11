@@ -39,6 +39,7 @@ void ipt_qos(void)
 	int gum;
 	int sizegroup;
 	int class_flag;
+	int rule_num;
 
 	if (!nvram_get_int("qos_enable")) return;
 
@@ -47,6 +48,7 @@ void ipt_qos(void)
 	gum = 0x100;
 	sizegroup = 0;
 	prev_max = 0;
+	rule_num = 0;
 
 	ip46t_write(
 		":QOSO - [0:0]\n"
@@ -90,6 +92,7 @@ void ipt_qos(void)
 
 		if ((p = strsep(&g, ">")) == NULL) break;
 		i = vstrsep(p, "<", &addr_type, &addr, &proto, &port_type, &port, &ipp2p, &layer7, &bcount, &class_prio, &p);
+		rule_num++;
 		if (i == 9) {
 			// fixup < v0.08		// !!! temp
 			class_prio = bcount;
@@ -181,6 +184,7 @@ void ipt_qos(void)
 
 		chain = "QOSO";
 		class_num |= class_flag;
+		class_num |= rule_num << 20;
 		sprintf(end + strlen(end), " -j CONNMARK --set-return 0x%x/0xFF\n", class_num);
 
 		// protocol & ports
@@ -218,6 +222,7 @@ void ipt_qos(void)
 	i = nvram_get_int("qos_default");
 	if ((i < 0) || (i > 9)) i = 3;	// "low"
 	class_num = i + 1;
+	class_num |= 0xFF00000; // use rule_num=255 for default
 	ip46t_write("-A QOSO -j CONNMARK --set-return 0x%x\n", class_num);
 	
 	ipt_write(
