@@ -35,7 +35,7 @@ function verifyFields(focused, quiet)
 		_ipv6_service: 1,
 		_ipv6_prefix: 1,
 		_ipv6_prefix_length: 1,
-		_f_ipv6_rtr_addr: 1,
+		_ipv6_rtr_addr: 1,
 		_ipv6_tun_v4end: 1,
 		_f_ipv6_ifname: 1,
 		_ipv6_tun_addr: 1,
@@ -48,7 +48,7 @@ function verifyFields(focused, quiet)
 		case 'other':
 			vis._ipv6_prefix = 0;
 			vis._ipv6_prefix_length = 0;
-			vis._f_ipv6_rtr_addr = 0;
+			vis._ipv6_rtr_addr = 0;
 			vis._ipv6_tun_v4end = 0;
 			vis._ipv6_tun_addr = 0;
 			vis._ipv6_tun_addrlen = 0;
@@ -102,7 +102,7 @@ function verifyFields(focused, quiet)
 	}
 
 	// IPv6 address
-	a = ['_ipv6_prefix', '_ipv6_tun_addr', '_f_ipv6_rtr_addr'];
+	a = ['_ipv6_prefix', '_ipv6_tun_addr', '_ipv6_rtr_addr'];
 	for (i = a.length - 1; i >= 0; --i)
 		if ((vis[a[i]]) && (!v_ipv6_addr(a[i], quiet))) ok = 0;
 
@@ -123,7 +123,6 @@ function save()
 
 	var fom = E('_fom');
 
-	fom.ipv6_rtr_addr.value = fom.f_ipv6_rtr_addr.value;
 	fom.ipv6_ifname = fom.f_ipv6_ifname;
 
 	form.submit(fom, 1);
@@ -149,7 +148,6 @@ function save()
 <input type='hidden' name='_nextwait' value='10'>
 <input type='hidden' name='_service' value='*'>
 
-<input type='hidden' name='ipv6_rtr_addr'>
 <input type='hidden' name='ipv6_ifname'>
 
 <div class='section-title'>IPv6</div>
@@ -164,7 +162,7 @@ createFieldTable('', [
 		{ name: 'ipv6_prefix_length', type: 'text', maxlen: 3, size: 3, value: nvram.ipv6_prefix_length, 
 		suffix: '<br><small>Note: for route advertisement, the prefix length is ignored and /64 default is used</small>' }
 	] },
-	{ title: 'Router IPv6 address will be:', indent: 2, name: 'f_ipv6_rtr_addr', type: 'text', maxlen: 46, size: 48, value: nvram.ipv6_rtr_addr},
+	{ title: 'Router IPv6 address will be:', indent: 2, name: 'ipv6_rtr_addr', type: 'text', maxlen: 46, size: 48, value: nvram.ipv6_rtr_addr},
 	{ title: 'IPv6 Interface Name', name: 'f_ipv6_ifname', type: 'text', maxlen: 8, size: 10, value: nvram.ipv6_ifname },
 	{ title: 'Tunnel Foreign Endpoint (IPv4 Address)', name: 'ipv6_tun_v4end', type: 'text', maxlen: 15, size: 17, value: nvram.ipv6_tun_v4end },
 	{ title: 'Tunnel IPv6 address', indent: 2, multi: [
