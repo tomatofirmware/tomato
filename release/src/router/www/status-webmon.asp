@@ -328,6 +328,7 @@ function earlyInit()
 		if (maxLimit <= 10)
 			E('webmon-mc').style.display = 'none';
 		else {
+			if (maxLimit <= 20) E('mc20').style.display = 'none';
 			if (maxLimit <= 50) E('mc50').style.display = 'none';
 			if (maxLimit <= 100) E('mc100').style.display = 'none';
 			if (maxLimit <= 200) E('mc200').style.display = 'none';
@@ -389,6 +390,7 @@ function earlyInit()
 		<div id='webmon-mc'>
 			Show up to&nbsp;
 			<a href='javascript:switchMaxCount(10);' id='mc10'>10,</a>
+			<a href='javascript:switchMaxCount(20);' id='mc20'>20,</a>
 			<a href='javascript:switchMaxCount(50);' id='mc50'>50,</a>
 			<a href='javascript:switchMaxCount(100);' id='mc100'>100,</a>
 			<a href='javascript:switchMaxCount(200);' id='mc200'>200,</a>
@@ -401,7 +403,9 @@ function earlyInit()
 		</div>
 		&raquo; <a href="admin-log.asp">Web Monitor Configuration</a>
 		<br><br>
-		<script type='text/javascript'>genStdRefresh(1,3,'ref.toggle()');</script>
+
+		<script type='text/javascript'>genStdRefresh(1,0,'ref.toggle()');</script>
+
 	</div>
 </div>
 

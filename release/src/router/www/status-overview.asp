@@ -97,11 +97,14 @@ function c(id, htm)
 function show()
 {
 	c('cpu', stats.cpuload);
+	c('freqcpu', stats.freqcpu); //Victek
 	c('uptime', stats.uptime);
 	c('time', stats.time);
 	c('wanip', stats.wanip);
+	c('wanprebuf',stats.wanprebuf); //Victek
 	c('wannetmask', stats.wannetmask);
 	c('wangateway', stats.wangateway);
+	c('ispconid', stats.ispconid); //Victek
 	c('dns', stats.dns);
 	c('memory', stats.memory);
 	c('swap', stats.swap);
@@ -174,6 +177,7 @@ function init()
 createFieldTable('', [
 	{ title: 'Name', text: nvram.router_name },
 	{ title: 'Model', text: nvram.t_model_name },
+	{ title: 'CPU Frequency (MHz)', rid: 'freqcpu', text: stats.freqcpu }, //Victek
 	null,
 	{ title: 'Time', rid: 'time', text: stats.time },
 	{ title: 'Uptime', rid: 'uptime', text: stats.uptime },
@@ -191,8 +195,10 @@ createFieldTable('', [
 	{ title: 'MAC Address', text: nvram.wan_hwaddr },
 	{ title: 'Connection Type', text: { 'dhcp':'DHCP', 'static':'Static IP', 'pppoe':'PPPoE', 'pptp':'PPTP', 'l2tp':'L2TP' }[nvram.wan_proto] || '-' },
 	{ title: 'IP Address', rid: 'wanip', text: stats.wanip },
+	{ title: 'Previous WAN IP', rid: 'wanprebuf',text:stats.wanprebuf }, //Victek
 	{ title: 'Subnet Mask', rid: 'wannetmask', text: stats.wannetmask },
 	{ title: 'Gateway', rid: 'wangateway', text: stats.wangateway },
+	{ title: 'ISP Concentrator ID', rid: 'ispconid', text: stats.ispconid }, //Victek
 	{ title: 'DNS', rid: 'dns', text: stats.dns },
 	{ title: 'MTU', text: nvram.wan_run_mtu },
 	null,
@@ -277,7 +283,7 @@ W('</div>');
 
 </td></tr>
 <tr><td id='footer' colspan=2>
-	<script type='text/javascript'>genStdRefresh(1,0,'ref.toggle()');</script>
+	<script type='text/javascript'>genStdRefresh(1,1,'ref.toggle()');</script>
 </td></tr>
 </table>
 </form>

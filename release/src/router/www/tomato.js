@@ -1072,7 +1072,7 @@ TomatoGrid.prototype = {
 		this.editor = null;
 		this.canSort = options.indexOf('sort') != -1;
 		this.canMove = options.indexOf('move') != -1;
-		this.maxAdd = maxAdd || 140;
+		this.maxAdd = maxAdd || 200;
 		this.canEdit = (editorFields != null);
 		this.canDelete = this.canEdit || (options.indexOf('delete') != -1);
 		this.editorFields = editorFields;
@@ -1946,7 +1946,7 @@ TomatoRefresh.prototype = {
 function genStdTimeList(id, zero, min)
 {
 	var b = [];
-	var t = [3,4,5,10,15,30,60,120,180,240,300,10*60,15*60,20*60,30*60];
+	var t = [0.25,0.5,1,2,3,4,5,10,15,30,60,120,180,240,300,10*60,15*60,20*60,30*60];
 	var i, v;
 
 	if (min >= 0) {
@@ -2230,6 +2230,10 @@ function navi()
 			['View Details',	'detailed.asp'],
 			['Transfer Rates',	'ctrate.asp']
 			] ],
+		['IP/MAC BW Limiter',    		'new', 0, [
+                       ['IP/MAC BW Limit',     'qoslimit.asp'],
+                       ['ARP Binding',         'arpbind.asp']
+                       ] ],
 		['Access Restriction',	'restrict.asp'],
 /* REMOVE-BEGIN
 		['Scripts',				'sc', 0, [

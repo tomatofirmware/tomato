@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
-	Copyright (C) 2006-2010 Jonathan Zarate
+	Copyright (C) 2006-2009 Jonathan Zarate
 	http://www.polarcloud.com/tomato/
 
 	For use with Tomato Firmware only.
@@ -85,30 +85,57 @@ function init()
 
 <!-- / / / -->
 
-<div style='float:right;margin:20px 20px;text-align:center'>
-<img src='tux.png' alt='Linux &amp; Tomato' id='tux'>
+<div style='float:right;margin:80px 20px;text-align:center'>
+<img src='kinaree.png' alt='Linux &amp; Tomato' id='tux'>
 </div>
-<div style='margin:20px 20px;font-size:14px;color:#555;'>
-Tomato Firmware v<% version(1); %><br>
+<div style='margin:30px 30px;font-size:14px;color:#555;'>
 
+<b>Tomato Firmware v<% version(1); %></b><br>
+<br><br>
+<b>Based on Tomato Firmware v<% version(); %></b><br>
+Copyright (C) 2006-2010 Jonathan Zarate<br>
+<a href='http://www.polarcloud.com/tomato/' target='_new'>http://www.polarcloud.com/tomato/</a><br>
+<br>
 /* USB-BEGIN */
-<br>USB support integration and GUI,<br>
+<br><b>USB support integration and GUI</b><br>
 /* USB-END */
-Linux kernel <% version(2); %> and Broadcom Wireless Driver <% version(3); %> updates,<br>
-support for additional router models and Wireless-N mode.<br>
+<b>Linux kernel <% version(2); %> <br>
+Broadcom Wireless Driver <% version(3); %> <br>
+Support for additional router models and Wireless-N mode.</b><br>
 Copyright (C) 2008-2010 Fedor Kozhevnikov and Ray Van Tassle<br>
 <a href='http://www.tomatousb.org/' target='_new'>http://www.tomatousb.org</a><br>
 <!-- / / / -->
-<br><br>
+<br>
 
 /* VPN-BEGIN */
-VPN integration and GUI Copyright (C) 2010 Keith Moyer, <a href='mailto:tomatovpn@keithmoyer.com'>tomatovpn@keithmoyer.com</a><br>
-<br><br>
+<b>VPN integration and GUI Copyright (C) 2010 Keith Moyer</b><br>
+<a href='mailto:tomatovpn@keithmoyer.com'>tomatovpn@keithmoyer.com</a><br>
+<br>
 /* VPN-END */
-
-Based on Tomato Firmware v<% version(); %><br>
-Copyright (C) 2006-2010 Jonathan Zarate<br>
-<a href='http://www.polarcloud.com/tomato/' target='_new'>http://www.polarcloud.com/tomato/</a><br>
+<br>
+<b>This compilation by Toastman, Bangkok, may include:</b><br>
+<br>
+<b>All current "Teddy Bear" features, notably:</b><br>
+- USB Support, Samba, FTP, Media Servers<br>
+- Web Monitor<br>
+- Per-connection transfer rates<br>
+- Byte counter added to QOS/Details<br>
+- QOS rule ID added to QOS/Details<br>
+- Additional ipv6 support in GUI, QOS, Conntrack<br>
+<br>
+<b>"Victek" RAF features:</b><br>
+- IP/MAC Bandwidth Limiter | ARP Binding<br>
+- CPU Info & Overclock | Previous WAN IP<br>
+- Access Concentrator ID | Additional Themes<br>
+<br>
+<b>"Toastman" Features:</b><br>
+- 250 entry Static DHCP | 500 entry Access Restrictions<br>
+- QOS class labels | Toastman QOS rules<br>
+- Fast conntrack timeout | Fast auto refresh<br>
+- Tools/System refresh timer<br>
+- Safe CPU frequency selector<br>
+- Loads upnpconfig.custom from JFFS, for VPN UPnP support<br>
+<br>
 <br>
 Built on <% build_time(); %><br>
 <br><br>

@@ -46,6 +46,7 @@ var xmenus = [['Status', 'status'], ['Bandwidth', 'bwm'], ['Tools', 'tools'], ['
 /* VPN-BEGIN */
 	['VPN Tunneling', 'vpn'],
 /* VPN-END */
+	['IP/MAC BW Limiter', 'new'],
 	['Administration', 'admin']];
 
 function toggle(service, isup)
@@ -296,7 +297,8 @@ var m = [
 	{ title: 'Allow Wireless Access', name: 'f_http_wireless', type: 'checkbox', value:  nvram.web_wl_filter == 0 },
 	null,
 	{ title: 'Color Scheme', name: 'web_css', type: 'select',
-		options: [['red','Tomato'],['black','Black'],['blue','Blue'],['bluegreen','Blue &amp; Green (Lighter)'],['bluegreen2','Blue &amp; Green (Darker)'],['brown','Brown'],['cyan','Cyan'],['olive','Olive'],['pumpkin','Pumpkin'],
+		options: [['red','Tomato'],['asus','Asustek'],['black','Black'],['blue','Blue'],['bluegreen','Blue &amp; Green (Lighter)'],['bluegreen2','Blue &amp; Green (Darker)'],['bluedream','Bluedream'],['buffalo','Buffalo'],['brown','Brown'],['cyan','Cyan'],['enlightened','Enlightened'],['linksys','Linksys'],['olive','Olive'],['purple','Purple'],['pumpkin','Pumpkin'],['tijuana','Tijuana'],
+
 /* THEMES-BEGIN */
 		['usbred','USB Red'],['usbblue','USB Blue'],
 /* THEMES-END */
