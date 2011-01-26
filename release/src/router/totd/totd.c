@@ -212,7 +212,7 @@ to: %s", T.user);
 
 	/* close any open descriptors */
 	endpwent();
-	endgrent();
+	//endgrent();
 
 	/* chroot() cage totd if asked for */
 	if (T.rootdir) {
