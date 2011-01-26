@@ -118,12 +118,14 @@ static void tun_setup(int do_mktun, int do_rmtun)
 					strerror(errno));
 			exit(1);
 		}
+#if 0
 		if (ioctl(gcfg->tun_fd, TUNSETGROUP, 0) < 0) {
 			slog(LOG_CRIT, "Unable to set group on %s, "
 					"aborting: %s\n", gcfg->tundev,
 					strerror(errno));
 			exit(1);
 		}
+#endif
 		slog(LOG_NOTICE, "Created persistent tun device %s\n",
 				gcfg->tundev);
 		return;
