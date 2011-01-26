@@ -1,0 +1,102 @@
+.TH TAYGA "8" "December 2010" "TAYGA 0.9.1" ""
+
+.SH NAME
+tayga \- stateless NAT64 daemon
+
+.SH SYNOPSIS
+.B tayga
+.I [OPTION]...
+.PP
+.B "tayga \-\-mktun"
+.I [OPTION]...
+.PP
+.B "tayga \-\-rmtun"
+.I [OPTION]...
+
+.SH DESCRIPTION
+TAYGA is a stateless NAT64 daemon for Linux.  Using the in-kernel TUN network
+driver, TAYGA receives IPv4 and IPv6 packets from the host's network stack,
+translates them to the other protocol, and then sends the translated packets
+back to the host using the same TUN interface.
+.P
+Translation is compliant with IETF Internet-Draft
+draft-ietf-behave-v6v4-xlate-23, and address mapping is performed in
+accordance with RFC 6052.  Optionally, TAYGA may be configured to dynamically
+map IPv6 hosts to addresses drawn from a configured IPv4 address pool.
+.P
+As a stateless NAT, TAYGA requires a one-to-one mapping between IPv4 addresses
+and IPv6 addresses.  Mapping multiple IPv6 addresses onto a single IPv4
+address can be achieved by mapping IPv6 addresses to private IPv4 addresses
+with TAYGA and then using a stateful NAT44 (such as the iptables(8) MASQUERADE
+target) to map the private IPv4 addresses onto the desired single IPv4 address.
+.P
+TAYGA's configuration is stored in the tayga.conf(5) file, which is usually
+found in /etc/tayga.conf or /usr/local/etc/tayga.conf.
+
+.SH INVOCATION
+Without the
+.B \-\-mktun
+or
+.B \-\-rmtun
+options, the `tayga` executable runs as a daemon, translating packets as
+described above.
+.P
+The
+.B \-\-mktun
+and
+.B \-\-rmtun
+options instruct TAYGA to create or destroy, respectively, its configured TUN
+device as a "persistent" interface and then immediately exit.
+.P
+Persistent TUN devices remain present on the host system even when TAYGA is
+not running.  This allows host-side network parameters and firewall rules to
+be configured prior to commencement of packet translation.  This may simplify
+network configuration on the host; for example, systems which use a
+Debian-style /etc/network/interfaces file may configure TAYGA's TUN device at
+boot by running `tayga --mktun` as a "pre-up" command and then configuring the 
+TUN device as any other network interface.
+
+.SH OPTIONS
+.TP
+.BI "\-c " configfile " | \-\-config " configfile
+Read configuration options from
+.I configfile
+.TP
+.B \-d
+Enable debug messages (enables
+.B \-\-nodetach
+as well)
+.TP
+.B "\-n | \-\-nodetach"
+Do not detach from terminal
+.TP
+.BI "\-u " userid " | \-\-user " userid
+Set uid to
+.I userid
+after initialization
+.TP
+.BI "\-g " groupid " | \-\-group " groupid
+Set gid to
+.I groupid
+after initialization
+.TP
+.B "\-r | \-\-chroot"
+chroot() to data\-dir (specified in config file)
+.TP
+.BI "\-p " pidfile " | \-\-pidfile " pidfile
+Write process ID of daemon to
+.I pidfile
+.SH AUTHOR
+Written by Nathan Lutchansky <lutchann@litech.org>
+.SH COPYRIGHT
+Copyright \(co 2010 Nathan Lutchansky
+.br
+License GPLv2+: GNU GPL version 2 or later
+.br
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+.SH "SEE ALSO"
+
+.BR tayga.conf (5)
+.br
+.BR <http://www.litech.org/tayga/>
