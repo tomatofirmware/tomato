@@ -1,0 +1,195 @@
+.TH "totd" "8" "1.5" "Feike W. Dillema" "net"
+.SH "NAME"
+.LP 
+totd \- DNS proxy and translator for IPv6 and IPv4
+.SH "SYNTAX"
+.LP 
+totd [\fI\-6\fP] [\fI\-no6\fP] [\fI\-4\fP] [\fI\-no4\fP] [\fI\-64\fP] [\fI\-d<n>\fP] [\fI\-p\fP <prefix>] [\fI\-c\fP <configfile>]  [\fI\-u\fP <user>]  [\fI\-g\fP <group>]  [\fI\-t\fP <dir>] [\fI\-q\fP] [\fI\-v\fP] [\fI\-h\fP]
+.SH "DESCRIPTION"
+.LP 
+Totd is a small DNS proxy nameserver. Its main purpose is to support IPv6\-only hosts/networks that communicate with the IPv4 world using some network or transport level translation mechanism, like NAT\-PT or faithd(8). In addition, it has some other useful tricks and features one might fancy in a DNS proxy.
+Note that totd needs to be able to forward requests to a real nameserver (called a forwarder), in order to be useful.
+.SH "CONFIGURATION"
+.LP 
+Totd can be configured using commandline options, via its configuration file or even dynamically via HTTP requests (only
+if support for this has been added at compile time).
+.LP 
+If you want to run totd on a privileged port, e.g. the default port 53, you either have to run totd as root or start as root but let it switch to another user and group after it has opened the sockets its needs (see -u and -g options). In the former case, totd is able to rescan the interface list and deal with interface and address changes on the fly. In the latter case, totd will not be able to rescan interfaces and react to such changes but needs to be restarted to handle such changes.
+.LP 
+In the totd config file the first word is a keyword and it is followed by a value and or one or more attributes or optional values. Stuff between square brackets `[' and `]' below is optional while stuff between hooks`<' and `>' signifies a value you supply. (Neither the square brackets nor hooks are meant to be in the config file).
+.LP 
+The following keywords are valid in the totd config file:
+.TP 
+\fBforwarder\fR <ip address> [port <service port>] 
+.br 
+With this keyword you can specify an IP address (either IPv4 or IPv6) of a nameserver for totd to forward its queries to.
+With the optional port attribute an alternative port can be specified to query the forwarder on.  The default is the standard domain service port, i.e. 53. This feature is mainly useful for running totd and a forwarder nameserver, e.g. bind on the same machine. In such a case, clients can talk to totd on port 53, totd talks to named over some other port.
+.br 
+At least one forwarder needs to be specified in order for totd to have non\-trivial behaviour.
+.TP 
+\fBprefix\fR <IPv6 network prefix>
+.br 
+Specifies a 64 bit IPv6 address prefix to use for the `address translation trick' described in more detail below.
+The prefix must be written in IPv6 address format like (but without the quotes): `3ffe:1234:abcd:1234::'.
+.TP 
+\fBallow\fR <IP addresstring>
+.br 
+Specifies an (IPv4 or IPv6) address of a machine that is allowed to make http requests to totd.
+.TP 
+\fBport\fR <port number>
+.br 
+This option allows you to specify a different (TCP/UDP) port than the default (53) for totd to listen on.
+.TP 
+\fBinterfaces\fR <ifa> [<ifb> <ifc> ...]
+.br 
+By default totd listens on wildcard sockets. This option allows you to specify what network interfaces totd should listen on for incoming requests. Note, that his option is not available on all operating systems (not on Linux e.g.). When '*' is named as interface, the the interface list is ignored and wildcard sockets are used. If 'all' is named as interface, totd will scan all interfaces for addresses and open a socket to listen on for each of them. (Mostly useful in combination with scoped address rewriting, see scoped keyword).
+.TP 
+\fBpidfile\fR <filename>
+.br 
+Changes the default filename for totd to write its process id into.
+\fBstf\fR 
+.br 
+Enable 6to4 PTR rewriting.
+.TP 
+\fBscoped\fR <v6 prefix 1> <v6 prefix 2> <prefixlen>
+.br 
+Enable scoped address rewriting. This requires currently that the interfaces keyword is also used, i.e. scoped address rewriting is not supported for wildcard sockets.
+
+
+
+
+.SH "OPTIONS"
+.LP 
+.TP 
+\fB\-d\fR<\fIn\fP>
+Run totd in foreground to facilitate debugging and set debugging output level to \fIn\fP. 
+.TP 
+\fB\-6\fR
+Listen on IPv6 addresses for client queries
+.TP 
+\fB\-no6\fR
+Do not listen on IPv6 addresses
+.TP 
+\fB\-4\fR
+Listen on IPv4 addresses
+.TP 
+\fB\-no4\fR
+Do not listen on IPv4 addresses
+.TP 
+\fB\-64\fR
+Listen to both IPv4 and IPv6 addresses
+.TP 
+\fB\-p\fR <\fIprefix\fP>
+Add a IPv6 prefix to trick list
+.TP 
+\fBhttp-port\fR <port number>
+.br 
+Specifies a different port than the default (6464) to listen on for http requests. Note that http support is optional and needs to be compiled in.
+.TP 
+\fB\-c\fR <\fIfilename\fP>
+Specify alternative config file for totd to read in
+.TP 
+\fB\-u\fR <\fIuser\fP>
+Specify username or uid totd should switch to
+.TP 
+\fB\-g\fR <\fIgroup\fP>
+Specify groupname or gid totd should switch to
+.TP 
+\fB\-t\fR <\fIdir\fP>
+Specify a root directory to chroot() to
+.TP 
+\fB\-h\fR
+Output version and usage information and exit
+.TP 
+\fB\-q\fR
+Log only errors to syslog, be more quiet.
+.TP 
+\fB\-v\fR
+Log more verbosely, also log warnings and informational messages.
+.LP 
+.SH "HTTP REQUESTS"
+.LP 
+When support for it is compiled into totd and totd is started with the http-port commandline
+option, the following URLs can be requested from totd (at the specified port, say 6464):
+.LP 
+http://localhost:6464/index.html
+.br 
+http://localhost:6464/add_prefix?prefix=3ffe:abcd:1234:9876::
+.br 
+http://localhost:6464/del_prefix?prefix=3ffe:abcd:1234:9876::
+.LP 
+Of course, you choose your own values for the prefix to add or delete. Note that if your network
+can not be considered secure, it may be appropriate to let totd only listen to localhost for
+http requests (and use ssh-tunneling for remote access)? Basic http authentication could easily
+be supported, but we do not see much value in that. HTTPS support is more complicated and I
+currently do not believe it adds much over using ssh.
+.LP 
+.SH "FORWARDING"
+.LP 
+Totd is just a DNS\-proxy; it does not answer queries itself. It can only forward queries to a real nameserver. If there are multiple forwarders specified, it will use them in the order listed.  When a nameserver is or becomes unreachable totd will use the next nameserver in line. After the retry interval amount of time, totd will switch back to the previous nameserver. If that nameserver is still unreachable it uses the next nameserver in the config file again. You may see totd switch to backup nameservers for no apparent good reason, as totd is not very good at discriminating between an unreachable/malfunctioning nameserver or a single query that returns erronous results or is simply delayed a lot. 
+.br 
+(If the second nameserver is also unreachable and a third is specified, this sequence repeats itself.)
+.SH "ADDRESS TRANSLATION TRICK"
+.LP 
+Totd can treat each AAAA and A6 type query in a special way. This behaviour is enabled when one or more prefixes are configured (on the commandline or with the `prefix' keyword in the config file). It is meant to support network and transport level IPv6 to IPv4 transition mechanisms, like NAT\-PT and faith.
+.br 
+If the nameserver does not return an IPv6 address for the forwarded AAAA/A6 query, totd will make a second query but this time for an A record of the hostname of the original query. The resulting IPv4 address is then used to construct a fake IPv6 address, by replacing the lower 32 bits of the specified prefix with this IPv4 address. The resulting IPv6 address is sent as response to the original AAAA/A6 record query. 
+.br 
+In addition, totd treats PTR type queries (reverse name lookup) in the ip6.int. domain specially. If the query matches a specified prefix, totd will forward a PTR query for an IPv4 address (using the lower 32 bits of the address to construct an IPv4 address) instead and use that to construct a faked response to the original PTR query.
+.br 
+If multiple prefixed are configured, totd will cycle through them in round\-robin fashion. In this way totd can balance the load for multiple NAT\-PT/faithd(8) translators in a network.
+.SH "6TO4 PTR RECORDS"
+.LP 
+To enable 6to4 PTR query translation trick, add the `stf' keyword to your totd config file. 6to4 reverse lookup is based on draft\-moore\-6to4\-dns\-00.txt, section 3.3:
+.IP 
+     When such a resolver received a PTR or NS query for a label that had a [x2002].IP 6.ARPA suffix, it would first attempt to satisfy that query from its cache, or failing that, by forwarding the query to an upstream server.  If that query failed due to a "no such domain" error,the resolver would then attempt to find the server for the {something}.[x2002].IP 6.ARPA label by issuing an NS query for {something}.I N\-ADDR.ARPA.
+.IP 
+     If the original query was for PTR records, and one or more NS records were found for {something}.I N\-ADDR.ARPA, the resolver would then forward the original query for {something}.[x2002].IP 6.ARPA to one or more of those servers, and return the results from one of the forwarded queries if any were successful.
+.IP 
+     If the original query was for NS records, and one or more NS records were found for {something}.I N\-ADDR.ARPA, the resolver would then return the pseudo\-records corresponding to the IN\-ADDR.ARPA domains. Those pseudo\-records would NOT be marked as authoritative, and the resolver would NOT cache those records.
+.SH "SCOPED ADDRESSES"
+.LP 
+Totd supports re\-writing of scoped addresses in DNS responses.
+This technique allows usage of scoped addresses like site\-local
+addresses, without having to maintain  such addresses in a DNS database. Instead, totd derives the scoped address record from the global address record it does find in DNS. 
+.LP 
+Totd only performas this trick on queries that stay within the specified scope. I.e. if the query is made from scoped source address (link\-local unicast or site\-local unicast), and query's target address (totd's listening address) is also scoped address, totd attaches additional AAAA records converted by using 3 arguments of the scoped keyword.
+.LP 
+When you configure as below in totd config file:
+.TP 
+\fBscoped\fR 3ffe:501:ffff:: fec0:: 48
+
+.LP 
+and you made query from scoped source to totd's scoped destination, and the result has the following record:
+
+.TP 
+foo.kame.net.   \fBIN AAAA\fR 3ffe:501:ffff::9876:5432
+.LP 
+it will get additional records as follows:
+.TP 
+foo.kame.net.   \fBIN AAAA\fR 3ffe:501:ffff::9876:5432
+.TP 
+foo.kame.net.   \fBIN AAAA\fR fec0::9876:5432
+.TP 
+At this moment, prefixlen must be multiple of 8.
+.LP 
+Reverse query for fec0::9876:5432 will be converted into 3ffe:501:ffff::9876:5432 and forwarded to the real DNS servers.
+.LP 
+.SH "EXAMPLES"
+.LP 
+The Kame project provided network (NAT\-PT) and transport (faithd) level translators for the *BSD operating systems, see e.g. http://www.kame.net for more information.
+.br 
+Another transport level translator is 'The Portable Transport Relay Translator Daemon (pTRTd)' which supports Linux amongst others, see
+http://v6web.litech.org/ptrtd/
+.LP 
+.SH "FILES"
+.LP 
+\fIPREFIX/etc/totd.conf\fP
+.SH "AUTHOR"
+.LP 
+Feike W. Dillema <feico at pasta.cs.uit.no>
+
+Thanks to 6Net (EU project IST\-2001\-32603), http://www.6net.org/
+.SH "SEE ALSO"
+.LP 
+faithd(8) natptd(8) natptconfig(8) stf(4)

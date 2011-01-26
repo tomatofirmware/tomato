@@ -1,0 +1,191 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT(totd.c)
+
+SWILLCONF=""
+
+AC_ARG_ENABLE(malloc-debug,
+[  --enable-malloc-debug   Enables malloc debugging (default: no)],
+[case "${enableval}" in
+  yes) DBMALLOC=""
+       AC_MSG_RESULT("memory allocation debugging enabled") ;;
+  no)  DBMALLOC="#" ;;
+  *)   AC_MSG_ERROR(bad value ${enableval} for --enable-malloc-debug) ;;
+esac],[DBMALLOC="#"])
+
+AC_ARG_ENABLE(debug-tcp-only,
+[  --enable-debug-tcp-only   Enables tcp only operation for debugging purposes (default: no)],
+[case "${enableval}" in
+  yes) DBTCP=""
+       AC_MSG_RESULT("TCP only processing enabled") ;;
+  no)  DBTCP="#" ;;
+  *)   AC_MSG_ERROR(bad value ${enableval} for --enable-debug-tcp-only) ;;
+esac],[DBTCP="#"])
+
+AC_MSG_CHECKING("IPv6 transport support")
+AC_ARG_ENABLE(ip6,
+[  --enable-ip6   Enables support for IPv6 transport (default: yes)],
+[case "${enableval}" in
+  yes) OPTFLAGS="-DUSE_INET6 $OPTFLAGS"
+       SWILLCONF="--enable-ip6"
+       AC_MSG_RESULT("enabled") ;;
+  no)  AC_MSG_RESULT("disabled") ;;
+  *)   AC_MSG_ERROR(bad value ${enableval} for --enable-ip6) ;;
+esac],
+[OPTFLAGS="-DUSE_INET6 $OPTFLAGS"
+ SWILLCONF="--enable-ip6"
+ AC_MSG_RESULT("enabled")
+])
+
+AC_MSG_CHECKING("IPv4 transport support")
+AC_ARG_ENABLE(ip4,
+[  --enable-ip4   Enables support for IPv4 transport (default: yes)],
+[case "${enableval}" in
+  yes) OPTFLAGS="-DUSE_INET4 $OPTFLAGS"
+       AC_MSG_RESULT("enabled") ;;
+  no)  AC_MSG_RESULT("disabled") ;;
+  *)   AC_MSG_ERROR(bad value ${enableval} for --enable-ip4) ;;
+esac],
+[OPTFLAGS="-DUSE_INET4 $OPTFLAGS"
+ AC_MSG_RESULT("enabled")
+])
+
+AC_MSG_CHECKING("6to4 reverse lookup support")
+AC_ARG_ENABLE(stf,
+[  --enable-stf   Enables support for 6to4 (stf) reverse lookup (default: no)],
+[case "${enableval}" in
+  yes) OPTFLAGS="-DSTF $OPTFLAGS"
+       AC_MSG_RESULT("enabled") ;;
+  no)  AC_MSG_RESULT("disabled") ;;
+  *)   AC_MSG_ERROR(bad value ${enableval} for --enable-stf) ;;
+esac],
+[ AC_MSG_RESULT("disabled")
+])
+
+AC_MSG_CHECKING("scoped address rewriting support")
+AC_ARG_ENABLE(scoped-rewrite,
+[  --enable-scoped-rewrite   Enables support for scoped address rewriting (default: yes)],
+[case "${enableval}" in
+  yes) OPTFLAGS="-DSCOPED_REWRITE $OPTFLAGS"
+       AC_MSG_RESULT("enabled") ;;
+  no)  AC_MSG_RESULT("disabled") ;;
+  *)   AC_MSG_ERROR(bad value ${enableval} for --enable-scoped-rewrite) ;;
+esac],
+[OPTFLAGS="-DSCOPED_REWRITE $OPTFLAGS"
+ AC_MSG_RESULT("enabled")
+])
+
+AC_MSG_CHECKING("http reconfiguration and management support")
+AC_ARG_ENABLE(http-server,
+[  --enable-http-server   Enables support for configuration and management using a builtin (SWILL) web-server (default: no)],
+[case "${enableval}" in
+  yes) DOSWILL=""
+       AC_MSG_RESULT("enabled") ;;
+  no)  DOSWILL="#"
+       AC_MSG_RESULT("disabled") ;;
+  *)   AC_MSG_ERROR(bad value ${enableval} for --enable-http-server) ;;
+esac],
+[DOSWILL="#"
+ AC_MSG_RESULT("disabled")
+])
+
+dnl Checks for programs.
+AC_PROG_CC
+AC_PROG_CPP
+
+dnl BSD or ???
+AC_MSG_CHECKING(operating system specific definitions...)
+case `uname -s` in
+  NetBSD)
+    ostype=NetBSD
+    OPTFLAGS="$OPTFLAGS"
+    ;;
+  FreeBSD)
+    ostype=FreeBSD
+    OPTFLAGS="-DFreeBSD $OPTFLAGS"
+    ;;
+  OpenBSD)
+    ostype=OpenBSD
+    OPTFLAGS="$OPTFLAGS"
+    ;;
+  Darwin)
+    ostype=Darwin
+    OPTFLAGS="-DDarwin $OPTFLAGS -Dsocklen_t=int"
+    ;;
+  BSD/OS)
+    ostype=BSDI
+    OPTFLAGS="$OPTFLAGS -Dsocklen_t=int"
+    ;;
+  Linux)
+    ostype=Linux
+    OPTFLAGS="$OPTFLAGS"
+    AC_DEFINE(NEEDSV4MAPPED)
+    AC_DEFINE(WILDCARDONLY)
+    ;;
+  SunOS)
+    ostype=SunOS
+    OPTFLAGS="$OPTFLAGS"
+    ;;
+  *)
+    ostype='something unknown to totd'
+    echo 'Unsupported Operating System... You might need to configure your config.h and Makefile.'
+    echo 'If you succeeded the compile, please feedback to author with OS name, version and successful Makefile/config.h'
+    OPTFLAGS="$OPTFLAGS"
+    ;;
+esac
+AC_MSG_RESULT($ostype)
+
+AC_SUBST(OPTFLAGS)
+AC_SUBST(EXTINCLUDE)
+AC_SUBST(DBMALLOC)
+AC_SUBST(DBTCP)
+AC_SUBST(DOSWILL)
+AC_SUBST(SWILLCONF)
+
+dnl Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS(fcntl.h limits.h sys/ioctl.h sys/time.h syslog.h unistd.h sys/cdefs.h sys/filio.h sys/sockio.h stdint.h)
+AC_CONFIG_HEADER(config.h)
+AC_CHECK_LIB(nsl,gethostbyname)
+AC_CHECK_LIB(socket,bind)
+
+AC_MSG_CHECKING(whether SHUT_RD is defined by sys/socket.h)
+AC_TRY_COMPILE([#include <sys/types.h>
+#include <sys/socket.h>],
+	[int x = SHUT_RD;],
+	AC_MSG_RESULT(yes),
+	[AC_DEFINE(SHUT_RD, 0)
+	AC_DEFINE(SHUT_WR, 1)
+	AC_DEFINE(SHUT_RDWR, 2)
+	AC_MSG_RESULT(no)])
+
+AC_MSG_CHECKING(whether struct sockaddr has sa_len)
+AC_TRY_COMPILE([#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+],
+	[struct sockaddr_in sa;
+	int x = ((struct sockaddr *)&sa)->sa_len;],
+	[AC_DEFINE(HAVE_SA_LEN_FIELD)
+	AC_MSG_RESULT(yes)],
+	AC_MSG_RESULT(no))
+
+AC_MSG_CHECKING(whether struct sockaddr_in6 has sin6_scope_id)
+AC_TRY_COMPILE([#include <sys/types.h>
+#include <netinet/in.h>], [static struct sockaddr_in6 ac_sin6; int ac_size =
+sizeof (ac_sin6.sin6_scope_id);], [AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SIN6_SCOPE_ID)],
+AC_MSG_RESULT(no))
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_TYPE_UID_T
+AC_TYPE_PID_T
+AC_TYPE_SIZE_T
+AC_HEADER_TIME
+
+dnl Checks for library functions.
+AC_PROG_GCC_TRADITIONAL
+AC_FUNC_MEMCMP
+AC_TYPE_SIGNAL
+AC_CHECK_FUNCS(strlcpy strlcat daemon inet_aton)
+
+AC_OUTPUT(Makefile)

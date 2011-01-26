@@ -1,0 +1,79 @@
+Copyright (C) 1998 WIDE Project.  All rights reserved.
+Copyright (C) 1999,2000,2001,2002 University of Tromso.  All rights reserved.
+Copyright (C) 2002 Invenia Innovation AS. All rights reserved.
+
+*** Acknowledgements ***
+
+Thanks to 6Net (EU project IST-2001-32603), http://www.6net.org/, for 
+partially funding totd development.
+
+Thanks to Telenor FoU, Tromsø for funding of and collaboration in
+building our IPv6-only wireless MAN infrastructure.
+
+Thanks to the Kame project (http://www.kame.net), and Itojun Hagino
+in particular, for bugfixes and patches and the support for scoped
+address rewriting.
+
+Thanks to Nathan Lutchansky for adding Linux support.
+Thanks to Simon Leinen for making totd work on Solaris.
+
+And finally, thanks to those that reported bugs or requested features.
+
+*** What does totd do? ***
+
+Totd is a small DNS proxy nameserver that supports IPv6 only hosts/networks
+that communicate with the IPv4 world using some translation mechanism. 
+Examples of such translation mechanisms currently in use are: 
+
+   * IPv6/IPv4 Network Address and Packet Translation (NAT-PT)
+     implemented.
+   * Transport level translators as the faithd implemented by 
+     the KAME project (http://www.kame.net). See faithd(8) on
+     *BSD/Kame.
+
+These translators translate map IPv4 to IPv6 connections and back in some
+way. In order for an application to connect through such a translator to
+the world beyond it needs to use fake or fabricated addresses that are
+routed to this translator. These fake addresses don't exist in the DNS,
+and most likely you would not want them to appear there either. Totd
+fixes this problem for now (until more elegant solutions emerge?) by
+translating DNS queries/responses for the faked addresses. totd constructs
+these fake addresses based on a configured IPv6 translator prefix and
+records it *does* find in DNS. Totd is merely a stateless DNS-proxy, not 
+a nameserver itself. Totd needs to be able to forward requests to a real 
+nameserver. Recently, a running totd can be (re-)configured remotely
+using http; see the INSTALL document for more information about this.
+
+*** Some other experimental things you could use totd for ***
+
+Totd can do some things that are more experimental. you can select at
+compile time whether you want these or not. Totd supports re-writing of scoped
+addresses in DNS responses and supports reverse namelookup for 6to4 names.
+Scoped address rewriting is explained in the totd manual page.
+
+6to4 reverse lookup is based on draft-moore-6to4-dns-00.txt, 
+section 3.3:
+
+     When such a resolver received a PTR or NS query for a label that
+had a [x2002].IP6.ARPA suffix, it would first attempt to satisfy that
+query from its cache, or failing that, by forwarding the query to an
+upstream server.  If that query failed due to a "no such domain" error,
+the resolver would then attempt to find the server for the
+{something}.[x2002].IP6.ARPA label by issuing an NS query for
+{something}.IN-ADDR.ARPA.
+
+     If the original query was for PTR records, and one or more NS
+records were found for {something}.IN-ADDR.ARPA, the resolver would then
+forward the original query for {something}.[x2002].IP6.ARPA to one or
+more of those servers, and return the results from one of the forwarded
+queries if any were successful.
+
+     If the original query was for NS records, and one or more NS
+records were found for {something}.IN-ADDR.ARPA, the resolver would then
+return the pseudo-records corresponding to the IN-ADDR.ARPA domains.
+Those pseudo-records would NOT be marked as authoritative, and the
+resolver would NOT cache those records.
+
+*** Contacting the Author ***
+
+You can contact me (Feico Dillema) at feico at pasta.cs.uit.no (s/ at /@).

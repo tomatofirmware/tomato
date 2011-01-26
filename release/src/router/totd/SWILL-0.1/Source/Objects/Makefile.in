@@ -1,0 +1,48 @@
+#######################################################################
+# $Header: /home/pastacvs/cvs-rep/vermicelli/tot/src/SWILL-0.1/Source/Objects/Makefile.in,v 1.1 2005/01/27 08:46:24 dillema Exp $
+# DOH
+#######################################################################
+
+srcdir = @srcdir@
+VPATH  = @srcdir@
+
+#.KEEP_STATE:
+
+# Set your C++ compiler here.   g++ works on most machines,
+# but you might have to change it depending on your installation.
+#
+CC      = @CC@
+CCSHARED= @CCSHARED@
+prefix     = @prefix@
+
+# Comment out the following line if you're on an SGI or don't have ranlib!
+RANLIB  = @RANLIB@
+AR      = @AR@
+
+DOHOPT  = 
+
+########################################################################
+# Normally, you shouldn't have to change anything below this point     #
+########################################################################
+
+LIBOBJS = void.o fio.o memory.o base.o file.o list.o hash.o string.o
+
+LIBSRCS = void.c fio.c memory.c base.c file.c list.c hash.c string.c
+
+INCLUDE  = -I.
+CFLAGS   = @CFLAGS@
+SHELL  = /bin/sh
+
+#
+# Rules for creation of a .o file from .c
+.SUFFIXES: .c
+.c.o:
+	$(CC) $(CCSHARED) $(DOHOPT) $(INCLUDE) $(CFLAGS) -c -o $*.o $<
+
+all: $(LIBOBJS)
+
+clean::
+	rm -f *.o $(LIB)
+
+nuke::
+	rm -f Makefile *~ #* core a.out

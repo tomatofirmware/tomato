@@ -1,0 +1,14 @@
+/* ----------------------------------------------------------------------------- 
+ * web.c
+ *
+ *     This file implements the web-server.
+ * 
+ * Author(s) : David Beazley (beazley@cs.uchicago.edu)
+ *             Sotiria Lampoudi (slampoud@cs.uchicago.edu)
+ *
+ * Copyright (C) 1999-2002.  The University of Chicago
+ * See the file LICENSE for information on usage and redistribution.	
+ * ----------------------------------------------------------------------------- */
+
+static char cvsroot[]="$Header: /home/pastacvs/cvs-rep/vermicelli/tot/src/SWILL-0.1/Misc/fileheader,v 1.1 2005/01/27 08:46:24 dillema Exp $";
+

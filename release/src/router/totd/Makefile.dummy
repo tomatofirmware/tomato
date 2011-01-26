@@ -1,0 +1,9 @@
+all:
+	@echo 'To build totd, run ./configure and then execute: make depend && make'
+	@echo 
+	@echo 'try configure --help for options'
+
+distclean: clean
+	rm -f config.h
+
+clean:

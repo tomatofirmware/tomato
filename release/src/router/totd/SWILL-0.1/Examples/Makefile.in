@@ -1,0 +1,32 @@
+#######################################################################
+# $Header: /home/pastacvs/cvs-rep/vermicelli/tot/src/SWILL-0.1/Examples/Makefile.in,v 1.1 2005/01/27 08:46:23 dillema Exp $
+#######################################################################
+
+srcdir = @srcdir@
+VPATH  = @srcdir@
+
+prefix     = @prefix@
+exec_prefix= @exec_prefix@
+
+INCLUDE_DIR = $(prefix)/include @MPIINCLUDE@
+LIB_DIR = $(exec_prefix)/lib
+LIBS    = @NETLIBS@
+
+#.KEEP_STATE:
+
+CC      = @CC@
+MPICC   = @MPICC@
+
+simple:
+	$(CC) simple.c -I$(INCLUDE_DIR) -L$(LIB_DIR) -lswill $(LIBS) -o a.out
+
+sg:
+	$(CC) sg.c -I$(INCLUDE_DIR) -L$(LIB_DIR) -lswill -lgifplot -lm $(LIBS) -o a.out
+
+mandel:
+	$(CC) mandel.c -I$(INCLUDE_DIR) -L$(LIB_DIR) -lswill -lgd -lpng -ljpeg -lz -lm $(LIBS) -o a.out
+
+mpi:
+	$(MPICC) mpi.c -I$(INCLUDE_DIR) -L$(LIB_DIR) -lswillmpi $(LIBS) -o a.out
+
+

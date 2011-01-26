@@ -1,0 +1,60 @@
+##############################################################
+# Makefile
+#
+# SWILL
+##############################################################
+
+
+prefix     = @prefix@
+exec_prefix= @exec_prefix@
+
+SHELL = /bin/sh
+INCLUDE_DIR = $(prefix)/include
+LIB_DIR = $(exec_prefix)/lib
+RANLIB  = @RANLIB@
+
+# Installer
+
+INSTALL        = ./install-sh -c
+INSTALL_DATA   = ${INSTALL} -m 644
+INSTALL_PROGRAM= ${INSTALL} -m 755
+
+all: static
+
+static:
+	cd Source/Objects; $(MAKE)
+	cd Source/SWILL; $(MAKE) static
+
+shared:
+	cd Source/SWILL; $(MAKE) shared
+
+install:
+	@for i in *@SO@; \
+	   do \
+	     if test -f $$i; then \
+	        echo "Installing $(LIB_DIR)/$$i"; \
+	        $(INSTALL_PROGRAM) $$i $(LIB_DIR)/$$i; \
+             fi; \
+           done;
+	@for i in *.a; \
+	   do \
+	     if test -f $$i; then \
+	     echo "Installing $(LIB_DIR)/$$i"; \
+	     $(INSTALL_DATA) $$i $(LIB_DIR)/$$i; \
+	     $(RANLIB) $(LIB_DIR)/$$i; \
+	     fi; \
+           done;
+
+	@echo "Installing $(INCLUDE_DIR)/swill.h..."
+	@$(INSTALL_DATA) Include/swill.h $(INCLUDE_DIR)/swill.h
+
+clean:
+	cd Source/Objects; $(MAKE) clean
+	cd Source/SWILL; $(MAKE) clean
+	rm -rf *.so libswill*
+
+
+
+
+
+

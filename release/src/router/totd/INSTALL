@@ -1,0 +1,54 @@
+*** Compiling and Installing totd ***
+
+totd is known to compile and run on FreeBSD, NetBSD, and Darwin. It is
+expected to compile and run on any OS with a Kame derived IPv6 stack.
+In addition, totd (starting with version 1.3) is known to run on several
+Linux-based systems and has been reported to compile and run on Solaris 8.
+
+If compilation on your system fails you can send me problem reports,
+which I may process or maybe not.
+
+The best way to compile and install totd is to:
+
+1. run ./configure
+   configure takes --prefix <dir> as option to specify installation directory
+2. make depend && make && make install
+
+It is possible to add or remove compiling in some features. See also
+./configure --help for your options:
+
+   --enable-ip6   Enables support for IPv6 transport (default: yes)
+   --enable-ip4   Enables support for IPv4 transport (default: yes)
+   --enable-stf   Enables support for 6to4 (stf) reverse lookup (default: no)
+   --enable-scoped-rewrite Enables support for scoped address rewriting (default: yes)
+   --enable-http-server    Enables support for a builtin (SWILL) web-server (default: no)
+
+The last option in the list makes that a simple web server is compiled
+into totd can accept http requests for adding and removing prefixes
+from a running totd. This is most useful in more complicated network
+settings where multiple IPv4/IPv6 translators are deployed and 
+automatic failover between them is needed. This functionality is
+provided by SWILL which is shipped with totd in its original
+form. Note that the SWILL library is covered by the GNU LESSER GENERAL
+PUBLIC LICENSE. See for more info on this SWILL-0.1/COPYING. 
+
+Requesting index.html gives a HTML page with the current state and
+statistics of totd. You can also use it to dynamically update the
+prefixes used by totd. This is useful for more complicated network
+setups that employ multiple translation devices or mechanisms at the
+same time or have failover between primary and secondary devices, for
+example. Prefixes are added and removed by requesting add_prefix.html
+and del_prefix.html combined with the variable `prefix' set to the
+prefix in question. Example URL for adding a prefix:
+
+    http://localhost:6464/add_prefix?prefix=2001:xxxx:xxxx:xxxx::
+
+You can use a tool like curl (http://curl.haxx.se) to automatically,
+from a remote (management) machine, add and delete prefixes to a 
+running totd this way.
+
+Have fun,
+
+Feico
+
+
