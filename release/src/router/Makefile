@@ -92,6 +92,8 @@ obj-$(TCONFIG_NTFS) += ntfs-3g
 obj-$(TCONFIG_EBTABLES) += ebtables
 obj-$(TCONFIG_IPV6) += radvd
 obj-$(TCONFIG_IPV6) += dhcpv6
+obj-$(TCONFIG_IPV6) += tayga
+obj-$(TCONFIG_IPV6) += totd
 
 obj-$(TCONFIG_MEDIA_SERVER) += zlib
 obj-$(TCONFIG_MEDIA_SERVER) += sqlite
@@ -1168,6 +1170,40 @@ ifneq ($(MEDIA_SERVER_STATIC),y)
 	install -D libexif/libexif/.libs/libexif.so.12 $(INSTALLDIR)/libexif/usr/lib/libexif.so.12
 	$(STRIP) $(INSTALLDIR)/libexif/usr/lib/libexif.so.12
 endif
+
+tayga/stamp-h1:
+	cd tayga && \
+	    CC=$(CC) CFLAGS="$(EXTRACFLAGS)" $(CONFIGURE)
+	touch $@
+
+tayga: tayga/stamp-h1
+	@$(MAKE) -C tayga
+
+tayga-clean:
+	-@$(MAKE) -C tayga clean
+
+tayga-install: tayga
+	@$(SEP)
+	install -d $(INSTALLDIR)/tayga/usr/sbin
+	install -D tayga/tayga $(INSTALLDIR)/tayga/usr/sbin/tayga
+	$(STRIP) $(INSTALLDIR)/tayga/usr/sbin/tayga
+
+totd/stamp-h1:
+	cd totd && \
+	    CC=$(CC) CFLAGS="$(EXTRACFLAGS)" $(CONFIGURE) --enable-stf
+	touch $@
+
+totd: totd/stamp-h1
+	@$(MAKE) -C totd CC=$(CC)
+
+totd-clean:
+	-@$(MAKE) -C totd clean
+
+totd-install: totd
+	@$(SEP)
+	install -d $(INSTALLDIR)/totd/usr/sbin
+	install -D totd/totd $(INSTALLDIR)/totd/usr/sbin/totd
+	$(STRIP) $(INSTALLDIR)/totd/usr/sbin/totd
 
 zlib/stamp-h1:
 	cd zlib && \
