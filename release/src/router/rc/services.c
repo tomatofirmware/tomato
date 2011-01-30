@@ -75,7 +75,7 @@ void start_dnsmasq()
 	const char *lan_ifname;
 	char sdhcp_lease[32];
 	char *e;
-	int n;
+	int n, listen_port;
 	char *mac, *ip, *name;
 	char *p;
 	int ipn;
@@ -116,14 +116,22 @@ void start_dnsmasq()
 	// dns
 	const dns_list_t *dns = get_dns();	// this always points to a static buffer
 
+#ifdef TCONFIG_IPV6
+	if (nvram_match("ipv6_nat64", "1"))
+		listen_port = 5353;
+	else
+#endif
+		listen_port = 53;
+
 	if (((nv = nvram_get("dns_minport")) != NULL) && (*nv)) n = atoi(nv);
 		else n = 4096;
 	fprintf(f,
 		"resolv-file=%s\n"		// the real stuff is here
 		"addn-hosts=%s\n"		// "
 		"expand-hosts\n"		// expand hostnames in hosts file
-		"min-port=%u\n", 		// min port used for random src port
-		dmresolv, dmhosts, n);
+		"min-port=%u\n" 		// min port used for random src port
+		"port=%u\n",                    // port to listen
+		dmresolv, dmhosts, n, listen_port);
 	do_dns = nvram_match("dhcpd_dmdns", "1");
 
 	// DNS rebinding protection, will discard upstream RFC1918 responses
@@ -518,6 +526,41 @@ void stop_tayga(void)
 	eval("ip", "addr", "del", tayga_ipv4, "dev", tayga_dev);
 	eval("ip", "addr", "del", tayga_ipv6, "dev", tayga_dev);
 	eval("tayga", "-c", "/etc/tayga.conf", "--rmtun");
+}
+
+void start_totd(void)
+{
+	FILE *f;
+
+	if (getpid() != 1) {
+		start_service("totd");
+		return;
+	}
+
+	if (ipv6_enabled() && nvram_match("ipv6_nat64", "1")) {
+		// Create totd.conf
+		if ((f = fopen("/etc/totd.conf", "w")) == NULL) return;
+
+		fprintf(f,
+			"forwarder 127.0.0.1 port 5353\n"
+			"prefix 64:ff9b::\n"
+			"port 53\n"
+			"stf\n");
+		fclose(f);
+
+		// Start radvd
+		eval("totd", "-c", "/etc/totd.conf");
+	}
+}
+
+void stop_totd(void)
+{
+	if (getpid() != 1) {
+		stop_service("totd");
+		return;
+	}
+
+	killall_tk("totd");
 }
 
 static pid_t pid_radvd = -1;
@@ -1761,6 +1804,7 @@ void start_services(void)
 	 */
 	start_radvd();
 	start_tayga();
+	start_totd();
 #endif
 	restart_nas_services(1, 1);	// !!TB - Samba, FTP and Media Server
 }
@@ -1773,6 +1817,7 @@ void stop_services(void)
 #ifdef TCONFIG_IPV6
 	stop_radvd();
 	stop_tayga();
+	stop_totd();
 #endif
 	stop_sched();
 	stop_rstats();
@@ -1942,6 +1987,16 @@ TOP:
 		}
 		if (action & A_START) {
 			start_tayga();
+		}
+		goto CLEAR;
+	}
+
+	if (strcmp(service, "totd") == 0) {
+		if (action & A_STOP) {
+			stop_totd();
+		}
+		if (action & A_START) {
+			start_totd();
 		}
 		goto CLEAR;
 	}
