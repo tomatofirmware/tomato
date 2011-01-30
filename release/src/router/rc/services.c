@@ -455,6 +455,71 @@ void stop_ipv6_sit_tunnel(void)
 	modprobe_r("sit");
 }
 
+static char *tayga_dev = "nat64";
+static char *tayga_ipv4 = "192.168.3.1";
+
+void start_tayga(void)
+{
+	FILE *f;
+	char *prefix;
+
+	if (getpid() != 1) {
+		start_service("tayga");
+		return;
+	}
+
+	if (ipv6_enabled() && nvram_match("ipv6_nat64", "1")) {
+		char *tayga_prefix = "192.168.3.0/24";
+		char tayga_ipv6[100];
+
+		prefix = nvram_safe_get("ipv6_prefix");
+		sprintf(tayga_ipv6, "%s5", prefix);
+
+		// Create tayga.conf
+		if ((f = fopen("/etc/tayga.conf", "w")) == NULL) return;
+
+		fprintf(f,
+			"tun-device %s\n"
+			"ipv4-addr %s\n"
+			"ipv6-addr %s4\n"
+			"prefix 64:ff9b::/96\n"
+			"dynamic-pool %s\n",
+			tayga_dev, tayga_ipv4,
+			prefix, tayga_prefix);
+		fclose(f);
+
+		// Start radvd
+                modprobe("tun");
+		eval("tayga", "-c", "/etc/tayga.conf", "--mktun");
+		eval("ip", "link", "set", tayga_dev, "up");
+		eval("ip", "addr", "add", tayga_ipv6, "dev", tayga_dev);
+		eval("ip", "addr", "add", tayga_ipv4, "dev", tayga_dev);
+		eval("ip", "route", "add", tayga_prefix, "dev", tayga_dev);
+		eval("ip", "route", "add", "64:ff9b::/96", "dev",
+		     tayga_dev);
+		eval("tayga", "-c", "/etc/tayga.conf");
+	}
+}
+
+void stop_tayga(void)
+{
+	char tayga_ipv6[100];
+	char *prefix;
+
+	prefix = nvram_safe_get("ipv6_prefix");
+	sprintf(tayga_ipv6, "%s5", prefix);
+
+	if (getpid() != 1) {
+		stop_service("tayga");
+		return;
+	}
+
+	killall_tk("tayga");
+	eval("ip", "addr", "del", tayga_ipv4, "dev", tayga_dev);
+	eval("ip", "addr", "del", tayga_ipv6, "dev", tayga_dev);
+	eval("tayga", "-c", "/etc/tayga.conf", "--rmtun");
+}
+
 static pid_t pid_radvd = -1;
 
 void start_radvd(void)
@@ -1695,6 +1760,7 @@ void start_services(void)
 	 * dhcp6c-state will restart them.
 	 */
 	start_radvd();
+	start_tayga();
 #endif
 	restart_nas_services(1, 1);	// !!TB - Samba, FTP and Media Server
 }
@@ -1706,6 +1772,7 @@ void stop_services(void)
 	restart_nas_services(1, 0);	// stop Samba, FTP and Media Server
 #ifdef TCONFIG_IPV6
 	stop_radvd();
+	stop_tayga();
 #endif
 	stop_sched();
 	stop_rstats();
@@ -1865,6 +1932,16 @@ TOP:
 		}
 		if (action & A_START) {
 			start_radvd();
+		}
+		goto CLEAR;
+	}
+
+	if (strcmp(service, "tayga") == 0) {
+		if (action & A_STOP) {
+			stop_tayga();
+		}
+		if (action & A_START) {
+			start_tayga();
 		}
 		goto CLEAR;
 	}

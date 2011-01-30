@@ -21,7 +21,7 @@
 <script type='text/javascript' src='debug.js'></script>
 
 <script type='text/javascript'>
-//	<% nvram("ipv6_prefix,ipv6_prefix_length,ipv6_radvd,ipv6_rtr_addr,ipv6_service,ipv6_dns,ipv6_tun_addr,ipv6_tun_addrlen,ipv6_ifname,ipv6_tun_v4end,ipv6_tun_mtu,ipv6_tun_ttl"); %>
+//	<% nvram("ipv6_prefix,ipv6_prefix_length,ipv6_radvd,ipv6_nat64,ipv6_rtr_addr,ipv6_service,ipv6_dns,ipv6_tun_addr,ipv6_tun_addrlen,ipv6_ifname,ipv6_tun_v4end,ipv6_tun_mtu,ipv6_tun_ttl"); %>
 
 function verifyFields(focused, quiet)
 {
@@ -40,6 +40,7 @@ function verifyFields(focused, quiet)
 		_f_ipv6_dns_2: 1,
 		_f_ipv6_dns_3: 1,
 		_f_ipv6_radvd: 1,
+		_f_ipv6_nat64: 1,
 		_ipv6_tun_v4end: 1,
 		_ipv6_ifname: 1,
 		_ipv6_tun_addr: 1,
@@ -156,6 +157,7 @@ function save()
 	var fom = E('_fom');
 	fom.ipv6_dns.value = joinIPv6Addr([fom.f_ipv6_dns_1.value, fom.f_ipv6_dns_2.value, fom.f_ipv6_dns_3.value]);
 	fom.ipv6_radvd.value = fom.f_ipv6_radvd.checked ? 1 : 0;
+	fom.ipv6_nat64.value = fom.f_ipv6_nat64.checked ? 1 : 0;
 
 	form.submit(fom, 1);
 }
@@ -181,6 +183,7 @@ function save()
 <input type='hidden' name='_service' value='*'>
 
 <input type='hidden' name='ipv6_radvd'>
+<input type='hidden' name='ipv6_nat64'>
 <input type='hidden' name='ipv6_dns'>
 
 <div class='section-title'>IPv6 Configuration</div>
@@ -208,7 +211,9 @@ createFieldTable('', [
 		{ name: 'ipv6_tun_addrlen', type: 'text', maxlen: 3, size: 5, value: nvram.ipv6_tun_addrlen }
 	] },
 	{ title: 'Tunnel MTU', name: 'ipv6_tun_mtu', type: 'text', maxlen: 4, size: 8, value: nvram.ipv6_tun_mtu, suffix: ' <small>(0 for default)</small>' },
-	{ title: 'Tunnel TTL', name: 'ipv6_tun_ttl', type: 'text', maxlen: 3, size: 8, value: nvram.ipv6_tun_ttl }
+	{ title: 'Tunnel TTL', name: 'ipv6_tun_ttl', type: 'text', maxlen: 3, size: 8, value: nvram.ipv6_tun_ttl },
+        null,
+	{ title: 'Enable NAT64', name: 'f_ipv6_nat64', type: 'checkbox', value: nvram.ipv6_nat64 != '0' }
 ]);
 </script>
 </div>
