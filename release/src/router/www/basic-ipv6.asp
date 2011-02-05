@@ -21,7 +21,7 @@
 <script type='text/javascript' src='debug.js'></script>
 
 <script type='text/javascript'>
-//	<% nvram("ipv6_prefix,ipv6_prefix_length,ipv6_radvd,ipv6_nat64,ipv6_rtr_addr,ipv6_service,ipv6_dns,ipv6_tun_addr,ipv6_tun_addrlen,ipv6_ifname,ipv6_tun_v4end,ipv6_tun_mtu,ipv6_tun_ttl"); %>
+//	<% nvram("ipv6_prefix,ipv6_prefix_length,ipv6_radvd,ipv6_nat64,tayga_prefix,tayga_prefixlen,tayga_server4,tayga_server6,tayga_client4,tayga_client6,ipv6_rtr_addr,ipv6_service,ipv6_dns,ipv6_tun_addr,ipv6_tun_addrlen,ipv6_ifname,ipv6_tun_v4end,ipv6_tun_mtu,ipv6_tun_ttl"); %>
 
 function verifyFields(focused, quiet)
 {
@@ -46,7 +46,13 @@ function verifyFields(focused, quiet)
 		_ipv6_tun_addr: 1,
 		_ipv6_tun_addrlen: 1,
 		_ipv6_tun_ttl: 1,
-		_ipv6_tun_mtu: 1
+		_ipv6_tun_mtu: 1,
+		_tayga_prefix: 1,
+		_tayga_prefixlen: 1,
+		_tayga_client4: 1,
+		_tayga_client6: 1,
+		_tayga_server4: 1,
+		_tayga_server6: 1
 	};
 
 	switch(E('_ipv6_service').value) {
@@ -82,6 +88,15 @@ function verifyFields(focused, quiet)
 		case 'sit':
 			break;
 	}
+
+	if(!E('_f_ipv6_nat64').checked) {
+		vis._tayga_prefix = 0;
+		vis._tayga_prefixlen = 0;
+		vis._tayga_client4 = 0;
+		vis._tayga_client6 = 0;
+		vis._tayga_server4 = 0;
+		vis._tayga_server6 = 0;
+	}
 	
 	for (a in vis) {
 		b = E(a);
@@ -100,12 +115,12 @@ function verifyFields(focused, quiet)
 	}
 
 	// IP address
-	a = ['_ipv6_tun_v4end'];
+	a = ['_ipv6_tun_v4end', '_tayga_prefix', '_tayga_client4', '_tayga_server4'];
 	for (i = a.length - 1; i >= 0; --i)
 		if ((vis[a[i]]) && (!v_ip(a[i], quiet || !ok))) ok = 0;
 
 	// range
-	a = [['_ipv6_prefix_length', 3, 64], ['_ipv6_tun_addrlen', 3, 127], ['_ipv6_tun_ttl', 0, 255]];
+	a = [['_ipv6_prefix_length', 3, 64], ['_ipv6_tun_addrlen', 3, 127], ['_ipv6_tun_ttl', 0, 255], ['_tayga_prefixlen', 3, 30]];
 	for (i = a.length - 1; i >= 0; --i) {
 		b = a[i];
 		if ((vis[b[0]]) && (!v_range(b[0], quiet || !ok, b[1], b[2]))) ok = 0;
@@ -119,7 +134,7 @@ function verifyFields(focused, quiet)
 	}
 
 	// IPv6 address
-	a = ['_ipv6_prefix', '_ipv6_tun_addr'];
+	a = ['_ipv6_prefix', '_ipv6_tun_addr', '_tayga_client6', '_tayga_server6'];
 	for (i = a.length - 1; i >= 0; --i)
 		if ((vis[a[i]]) && (!v_ipv6_addr(a[i], quiet || !ok))) ok = 0;
 
@@ -213,7 +228,13 @@ createFieldTable('', [
 	{ title: 'Tunnel MTU', name: 'ipv6_tun_mtu', type: 'text', maxlen: 4, size: 8, value: nvram.ipv6_tun_mtu, suffix: ' <small>(0 for default)</small>' },
 	{ title: 'Tunnel TTL', name: 'ipv6_tun_ttl', type: 'text', maxlen: 3, size: 8, value: nvram.ipv6_tun_ttl },
         null,
-	{ title: 'Enable NAT64', name: 'f_ipv6_nat64', type: 'checkbox', value: nvram.ipv6_nat64 != '0' }
+	{ title: 'Enable NAT64', name: 'f_ipv6_nat64', type: 'checkbox', value: nvram.ipv6_nat64 != '0' },
+	{ title: 'NAT64 IPv4 Prefix', name: 'tayga_prefix', type: 'text', value: nvram.tayga_prefix },
+	{ title: 'NAT64 IPv4 Prefix Length', name: 'tayga_prefixlen', type: 'text', value: nvram.tayga_prefixlen },
+	{ title: 'NAT64 Client IPv4 Address', name: 'tayga_client4', type: 'text', value: nvram.tayga_client4 },
+	{ title: 'NAT64 Client IPv6 Address', name: 'tayga_client6', type: 'text', value: nvram.tayga_client6 },
+	{ title: 'NAT64 Server IPv4 Address', name: 'tayga_server4', type: 'text', value: nvram.tayga_server4 },
+	{ title: 'NAT64 Server IPv6 Address', name: 'tayga_server6', type: 'text', value: nvram.tayga_server6 }
 ]);
 </script>
 </div>

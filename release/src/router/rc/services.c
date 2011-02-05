@@ -464,12 +464,10 @@ void stop_ipv6_sit_tunnel(void)
 }
 
 static char *tayga_dev = "nat64";
-static char *tayga_ipv4 = "192.168.3.1";
 
 void start_tayga(void)
 {
 	FILE *f;
-	char *prefix;
 
 	if (getpid() != 1) {
 		start_service("tayga");
@@ -477,11 +475,16 @@ void start_tayga(void)
 	}
 
 	if (ipv6_enabled() && nvram_match("ipv6_nat64", "1")) {
-		char *tayga_prefix = "192.168.3.0/24";
-		char tayga_ipv6[100];
+		char *tayga_prefix = nvram_safe_get("tayga_prefix");
+		char *tayga_prefixlen = nvram_safe_get("tayga_prefixlen");
+		char *tayga_server4 = nvram_safe_get("tayga_server4");
+		char *tayga_server6 = nvram_safe_get("tayga_server6");
+		char *tayga_client4 = nvram_safe_get("tayga_client4");
+		char *tayga_client6 = nvram_safe_get("tayga_client6");
+		char route_prefix[100];
 
-		prefix = nvram_safe_get("ipv6_prefix");
-		sprintf(tayga_ipv6, "%s5", prefix);
+		snprintf(route_prefix, sizeof(route_prefix),
+			 "%s/%s", tayga_prefix, tayga_prefixlen);
 
 		// Create tayga.conf
 		if ((f = fopen("/etc/tayga.conf", "w")) == NULL) return;
@@ -489,20 +492,21 @@ void start_tayga(void)
 		fprintf(f,
 			"tun-device %s\n"
 			"ipv4-addr %s\n"
-			"ipv6-addr %s4\n"
+			"ipv6-addr %s\n"
 			"prefix 64:ff9b::/96\n"
 			"dynamic-pool %s\n",
-			tayga_dev, tayga_ipv4,
-			prefix, tayga_prefix);
+			tayga_dev, tayga_server4,
+			tayga_server6, route_prefix);
 		fclose(f);
 
 		// Start radvd
                 modprobe("tun");
 		eval("tayga", "-c", "/etc/tayga.conf", "--mktun");
 		eval("ip", "link", "set", tayga_dev, "up");
-		eval("ip", "addr", "add", tayga_ipv6, "dev", tayga_dev);
-		eval("ip", "addr", "add", tayga_ipv4, "dev", tayga_dev);
-		eval("ip", "route", "add", tayga_prefix, "dev", tayga_dev);
+		eval("ip", "addr", "add", tayga_client6, "dev", tayga_dev);
+		eval("ip", "addr", "add", tayga_client4, "dev", tayga_dev);
+		eval("ip", "route", "add", route_prefix, "dev", tayga_dev);
+		eval("ip", "route", "add", tayga_server6, "dev", tayga_dev);
 		eval("ip", "route", "add", "64:ff9b::/96", "dev",
 		     tayga_dev);
 		eval("tayga", "-c", "/etc/tayga.conf");
@@ -511,11 +515,8 @@ void start_tayga(void)
 
 void stop_tayga(void)
 {
-	char tayga_ipv6[100];
-	char *prefix;
-
-	prefix = nvram_safe_get("ipv6_prefix");
-	sprintf(tayga_ipv6, "%s5", prefix);
+	char *tayga_client4 = nvram_safe_get("tayga_client4");
+	char *tayga_client6 = nvram_safe_get("tayga_client6");
 
 	if (getpid() != 1) {
 		stop_service("tayga");
@@ -523,8 +524,8 @@ void stop_tayga(void)
 	}
 
 	killall_tk("tayga");
-	eval("ip", "addr", "del", tayga_ipv4, "dev", tayga_dev);
-	eval("ip", "addr", "del", tayga_ipv6, "dev", tayga_dev);
+	eval("ip", "addr", "del", tayga_client4, "dev", tayga_dev);
+	eval("ip", "addr", "del", tayga_client6, "dev", tayga_dev);
 	eval("tayga", "-c", "/etc/tayga.conf", "--rmtun");
 }
 
