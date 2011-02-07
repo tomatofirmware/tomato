@@ -93,7 +93,7 @@ const defaults_t defaults[] = {
 	{ "autofw_port0",		""				},	// out_proto:out_port,in_proto:in_port0-in_port1>to_port0-to_port1,enable,desc
 */
 	// DHCP server parameters
-	{ "dhcp_start",			"100"			},	//
+	{ "dhcp_start",			"2"			},	//
 	{ "dhcp_num",			"50"			},	//
 	{ "dhcpd_startip",		"" 				},	// if empty, tomato will use dhcp_start/dchp_num for better compatibility
 	{ "dhcpd_endip",		"" 				},	// "
@@ -125,6 +125,23 @@ const defaults_t defaults[] = {
 	{ "pppoe_lei",			""				},
 	{ "pppoe_lef",			""				},
 
+#ifdef TCONFIG_IPV6
+	// IPv6 parameters
+	{ "ipv6_service",		""				},	// [''|native|native-pd|sit|other]
+	{ "ipv6_prefix",		""				},	// The global-scope IPv6 prefix to route/advertise
+	{ "ipv6_prefix_length",		"64"				},	// The bit length of the prefix. Used by dhcp6c. For radvd, /64 is always assumed.
+	{ "ipv6_rtr_addr",		""				},	// defaults to $ipv6_prefix::1
+	{ "ipv6_radvd",			"1"				},	// Enable Router Advertisement (radvd)
+	{ "ipv6_ifname",		"six0"				},	// The interface facing the rest of the IPv6 world
+	{ "ipv6_tun_v4end",		"0.0.0.0"			},	// Foreign IPv4 endpoint of SIT tunnel
+	{ "ipv6_tun_addr",		""				},	// IPv6 address to assign to local tunnel endpoint
+	{ "ipv6_tun_addrlen",		"64"				},	// CIDR prefix length for tunnel's IPv6 address	
+	{ "ipv6_tun_mtu",		"0"				},	// Tunnel MTU, 0 for default
+	{ "ipv6_tun_ttl",		"255"				},	// Tunnel TTL
+	{ "ipv6_dns",			""				},	// DNS server(s) IPs
+	{ "ipv6_get_dns",		""				},	// DNS IP address which get by dhcp6c
+#endif
+
 	// Wireless parameters
 	{ "wl_ifname",			""				},	// Interface name
 	{ "wl_hwaddr",			""				},	// MAC address
@@ -132,8 +149,8 @@ const defaults_t defaults[] = {
 	{ "wl_corerev",			""				},	// Current core revision
 	{ "wl_phytypes",		""				},	// List of supported wireless bands (e.g. "ga")
 	{ "wl_radioids",		""				},	// List of radio IDs
-	{ "wl_ssid",			"wireless"		},	// Service set ID (network name)
-	{ "wl1_ssid",			"wireless1"		},
+	{ "wl_ssid",			"Tomato.RAF24"		},	// Service set ID (network name)
+	{ "wl1_ssid",			"Tomato.RAF50"		},
 	{ "wl_country_code",		""		},		// Country (default obtained from driver)
 	{ "wl_radio",			"1"				},	// Enable (1) or disable (0) radio
 	{ "wl1_radio",			"1"				},	// Enable (1) or disable (0) radio
@@ -171,7 +188,7 @@ const defaults_t defaults[] = {
 	{ "wl_infra",			"1"				},	// Network Type (BSS/IBSS)
 	{ "wl_btc_mode",		"0"				},	// !!TB - BT Coexistence Mode
 	{ "wl_sta_retry_time",		"5"				},	// !!TB - Seconds between association attempts (0 to disable retries)
-	{ "wl_interfmode",		"2"				},	// Interference Mitigation Mode (0|1|2|3)
+	{ "wl_interfmode",		"3"				},	// Interference Mitigation Mode (0|1|2|3)
 
 	{ "wl_passphrase",		""				},	// Passphrase	// Add
 	{ "wl_wep_bit",			"128"			},	// WEP encryption [64 | 128] // Add
@@ -187,7 +204,7 @@ const defaults_t defaults[] = {
 	{ "wl_radius_ipaddr",	""				},	// RADIUS server IP address
 	{ "wl_radius_key",		""				},	// RADIUS shared secret
 	{ "wl_radius_port",		"1812"			},	// RADIUS server UDP port
-	{ "wl_crypto",			"tkip"			},	// WPA data encryption
+	{ "wl_crypto",			"aes"			},	// WPA data encryption
 	{ "wl_net_reauth",		"36000"			},	// Network Re-auth/PMK caching duration
 	{ "wl_akm",				""				},	// WPA akm list
 
@@ -301,17 +318,17 @@ const defaults_t defaults[] = {
 	{ "ddnsx_refresh",		"28"			},
 
 // basic-ident
-	{ "router_name",		"tomato"		},
+	{ "router_name",		"tomatoRAF"		},
 	{ "wan_hostname",		"unknown"		},
 	{ "wan_domain",			""				},
 
 // basic-time
-	{ "tm_sel",				"PST8PDT,M3.2.0/2,M11.1.0/2"	},
-	{ "tm_tz",				"PST8PDT,M3.2.0/2,M11.1.0/2"	},
+	{ "tm_sel",				"CET-1CEST,M3.5.0/2,M10.5.0/3"	},
+	{ "tm_tz",				"CET-1CEST,M3.5.0/2,M10.5.0/3"	},
 	{ "tm_dst",				"1",							},
 	{ "ntp_updates",		"4"								},
 	{ "ntp_tdod",			"0"								},
-	{ "ntp_server",			"0.pool.ntp.org 1.pool.ntp.org 2.pool.ntp.org" },
+	{ "ntp_server",			"0.europe.pool.ntp.org 1.europe.pool.ntp.org 2.europe.pool.ntp.org" },
 	{ "ntp_kiss",			""								},
 	{ "ntp_kiss_ignore",	""								},
 
@@ -332,7 +349,7 @@ const defaults_t defaults[] = {
 	{ "nf_l7in",			"1"				},
 #ifdef LINUX26
 	{ "nf_sip",			"1"				},
-	{ "ct_hashsize",		""				},
+	{ "ct_hashsize",		"2048"				},
 #endif
 #ifdef LINUX26
 	{ "nf_rtsp",			"0"				},
@@ -368,8 +385,8 @@ const defaults_t defaults[] = {
 //	{ "dnsmasq_norw",		"0"				},
 
 // advanced-firewall
-//		{ "block_loopback",		"0"				},	// nat loopback
-	{ "nf_loopback",		"1"				},
+//	{ "block_loopback",		"0"				},	// nat loopback
+	{ "nf_loopback",		"0"				},
 	{ "block_wan",			"1"				},	// block inbound icmp
 	{ "multicast_pass",		"0"				},	// enable multicast proxy
 	{ "ne_syncookies",		"0"				},	// tcp_syncookies
@@ -397,6 +414,9 @@ const defaults_t defaults[] = {
 
 // forward-*
 	{ "portforward",		"0<3<1.1.1.0/24<1000:2000<<192.168.1.2<ex: 1000 to 2000, restricted>0<2<<1000,2000<<192.168.1.2<ex: 1000 and 2000>0<1<<1000<2000<192.168.1.2<ex: different internal port>0<3<<1000:2000,3000<<192.168.1.2<ex: 1000 to 2000, and 3000>" },
+#ifdef TCONFIG_IPV6
+	{ "ipv6_portforward",	""},
+#endif
 	{ "trigforward",		"0<1<3000:4000<5000:6000<ex: open 5000-6000 if 3000-4000>"	},
 	{ "dmz_enable",			"0"				},
 	{ "dmz_ipaddr",			"0"				},
@@ -424,7 +444,7 @@ const defaults_t defaults[] = {
 	{ "qos_fin",			"1"				},
 	{ "qos_rst",			"1"				},
 	{ "qos_icmp",			"0"				},
-	{ "qos_reset",			"0"				},
+	{ "qos_reset",			"1"				},
 	{ "qos_obw",			"230"			},
 	{ "qos_ibw",			"1000"			},
 	{ "qos_orules",			"0<<6<d<80,443<0<<0:512<1<WWW>0<<6<d<80,443<0<<512:<3<WWW (512K+)>0<<-1<d<53<0<<0:2<0<DNS>0<<-1<d<53<0<<2:<4<DNS (2K+)" },
@@ -469,7 +489,7 @@ const defaults_t defaults[] = {
 	{ "https_crt_file",		""				},
 	{ "https_crt",			""				},
 	{ "web_wl_filter",		"0"				},	// Allow/Deny Wireless Access Web
-	{ "web_css",			"tomato"		},
+	{ "web_css",			"usbred"		},
 	{ "web_svg",			"1"				},
 	{ "telnetd_eas",		"1"				},
 	{ "telnetd_port",		"23"			},
@@ -569,7 +589,7 @@ const defaults_t defaults[] = {
 	{ "usb_irq_thresh",		"0"				},
 	{ "usb_storage",		"1"				},
 	{ "usb_printer",		"1"				},
-	{ "usb_printer_bidirect",	"1"				},
+	{ "usb_printer_bidirect",	"0"				},
 	{ "usb_ext_opt",		""				},
 	{ "usb_fat_opt",		""				},
 	{ "usb_ntfs_opt",		""				},
@@ -618,9 +638,9 @@ const defaults_t defaults[] = {
 	{ "smbd_cpage",			""				},
 	{ "smbd_cset",			"utf8"				},
 	{ "smbd_custom",		""				},
-	{ "smbd_autoshare",		"1"				},
+	{ "smbd_autoshare",		"2"				},
 	{ "smbd_shares",
-		"share</mnt<Default Share<0<0>root$</<Hidden Root<0<1"
+		"jffs</jffs<JFFS<1<0>root$</<Hidden Root<0<1"
 	},
 	{ "smbd_user",			"nas"				},
 	{ "smbd_passwd",		""				},
@@ -772,6 +792,26 @@ const defaults_t defaults[] = {
 	{ "vpn_client2_crt",      ""              },
 	{ "vpn_client2_key",      ""              },
 #endif	// vpn
+
+// new_qoslimit
+	{ "new_qoslimit_enable",		"0"			}, //!! RAF
+	{ "new_qoslimit_obw",			""			}, //!! RAF
+	{ "new_qoslimit_ibw",			""			}, //!! RAF
+	{ "new_qoslimit_rules",			"" 			}, //!! RAF
+	{ "new_qoslimit_d_enable",		"0"			}, //!! RAF
+	{ "new_qoslimit_d_dlr",			""			}, //!! RAF
+	{ "new_qoslimit_d_dlc",			""			}, //!! RAF
+	{ "new_qoslimit_d_ulr",			""			}, //!! RAF
+	{ "new_qoslimit_d_ulc",			""			}, //!! RAF
+ 
+
+
+// new_arpbind
+	{ "new_arpbind_enable",			"0"			}, //!! RAF
+	{ "new_arpbind_only",			"0"			}, //!! RAF
+	{ "new_arpbind_list",			"" 			}, //!! RAF
+
+
 
 #if 0
 // safe to remove?

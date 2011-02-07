@@ -108,8 +108,10 @@ extern int listen_main(int argc, char **argv);
 extern int ipup_main(int argc, char **argv);
 extern int ipdown_main(int argc, char **argv);
 extern int pppevent_main(int argc, char **argv);
-extern int set_pppoepid_main(int argc, char **argv);	// by tallest 1219
-extern int pppoe_down_main(int argc, char **argv);		// by tallest 0407
+#ifdef TCONFIG_IPV6
+extern int ip6up_main(int argc, char **argv);
+extern int ip6down_main(int argc, char **argv);
+#endif
 
 // rc.c
 extern void restore_defaults(void);
@@ -124,11 +126,13 @@ extern void start_pptp(int mode);
 extern void stop_pptp(void);
 extern void start_pppoe(int);
 extern void stop_pppoe(void);
-extern void stop_singe_pppoe(int num);
 extern void start_l2tp(void);
 extern void stop_l2tp(void);
 extern void start_wan(int mode);
 extern void start_wan_done(char *ifname);
+#ifdef TCONFIG_IPV6
+extern void start_wan6_done(char *wan_ifname);
+#endif
 extern void stop_wan(void);
 extern void force_to_dial(void);
 extern void do_wan_routes(char *ifname, int metric, int add);
@@ -144,6 +148,9 @@ extern void do_static_routes(int add);
 extern int radio_main(int argc, char *argv[]);
 extern int wldist_main(int argc, char *argv[]);
 extern void start_wl(void);
+#ifdef TCONFIG_IPV6
+extern void enable_ipv6(int enable);
+#endif
 
 // dhcpc.c
 extern int dhcpc_event_main(int argc, char **argv);
@@ -151,6 +158,11 @@ extern int dhcpc_release_main(int argc, char **argv);
 extern int dhcpc_renew_main(int argc, char **argv);
 extern void start_dhcpc(void);
 extern void stop_dhcpc(void);
+#ifdef TCONFIG_IPV6
+extern int dhcp6c_state_main(int argc, char **argv);
+extern void start_dhcp6c(void);
+extern void stop_dhcp6c(void);
+#endif
 
 // services.c
 extern void start_cron(void);
@@ -190,6 +202,14 @@ extern void restart_nas_services(int stop, int start);
 extern void start_hotplug2();
 extern void stop_hotplug2(void);
 #endif
+#ifdef TCONFIG_IPV6
+extern void start_ipv6_sit_tunnel(void);
+extern void stop_ipv6_sit_tunnel(void);
+extern void start_radvd(void);
+extern void stop_radvd(void);
+extern void start_ipv6(void);
+extern void stop_ipv6(void);
+#endif
 
 // !!TB - USB Support
 // usb.c
@@ -212,11 +232,11 @@ extern void stop_nas(void);
 extern void notify_nas(const char *ifname);
 
 // firewall.c
-extern char wanface[];
-extern char manface[];
+extern wanface_list_t wanfaces;
 extern char lanface[];
-extern char wanaddr[];
-extern char manaddr[];
+#ifdef TCONFIG_IPV6
+extern char wan6face[];
+#endif
 extern char lan_cclass[];
 extern const char *chain_in_accept;
 extern const char *chain_out_drop;
@@ -226,6 +246,16 @@ extern char **layer7_in;
 
 extern void enable_ip_forward(void);
 extern void ipt_write(const char *format, ...);
+extern void ip6t_write(const char *format, ...);
+#if defined(TCONFIG_IPV6) && defined(LINUX26)
+#define ip46t_write(args...) do { ipt_write(args); ip6t_write(args); } while(0)
+#define ip46t_flagged_write(do_ip6t, args...) do { ipt_write(args); if (do_ip6t) ip6t_write(args); } while(0)
+#define ip46t_cond_write(do_ip6t, args...) do { if (do_ip6t) ip6t_write(args); else ipt_write(args); } while(0)
+#else
+#define ip46t_write ipt_write
+#define ip46t_flagged_write(do_ip6t, args...) ipt_write(args)
+#define ip46t_cond_write(do_ip6t, args...) ipt_write(args)
+#endif
 extern void ipt_addr(char *addr, int maxlen, const char *s, const char *dir);
 extern int ipt_ipp2p(const char *v, char *opt);
 extern int ipt_layer7(const char *v, char *opt);
@@ -239,6 +269,9 @@ extern void create_test_iptfile(void);
 // forward.c
 extern void ipt_forward(ipt_table_t table);
 extern void ipt_triggered(ipt_table_t table);
+#ifdef TCONFIG_IPV6
+extern void ip6t_forward(void);
+#endif
 
 // restrict.c
 extern int rcheck_main(int argc, char *argv[]);
@@ -376,5 +409,13 @@ static inline void write_vpn_dnsmasq_config(FILE*) {}
 static inline void start_vpn_eas() { }
 #define write_vpn_resolv(f) (0)
 #endif
+
+// new_qoslimit.c
+extern void new_qoslimit_start(void);
+extern void new_qoslimit_stop(void);
+
+// new_arpbind.c
+extern void new_arpbind_start(void);
+extern void new_arpbind_stop(void);
 
 #endif

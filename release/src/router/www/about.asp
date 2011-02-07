@@ -76,7 +76,7 @@ function init()
 <body onload='init()'>
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
-	<div class='title'>Tomato</div>
+	<div class='title'>Tomato RAF</div>
 	<div class='version'>Version <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
@@ -89,22 +89,31 @@ function init()
 <img src='tux.png' alt='Linux &amp; Tomato' id='tux'>
 </div>
 <div style='margin:20px 20px;font-size:14px;color:#555;'>
-Tomato Firmware v<% version(1); %><br>
+Tomato Firmware RAF<% version(1); %><br>
 
-/* USB-BEGIN */
+<!-- USB-BEGIN -->
 <br>USB support integration and GUI,<br>
-/* USB-END */
+<!-- USB-END -->
 Linux kernel <% version(2); %> and Broadcom Wireless Driver <% version(3); %> updates,<br>
 support for additional router models and Wireless-N mode.<br>
-Copyright (C) 2008-2010 Fedor Kozhevnikov and Ray Van Tassle<br>
+Copyright (C) 2008-2011 Fedor Kozhevnikov and Ray Van Tassle<br>
 <a href='http://www.tomatousb.org/' target='_new'>http://www.tomatousb.org</a><br>
 <!-- / / / -->
-<br><br>
+<br>
 
-/* VPN-BEGIN */
-VPN integration and GUI Copyright (C) 2010 Keith Moyer, <a href='mailto:tomatovpn@keithmoyer.com'>tomatovpn@keithmoyer.com</a><br>
+<!-- VPN-BEGIN -->
+VPN integration and GUI,
+Copyright (C) 2010 Keith Moyer,<br>
+<a href='mailto:tomatovpn@keithmoyer.com'>tomatovpn@keithmoyer.com</a><br>
 <br><br>
-/* VPN-END */
+<!-- VPN-END -->
+
+<b>Victek RAF features:</b><br>
+System Info Extended Features<br>
+QoS IP/Range BW Limiter | ARP Binding<br>
+Copyright (C) 2007-2011 Vicente Soriano<br>
+<a href='http://victek.is-a-geek.com' target='_new'>http://victek.is-a-geek.com</a><br>
+<br>
 
 Based on Tomato Firmware v<% version(); %><br>
 Copyright (C) 2006-2010 Jonathan Zarate<br>

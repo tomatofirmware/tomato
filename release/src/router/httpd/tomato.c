@@ -9,6 +9,8 @@
 
 #include <sys/sysinfo.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/socket.h>
 #include <arpa/inet.h>
 #include <time.h>
 
@@ -103,7 +105,7 @@ void wi_cgi_bin(char *url, int len, char *boundary)
 	post_buf = NULL;
 
 	if (post) {
-		if (len >= (32 * 1024)) {
+		if (len >= (128 * 1024)) {
 			syslog(LOG_WARNING, "POST length exceeded maximum allowed");
 			exit(1);
 		}
@@ -120,10 +122,11 @@ void wi_cgi_bin(char *url, int len, char *boundary)
 	}
 }
 
-static void _execute_command(char *url, char *command, char *query, char *output)
+static void _execute_command(char *url, char *command, char *query, wofilter_t wof)
 {
 	char webExecFile[]  = "/tmp/.wxXXXXXX";
 	char webQueryFile[] = "/tmp/.wqXXXXXX";
+	char cmd[sizeof(webExecFile) + 10];
 	FILE *f;
 	int fe, fq = -1;
 
@@ -150,7 +153,6 @@ static void _execute_command(char *url, char *command, char *query, char *output
 		fclose(f);
 	}
 	else {
-		unlink(output);
 		close(fe);
 		unlink(webExecFile);
 		if (query) {
@@ -167,7 +169,6 @@ static void _execute_command(char *url, char *command, char *query, char *output
 			fclose(f);
 		}
 		else {
-			unlink(output);
 			unlink(webExecFile);
 			close(fq);
 			unlink(webQueryFile);
@@ -175,46 +176,27 @@ static void _execute_command(char *url, char *command, char *query, char *output
 		}
 	}
 
-	char *cmd[] = { webExecFile, NULL };
-	_eval(cmd, output, 0, NULL);
+	sprintf(cmd, "%s 2>&1", webExecFile);
+	web_pipecmd(cmd, wof);
 	unlink(webQueryFile);
 	unlink(webExecFile);
 }
 
 static void wo_cgi_bin(char *url)
 {
-	char webOutpFile[] = "/tmp/.woXXXXXX";
-	int fd;
-
-	if ((fd = mkstemp(webOutpFile)) < 0)
-		exit(1);
-	close(fd);
-
-	_execute_command(url, NULL, post_buf, webOutpFile);
-
+	if (!header_sent) send_header(200, NULL, mime_html, 0);
+	_execute_command(url, NULL, post_buf, WOF_NONE);
 	if (post_buf) {
 		free(post_buf);
 		post_buf = NULL;
 	}
-	wo_asp(webOutpFile);
-	unlink(webOutpFile);
 }
 
 static void wo_shell(char *url)
 {
-	char webOutpFile[] = "/tmp/.woXXXXXX";
-	int fd;
-
-	if ((fd = mkstemp(webOutpFile)) < 0)
-		exit(1);
-	close(fd);
-
-	_execute_command(NULL, webcgi_get("command"), NULL, webOutpFile);
-
 	web_puts("\ncmdresult = '");
-	web_putfile(webOutpFile, WOF_JAVASCRIPT);
+	_execute_command(NULL, webcgi_get("command"), NULL, WOF_JAVASCRIPT);
 	web_puts("';");
-	unlink(webOutpFile);
 }
 
 static void wo_blank(char *url)
@@ -249,8 +231,15 @@ static void wo_nvram(char *url)
 
 static void wo_iptables(char *url)
 {
-	web_pipecmd("iptables -nvL; iptables -t nat -nvL; iptables -t mangle -nvL", WOF_NONE);
+	web_pipecmd("iptables -nvL; echo; iptables -t nat -nvL; echo; iptables -t mangle -nvL", WOF_NONE);
 }
+
+#ifdef TCONFIG_IPV6
+static void wo_ip6tables(char *url)
+{
+	web_pipecmd("ip6tables -nvL; echo; ip6tables -t mangle -nvL", WOF_NONE);
+}
+#endif
 
 /*
 static void wo_spin(char *url)
@@ -285,7 +274,9 @@ const struct mime_handler mime_handlers[] = {
 	{ "cfe/*.bin",		mime_binary,				0,	wi_generic,			wo_cfe,			1 },
 	{ "nvram/*.txt",	mime_binary,				0,	wi_generic,			wo_nvram,		1 },
 	{ "ipt/*.txt",		mime_binary,				0,	wi_generic,			wo_iptables,	1 },
-
+#ifdef TCONFIG_IPV6
+	{ "ip6t/*.txt",		mime_binary,				0,	wi_generic,			wo_ip6tables,	1 },
+#endif
 	{ "cfg/*.cfg",			NULL,					0,	wi_generic,			wo_backup,		1 },
 	{ "cfg/restore.cgi",	mime_html,				0,	wi_restore,			wo_restore,		1 },
 	{ "cfg/defaults.cgi",	NULL,					0,	wi_generic,	 		wo_defaults,	1 },
@@ -359,6 +350,7 @@ const aspapi_t aspapi[] = {
 	{ "compmac",			asp_compmac			},
 	{ "ctcount",			asp_ctcount			},
 	{ "ctdump",				asp_ctdump			},
+	{ "ctrate",				asp_ctrate			},
 	{ "ddnsx",				asp_ddnsx			},
 	{ "devlist",			asp_devlist			},
 	{ "webmon",			asp_webmon			},
@@ -468,6 +460,9 @@ typedef struct {
 		VT_RANGE,		// expect an integer, check range
 		VT_IP,			// expect an ip address
 		VT_MAC,			// expect a mac address
+#ifdef TCONFIG_IPV6
+		VT_IPV6,		// expect an ipv6 address
+#endif
 		VT_TEMP			// no checks, no commit
 	} vtype;
 	nvset_varg_t va;
@@ -487,6 +482,9 @@ typedef struct {
 #define	V_OCTET				VT_RANGE,	{ .l = 0 },		{ .l = 255 }
 #define V_NUM				VT_RANGE,	{ .l = 0 },		{ .l = 0x7FFFFFFF }
 #define	V_TEMP				VT_TEMP,	{ }, 			{ }
+#ifdef TCONFIG_IPV6
+#define V_IPV6				VT_IPV6,	{ },			{ }
+#endif
 
 static const nvset_t nvset_list[] = {
 
@@ -505,7 +503,7 @@ static const nvset_t nvset_list[] = {
 	{ "ntp_kiss",			V_LENGTH(0, 255)	},
 
 // basic-static
-	{ "dhcpd_static",		V_LENGTH(0, 106*101)},	// 106 (max chars per entry) x 100 entries
+	{ "dhcpd_static",		V_LENGTH(0, 106*251)},	// 251 (max chars per entry) x 100 entries
 
 // basic-ddns
 	{ "ddnsx0",				V_LENGTH(0, 2048)	},
@@ -590,6 +588,22 @@ static const nvset_t nvset_list[] = {
 	{ "wl_nbw",			V_NONE				},
 	{ "wl_mimo_preamble",		V_WORD				},	// 802.11n Preamble: mm/gf/auto/gfbcm
 	{ "wl_nctrlsb",			V_NONE				},	// none, lower, upper
+
+#ifdef TCONFIG_IPV6
+// basic-ipv6
+	{ "ipv6_service",		V_LENGTH(0, 16)			},	// '', native, native-pd, sit, other
+	{ "ipv6_prefix",		V_IPV6				},
+	{ "ipv6_prefix_length",		V_RANGE(3, 127)			},
+	{ "ipv6_rtr_addr",		V_LENGTH(0, 40)			},
+	{ "ipv6_radvd",			V_01				},
+	{ "ipv6_tun_addr",		V_IPV6				},
+	{ "ipv6_tun_addrlen",		V_RANGE(3, 127)			},
+	{ "ipv6_ifname",		V_LENGTH(0, 8)			},
+	{ "ipv6_tun_v4end",		V_IP				},
+	{ "ipv6_tun_mtu",		V_NUM				},	// Tunnel MTU
+	{ "ipv6_tun_ttl",		V_NUM				},	// Tunnel TTL
+	{ "ipv6_dns",			V_LENGTH(0, 40*3)		},	// ip6 ip6 ip6
+#endif
 
 // basic-wfilter
 	{ "wl_macmode",			V_NONE				},	// allow, deny, disabled
@@ -718,12 +732,17 @@ static const nvset_t nvset_list[] = {
 // forward-basic
 	{ "portforward",		V_LENGTH(0, 4096)	},
 
+#ifdef TCONFIG_IPV6
+// forward-basic-ipv6
+	{ "ipv6_portforward",	V_LENGTH(0, 4096)	},
+#endif
+
 // forward-triggered
 	{ "trigforward",		V_LENGTH(0, 4096)	},
 
 
 // access restriction
-	{ "rruleN",				V_RANGE(0, 49)		},
+	{ "rruleN",				V_RANGE(0, 99)		},
 //	{ "rrule##",			V_LENGTH(0, 2048)	},	// in save_variables()
 
 // admin-access
@@ -915,6 +934,23 @@ static const nvset_t nvset_list[] = {
 	{ "ne_vbeta",			V_NUM				},
 	{ "ne_vgamma",			V_NUM				},
 
+// new_qoslimit
+	{ "new_qoslimit_enable",         V_01                    }, // !!RAF
+	{ "new_qoslimit_obw",            V_RANGE(10, 999999)     }, // !!RAF
+	{ "new_qoslimit_ibw",            V_RANGE(10, 999999)     }, // !!RAF
+	{ "new_qoslimit_rules",          V_LENGTH(0, 4096)       }, // !!RAF
+	{ "new_qoslimit_d_enable",       V_01                    }, // !!RAF
+	{ "new_qoslimit_d_dlr",          V_RANGE(10, 999999)     }, // !!RAF
+	{ "new_qoslimit_d_dlc",          V_RANGE(10, 999999)     }, // !!RAF
+	{ "new_qoslimit_d_ulr",          V_RANGE(10, 999999)     }, // !!RAF
+	{ "new_qoslimit_d_ulc",          V_RANGE(10, 999999)     }, // !!RAF
+
+
+// new_arpbind
+	{ "new_arpbind_enable",          V_01                    }, // !!RAF
+	{ "new_arpbind_only",            V_01                   },  // !!RAF
+	{ "new_arpbind_list",            V_LENGTH(0, 4096)       }, // !!RAF
+
 #ifdef TCONFIG_OPENVPN
 // vpn
 	{ "vpn_debug",            V_01                },
@@ -1079,6 +1115,9 @@ static int webcgi_nvram_set(const nvset_t *v, const char *name, int write)
 	unsigned u[6];
 	int ok;
 	int dirty;
+#ifdef TCONFIG_IPV6
+	struct in6_addr addr;
+#endif
 
 	if ((p = webcgi_get((char*)name)) == NULL) return 0;
 
@@ -1105,6 +1144,11 @@ static int webcgi_nvram_set(const nvset_t *v, const char *name, int write)
 		if ((sscanf(p, "%2x:%2x:%2x:%2x:%2x:%2x", &u[0], &u[1], &u[2], &u[3], &u[4], &u[5]) != 6) ||
 			(u[0] > 255) || (u[1] > 255) || (u[2] > 255) || (u[3] > 255) || (u[4] > 255) || (u[5] > 255)) ok = 0;
 		break;
+#ifdef TCONFIG_IPV6
+	case VT_IPV6:
+		if (inet_pton(AF_INET6, p, &addr) != 1) ok = 0;
+		break;
+#endif
 	default:
 		// shutup gcc
 		break;

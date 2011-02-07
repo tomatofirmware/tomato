@@ -14,6 +14,8 @@ OBJS := rc.o init.o interface.o network.o wan.o services.o dhcp.o
 OBJS += firewall.o ppp.o telssh.o wnas.o
 OBJS += listen.o redial.o led.o qos.o forward.o misc.o mtd.o
 OBJS += buttons.o restrict.o gpio.o sched.o
+#!!RAF BW feature
+OBJS += new_qoslimit.o new_arpbind.o 
 #	heartbeat.o
 
 ifeq ($(TCONFIG_USB),y)
@@ -68,7 +70,6 @@ install: all
 	@cd $(INSTALLDIR)/sbin && ln -sf rc sched
 
 	@cd $(INSTALLDIR)/sbin && ln -sf rc disconnected_pppoe
-	@cd $(INSTALLDIR)/sbin && ln -sf rc pppoe_down
 	@cd $(INSTALLDIR)/sbin && ln -sf rc listen
 	@cd $(INSTALLDIR)/sbin && ln -sf rc ppp_event
 
@@ -81,6 +82,10 @@ install: all
 	@cd $(INSTALLDIR)/sbin && ln -sf rc dhcpc-renew
 
 	@cd $(INSTALLDIR)/sbin && ln -sf rc wldist
+
+ifeq ($(TCONFIG_IPV6),y)
+	@cd $(INSTALLDIR)/sbin && ln -sf rc dhcp6c-state
+endif
 
 ifeq ($(TCONFIG_DDNS),y)
 	@cd $(INSTALLDIR)/sbin && ln -sf rc ddns-update
