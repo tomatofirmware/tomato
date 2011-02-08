@@ -739,6 +739,9 @@ static const nvset_t nvset_list[] = {
 #ifdef TCONFIG_IPV6
 // forward-basic-ipv6
 	{ "ipv6_portforward",	V_LENGTH(0, 4096)	},
+// advanced-nat64
+	{ "nat64_static",		V_LENGTH(0, 4096)	},
+
 #endif
 
 // forward-triggered

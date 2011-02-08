@@ -482,6 +482,7 @@ void start_tayga(void)
 		char *tayga_client4 = nvram_safe_get("tayga_client4");
 		char *tayga_client6 = nvram_safe_get("tayga_client6");
 		char route_prefix[100];
+		char *nv, *nvp;
 
 		snprintf(route_prefix, sizeof(route_prefix),
 			 "%s/%s", tayga_prefix, tayga_prefixlen);
@@ -497,6 +498,19 @@ void start_tayga(void)
 			"dynamic-pool %s\n",
 			tayga_dev, tayga_server4,
 			tayga_server6, route_prefix);
+
+		nvp = nv = strdup(nvram_safe_get("nat64_static"));
+		if (nv) {
+			char *b;
+			while ((b = strsep(&nvp, ">")) != NULL) {
+				char *ipv4, *ipv6;
+				if ((vstrsep(b, "<", &ipv4, &ipv6, NULL) != 2))
+					continue;
+
+				fprintf(f, "map %s %s\n", ipv4, ipv6);
+			}
+		}
+
 		fclose(f);
 
 		// Start radvd

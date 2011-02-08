@@ -420,6 +420,7 @@ const defaults_t defaults[] = {
 	{ "portforward",		"0<3<1.1.1.0/24<1000:2000<<192.168.1.2<ex: 1000 to 2000, restricted>0<2<<1000,2000<<192.168.1.2<ex: 1000 and 2000>0<1<<1000<2000<192.168.1.2<ex: different internal port>0<3<<1000:2000,3000<<192.168.1.2<ex: 1000 to 2000, and 3000>" },
 #ifdef TCONFIG_IPV6
 	{ "ipv6_portforward",	""},
+	{ "nat64_static",	""},
 #endif
 	{ "trigforward",		"0<1<3000:4000<5000:6000<ex: open 5000-6000 if 3000-4000>"	},
 	{ "dmz_enable",			"0"				},
