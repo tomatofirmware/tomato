@@ -307,6 +307,12 @@ void asp_sysinfo(int argc, char **argv)
 	struct sysinfo si;
 	char s[64];
 	meminfo_t mem;
+	char system_type[64];
+	char cpu_model[64];
+	char bogomips[8];
+	char cpuclk[8];
+
+	get_cpuinfo(system_type, cpu_model, bogomips, cpuclk);
 
 	web_puts("\nsysinfo = {\n");
 	sysinfo(&si);
@@ -323,7 +329,11 @@ void asp_sysinfo(int argc, char **argv)
 		"\ttotalswap: %ld,\n"
 		"\tfreeswap: %ld,\n"
 		"\ttotalfreeram: %ld,\n"
-		"\tprocs: %d\n",
+		"\tprocs: %d,\n"
+		"\tsystemtype: '%s',\n"
+		"\tcpumodel: '%s',\n"
+		"\tbogomips: '%s',\n"
+		"\tcpuclk: '%s'\n",
 			si.uptime,
 			reltime(s, si.uptime),
 			si.loads[0], si.loads[1], si.loads[2],
@@ -331,7 +341,11 @@ void asp_sysinfo(int argc, char **argv)
 			mem.shared, mem.buffers, mem.cached,
 			mem.swaptotal, mem.swapfree,
 			mem.maxfreeram,
-			si.procs);
+			si.procs,
+			system_type,
+			cpu_model,
+			bogomips,
+			cpuclk);
 	web_puts("};\n");
 }
 
