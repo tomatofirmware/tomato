@@ -82,7 +82,7 @@ function init()
 <td id='content'>
 <div id='ident'><% ident(); %></div>
 
-<div style='float:right;margin:80px 20px;text-align:center'>
+<div style='float:right;margin:110px 20px;text-align:center'>
 <img src='kinaree.png' alt='Linux &amp; Tomato' id='tux'>
 </div>
 <div style='margin:30px 30px;font-size:14px;color:#555;'>
@@ -115,18 +115,8 @@ VPN integration and GUI Copyright (C) 2010 Keith Moyer,<br>
 - Additional ipv6 support in GUI, QOS, Conntrack<br>
 <br>
 <b>"Victek RAF" features:</b><br>
-- ARP Binding | CPU Info & Freq<br>
-- Previous WAN IP | Additional Themes<br>
-<br>
-<b>"Victek/PrinceAMD/Phykris/Shibby" features:</b><br>
-- Revised IP/MAC/Range QOS/Bandwidth Limiter<br>
-<!-- BT-BEGIN -->
-<br>
-Transmission 2.13 integration and GUI<br>
-Copyright (C) 2007-2011 Michał Rupental, Vicente Soriano. <br>
-<a href='http://victek.is-a-geek.com' target='_new'>http://victek.is-a-geek.com</a><br>
-<a href='http://openlinksys.info' target='_new'>http://openlinksys.info</a><br>
-<!-- BT-END -->
+- CPU Info & Freq | Previous WAN IP | Additional Themes | ARP Binding <br>
+- Revised IP/MAC/Range QOS/Bandwidth Limiter by Victek/PrinceAMD/Phykris/Shibby<br>
 <br>
 <b>"Toastman" Features:</b><br>
 - 250 entry limit in Static DHCP | 500 entry limit in Access Restrictions<br>
