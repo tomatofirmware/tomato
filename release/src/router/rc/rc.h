@@ -405,6 +405,10 @@ extern void start_smbd(void);
 extern void stop_smbd(void);
 #endif
 
+// new_arpbind.c
+extern void new_arpbind_start(void);
+extern void new_arpbind_stop(void);
+
 // vpn.c
 #ifdef TCONFIG_OPENVPN
 extern void start_vpnclient(int clientNum);
@@ -432,10 +436,5 @@ static inline void start_vpn_eas() { }
 extern void ipt_qoslimit(int chain);
 extern void new_qoslimit_start(void);
 extern void new_qoslimit_stop(void);
-
-// new_arpbind.c
-extern void new_arpbind_start(void);
-extern void new_arpbind_stop(void);
-
 
 #endif

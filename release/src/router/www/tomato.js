@@ -2363,7 +2363,7 @@ function navi()
 			['Identification',	'ident.asp'],
 			['Time',			'time.asp'],
 			['DDNS',			'ddns.asp'],
-			['Static DHCP',		'static.asp'],
+			['Static DHCP/ARP',		'static.asp'],
 			['Wireless Filter',	'wfilter.asp'] ] ],
 		['Advanced', 			'advanced', 0, [
 			['Conntrack / Netfilter',	'ctnf.asp'],
@@ -2388,10 +2388,7 @@ function navi()
 			['View Details',	'detailed.asp'],
 			['Transfer Rates',	'ctrate.asp']
 			] ],
-		['BW Limiter/QoS',    		'new', 0, [
-                       ['BW Limit/QoS',         'qoslimit.asp'],
-                       ['ARP Binding',         'arpbind.asp']
-                       ] ],
+		['BW Limiter/QoS',    		'new-qoslimit.asp'],
 		['Access Restriction',	'restrict.asp'],
 /* REMOVE-BEGIN
 		['Scripts',				'sc', 0, [

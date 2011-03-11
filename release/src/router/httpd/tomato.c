@@ -954,9 +954,8 @@ static const nvset_t nvset_list[] = {
 	
 
 // new_arpbind
-	{ "new_arpbind_enable",          V_01                    },
-	{ "new_arpbind_only",            V_01                   },
-	{ "new_arpbind_list",            V_LENGTH(0, 4096)       },
+	{ "new_arpbind_enable",          V_01       },
+	{ "new_arpbind_only",            V_01       },
 
 #ifdef TCONFIG_OPENVPN
 // vpn
