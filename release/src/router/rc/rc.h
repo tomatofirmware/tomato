@@ -409,6 +409,12 @@ extern void stop_smbd(void);
 extern void new_arpbind_start(void);
 extern void new_arpbind_stop(void);
 
+// transmission.c
+#ifdef TCONFIG_BT
+extern void start_bittorrent();
+extern void stop_bittorrent();
+#endif
+
 // vpn.c
 #ifdef TCONFIG_OPENVPN
 extern void start_vpnclient(int clientNum);

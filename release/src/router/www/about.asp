@@ -104,6 +104,12 @@ Copyright (C) 2008-2011 Fedor Kozhevnikov, Ray Van Tassle, Wes Campaigne<br>
 VPN integration and GUI Copyright (C) 2010 Keith Moyer,<br>
 <a href='mailto:tomatovpn@keithmoyer.com'>tomatovpn@keithmoyer.com</a><br>
 <!-- VPN-END -->
+<!-- BT-BEGIN -->
+Transmission 2.13 integration and GUI<br>
+Copyright (C) 2007-2011 Michał Rupental, Vicente Soriano.<br>
+<a href='http://openlinksys.info' target='_new'>http://openlinksys.info</a><br>
+<a href='http://victek.is-a-geek.com' target='_new'>http://victek.is-a-geek.com</a><br>
+<!-- BT-END -->
 <br>
 <br>
 <b>This compilation by Toastman, Bangkok, may also include:</b><br>
