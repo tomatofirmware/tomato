@@ -115,9 +115,8 @@ VPN integration and GUI Copyright (C) 2010 Keith Moyer,<br>
 - Additional ipv6 support in GUI, QOS, Conntrack<br>
 <br>
 <b>"Victek RAF" features:</b><br>
-- CPU Info & Freq | Previous WAN IP | Additional Themes<br>
-- Revised Static ARP Binding & IP/MAC/Range QOS/Bandwidth Limiter<br>
-- (code by Victek/PrinceAMD/Phykris/Shibby)<br>
+- Flash Size Info | CPU Info & Freq | Previous WAN IP | Additional Themes<br>
+- Revised Static ARP Binding | Revised IP/MAC/Range QOS/Bandwidth Limiter<br>
 <br>
 <b>"Toastman" Features:</b><br>
 - 250 entry limit in Static DHCP | 500 entry limit in Access Restrictions<br>
@@ -125,6 +124,7 @@ VPN integration and GUI Copyright (C) 2010 Keith Moyer,<br>
 - CPU frequency selector | Faster page refresh settings<br>
 - VLAN Support for UPnP - if exists, loads upnpconfig.custom from JFFS<br>
 <br>
+Developments by Victek/PrinceAMD/Phykris/Shibby/Toastman<br>
 <br>
 Based on Tomato Firmware v<% version(); %><br>
 Copyright (C) 2006-2010 Jonathan Zarate<br>
