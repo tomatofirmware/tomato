@@ -1293,8 +1293,12 @@ int start_firewall(void)
 	modprobe("ip6t_REJECT");
 #endif
 	/*Deon Thomas attempt to start xt_IMQ and imq */
-	/*shibby - fix modprobing IMQ for kernel 2.4 */
+	/*shibby - fix modprobing IMQ for kernel 2.4 & allow to set IMQ numdevs parameter */
 	modprobe("imq");
+	char numdevs[10];
+	sprintf(numdevs, "numdevs=%d", nvram_get_int("imq_numdevs"));
+	modprobe("imq", numdevs );
+
 #ifdef LINUX26
 	modprobe("xt_IMQ");
 #else

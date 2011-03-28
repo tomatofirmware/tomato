@@ -396,6 +396,7 @@ const defaults_t defaults[] = {
 	{ "ne_syncookies",		"0"				},	// tcp_syncookies
 	{ "dhcp_pass",			"1"				},	// allow DHCP responses
 	{ "ne_shlimit",			"0,3,60"			},
+	{ "imq_numdevs",		"2"				},
 
 // advanced-routing
 	{ "routes_static",		""				},
