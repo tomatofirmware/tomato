@@ -120,7 +120,7 @@ VPN integration and GUI Copyright (C) 2010 Keith Moyer,<br>
 <br>
 <b>"Toastman" Features:</b><br>
 - 250 entry limit in Static DHCP | 500 entry limit in Access Restrictions<br>
-- QOS class labels | Toastman QOS rules | Fast conntrack timeout<br>
+- Configurable QOS class names | Toastman QOS rules | Fast conntrack timeout<br>
 - CPU frequency selector | Faster page refresh settings<br>
 - VLAN Support for UPnP - if exists, loads upnpconfig.custom from JFFS<br>
 <br>

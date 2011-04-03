@@ -44,16 +44,18 @@
 </style>
 
 <script type='text/javascript'>
-// <% nvram("web_svg,qos_enable"); %>
+// <% nvram("qos_classnames,web_svg,qos_enable"); %>
 
 //<% qrate(); %>
 
 var svgReady = 0;
 
-//Toastman Class Labels
 
-var abc = ['Unclassified','Service','VOIP/Game','Media','Remote','WWW', 'Mail', 'Messenger','Download','P2P/Bulk','Crawl'];
-//	var abc = ['Unclassified', '1)', '2)', '3)', '4)', '5)', '6)','7)','8)','9)','10)'];
+var Unclassified = ['Unclassified'];
+var classNames = nvram.qos_classnames.split(' ');		//Toastman Class Labels
+var abc = Unclassified.concat(classNames);
+
+
 //      var abc = ['Unclassified', 'Highest', 'High', 'Medium', 'Low', 'Lowest', 'Class A', 'Class B', 'Class C', 'Class D', 'Class E'];
 
 var colors = [

@@ -33,13 +33,17 @@
 <script type='text/javascript' src='protocols.js'></script>
 
 <script type='text/javascript'>
-//	<% nvram(''); %>	// http_id
 
-//Toastman Class Labels
+//	<% nvram('qos_classnames'); %>	// http_id
 
-var abc = ['Unclassified', 'Service','VOIP/Game','Media','Remote','WWW', 'Mail', 'Messenger','Download','P2P/Bulk','Crawl'];
-//	var abc = ['Unclassified', '1)', '2)', '3)', '4)', '5)', '6)','7)','8)','9)','10)'];
+
+
+var Unclassified = ['Unclassified'];
+var classNames = nvram.qos_classnames.split(' ');		//Toastman - Configurable Class Labels
+var abc = Unclassified.concat(classNames);
+
 //      var abc = ['Unclassified', 'Highest', 'High', 'Medium', 'Low', 'Lowest', 'Class A','Class B','Class C','Class D','Class E'];
+
 
 var colors = ['F08080','E6E6FA','0066CC','8FBC8F','FAFAD2','ADD8E6','9ACD32','E0FFFF','90EE90','FF9933','FFF0F5'];
 
