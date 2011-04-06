@@ -36,14 +36,9 @@
 
 //	<% nvram('qos_classnames'); %>	// http_id
 
-
-
 var Unclassified = ['Unclassified'];
-var classNames = nvram.qos_classnames.split(' ');		//Toastman - Configurable Class Labels
+var classNames = nvram.qos_classnames.split(' ');		// Toastman - configurable class names
 var abc = Unclassified.concat(classNames);
-
-//      var abc = ['Unclassified', 'Highest', 'High', 'Medium', 'Low', 'Lowest', 'Class A','Class B','Class C','Class D','Class E'];
-
 
 var colors = ['F08080','E6E6FA','0066CC','8FBC8F','FAFAD2','ADD8E6','9ACD32','E0FFFF','90EE90','FF9933','FFF0F5'];
 
