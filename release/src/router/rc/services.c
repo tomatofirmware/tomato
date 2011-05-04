@@ -1894,10 +1894,13 @@ TOP:
 	if (strcmp(service, "qoslimit") == 0) {
 		if (action & A_STOP) {
 			new_qoslimit_stop();
+			start_cmon();
 		}
 		stop_firewall(); start_firewall();		// always restarted
 		if (action & A_START) {
 			new_qoslimit_start();
+			start_cmon();
+
 		}
 		goto CLEAR;
 	}
@@ -1913,7 +1916,6 @@ TOP:
 			stop_cmon();
 		}
 		if (action & A_START) {	
-//			stop_qos(); start_qos();		//always restarted  ???  
  			start_cmon();
 		}
 		goto CLEAR;
