@@ -895,6 +895,11 @@ const defaults_t defaults[] = {
 
 #endif	// 0
 
+
+// arpbind
+	{ "arpbind_enable",			"0"			},
+	{ "arpbind_only",			"0"			},
+	{ "arpbind_list",			"" 			},
 	{ NULL, NULL	}
 };
 

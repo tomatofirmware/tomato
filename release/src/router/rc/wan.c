@@ -806,10 +806,10 @@ void start_wan_done(char *wan_ifname)
 
 	dns_to_resolv();
 	start_dnsmasq();
-
 	start_firewall();
 	start_qos();
-	new_arpbind_start();
+	start_arpbind();
+
 
 	do_static_routes(1);
 	// and routes supplied via DHCP
@@ -870,6 +870,8 @@ void stop_wan(void)
 	
 	TRACE_PT("begin\n");
 
+
+	stop_arpbind();
 	stop_qos();
 	stop_upnp();	//!!TB - moved from stop_services()
 	stop_firewall();
