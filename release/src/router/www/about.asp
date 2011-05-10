@@ -118,10 +118,10 @@ VPN integration and GUI Copyright (C) 2010 Keith Moyer,<br>
 - 250 entry limit in Static DHCP  & Wireless Filter | 500 entry limit in Access Restrictions<br>
 - Configurable QOS class names | Toastman QOS rules | Fast conntrack timeout<br>
 - CPU frequency selector | Faster page refresh settings | Client Monitor Graphs<br>
-- VLAN Support for UPnP - if exists, loads upnpconfig.custom from JFFS<br>
+- UPnP Support for vlans - if exists, loads upnpconfig.custom from JFFS<br>
 <br>
 <b>Developments by Victek/PrinceAMD/Phykris/Shibby/Toastman</b><br>
-- Revised Static ARP Binding | Revised IP/MAC/Range QOS/Bandwidth Limiter<br>
+- Revised Static ARP Binding | Revised QOS/Bandwidth Limiter<br>
 <br>
 Based on Tomato Firmware v<% version(); %><br>
 Copyright (C) 2006-2010 Jonathan Zarate<br>
