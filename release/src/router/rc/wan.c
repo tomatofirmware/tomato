@@ -806,6 +806,7 @@ void start_wan_done(char *wan_ifname)
 
 	start_firewall();
 	start_qos();
+	start_qoslimit();
 
 	do_static_routes(1);
 	// and routes supplied via DHCP
@@ -867,6 +868,8 @@ void stop_wan(void)
 	
 	TRACE_PT("begin\n");
 
+
+	stop_qoslimit();
 	stop_qos();
 	stop_upnp();	//!!TB - moved from stop_services()
 	stop_firewall();

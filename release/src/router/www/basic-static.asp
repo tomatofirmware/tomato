@@ -266,8 +266,54 @@ function init()
 </div>
 
 <div>
-<small>To specify multiple hostnames per device, separate them with spaces.</small>
+		<small>
+		<ul>
+		<li>To specify multiple hostnames per device, separate them with spaces.<br>
+		</ul>
+		</small>
+</div>		
+
+<br>
+<div class='section-title'>Static ARP</div>
+<div class='section'>
+	<script type='text/javascript'>
+	createFieldTable('', [
+		{ title: 'Enable static ARP', name: 'f_arpbind_enable', type: 'checkbox', value: nvram.arpbind_enable != '0' },
+		{ title: 'Restrict unlisted machines', name: 'f_arpbind_only', type: 'checkbox', value: nvram.arpbind_only != '0' }
+	]);
+	</script>
 </div>
+
+<div>
+		<small>
+		<ul>
+		<li>Static ARP only works if there's one MAC address per IP. You can't enter two MAC addresses in the above table.<br>
+		</ul>
+		</small>
+</div>	
+
+			<br>
+			<br>
+			<br>
+
+<div>
+			<ul>
+			<b>When using "Restrict unlisted machines"</b>
+			</ul>
+</div>
+
+<div>
+		<small>
+		<ul>
+		<li> DHCP should issue a "range" with only 1 IP address, preferably the administrator's IP - e.g. 192.168.1.100-100.<br>
+		<li> You <b>MUST</b> enter your own (administrator) IP and MAC into the table, or you may be locked out of the router.<br>
+		<li> You must add the IP/MAC address of all your access point(s) etc. to the table.<br>
+		<li> All listed IP's will now show as "active" in the WOL table.<br>
+		</ul>
+		</small>
+
+</div>
+
 
 <!-- / / / -->
 

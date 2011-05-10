@@ -462,7 +462,7 @@ const defaults_t defaults[] = {
 	{ "ne_vbeta",			"6"				},	// "
 	{ "ne_vgamma",			"2"				},	// "
 
-// new_qoslimit
+// qos-bw-limiter
 	{ "qosl_enable",		"0"			},
 //	{ "qosl_obw",			""			},	unused - used qos_obw
 //	{ "qosl_ibw",			""			},	unused - used qos_obw

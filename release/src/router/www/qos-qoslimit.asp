@@ -79,7 +79,24 @@ qosg.dataToView = function(data) {
 
 qosg.resetNewEditor = function() {
 	var f = fields.getAll(this.newEditor);
-	
+
+	ferror.clearAll(f);
+	if ((c = cookie.get('addqoslimit')) != null) {
+		cookie.set('addqoslimit', '', 0);
+		c = c.split(',');
+		if (c.length == 2) {
+	f[0].value = c[0];
+	f[1].value = '';
+	f[2].value = '';
+	f[3].value = '';
+	f[4].value = '';
+	f[5].selectedIndex = '2';
+	f[6].selectedIndex = '0';
+	f[7].selectedIndex = '0';
+	return;
+		}
+	}
+
 	f[0].value = '';
 	f[1].value = '';
 	f[2].value = '';
@@ -241,7 +258,7 @@ function init()
 
 <!-- / / / -->
 
-<input type='hidden' name='_nextpage' value='qos-bwlimiter.asp'>
+<input type='hidden' name='_nextpage' value='qos-qoslimit.asp'>
 <input type='hidden' name='_nextwait' value='10'>
 <input type='hidden' name='_service' value='qoslimit-restart'>
 
@@ -250,7 +267,7 @@ function init()
 <input type='hidden' name='qosl_denable'>
 
 
-<div id='bwlimit'>
+<div id='qoslimit'>
 
 	<div class='section-title'>Bandwidth Limiter - QOS</div>
 	<div class='section'>
@@ -264,13 +281,15 @@ function init()
 		<br>
 		<table class='tomato-grid' id='qosg-grid'></table>
 		<div>
+		<br>
+		<br>
+		<br>
 			<ul>
-				<li><b>IP Address / IP Range</b> - e.g. 192.168.1.5 or 192.168.1.45-57 or 45-57 -  A range of IP's will <b>share</b> the bandwidth.
+				<li><b>IP Address / IP Range</b> - e.g. 192.168.1.5 or 192.168.1.45-57 or 45-57 -  A range of IP's will <b>share</b> the bandwidth.<br>
 			</ul>
 		</div>
 	</div>
 	
-	<br>
 
 	<div class='section-title'>Default Class rate/ceiling for unlisted IP's</div>
 	<div class='section'>
@@ -305,6 +324,9 @@ function init()
 			]);
 		</script>
 		<div>
+			<br>
+			<br>
+			<br>
 			<ul>
 				<li><b>Default Class</b> - All clients not included in the list will <b>share</b> the Default Rate/Ceiling setting.
 			</ul>

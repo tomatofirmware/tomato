@@ -2386,8 +2386,8 @@ function navi()
 			['Classification',	'classify.asp'],
 			['View Graphs',		'graphs.asp'],
 			['View Details',	'detailed.asp'],
-			['Transfer Rates',	'ctrate.asp'] ] ],
-
+			['Transfer Rates',	'ctrate.asp'],
+			['B/W Limiter',		'qoslimit.asp'] ] ],
 		['Access Restriction',		'restrict.asp'],
 /* REMOVE-BEGIN
 		['Scripts',				'sc', 0, [
