@@ -283,7 +283,6 @@ void preset_wan(char *ifname, char *gw, char *netmask)
 	start_dnsmasq();
 	sleep(1);
 	start_firewall();
-	start_cmon();							// Where to put this?
 }
 
 // -----------------------------------------------------------------------------
@@ -824,12 +823,11 @@ void start_wan_done(char *wan_ifname)
 
 	dns_to_resolv();
 	start_dnsmasq();
-
 	start_firewall();
 	start_qos();
-	start_cmon();							// Where to put this?
 	start_qoslimit();
 	start_arpbind();
+
 
 
 	do_static_routes(1);
@@ -859,6 +857,7 @@ void start_wan_done(char *wan_ifname)
 
 	stop_upnp();
 	start_upnp();
+	start_cmon();
 
 	// restart httpd
 	start_httpd();
@@ -894,7 +893,6 @@ void stop_wan(void)
 	stop_arpbind();
 	stop_qoslimit();
 	stop_qos();
-	stop_cmon();
 	stop_upnp();	//!!TB - moved from stop_services()
 	stop_firewall();
 	stop_igmp_proxy();
