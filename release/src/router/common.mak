@@ -35,7 +35,7 @@ export SIZE := $(CROSS_COMPILE)size
 kver=$(subst ",,$(word 3, $(shell grep "UTS_RELEASE" $(LINUXDIR)/include/linux/$(1))))
 
 LINUX_KERNEL=$(call kver,version.h)
-ifeq ($(LINUX_KERNEL),)
+ifeq ($(LINUX_KERNEL26),)
 LINUX_KERNEL=$(call kver,utsrelease.h)
 endif
 
