@@ -914,6 +914,7 @@ const defaults_t defaults[] = {
 	{ "new_arpbind_only",			"0"			},
 	{ "new_arpbind_list",			"" 			},
 
+#ifdef TCONFIG_NOCAT
 // NoCatSplash. !!Victek
 	{ "NC_enable",		"0" }, // enable NoCatSplash
 	{ "NC_Verbosity",	"2" },
@@ -930,6 +931,7 @@ const defaults_t defaults[] = {
         { "NC_LoginTimeout",	"3600"	},
         { "NC_RenewTimeout",	"0" },
         { "NC_AllowedWebHosts",	"www.victek.is-a-geek.com" },
+#endif	// NocatSplash
 
 	{ NULL, NULL	}
 };
