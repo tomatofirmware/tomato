@@ -75,7 +75,7 @@ function init()
 <body onload='init()'>
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
-	<div class='title'>Tomato RAF</div>
+	<div class='title'>Tomato</div>
 	<div class='version'>Version <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
@@ -85,7 +85,8 @@ function init()
 <div style='float:right;margin:140px 50px;text-align:center'>
 <img src='kinaree.png' alt='Linux &amp; Tomato' id='tux'>
 </div>
-
+<br>
+<br>
 <b>Tomato Firmware v<% version(1); %></b><br>
 - Linux kernel <% version(2); %> and Broadcom Wireless Driver <% version(3); %> updates<br>
 - Support for additional router models, dual-band and Wireless-N mode.<br>

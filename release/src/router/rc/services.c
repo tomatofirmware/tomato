@@ -914,6 +914,7 @@ void start_syslog(void)
 	char s[64];
 	char cfg[256];
 	char *rot_siz = "50";
+	char *log_file_path;
 
 	argv[0] = "syslogd";
 	argc = 1;
@@ -929,6 +930,20 @@ void start_syslog(void)
 
 	if (nvram_match("log_file", "1")) {
 		argv[argc++] = "-L";
+
+		// log to custom path - shibby
+		if (nvram_match("log_file_custom", "1")) {
+			log_file_path = nvram_safe_get("log_file_path");
+			argv[argc++] = "-s";
+			argv[argc++] = "5000";
+			argv[argc++] = "-b";
+			argv[argc++] = "5";
+			argv[argc++] = "-O";
+			argv[argc++] = log_file_path;
+			remove("/var/log/messages");
+			symlink(log_file_path, "/var/log/messages");
+		}
+		else
 
 		/* Read options:    rotate_size(kb)    num_backups    logfilename.
 		 * Ignore these settings and use defaults if the logfile cannot be written to.
@@ -957,8 +972,11 @@ void start_syslog(void)
 			}
 		}
 
+		if (nvram_match("log_file_custom", "0")) {
 		argv[argc++] = "-s";
 		argv[argc++] = rot_siz;
+		}
+
 
 		if (isdigit(*b_opt)) {
 			argv[argc++] = "-b";
