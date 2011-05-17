@@ -1058,6 +1058,7 @@ void stop_splashd(void)
 {
 	pid_splashd = -1;
 	stop_nocat();
+	start_wan(BOOT);
 }
 #endif
 

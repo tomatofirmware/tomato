@@ -147,7 +147,6 @@ createFieldTable('', [
 <span style='color:blue'>
 <b>User Guide</b><br>
 </span>
-<br>
 <ul>
 <li><b>Enable</b> - The router will show a Welcome banner when a client attempts to access the Internet.<br>
 <li><b>Log Info Level</b> - Verbosity level for log messages from this module, Level 0=Silent, 10=Verbose, (Default=2).<br>
@@ -164,13 +163,21 @@ Leave a blank space between each port number. Use only one of these two options 
 <li><b>Excluded URLs</b> - Sites that can be accessed without the Welcome banner appearing.<br>
 Leave a blank space between each URL.<br>
 <li><b>MAC address Whitelist</b> - addresses excluded from the portal. Leave a blank space between each MAC address.<br>
-<li><b>Customized Splash File Path</b> - You may upload a custom Welcome banner that will overwrite the default one.<br><br>
+<li><b>Customized Splash File Path</b> - You may upload a custom Welcome banner that will overwrite the default one.<br>
 <br>
-<span style='color:red'>
-<b> Note:</b> When the client's lease has expired, he must enter the Splash page again to get a new lease. No warning is given, therefore you may wish to give a long lease time to avoid problems.
-<br>
-</span>
 </ul>
+
+<span style='color:blue'>
+<b> Notes</b> 
+</span>
+<br>
+<ul>
+After activating the Portal, there will be approximately 20 seconds delay before it takes effect.<br>
+When the lease expires, the client must enter the Splash page again to get a new lease.<br>
+No warning is given when the lease is about to expire. A long lease time will reduce client complaints.<br>
+</ul>
+<br>
+
 <br>
 </td></tr>
 <tr><td id='footer' colspan=2>
