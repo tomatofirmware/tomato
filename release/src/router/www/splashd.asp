@@ -139,7 +139,7 @@ createFieldTable('', [
 	{ title: 'Gateway Port', indent: 2, name: 'NC_GatewayPort', type: 'text', maxlen: 5, size: 7, value: fixPort(nvram.NC_GatewayPort, 5280) },
 	{ title: 'Captive Site Forwarding', name: 'f_NC_ForcedRedirect', type: 'checkbox', value: (nvram.NC_ForcedRedirect == '1') },	
 		{ title: 'Home Page', indent: 2, name: 'NC_HomePage', type: 'text', maxlen: 255, size: 34, value: nvram.NC_HomePage },
-	{ title: 'Welcome HTML Path', name: 'NC_DocumentRoot', type: 'text', maxlen: 255, size: 20, value: nvram.NC_DocumentRoot, suffix: '<span>&nbsp;/splash.html</span>' },
+	{ title: 'Welcome HTML Path', name: 'NC_DocumentRoot', type: 'text', maxlen: 255, size: 34, value: nvram.NC_DocumentRoot, suffix: '<span>&nbsp;/splash.html</span>' },
 	{ title: 'Login Timeout', name: 'NC_LoginTimeout', type: 'text', maxlen: 8, size: 4, value: nvram.NC_LoginTimeout },	
 	{ title: 'Max Missed ARP', name: 'NC_MaxMissedARP', type: 'text', maxlen: 10, size: 2, value: nvram.NC_MaxMissedARP },
 	{ title: 'Idle Timeout', name: 'NC_IdleTimeout', type: 'text', maxlen: 8, size: 4, value: nvram.NC_IdleTimeout },
