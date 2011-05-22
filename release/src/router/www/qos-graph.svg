@@ -42,6 +42,7 @@ path {
 
 var vWidth = 310;
 var vHeight = 310;
+
 var tipInfo = [];
 var tipTimer = null;
 var tipLastN = null;

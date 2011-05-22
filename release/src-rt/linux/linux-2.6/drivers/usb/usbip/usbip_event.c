@@ -72,43 +72,55 @@ static int event_handler(struct usbip_device *ud)
 	return 0;
 }
 
-static int event_handler_loop(void *data)
+static void event_handler_loop(struct usbip_task *ut)
 {
-	struct usbip_device *ud = data;
+	struct usbip_device *ud = container_of(ut, struct usbip_device, eh);
 
-	while (!kthread_should_stop()) {
-		wait_event_interruptible(ud->eh_waitq,
-					usbip_event_happened(ud) ||
-					kthread_should_stop());
-		usbip_dbg_eh("wakeup\n");
+	while (1) {
+		if (signal_pending(current)) {
+			usbip_dbg_eh("signal catched!\n");
+			break;
+		}
 
 		if (event_handler(ud) < 0)
 			break;
+
+		wait_event_interruptible(ud->eh_waitq,
+					usbip_event_happened(ud));
+		usbip_dbg_eh("wakeup\n");
 	}
-	return 0;
 }
 
 int usbip_start_eh(struct usbip_device *ud)
 {
+	struct usbip_task *eh = &ud->eh;
+	struct task_struct *th;
+
 	init_waitqueue_head(&ud->eh_waitq);
 	ud->event = 0;
 
-	ud->eh = kthread_run(event_handler_loop, ud, "usbip_eh");
-	if (IS_ERR(ud->eh)) {
+	usbip_task_init(eh, "usbip_eh", event_handler_loop);
+
+	th = kthread_run(usbip_thread, (void *)eh, "usbip");
+	if (IS_ERR(th)) {
 		printk(KERN_WARNING
 			"Unable to start control thread\n");
-		return PTR_ERR(ud->eh);
+		return PTR_ERR(th);
 	}
+
+	wait_for_completion(&eh->thread_done);
 	return 0;
 }
 EXPORT_SYMBOL_GPL(usbip_start_eh);
 
 void usbip_stop_eh(struct usbip_device *ud)
 {
-	if (ud->eh == current)
+	struct usbip_task *eh = &ud->eh;
+
+	if (eh->thread == current)
 		return; /* do not wait for myself */
 
-	kthread_stop(ud->eh);
+	wait_for_completion(&eh->thread_done);
 	usbip_dbg_eh("usbip_eh has finished\n");
 }
 EXPORT_SYMBOL_GPL(usbip_stop_eh);

@@ -279,7 +279,7 @@ static int proc_pid_auxv(struct task_struct *task, char *buffer)
 static int proc_pid_wchan(struct task_struct *task, char *buffer)
 {
 	unsigned long wchan;
-	char symname[KSYM_NAME_LEN];
+	char symname[KSYM_NAME_LEN+1];
 
 	wchan = get_wchan(task);
 

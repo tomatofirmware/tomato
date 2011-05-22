@@ -18,7 +18,6 @@
  */
 
 #include <linux/slab.h>
-#include <linux/kthread.h>
 
 #include "usbip_common.h"
 #include "vhci.h"
@@ -100,9 +99,6 @@ static void vhci_recv_ret_submit(struct vhci_device *vdev,
 	if (usbip_recv_iso(ud, urb) < 0)
 		return;
 
-	/* restore the padding in iso packets */
-	if (usbip_pad_iso(ud, urb) < 0)
-		return;
 
 	if (usbip_dbg_flag_vhci_rx)
 		usbip_dump_urb(urb);
@@ -273,17 +269,22 @@ static void vhci_rx_pdu(struct usbip_device *ud)
 
 /*-------------------------------------------------------------------------*/
 
-int vhci_rx_loop(void *data)
+void vhci_rx_loop(struct usbip_task *ut)
 {
-	struct usbip_device *ud = data;
+	struct usbip_device *ud = container_of(ut, struct usbip_device, tcp_rx);
 
 
-	while (!kthread_should_stop()) {
+	while (1) {
+		if (signal_pending(current)) {
+			usbip_dbg_vhci_rx("signal catched!\n");
+			break;
+		}
+
+
 		if (usbip_event_happened(ud))
 			break;
 
 		vhci_rx_pdu(ud);
 	}
-
-	return 0;
 }
+

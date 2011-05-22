@@ -264,9 +264,11 @@ void stub_device_cleanup_urbs(struct stub_device *sdev)
 
 		kmem_cache_free(stub_priv_cache, priv);
 
-		kfree(urb->transfer_buffer);
+		if (urb->transfer_buffer != NULL)
+			kfree(urb->transfer_buffer);
 
-		kfree(urb->setup_packet);
+		if (urb->setup_packet != NULL)
+			kfree(urb->setup_packet);
 
 		usb_free_urb(urb);
 	}

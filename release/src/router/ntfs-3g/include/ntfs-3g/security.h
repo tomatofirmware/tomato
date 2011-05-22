@@ -137,7 +137,6 @@ struct PERMISSIONS_CACHE {
 enum {
 	SECURITY_DEFAULT,	/* rely on fuse for permissions checking */
 	SECURITY_RAW,		/* force same ownership/permissions on files */
-	SECURITY_ACL,		/* enable Posix ACLs (when compiled in) */
 	SECURITY_ADDSECURIDS,	/* upgrade old security descriptors */
 	SECURITY_STATICGRPS,	/* use static groups for access control */
 	SECURITY_WANTED		/* a security related option was present */
@@ -350,7 +349,7 @@ INDEX_ENTRY *ntfs_read_sii(struct SECURITY_API *scapi,
 INDEX_ENTRY *ntfs_read_sdh(struct SECURITY_API *scapi,
 		INDEX_ENTRY *entry);
 struct SECURITY_API *ntfs_initialize_file_security(const char *device,
-                                unsigned long flags);
+                                int flags);
 BOOL ntfs_leave_file_security(struct SECURITY_API *scx);
 
 int ntfs_get_usid(struct SECURITY_API *scapi, uid_t uid, char *buf);

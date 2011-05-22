@@ -105,10 +105,14 @@ VPN integration and GUI Copyright (C) 2010 Keith Moyer,<br>
 <a href='mailto:tomatovpn@keithmoyer.com'>tomatovpn@keithmoyer.com</a><br>
 <!-- VPN-END -->
 <br>
+<br>
 <b>This compilation by Toastman may also include:</b><br>
 <br>
-<b>All current "Teddy Bear" features, notably:</b><br>
-- USB Support | Samba | FTP | Media Server | IPv6<br>
+<b>"Teddy Bear" current features, notably:</b><br>
+- USB Support, Samba, FTP, Media Servers<br>
+- Web Monitor, Per-connection transfer rates<br>
+- Byte counter, QOS rule ID added to QOS/Details<br>
+- Additional ipv6 support in GUI, QOS, Conntrack<br>
 <a href='http://www.tomatousb.org/' target='_new'>http://www.tomatousb.org</a><br>
 <br>
 <b>"Victek RAF" features:</b><br>
@@ -134,7 +138,7 @@ Captive Portal Copyright (C) 2011 Ofer Chen & Vicente Soriano<br>
 - Comprehensive QOS rule examples set by default<br>
 <a href='http://www.linksysinfo.org/forums/showthread.php?t=60304' target='_new'>http://www.linksysinfo.org/forums/showthread.php?t=60304</a><br>
 <br>
-<b>Development by Victek/PrinceAMD/Phykris/Shibby/Toastman</b><br>
+<b>* Development by Victek/PrinceAMD/Phykris/Shibby/Toastman</b><br>
 <br>
 Based on Tomato Firmware v<% version(); %><br>
 Copyright (C) 2006-2010 Jonathan Zarate<br>

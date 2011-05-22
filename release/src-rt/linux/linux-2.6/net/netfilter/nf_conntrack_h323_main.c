@@ -163,7 +163,9 @@ static int get_tpkt_data(struct sk_buff *skb, unsigned int protoff,
 				}
 
 				/* Fragmented TPKT */
-				DEBUGP("nf_ct_h323: fragmented TPKT\n");
+				if (net_ratelimit())
+					printk("nf_ct_h323: "
+					       "fragmented TPKT\n");
 				goto clear_out;
 			}
 
@@ -597,9 +599,10 @@ static int h245_help(struct sk_buff *skb, unsigned int protoff,
 		ret = DecodeMultimediaSystemControlMessage(data, datalen,
 							   &mscm);
 		if (ret < 0) {
-			DEBUGP("nf_ct_h245: decoding error: %s\n",
-			       ret == H323_ERROR_BOUND ?
-			       "out of bound" : "out of range");
+			if (net_ratelimit())
+				printk("nf_ct_h245: decoding error: %s\n",
+				       ret == H323_ERROR_BOUND ?
+				       "out of bound" : "out of range");
 			/* We don't drop when decoding error */
 			break;
 		}
@@ -1151,9 +1154,10 @@ static int q931_help(struct sk_buff *skb, unsigned int protoff,
 		/* Decode Q.931 signal */
 		ret = DecodeQ931(data, datalen, &q931);
 		if (ret < 0) {
-			DEBUGP("nf_ct_q931: decoding error: %s\n",
-			       ret == H323_ERROR_BOUND ?
-			       "out of bound" : "out of range");
+			if (net_ratelimit())
+				printk("nf_ct_q931: decoding error: %s\n",
+				       ret == H323_ERROR_BOUND ?
+				       "out of bound" : "out of range");
 			/* We don't drop when decoding error */
 			break;
 		}
@@ -1737,9 +1741,10 @@ static int ras_help(struct sk_buff *skb, unsigned int protoff,
 	/* Decode RAS message */
 	ret = DecodeRasMessage(data, datalen, &ras);
 	if (ret < 0) {
-		DEBUGP("nf_ct_ras: decoding error: %s\n",
-		       ret == H323_ERROR_BOUND ?
-		       "out of bound" : "out of range");
+		if (net_ratelimit())
+			printk("nf_ct_ras: decoding error: %s\n",
+			       ret == H323_ERROR_BOUND ?
+			       "out of bound" : "out of range");
 		goto accept;
 	}
 

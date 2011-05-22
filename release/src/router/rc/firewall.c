@@ -74,47 +74,20 @@ struct {
 // -----------------------------------------------------------------------------
 
 #ifdef LINUX26
-static const char *fastnat_run_dir = "/var/run/fastnat";
-
-void allow_fastnat(const char *service, int allow)
-{
-	char p[128];
-
-	snprintf(p, sizeof(p), "%s/%s", fastnat_run_dir, service);
-	if (allow) {
-		unlink(p);
-	}
-	else {
-		mkdir_if_none(fastnat_run_dir);
-		f_write_string(p, "", 0, 0);
-	}
-}
-
-static inline int fastnat_allowed(void)
-{
-	DIR *dir;
-	struct dirent *dp;
-	int enabled;
-
-	enabled = !nvram_get_int("qos_enable") && !nvram_get_int("fastnat_disable");
-
-	if (enabled && (dir = opendir(fastnat_run_dir))) {
-		while ((dp = readdir(dir))) {
-			if (strcmp(dp->d_name, ".") == 0 || strcmp(dp->d_name, "..") == 0)
-				continue;
-			enabled = 0;
-			break;
-		}
-		closedir(dir);
-	}
-
-	return (enabled);
-}
-
-void try_enabling_fastnat(void)
+void enable_fastnat(int enable)
 {
 	f_write_string("/proc/sys/net/ipv4/netfilter/ip_conntrack_fastnat",
-		fastnat_allowed() ? "1" : "0", 0, 0);
+		enable ? "1" : "0", 0, 0);
+}
+
+int fastnat_enabled(void)
+{
+	char v[4];
+
+	if (f_read_string("/proc/sys/net/ipv4/netfilter/ip_conntrack_fastnat", v, sizeof(v)) > 0)
+		return atoi(v);
+
+	return 0;
 }
 #endif
 
@@ -1266,7 +1239,7 @@ int start_firewall(void)
 #endif
 
 #ifdef LINUX26
-	can_enable_fastnat = 1;
+	can_enable_fastnat = (nvram_get_int("fastnat_disable") == 0);
 #endif
 
 	strlcpy(s, nvram_safe_get("lan_ipaddr"), sizeof(s));
@@ -1407,6 +1380,9 @@ int start_firewall(void)
 		killall("miniupnpd", SIGUSR2);
 	}
 
+#ifdef LINUX26
+	enable_fastnat(can_enable_fastnat);
+#endif
 	simple_unlock("restrictions");
 	sched_restrictions();
 	enable_ip_forward();
@@ -1444,10 +1420,6 @@ int start_firewall(void)
 #endif
 	run_nvscript("script_fire", NULL, 1);
 
-#ifdef LINUX26
-	allow_fastnat("firewall", can_enable_fastnat);
-	try_enabling_fastnat();
-#endif
 	simple_unlock("firewall");
 	return 0;
 }
