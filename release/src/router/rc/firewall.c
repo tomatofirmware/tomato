@@ -416,8 +416,8 @@ int ipt_layer7(const char *v, char *opt)
 
 static void save_webmon(void)
 {
-	eval("cp", "/proc/webmon_recent_domains", "/var/webmon/domain");
-	eval("cp", "/proc/webmon_recent_searches", "/var/webmon/search");
+	system("cp /proc/webmon_recent_domains /var/webmon/domain");
+	system("cp /proc/webmon_recent_searches /var/webmon/search");
 }
 
 static void ipt_webmon()
@@ -1319,14 +1319,19 @@ int start_firewall(void)
 	modprobe("nf_conntrack_ipv6");
 	modprobe("ip6t_REJECT");
 #endif
-	/*Deon Thomas attempt to start xt_IMQ and imq */
-	modprobe("imq");
+
+/* shibby */
+if (nvram_match("imq_enable", "1")) {
+	char numdevs[10];
+	sprintf(numdevs, "numdevs=%d", nvram_get_int("imq_numdevs"));
+	modprobe("imq", numdevs );
 #ifdef LINUX26
 	modprobe("xt_IMQ");
 #else
 	modprobe("ipt_IMQ");
 #endif
-	
+	}
+
 	mangle_table();
 	nat_table();
 	filter_table();

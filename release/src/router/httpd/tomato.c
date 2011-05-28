@@ -651,6 +651,8 @@ static const nvset_t nvset_list[] = {
 	{ "nf_loopback",		V_NUM				},
 	{ "ne_syncookies",		V_01				},
 	{ "dhcp_pass",			V_01				},
+	{ "imq_enable",			V_01				},
+	{ "imq_numdevs",		V_RANGE(2, 16)			},
 #ifdef TCONFIG_EMF
 	{ "emf_entry",			V_NONE				},
 	{ "emf_uffp_entry",		V_NONE				},
@@ -765,7 +767,7 @@ static const nvset_t nvset_list[] = {
 	{ "https_lanport",		V_PORT				},
 	{ "web_wl_filter",		V_01				},
 	{ "web_css",			V_LENGTH(1, 32)		},
-	{ "web_mx",			V_LENGTH(0, 128)	},
+	{ "web_mx",				V_LENGTH(0, 128)	},
 	{ "http_wanport",		V_PORT				},
 	{ "telnetd_eas",		V_01				},
 	{ "telnetd_port",		V_PORT				},
@@ -962,6 +964,7 @@ static const nvset_t nvset_list[] = {
 	{ "new_arpbind_list",            V_LENGTH(0, 4096)	},
 
 //NotCatSplash. Victek.
+#ifdef TCONFIG_NOCAT
 	{ "NC_enable",			V_01				},
 	{ "NC_Verbosity",		V_RANGE(0, 10)			},
         { "NC_GatewayName",		V_LENGTH(0, 255)		},
@@ -979,6 +982,7 @@ static const nvset_t nvset_list[] = {
         { "NC_AllowedWebHosts",		V_LENGTH(0, 255)		},
         { "NC_MACWhiteList",		V_LENGTH(0, 255)		},
 	{ "NC_SplashFile",		V_LENGTH(0, 8192)		},
+#endif
 
 #ifdef TCONFIG_OPENVPN
 // vpn

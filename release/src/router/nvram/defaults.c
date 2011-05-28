@@ -390,12 +390,14 @@ const defaults_t defaults[] = {
 
 // advanced-firewall
 //		{ "block_loopback",		"0"				},	// nat loopback
-	{ "nf_loopback",		"1"				},
+	{ "nf_loopback",		"0"				},
 	{ "block_wan",			"1"				},	// block inbound icmp
 	{ "multicast_pass",		"0"				},	// enable multicast proxy
 	{ "ne_syncookies",		"0"				},	// tcp_syncookies
 	{ "dhcp_pass",			"1"				},	// allow DHCP responses
-	{ "ne_shlimit",			"0,3,60"		},
+	{ "ne_shlimit",			"1,3,60"			},	//shibby - enable limit connection attempts for sshd
+	{ "imq_enable",			"0"				},
+	{ "imq_numdevs",		"2"				},
 
 // advanced-routing
 	{ "routes_static",		""				},
@@ -900,20 +902,21 @@ const defaults_t defaults[] = {
 	{ "new_qoslimit_enable",		"0"			},
 	{ "new_qoslimit_obw",			""			},
 	{ "new_qoslimit_ibw",			""			},
-	{ "new_qoslimit_rules",			"" 			},
-	{ "qosl_enable",			"0" 			},
-	{ "qosl_tcp",			"0" 			},//unlimited
-	{ "qosl_udp",			"0" 			},//unlimited
-	{ "qosl_dlc",			"" 			},
-	{ "qosl_ulc",			"" 			},
-	{ "qosl_dlr",			"" 			},
-	{ "qosl_ulr",			"" 			},
+	{ "new_qoslimit_rules",			""			},
+	{ "qosl_enable",			"0"			},
+	{ "qosl_tcp",				"0"			},//unlimited
+	{ "qosl_udp",				"0"			},//unlimited
+	{ "qosl_dlc",				""			},
+	{ "qosl_ulc",				""			},
+	{ "qosl_dlr",				""			},
+	{ "qosl_ulr",				""			},
 
 // new_arpbind
 	{ "new_arpbind_enable",			"0"			},
 	{ "new_arpbind_only",			"0"			},
 	{ "new_arpbind_list",			"" 			},
 
+// NoCatSplash. !!Victek
 #ifdef TCONFIG_NOCAT
 // NoCatSplash. !!Victek
 	{ "NC_enable",		"0" }, // enable NoCatSplash
