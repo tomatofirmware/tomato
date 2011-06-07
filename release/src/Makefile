@@ -619,6 +619,16 @@ else
 	@$(MAKE) bin OPENVPN=y NTFS=y B=NC BUILD_DESC="$(VPN)" USB="USB" NOCAT=y BUILD_DESC+=" $(NC)"
 endif
 
+## Toastman
+## Make the "Mini: no USB, + NOCAT" build - for 4MB routers
+ncm:
+	@$(MAKE) bin JFFSv1=y NOCAT=y B=F BUILD_DESC="MiniNOCAT" USB=""
+
+## Toastman
+## Make the "normal" build + NOCAT
+ncs:
+	@$(MAKE) bin NOCAT=y B=A BUILD_DESC="StdNOCAT" USB="USB"
+
 ## Make the "No USB" build
 s:
 ifeq ($(CONFIG_LINUX26),y)
@@ -743,6 +753,8 @@ help:
 	@echo "d            D build (standard minus Samba server)"
 	@echo "m            M build (standard plus extra utilities and NTFS support)"
 	@echo "nc           NC build (standard plus VPN, extra utilities, NTFS support and NOCAT)"
+	@echo "ncm	    NCS build (no USB support, NOCAT)"
+	@echo "ncs	    NCS build (std + NOCAT)"
 ifeq ($(CONFIG_LINUX26),y)
 	@echo "e            E build (standard plus VPN, extra utilities and NTFS support)"
 	@echo "i            I build (IPv6 with no USB support minus CIFS and RIPv1/2)"
