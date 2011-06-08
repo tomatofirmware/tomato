@@ -96,6 +96,8 @@ Copyright (C) 2006-2010 Jonathan Zarate<br>
 <a href='http://gemini.net.pl/~slodki/tomato-sdhc.html' target='_new'>SDHC integration and GUI</a>
 Copyright (C) 2009 Tomasz Słodkowicz<br>
 <br>
+VLAN administration GUI Copyright (C) 2011 Augusto Bott<br>
+<br>
 Built on <% build_time(); %><br>
 <br><br>
 
