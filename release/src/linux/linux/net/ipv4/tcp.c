@@ -252,6 +252,7 @@
 #include <linux/init.h>
 #include <linux/smp_lock.h>
 #include <linux/fs.h>
+#include <linux/random.h> /* SpeedMod linux-2.4.20-nethashfix */
 
 #include <net/icmp.h>
 #include <net/tcp.h>
@@ -542,6 +543,7 @@ int tcp_listen_start(struct sock *sk)
 	for (lopt->max_qlen_log = 6; ; lopt->max_qlen_log++)
 		if ((1<<lopt->max_qlen_log) >= sysctl_max_syn_backlog)
 			break;
+	get_random_bytes(&lopt->hash_rnd, 4); /* SpeedMod linux-2.4.20-nethashfix */
 
 	write_lock_bh(&tp->syn_wait_lock);
 	tp->listen_opt = lopt;
@@ -1503,15 +1505,14 @@ int tcp_recvmsg(struct sock *sk, struct msghdr *msg,
 		struct sk_buff * skb;
 		u32 offset;
 
-		/* Are we at urgent data? Stop if we have read anything. */
-		if (copied && tp->urg_data && tp->urg_seq == *seq)
-			break;
-
-		if (signal_pending(current)) {
+		/* Are we at urgent data? Stop if we have read anything or have SIGURG pending. */
+		if (tp->urg_data && tp->urg_seq == *seq) {
 			if (copied)
 				break;
-			copied = timeo ? sock_intr_errno(timeo) : -EAGAIN;
-			break;
+			if (signal_pending(current)) {
+				copied = timeo ? sock_intr_errno(timeo) : -EAGAIN;
+				break;
+			}
 		}
 
 		/* Next get a buffer. */
@@ -1550,6 +1551,7 @@ int tcp_recvmsg(struct sock *sk, struct msghdr *msg,
 			    sk->state == TCP_CLOSE ||
 			    (sk->shutdown & RCV_SHUTDOWN) ||
 			    !timeo ||
+			    signal_pending(current) ||
 			    (flags & MSG_PEEK))
 				break;
 		} else {
@@ -1577,6 +1579,11 @@ int tcp_recvmsg(struct sock *sk, struct msghdr *msg,
 
 			if (!timeo) {
 				copied = -EAGAIN;
+				break;
+			}
+
+			if (signal_pending(current)) {
+				copied = sock_intr_errno(timeo);
 				break;
 			}
 		}
@@ -2061,7 +2068,7 @@ out:
 
 /* These states need RST on ABORT according to RFC793 */
 
-extern __inline__ int tcp_need_reset(int state)
+static inline int tcp_need_reset(int state)
 {
 	return ((1 << state) &
 	       	(TCPF_ESTABLISHED|TCPF_CLOSE_WAIT|TCPF_FIN_WAIT1|

@@ -447,6 +447,8 @@ static void SMP_TIMER_NAME(tcp_twkill)(unsigned long dummy)
 
 	while((tw = tcp_tw_death_row[tcp_tw_death_row_slot]) != NULL) {
 		tcp_tw_death_row[tcp_tw_death_row_slot] = tw->next_death;
+		if (tw->next_death)
+			tw->next_death->pprev_death = tw->pprev_death; /* SpeedMod linux-2.4.20-nethashfix */
 		tw->pprev_death = NULL;
 		spin_unlock(&tw_death_lock);
 
@@ -936,6 +938,12 @@ struct sock *tcp_check_req(struct sock *sk,struct sk_buff *skb,
 	if (flg & (TCP_FLAG_RST|TCP_FLAG_SYN))
 		goto embryonic_reset;
 
+	/* ACK sequence verified above, just make sure ACK is
+	 * set.  If ACK not set, just silently drop the packet.
+	 */
+	if (!(flg & TCP_FLAG_ACK))
+		return NULL;
+	
 	/* If TCP_DEFER_ACCEPT is set, drop bare ACK. */
 	if (tp->defer_accept && TCP_SKB_CB(skb)->end_seq == req->rcv_isn+1) {
 		req->acked = 1;

@@ -1641,6 +1641,7 @@ struct tcp_listen_opt
 	int			qlen;
 	int			qlen_young;
 	int			clock_hand;
+	u32			hash_rnd; /* SpeedMod: linux-2.4.20-nethashfix */
 	struct open_request	*syn_table[TCP_SYNQ_HSIZE];
 };
 
