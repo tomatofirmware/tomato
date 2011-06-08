@@ -265,9 +265,9 @@ const defaults_t defaults[] = {
 	{ "macnames",			""				},
 
 // advanced-ctnf
-	{ "ct_tcp_timeout",		""				},
-	{ "ct_udp_timeout",		""				},
-	{ "ct_max",				""				},
+	{ "ct_tcp_timeout",		"180 1200 120 60 120 120 10 60 30 120"	},
+	{ "ct_udp_timeout",		"30 180"				},
+	{ "ct_max",				"8192"				},
 	{ "nf_ttl",				"0"				},
 	{ "nf_l7in",			"1"				},
 	{ "nf_rtsp",			"1"				},
