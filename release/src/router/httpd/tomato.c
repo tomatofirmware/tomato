@@ -719,6 +719,8 @@ static const nvset_t nvset_list[] = {
 	{ "ne_vbeta",			V_NUM				},
 	{ "ne_vgamma",			V_NUM				},
 
+	{ "qos_pfifo",			V_01				}, // !!TB
+
 
 /*
 ppp_static			0/1
