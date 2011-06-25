@@ -451,8 +451,8 @@ const defaults_t defaults[] = {
 	{ "qos_rst",			"1"				},
 	{ "qos_icmp",			"0"				},
 	{ "qos_reset",			"1"				},
-	{ "qos_obw",			"230"			},
-	{ "qos_ibw",			"1000"			},
+	{ "qos_obw",			"5000"			},
+	{ "qos_ibw",			"50000"			},
 	{ "qos_orules",			"0<<6<d<80,443<0<<0:512<1<WWW>0<<6<d<80,443<0<<512:<3<WWW (512K+)>0<<-1<d<53<0<<0:2<0<DNS>0<<-1<d<53<0<<2:<4<DNS (2K+)" },
 	{ "qos_burst0",			""				},
 	{ "qos_burst1",			""				},
@@ -604,6 +604,8 @@ const defaults_t defaults[] = {
 #ifdef TCONFIG_NTFS
 	{ "usb_fs_ntfs",		"1"				},
 #endif
+	{ "usb_fs_hfs",			"1"				}, //!Victek
+	{ "usb_fs_hfsplus",		"1"				}, //!Victek
 	{ "usb_automount",		"1"				},
 #if 0
 	{ "usb_bdflush",		"30 500 0 0 100 100 60 0 0"	},
@@ -906,10 +908,10 @@ const defaults_t defaults[] = {
 	{ "qosl_enable",			"0"			},
 	{ "qosl_tcp",				"0"			},//unlimited
 	{ "qosl_udp",				"0"			},//unlimited
-	{ "qosl_dlc",				""			},
-	{ "qosl_ulc",				""			},
-	{ "qosl_dlr",				""			},
-	{ "qosl_ulr",				""			},
+	{ "qosl_dlc",				"750"			},
+	{ "qosl_ulc",				"750"			},
+	{ "qosl_dlr",				"500"			},
+	{ "qosl_ulr",				"500"			},
 
 // new_arpbind
 	{ "new_arpbind_enable",			"0"			},
