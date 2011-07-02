@@ -772,6 +772,12 @@ void start_wan_done(char *wan_ifname)
 	start_firewall();
 	start_qos();
 
+	new_qoslimit_start(); //!! RAF
+	new_arpbind_start(); //!! RAF
+
+
+
+
 	stop_igmp_proxy();
 	start_igmp_proxy();
 	
@@ -819,6 +825,9 @@ void stop_wan(void)
 	char *next;
 	
 	_dprintf("%s: begin\n", __FUNCTION__);
+
+	new_arpbind_stop(); //!! RAF
+	new_qoslimit_stop(); //!! RAF
 
 	stop_qos();
 	stop_firewall();

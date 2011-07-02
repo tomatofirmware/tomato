@@ -95,9 +95,11 @@ function show()
 	c('uptime', stats.uptime);
 	c('time', stats.time);
 	c('wanip', stats.wanip);
+	c('wanprebuf',stats.wanprebuf); //Victek
 	c('wannetmask', stats.wannetmask);
 	c('wangateway', stats.wangateway);
 	c('dns', stats.dns);
+	c('ispconid', stats.ispconid); //Victek
 	c('memory', stats.memory);
 
 	c('wanstatus', stats.wanstatus);
@@ -157,6 +159,9 @@ function init()
 createFieldTable('', [
 	{ title: 'Name', text: nvram.router_name },
 	{ title: 'Model', text: nvram.t_model_name },
+	{ title: 'Chipset', text: stats.systemtype },
+	{ title: 'CPU Freq', text: stats.cpumhz },
+	{ title: 'Flash RAM Size', text: stats.flashsize },
 	null,
 	{ title: 'Time', rid: 'time', text: stats.time },
 	{ title: 'Uptime', rid: 'uptime', text: stats.uptime },
@@ -177,6 +182,8 @@ createFieldTable('', [
 	{ title: 'Gateway', rid: 'wangateway', text: stats.wangateway },
 	{ title: 'DNS', rid: 'dns', text: stats.dns },
 	{ title: 'MTU', text: nvram.wan_run_mtu },
+	{ title: 'Previous WAN IP', rid: 'wanprebuf',text:stats.wanprebuf }, //Victek
+	{ title: 'ISP Concentrator ID', rid: 'ispconid', text: stats.ispconid }, //Victek
 	null,
 	{ title: 'Status', rid: 'wanstatus', text: stats.wanstatus },
 	{ title: 'Connection Uptime', rid: 'wanuptime', text: stats.wanuptime },

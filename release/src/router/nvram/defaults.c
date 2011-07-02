@@ -500,6 +500,22 @@ const defaults_t defaults[] = {
 	{ "script_fire",		""				},
 	{ "script_wanup",		""				},
 
+// new_qoslimit
+	{ "new_qoslimit_enable",		"0"			}, //!! RAF
+	{ "new_qoslimit_obw",			""			}, //!! RAF
+	{ "new_qoslimit_ibw",			""			}, //!! RAF
+	{ "new_qoslimit_rules",			"" 			}, //!! RAF
+	{ "new_qoslimit_d_enable",		"0"			}, //!! RAF
+	{ "new_qoslimit_d_dlr",			""			}, //!! RAF
+	{ "new_qoslimit_d_dlc",			""			}, //!! RAF
+	{ "new_qoslimit_d_ulr",			""			}, //!! RAF
+	{ "new_qoslimit_d_ulc",			""			}, //!! RAF
+ 
+// new_arpbind
+	{ "new_arpbind_enable",			"0"			}, //!! RAF
+	{ "new_arpbind_only",			"0"			}, //!! RAF
+	{ "new_arpbind_list",			"" 			}, //!! RAF
+
 #if 0
 // safe to remove?
 	{ "QoS",					"0"			},

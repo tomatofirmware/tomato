@@ -93,7 +93,7 @@ input[type='button']:hover {
 
 #header {
 	background: #af4141;
-	padding: 30px 10px 20px 10px;
+	padding: 15px 10px 13px 10px;
 	border-bottom: 2px dotted #ddd;
 }
 #header .title {
@@ -127,7 +127,7 @@ input[type='button']:hover {
 }
 
 #navi {
-	width: 130px;
+	width: 140px;
 	font-size: 12px;
 	border-right: 1px solid #f0f0f0;
 	padding: 20px 0;
@@ -157,7 +157,7 @@ input[type='button']:hover {
 #content {
 	padding: 5px 4px 20px 4px;
 	vertical-align: top;
-	width: 770px;
+	width: 740px;
 }
 
 #ident {

@@ -268,6 +268,13 @@ function init()
 	<table class='tomato-grid' id='bs-grid'></table>
 </div>
 
+<div class='section-title'>Notes</div>
+<div class='section'>
+<ul>
+<li>To specify multiple hostnames for the same IP address, separate them with spaces.</li>
+<li>To enforce fixed/static ARP binding, see <a href=basic-arpbind.asp>Static ARP</a>.</li>
+</ul>
+</div>
 
 <!-- / / / -->
 

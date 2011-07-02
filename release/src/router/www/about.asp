@@ -89,14 +89,21 @@ function init()
 <img src='tux.png' alt='Linux &amp; Tomato' id='tux'>
 </div>
 <div style='margin:20px 20px;font-size:14px;color:#555;'>
-Tomato Firmware v<% version(1); %><br>
+Tomato Firmware v<% version(1); %> ND<br>
 Copyright (C) 2006-2010 Jonathan Zarate<br>
 <a href='http://www.polarcloud.com/tomato/' target='_new'>http://www.polarcloud.com/tomato/</a><br>
 <br>
 <a href='http://gemini.net.pl/~slodki/tomato-sdhc.html' target='_new'>SDHC integration and GUI</a>
 Copyright (C) 2009 Tomasz Słodkowicz<br>
 <br>
-VLAN administration GUI Copyright (C) 2011 Augusto Bott<br>
+<a href='http://victek.is-a-geek.com' target='_new'>QoS IP/Range BW Limiter, ARP Binding</a> 
+Copyright (C) 2007-2011 Michał Rupental, Vicente Soriano.<br>
+<br>
+<a href='http://touristinparadise.blogspot.com/2008/04/linksys-wrt54gl-routers-improving.html' target='_new'>Tomato SpeedMod</a> 
+Copyright (C) 2008-2010 Rodney Chua.<br>
+<br>
+<a href='http://code.google.com/p/tomato-sdhc-vlan/' target='_new'>VLAN administration GUI</a> 
+Copyright (C) 2011 Augusto Bott<br>
 <br>
 Built on <% build_time(); %><br>
 <br><br>

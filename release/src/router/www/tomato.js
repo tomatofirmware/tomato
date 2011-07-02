@@ -2000,10 +2000,11 @@ function navi()
 			['Time',			'time.asp'],
 			['DDNS',			'ddns.asp'],
 			['Static DHCP',		'static.asp'],
+			['Static ARP',	'arpbind.asp'],
 			['Wireless Filter',	'wfilter.asp'] ] ],
 		['Advanced', 			'advanced', 0, [
-			['Conntrack / Netfilter',	'ctnf.asp'],
-			['DHCP / DNS',		'dhcpdns.asp'],
+			['Conntrack/Netfilter',	'ctnf.asp'],
+			['DHCP/DNS',		'dhcpdns.asp'],
 			['Firewall',		'firewall.asp'],
 			['MAC Address',		'mac.asp'],
 			['Miscellaneous',	'misc.asp'],
@@ -2014,12 +2015,13 @@ function navi()
 			['Basic',			'basic.asp'],
 			['DMZ',				'dmz.asp'],
 			['Triggered',		'triggered.asp'],
-			['UPnP / NAT-PMP',	'upnp.asp'] ] ],
+			['UPnP/NAT-PMP',	'upnp.asp'] ] ],
 		['QoS',					'qos', 0, [
 			['Basic Settings',	'settings.asp'],
 			['Classification',	'classify.asp'],
 			['View Graphs',		'graphs.asp'],
-			['View Details',	'detailed.asp']
+			['View Details',	'detailed.asp'],
+			['B/W Limiter',	'qoslimit.asp']
 			] ],
 		['Access Restriction',	'restrict.asp'],
 /* REMOVE-BEGIN
@@ -2034,7 +2036,7 @@ REMOVE-END */
 		['Administration',		'admin', 0, [
 			['Admin Access',	'access.asp'],
 			['Bandwidth Monitoring','bwm.asp'],
-			['Buttons / LED',	'buttons.asp'],
+			['Buttons/LED',	'buttons.asp'],
 			['CIFS Client',		'cifs.asp'],
 			['Configuration',	'config.asp'],
 			['Debugging',		'debug.asp'],

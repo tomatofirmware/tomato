@@ -7,7 +7,7 @@
 	No part of this file may be used without permission.
 */
 
-//<% nvram("l2tp_get_ip,pptp_get_ip,pptp_server_ip,router_name,wan_domain,wan_gateway,wan_get_domain,wan_hostname,wan_hwaddr,wan_ipaddr,wan_netmask,wan_proto,wan_run_mtu,et0macaddr,lan_proto,lan_ipaddr,dhcp_start,dhcp_num,dhcpd_startip,dhcpd_endip,lan_netmask,security_mode2,wl_crypto,wl_mode,wds_enable,wl0_hwaddr,wl_net_mode,wl_radio,wl_channel,lan_gateway,wl_ssid,t_model_name"); %>
+//<% nvram("l2tp_get_ip,ppp_get_ac,pptp_get_ip,pptp_server_ip,router_name,clkfreq,wan_ipaddr_buf,wan_domain,wan_gateway,wan_get_domain,wan_hostname,wan_hwaddr,wan_ipaddr,wan_netmask,wan_proto,wan_run_mtu,et0macaddr,lan_proto,lan_ipaddr,dhcp_start,dhcp_num,dhcpd_startip,dhcpd_endip,lan_netmask,security_mode2,wl_crypto,wl_mode,wds_enable,wl0_hwaddr,wl_net_mode,wl_radio,wl_channel,lan_gateway,wl_ssid,t_model_name"); %>
 //<% uptime(); %>
 //<% sysinfo(); %>
 //<% wlradio(); %>
@@ -23,10 +23,13 @@ do {
 	else if (last_wan_proto != nvram.wan_proto) {
 		reloadPage();
 	}
-
+	stats.flashsize = sysinfo.flashsize+'MB';
+	stats.cpumhz = sysinfo.cpuclk+'MHz';
+	stats.systemtype = sysinfo.systemtype;
 	stats.cpuload = ((sysinfo.loads[0] / 65536.0).toFixed(2) + '<small> / </small> ' +
 		(sysinfo.loads[1] / 65536.0).toFixed(2) + '<small> / </small>' +
 		(sysinfo.loads[2] / 65536.0).toFixed(2));
+	stats.freqcpu = nvram.clkfreq;
 	stats.uptime = sysinfo.uptime_s;
 
 	a = sysinfo.totalram + sysinfo.totalswap;
@@ -35,6 +38,7 @@ do {
 
 	stats.time = '<% time(); %>';
 	stats.wanup = '<% wanup(); %>' == '1';
+	stats.wanprebuf = nvram.wan_ipaddr_buf; //Victek
 	stats.wanuptime = '<% link_uptime(); %>';
 	stats.wanlease = '<% dhcpc_time(); %>';
 
@@ -44,6 +48,7 @@ do {
 	stats.wanip = nvram.wan_ipaddr;
 	stats.wannetmask = nvram.wan_netmask;
 	stats.wangateway = nvram.wan_gateway;
+	stats.ispconid = nvram.ppp_get_ac; //Victek
 
 	switch (nvram.wan_proto) {
 	case 'pptp':
