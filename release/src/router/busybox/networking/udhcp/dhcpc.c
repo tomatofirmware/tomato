@@ -880,6 +880,7 @@ static int udhcp_raw_socket(int ifindex)
 	 *
 	 * TODO: make conditional?
 	 */
+#define SERVER_AND_CLIENT_PORTS  ((67 << 16) + 68)
 	static const struct sock_filter filter_instr[] = {
 		/* load 9th byte (protocol) */
 		BPF_STMT(BPF_LD|BPF_B|BPF_ABS, 9),
@@ -911,18 +912,18 @@ static int udhcp_raw_socket(int ifindex)
 	fd = xsocket(PF_PACKET, SOCK_DGRAM, htons(ETH_P_IP));
 	log1("Got raw socket fd %d", fd); //log2?
 
-	sock.sll_family = AF_PACKET;
-	sock.sll_protocol = htons(ETH_P_IP);
-	sock.sll_ifindex = ifindex;
-	xbind(fd, (struct sockaddr *) &sock, sizeof(sock));
-
-	if (CLIENT_PORT == 68) {
-		/* Use only if standard port is in use */
+	if (SERVER_PORT == 67 && CLIENT_PORT == 68) {
+		/* Use only if standard ports are in use */
 		/* Ignoring error (kernel may lack support for this) */
 		if (setsockopt(fd, SOL_SOCKET, SO_ATTACH_FILTER, &filter_prog,
 				sizeof(filter_prog)) >= 0)
 			log1("Attached filter to raw socket fd %d", fd); // log?
 	}
+
+	sock.sll_family = AF_PACKET;
+	sock.sll_protocol = htons(ETH_P_IP);
+	sock.sll_ifindex = ifindex;
+	xbind(fd, (struct sockaddr *) &sock, sizeof(sock));
 
 	log1("Created raw socket");
 
