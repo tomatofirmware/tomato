@@ -370,7 +370,21 @@ function verifyFields(focused, quiet)
 <td id='content'>
 <div id='ident'><% ident(); %></div>
 
+
+
+<div class='section-title' id='stitle' onclick='document.location="qos-graphs.asp"' style='cursor:pointer'>Transfer Rates</div>
+<div class='section'>
+<table id='grid' class='tomato-grid' style="float:left" cellspacing=1></table>
+<input type='checkbox' id='resolve' onclick='resolveChanged()' onchange='resolveChanged()'> Automatically Resolve Addresses
+&nbsp;&nbsp;&nbsp;
+<input type='checkbox' id='thres' onclick='thresChanged()' onchange='thresChanged()'> Hide Inactive Connections
+
+<div id='loading'><br><b>Loading...</b></div>
+</div>
+
+
 <!-- / / / -->
+
 
 <div class='section-title'>Filters <small><i><a href='javascript:toggleFiltersVisibility();'>(Toggle Visibility)</a></i></small></div>
 <div class='section' id='sesdivfilters' style='display:none'>
@@ -385,24 +399,14 @@ createFieldTable('',c);
 </div>
 </div>
 
-<div class='section-title' id='stitle' onclick='document.location="qos-graphs.asp"' style='cursor:pointer'>Transfer Rates</div>
-<div class='section'>
-<table id='grid' class='tomato-grid' style="float:left" cellspacing=1></table>
-<input type='checkbox' id='resolve' onclick='resolveChanged()' onchange='resolveChanged()'> Automatically Resolve Addresses
-&nbsp;&nbsp;&nbsp;
-<input type='checkbox' id='thres' onclick='thresChanged()' onchange='thresChanged()'> Hide Inactive Connections
-
-<div id='loading'><br><b>Loading...</b></div>
-</div>
 
 <!-- / / / -->
 
 </td></tr>
 <tr><td id='footer' colspan=2>
-	<script type='text/javascript'>genStdRefresh(1,1,'ref.toggle()');</script>
+	<script type='text/javascript'>genStdRefresh(1,3,'ref.toggle()');</script>
 </td></tr>
 </table>
 </form>
 </body>
 </html>
-
