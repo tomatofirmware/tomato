@@ -121,21 +121,15 @@ VPN integration and GUI Copyright (C) 2010 Keith Moyer,<br>
 <br>
 <b>"Victek RAF" features:</b><br>
 - CPU Freq | Previous WAN IP<br>
-- HFS/HFS+MAC OS x read support<br>
 <!-- NOCAT-BEGIN -->
-- Captive Portal (Based on NocatSplash) <br>
+- Captive Portal (Based in NocatSplash)<br>
+Copyright (C) 2011 Ofer Chen & Vicente Soriano<br>
 <!-- NOCAT-END -->
-Copyright (C) 2007-2011 Vicente Soriano<br>
-<!-- NOCAT-BEGIN -->
-Captive Portal Copyright (C) 2011 Ofer Chen & Vicente Soriano<br>
-<!-- NOCAT-END -->
+Tomato RAF. Copyright (C) 2007-2011 Vicente Soriano. <br>
 <a href='http://victek.is-a-geek.com' target='_new'>http://victek.is-a-geek.com</a><br>
 <br>
 <b>"Shibby" features:</b><br>
 - Custom log file path<br>
-<!-- LINUX26-BEGIN -->
-- SD-idle tool integration<br>
-<!-- LINUX26-END -->
 <!-- SNMP-BEGIN -->
 - SNMP integration and GUI<br>
 <!-- SNMP-END -->
@@ -154,12 +148,9 @@ Copyright (C) 2011 Augusto Bott<br>
 - 250 entry limit in Static DHCP  & Wireless Filter<br>
 - 500 entry limit in Access Restriction rules<br>
 - Up to 80 QOS rules<br>
-- IMQ based QOS/Bandwidth Limiter<br>
 - Configurable QOS class names<br>
 - CPU frequency selector<br>
-- Starts with LAN DHCP off if nvram is reset<br>
 - Comprehensive QOS rule examples set by default<br>
-- Extra Themes<br>
 <a href='http://www.linksysinfo.org/forums/showthread.php?t=60304' target='_new'>http://www.linksysinfo.org/forums/showthread.php?t=60304</a><br>
 <br>
 Built on <% build_time(); %><br>
