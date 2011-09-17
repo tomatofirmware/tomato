@@ -847,6 +847,10 @@ void start_wan_done(char *wan_ifname)
 	start_firewall();
 	start_qos();
 
+#ifdef TCONFIG_NOCAT
+	start_nocat();
+#endif
+
 	do_static_routes(1);
 	// and routes supplied via DHCP
 	do_wan_routes(using_dhcpc() ? nvram_safe_get("wan_ifname") : wan_ifname, 0, 1);

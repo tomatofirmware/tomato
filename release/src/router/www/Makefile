@@ -9,7 +9,7 @@ install:
 	rm -rf $(INSTALLDIR)/www
 	mkdir -p $(INSTALLDIR)/www
 
-	cp *.gif *.png *.ico robots.txt $(INSTALLDIR)/www
+	cp *.gif *.png *.ico *.html robots.txt $(INSTALLDIR)/www
 
 # squish some of the files by trimming whitespace...
 
@@ -100,6 +100,14 @@ ifneq ($(TCONFIG_MEDIA_SERVER),y)
 	sed -i $(INSTALLDIR)/www/tomato.js -e "/MEDIA-SRV-BEGIN/,/MEDIA-SRV-END/d"
 endif
 
+# Victek for RAF verion
+# Only include Captive Portal menu option and pages when configured.
+ifneq ($(TCONFIG_NOCAT),y)
+	rm -f $(INSTALLDIR)/www/new-splashd.asp
+	rm -f $(INSTALLDIR)/www/splash.html
+	sed -i $(INSTALLDIR)/www/tomato.js -e "/NOCAT-BEGIN/,/NOCAT-END/d"
+endif
+
 # Only include IPv6 options if IPv6 is configured in.
 ifneq ($(TCONFIG_IPV6),y)
 	rm -f $(INSTALLDIR)/www/basic-ipv6.asp
@@ -154,7 +162,7 @@ endif
 
 # clean up
 	cd $(INSTALLDIR)/www && \
-	for F in $(wildcard *.asp *.js); do \
+	for F in $(wildcard *.asp *.js *.jsx *.html); do \
 		[ -f $(INSTALLDIR)/www/$$F ] && sed -i $$F \
 		-e "/LINUX26-BEGIN/d"	-e "/LINUX26-END/d" \
 		-e "/USB-BEGIN/d"	-e "/USB-END/d" \
@@ -172,6 +180,7 @@ endif
 		-e "/IPV6-BEGIN/d"	-e "/IPV6-END/d" \
 		-e "/CTF-BEGIN/d"	-e "/CTF-END/d" \
 		-e "/SNMP-BEGIN/d"	-e "/SNMP_END/d"\
+		-e "/NOCAT-BEGIN/d"	-e "/NOCAT_END/d"\
 		|| true; \
 	done
 

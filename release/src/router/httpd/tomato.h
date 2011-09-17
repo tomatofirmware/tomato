@@ -172,6 +172,12 @@ extern void asp_climon(int argc, char **argv);
 extern void asp_iptraffic(int argc, char **argv);
 
 
+#ifdef TCONFIG_NOCAT
+// nocat.c
+extern void wi_uploadsplash(char *url, int len, char *boundary);
+extern void wo_uploadsplash(char *url);
+#endif
+
 #if TOMATO_SL
 // share.c
 extern void asp_sharelist(int argc, char **argv);

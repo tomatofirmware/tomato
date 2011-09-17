@@ -424,27 +424,27 @@ function v_macip(e, quiet, bok, ipp)
 				return false;
 			}
 		}
-        else e.value = a;
+		else e.value = a;
 		ferror.clear(e);
 		return true;
 	}
 
 	a = s.split('-');
+    
 	if (a.length > 2) {
 		ferror.set(e, 'Invalid IP address range', quiet);
 		return false;
 	}
-	c = 0;
+	
+	c = 0
+	
 	for (i = 0; i < a.length; ++i) {
-		b = a[i];
-		if (b.match(/^\d+$/)) b = ipp + b;
-
+		b = a[i];    
 		b = fixIP(b);
 		if (!b) {
 			ferror.set(e, 'Invalid IP address', quiet);
 			return false;
 		}
-
 		if (b.indexOf(ipp) != 0) {
 			ferror.set(e, 'IP address outside of LAN', quiet);
 			return false;
@@ -2327,9 +2327,13 @@ function navi()
 			['Classification',	'classify.asp'],
 			['View Graphs',		'graphs.asp'],
 			['View Details',	'detailed.asp'],
-			['Transfer Rates',	'ctrate.asp']
-			] ],
+			['Transfer Rates',	'ctrate.asp'] ] ],
 		['Access Restriction',	'restrict.asp'],
+
+/* NOCAT-BEGIN */
+		['Captive Portal',	'splashd.asp'],
+/* NOCAT-END */
+
 /* REMOVE-BEGIN
 		['Scripts',				'sc', 0, [
 			['Startup',			'startup.asp'],

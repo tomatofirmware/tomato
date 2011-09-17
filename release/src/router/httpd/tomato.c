@@ -329,7 +329,8 @@ const struct mime_handler mime_handlers[] = {
 	{ "resolve.cgi",	mime_javascript,			0,	wi_generic,			wo_resolve,		1 },
 	{ "expct.cgi",		mime_html,					0,	wi_generic,			wo_expct,		1 },
 	{ "service.cgi",	NULL,						0,	wi_generic,			wo_service,		1 },
-//	{ "logout.cgi",		NULL,	   		 			0,	wi_generic,			wo_logout,		0 },	// see httpd.c
+//	{ "logout.cgi",		NULL,	   		 			0,	wi_generic,			wo_logout,		0 },
+// see httpd.c
 	{ "shutdown.cgi",	mime_html,					0,	wi_generic,			wo_shutdown,	1 },
 #ifdef TCONFIG_OPENVPN
 	{ "vpnstatus.cgi",	mime_javascript,			0,	wi_generic,			wo_vpn_status,		1 },
@@ -340,8 +341,11 @@ const struct mime_handler mime_handlers[] = {
 #ifdef BLACKHOLE
 	{ "blackhole.cgi",	NULL,						0,	wi_blackhole,		NULL,			1 },
 #endif
-//	{ "test",			mime_html,					0,	wi_generic,			wo_test,		1 },
-	{ NULL,				NULL,						0,	NULL,				NULL,			1 }
+#ifdef TCONFIG_NOCAT
+	{ "uploadsplash.cgi",		NULL,					0,	wi_uploadsplash,	wo_uploadsplash,	1 },
+	{ "ext/uploadsplash.cgi",	NULL,					0,	wi_uploadsplash,	wo_uploadsplash,	1 },
+#endif
+	{ NULL,				NULL,					0,	NULL,		NULL,			1 }
 };
 
 const aspapi_t aspapi[] = {
@@ -514,8 +518,9 @@ static const nvset_t nvset_list[] = {
 // basic-static
 //	{ "bwm_client",			V_LENGTH(0, 2048)	},
 	{ "dhcpd_static",		V_LENGTH(0, 106*251)},	// 106 (max chars per entry) x n entries
-	{ "dhcpd_static_only",	V_01				},
+	{ "dhcpd_static_only",		V_01			},
 	{ "arpbind_static",		V_LENGTH(0, 34*251)},	// 34 (max chars per entry) x n entries
+
 
 // basic-ddns
 	{ "ddnsx0",				V_LENGTH(0, 2048)	},
@@ -869,7 +874,7 @@ static const nvset_t nvset_list[] = {
 	{ "https_lanport",		V_PORT				},
 	{ "web_wl_filter",		V_01				},
 	{ "web_css",			V_LENGTH(1, 32)		},
-	{ "web_mx",				V_LENGTH(0, 128)	},
+	{ "web_mx",			V_LENGTH(0, 128)	},
 	{ "http_wanport",		V_PORT				},
 	{ "telnetd_eas",		V_01				},
 	{ "telnetd_port",		V_PORT				},
@@ -1065,6 +1070,28 @@ static const nvset_t nvset_list[] = {
 	{ "ne_valpha",			V_NUM				},
 	{ "ne_vbeta",			V_NUM				},
 	{ "ne_vgamma",			V_NUM				},
+
+
+#ifdef TCONFIG_NOCAT
+//NoCatSplash
+	{ "NC_enable",			V_01				},
+	{ "NC_Verbosity",		V_RANGE(0, 10)			},
+        { "NC_GatewayName",		V_LENGTH(0, 255)		},
+	{ "NC_GatewayPort",		V_PORT				},
+        { "NC_ForcedRedirect",		V_01				},
+        { "NC_HomePage",		V_LENGTH(0, 255)		},
+        { "NC_DocumentRoot",		V_LENGTH(0, 255)		},
+        { "NC_SplashURL",		V_LENGTH(0, 255)		},
+        { "NC_LoginTimeout",		V_RANGE(0, 86400000)		},
+        { "NC_IdleTimeout",		V_RANGE(0, 86400000)		},
+	{ "NC_MaxMissedARP",		V_RANGE(0, 10)			},
+	{ "NC_PeerChecktimeout",	V_RANGE(0, 60)			},
+        { "NC_ExcludePorts",		V_LENGTH(0, 255)		},
+        { "NC_IncludePorts",		V_LENGTH(0, 255)		},
+        { "NC_AllowedWebHosts",		V_LENGTH(0, 255)		},
+        { "NC_MACWhiteList",		V_LENGTH(0, 255)		},
+	{ "NC_SplashFile",		V_LENGTH(0, 8192)		},
+#endif
 
 #ifdef TCONFIG_OPENVPN
 // vpn

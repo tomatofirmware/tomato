@@ -448,4 +448,12 @@ static inline void start_vpn_eas() { }
 #define write_vpn_resolv(f) (0)
 #endif
 
+
+#ifdef TCONFIG_NOCAT
+// nocat.c 
+extern void start_nocat(); 
+extern void stop_nocat(); 
+extern void reset_nocat(); 
+#endif
+
 #endif
