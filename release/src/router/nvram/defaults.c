@@ -136,11 +136,11 @@ const defaults_t defaults[] = {
 	{ "ppp_idletime",		"5"				},	// Dial on demand max idle time (mins)
 	{ "ppp_keepalive",		"0"				},	// Restore link automatically
 	{ "ppp_demand",			"0"				},	// Dial on demand
-	{ "ppp_redialperiod",	"30"			},	// Redial Period  (seconds)*/
-	{ "ppp_mru",			"1500"			},	// Negotiate MRU to this value
-	{ "ppp_mtu",			"1500"			},	// Negotiate MTU to the smaller of this value or the peer MRU
+	{ "ppp_redialperiod",		"30"				},	// Redial Period  (seconds)*/
+	{ "ppp_mru",			"1500"				},	// Negotiate MRU to this value
+	{ "ppp_mtu",			"1500"				},	// Negotiate MTU to the smaller of this value or the peer MRU
 	{ "ppp_service",		""				},	// PPPoE service name
-	{ "ppp_ac",				""				},	// PPPoE access concentrator name
+	{ "ppp_ac",			""				},	// PPPoE access concentrator name
 	{ "ppp_static",			"0"				},	// Enable / Disable Static IP
 	{ "ppp_static_ip",		""				},	// PPPoE Static IP
 	{ "ppp_get_ac",			""				},	// PPPoE Server ac name
@@ -175,20 +175,19 @@ const defaults_t defaults[] = {
 	{ "wl_corerev",			""				},	// Current core revision
 	{ "wl_phytypes",		""				},	// List of supported wireless bands (e.g. "ga")
 	{ "wl_radioids",		""				},	// List of radio IDs
-	{ "wl_ssid",			"wireless"		},	// Service set ID (network name)
-	{ "wl1_ssid",			"wireless1"		},
-	{ "wl_country_code",		""		},		// Country (default obtained from driver)
+	{ "wl_ssid",			"wireless"			},	// Service set ID (network name)
+	{ "wl1_ssid",			"wireless1"			},
 	{ "wl_radio",			"1"				},	// Enable (1) or disable (0) radio
 	{ "wl1_radio",			"1"				},	// Enable (1) or disable (0) radio
 	{ "wl_closed",			"0"				},	// Closed (hidden) network
 	{ "wl_ap_isolate",		"0"				},	// AP isolate mode
-	{ "wl_mode",			"ap"			},	// AP mode (ap|sta|wds)
+	{ "wl_mode",			"ap"				},	// AP mode (ap|sta|wds)
 	{ "wl_lazywds",			"1"				},	// Enable "lazy" WDS mode (0|1)
-	{ "wl_wds",				""				},	// xx:xx:xx:xx:xx:xx ...
+	{ "wl_wds",			""				},	// xx:xx:xx:xx:xx:xx ...
 	{ "wl_wds_timeout",		"1"				},	// WDS link detection interval defualt 1 sec*/
-	{ "wl_wep",				"disabled"		},	// WEP data encryption (enabled|disabled)
+	{ "wl_wep",			"disabled"			},	// WEP data encryption (enabled|disabled)
 	{ "wl_auth",			"0"				},	// Shared key authentication optional (0) or required (1)
-	{ "wl_key",				"1"				},	// Current WEP key
+	{ "wl_key",			"1"				},	// Current WEP key
 	{ "wl_key1",			""				},	// 5/13 char ASCII or 10/26 char hex
 	{ "wl_key2",			""				},	// 5/13 char ASCII or 10/26 char hex
 	{ "wl_key3",			""				},	// 5/13 char ASCII or 10/26 char hex
@@ -197,27 +196,26 @@ const defaults_t defaults[] = {
 	{ "wl1_channel",		"0"				},
 	{ "wl_rate",			"0"				},	// Rate (bps, 0 for auto)
 	{ "wl_mrate",			"0"				},	// Mcast Rate (bps, 0 for auto)
-	{ "wl_rateset",			"default"		},	// "default" or "all" or "12"
-	{ "wl_frag",			"2346"			},	// Fragmentation threshold
-	{ "wl_rts",				"2347"			},	// RTS threshold
+	{ "wl_rateset",			"default"			},	// "default" or "all" or "12"
+	{ "wl_frag",			"2346"				},	// Fragmentation threshold
+	{ "wl_rts",			"2347"				},	// RTS threshold
 	{ "wl_dtim",			"1"				},	// DTIM period (3.11.5)*/	// It is best value for WiFi test
-	{ "wl_bcn",				"100"			},	// Beacon interval
-	{ "wl_plcphdr",			"long"			},	// 802.11b PLCP preamble type
-	{ "wl_net_mode",		"mixed"			},	// Wireless mode (mixed|g-only|b-only|disable)
+	{ "wl_bcn",			"100"				},	// Beacon interval
+	{ "wl_plcphdr",			"long"				},	// 802.11b PLCP preamble type
+	{ "wl_net_mode",		"mixed"				},	// Wireless mode (mixed|g-only|b-only|disable)
 	{ "wl_gmode",			"1"				},	// 54g mode
-	{ "wl_gmode_protection","off"			},	// 802.11g RTS/CTS protection (off|auto)
-	{ "wl_afterburner",		"off"			},	// AfterBurner
-	{ "wl_frameburst",		"off"			},	// BRCM Frambursting mode (off|on)
-	{ "wl_wme",			"auto"			},	// WME mode (auto|off|on)
-	{ "wl1_wme",			"auto"			},	// WME mode (auto|off|on)
-	{ "wl_antdiv",			"-1"			},	// Antenna Diversity (-1|0|1|3)
+	{ "wl_gmode_protection","off"					},	// 802.11g RTS/CTS protection (off|auto)
+	{ "wl_afterburner",		"off"				},	// AfterBurner
+	{ "wl_frameburst",		"off"				},	// BRCM Frambursting mode (off|on)
+	{ "wl_wme",			"auto"				},	// WME mode (auto|off|on)
+	{ "wl1_wme",			"auto"				},	// WME mode (auto|off|on)
+	{ "wl_antdiv",			"-1"				},	// Antenna Diversity (-1|0|1|3)
 	{ "wl_infra",			"1"				},	// Network Type (BSS/IBSS)
 	{ "wl_btc_mode",		"0"				},	// !!TB - BT Coexistence Mode
 	{ "wl_sta_retry_time",		"5"				},	// !!TB - Seconds between association attempts (0 to disable retries)
-	{ "wl_interfmode",		"3"				},	// Interference Mitigation Mode (0|1|2|3)
-
+	{ "wl_interfmode",		"0"				},	// Interference Mitigation Mode (0|1|2|3)
 	{ "wl_passphrase",		""				},	// Passphrase	// Add
-	{ "wl_wep_bit",			"128"			},	// WEP encryption [64 | 128] // Add
+	{ "wl_wep_bit",			"128"				},	// WEP encryption [64 | 128] // Add
 	{ "wl_wep_buf",			""				},	// save all settings for web // Add
 	{ "wl_wep_gen",			""				},	// save all settings for generate button	// Add
 	{ "wl_wep_last",		""				},	// Save last wl_wep mode	// Add
@@ -225,14 +223,14 @@ const defaults_t defaults[] = {
 	// WPA parameters
 	{ "wl_security_mode",		"disabled"		},	// WPA mode (disabled|radius|wpa_personal|wpa_enterprise|wep|wpa2_personal|wpa2_enterprise) for WEB	// Add
 	{ "wl_auth_mode",		"none"			},	// Network authentication mode (radius|none)
-	{ "wl_wpa_psk",			""				},	// WPA pre-shared key
-	{ "wl_wpa_gtk_rekey",	"3600"			},	// WPA GTK rekey interval	// Modify
-	{ "wl_radius_ipaddr",	""				},	// RADIUS server IP address
-	{ "wl_radius_key",		""				},	// RADIUS shared secret
+	{ "wl_wpa_psk",			""			},	// WPA pre-shared key
+	{ "wl_wpa_gtk_rekey",		"3600"			},	// WPA GTK rekey interval	// Modify
+	{ "wl_radius_ipaddr",		""			},	// RADIUS server IP address
+	{ "wl_radius_key",		""			},	// RADIUS shared secret
 	{ "wl_radius_port",		"1812"			},	// RADIUS server UDP port
 	{ "wl_crypto",			"aes"			},	// WPA data encryption
 	{ "wl_net_reauth",		"36000"			},	// Network Re-auth/PMK caching duration
-	{ "wl_akm",				""				},	// WPA akm list
+	{ "wl_akm",			""			},	// WPA akm list
 
 	// WME parameters (cwmin cwmax aifsn txop_b txop_ag adm_control oldest_first)
 	// EDCA parameters for STA
@@ -248,7 +246,7 @@ const defaults_t defaults[] = {
 	{ "wl_wme_ap_vo",		"3 7 1 3264 1504 off off"	},	// WME AP AC_VO paramters
 
 	{ "wl_wme_no_ack",		"off"			},	// WME No-Acknowledgmen mode
-	{ "wl_wme_apsd",		"on"			},	// WME APSD mode
+	{ "wl_wme_apsd",		"off"			},	// WME APSD mode
 	{ "wl_wme_bss_disable",		"0"			},	// WME BSS disable advertising (off|on)
 
 	/* Per AC Tx parameters */
@@ -375,7 +373,7 @@ const defaults_t defaults[] = {
 	{ "nf_l7in",			"1"				},
 #ifdef LINUX26
 	{ "nf_sip",			"1"				},
-	{ "ct_hashsize",		""				},
+	{ "ct_hashsize",		"2048"				},
 #endif
 #ifdef LINUX26
 	{ "nf_rtsp",			"0"				},
@@ -425,12 +423,12 @@ const defaults_t defaults[] = {
 	{ "multicast_lan3",		"0"				},	// on LAN3 (br3)
 	{ "ne_syncookies",		"0"				},	// tcp_syncookies
 	{ "dhcp_pass",			"1"				},	// allow DHCP responses
-	{ "ne_shlimit",			"0,3,60"		},
+	{ "ne_shlimit",			"1,3,60"			},	// limit connection attempts for sshd
 
 // advanced-routing
 	{ "routes_static",		""				},
 	{ "dhcp_routes",		"1"				},
-	{ "wk_mode",			"gateway"		},	// Network mode [gateway|router]
+	{ "wk_mode",			"gateway"			},	// Network mode [gateway|router]
 #ifdef TCONFIG_ZEBRA
 	{ "dr_setting",			"0"				},	// [ Disable | WAN | LAN | Both ]
 	{ "dr_lan_tx",			"0"				},	// Dynamic-Routing LAN out
@@ -449,11 +447,13 @@ const defaults_t defaults[] = {
 	{ "trunk_vlan_so",		"0"				},	// VLAN trunk support override
 
 // advanced-wireless
-	{ "wl_txant",			"3"				},
-	{ "wl_txpwr",			"42"			},
-	{ "wl_maxassoc",		"128"			},	// Max associations driver could support
-	{ "wl_bss_maxassoc",		"128"			},
+	{ "wl_txpwr",			"42"				},
+	{ "wl0_txpwr",			"42"				},
+	{ "wl_maxassoc",		"128"				},	// Max associations driver could support
+	{ "wl_bss_maxassoc",		"128"				},
 	{ "wl_distance",		""				},
+	{ "wl_country_code",		"SG"				},	// Country (default obtained from driver)
+	{ "wl0_country_code",		"SG"				},	// Country (default obtained from driver)
 
 // forward-*
 	{ "portforward",		"0<3<1.1.1.0/24<1000:2000<<192.168.1.2<ex: 1000 to 2000, restricted>0<2<<1000,2000<<192.168.1.2<ex: 1000 and 2000>0<1<<1000<2000<192.168.1.2<ex: different internal port>0<3<<1000:2000,3000<<192.168.1.2<ex: 1000 to 2000, and 3000>" },
@@ -466,11 +466,12 @@ const defaults_t defaults[] = {
 	{ "dmz_sip",			""				},
 
 // forward-upnp
-	{ "upnp_enable",		"0"				},
+	{ "upnp_enable",		"3"				},
 	{ "upnp_secure",		"1"				},
 	{ "upnp_port",			"0"				},
 	{ "upnp_ssdp_interval",		"60"				},	// SSDP interval
 	{ "upnp_mnp",			"0"				},
+	{ "upnp_lan",			"1"				},	// Listen on LAN by default
 
 	{ "upnp_clean",			"1"				},	/* 0:Disable 1:Enable */
 	{ "upnp_clean_interval",	"600"				},	/* Cleaning interval in seconds */
@@ -956,6 +957,26 @@ const defaults_t defaults[] = {
 	{ "wd_aof",				""				},
 
 #endif	// 0
+
+
+#ifdef TCONFIG_NOCAT
+// NoCatSplash
+	{ "NC_enable",		"0" 					}, 	// enable NoCatSplash
+	{ "NC_Verbosity",	"0"					},	// logging too verbose on startup!
+	{ "NC_GatewayName",	"WWW Portal" 				},
+        { "NC_GatewayPort",	"5280" 					},
+        { "NC_GatewayMode",	"Open" 					},
+        { "NC_DocumentRoot",	"/tmp/splashd" 				},
+        { "NC_ExcludePorts",	"1863" 					},
+        { "NC_HomePage",	"" 					},
+        { "NC_ForcedRedirect",	"0" 					},
+        { "NC_IdleTimeout",	"0" 					},
+        { "NC_MaxMissedARP",	"5" 					},
+	{ "NC_PeerChecktimeout", "0"					},
+        { "NC_LoginTimeout",	"86400"					},
+        { "NC_RenewTimeout",	"0" 					},
+        { "NC_AllowedWebHosts",	""					},
+#endif
 
 	{ NULL, NULL	}
 };
