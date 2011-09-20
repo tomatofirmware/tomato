@@ -22,7 +22,6 @@
  * See README, README_WSC and COPYING for more details.
  */
 
-#include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <unistd.h>
@@ -38,7 +37,6 @@
 #endif /* linux */
 
 #include <netinet/in.h>
-#include <arpa/inet.h>
 #include <UdpLib.h>
 
 /* Comment out the next line if debug strings are not needed */
@@ -98,16 +96,12 @@ int udp_open()
 */
 int udp_bind(int fd, int portno)
 {
-	char *p;
 	struct sockaddr_in binder;
 
 	DEBUGF("Entered udp_bind\n");
 
 	binder.sin_family = AF_INET;
-	if ((p = getenv("UDP_BIND_IP")) && *p)
-		binder.sin_addr.s_addr = inet_addr(p);
-	else
-		binder.sin_addr.s_addr = INADDR_ANY;
+	binder.sin_addr.s_addr = INADDR_ANY;
 	binder.sin_port = htons(portno);
 
 	/* bind protocol to socket */

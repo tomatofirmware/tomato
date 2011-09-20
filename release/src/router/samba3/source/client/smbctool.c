@@ -3289,10 +3289,8 @@ static void readline_callback(void)
 
  again:
 
-	if (cli->fd < 0 || cli->fd >= FD_SETSIZE) {
-		errno = EBADF;
+	if (cli->fd == -1)
 		return;
-	}
 
 	FD_ZERO(&fds);
 	FD_SET(cli->fd,&fds);

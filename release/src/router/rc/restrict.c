@@ -12,8 +12,7 @@
 #define MAX_NRULES	50
 
 
-static inline void unsched_restrictions(void)
-
+static void unsched_restrictions(void)
 {
 	system("cru d rcheck");
 }
@@ -78,14 +77,6 @@ int rcheck_main(int argc, char *argv[])
 	int count;
 	int radio;
 	int r;
-#ifdef TCONFIG_IPV6
-	int r6;
-#endif
-
-#ifdef LINUX26
-	int ipt_active;
-#endif
-
 
 	if (!nvram_contains_word("log_events", "acre")) {
 		setlogmask(LOG_MASK(LOG_EMERG));	// can't set to 0
@@ -107,10 +98,6 @@ int rcheck_main(int argc, char *argv[])
 		now_mins = (tms->tm_hour * 60) + tms->tm_min;
 	}
 
-#ifdef LINUX26
-	ipt_active = 0;
-#endif
-
 	activated = strtoull(nvram_safe_get("rrules_activated"), NULL, 16);
 	count = 0;
 	radio = foreach_wif(0, NULL, radio_on) ? -1 : -2;
@@ -129,11 +116,6 @@ int rcheck_main(int argc, char *argv[])
 		else {
 			insch = in_sched(now_mins, now_dow, sched_begin, sched_end, sched_dow);
 		}
-
-#ifdef LINUX26
-		if ((insch) && (comp != '~'))
-			++ipt_active;
-#endif
 
 		n = 1 << nrule;
 		if ((insch) == ((activated & n) != 0)) {
@@ -155,23 +137,16 @@ int rcheck_main(int argc, char *argv[])
 				r = eval("iptables", "-A", "restrict", "-j", buf);
 			}
 
-#ifdef TCONFIG_IPV6
-			r6 = eval("ip6tables", "-D", "restrict", "-j", buf);
-			if (ipv6_enabled()) {
-				if (insch) {
-					// ignore error above (if any)
-
-					r6 = eval("ip6tables", "-A", "restrict", "-j", buf);
-				}
-				r |= r6;
-			}
-#endif
-
 			if (r != 0) {
-				syslog(LOG_ERR, "Iptables: %sactivating chain \"%s\" failed. Retrying in 15 minutes.",
-					insch ? "" : "de", buf);
+				syslog(LOG_ERR, "Iptables command failed. Retrying in 15 minutes.");
 				continue;
 			}
+/*
+			if (eval("iptables", insch ? "-A" : "-D", "restrict", "-j", buf) != 0) {
+				syslog(LOG_ERR, "iptables command failed");
+				continue;
+			}
+*/
 		}
 
 		if (insch) activated |= n;
@@ -236,7 +211,6 @@ void ipt_restrictions(void)
 	int http_file;
 	int ex;
 	int first;
-	int v4v6_ok;
 
 	need_web = 0;
 	first = 1;
@@ -268,12 +242,7 @@ void ipt_restrictions(void)
 		if (first) {
 			first = 0;
 
-			ip46t_write(":restrict - [0:0]\n");
-#ifdef TCONFIG_IPV6
-			if (*wan6face)
-				ip6t_write("-A FORWARD -o %s -j restrict\n",
-					  wan6face);
-#endif
+			ipt_write(":restrict - [0:0]\n");
 			for (n = 0; n < wanfaces.count; ++n) {
 				if (*(wanfaces.iface[n].name)) {
 					ipt_write("-A FORWARD -o %s -j restrict\n",
@@ -283,7 +252,7 @@ void ipt_restrictions(void)
 		}
 
 		sprintf(reschain, "rres%02d", nrule);
-		ip46t_write(":%s - [0:0]\n", reschain);
+		ipt_write(":%s - [0:0]\n", reschain);
 
 		blockall = 1;
 
@@ -329,29 +298,23 @@ void ipt_restrictions(void)
 			if (!ipt_ipp2p(ipp2p, app)) {
 				if (ipt_layer7(layer7, app) == -1) continue;
 			}
-#ifdef TCONFIG_IPV6
-			v4v6_ok = ((*app) ? 0 : IPT_V6) | IPT_V4;
-#else
-			v4v6_ok = IPT_V4;
-#endif
+
+			blockall = 0;
 
 			// dest ip/domain address
 			if ((*addr_type == '1') || (*addr_type == '2')) {
-				v4v6_ok = ipt_addr(iptaddr, sizeof(iptaddr), addr, (*addr_type == '1') ? "dst" : "src", v4v6_ok, (v4v6_ok == IPT_V4), "restrictions", NULL);
-				if (!v4v6_ok)
+				if (!ipt_addr(iptaddr, sizeof(iptaddr), addr, (*addr_type == '1') ? "dst" : "src", AF_INET, "restrictions", NULL))
 					continue;
 			}
 			else {
 				iptaddr[0] = 0;
 			}
 
-			blockall = 0;
-
 			// proto & ports
 			proto = atoi(pproto);
 			if (proto <= -2) {
 				// shortcut if any proto+any port
-				ip46t_flagged_write(v4v6_ok, "-A %s %s %s -j %s\n", reschain, iptaddr, app, chain_out_drop);
+				ipt_write("-A %s %s %s -j %s\n", reschain, iptaddr, app, chain_out_drop);
 				continue;
 			}
 			else if ((proto == 6) || (proto == 17) || (proto == -1)) {
@@ -369,12 +332,12 @@ void ipt_restrictions(void)
 					ports[0] = 0;
 				}
 				if (proto != 17)
-					ip46t_flagged_write(v4v6_ok, "-A %s -p tcp %s %s %s -j %s\n", reschain, ports, iptaddr, app, chain_out_drop);
+					ipt_write("-A %s -p tcp %s %s %s -j %s\n", reschain, ports, iptaddr, app, chain_out_drop);
 				if (proto != 6)
-					ip46t_flagged_write(v4v6_ok, "-A %s -p udp %s %s %s -j %s\n", reschain, ports, iptaddr, app, chain_out_drop);
+					ipt_write("-A %s -p udp %s %s %s -j %s\n", reschain, ports, iptaddr, app, chain_out_drop);
 			}
 			else {
-				ip46t_flagged_write(v4v6_ok, "-A %s -p %d %s %s -j %s\n", reschain, proto, iptaddr, app, chain_out_drop);
+				ipt_write("-A %s -p %d %s %s -j %s\n", reschain, proto, iptaddr, app, chain_out_drop);
 			}
 		}
 
@@ -396,7 +359,7 @@ void ipt_restrictions(void)
 				*p = 0;
 			}
 			else p = NULL;
-			ip46t_write("-A %s -p tcp -m web --hore \"%s\" -j %s\n", reschain, http, chain_out_reject);
+			ipt_write("-A %s -p tcp -m web --hore \"%s\" -j %s\n", reschain, http, chain_out_reject);
 			need_web = 1;
 			blockall = 0;
 			if (p == NULL) break;
@@ -410,7 +373,7 @@ void ipt_restrictions(void)
 		if (http_file & 2) strcpy(app, ".swf$ ");
 		if (http_file & 4) strcat(app, ".class$ .jar$");
 		if (app[0]) {
-			ip46t_write("-A %s -p tcp -m multiport --dports %s -m web --path \"%s\" -j %s\n",
+			ipt_write("-A %s -p tcp -m multiport --dports %s -m web --path \"%s\" -j %s\n",
 				reschain, nvram_safe_get("rrulewp"), app, chain_out_reject);
 			need_web = 1;
 			blockall = 0;
@@ -418,7 +381,7 @@ void ipt_restrictions(void)
 
 		if (*comps) {
 			if (blockall) {
-				ip46t_write("-X %s\n", reschain);	// chain not needed
+				ipt_write("-X %s\n", reschain);	// chain not needed
 				sprintf(nextchain, "-j %s", chain_out_drop);
 			}
 			else {
@@ -427,37 +390,29 @@ void ipt_restrictions(void)
 
 			ex = 0;
 			sprintf(devchain, "rdev%02d", nrule);
-			ip46t_write(":%s - [0:0]\n", devchain);
+			ipt_write(":%s - [0:0]\n", devchain);
 			while ((q = strsep(&comps, ">")) != NULL) {
 				if (*q == 0) continue;
 				if (*q == '!') {
 					ex = 1;
 					continue;
 				}
-#ifdef TCONFIG_IPV6
-				v4v6_ok = IPT_V6 | IPT_V4;
-#else
-				v4v6_ok = IPT_V4;
-#endif
-				if (sscanf(q, "%2hhx:%2hhx:%2hhx:%2hhx:%2hhx:%2hhx",
-					   iptaddr, iptaddr, iptaddr, iptaddr, iptaddr, iptaddr) == 6) {
+				if (strchr(q, ':')) {
 					snprintf(iptaddr, sizeof(iptaddr), "-m mac --mac-source %s", q);
 				}
 				else {
-					v4v6_ok = ipt_addr(iptaddr, sizeof(iptaddr), q, "src", v4v6_ok, (v4v6_ok == IPT_V4), "restrictions", "filtering");
-					if (!v4v6_ok)
+					if (!ipt_addr(iptaddr, sizeof(iptaddr), q, "src", AF_INET, "restrictions", "filtering"))
 						continue;
 				}
-				ip46t_flagged_write(v4v6_ok,
-					"-A %s %s %s\n", devchain, iptaddr, ex ? "-j RETURN" : nextchain);
+				ipt_write("-A %s %s %s\n", devchain, iptaddr, ex ? "-j RETURN" : nextchain);
 			}
 
 			if (ex) {
-				ip46t_write("-A %s %s\n", devchain, nextchain);
+				ipt_write("-A %s %s\n", devchain, nextchain);
 			}
 		}
 		else if (blockall) {
-			ip46t_write("-A %s -j %s\n", reschain, chain_out_drop);
+			ipt_write("-A %s -j %s\n", reschain, chain_out_drop);
 		}
 	}
 

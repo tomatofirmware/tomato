@@ -76,15 +76,7 @@ ip6tc_handle_t create_handle(const char *tablename, const char* modprobe)
 
 static int parse_counters(char *string, struct ip6t_counters *ctr)
 {
-	unsigned long long pcnt, bcnt;
-	int ret;
-
-	ret = sscanf(string, "[%llu:%llu]",
-		     (unsigned long long *)&pcnt,
-		     (unsigned long long *)&bcnt);
-	ctr->pcnt = pcnt;
-	ctr->bcnt = bcnt;
-	return ret == 2;
+	return (sscanf(string, "[%llu:%llu]", (unsigned long long *)&ctr->pcnt, (unsigned long long *)&ctr->bcnt) == 2);
 }
 
 /* global new argv and argc */
@@ -310,9 +302,8 @@ int main(int argc, char *argv[])
 			char *parsestart;
 
 			/* the parser */
-			char *curchar;
-			int quote_open, escaped;
-			size_t param_len;
+			char *param_start, *curchar;
+			int quote_open;
 
 			/* reset the newargv */
 			newargc = 0;
@@ -359,46 +350,44 @@ int main(int argc, char *argv[])
 			 * longer a real hacker, but I can live with that */
 
 			quote_open = 0;
-			escaped = 0;
-			param_len = 0;
-
+			param_start = parsestart;
+			
 			for (curchar = parsestart; *curchar; curchar++) {
-				char param_buffer[1024];
-
-				if (quote_open) {
-					if (escaped) {
-						param_buffer[param_len++] = *curchar;
-						escaped = 0;
-						continue;
-					} else if (*curchar == '\\') {
-						escaped = 1;
-						continue;
-					} else if (*curchar == '"') {
+				if (*curchar == '"') {
+					/* quote_open cannot be true if there
+					 * was no previous character.  Thus, 
+					 * curchar-1 has to be within bounds */
+					if (quote_open && 
+					    *(curchar-1) != '\\') {
 						quote_open = 0;
 						*curchar = ' ';
 					} else {
-						param_buffer[param_len++] = *curchar;
-						continue;
-					}
-				} else {
-					if (*curchar == '"') {
 						quote_open = 1;
-						continue;
+						param_start++;
 					}
-				}
-
+				} 
 				if (*curchar == ' '
 				    || *curchar == '\t'
 				    || * curchar == '\n') {
+					char param_buffer[1024];
+					int param_len = curchar-param_start;
+
+					if (quote_open)
+						continue;
+
 					if (!param_len) {
 						/* two spaces? */
+						param_start++;
 						continue;
 					}
-
-					param_buffer[param_len] = '\0';
+					
+					/* end of one parameter */
+					strncpy(param_buffer, param_start,
+						param_len);
+					*(param_buffer+param_len) = '\0';
 
 					/* check if table name specified */
-					if (!strncmp(param_buffer, "-t", 2)
+					if (!strncmp(param_buffer, "-t", 3)
                                             || !strncmp(param_buffer, "--table", 8)) {
 						exit_error(PARAMETER_PROBLEM, 
 						   "Line %u seems to have a "
@@ -407,14 +396,9 @@ int main(int argc, char *argv[])
 					}
 
 					add_argv(param_buffer);
-					param_len = 0;
+					param_start += param_len + 1;
 				} else {
-					/* regular character, copy to buffer */
-					param_buffer[param_len++] = *curchar;
-
-					if (param_len >= sizeof(param_buffer))
-						exit_error(PARAMETER_PROBLEM, 
-						   "Parameter too long!");
+					/* regular character, skip */
 				}
 			}
 
@@ -428,7 +412,6 @@ int main(int argc, char *argv[])
 					 &newargv[2], &handle);
 
 			free_argv();
-			fflush(stdout);
 		}
 		if (!ret) {
 			fprintf(stderr, "%s: line %u failed\n",

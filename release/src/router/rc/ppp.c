@@ -59,13 +59,10 @@ int ipup_main(int argc, char **argv)
 
 	f_write_string("/tmp/ppp/link", argv[1], 0, 0);
 	
-	if ((p = getenv("IPREMOTE"))) {
-		nvram_set("wan_gateway_get", p);
-		TRACE_PT("IPREMOTE=%s\n", p);
-	}
-
 	if ((value = getenv("IPLOCAL"))) {
 		_dprintf("IPLOCAL=%s\n", value);
+
+		ifconfig(wan_ifname, IFUP, value, "255.255.255.255");
 
 		switch (get_wan_proto()) {
 		case WP_PPPOE:
@@ -76,15 +73,14 @@ int ipup_main(int argc, char **argv)
 		case WP_PPTP:
 		case WP_L2TP:
 			nvram_set("wan_ipaddr_buf", nvram_safe_get("ppp_get_ip"));
+			nvram_set("ppp_get_ip", value);
 			break;
 		}
+	}
 
-		if (!nvram_match("ppp_get_ip", value)) {
-			ifconfig(wan_ifname, IFUP, "0.0.0.0", NULL);
-			nvram_set("ppp_get_ip", value);
-		}
-
-		_ifconfig(wan_ifname, IFUP, value, "255.255.255.255", (p && (*p)) ? p : NULL);
+	if ((value = getenv("IPREMOTE"))) {
+		nvram_set("wan_gateway_get", value);
+		TRACE_PT("IPREMOTE=%s\n", value);
 	}
 
 	buf[0] = 0;
@@ -134,11 +130,10 @@ int ipdown_main(int argc, char **argv)
 		nvram_set("wan_gateway_get", nvram_safe_get("wan_gateway"));
 
 		// Set default route to gateway if specified
-		route_del(nvram_safe_get("wan_ifname"), 0, "0.0.0.0", nvram_safe_get("wan_gateway"), "0.0.0.0");
 		route_add(nvram_safe_get("wan_ifname"), 0, "0.0.0.0", nvram_safe_get("wan_gateway"), "0.0.0.0");
 	}
 
-	if (nvram_get_int("ppp_demand")) {
+	if ((nvram_get_int("ppp_demand")) && ((proto == WP_PPTP) || (proto == WP_L2TP) || (proto == WP_PPPOE))) {
 		killall("listen", SIGKILL);
 		eval("listen", nvram_safe_get("lan_ifname"));
 	}

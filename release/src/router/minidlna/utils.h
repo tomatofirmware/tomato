@@ -25,9 +25,6 @@
 #define __UTILS_H__
 
 int
-strcatf(struct string_s *str, char *fmt, ...);
-
-int
 ends_with(const char * haystack, const char * needle);
 
 char *
@@ -40,7 +37,7 @@ char *
 modifyString(char * string, const char * before, const char * after, short like);
 
 char *
-escape_tag(const char *tag, int force_alloc);
+escape_tag(const char *tag);
 
 void
 strip_ext(char * name);

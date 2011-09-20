@@ -241,10 +241,7 @@ BOOL downgrade_oplock(files_struct *fsp)
 int oplock_notify_fd(void)
 {
 	if (koplocks) {
-		int fd = koplocks->notification_fd;
-		if (fd < 0 || fd >= FD_SETSIZE) {
-			return -1;
-		}
+		return koplocks->notification_fd;
 	}
 
 	return -1;

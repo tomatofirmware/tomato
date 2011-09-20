@@ -1,7 +1,7 @@
 include ../common.mak
 DESTDIR=$(INSTALLDIR)
 
-# Define USE_WRAP if you want to compile with
+# Comment out line bellow if you don't want to use 
 # libwrap (hosts.{allow,deny} access control)
 ifneq ($(USE_WRAP),)
 LIBS += -lwrap

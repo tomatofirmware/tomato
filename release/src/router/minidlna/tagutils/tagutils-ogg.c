@@ -196,6 +196,7 @@ static void
 _ogg_vorbis_end(ogg_stream_processor *stream, struct song_metadata *psong)
 {
 	ogg_misc_vorbis_info *inf = stream->data;
+	long minutes, seconds;
 	double bitrate, time;
 
 	time = (double)inf->lastgranulepos / inf->vi.rate;
@@ -209,6 +210,9 @@ _ogg_vorbis_end(ogg_stream_processor *stream, struct song_metadata *psong)
 		}
 		psong->song_length = time * 1000;
 	}
+
+	minutes = (long)time / 60;
+	seconds = (long)time - minutes * 60;
 
 	vorbis_comment_clear(&inf->vc);
 	vorbis_info_clear(&inf->vi);
@@ -303,7 +307,7 @@ static ogg_stream_processor *
 _ogg_find_stream_processor(ogg_stream_set *set, ogg_page *page)
 {
 	ogg_uint32_t serial = ogg_page_serialno(page);
-	int i;
+	int i, found = 0;
 	int invalid = 0;
 	int constraint = 0;
 	ogg_stream_processor *stream;
@@ -312,6 +316,7 @@ _ogg_find_stream_processor(ogg_stream_set *set, ogg_page *page)
 	{
 		if(serial == set->streams[i].serial)
 		{
+			found = 1;
 			stream = &(set->streams[i]);
 
 			set->in_headers = 0;
@@ -450,7 +455,6 @@ _get_oggfileinfo(char *filename, struct song_metadata *psong)
 		{
 			DPRINTF(E_FATAL, L_SCANNER, "Could not find a processor for stream, bailing\n");
 			_ogg_free_stream_set(processors);
-			fclose(file);
 			return -1;
 		}
 

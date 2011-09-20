@@ -2167,7 +2167,6 @@ int ppp_available(void)
 
 void logwtmp (const char *line, const char *name, const char *host)
 {
-#if 0
     struct utmp ut, *utp;
     pid_t  mypid = getpid();
 #if __GLIBC__ < 2
@@ -2232,7 +2231,6 @@ void logwtmp (const char *line, const char *name, const char *host)
 
 	close (wtmp);
     }
-#endif
 #endif
 }
 

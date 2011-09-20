@@ -8,7 +8,6 @@
 #include "tomato.h"
 
 #include <sys/stat.h>
-#include <sys/ioctl.h>
 
 /*
 #include <fcntl.h>
@@ -201,8 +200,6 @@ void asp_netdev(int argc, char **argv)
 	char *ifname;
 	char comma;
 	char *exclude;
-	int sfd;
-	struct ifreq ifr;
 
 	exclude = nvram_safe_get("rstats_exclude");
 	web_puts("\n\nnetdev={");
@@ -210,11 +207,6 @@ void asp_netdev(int argc, char **argv)
 		fgets(buf, sizeof(buf), f);	// header
 		fgets(buf, sizeof(buf), f);	// "
 		comma = ' ';
-
-		if ((sfd = socket(AF_INET, SOCK_RAW, IPPROTO_RAW)) < 0) {
-			_dprintf("[%s %d]: error opening socket %m\n", __FUNCTION__, __LINE__);
-		}
-
 		while (fgets(buf, sizeof(buf), f)) {
 			if ((p = strchr(buf, ':')) == NULL) continue;
 			*p = 0;
@@ -223,28 +215,42 @@ void asp_netdev(int argc, char **argv)
 //			if (strncmp(ifname, "ppp", 3) == 0) ifname = "ppp";
 			if ((strcmp(ifname, "lo") == 0) || (find_word(exclude, ifname))) continue;
 
-			// skip down interfaces
-			if (sfd >= 0) {
-				strcpy(ifr.ifr_name, ifname);
-				if (ioctl(sfd, SIOCGIFFLAGS, &ifr) != 0) continue;
-				if ((ifr.ifr_flags & IFF_UP) == 0) continue;
-			}
-
 			// <rx bytes, packets, errors, dropped, fifo errors, frame errors, compressed, multicast><tx ...>
 			if (sscanf(p + 1, "%lu%*u%*u%*u%*u%*u%*u%*u%lu", &rx, &tx) != 2) continue;
-			if (!strcmp(ifname, "imq1"))
-				web_printf("%c'%s':{rx:0x0,tx:0x%lx}", comma, ifname, rx, tx);
-			else if (!strcmp(ifname, "imq2"))
-				web_printf("%c'%s':{rx:0x%lx,tx:0x0}", comma, ifname, rx, tx);
-			else
-				web_printf("%c'%s':{rx:0x%lx,tx:0x%lx}", comma, ifname, rx, tx);
-				
+			web_printf("%c'%s':{rx:0x%lx,tx:0x%lx}", comma, ifname, rx, tx);
 			comma = ',';
 		}
-
-		if (sfd >= 0) close(sfd);
 		fclose(f);
 	}
+	web_puts("};\n");
+}
+
+void asp_climon(int argc, char **argv) {
+	FILE *ti;
+	FILE *to;
+
+	char bi[512];
+	char bo[512];
+
+	char ip[64];
+	unsigned long rx, tx;
+
+	char comma;
+
+	web_puts("\n\nclimon={");
+	if ((to = popen("iptables -vnxL traffic_out", "r")) != NULL) {
+		if ((ti = popen("iptables -vnxL traffic_in", "r")) != NULL) {
+		comma = ' ';
+		while ((fgets(bi, sizeof(bi), ti)) && (fgets(bo, sizeof(bo), to))) {
+			if( (sscanf(bi, "%*s %lu %*s %*s %*s %*s %*s %s", &rx, ip)!=2) ||
+				(sscanf(bo, "%*s %lu %*s %*s %*s %*s %*s %*s", &tx)!=1) ) continue;
+				web_printf("%c'%s':{rx:0x%lx,tx:0x%lx}", comma, ip, rx, tx);
+				comma = ',';
+			}
+		}
+		pclose(ti);
+	}
+	pclose(to);
 	web_puts("};\n");
 }
 
@@ -418,7 +424,6 @@ void asp_iptraffic(int argc, char **argv) {
 					if (strncmp(sb, "udp", 3) == 0) ct_udp++;
 				}
 				web_printf("%c['%s', %lu, %lu, %lu, %lu, %lu, %lu, %lu, %lu, %lu, %lu]", 
-
 							comma, ip, rx_bytes, tx_bytes, rp_tcp, tp_tcp, rp_udp, tp_udp, rp_icmp, tp_icmp, ct_tcp, ct_udp);
 				comma = ',';
 			}

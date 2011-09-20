@@ -33,6 +33,7 @@
 </style>
 
 <script type='text/javascript' src='debug.js'></script>
+
 <script type='text/javascript' src='wireless.jsx?_http_id=<% nv(http_id); %>'></script>
 <script type='text/javascript' src='bwm-common.js'></script>
 
@@ -133,12 +134,11 @@ function init()
 
 	ref.start();
 }
-
 </script>
 
 </head>
 <body onload='init()'>
-<form id='_fom' method='post' action='tomato.cgi'>
+<form>
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
@@ -223,4 +223,3 @@ function init()
 </form>
 </body>
 </html>
-

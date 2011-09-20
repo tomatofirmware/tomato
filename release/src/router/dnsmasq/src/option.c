@@ -910,8 +910,7 @@ static char *parse_dhcp_opt(char *arg, int flags)
 	  new->val = op = opt_malloc((5 * addrs) + 1);
 	  new->flags |= DHOPT_ADDR;
 
-	  if (!(new->flags & (DHOPT_ENCAPSULATE | DHOPT_VENDOR | DHOPT_RFC3925)) && 
-	      new->opt == OPTION_SIP_SERVER)
+	  if (!(new->flags & (DHOPT_ENCAPSULATE | DHOPT_VENDOR | DHOPT_RFC3925)) && new->opt == 120)
 	    {
 	      *(op++) = 1; /* RFC 3361 "enc byte" */
 	      new->flags &= ~DHOPT_ADDR;
@@ -948,14 +947,13 @@ static char *parse_dhcp_opt(char *arg, int flags)
       else if (is_string)
 	{
 	  /* text arg */
-	  if ((new->opt == OPTION_DOMAIN_SEARCH || new->opt == OPTION_SIP_SERVER) &&
-	      !(new->flags & (DHOPT_ENCAPSULATE | DHOPT_VENDOR | DHOPT_RFC3925)))
+	  if ((new->opt == 119 || new->opt == 120) && !(new->flags & (DHOPT_ENCAPSULATE | DHOPT_VENDOR | DHOPT_RFC3925)))
 	    {
 	      /* dns search, RFC 3397, or SIP, RFC 3361 */
 	      unsigned char *q, *r, *tail;
 	      unsigned char *p, *m = NULL, *newp;
 	      size_t newlen, len = 0;
-	      int header_size = (new->opt == OPTION_DOMAIN_SEARCH) ? 0 : 1;
+	      int header_size = (new->opt == 119) ? 0 : 1;
 	      
 	      arg = comma;
 	      comma = split(arg);
@@ -1017,7 +1015,7 @@ static char *parse_dhcp_opt(char *arg, int flags)
 		}
       
 	      /* RFC 3361, enc byte is zero for names */
-	      if (new->opt == OPTION_SIP_SERVER)
+	      if (new->opt == 120)
 		m[0] = 0;
 	      new->len = (int) len + header_size;
 	      new->val = m;
@@ -1207,9 +1205,6 @@ static char *one_opt(int option, char *arg, char *gen_prob, int command_line)
 	daemon->log_file = opt_string_alloc(arg);
       else
 	{	  
-#ifdef __ANDROID__
-	  problem = _("setting log facility is not possible under Android");
-#else
 	  for (i = 0; facilitynames[i].c_name; i++)
 	    if (hostname_isequal((char *)facilitynames[i].c_name, arg))
 	      break;
@@ -1217,8 +1212,7 @@ static char *one_opt(int option, char *arg, char *gen_prob, int command_line)
 	  if (facilitynames[i].c_name)
 	    daemon->log_fac = facilitynames[i].c_val;
 	  else
-	    problem = _("bad log facility");
-#endif
+	    problem = "bad log facility";
 	}
       break;
       
@@ -2090,7 +2084,7 @@ static char *one_opt(int option, char *arg, char *gen_prob, int command_line)
 		}
 	      
 	      for (cp = a[j]; *cp; cp++)
-		if (!isdigit((unsigned char)*cp) && *cp != ' ')
+		if (!isdigit((int)*cp) && *cp != ' ')
 		  break;
 	      
 	      if (*cp)
@@ -2408,14 +2402,14 @@ static char *one_opt(int option, char *arg, char *gen_prob, int command_line)
 	  option = '?';
 	else
 	  {
-	    unsigned char *p;
+	    char *p;
 	    int dig = 0;
 	    struct dhcp_vendor *new = opt_malloc(sizeof(struct dhcp_vendor));
 	    new->netid.net = opt_string_alloc(set_prefix(arg));
 	    /* check for hex string - must digits may include : must not have nothing else, 
 	       only allowed for agent-options. */
-	    for (p = (unsigned char *)comma; *p; p++)
-	      if (isxdigit(*p))
+	    for (p = comma; *p; p++)
+	      if (isxdigit((int)*p))
 		dig = 1;
 	      else if (*p != ':')
 		break;
@@ -3235,13 +3229,8 @@ void read_opts(int argc, char **argv, char *compile_opts)
       
       if (option == -1)
 	{
-	  for (; optind < argc; optind++)
-	    {
-	      unsigned char *c = (unsigned char *)argv[optind];
-	      for (; *c != 0; c++)
-		if (!isspace(*c))
-		  die(_("junk found in command line"), NULL, EC_BADCONF);
-	    }
+	  if (optind < argc)
+	    die(_("junk found in command line"), NULL, EC_BADCONF);
 	  break;
 	}
 

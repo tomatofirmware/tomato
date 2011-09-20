@@ -110,13 +110,11 @@ endif
 
 # Only include IPv6 options if IPv6 is configured in.
 ifneq ($(TCONFIG_IPV6),y)
-	cd $(INSTALLDIR)/www && \
-	for F in $(wildcard *.asp *.js *.jsx); do \
-		[ -f $(INSTALLDIR)/www/$$F ] && sed -i $$F \
-		-e "/IPV6-BEGIN/,/IPV6-END/d" \
-		|| true; \
-	done
 	rm -f $(INSTALLDIR)/www/basic-ipv6.asp
+	sed -i $(INSTALLDIR)/www/tomato.js -e "/IPV6-BEGIN/,/IPV6-END/d"
+	sed -i $(INSTALLDIR)/www/about.asp -e "/IPV6-BEGIN/,/IPV6-END/d"
+	sed -i $(INSTALLDIR)/www/admin-debug.asp -e "/IPV6-BEGIN/,/IPV6-END/d"
+	sed -i $(INSTALLDIR)/www/advanced-dhcpdns.asp -e "/IPV6-BEGIN/,/IPV6-END/d"
 endif
 
 # Only include the USB and NAS pages if USB Support is configured in.
@@ -181,8 +179,8 @@ endif
 		-e "/AES-BEGIN/d"	-e "/AES-END/d" \
 		-e "/IPV6-BEGIN/d"	-e "/IPV6-END/d" \
 		-e "/CTF-BEGIN/d"	-e "/CTF-END/d" \
-		-e "/NOCAT-BEGIN/d"	-e "/NOCAT_END/d"\
 		-e "/SNMP-BEGIN/d"	-e "/SNMP_END/d"\
+		-e "/NOCAT-BEGIN/d"	-e "/NOCAT_END/d"\
 		|| true; \
 	done
 

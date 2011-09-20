@@ -289,7 +289,6 @@ fetch_string_txt(char *fname, char *lang, int n, ...)
     if (!*strs[i])
       *strs[i] = defstr[i];
   }
-  fclose(fp);
 
  _exit:
   free(keys);

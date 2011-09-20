@@ -70,6 +70,8 @@ void wi_upgrade(char *url, int len, char *boundary)
 
 	rboot = 1;
 
+	led(LED_DIAG, 1);
+
 	signal(SIGTERM, SIG_IGN);
 	signal(SIGINT, SIG_IGN);
 	signal(SIGHUP, SIG_IGN);
@@ -77,8 +79,6 @@ void wi_upgrade(char *url, int len, char *boundary)
 
 	prepare_upgrade();
 	system("cp reboot.asp /tmp");	// copy to memory
-
-	led(LED_DIAG, 1);
 
 	char fifo[] = "/tmp/flashXXXXXX";
 	int pid = -1;
@@ -130,10 +130,13 @@ ERROR2:
 	}
 	set_action(ACT_REBOOT);
 
-	if (resmsg_fread("/tmp/.mtd-write"))
-		error = NULL;
+	resmsg_fread("/tmp/.mtd-write");
+
+	web_eat(len);
+	return;
+
 ERROR:
-	if (error) resmsg_set(error);
+	resmsg_set(error);
 	web_eat(len);
 }
 

@@ -20,7 +20,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <libgen.h>
 #include <time.h>
 
 #include "tivo_utils.h"
@@ -85,8 +84,7 @@ SendRootContainer(struct upnphttp * h)
 			   "</Content>"
 			  "</Links>"
 			 "</Item>"
-			"</TiVoContainer>",
-	                friendly_name, friendly_name, friendly_name, friendly_name);
+			"</TiVoContainer>", friendly_name, friendly_name, friendly_name, friendly_name);
 	BuildResp_upnphttp(h, resp, len);
 	free(resp);
 	SendResp_upnphttp(h);
@@ -112,43 +110,53 @@ int callback(void *args, int argc, char **argv, char **azColName)
 	char *id = argv[0], *class = argv[1], *detailID = argv[2], *size = argv[3], *title = argv[4], *duration = argv[5],
              *bitrate = argv[6], *sampleFrequency = argv[7], *artist = argv[8], *album = argv[9], *genre = argv[10],
              *comment = argv[11], *date = argv[12], *resolution = argv[13], *mime = argv[14], *path = argv[15];
-	struct string_s *str = passed_args->str;
+	char str_buf[4096];
+	int ret = 0, flags = 0, count;
 
 	if( strncmp(class, "item", 4) == 0 )
 	{
-		int flags = 0;
 		unescape_tag(title);
 		if( strncmp(mime, "audio", 5) == 0 )
 		{
 			flags |= FLAG_NO_PARAMS;
-			strcatf(str, "<Item><Details>"
-			             "<ContentType>audio/*</ContentType>"
-			             "<SourceFormat>%s</SourceFormat>"
-			             "<SourceSize>%s</SourceSize>"
-			             "<SongTitle>%s</SongTitle>", mime, size, title);
+			ret = sprintf(str_buf, "<Item><Details>"
+			                       "<ContentType>audio/*</ContentType>"
+			                       "<SourceFormat>%s</SourceFormat>"
+			                       "<SourceSize>%s</SourceSize>"
+			                       "<SongTitle>%s</SongTitle>", mime, size, title);
+			memcpy(passed_args->resp+passed_args->size, &str_buf, ret+1);
+			passed_args->size += ret;
 			if( date )
 			{
-				strcatf(str, "<AlbumYear>%.*s</AlbumYear>", 4, date);
+				ret = sprintf(str_buf, "<AlbumYear>%.*s</AlbumYear>", 4, date);
+				memcpy(passed_args->resp+passed_args->size, &str_buf, ret+1);
+				passed_args->size += ret;
 			}
 		}
 		else if( strcmp(mime, "image/jpeg") == 0 )
 		{
 			flags |= FLAG_SEND_RESIZED;
-			strcatf(str, "<Item><Details>"
-			             "<ContentType>image/*</ContentType>"
-			             "<SourceFormat>image/jpeg</SourceFormat>"
-			             "<SourceSize>%s</SourceSize>", size);
+			ret = sprintf(str_buf, "<Item><Details>"
+			                       "<ContentType>image/*</ContentType>"
+			                       "<SourceFormat>image/jpeg</SourceFormat>"
+			                       "<SourceSize>%s</SourceSize>", size);
+			memcpy(passed_args->resp+passed_args->size, &str_buf, ret+1);
+			passed_args->size += ret;
 			if( date )
 			{
 				struct tm tm;
 				memset(&tm, 0, sizeof(tm));
 				tm.tm_isdst = -1; // Have libc figure out if DST is in effect or not
 				strptime(date, "%Y-%m-%dT%H:%M:%S", &tm);
-				strcatf(str, "<CaptureDate>0x%X</CaptureDate>", (unsigned int)mktime(&tm));
+				ret = sprintf(str_buf, "<CaptureDate>0x%X</CaptureDate>", (unsigned int)mktime(&tm));
+				memcpy(passed_args->resp+passed_args->size, &str_buf, ret+1);
+				passed_args->size += ret;
 			}
 			if( comment )
 			{
-				strcatf(str, "<Caption>%s</Caption>", comment);
+				ret = sprintf(str_buf, "<Caption>%s</Caption>", comment);
+				memcpy(passed_args->resp+passed_args->size, &str_buf, ret+1);
+				passed_args->size += ret;
 			}
 		}
 		else if( strncmp(mime, "video", 5) == 0 )
@@ -156,90 +164,116 @@ int callback(void *args, int argc, char **argv, char **azColName)
 			char *episode;
 			flags |= FLAG_NO_PARAMS;
 			flags |= FLAG_VIDEO;
-			strcatf(str, "<Item><Details>"
-			             "<ContentType>video/x-tivo-mpeg</ContentType>"
-			             "<SourceFormat>%s</SourceFormat>"
-			             "<SourceSize>%s</SourceSize>", mime, size);
+			ret = sprintf(str_buf, "<Item><Details>"
+			                       "<ContentType>video/x-tivo-mpeg</ContentType>"
+			                       "<SourceFormat>%s</SourceFormat>"
+			                       "<SourceSize>%s</SourceSize>", mime, size);
+			memcpy(passed_args->resp+passed_args->size, &str_buf, ret+1);
+			passed_args->size += ret;
 			episode = strstr(title, " - ");
 			if( episode )
 			{
-				strcatf(str, "<Title>%.*s</Title>"
-				             "<EpisodeTitle>%s</EpisodeTitle>", 
-				             (int)(episode-title), title, episode+3);
+				ret = sprintf(str_buf, "<Title>%.*s</Title>"
+				                       "<EpisodeTitle>%s</EpisodeTitle>", 
+				                       episode-title, title, episode+3);
 			}
 			else
 			{
-				strcatf(str, "<Title>%s</Title>", title);
+				ret = sprintf(str_buf, "<Title>%s</Title>", title);
 			}
+			memcpy(passed_args->resp+passed_args->size, &str_buf, ret+1);
+			passed_args->size += ret;
 			if( date )
 			{
 				struct tm tm;
 				memset(&tm, 0, sizeof(tm));
 				tm.tm_isdst = -1; // Have libc figure out if DST is in effect or not
 				strptime(date, "%Y-%m-%dT%H:%M:%S", &tm);
-				strcatf(str, "<CaptureDate>0x%X</CaptureDate>", (unsigned int)mktime(&tm));
+				ret = sprintf(str_buf, "<CaptureDate>0x%X</CaptureDate>", (unsigned int)mktime(&tm));
+				memcpy(passed_args->resp+passed_args->size, &str_buf, ret+1);
+				passed_args->size += ret;
 			}
 			if( comment )
 			{
-				strcatf(str, "<Description>%s</Description>", comment);
+				ret = sprintf(str_buf, "<Description>%s</Description>", comment);
+				memcpy(passed_args->resp+passed_args->size, &str_buf, ret+1);
+				passed_args->size += ret;
 			}
 		}
 		else
 		{
 			return 0;
 		}
-		strcatf(str, "<Title>%s</Title>", unescape_tag(title));
+		ret = sprintf(str_buf, "<Title>%s</Title>", unescape_tag(title));
+		memcpy(passed_args->resp+passed_args->size, &str_buf, ret+1);
+		passed_args->size += ret;
 		if( artist ) {
-			strcatf(str, "<ArtistName>%s</ArtistName>", unescape_tag(artist));
+			ret = sprintf(str_buf, "<ArtistName>%s</ArtistName>", unescape_tag(artist));
+			memcpy(passed_args->resp+passed_args->size, &str_buf, ret+1);
+			passed_args->size += ret;
 		}
 		if( album ) {
-			strcatf(str, "<AlbumTitle>%s</AlbumTitle>", unescape_tag(album));
+			ret = sprintf(str_buf, "<AlbumTitle>%s</AlbumTitle>", unescape_tag(album));
+			memcpy(passed_args->resp+passed_args->size, &str_buf, ret+1);
+			passed_args->size += ret;
 		}
 		if( genre ) {
-			strcatf(str, "<MusicGenre>%s</MusicGenre>", unescape_tag(genre));
+			ret = sprintf(str_buf, "<MusicGenre>%s</MusicGenre>", unescape_tag(genre));
+			memcpy(passed_args->resp+passed_args->size, &str_buf, ret+1);
+			passed_args->size += ret;
 		}
 		if( resolution ) {
 			char *width = strsep(&resolution, "x");
-			strcatf(str, "<SourceWidth>%s</SourceWidth>"
-			                   "<SourceHeight>%s</SourceHeight>",
-			                   width, resolution);
+			ret = sprintf(str_buf, "<SourceWidth>%s</SourceWidth>"
+			                       "<SourceHeight>%s</SourceHeight>",
+			              width, resolution);
+			memcpy(passed_args->resp+passed_args->size, &str_buf, ret+1);
+			passed_args->size += ret;
 		}
 		if( duration ) {
-			strcatf(str, "<Duration>%d</Duration>",
-			      atoi(strrchr(duration, '.')+1) + (1000*atoi(strrchr(duration, ':')+1))
-			      + (60000*atoi(strrchr(duration, ':')-2)) + (3600000*atoi(duration)));
+			ret = sprintf(str_buf, "<Duration>%d</Duration>",
+			      atoi(rindex(duration, '.')+1) + (1000*atoi(rindex(duration, ':')+1)) + (60000*atoi(rindex(duration, ':')-2)) + (3600000*atoi(duration)));
+			memcpy(passed_args->resp+passed_args->size, &str_buf, ret+1);
+			passed_args->size += ret;
 		}
 		if( bitrate ) {
-			strcatf(str, "<SourceBitRate>%s</SourceBitRate>", bitrate);
+			ret = sprintf(str_buf, "<SourceBitRate>%s</SourceBitRate>", bitrate);
+			memcpy(passed_args->resp+passed_args->size, &str_buf, ret+1);
+			passed_args->size += ret;
 		}
 		if( sampleFrequency ) {
-			strcatf(str, "<SourceSampleRate>%s</SourceSampleRate>", sampleFrequency);
+			ret = sprintf(str_buf, "<SourceSampleRate>%s</SourceSampleRate>", sampleFrequency);
+			memcpy(passed_args->resp+passed_args->size, &str_buf, ret+1);
+			passed_args->size += ret;
 		}
-		strcatf(str, "</Details><Links><Content>"
-		             "<ContentType>%s</ContentType>"
-		             "<Url>/%s/%s.dat</Url>%s</Content>",
-		             mime,
-		             (flags & FLAG_SEND_RESIZED)?"Resized":"MediaItems", detailID,
-		             (flags & FLAG_NO_PARAMS)?"<AcceptsParams>No</AcceptsParams>":"");
+		ret = sprintf(str_buf, "</Details><Links><Content>"
+		                       "<ContentType>%s</ContentType>"
+		                       "<Url>/%s/%s.dat</Url>%s</Content>",
+		                       mime,
+		                       (flags & FLAG_SEND_RESIZED)?"Resized":"MediaItems", detailID,
+		                       (flags & FLAG_NO_PARAMS)?"<AcceptsParams>No</AcceptsParams>":"");
+		memcpy(passed_args->resp+passed_args->size, &str_buf, ret+1);
+		passed_args->size += ret;
 		if( flags & FLAG_VIDEO )
 		{
-			char *esc_name = escape_tag(basename(path), 1);
-			strcatf(str, "<CustomIcon>"
-			               "<ContentType>video/*</ContentType>"
-			               "<Url>urn:tivo:image:save-until-i-delete-recording</Url>"
-			             "</CustomIcon>"
-			             "<Push><Container>Videos</Container></Push>"
-			             "<File>%s</File> </Links>", esc_name);
-			free(esc_name);
+			char *name = basename(path);
+			char *esc_name = escape_tag(name);
+			ret = sprintf(str_buf, "<CustomIcon>"
+			                         "<ContentType>video/*</ContentType>"
+			                         "<Url>urn:tivo:image:save-until-i-delete-recording</Url>"
+			                       "</CustomIcon>"
+			                       "<Push><Container>Videos</Container></Push>"
+			                       "<File>%s</File> </Links>", esc_name?esc_name:name);
+			if( esc_name )
+				free(esc_name);
 		}
 		else
 		{
-			strcatf(str, "</Links>");
+			ret = sprintf(str_buf, "</Links>");
 		}
 	}
 	else if( strncmp(class, "container", 9) == 0 )
 	{
-		int count;
 		/* Determine the number of children */
 #ifdef __sparc__ /* Adding filters on large containers can take a long time on slow processors */
 		count = sql_get_int_field(db, "SELECT count(*) from OBJECTS where PARENT_ID = '%s'", id);
@@ -248,49 +282,48 @@ int callback(void *args, int argc, char **argv, char **azColName)
 		                              " (MIME in ('image/jpeg', 'audio/mpeg', 'video/mpeg', 'video/x-tivo-mpeg')"
 		                              " or CLASS glob 'container*')", id);
 #endif
-		strcatf(str, "<Item>"
-		             "<Details>"
-		               "<ContentType>x-container/folder</ContentType>"
-		               "<SourceFormat>x-container/folder</SourceFormat>"
-		               "<Title>%s</Title>"
-		               "<TotalItems>%d</TotalItems>"
-		             "</Details>"
-		             "<Links>"
-		               "<Content>"
-		                 "<Url>/TiVoConnect?Command=QueryContainer&amp;Container=%s</Url>"
-		                 "<ContentType>x-tivo-container/folder</ContentType>"
-		               "</Content>"
-		             "</Links>",
-		             unescape_tag(title), count, id);
+		ret = sprintf(str_buf, "<Item>"
+		                         "<Details>"
+		                           "<ContentType>x-container/folder</ContentType>"
+		                           "<SourceFormat>x-container/folder</SourceFormat>"
+		                           "<Title>%s</Title>"
+		                           "<TotalItems>%d</TotalItems>"
+		                         "</Details>"
+		                         "<Links>"
+		                           "<Content>"
+		                             "<Url>/TiVoConnect?Command=QueryContainer&amp;Container=%s</Url>"
+		                             "<ContentType>x-tivo-container/folder</ContentType>"
+		                           "</Content>"
+		                         "</Links>",
+		                         unescape_tag(title), count, id);
 	}
-	strcatf(str, "</Item>");
+	memcpy(passed_args->resp+passed_args->size, &str_buf, ret+1);
+	passed_args->size += ret;
+	ret = sprintf(str_buf, "</Item>");
+	memcpy(passed_args->resp+passed_args->size, &str_buf, ret+1);
+	passed_args->size += ret;
 
 	passed_args->returned++;
 
 	return 0;
 }
 
-#define SELECT_COLUMNS "SELECT o.OBJECT_ID, o.CLASS, o.DETAIL_ID, d.SIZE, d.TITLE," \
-	               " d.DURATION, d.BITRATE, d.SAMPLERATE, d.ARTIST, d.ALBUM, d.GENRE," \
-	               " d.COMMENT, d.DATE, d.RESOLUTION, d.MIME, d.PATH, d.DISC, d.TRACK "
-
 void
 SendItemDetails(struct upnphttp * h, sqlite_int64 item)
 {
+	char * resp = malloc(32768);
 	char *sql;
 	char *zErrMsg = NULL;
 	struct Response args;
-	struct string_s str;
 	int ret;
 	memset(&args, 0, sizeof(args));
-	memset(&str, 0, sizeof(str));
 
-	str.data = malloc(32768);
-	str.size = 32768;
-	str.off = sprintf(str.data, "<?xml version='1.0' encoding='UTF-8' ?>\n<TiVoItem>");
-	args.str = &str;
+	args.resp = resp;
+	args.size = sprintf(resp, "<?xml version='1.0' encoding='UTF-8' ?>\n<TiVoItem>");
 	args.requested = 1;
-	asprintf(&sql, SELECT_COLUMNS
+	asprintf(&sql, "SELECT o.OBJECT_ID, o.CLASS, o.DETAIL_ID, d.SIZE, d.TITLE,"
+	               " d.DURATION, d.BITRATE, d.SAMPLERATE, d.ARTIST, d.ALBUM,"
+	               " d.GENRE, d.COMMENT, d.DATE, d.RESOLUTION, d.MIME, d.PATH, d.TRACK "
 	               "from OBJECTS o left join DETAILS d on (d.ID = o.DETAIL_ID)"
 		       " where o.DETAIL_ID = %lld group by o.DETAIL_ID", item);
 	DPRINTF(E_DEBUG, L_TIVO, "%s\n", sql);
@@ -301,10 +334,10 @@ SendItemDetails(struct upnphttp * h, sqlite_int64 item)
 		DPRINTF(E_ERROR, L_HTTP, "SQL error: %s\n", zErrMsg);
 		sqlite3_free(zErrMsg);
 	}
-	strcatf(&str, "</TiVoItem>");
+	strcat(resp, "</TiVoItem>");
 
-	BuildResp_upnphttp(h, str.data, str.off);
-	free(str.data);
+	BuildResp_upnphttp(h, resp, strlen(resp));
+	free(resp);
 	SendResp_upnphttp(h);
 }
 
@@ -312,25 +345,24 @@ void
 SendContainer(struct upnphttp * h, const char * objectID, int itemStart, int itemCount, char * anchorItem,
               int anchorOffset, int recurse, char * sortOrder, char * filter, unsigned long int randomSeed)
 {
-	char *resp = malloc(262144);
+	char * resp = malloc(262144);
 	char *sql, *item, *saveptr;
 	char *zErrMsg = NULL;
 	char **result;
-	char *title, *which;
-	char what[10], order[96]={0}, order2[96]={0}, myfilter[256]={0};
+	char *title = NULL;
+	char what[10], order[64]={0}, order2[64]={0}, myfilter[256]={0};
 	char str_buf[1024];
+	char *which;
 	char type[8];
 	char groupBy[19] = {0};
 	struct Response args;
-	struct string_s str;
 	int totalMatches = 0;
 	int i, ret;
 	memset(&args, 0, sizeof(args));
-	memset(&str, 0, sizeof(str));
+	memset(resp, 0, sizeof(262144));
 
-	args.str = &str;
-	str.data = resp+1024;
-	str.size = 262144-1024;
+	args.resp = resp;
+	args.size = 1024;
 	if( itemCount >= 0 )
 	{
 		args.requested = itemCount;
@@ -378,14 +410,17 @@ SendContainer(struct upnphttp * h, const char * objectID, int itemStart, int ite
 	}
 	else
 	{
-		item = sql_get_text_field(db, "SELECT NAME from OBJECTS where OBJECT_ID = '%s'", objectID);
-		if( item )
+		sql = sqlite3_mprintf("SELECT NAME from OBJECTS where OBJECT_ID = '%s'", objectID);
+		if( (sql_get_table(db, sql, &result, &ret, NULL) == SQLITE_OK) && ret )
 		{
-			title = escape_tag(item, 1);
-			sqlite3_free(item);
+			title = escape_tag(result[1]);
+			if( !title )
+				title = strdup(result[1]);
 		}
 		else
 			title = strdup("UNKNOWN");
+		sqlite3_free(sql);
+		sqlite3_free_table(result);
 	}
 
 	if( recurse )
@@ -410,9 +445,9 @@ SendContainer(struct upnphttp * h, const char * objectID, int itemStart, int ite
 		}
 		else
 		{
-			short title_state = 0;
+			short track_done = 0;
 			item = strtok_r(sortOrder, ",", &saveptr);
-			while( item != NULL )
+			for( i=0; item != NULL; i++ )
 			{
 				int reverse=0;
 				if( *item == '!' )
@@ -428,26 +463,17 @@ SendContainer(struct upnphttp * h, const char * objectID, int itemStart, int ite
 				else if( strcasecmp(item, "Title") == 0 )
 				{
 					/* Explicitly sort music by track then title. */
-					if( title_state < 2 && *objectID == '1' )
+					if( !track_done && *objectID == '1' )
 					{
-						if( !title_state )
-						{
-							strcat(order, "DISC");
-							strcat(order2, "DISC");
-							title_state = 1;
-						}
-						else
-						{
-							strcat(order, "TRACK");
-							strcat(order2, "TRACK");
-							title_state = 2;
-						}
+						strcat(order, "TRACK");
+						strcat(order2, "TRACK");
+						track_done = 1;
 					}
 					else
 					{
 						strcat(order, "TITLE");
 						strcat(order2, "TITLE");
-						title_state = -1;
+						track_done = 0;
 					}
 				}
 				else if( strcasecmp(item, "CreationDate") == 0 ||
@@ -481,22 +507,14 @@ SendContainer(struct upnphttp * h, const char * objectID, int itemStart, int ite
 				strcat(order, ", ");
 				strcat(order2, ", ");
 				unhandled_order:
-				if( title_state <= 0 )
+				if( !track_done )
 					item = strtok_r(NULL, ",", &saveptr);
 			}
-			if( title_state != -1 )
-			{
-				strcat(order, "TITLE ASC, ");
-				if( itemCount >= 0 )
-					strcat(order2, "TITLE ASC, ");
-				else
-					strcat(order2, "TITLE DESC, ");
-			}
-			strcat(order, "DETAIL_ID ASC");
+			strcat(order, "TITLE ASC, DETAIL_ID ASC");
 			if( itemCount >= 0 )
-				strcat(order2, "DETAIL_ID ASC");
+				strcat(order2, "TITLE ASC, DETAIL_ID ASC");
 			else
-				strcat(order2, "DETAIL_ID DESC");
+				strcat(order2, "TITLE DESC, DETAIL_ID DESC");
 		}
 	}
 	else
@@ -557,9 +575,7 @@ SendContainer(struct upnphttp * h, const char * objectID, int itemStart, int ite
 		if( strstr(anchorItem, "QueryContainer") )
 		{
 			strcpy(what, "OBJECT_ID");
-			saveptr = strrchr(anchorItem, '=');
-			if( saveptr )
-				anchorItem = saveptr + 1;
+			anchorItem = rindex(anchorItem, '=')+1;
 		}
 		else
 		{
@@ -596,12 +612,14 @@ SendContainer(struct upnphttp * h, const char * objectID, int itemStart, int ite
 	                            " where %s and (%s)",
 	                            which, myfilter);
 	totalMatches = (ret > 0) ? ret : 0;
-	if( itemCount < 0 && !itemStart && !anchorOffset )
+	if( itemCount < 0 && !args.start )
 	{
 		args.start = totalMatches + itemCount;
 	}
 
-	sql = sqlite3_mprintf(SELECT_COLUMNS
+	sql = sqlite3_mprintf("SELECT o.OBJECT_ID, o.CLASS, o.DETAIL_ID, d.SIZE, d.TITLE,"
+	                      " d.DURATION, d.BITRATE, d.SAMPLERATE, d.ARTIST, d.ALBUM,"
+	                      " d.GENRE, d.COMMENT, d.DATE, d.RESOLUTION, d.MIME, d.PATH, d.TRACK "
 	                      "from OBJECTS o left join DETAILS d on (d.ID = o.DETAIL_ID)"
 		              " where %s and (%s)"
 	                      " %s"
@@ -614,13 +632,7 @@ SendContainer(struct upnphttp * h, const char * objectID, int itemStart, int ite
 	{
 		DPRINTF(E_ERROR, L_HTTP, "SQL error: %s\n", zErrMsg);
 		sqlite3_free(zErrMsg);
-		Send500(h);
-		free(title);
-		free(which);
-		free(resp);
-		return;
 	}
-	strcatf(&str, "</TiVoContainer>");
 
 	ret = sprintf(str_buf, "<?xml version='1.0' encoding='UTF-8' ?>\n"
 			       "<TiVoContainer>"
@@ -633,12 +645,15 @@ SendContainer(struct upnphttp * h, const char * objectID, int itemStart, int ite
 	                         "<ItemStart>%d</ItemStart>"
 	                         "<ItemCount>%d</ItemCount>",
 	                         type, totalMatches, title, args.start, args.returned);
-	str.data -= ret;
-	memcpy(str.data, &str_buf, ret);
-	str.size = str.off+ret;
+	args.resp = resp+1024-ret;
+	memcpy(args.resp, &str_buf, ret);
+	ret = sprintf(str_buf, "</TiVoContainer>");
+	memcpy(resp+args.size, &str_buf, ret+1);
+	args.size += ret;
+	args.size -= args.resp-resp;
 	free(title);
 	free(which);
-	BuildResp_upnphttp(h, str.data, str.size);
+	BuildResp_upnphttp(h, args.resp, args.size);
 	free(resp);
 	SendResp_upnphttp(h);
 }
@@ -661,7 +676,7 @@ ProcessTiVoCommand(struct upnphttp * h, const char * orig_path)
 	item = strtok_r( path, "&", &saveptr );
 	while( item != NULL )
 	{
-		if( *item == '\0' )
+		if( strlen(item) == 0 )
 		{
 			item = strtok_r( NULL, "&", &saveptr );
 			continue;

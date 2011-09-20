@@ -160,7 +160,6 @@ function watchdogReset() {
 }
 
 function init() {
-
 	populateCache();
 
 	speed_history = [];

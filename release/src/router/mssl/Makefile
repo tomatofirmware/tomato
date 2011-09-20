@@ -4,7 +4,7 @@ CFLAGS	= -Os -Wall $(EXTRACFLAGS) -fPIC
 LIBS =
 LDFLAGS	=
 
-ifeq ($(FULL_OPENSSL),y)
+ifeq ($(TCONFIG_OPENVPN),y)
 CFLAGS	+= -I$(TOP)/openssl/include -DUSE_OPENSSL
 LIBS += -L$(TOP)/openssl -lssl -lcrypto
 else

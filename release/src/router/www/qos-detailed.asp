@@ -40,12 +40,10 @@
 
 <script type='text/javascript'>
 
-
-//	<% nvram('qos_classnames,lan_ipaddr,lan1_ipaddr,lan2_ipaddr,lan3_ipaddr,lan_ifname,lan1_ifname,lan2_ifname,lan3_ifname,wan_proto,lan_netmask,lan1_netmask,lan2_netmask,lan3_netmask'); %>
-
+//	<% nvram('qos_classnames,lan_ipaddr,lan1_ipaddr,lan2_ipaddr,lan3_ipaddr,lan_netmask,lan1_netmask,lan2_netmask,lan3_netmask,t_hidelr'); %>
 
 var Unclassified = ['Unclassified'];
-var classNames = nvram.qos_classnames.split(' ');
+var classNames = nvram.qos_classnames.split(' ');		// Toastman - configurable class names
 var abc = Unclassified.concat(classNames);
 
 var colors = ['F08080','E6E6FA','0066CC','8FBC8F','FAFAD2','ADD8E6','9ACD32','E0FFFF','90EE90','FF9933','FFF0F5'];
@@ -403,13 +401,14 @@ function init() {
 		E('_f_excludemcast').checked = mcastCB = 1;
 	}
 
-	if (((c = cookie.get('qos_filters')) != null) && (c == '1')) {
-		E('sesdivfilters').style.display='';
+	if (((c = cookie.get('qos_details_filters_vis')) != null) && (c == '1')) {
+		toggleVisibility("filters");
 	}
+
+	if (viewClass != -1) E('stitle').innerHTML = 'Details: ' + abc[viewClass] + ' <span id=\'numtotalconn\'></span>';
 
 	E('_f_shortcuts').checked = (((c = cookie.get('qos_detailed_shortcuts')) != null) && (c == '1'));
 
-	if (viewClass != -1) E('stitle').innerHTML = 'View Details: ' + abc[viewClass] + ' <span id=\'numtotalconn\'></span>';
 	grid.setup();
 	ref.postData = 'exec=ctdump&arg0=' + viewClass;
 	ref.initPage(250);
@@ -435,13 +434,15 @@ function dofilter() {
 	ref.start();
 }
 
-function toggleFiltersVisibility(){
-	if(E('sesdivfilters').style.display=='') {
-		E('sesdivfilters').style.display='none';
-		cookie.set('qos_filters', 0);
+function toggleVisibility(whichone) {
+	if(E('sesdiv' + whichone).style.display=='') {
+		E('sesdiv' + whichone).style.display='none';
+		E('sesdiv' + whichone + 'showhide').innerHTML='(Click here to show)';
+		cookie.set('qos_details_' + whichone + '_vis', 0);
 	} else {
-		E('sesdivfilters').style.display='';
-		cookie.set('qos_filters', 1);
+		E('sesdiv' + whichone).style.display='';
+		E('sesdiv' + whichone + 'showhide').innerHTML='(Click here to hide)';
+		cookie.set('qos_details_' + whichone + '_vis', 1);
 	}
 }
 
@@ -481,11 +482,9 @@ function verifyFields(focused, quiet)
 <td id='content'>
 <div id='ident'><% ident(); %></div>
 
-
 <!-- / / / -->
 
-
-<div class='section-title' id='stitle' onclick='document.location="qos-graphs.asp"' style='cursor:pointer'>View Details: <span id='numtotalconn'></span></div>
+<div class='section-title' id='stitle' onclick='document.location="qos-graphs.asp"' style='cursor:pointer'>Details <span id='numtotalconn'></span></div>
 <div class='section'>
 <table id='grid' class='tomato-grid' style="float:left" cellspacing=1></table>
 
@@ -494,7 +493,7 @@ function verifyFields(focused, quiet)
 
 <!-- / / / -->
 
-<div class='section-title'>Filters: <small><i><a href='javascript:toggleFiltersVisibility();'>(Toggle Visibility)</a></i></small></div>
+<div class='section-title'>Filters <small><i><a href='javascript:toggleVisibility("filters");'><span id='sesdivfiltersshowhide'>(Click here to show)</span></a></i></small></div>
 <div class='section' id='sesdivfilters' style='display:none'>
 <script type='text/javascript'>
 var c;
@@ -514,7 +513,7 @@ createFieldTable('',c);
 
 </td></tr>
 <tr><td id='footer' colspan=2>
-	<script type='text/javascript'>genStdRefresh(1,5,'ref.toggle()');</script>
+	<script type='text/javascript'>genStdRefresh(1,1,'ref.toggle()');</script>
 </td></tr>
 </table>
 </form>

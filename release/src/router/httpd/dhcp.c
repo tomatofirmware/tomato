@@ -37,15 +37,10 @@ void asp_dhcpc_time(int argc, char **argv)
 void wo_dhcpc(char *url)
 {
 	char *p;
-	char *argv[] = { NULL, NULL };
-	int pid;
 
 	if ((p = webcgi_get("exec")) != NULL) {
-		if (strcmp(p, "release") == 0)
-			argv[0] = "dhcpc-release";
-		else if (strcmp(p, "renew") == 0)
-			argv[0] = "dhcpc-renew";
-		_eval(argv, NULL, 0, &pid);
+		if (strcmp(p, "release") == 0) eval("dhcpc-release");
+			else if (strcmp(p, "renew") == 0) eval("dhcpc-renew");
 	}
 	common_redirect();
 }

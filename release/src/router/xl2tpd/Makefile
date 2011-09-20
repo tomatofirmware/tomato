@@ -113,7 +113,7 @@ $(EXEC): $(OBJS) $(HDRS)
 
 pfc:
 	$(CC) $(CFLAGS) -c contrib/pfc.c
-	$(CC) $(LDFLAGS) -o pfc pfc.o -lpcap $(LDLIBS)
+	$(CC) $(LDFLAGS) -lpcap $(LDLIBS) -o pfc pfc.o
 
 romfs:
 	$(ROMFSINST) /bin/$(EXEC)

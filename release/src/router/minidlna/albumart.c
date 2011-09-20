@@ -44,10 +44,10 @@ art_cache_exists(const char * orig_path, char ** cache_file)
 }
 
 char *
-save_resized_album_art(image_s * imsrc, const char * path)
+save_resized_album_art(image * imsrc, const char * path)
 {
 	int dstw, dsth;
-	image_s * imdst;
+	image * imdst;
 	char * cache_file;
 	char * cache_dir;
 
@@ -174,7 +174,8 @@ check_embedded_art(const char * path, const char * image_data, int image_size)
 	char * art_path = NULL;
 	char * cache_dir;
 	FILE * dstfile;
-	image_s * imsrc;
+	image * imsrc;
+	size_t nwritten;
 	static char last_path[PATH_MAX];
 	static unsigned int last_hash = 0;
 	static int last_success = 0;
@@ -192,7 +193,7 @@ check_embedded_art(const char * path, const char * image_data, int image_size)
 		if( !last_success )
 			return NULL;
 		art_cache_exists(path, &art_path);
-		if( link(last_path, art_path) == 0 )
+		if( link(last_path, art_path) == 0 || (errno == EEXIST) )
 		{
 			return(art_path);
 		}
@@ -228,7 +229,6 @@ check_embedded_art(const char * path, const char * image_data, int image_size)
 	}
 	else if( width > 0 && height > 0 )
 	{
-		size_t nwritten;
 		if( art_cache_exists(path, &art_path) )
 			goto end_art;
 		cache_dir = strdup(art_path);
@@ -272,7 +272,7 @@ check_for_album_file(char * dir, const char * path)
 {
 	char * file = malloc(PATH_MAX);
 	struct album_art_name_s * album_art_name;
-	image_s * imsrc = NULL;
+	image * imsrc = NULL;
 	int width=0, height=0;
 	char * art_file;
 

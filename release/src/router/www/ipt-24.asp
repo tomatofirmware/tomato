@@ -357,6 +357,7 @@ function verifyFields(focused, quiet) {
 		<td>&nbsp;</td>
 	</tr>
 	</table>
+
 <!-- / / / -->
 
 <br>

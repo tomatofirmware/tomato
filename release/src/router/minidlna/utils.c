@@ -31,20 +31,6 @@
 #include "upnpglobalvars.h"
 #include "log.h"
 
-inline int
-strcatf(struct string_s *str, const char *fmt, ...)
-{
-	int ret;
-	va_list ap;
-
-	va_start(ap, fmt);
-	ret = vsnprintf(str->data + str->off, str->size - str->off, fmt, ap);
-	str->off += ret;
-	va_end(ap);
-
-	return ret;
-}
-
 int
 ends_with(const char * haystack, const char * needle)
 {
@@ -114,12 +100,7 @@ modifyString(char * string, const char * before, const char * after, short like)
 			chgcnt++;
 			s = p+oldlen;
 		}
-		s = realloc(string, strlen(string)+((newlen-oldlen)*chgcnt)+1+like);
-		/* If we failed to realloc, return the original alloc'd string */
-		if( s )
-			string = s;
-		else
-			return string;
+		string = realloc(string, strlen(string)+((newlen-oldlen)*chgcnt)+1+like);
 	}
 
 	s = string;
@@ -155,7 +136,7 @@ modifyString(char * string, const char * before, const char * after, short like)
 }
 
 char *
-escape_tag(const char *tag, int force_alloc)
+escape_tag(const char *tag)
 {
 	char *esc_tag = NULL;
 
@@ -166,8 +147,6 @@ escape_tag(const char *tag, int force_alloc)
 		esc_tag = modifyString(esc_tag, "<", "&amp;lt;", 0);
 		esc_tag = modifyString(esc_tag, ">", "&amp;gt;", 0);
 	}
-	else if( force_alloc )
-		esc_tag = strdup(tag);
 
 	return esc_tag;
 }
@@ -191,7 +170,7 @@ make_dir(char * path, mode_t mode)
 	struct stat st;
 
 	do {
-		c = '\0';
+		c = 0;
 
 		/* Bypass leading non-'/'s and then subsequent '/'s. */
 		while (*s) {
@@ -200,7 +179,7 @@ make_dir(char * path, mode_t mode)
 					++s;
 				} while (*s == '/');
 				c = *s;     /* Save the current char */
-				*s = '\0';     /* and replace it with nul. */
+				*s = 0;     /* and replace it with nul. */
 				break;
 			}
 			++s;
@@ -209,11 +188,9 @@ make_dir(char * path, mode_t mode)
 		if (mkdir(path, mode) < 0) {
 			/* If we failed for any other reason than the directory
 			 * already exists, output a diagnostic and return -1.*/
-			if (errno != EEXIST || (stat(path, &st) < 0 || !S_ISDIR(st.st_mode))) {
-				DPRINTF(E_WARN, L_GENERAL, "make_dir: cannot create directory '%s'\n", path);
-				if (c)
-					*s = c;
-				return -1;
+			if (errno != EEXIST
+			    || (stat(path, &st) < 0 || !S_ISDIR(st.st_mode))) {
+				break;
 			}
 		}
 	        if (!c)
@@ -223,6 +200,9 @@ make_dir(char * path, mode_t mode)
 		*s = c;
 
 	} while (1);
+
+	DPRINTF(E_WARN, L_GENERAL, "make_dir: cannot create directory '%s'\n", path);
+	return -1;
 }
 
 int

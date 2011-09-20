@@ -222,9 +222,8 @@ what:
 # USB ("USB"|"")
 # JFFSv1 | NO_JFFS
 # NO_CIFS, NO_SSH, NO_ZEBRA, NO_SAMBA, NO_HTTPS, NO_XXTP, NO_LIBOPT
-# SAMBA3, OPENVPN, IPV6SUPP, EBTABLES, NTFS, MEDIASRV, BBEXTRAS, USBEXTRAS, BCM57, SLIM, NOCAT
+# SAMBA3, OPENVPN, IPV6SUPP, EBTABLES, NTFS, MEDIASRV, BBEXTRAS, USBEXTRAS, BCM57, SLIM, NOCATD
 # SNMP
-
 
 define RouterOptions
 	@( \
@@ -642,7 +641,7 @@ endif
 ## Make the "normal (with NTFS support) + VPN + NOCAT" build
 nc:
 ifeq ($(CONFIG_LINUX26),y)
-	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=NC BUILD_DESC="$(VPN)" USB="USB" SNMP=y NOCAT=y BUILD_DESC+="-$(NC)"
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=NC BUILD_DESC="$(VPN)" USB="USB" NOCAT=y BUILD_DESC+="-$(NC)"
 else
 	@$(MAKE) bin OPENVPN=y NTFS=y B=NC BUILD_DESC="$(VPN)" USB="USB" NOCAT=y BUILD_DESC+=" $(NC)"
 endif
@@ -668,9 +667,9 @@ endif
 ## Make the "VPN with no USB support"
 v:
 ifeq ($(CONFIG_LINUX26),y)
-	@$(MAKE) bin OPENVPN=y NO_JFFS=y B=V BUILD_DESC="$(VPN)" USB=""
+	@$(MAKE) bin OPENVPN=y NO_JFFS=y B=V BUILD_DESC="$(VPN)" USB="" SNMP=y
 else
-	@$(MAKE) bin OPENVPN=y BBEXTRAS=y BCM57=y B=V BUILD_DESC="$(VPN)" USB=""
+	@$(MAKE) bin OPENVPN=y BBEXTRAS=y BCM57=y B=V BUILD_DESC="$(VPN)" USB=""  SNMP=y
 endif
 
 ## Make the "Small VPN with no USB support" build
@@ -696,6 +695,9 @@ r2c:
 
 r2d:
 	@$(MAKE) d MIPS32=r2
+
+r2nc:
+	@$(MAKE) nc MIPS32=r2
 
 r2e:
 	@$(MAKE) e MIPS32=r2
@@ -747,9 +749,6 @@ n60m:
 
 n60n:
 	@$(MAKE) r2n NVRAM_SIZE=60 LINKSYS_E=1
-
-n60nc:
-	@$(MAKE) r2nc NVRAM_SIZE=60 LINKSYS_E=1
 
 n60o:
 	@$(MAKE) r2o NVRAM_SIZE=60 LINKSYS_E=1
@@ -849,8 +848,8 @@ ifeq ($(CONFIG_LINUX26),y)
 	@echo "r2nc         MIPS Release 2 NC build (standard plus VPN, extras and NOCAT)"
 	@echo "r2s          MIPS Release 2 S build (no USB support)"
 	@echo "r2v          MIPS Release 2 V build (VPN with no USB support)"
-	@echo "n60m         Linksys E-series build (60KB NVRAM, standard plus extras)"
 	@echo "n60e         Linksys E-series build (60KB NVRAM, standard plus VPN and extras)"
+	@echo "n60m         Linksys E-series build (60KB NVRAM, standard plus extras)"
 	@echo "n60nc        Linksys E-series build (60KB NVRAM, standard plus extras, plus VPN, plus NOCAT)"
 	@echo "n60s         Linksys E-series build (60KB NVRAM, no USB support)"
 	@echo "n60v         Linksys E-series build (60KB NVRAM, VPN with no USB support)"
@@ -866,3 +865,5 @@ endif
 	
 .PHONY: all clean distclean cleanimage cleantools cleankernel prepk what setprofile help
 .PHONY: a b c d m nc Makefile allversions tomato_profile.mak
+
+

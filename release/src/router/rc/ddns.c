@@ -14,7 +14,7 @@
 
 
 //	#define DLOG(args...) syslog(LOG_DEBUG, args)
-#define DLOG(fmt, args...) _dprintf(fmt"\n", args)
+#define DLOG(args...) do { } while(0)
 
 static void update(int num, int *dirty, int force)
 {
@@ -39,13 +39,13 @@ static void update(int num, int *dirty, int force)
 
 	DLOG("%s", __FUNCTION__);
 
-	sprintf(s, "ddns%d", num);
-	eval("cru", "d", s);
-	DLOG("%s: cru d %s", __FUNCTION__, s);
+	sprintf(s, "cru d ddns%d", num);
+	system(s);
+	DLOG("%s: %s", __FUNCTION__, s);
 
-	sprintf(s, "ddnsf%d", num);
-	eval("cru", "d", s);
-	DLOG("%s: cru d %s", __FUNCTION__, s);
+	sprintf(s, "cru d ddnsf%d", num);
+	system(s);
+	DLOG("%s: %s", __FUNCTION__, s);
 
 	sprintf(ddnsx, "ddnsx%d", num);
 	sprintf(ddnsx_path, "/var/lib/mdu/%s", ddnsx);
@@ -55,7 +55,7 @@ static void update(int num, int *dirty, int force)
 	sprintf(msg_fn, "%s.msg", ddnsx_path);
 
 	if ((vstrsep(config, "<", &serv, &user, &host, &wild, &mx, &bmx, &cust) != 7) || (*serv == 0)) {
-		DLOG("%s: msg=''\n", __FUNCTION__);
+		_dprintf("%s: msg=''\n", __FUNCTION__);
 		f_write(msg_fn, NULL, 0, 0, 0);
 		return;
 	}
@@ -200,11 +200,10 @@ static void update(int num, int *dirty, int force)
 		if (t < now) t = now;
 
 		tm = localtime(&t);
-		sprintf(s, "ddnsf%d", num);
-		sprintf(v, "%d %d %d %d * ddns-update %d force",
+		sprintf(s, "cru a ddnsf%d \"%d %d %d %d * ddns-update %d force\"", num,
 			tm->tm_min, tm->tm_hour, tm->tm_mday, tm->tm_mon + 1, num);
-		DLOG("%s: cru a %s %s", __FUNCTION__, s, v);
-		eval("cru", "a", s, v);
+		DLOG("%s: %s", __FUNCTION__, s);
+		system(s);
 	}
 
 	if (ip[0] == '@') {
@@ -231,10 +230,9 @@ SCHED:
 		tm = localtime(&t);
 		DLOG("%s: sch: %d:%d\n", __FUNCTION__, tm->tm_hour, tm->tm_min);
 
-		sprintf(s, "ddns%d", num);
-		sprintf(v, "%d * * * * ddns-update %d", tm->tm_min, num);
-		DLOG("%s: cru a %s %s", __FUNCTION__, s, v);
-		eval("cru", "a", s, v);
+		sprintf(s, "cru a ddns%d \"%d * * * * ddns-update %d\"", num, tm->tm_min, num);
+		DLOG("%s: %s", __FUNCTION__, s);
+		system(s);
 
 		//	sprintf(s, "cru a ddns%d \"*/10 * * * * ddns-update %d\"", num);
 		//	system(s);
@@ -287,10 +285,10 @@ void stop_ddns(void)
 {
 	DLOG("%s", __FUNCTION__);
 
-	eval("cru", "d", "ddns0");
-	eval("cru", "d", "ddns1");
-	eval("cru", "d", "ddnsf0");
-	eval("cru", "d", "ddnsf1");
+	system("cru d ddns0");
+	system("cru d ddns1");
+	system("cru d ddnsf0");
+	system("cru d ddnsf1");
 	killall("ddns-update", SIGKILL);
 	killall("mdu", SIGKILL);
 }

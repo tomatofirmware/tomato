@@ -75,7 +75,6 @@ struct song_metadata {
 	char compilation;                       // YTCP
 
 	int bitrate;
-	int max_bitrate;
 	int samplerate;
 	int samplesize;
 	int channels;
@@ -106,9 +105,9 @@ struct song_metadata {
 	int plist_id;
 };
 
-#define WMA     0x161
-#define WMAPRO  0x162
-#define WMALSL  0x163
+#define WMAV1     0x161
+#define WMAV2     0x162
+#define WMAPRO    0x163
 
 extern int scan_init(char *path);
 extern void make_composite_tags(struct song_metadata *psong);

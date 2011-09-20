@@ -19,14 +19,9 @@ int printenv_main(int argc UNUSED_PARAM, char **argv)
 
 	/* no variables specified, show whole env */
 	if (!argv[1]) {
-		char **e = environ;
-
-		/* environ can be NULL! (for example, after clearenv())
-		 * Check for that:
-		 */
-		if (e)
-			while (*e)
-				puts(*e++);
+		int e = 0;
+		while (environ[e])
+			puts(environ[e++]);
 	} else {
 		/* search for specified variables and print them out if found */
 		char *arg, *env;

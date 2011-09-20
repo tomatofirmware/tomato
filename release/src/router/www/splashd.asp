@@ -14,7 +14,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Captive Portal</title>
+<title>[<% ident(); %>] New: Captive Portal</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <link rel='stylesheet' type='text/css' href='<% nv('web_css'); %>.css'>
 <script type='text/javascript' src='tomato.js'></script>
@@ -25,10 +25,7 @@ textarea {
 }
 </style>
 <script type='text/javascript'>
-
 //	<% nvram("NC_enable,NC_Verbosity,NC_GatewayName,NC_GatewayPort,NC_ForcedRedirect,NC_HomePage,NC_DocumentRoot,NC_LoginTimeout,NC_IdleTimeout,NC_MaxMissedARP,NC_ExcludePorts,NC_IncludePorts,NC_AllowedWebHosts,NC_MACWhiteList"); %>
-
-
 function fix(name)
 {
  var i;
@@ -48,7 +45,7 @@ function uploadButton()
  alert('Wrong filename, the correct extension is ".html".');
  return;
  }
- if (!confirm('Upload file ' + name + ' to replace the default splash page?')) return;
+ if (!confirm('Are you sure the file' + name + 'must be uploaded to the device?')) return;
  E('upload-button').disabled = 1;
  fields.disableAll(E('config-section'), 1);
  fields.disableAll(E('footer'), 1);
@@ -57,22 +54,6 @@ function uploadButton()
 
 function verifyFields(focused, quiet)
 {
-	var a = E('_f_NC_enable').checked;
-
-	E('_NC_Verbosity').disabled = !a;
-	E('_NC_GatewayName').disabled = !a;
-	E('_NC_GatewayPort').disabled = !a;
-	E('_f_NC_ForcedRedirect').disabled = !a;
-	E('_NC_HomePage').disabled = !a;
-	E('_NC_DocumentRoot').disabled = !a;
-	E('_NC_LoginTimeout').disabled = !a;
-	E('_NC_IdleTimeout').disabled = !a;
-	E('_NC_MaxMissedARP').disabled = !a;
-	E('_NC_ExcludePorts').disabled = !a;
-	E('_NC_IncludePorts').disabled = !a;
-	E('_NC_AllowedWebHosts').disabled = !a;
-	E('_NC_MACWhiteList').disabled = !a;
-
 	if ( (E('_f_NC_ForcedRedirect').checked) && (!v_length('_NC_HomePage', quiet, 1, 255))) return 0;
 	if (!v_length('_NC_GatewayName', quiet, 1, 255)) return 0;	
 	if ( (E('_NC_IdleTimeout').value != '0') && (!v_range('_NC_IdleTimeout', quiet, 300))) return 0;
@@ -118,7 +99,7 @@ function init()
 <body onLoad="init()">
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
-	<div class='title'>Tomato</div>
+	<div class='title'>Tomato RAF</div>
 	<div class='version'>Version <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
@@ -127,27 +108,27 @@ function init()
 <div class='section-title'>Captive Portal Management</div>
 <div class='section' id='config-section'>
 <form id='_fom' method='post' action='tomato.cgi'>
-<input type='hidden' name='_nextpage' value='new-splashd.asp'>
+<input type='hidden' name='_nextpage' value='splashd.asp'>
 <input type='hidden' name='_service' value='splashd-restart'>
 <input type='hidden' name='NC_enable'>
 <input type='hidden' name='NC_ForcedRedirect'>
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: 'Enable',  name: 'f_NC_enable', type: 'checkbox', value: nvram.NC_enable == '1' },
-	{ title: 'Log Info Level',  name: 'NC_Verbosity', type: 'text', maxlen: 10, size: 2, value: nvram.NC_Verbosity },
-	{ title: 'Gateway Name', name: 'NC_GatewayName', type: 'text', maxlen: 255, size: 34, value: nvram.NC_GatewayName },
-	{ title: 'Gateway Port', indent: 2, name: 'NC_GatewayPort', type: 'text', maxlen: 6, size: 10, value: fixPort(nvram.NC_GatewayPort, 5280) },
+	{ title: 'Enable Function', name: 'f_NC_enable', type: 'checkbox', value: nvram.NC_enable == '1' },
+	{ title: 'Gateway Name', name: 'NC_GatewayName', type: 'text', maxlen: 255, size: 34, value: nvram.NC_GatewayName },	
 	{ title: 'Captive Site Forwarding', name: 'f_NC_ForcedRedirect', type: 'checkbox', value: (nvram.NC_ForcedRedirect == '1') },	
-		{ title: 'Home Page', indent: 2, name: 'NC_HomePage', type: 'text', maxlen: 255, size: 34, value: nvram.NC_HomePage },
-	{ title: 'Welcome HTML Path', name: 'NC_DocumentRoot', type: 'text', maxlen: 255, size: 34, value: nvram.NC_DocumentRoot, suffix: '<span>&nbsp;/splash.html</span>' },
-	{ title: 'Login Timeout', name: 'NC_LoginTimeout', type: 'text', maxlen: 8, size: 10, value: nvram.NC_LoginTimeout },	
-	{ title: 'Max Missed ARP', name: 'NC_MaxMissedARP', type: 'text', maxlen: 10, size: 10, value: nvram.NC_MaxMissedARP },
-	{ title: 'Idle Timeout', name: 'NC_IdleTimeout', type: 'text', maxlen: 8, size: 10, value: nvram.NC_IdleTimeout },
+	{ title: 'Home Page', name: 'NC_HomePage', type: 'text', maxlen: 255, size: 34, value: nvram.NC_HomePage },
+	{ title: 'Welcome html Path', name: 'NC_DocumentRoot', type: 'text', maxlen: 255, size: 20, value: nvram.NC_DocumentRoot, suffix: '<span>&nbsp;/splash.html</span>' },
+	{ title: 'Logged Timeout', name: 'NC_LoginTimeout', type: 'text', maxlen: 8, size: 4, value: nvram.NC_LoginTimeout },	
+	{ title: 'Idle Timeout', name: 'NC_IdleTimeout', type: 'text', maxlen: 8, size: 4, value: nvram.NC_IdleTimeout },
+	{ title: 'Max Missed ARP', name: 'NC_MaxMissedARP', type: 'text', maxlen: 10, size: 2, value: nvram.NC_MaxMissedARP },
 	null,
-	{ title: 'Excluded Ports', name: 'NC_ExcludePorts', type: 'text', maxlen: 255, size: 34, value: nvram.NC_ExcludePorts },
-	{ title: 'Included Ports', name: 'NC_IncludePorts', type: 'text', maxlen: 255, size: 34, value: nvram.NC_IncludePorts },	
-	{ title: 'Excluded URLs', name: 'NC_AllowedWebHosts', type: 'text', maxlen: 255, size: 34, value: nvram.NC_AllowedWebHosts },	
-	{ title: 'MAC Address Whitelist', name: 'NC_MACWhiteList', type: 'text', maxlen: 255, size: 34, value: nvram.NC_MACWhiteList }		
+	{ title: 'Log Info Level', name: 'NC_Verbosity', type: 'text', maxlen: 10, size: 2, value: nvram.NC_Verbosity },
+	{ title: 'Gateway Port', name: 'NC_GatewayPort', type: 'text', maxlen: 10, size: 7, value: fixPort(nvram.NC_GatewayPort, 5280) },
+	{ title: 'Excluded Ports to be redirected', name: 'NC_ExcludePorts', type: 'text', maxlen: 255, size: 34, value: nvram.NC_ExcludePorts },
+	{ title: 'Included Ports to be redirected', name: 'NC_IncludePorts', type: 'text', maxlen: 255, size: 34, value: nvram.NC_IncludePorts },	
+	{ title: 'URL Excluded off Captive Portal', name: 'NC_AllowedWebHosts', type: 'text', maxlen: 255, size: 34, value: nvram.NC_AllowedWebHosts },	
+	{ title: 'MAC Address Whitelist', name: 'NC_MACWhiteList', type: 'text', maxlen: 255, size: 34, value: nvram.NC_MACWhiteList }
 ]);
 </script>
 </form>
@@ -161,37 +142,29 @@ createFieldTable('', [
  <br>
  </form>
 </div>
-<br>
-<br>
-<br>
+<hr>
 <span style='color:blue'>
-<b>User Guide</b><br>
-</span>
+<b>Captive Portal. User Guide.</b><br>
 <br>
-<ul>
-<li><b>Enable</b> - The router will show a Welcome banner when a client attempts to access the Internet.<br>
-<li><b>Log Info Level</b> - Verbosity level for log messages from this module, Level 0=Silent, 10=Verbose, (Default=0).<br>
-<li><b>Gateway name</b> - The name of the gateway appearing in the Welcome banner.<br>
-<li><b>Gateway port</b> - The port number of the gateway. Default=5280.<br>
-<li><b>Captive Site Forwarding</b> - When active, a 'Home Page' will appear after you click "Agree" in the Welcome banner.<br>
-<li><b>Home Page</b> - The URL for the 'Home Page' mentioned above is located.<br>
-<li><b>Welcome HTML Path</b> - The location where the Welcome banner is stored.<br>
-<li><b>Login Timeout</b> - The client can use the internet until this time expires. Default=3600sec.<br>
-<li><b>Max Missed ARP</b> - No. of times a client can be missing from ARP cache before the connection is closed. Default=5.<br>
-<li><b>Idle Timeout</b> - How often the ARP cache will be checked (seconds). Default=0.<br>
-<li><b>Included ports</b> - TCP ports to allow access to after login, all others will be denied.<br>
-<li><b>Excluded ports</b> - TCP ports to denied access to after login, all others will be allowed.<br>
-Leave a blank space between each port number. Use only one of these two options to avoid conflicts.<br>
-<li><b>Excluded URLs</b> - Sites that can be accessed without the Welcome banner appearing.<br>
-Leave a blank space between each URL.<br>
-<li><b>MAC address Whitelist</b> - addresses excluded from the portal. Leave a blank space between each MAC address.<br>
-<li><b>Customized Splash File Path</b> - You may upload a custom Welcome banner that will overwrite the default one.<br><br>
+<b>*- Enable function:</b> When you tick and save the router will show a Welcome Banner when a computer access the Internet.<br>
+<b>*- Gateway name:</b> The name of the Gateway appearing in the welcome banner<br>
+<b>*- Captive Site Forwarding:</b> When active, the 'Home Page' (read next line) will appear after you Agree in Welcome Banner.<br>
+<b>*- Home page:</b> The URL that will appear after you Agree the Welcome Banner.<br>
+<b>*- Welcome html Path:</b> The location where the Welcome banner is located<br>
+<b>*- Logged Timeout:</b> During this period of time no Welcome banner will appear when you access to the device. Default=3600 sec.(1 Hour).<br>
+<b>*- Idle Timeout:</b> Expired time where you can't access the device again.Default value=0.<br>
+<b>*- Max Missed ARP:</b> Number of lost ARP before considering the client has leaved the connection. Default = 5<br>
+<b>*- Log Info Level:</b> Messages from this module stored internally for better trace. Level 0=Silent, 10=Parrot, 2=Default.<br>
+<b>*- Gateway Port:</b> Port to be used by the Captive Portal for page redirection. Port 1 to 65534. Default=5280.<br>
+<b>*- Excluded/Included ports to be redirected:</b> When setting any port (included or excluded) leave a blank space between each port number, i.e; 25 110 4662 4672. Use prefereable one of the two option to avoid conflicts.<br>
+<b>*- URL excluded off the portal:</b> URL that will be accessed without Welcome banner screen appearing. When you set allowed url's also leave a blank space between each url. i.e; http://www.google.com http://www.google.es<br>
+<b>*- MAC address whitelist:</b> MAC addresses excluded of the feature. Leave a blank space between each MAC Address, i.e; 11:22:33:44:55:66 11:22:33:44:55:67<br>
+<b>*- Customized Splash File Path:</b> Here you can upload your personal Welcome banner that will overwrite the default one.<br><br>
+</span>
 <br>
 <span style='color:red'>
-<b> Note:</b> When the client's lease has expired, he must enter the Splash page again to get a new lease. No warning is given, therefore you may wish to give a long lease time to avoid problems.
-<br>
+<b> Note: If Login Time is expired you should re-enter again into the splash page to get a new lease period. Be aware, there is no notice about expired period so, you can loss Internet Access.</b><br>
 </span>
-</ul>
 <br>
 </td></tr>
 <tr><td id='footer' colspan=2>

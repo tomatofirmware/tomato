@@ -123,7 +123,7 @@ createFieldTable('', [
 ]);
 </script>
 <div style='float:left'><input type='button' value='Execute' onclick='execute()' id='execb'></div>
-<script type='text/javascript'>genStdRefresh(1,1,'ref.toggle()');</script>
+<script type='text/javascript'>genStdRefresh(1,5,'ref.toggle()');</script>
 </div>
 
 <div>
@@ -131,7 +131,6 @@ createFieldTable('', [
 		<li><b>TIP</b> - Use the command "nvram export --set" or "nvram export --set | grep qos" to cut and paste configuration
 	</ul>
 </div>
-
 
 <div style="visibility:hidden;text-align:right" id="wait">Please wait... <img src='spin.gif' style="vertical-align:top"></div>
 <pre id='result'></pre>

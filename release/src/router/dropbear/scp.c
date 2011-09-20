@@ -343,7 +343,7 @@ main(int argc, char **argv)
 			addargs(&args, "-p%s", optarg);
 			break;
 		case 'B':
-			fprintf(stderr, "Note: -B option is disabled in this version of scp");
+			addargs(&args, "-oBatchmode yes");
 			break;
 		case 'l':
 			speed = strtod(optarg, &endp);
@@ -492,9 +492,7 @@ toremote(char *targ, int argc, char **argv)
 			addargs(&alist, "%s", ssh_program);
 			if (verbose_mode)
 				addargs(&alist, "-v");
-#if 0
-			// Disabled since dbclient won't understand them
-			// and scp works fine without them.
+#ifndef DROPBEAR_CLIENT
 			addargs(&alist, "-x");
 			addargs(&alist, "-oClearAllForwardings yes");
 			addargs(&alist, "-n");

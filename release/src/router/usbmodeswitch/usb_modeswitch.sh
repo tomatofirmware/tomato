@@ -1,8 +1,8 @@
 #!/bin/sh
-# part of usb_modeswitch 1.1.7
+# part of usb_modeswitch 1.1.6
 device_in()
 {
-	if [ ! -e /var/lib/usb_modeswitch/$1 ]; then
+	if [ ! -e /etc/usb_modeswitch.d/$1 ]; then
 		return 0
 	fi
 	while read line
@@ -10,7 +10,7 @@ device_in()
 		if [ $(expr "$line" : "$2:$3") != 0 ]; then
 			return 1
 		fi
-	done </var/lib/usb_modeswitch/$1
+	done </etc/usb_modeswitch.d/$1
 	if [ $(expr "$line" : "$2:$3") != 0 ]; then
 		return 1
 	fi

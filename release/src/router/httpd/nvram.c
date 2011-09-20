@@ -18,7 +18,7 @@ static int print_wlnv(int idx, int unit, int subunit, void *param)
 	char *nv;
 
 	nv = wl_nvname(k + 3, unit, subunit);
-	web_printf("\t%s: '", nv);
+	web_printf("\t'%s': '", nv); // AB multiSSID
 	web_putj(nvram_safe_get(nv));
 	web_puts("',\n");
 
@@ -39,7 +39,7 @@ void asp_nvram(int argc, char **argv)
 		if (strcmp(k, "wl_unit") == 0)
 			continue;
 
-		web_printf("\t%s: '", k);
+		web_printf("\t'%s': '", k); // AB multiSSID
 		web_putj(nvram_safe_get(k));
 		web_puts("',\n");
 
@@ -49,19 +49,19 @@ void asp_nvram(int argc, char **argv)
 	}
 	free(list);
 
-	web_puts("\twl_unit: '");
+	web_puts("\t'wl_unit': '"); // AB multiSSID
 	web_putj(nvram_safe_get("wl_unit"));
 	web_puts("',\n");
 
-	web_puts("\thttp_id: '");
+	web_puts("\t'http_id': '"); // AB multiSSID
 	web_putj(nvram_safe_get("http_id"));
 	web_puts("',\n");
 
-	web_puts("\tweb_mx: '");
+	web_puts("\t'web_mx': '"); // AB multiSSID
 	web_putj(nvram_safe_get("web_mx"));
 	web_puts("',\n");
 
-	web_puts("\tweb_pb: '");
+	web_puts("\t'web_pb': '"); // AB multiSSID
 	web_putj(nvram_safe_get("web_pb"));
 	web_puts("'};\n");
 }
@@ -94,24 +94,9 @@ void asp_nv(int argc, char **argv)
 
 void asp_nvstat(int argc, char **argv)
 {
-	FILE *fp;
-	struct nvram_header header;
-	int part, size, used = 0;
-	char s[20];
+	int space, used = 0;
 
-	if (mtd_getinfo("nvram", &part, &size)) {
-		sprintf(s, MTD_DEV(%dro), part);
-
-		if ((fp = fopen(s, "r"))) {
-			if (fseek(fp, size >= NVRAM_SPACE ? size - NVRAM_SPACE : 0, SEEK_SET) == 0) {
-				if ((fread(&header, sizeof(header), 1, fp) == 1) &&
-				    (header.magic == NVRAM_MAGIC)) {
-					used = header.len;
-				}
-			}
-			fclose(fp);
-		}
-	}
-
-	web_printf("\nnvstat = { size: %d, free: %d };\n", NVRAM_SPACE, NVRAM_SPACE - used);
+	used = nvram_get_int("=nvram_used");
+	space = nvram_get_int("=nvram_space");
+	web_printf("\nnvstat = { size: %d, free: %d };\n", space, space - used);
 }

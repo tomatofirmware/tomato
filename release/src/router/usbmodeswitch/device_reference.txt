@@ -1,7 +1,7 @@
 #
 # Device and Configuration Reference (UTF-8 encoding used)
 #
-# Last modified: 2011-02-26
+# Last modified: 2010-08-26
 #
 # Collection of configurations for usb_modeswitch, a mode switching
 # tool for controlling flip flop (multiple mode) USB devices
@@ -20,18 +20,21 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
+# In order to activate a device included here you might remove the
+# comment signs (";") from the respective entry.
+#
+# It is rather recommended to copy device information to a different
+# file, to ease editing work and oversight and to avoid possible
+# conflicts by activating multiple entries.
 # There is no guarantee that this file is error-free!
 #
 # The actual entries are further down, after the command reference.
 
 
 # For custom settings:
-# Numbers can be decimal or hexadecimal, MessageContents MUST be
+# Numbers can be decimal or hexadecimal, MessageStrings MUST be
 # hexadecimal without prepended "0x". Digits 9-16 in the known
-# message strings are arbitrary; I set them to "12345678". If more
-# than one message is used for a configuration, digits 9-16 must be
-# unique for every MessageContent.
-
+# MessageStrings are arbitrary; I set them to "12345678"
 
 # What it all means (short command line flags appended):
 #
@@ -54,13 +57,12 @@
 # * TargetProductList        (file only) <comma separated hex strings>
 #
 # Like TargetProduct, but more than one possibility. Only used in automated
-# config files (in /usr/share/usb_modeswitch).
+# config files (in /etc/usb_modeswitch.d).
 #
 #
 # * TargetClass              -C <hex number>
 #
-# Some devices don't change IDs. They only switch their device class (or
-# rather the class of the first interface).
+# Some weird devices don't change IDs. They only switch the device class.
 # If the device has the target class -> no action (and vice versa)
 #
 #
@@ -86,7 +88,6 @@
 # * ReleaseDelay             -w <milliseconds>
 #
 # Waiting time after message transfers. Helps with some sensitive devices
-# by preventing any device access after sending the switching command
 #
 #
 # * ResponseEndpoint         -r <hex number>
@@ -138,21 +139,12 @@
 # it back to storage mode ...
 #
 #
-# * Configuration            -u <hex number>
-#
-# Some devices offer a "clean" way of switching by selecting a different
-# internal configuration. This is what every manufacturer should have
-# done, as it is covered by the USB specification
-#
-#
 # * Interface                -i <hex number>
+# * Configuration            -u <hex number>
 # * AltSetting               -a <hex number>
 #
 # More USB parameter to help with tricky devices and for doing lots
 # of cruel experiments ...
-# For example, the "Interface" parameter can be "abused" to detach
-# a driver from a specific interface of a composite device (combine
-# with "-d")
 #
 ## Note:
 ## AltSetting/Configuration changes and ResetUSB are executed after all
@@ -163,9 +155,8 @@
 # * InquireDevice <0|1>      -I (disables inquiry)
 #
 # The standard since 1.0.0 is to do a SCSI inquiry on the default device
-# before other actions. This gives additional info for identifying a device
+# before other actions. This might be a future way to identify a device
 # without ambiguities. If it causes trouble with your device, just disable.
-# Mostly useful for manual experiments
 #
 #
 # * CheckSuccess             -s <number>
@@ -184,21 +175,16 @@
 #
 # The binary tells the wrapper script NOT to check for and initiate
 # binding of the serial driver after switching.
-# Useful for non-modem devices (WiMAX, WLAN etc.); modem devices will
-# be bound to the serial modem driver if they are not taken care of
-# otherwise
-#
+# Mostly useful for non-modem devices
 #
 #
 # -> All other entries are just ignored <-
-
 
 # Additional command line flags:
 # 
 # Verbose output             -W
 # No output at all           -q
 # Other config file          -c <file>
-
 
 # For filling in all this information for an unknown device,
 # see instructions and links on the homepage:
@@ -213,13 +199,13 @@
 #
 # The message SHOULD be the same for all Option devices
 
-DefaultVendor=  0x05c6
-DefaultProduct= 0x1000
+;DefaultVendor=  0x05c6
+;DefaultProduct= 0x1000
 
-TargetVendor=   0x0af0
-TargetProduct=  0x6600
+;TargetVendor=   0x0af0
+;TargetProduct=  0x6600
 
-MessageContent="55534243123456780000000000000601000000000000000000000000000000"
+;MessageContent="55534243123456780000000000000601000000000000000000000000000000"
 
 
 #######################################################
@@ -227,13 +213,13 @@ MessageContent="55534243123456780000000000000601000000000000000000000000000000"
 #
 # Contributor: The Pharscape Forum
 
-DefaultVendor=  0x05c6
-DefaultProduct= 0x1000
+;DefaultVendor=  0x05c6
+;DefaultProduct= 0x1000
 
-TargetVendor=   0x0af0
-TargetProduct=  0x6901
+;TargetVendor=   0x0af0
+;TargetProduct=  0x6901
 
-MessageContent="55534243123456780000000000000601000000000000000000000000000000"
+;MessageContent="55534243123456780000000000000601000000000000000000000000000000"
 
 
 ########################################################
@@ -241,17 +227,17 @@ MessageContent="55534243123456780000000000000601000000000000000000000000000000"
 #
 # Contributor: Bernd Holzm�ller
 
-DefaultVendor=  0x05c6
-DefaultProduct= 0x1000
+;DefaultVendor=  0x05c6
+;DefaultProduct= 0x1000
 
-TargetVendor=   0x0af0
-TargetProduct=  0x6600
+;TargetVendor=   0x0af0
+;TargetProduct=  0x6600
 
-MessageContent="55534243123456780000000000000601000000000000000000000000000000"
+;MessageContent="55534243123456780000000000000601000000000000000000000000000000"
 
 # ResponseEndpoint=0x84
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
@@ -259,13 +245,13 @@ NeedResponse=1
 #
 # Contributors: Lucas Benedicic, Morgwai Kotarbinski
 
-DefaultVendor=  0x05c6
-DefaultProduct= 0x1000
+;DefaultVendor=  0x05c6
+;DefaultProduct= 0x1000
 
-TargetVendor=   0x0af0
-TargetProduct=  0x6701
+;TargetVendor=   0x0af0
+;TargetProduct=  0x6701
 
-MessageContent="55534243123456780000000000000601000000000000000000000000000000"
+;MessageContent="55534243123456780000000000000601000000000000000000000000000000"
 
 
 ########################################################
@@ -273,16 +259,16 @@ MessageContent="55534243123456780000000000000601000000000000000000000000000000"
 #
 # Contributor: Fridtjof Busse
 
-DefaultVendor=  0x05c6
-DefaultProduct= 0x1000
+;DefaultVendor=  0x05c6
+;DefaultProduct= 0x1000
 
-TargetVendor=   0x0af0
-TargetProduct=  0x6701
+;TargetVendor=   0x0af0
+;TargetProduct=  0x6701
 
-MessageContent="55534243123456780000000000000601000000000000000000000000000000"
+;MessageContent="55534243123456780000000000000601000000000000000000000000000000"
 
 # Response reading needed according to one (1) report
-NeedResponse=1
+;NeedResponse=1
 
 
 #######################################################
@@ -294,12 +280,12 @@ NeedResponse=1
 #
 # Contributor: Paul Hardwick
 
-DefaultVendor=  0x0af0
-DefaultProduct= 0x6911
+;DefaultVendor=  0x0af0
+;DefaultProduct= 0x6911
 
-TargetClass=    0xff
+;TargetClass=    0xff
 
-MessageContent="55534243123456780000000000000601000000000000000000000000000000"
+;MessageContent="55534243123456780000000000000601000000000000000000000000000000"
 
 
 ########################################################
@@ -312,15 +298,15 @@ MessageContent="55534243123456780000000000000601000000000000000000000000000000"
 #
 # Contributor: wahlm, Peter Kraker, Pakdhetimin Sekum
 
-DefaultVendor=  0x1e0e
-DefaultProduct= 0xf000
+;DefaultVendor=  0x1e0e
+;DefaultProduct= 0xf000
 
-TargetVendor=   0x1e0e
-TargetProduct=  0x9000
+;TargetVendor=   0x1e0e
+;TargetProduct=  0x9000
 
-MessageContent="555342431234567800000000000006bd000000020000000000000000000000"
+;MessageContent="555342431234567800000000000006bd000000020000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 #######################################################
@@ -330,12 +316,12 @@ NeedResponse=1
 #
 # Contributor: Matti Viljanen
 
-DefaultVendor=  0x0af0
-DefaultProduct= 0x6971
+;DefaultVendor=  0x0af0
+;DefaultProduct= 0x6971
 
-TargetClass=    0xff
+;TargetClass=    0xff
 
-MessageContent="555342431223456780100000080000601000000000000000000000000000000"
+;MessageContent="555342431223456780100000080000601000000000000000000000000000000"
 
 
 #######################################################
@@ -345,12 +331,12 @@ MessageContent="555342431223456780100000080000601000000000000000000000000000000"
 #
 # Contributor: Gerold Gruber
 
-DefaultVendor=  0x0af0
-DefaultProduct= 0x7011
+;DefaultVendor=  0x0af0
+;DefaultProduct= 0x7011
 
-TargetClass=    0xff
+;TargetClass=    0xff
 
-MessageContent="55534243785634120100000080000601000000000000000000000000000000"
+;MessageContent="55534243785634120100000080000601000000000000000000000000000000"
 
 
 ###################################################### 
@@ -360,14 +346,14 @@ MessageContent="55534243785634120100000080000601000000000000000000000000000000"
 #
 # Contributor: Vincent Teoh
 
-DefaultVendor=  0x0af0
-DefaultProduct= 0x7401
+;DefaultVendor=  0x0af0
+;DefaultProduct= 0x7401
 
-TargetClass=    0xff
+;TargetClass=    0xff
 
-MessageContent="55534243785634120100000080000601000000000000000000000000000000"
+;MessageContent="55534243785634120100000080000601000000000000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ######################################################## 
@@ -375,12 +361,12 @@ NeedResponse=1
 #
 # Contributor: The Solutor
 
-DefaultVendor=  0x0af0
-DefaultProduct= 0x7501
+;DefaultVendor=  0x0af0
+;DefaultProduct= 0x7501
 
-TargetClass=    0xff
+;TargetClass=    0xff
 
-MessageContent="55534243785634120100000080000601000000000000000000000000000000"
+;MessageContent="55534243785634120100000080000601000000000000000000000000000000"
 
 
 ########################################################
@@ -388,12 +374,12 @@ MessageContent="55534243785634120100000080000601000000000000000000000000000000"
 #
 # Contributor: sissie from Bullteam
 
-DefaultVendor=  0x0af0
-DefaultProduct= 0xd033
+;DefaultVendor=  0x0af0
+;DefaultProduct= 0xd033
 
-TargetClass=    0xff
+;TargetClass=    0xff
 
-MessageContent="55534243785634120100000080000601000000000000000000000000000000"
+;MessageContent="55534243785634120100000080000601000000000000000000000000000000"
 
 
 ########################################################
@@ -401,12 +387,12 @@ MessageContent="55534243785634120100000080000601000000000000000000000000000000"
 #
 # Contributor: Hans Kurent, Denis Sutter, Vincent Teoh
 
-DefaultVendor=  0x12d1
-DefaultProduct= 0x1003
+;DefaultVendor=  0x12d1
+;DefaultProduct= 0x1003
 
-TargetClass=    0xff
+;TargetClass=    0xff
 
-HuaweiMode=1
+;HuaweiMode=1
 
 
 ########################################################
@@ -414,14 +400,14 @@ HuaweiMode=1
 #
 # Contributor: Dale Lane
 
-DefaultVendor=  0x12d1
-DefaultProduct= 0x1001
+;DefaultVendor=  0x12d1
+;DefaultProduct= 0x1001
 
-TargetClass=    0xff
+;TargetClass=    0xff
 
 # choose one of these:
-DetachStorageOnly=1
-HuaweiMode=1
+;DetachStorageOnly=1
+;HuaweiMode=1
 
 
 ########################################################
@@ -429,12 +415,12 @@ HuaweiMode=1
 #
 # Contributor: Tom Dawahare
 
-DefaultVendor=  0x12d1
-DefaultProduct= 0x1414
+;DefaultVendor=  0x12d1
+;DefaultProduct= 0x1414
 
-TargetClass=    0xff
+;TargetClass=    0xff
 
-HuaweiMode=1
+;HuaweiMode=1
 
 
 ########################################################
@@ -445,13 +431,13 @@ HuaweiMode=1
 #
 # Contributor: Joakim Wenrgren
 
-DefaultVendor=  0x1033
-DefaultProduct= 0x0035
+;DefaultVendor=  0x1033
+;DefaultProduct= 0x0035
 
-TargetVendor=   0x12d1
-TargetProduct=  0x1003
+;TargetVendor=   0x12d1
+;TargetProduct=  0x1003
 
-HuaweiMode=1
+;HuaweiMode=1
 
 
 ########################################################
@@ -461,16 +447,16 @@ HuaweiMode=1
 #
 # Contributor: Flávio Moringa and others
 
-DefaultVendor=  0x19d2
-DefaultProduct= 0x2000
+;DefaultVendor=  0x19d2
+;DefaultProduct= 0x2000
 
-TargetVendor=   0x19d2
-TargetProductList="0001"
+;TargetVendor=   0x19d2
+;TargetProductList="0001"
 
-MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
-MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+;MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
@@ -478,16 +464,16 @@ NeedResponse=1
 #
 # Contributor: andylog
 
-DefaultVendor=  0x19d2
-DefaultProduct= 0x2000
+;DefaultVendor=  0x19d2
+;DefaultProduct= 0x2000
 
-TargetVendor=   0x19d2
-TargetProduct=  0x0002
+;TargetVendor=   0x19d2
+;TargetProduct=  0x0002
 
-MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
-MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+;MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
@@ -498,28 +484,28 @@ NeedResponse=1
 #
 # Contributor: Alvaro Lopes <alvieboy at alvie dot com>
 
-DefaultVendor=  0x19d2
-DefaultProduct= 0x2000
+;DefaultVendor=  0x19d2
+;DefaultProduct= 0x2000
 
 
 # To modem mode:
 
-TargetVendor=   0x19d2
-TargetProduct=  0x0015
+;TargetVendor=   0x19d2
+;TargetProduct=  0x0015
 
-MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
-MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+;MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 # To SD slot mode:
 
-TargetVendor=   0x05c6
-TargetProduct=  0x2001
+;TargetVendor=   0x05c6
+;TargetProduct=  0x2001
 
-MessageContent="55534243123456782000000080000a86010101180101010101000000000000"
+;MessageContent="55534243123456782000000080000a86010101180101010101000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
@@ -532,16 +518,16 @@ NeedResponse=1
 #
 # Contributor: Joakim Wennergren and others
 
-DefaultVendor=  0x19d2
-DefaultProduct= 0x2000
+;DefaultVendor=  0x19d2
+;DefaultProduct= 0x2000
 
-TargetVendor=   0x19d2
-TargetProduct=  0x0031
+;TargetVendor=   0x19d2
+;TargetProduct=  0x0031
 
-MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
-MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+;MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
@@ -549,16 +535,16 @@ NeedResponse=1
 #
 # Contributor: andylog
 
-DefaultVendor=  0x19d2
-DefaultProduct= 0x2000
+;DefaultVendor=  0x19d2
+;DefaultProduct= 0x2000
 
-TargetVendor=   0x19d2
-TargetProduct=  0x0037
+;TargetVendor=   0x19d2
+;TargetProduct=  0x0037
 
-MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
-MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+;MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
@@ -567,33 +553,33 @@ NeedResponse=1
 # and others
 #
 # Many new ZTE devices use this sequence. There are
-# several ID combinations check your default
+# several ID combinations; check your default
 #
 # Contributor: Michael Khurtsiya, Amit Pundir and others
 
-DefaultVendor=  0x19d2
-DefaultProduct= 0xfff5
+;DefaultVendor=  0x19d2
+;DefaultProduct= 0xfff5
 
-TargetVendor=   0x19d2
-TargetProduct=  0xffff
+;TargetVendor=   0x19d2
+;TargetProduct=  0xffff
 
 # No. 2
 
-DefaultVendor=  0x19d2
-DefaultProduct= 0xfff6
+;DefaultVendor=  0x19d2
+;DefaultProduct= 0xfff6
 
-TargetVendor=   0x19d2
-TargetProduct=  0xfff1
+;TargetVendor=   0x19d2
+;TargetProduct=  0xfff1
 
 # No. 3
 
-DefaultVendor=  0x19d2
-DefaultProduct= 0xfff5
+;DefaultVendor=  0x19d2
+;DefaultProduct= 0xfff5
 
-TargetVendor=   0x19d2
-TargetProduct=  0xfff1
+;TargetVendor=   0x19d2
+;TargetProduct=  0xfff1
 
-MessageContent="5553424312345678c00000008000069f030000000000000000000000000000"
+;MessageContent="5553424312345678c00000008000069f030000000000000000000000000000"
 
 
 ########################################################
@@ -601,13 +587,13 @@ MessageContent="5553424312345678c00000008000069f030000000000000000000000000000"
 #
 # Contributor: Wasim Baig
 
-DefaultVendor=  0x19d2
-DefaultProduct= 0xfff5
+;DefaultVendor=  0x19d2
+;DefaultProduct= 0xfff5
 
-TargetVendor=   0x19d2
-TargetProduct=  0xffff
+;TargetVendor=   0x19d2
+;TargetProduct=  0xffff
 
-MessageContent="5553424312345678c00000008000069f010000000000000000000000000000"
+;MessageContent="5553424312345678c00000008000069f010000000000000000000000000000"
 
 # Just for information: try it with the message from the AC8710 ...
 
@@ -617,16 +603,16 @@ MessageContent="5553424312345678c00000008000069f010000000000000000000000000000"
 #
 # Contributor: David Taillandier
 
-DefaultVendor=  0x19d2
-DefaultProduct= 0x2000
+;DefaultVendor=  0x19d2
+;DefaultProduct= 0x2000
 
-TargetVendor=   0x19d2
-TargetProduct=  0x0052
+;TargetVendor=   0x19d2
+;TargetProduct=  0x0052
 
-MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
-MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+;MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
@@ -634,16 +620,16 @@ NeedResponse=1
 #
 # Contributor: Lucio Asnaghi a.k.a. kRAkEn/gORe
 
-DefaultVendor=  0x19d2
-DefaultProduct= 0x2000
+;DefaultVendor=  0x19d2
+;DefaultProduct= 0x2000
 
-TargetVendor=   0x19d2
-TargetProduct=  0x0002
+;TargetVendor=   0x19d2
+;TargetProduct=  0x0002
 
-MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
-MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+;MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
@@ -651,16 +637,16 @@ NeedResponse=1
 #
 # Contributor: Alex Scortegagna
 
-DefaultVendor=  0x19d2
-DefaultProduct= 0x2000
+;DefaultVendor=  0x19d2
+;DefaultProduct= 0x2000
 
-TargetVendor=   0x19d2
-TargetProduct=  0x0002
+;TargetVendor=   0x19d2
+;TargetProduct=  0x0002
 
-MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
-MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+;MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
@@ -670,14 +656,14 @@ NeedResponse=1
 #
 # Contributor: Razvan Dragomirescu, Mike Kirk
 
-DefaultVendor=  0x1410
-DefaultProduct= 0x5010
+;DefaultVendor=  0x1410
+;DefaultProduct= 0x5010
 
-TargetVendor=   0x1410
-TargetProduct=  0x4400
+;TargetVendor=   0x1410
+;TargetProduct=  0x4400
 
-MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
-NeedResponse=1
+;MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+;NeedResponse=1
 
 
 ########################################################
@@ -687,14 +673,14 @@ NeedResponse=1
 #
 # Contributor: Chris Thielen
 
-DefaultVendor=  0x1410
-DefaultProduct= 0x5010
+;DefaultVendor=  0x1410
+;DefaultProduct= 0x5010
 
-TargetVendor=   0x1410
-TargetProduct=  0x4100
+;TargetVendor=   0x1410
+;TargetProduct=  0x4100
 
-MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
-NeedResponse=1
+;MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+;NeedResponse=1
 
 
 ########################################################
@@ -702,13 +688,13 @@ NeedResponse=1
 #
 # Contributor: Joakim Wennergren
 
-DefaultVendor=  0x1410
-DefaultProduct= 0x5020
+;DefaultVendor=  0x1410
+;DefaultProduct= 0x5020
 
-Interface=      5
+;Interface=      5
 
-MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
-NeedResponse=1
+;MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+;NeedResponse=1
 
 
 ########################################################
@@ -716,14 +702,14 @@ NeedResponse=1
 #
 # Contributor: Richard Laager
 
-DefaultVendor=  0x1410
-DefaultProduct= 0x5030
+;DefaultVendor=  0x1410
+;DefaultProduct= 0x5030
 
-TargetVendor=   0x1410
-TargetProduct=  0x6000
+;TargetVendor=   0x1410
+;TargetProduct=  0x6000
 
-MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
-NeedResponse=1
+;MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+;NeedResponse=1
 
 
 ########################################################
@@ -732,25 +718,25 @@ NeedResponse=1
 #
 # Contributor: Aleksandar Samardzic, Marcelo Fernandez
 
-DefaultVendor=  0x1c9e
-DefaultProduct= 0x1001
+;DefaultVendor=  0x1c9e
+;DefaultProduct= 0x1001
 
-TargetVendor=   0x1c9e
-TargetProduct=  0x6061
+;TargetVendor=   0x1c9e
+;TargetProduct=  0x6061
 
-MessageContent="55534243123456780000000000000606f50402527000000000000000000000"
+;MessageContent="55534243123456780000000000000606f50402527000000000000000000000"
 
 
 ########################################################
 # Alcatel X200/X060S
 
-DefaultVendor=  0x1bbb
-DefaultProduct= 0xf000
+;DefaultVendor=  0x1bbb
+;DefaultProduct= 0xf000
 
-TargetVendor=   0x1bbb
-TargetProduct=  0x0000
+;TargetVendor=   0x1bbb
+;TargetProduct=  0x0000
 
-MessageContent="55534243123456788000000080000606f50402527000000000000000000000"
+;MessageContent="55534243123456788000000080000606f50402527000000000000000000000"
 
 
 ########################################################
@@ -762,14 +748,14 @@ MessageContent="55534243123456788000000080000606f50402527000000000000000000000"
 #
 # Contributor: Vladimir Poluektov, Gabriel Smolar
 
-DefaultVendor=  0x05c6
-DefaultProduct= 0x1000
+;DefaultVendor=  0x05c6
+;DefaultProduct= 0x1000
 
-TargetVendor=   0x16d5
-TargetProduct=  0x6502
+;TargetVendor=   0x16d5
+;TargetProduct=  0x6502
 
-MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
-NeedResponse=1
+;MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+;NeedResponse=1
 
 
 ########################################################
@@ -781,15 +767,15 @@ NeedResponse=1
 #
 # Contributor: Alexander Czigler
 
-DefaultVendor=  0x1a8d
-DefaultProduct= 0x1000
+;DefaultVendor=  0x1a8d
+;DefaultProduct= 0x1000
 
-TargetVendor=   0x1a8d
-TargetProduct=  0x1002
+;TargetVendor=   0x1a8d
+;TargetProduct=  0x1002
 
-MessageContent="55534243123456781200000080000603000000020000000000000000000000"
+;MessageContent="55534243123456781200000080000603000000020000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
@@ -799,15 +785,15 @@ NeedResponse=1
 #
 # Contributor: Alexander Czigler
 
-DefaultVendor=  0x1dd6
-DefaultProduct= 0x1000
+;DefaultVendor=  0x1dd6
+;DefaultProduct= 0x1000
 
-TargetVendor=   0x1dd6
-TargetProduct=  0x1002
+;TargetVendor=   0x1dd6
+;TargetProduct=  0x1002
 
-MessageContent="55534243123456781200000080000603000000020000000000000000000000"
+;MessageContent="55534243123456781200000080000603000000020000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
@@ -818,13 +804,13 @@ NeedResponse=1
 #
 # Contributor: Alexander Czigler
 
-DefaultVendor=  0x16d8
-DefaultProduct= 0x6803
+;DefaultVendor=  0x16d8
+;DefaultProduct= 0x6803
 
-TargetVendor=   0x16d8
-TargetProduct=  0x680a
+;TargetVendor=   0x16d8
+;TargetProduct=  0x680a
 
-MessageContent="555342431234567824000000800008ff524445564348470000000000000000"
+;MessageContent="555342431234567824000000800008ff524445564348470000000000000000"
 
 
 ########################################################
@@ -832,13 +818,13 @@ MessageContent="555342431234567824000000800008ff524445564348470000000000000000"
 #
 # Contributor: Mathias Picker
 
-DefaultVendor=  0x16d8
-DefaultProduct= 0xf000
+;DefaultVendor=  0x16d8
+;DefaultProduct= 0xf000
 
-TargetVendor=   0x16d8
-TargetProduct=  0x6006
+;TargetVendor=   0x16d8
+;TargetProduct=  0x6006
 
-MessageContent="55534243d85dd88524000000800008ff524445564348470000000000000000"
+;MessageContent="55534243d85dd88524000000800008ff524445564348470000000000000000"
 
 
 ########################################################
@@ -846,15 +832,15 @@ MessageContent="55534243d85dd88524000000800008ff524445564348470000000000000000"
 #
 # Contributor: Mijail Anton
 
-DefaultVendor=  0x0930
-DefaultProduct= 0x0d46
+;DefaultVendor=  0x0930
+;DefaultProduct= 0x0d46
 
-TargetVendor=   0x0930
-TargetProduct=  0x0d45
+;TargetVendor=   0x0930
+;TargetProduct=  0x0d45
 
-MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
@@ -862,13 +848,13 @@ NeedResponse=1
 #
 # Contributor: Mark A. Ziesemer
 
-DefaultVendor=  0x106c
-DefaultProduct= 0x3b03
+;DefaultVendor=  0x106c
+;DefaultProduct= 0x3b03
 
-TargetVendor=   0x106c
-TargetProduct=  0x3715
+;TargetVendor=   0x106c
+;TargetProduct=  0x3715
 
-MessageContent="555342431234567824000000800008ff024445564348470000000000000000"
+;MessageContent="555342431234567824000000800008ff024445564348470000000000000000"
 
 
 ########################################################
@@ -876,15 +862,15 @@ MessageContent="555342431234567824000000800008ff024445564348470000000000000000"
 #
 # Contributor: "paul"
 
-DefaultVendor=  0x1ab7
-DefaultProduct= 0x5700
+;DefaultVendor=  0x1ab7
+;DefaultProduct= 0x5700
 
-TargetVendor=   0x1ab7
-TargetProduct=  0x5731
+;TargetVendor=   0x1ab7
+;TargetProduct=  0x5731
 
-MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
@@ -892,15 +878,15 @@ NeedResponse=1
 #
 # Contributor: A-Link Europe Ltd.
 
-DefaultVendor=  0x1e0e
-DefaultProduct= 0xf000
+;DefaultVendor=  0x1e0e
+;DefaultProduct= 0xf000
 
-TargetVendor=   0x1e0e
-TargetProduct=  0x9200
+;TargetVendor=   0x1e0e
+;TargetProduct=  0x9200
 
-MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
@@ -908,13 +894,13 @@ NeedResponse=1
 #
 # Contributor: Vincent Teoh
 
-DefaultVendor=  0x1199
-DefaultProduct= 0x0fff
+;DefaultVendor=  0x1199
+;DefaultProduct= 0x0fff
 
-TargetVendor=   0x1199
-TargetProduct=  0x0023
+;TargetVendor=   0x1199
+;TargetProduct=  0x0023
 
-SierraMode=1
+;SierraMode=1
 
 
 ########################################################
@@ -922,13 +908,13 @@ SierraMode=1
 #
 # Contributor: Vincent Teoh
 
-DefaultVendor=  0x1199
-DefaultProduct= 0x0fff
+;DefaultVendor=  0x1199
+;DefaultProduct= 0x0fff
 
-TargetVendor=   0x1199
-TargetProduct=  0x6856
+;TargetVendor=   0x1199
+;TargetProduct=  0x6856
 
-SierraMode=1
+;SierraMode=1
 
 
 ########################################################
@@ -936,13 +922,13 @@ SierraMode=1
 #
 # Special procedure, takes around 25 secs. on the whole
 
-DefaultVendor=  0x0fce
-DefaultProduct= 0xd0e1
+;DefaultVendor=  0x0fce
+;DefaultProduct= 0xd0e1
 
-TargetClass=    0x02
+;TargetClass=    0x02
 
-SonyMode=1
-Configuration=2
+;SonyMode=1
+;Configuration=2
 
 
 ########################################################
@@ -952,10 +938,10 @@ Configuration=2
 #
 # Contributor: Jérôme Oufella
 
-DefaultVendor=  0x1004
-DefaultProduct= 0x1000
+;DefaultVendor=  0x1004
+;DefaultProduct= 0x1000
 
-MessageContent="55534243123456780000000000000aff554d53434847000000000000000000"
+;MessageContent="55534243123456780000000000000aff554d53434847000000000000000000"
 
 
 ########################################################
@@ -968,13 +954,13 @@ MessageContent="55534243123456780000000000000aff554d53434847000000000000000000"
 #
 # Contributor: A Friend
 
-DefaultVendor=  0x05c6
-DefaultProduct= 0x1000
+;DefaultVendor=  0x05c6
+;DefaultProduct= 0x1000
 
-TargetVendor=   0x04e8
-TargetProduct=  0x6601
+;TargetVendor=   0x04e8
+;TargetProduct=  0x6601
 
-MessageContent="55534243123456780000000000000616000000000000000000000000000000"
+;MessageContent="55534243123456780000000000000616000000000000000000000000000000"
 
 
 ######################################################## 
@@ -982,13 +968,13 @@ MessageContent="55534243123456780000000000000616000000000000000000000000000000"
 #
 # Contributor: Stefan Olejnik
 
-DefaultVendor=  0x1c9e
-DefaultProduct= 0xf000
+;DefaultVendor=  0x1c9e
+;DefaultProduct= 0xf000
 
-TargetVendor=   0x1c9e
-TargetProduct=  0x9000
+;TargetVendor=   0x1c9e
+;TargetProduct=  0x9000
 
-MessageContent="55534243123456788000000080000606f50402527000000000000000000000"
+;MessageContent="55534243123456788000000080000606f50402527000000000000000000000"
 
 
 ########################################################
@@ -998,13 +984,13 @@ MessageContent="55534243123456788000000080000606f50402527000000000000000000000"
 #
 # Contributor: Vincent Teoh
 
-DefaultVendor=  0x1c9e
-DefaultProduct= 0xf000
+;DefaultVendor=  0x1c9e
+;DefaultProduct= 0xf000
 
-TargetVendor=   0x1c9e
-TargetProduct=  0x9063
+;TargetVendor=   0x1c9e
+;TargetProduct=  0x9063
 
-MessageContent="55534243123456788000000080000606f50402527000000000000000000000"
+;MessageContent="55534243123456788000000080000606f50402527000000000000000000000"
 
 
 ########################################################
@@ -1014,13 +1000,13 @@ MessageContent="55534243123456788000000080000606f50402527000000000000000000000"
 # 
 # Contributor: Aaron Guidazzi
 
-DefaultVendor=  0x1c9e
-DefaultProduct= 0x9200
+;DefaultVendor=  0x1c9e
+;DefaultProduct= 0x9200
 
-TargetVendor=   0x1c9e
-TargetProduct=  0x9202
+;TargetVendor=   0x1c9e
+;TargetProduct=  0x9202
 
-MessageContent="55534243123456780000000000000606f50402527000000000000000000000"
+;MessageContent="55534243123456780000000000000606f50402527000000000000000000000"
 
 
 ########################################################
@@ -1030,13 +1016,13 @@ MessageContent="55534243123456780000000000000606f50402527000000000000000000000"
 #
 # Contributor: Jeffrey Hoogland
 
-DefaultVendor=  0x1f28
-DefaultProduct= 0x0021
+;DefaultVendor=  0x1f28
+;DefaultProduct= 0x0021
 
-TargetVendor=   0x1f28
-TargetProduct=  0x0020
+;TargetVendor=   0x1f28
+;TargetProduct=  0x0020
 
-MessageContent="555342431234567824000000800108df200000000000000000000000000000"
+;MessageContent="555342431234567824000000800108df200000000000000000000000000000"
 
 # Afterwards (optional): "usb_modeswitch -v 0x1f28 -p 0x0020 -R"
 
@@ -1046,13 +1032,13 @@ MessageContent="555342431234567824000000800108df200000000000000000000000000000"
 #
 # Contributor: Chris Wright
 
-DefaultVendor=  0x1b7d
-DefaultProduct= 0x0700
+;DefaultVendor=  0x1b7d
+;DefaultProduct= 0x0700
 
-TargetVendor=   0x1b7d
-TargetProduct=  0x0001
+;TargetVendor=   0x1b7d
+;TargetProduct=  0x0001
 
-MessageContent="555342431234567824000000800008FF05B112AEE102000000000000000000"
+;MessageContent="555342431234567824000000800008FF05B112AEE102000000000000000000"
 
 
 ########################################################
@@ -1062,13 +1048,13 @@ MessageContent="555342431234567824000000800008FF05B112AEE102000000000000000000"
 #
 # Contributor: Arif Ahmed
 
-DefaultVendor=  0x04e8
-DefaultProduct= 0xf000
+;DefaultVendor=  0x04e8
+;DefaultProduct= 0xf000
 
-TargetVendor=   0x04e8
-TargetProduct=  0x6601
+;TargetVendor=   0x04e8
+;TargetProduct=  0x6601
 
-MessageContent="55534243123456780000000000000616000000000000000000000000000000"
+;MessageContent="55534243123456780000000000000616000000000000000000000000000000"
 
 
 ########################################################
@@ -1078,13 +1064,13 @@ MessageContent="55534243123456780000000000000616000000000000000000000000000000"
 #
 # Contributor: Paranoid Paranoia
 
-DefaultVendor=  0x12d1
-DefaultProduct= 0x1446
+;DefaultVendor=  0x12d1
+;DefaultProduct= 0x1446
 
-TargetVendor=   0x12d1
-TargetProduct=  0x14ac
+;TargetVendor=   0x12d1
+;TargetProduct=  0x14ac
 
-MessageContent="55534243123456780000000000000011060000000000000000000000000000"
+;MessageContent="55534243123456780000000000000011060000000000000000000000000000"
 
 
 ########################################################
@@ -1093,13 +1079,13 @@ MessageContent="55534243123456780000000000000011060000000000000000000000000000"
 #
 # Contributor: Anders Blomdell, Ahmed Soliman
 
-DefaultVendor=  0x12d1
-DefaultProduct= 0x1446
+;DefaultVendor=  0x12d1
+;DefaultProduct= 0x1446
 
-TargetVendor=   0x12d1
-TargetProduct=  0x1001
+;TargetVendor=   0x12d1
+;TargetProduct=  0x1001
 
-MessageContent="55534243123456780000000000000011060000000000000000000000000000"
+;MessageContent="55534243123456780000000000000011060000000000000000000000000000"
 
 
 ########################################################
@@ -1107,16 +1093,16 @@ MessageContent="55534243123456780000000000000011060000000000000000000000000000"
 #
 # Contributor: Paul McDermott
 
-DefaultVendor=  0x19d2
-DefaultProduct= 0x2000
+;DefaultVendor=  0x19d2
+;DefaultProduct= 0x2000
 
-TargetVendor=   0x19d2
-TargetProduct=  0x0055
+;TargetVendor=   0x19d2
+;TargetProduct=  0x0055
 
-MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
-MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+;MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ######################################################## 
@@ -1125,13 +1111,13 @@ NeedResponse=1
 #
 # Contributor: Chris
 
-DefaultVendor=  0x1c9e
-DefaultProduct= 0xf000
+;DefaultVendor=  0x1c9e
+;DefaultProduct= 0xf000
 
-TargetVendor=   0x1c9e
-TargetProduct=  0x9603
+;TargetVendor=   0x1c9e
+;TargetProduct=  0x9603
 
-MessageContent="55534243123456788000000080000606f50402527000000000000000000000"
+;MessageContent="55534243123456788000000080000606f50402527000000000000000000000"
 
 
 ######################################################## 
@@ -1139,15 +1125,15 @@ MessageContent="55534243123456788000000080000606f50402527000000000000000000000"
 #
 # Contributor: Zhang Le
 
-DefaultVendor=  0x05c6
-DefaultProduct= 0x2001
+;DefaultVendor=  0x05c6
+;DefaultProduct= 0x2001
 
-TargetVendor=   0x1e0e
-TargetProductList="ce16,cefe"
+;TargetVendor=   0x1e0e
+;TargetProductList="ce16,cefe"
 
-MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ######################################################## 
@@ -1155,15 +1141,15 @@ NeedResponse=1
 #
 # Contributor: Matt Roberds
 
-DefaultVendor=  0x1410
-DefaultProduct= 0x5031
+;DefaultVendor=  0x1410
+;DefaultProduct= 0x5031
 
-TargetVendor=   0x1410
-TargetProduct=  0x6002
+;TargetVendor=   0x1410
+;TargetProduct=  0x6002
 
-MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
@@ -1171,31 +1157,31 @@ NeedResponse=1
 #
 # Contributor: Moritz Grosse-Wentrup
 
-DefaultVendor=  0x19d2
-DefaultProduct= 0x0053
+;DefaultVendor=  0x19d2
+;DefaultProduct= 0x0053
 
-TargetVendor=   0x19d2
-TargetProduct=  0x0031
+;TargetVendor=   0x19d2
+;TargetProduct=  0x0031
 
-MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
-MessageContent2="55534243876543212000000080000c85010101180101010101000000000000"
+;MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+;MessageContent2="55534243876543212000000080000c85010101180101010101000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
 # Philips TalkTalk (NXP Semiconductors "Dragonfly")
 #
 
-DefaultVendor=  0x0471
-DefaultProduct= 0x1237
+;DefaultVendor=  0x0471
+;DefaultProduct= 0x1237
 
-TargetVendor=   0x0471
-TargetProduct=  0x1234
+;TargetVendor=   0x0471
+;TargetProduct=  0x1234
 
-MessageContent="5553424312345678000000000000061b000000030000000000000000000000"
+;MessageContent="5553424312345678000000000000061b000000030000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
@@ -1203,33 +1189,33 @@ NeedResponse=1
 #
 # Contributor: Emfox Zhou
 
-DefaultVendor=  0x0471
-DefaultProduct= 0x1237
+;DefaultVendor=  0x0471
+;DefaultProduct= 0x1237
 
-TargetVendor=   0x0471
-TargetProduct=  0x1206
+;TargetVendor=   0x0471
+;TargetProduct=  0x1206
 
-MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
-Configuration=2
+;Configuration=2
 
 
 ########################################################
 # ZTE K3565
 #
 
-DefaultVendor=  0x19d2
-DefaultProduct= 0x2000
+;DefaultVendor=  0x19d2
+;DefaultProduct= 0x2000
 
-TargetVendor=   0x19d2
-TargetProduct=  0x0063
+;TargetVendor=   0x19d2
+;TargetProduct=  0x0063
 
-MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
-MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+;MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
@@ -1237,15 +1223,15 @@ NeedResponse=1
 #
 # Contributor: Prashad Prashant
 
-DefaultVendor=  0x148f
-DefaultProduct= 0x2578
+;DefaultVendor=  0x148f
+;DefaultProduct= 0x2578
 
-TargetVendor=   0x148f
-TargetProduct=  0x9021
+;TargetVendor=   0x148f
+;TargetProduct=  0x9021
 
-MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
@@ -1253,13 +1239,13 @@ NeedResponse=1
 #
 # Contributor: Genar Codina
 
-DefaultVendor=  0x12d1
-DefaultProduct= 0x1446
+;DefaultVendor=  0x12d1
+;DefaultProduct= 0x1446
 
-TargetVendor=   0x12d1
-TargetProduct=  0x1406
+;TargetVendor=   0x12d1
+;TargetProduct=  0x1406
 
-MessageContent="55534243123456780000000000000011060000000000000000000000000000"
+;MessageContent="55534243123456780000000000000011060000000000000000000000000000"
 
 
 ########################################################
@@ -1269,25 +1255,25 @@ MessageContent="55534243123456780000000000000011060000000000000000000000000000"
 #
 # Contributor: Carolin Latze and others
 
-DefaultVendor=  0x12d1
-DefaultProduct= 0x1446
+;DefaultVendor=  0x12d1
+;DefaultProduct= 0x1446
 
-TargetVendor=   0x12d1
-TargetProduct=  0x140c
+;TargetVendor=   0x12d1
+;TargetProduct=  0x140c
 
-MessageContent="55534243123456780000000000000011060000000000000000000000000000"
+;MessageContent="55534243123456780000000000000011060000000000000000000000000000"
 
 
 ########################################################
 # C-motech CHU-629S
 #
 
-DefaultVendor=  0x16d8
-DefaultProduct= 0x700a
+;DefaultVendor=  0x16d8
+;DefaultProduct= 0x700a
 
-TargetClass=0xff
+;TargetClass=0xff
 
-MessageContent="55534243123456782400000080000dfe524445564348473d4e444953000000"
+;MessageContent="55534243123456782400000080000dfe524445564348473d4e444953000000"
 
 
 ########################################################
@@ -1295,13 +1281,13 @@ MessageContent="55534243123456782400000080000dfe524445564348473d4e444953000000"
 #
 # Contributor: Yaroslav Levandovskiy
 
-DefaultVendor=  0x1076
-DefaultProduct= 0x7f40
+;DefaultVendor=  0x1076
+;DefaultProduct= 0x7f40
 
-TargetVendor=   0x1076
-TargetProduct=  0x7f00
+;TargetVendor=   0x1076
+;TargetProduct=  0x7f00
 
-GCTMode=1
+;GCTMode=1
 
 
 ########################################################
@@ -1309,15 +1295,15 @@ GCTMode=1
 #
 # Contributor: Antti Turunen
 
-DefaultVendor=  0x0421
-DefaultProduct= 0x0610
+;DefaultVendor=  0x0421
+;DefaultProduct= 0x0610
 
-TargetVendor=   0x0421
-TargetProduct=  0x0612
+;TargetVendor=   0x0421
+;TargetProduct=  0x0612
 
-MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
@@ -1325,13 +1311,13 @@ NeedResponse=1
 #
 # Contributor: Felix Schwarz
 
-DefaultVendor=  0x12d1
-DefaultProduct= 0x1520
+;DefaultVendor=  0x12d1
+;DefaultProduct= 0x1520
 
-TargetVendor=   0x12d1
-TargetProduct=  0x1465
+;TargetVendor=   0x12d1
+;TargetProduct=  0x1465
 
-MessageContent="55534243123456780000000000000011060000000000000000000000000000"
+;MessageContent="55534243123456780000000000000011060000000000000000000000000000"
 
 
 ########################################################
@@ -1339,13 +1325,13 @@ MessageContent="55534243123456780000000000000011060000000000000000000000000000"
 #
 # Contributor: Nikolaos Koutsianas
 
-DefaultVendor=  0x12d1
-DefaultProduct= 0x1521
+;DefaultVendor=  0x12d1
+;DefaultProduct= 0x1521
 
-TargetVendor=   0x12d1
-TargetProduct=  0x1464
+;TargetVendor=   0x12d1
+;TargetProduct=  0x1464
 
-MessageContent="55534243123456780000000000000011060000000000000000000000000000"
+;MessageContent="55534243123456780000000000000011060000000000000000000000000000"
 
 
 #########################################
@@ -1353,8 +1339,8 @@ MessageContent="55534243123456780000000000000011060000000000000000000000000000"
 #
 # Contributor: Bob Williams
 
-DefaultVendor=  0x0471
-DefaultProduct= 0x1210
+;DefaultVendor=  0x0471
+;DefaultProduct= 0x1210
 
 # The report said that giving the target IDs prevented
 # the device from switching. Got to try it out ...
@@ -1362,9 +1348,9 @@ DefaultProduct= 0x1210
 #TargetVendor=   0x1dbc
 #TargetProduct=  0x0005
 
-MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
@@ -1372,13 +1358,13 @@ NeedResponse=1
 #
 # Contributor: Antti Turunen
 
-DefaultVendor=  0x05c6
-DefaultProduct= 0xf000
+;DefaultVendor=  0x05c6
+;DefaultProduct= 0xf000
 
-TargetVendor=   0x05c6
-TargetProduct=  0x9000
+;TargetVendor=   0x05c6
+;TargetProduct=  0x9000
 
-MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
 
 
 ########################################################
@@ -1386,12 +1372,12 @@ MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
 #
 # WLAN devices from Linux kernel
 
-DefaultVendor=  0x0ace
-DefaultProduct= 0x2011
+;DefaultVendor=  0x0ace
+;DefaultProduct= 0x2011
 
-MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
@@ -1399,12 +1385,12 @@ NeedResponse=1
 #
 # WLAN devices from Linux kernel
 
-DefaultVendor=  0x0ace
-DefaultProduct= 0x20ff
+;DefaultVendor=  0x0ace
+;DefaultProduct= 0x20ff
 
-MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
@@ -1412,28 +1398,28 @@ NeedResponse=1
 #
 # Contributor: Reinis Danne
 
-DefaultVendor=  0x05c6
-DefaultProduct= 0x1000
+;DefaultVendor=  0x05c6
+;DefaultProduct= 0x1000
 
-TargetVendor=   0x1fe7
-TargetProduct=  0x0100
+;TargetVendor=   0x1fe7
+;TargetProduct=  0x0100
 
-MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
 # AVM Fritz!Wlan USB Stick N
 #
 
-DefaultVendor=  0x057c
-DefaultProduct= 0x84ff
+;DefaultVendor=  0x057c
+;DefaultProduct= 0x84ff
 
-TargetVendor=   0x057c
-TargetProduct=  0x8401
+;TargetVendor=   0x057c
+;TargetProduct=  0x8401
 
-MessageContent="5553424312345678000000000000061b000000ff0000000000000000000000"
+;MessageContent="5553424312345678000000000000061b000000ff0000000000000000000000"
 
 
 ########################################################
@@ -1441,13 +1427,13 @@ MessageContent="5553424312345678000000000000061b000000ff0000000000000000000000"
 #
 # Contributor: Bicio
 
-DefaultVendor=  0x072f
-DefaultProduct= 0x100d
+;DefaultVendor=  0x072f
+;DefaultProduct= 0x100d
 
-TargetVendor=   0x072f
-TargetProduct=  0x90cc
+;TargetVendor=   0x072f
+;TargetProduct=  0x90cc
 
-MessageContent="01b0000000000000000000000000000000000000000000000000000000000000"
+;MessageContent="01b0000000000000000000000000000000000000000000000000000000000000"
 
 
 ########################################################
@@ -1455,13 +1441,13 @@ MessageContent="01b0000000000000000000000000000000000000000000000000000000000000
 #
 # Contributor: Jason Smith
 
-DefaultVendor=  0x106c
-DefaultProduct= 0x3b06
+;DefaultVendor=  0x106c
+;DefaultProduct= 0x3b06
 
-TargetVendor=   0x106c
-TargetProduct=  0x3717
+;TargetVendor=   0x106c
+;TargetProduct=  0x3717
 
-MessageContent="555342431234567824000000800008ff020000000000000000000000000000
+;MessageContent="555342431234567824000000800008ff020000000000000000000000000000
 
 
 ########################################################
@@ -1469,16 +1455,16 @@ MessageContent="555342431234567824000000800008ff020000000000000000000000000000
 #
 # Contributor: Alberto Maurizi
 
-DefaultVendor=  0x19d2
-DefaultProduct= 0x0026
+;DefaultVendor=  0x19d2
+;DefaultProduct= 0x0026
 
-TargetVendor=   0x19d2
-TargetProduct=  0x0094
+;TargetVendor=   0x19d2
+;TargetProduct=  0x0094
 
-MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
-MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+;MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
@@ -1486,12 +1472,12 @@ NeedResponse=1
 #
 # Contributor: Isaac Salgado
 
-DefaultVendor=  0x12d1
-DefaultProduct= 0x101e
+;DefaultVendor=  0x12d1
+;DefaultProduct= 0x101e
 
-TargetClass=0xff
+;TargetClass=0xff
 
-MessageContent="55534243123456780600000080000601000000000000000000000000000000"
+;MessageContent="55534243123456780600000080000601000000000000000000000000000000"
 
 
 ########################################################
@@ -1499,11 +1485,11 @@ MessageContent="55534243123456780600000080000601000000000000000000000000000000"
 #
 # Contributor: Alexander Gordeev
 
-DefaultVendor= 0x198f
-DefaultProduct=0xbccd
+;DefaultVendor= 0x198f
+;DefaultProduct=0xbccd
 
-TargetVendor=  0x198f
-TargetProduct= 0x0220
+;TargetVendor=  0x198f
+;TargetProduct= 0x0220
 
 MessageContent="555342431234567824000000800006bc626563240000000000000000000000"
 
@@ -1513,13 +1499,13 @@ MessageContent="555342431234567824000000800006bc626563240000000000000000000000"
 #
 # Contributor: Jérôme Oufella
 
-DefaultVendor= 0x1004
-DefaultProduct=0x607f
+;DefaultVendor= 0x1004
+;DefaultProduct=0x607f
 
-TargetVendor=  0x1004
-TargetProduct= 0x6114
+;TargetVendor=  0x1004
+;TargetProduct= 0x6114
 
-MessageContent="1201100102000040041014610000010200018006000100001200"
+;MessageContent="1201100102000040041014610000010200018006000100001200"
 
 
 ########################################################
@@ -1527,10 +1513,10 @@ MessageContent="1201100102000040041014610000010200018006000100001200"
 #
 # Contributor: Ying-Hung Lo
 
-DefaultVendor= 0x0482
-DefaultProduct=0x024d
+;DefaultVendor= 0x0482
+;DefaultProduct=0x024d
 
-Configuration=2
+;Configuration=2
 
 
 ########################################################
@@ -1538,16 +1524,16 @@ Configuration=2
 #
 # Contributor: Alberto Ciampini
 
-DefaultVendor= 0x1266
-DefaultProduct=0x1000
+;DefaultVendor= 0x1266
+;DefaultProduct=0x1000
 
-TargetVendor=  0x1266
-TargetProduct= 0x1009
+;TargetVendor=  0x1266
+;TargetProduct= 0x1009
 
-MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
-MessageContent2="5553424387654321000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+;MessageContent2="5553424387654321000000000000061b000000020000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
@@ -1555,13 +1541,13 @@ NeedResponse=1
 #
 # Contributor: Betavine Project
 
-DefaultVendor= 0x0fce
-DefaultProduct=0xd0cf
+;DefaultVendor= 0x0fce
+;DefaultProduct=0xd0cf
 
-TargetClass=0x02
+;TargetClass=0x02
 
-DetachStorageOnly=1
-Configuration=3
+;DetachStorageOnly=1
+;Configuration=3
 
 
 ########################################################
@@ -1590,15 +1576,15 @@ NeedResponse=1
 #
 # Contributor: Adam J. Porter
 
-DefaultVendor= 0x1fac
-DefaultProduct=0x0130
+;DefaultVendor= 0x1fac
+;DefaultProduct=0x0130
 
-TargetVendor=  0x1fac
-TargetProduct= 0x0131
+;TargetVendor=  0x1fac
+;TargetProduct= 0x0131
 
-CheckSuccess=20
+;CheckSuccess=20
 
-MessageContent="555342431234567824000000800108df200000000000000000000000000000"
+;MessageContent="555342431234567824000000800108df200000000000000000000000000000"
 
 
 ########################################################
@@ -1606,13 +1592,13 @@ MessageContent="555342431234567824000000800108df200000000000000000000000000000"
 #
 # Contributor: John Watt
 
-DefaultVendor=  0x1bbb
-DefaultProduct= 0xf000
+;DefaultVendor=  0x1bbb
+;DefaultProduct= 0xf000
 
-TargetVendor=   0x1bbb
-TargetProduct=  0x0017
+;TargetVendor=   0x1bbb
+;TargetProduct=  0x0017
 
-MessageContent="55534243123456788000000080000606f50402527000000000000000000000"
+;MessageContent="55534243123456788000000080000606f50402527000000000000000000000"
 
 
 ########################################################
@@ -1620,16 +1606,16 @@ MessageContent="55534243123456788000000080000606f50402527000000000000000000000"
 #
 # Contributors: Akos Ladanyi, John Talbut
 
-DefaultVendor=  0x19d2
-DefaultProduct= 0x0103
+;DefaultVendor=  0x19d2
+;DefaultProduct= 0x0103
 
-TargetVendor=   0x19d2
-TargetProduct=  0x0031
+;TargetVendor=   0x19d2
+;TargetProduct=  0x0031
 
-MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
-MessageContent2="55534243876543212000000080000c85010101180101010101000000000000"
+;MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+;MessageContent2="55534243876543212000000080000c85010101180101010101000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
@@ -1637,15 +1623,15 @@ NeedResponse=1
 #
 # Contributor: Nils Radtke
 
-DefaultVendor=  0x0b3c
-DefaultProduct= 0xc700
+;DefaultVendor=  0x0b3c
+;DefaultProduct= 0xc700
 
-TargetVendor=   0x0b3c
-TargetProductList="c000,c001,c002"
+;TargetVendor=   0x0b3c
+;TargetProductList="c000,c001,c002"
 
-MessageContent="5553424312345678000000000000061b000000030000000000000000000000"
+;MessageContent="5553424312345678000000000000061b000000030000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
@@ -1653,42 +1639,42 @@ NeedResponse=1
 #
 # Contributor: uusrlnx
 
-DefaultVendor=  0x19d2
-DefaultProduct= 0x0083
+;DefaultVendor=  0x19d2
+;DefaultProduct= 0x0083
 
-TargetVendor=   0x19d2
-TargetProduct=  0x0124
+;TargetVendor=   0x19d2
+;TargetProduct=  0x0124
 
-MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
 # ZTE MU351
 
-DefaultVendor=  0x19d2
-DefaultProduct= 0x0003
+;DefaultVendor=  0x19d2
+;DefaultProduct= 0x0003
 
-TargetClass=0xff
+;TargetClass=0xff
 
-MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
 # LG L-05A
 
-DefaultVendor=  0x1004
-DefaultProduct= 0x613a
+;DefaultVendor=  0x1004
+;DefaultProduct= 0x613a
 
-TargetVendor=   0x1004
-TargetProduct=  0x6124
+;TargetVendor=   0x1004
+;TargetProduct=  0x6124
 
-MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
@@ -1696,15 +1682,15 @@ NeedResponse=1
 #
 # Contributor: Chris Jager
 
-DefaultVendor=  0x1004
-DefaultProduct= 0x613f
+;DefaultVendor=  0x1004
+;DefaultProduct= 0x613f
 
-TargetVendor=   0x1004
-TargetProduct=  0x6141
+;TargetVendor=   0x1004
+;TargetProduct=  0x6141
 
-MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ######################################################## 
@@ -1712,58 +1698,58 @@ NeedResponse=1
 #
 # Contributor: Oliver Mattos
 
-DefaultVendor= 0x1004
-DefaultProduct=0x607f
+;DefaultVendor= 0x1004
+;DefaultProduct=0x607f
 
-TargetVendor=  0x1004
-TargetProduct= 0x6000
+;TargetVendor=  0x1004
+;TargetProduct= 0x6000
 
-MessageContent="555342431234567803000000800006f1022000000000000000000000000000"
-MessageContent2="555342438765432103000000800006f1010100000000000000000000000000"
+;MessageContent="555342431234567803000000800006f1022000000000000000000000000000"
+;MessageContent2="555342438765432103000000800006f1010100000000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
 # Royaltek Q110 - UNCONFIRMED!
 
-DefaultVendor=  0x1266
-DefaultProduct= 0x1000
+;DefaultVendor=  0x1266
+;DefaultProduct= 0x1000
 
-TargetVendor=   0x1266
-TargetProduct=  0x1009
+;TargetVendor=   0x1266
+;TargetProduct=  0x1009
 
-MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
-MessageContent2="5553424387654321000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+;MessageContent2="5553424387654321000000000000061b000000020000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
 # Rogers Rocket Stick (a Sony Ericsson device)
 
-DefaultVendor=  0x0fce
-DefaultProduct= 0xd103
+;DefaultVendor=  0x0fce
+;DefaultProduct= 0xd103
 
-TargetClass=    0x02
+;TargetClass=    0x02
 
-SonyMode=1
+;SonyMode=1
 
 
 ########################################################
 # BandRich BandLuxe C170, BandLuxe C270
 
-DefaultVendor= 0x1a8d
-DefaultProduct=0x1000
+;DefaultVendor= 0x1a8d
+;DefaultProduct=0x1000
 
-TargetVendor=  0x1a8d
-TargetProduct= 0x1009
+;TargetVendor=  0x1a8d
+;TargetProduct= 0x1009
 
-MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
-MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
-ReleaseDelay=4000
+;MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+;MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+;ReleaseDelay=4000
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
@@ -1834,7 +1820,7 @@ ResponseNeeded=1
 
 
 ########################################################
-# Huawei U8110 / U8300 / Joy, Vodafone 845 (Android smartphone)
+# Huawei U8110 / Joy, Vodafone 845 (Android smartphone)
 #
 # Contributor: David Erosa García
 
@@ -1873,27 +1859,27 @@ MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
 #
 # Contributor: Anoop John
 
-DefaultVendor=  0x19d2
-DefaultProduct= 0x2000
+;DefaultVendor=  0x19d2
+;DefaultProduct= 0x2000
 
-TargetVendor=   0x19d2
-TargetProduct=  0x0108
+;TargetVendor=   0x19d2
+;TargetProduct=  0x0108
 
-MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
-MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+;MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
 
-NeedResponse=1
+;NeedResponse=1
 
 
 ########################################################
 # BSNL Capitel
 
-DefaultVendor=  0x1c9e
-DefaultProduct= 0x9e00
+;DefaultVendor=  0x1c9e
+;DefaultProduct= 0x9e00
 
-TargetClass=0xff
+;TargetClass=0xff
 
-MessageContent="55534243123456780000000000000606f50402527000000000000000000000"
+;MessageContent="55534243123456780000000000000606f50402527000000000000000000000"
 
 
 #######################################################
@@ -1901,13 +1887,13 @@ MessageContent="55534243123456780000000000000606f50402527000000000000000000000"
 #
 # Contributor: Per Øyvind Karlsen
 
-DefaultVendor= 0x04e8
-DefaultProduct=0x689a
+;DefaultVendor= 0x04e8
+;DefaultProduct=0x689a
 
-TargetVendor=  0x04e8
-TargetProduct= 0x6889
+;TargetVendor=  0x04e8
+;TargetProduct= 0x6889
 
-MessageContent="55534243785634120100000080000601000000000000000000000000000000"
+;MessageContent="55534243785634120100000080000601000000000000000000000000000000"
 
 #######################################################
 # Kobil mIdentity 3G (1)
@@ -1942,14 +1928,14 @@ KobilMode=1
 #
 # Contributor: Enrico Mioso
 
-DefaultVendor= 0x1ee8
-DefaultProduct=0x0009
+;DefaultVendor= 0x1ee8
+;DefaultProduct=0x0009
 
-TargetVendor=  0x1ee8
-TargetProduct= 0x000b
+;TargetVendor=  0x1ee8
+;TargetProduct= 0x000b
 
-MessageContent="555342431234567800000000000010ff000000000000000000000000000000"
-NeedResponse=1
+;MessageContent="555342431234567800000000000010ff000000000000000000000000000000"
+;NeedResponse=1
 
 
 ########################################################
@@ -1957,14 +1943,14 @@ NeedResponse=1
 #
 # Contributor: Pierre-Andre Cornillon
 
-DefaultVendor= 0x0b3c
-DefaultProduct=0xf000
+;DefaultVendor= 0x0b3c
+;DefaultProduct=0xf000
 
-TargetVendor=  0x0b3c
-TargetProduct= 0xc003
+;TargetVendor=  0x0b3c
+;TargetProduct= 0xc003
 
-MessageContent="5553424312345678c000000080010606f50402527000000000000000000000"
-NeedResponse=1
+;MessageContent="5553424312345678c000000080010606f50402527000000000000000000000"
+;NeedResponse=1
 
 
 #######################################################
@@ -1972,13 +1958,13 @@ NeedResponse=1
 #
 # Contributor: Åsmund Hjulstad
 
-DefaultVendor= 0x12d1
-DefaultProduct=0x1446
+;DefaultVendor= 0x12d1
+;DefaultProduct=0x1446
 
-TargetVendor=  0x12d1
-TargetProduct= 0x1412
+;TargetVendor=  0x12d1
+;TargetProduct= 0x1412
 
-MessageContent="55534243123456780000000000000011060000000000000000000000000000"
+;MessageContent="55534243123456780000000000000011060000000000000000000000000000"
 
 
 #######################################################
@@ -1986,13 +1972,13 @@ MessageContent="55534243123456780000000000000011060000000000000000000000000000"
 #
 # Contributor: Juho Frits
 
-DefaultVendor= 0x0421
-DefaultProduct=0x0622
+;DefaultVendor= 0x0421
+;DefaultProduct=0x0622
 
-TargetVendor=  0x0421
-TargetProduct= 0x0623
+;TargetVendor=  0x0421
+;TargetProduct= 0x0623
 
-MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
 
 
 #######################################################
@@ -2000,13 +1986,13 @@ MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
 #
 # Contributor: Thomas Behan
 
-DefaultVendor= 0x0421
-DefaultProduct=0x0627
+;DefaultVendor= 0x0421
+;DefaultProduct=0x0627
 
-TargetVendor=  0x0421
-TargetProduct= 0x0612
+;TargetVendor=  0x0421
+;TargetProduct= 0x0612
 
-MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
 
 
 #######################################################
@@ -2014,25 +2000,25 @@ MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
 #
 # Contributor: Alexey Charkov
 
-DefaultVendor= 0x05c7
-DefaultProduct=0x1000
+;DefaultVendor= 0x05c7
+;DefaultProduct=0x1000
 
-TargetVendor=  0x05c7
-TargetProduct=	0x6000
+;TargetVendor=  0x05c7
+;TargetProduct=	0x6000
 
-MessageContent="5553424312345678c00000008000069f140000000000000000000000000000"
+;MessageContent="5553424312345678c00000008000069f140000000000000000000000000000"
 
 
 #######################################################
 # GW D301 (Advinne AMC)
 #
 
-DefaultVendor= 0x0fd1
-DefaultProduct=0x1000
+;DefaultVendor= 0x0fd1
+;DefaultProduct=0x1000
 
-TargetClass=0xff
+;TargetClass=0xff
 
-Configuration=3
+;Configuration=3
 
 
 #######################################################
@@ -2040,13 +2026,13 @@ Configuration=3
 #
 # Contributor: Shawn J. Goff
 
-DefaultVendor= 0x1004
-DefaultProduct=0x6190
+;DefaultVendor= 0x1004
+;DefaultProduct=0x6190
 
-TargetVendor=  0x1004
-TargetProduct= 0x61a7
+;TargetVendor=  0x1004
+;TargetProduct= 0x61a7
 
-MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
 
 
 #######################################################
@@ -2054,25 +2040,25 @@ MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
 #
 # Contributor: Noel J. Bergman, Gus Esquivel
 
-DefaultVendor= 0x106c
-DefaultProduct=0x3b05
+;DefaultVendor= 0x106c
+;DefaultProduct=0x3b05
 
-TargetVendor=  0x106c
-TargetProduct= 0x3716
+;TargetVendor=  0x106c
+;TargetProduct= 0x3716
 
-MessageContent="555342431234567824000000800008ff020000000000000000000000000000"
+;MessageContent="555342431234567824000000800008ff020000000000000000000000000000"
 
 
 #######################################################
 # AirPlus MCD-800
 #
 
-DefaultVendor= 0x1edf
-DefaultProduct=0x6003
+;DefaultVendor= 0x1edf
+;DefaultProduct=0x6003
 
-TargetClass=0xff
+;TargetClass=0xff
 
-Configuration=3
+;Configuration=3
 
 
 #######################################################
@@ -2080,235 +2066,37 @@ Configuration=3
 #
 # Contributor: Amit Mendapara
 
-DefaultVendor= 0x230d
-DefaultProduct=0x0001
+;DefaultVendor= 0x230d
+;DefaultProduct=0x0001
 
-TargetClass=0xff
+;TargetClass=0xff
 
-Configuration=3
+;Configuration=3
 
 
 ########################################################
 # MediaTek Wimax USB Card
 #
 
-DefaultVendor= 0x0e8d
-DefaultProduct=0x7109
+;DefaultVendor= 0x0e8d
+;DefaultProduct=0x7109
 
-TargetVendor=  0x0e8d
-TargetProduct= 0x7118
+;TargetVendor=  0x0e8d
+;TargetProduct= 0x7118
 
-MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
-MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
+;MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
+;MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
 
-NoDriverLoading=1
+;NoDriverLoading=1
 
 
 ########################################################
 # C-motech CHU-628S
-#
-# Contributor: Jungwon Seo
 
-DefaultVendor= 0x16d8
-DefaultProduct=0x6281
+;DefaultVendor= 0x16d8
+;DefaultProduct=0x6281
 
-TargetClass=0xff
+;TargetClass=0xff
 
-MessageContent="555342431234567824000000800008ff524445564348470000000000000000"
-
-
-######################################################## 
-# HSDPA USB modem from dealextreme 
-#
-# Contributor: Andrew 'Necromant' Andrianov 
-
-DefaultVendor= 0x05c6
-DefaultProduct=0x2000
-
-TargetVendor=  0x05c6
-TargetProduct= 0x0015
-
-MessageContent="5553424368032c882400000080000612000000240000000000000000000000" 
-
-NeedResponse=1
-
-# This modem doesn't react fast - it pauses for some 30-40 seconds 
-CheckSuccess=40 
-
-
-######################################################## 
-# Exiss Mobile E-190 series (made by C-motech)
-#
-# Contributor: Tri Mulya Saputra 
-
-DefaultVendor=  0x8888
-DefaultProduct= 0x6500
-
-TargetVendor=   0x16d8
-TargetProduct=  0x6533
-
-MessageContent="5553424398e2c4812400000080000bff524445564348473d43440000000000"
-
-
-######################################################## 
-# D-Link DWM-156 HSUPA 3.75G USB Modem 
-# F/W Ver. 1.05b01 upgr. at ftp://ftp.dlink.co.uk/dwm_3G/DWM-156/
-#
-# Contributor: Fuego
-
-DefaultVendor= 0x07d1
-DefaultProduct=0xa800
-
-TargetVendor=  0x07d1
-TargetProduct= 0x3e02
-
-MessageContent="5553424312345678000000000000061b000000020000000000000000000000" 
-
-
-########################################################
-# Franklin Wireless U210 (Variant)
-
-DefaultVendor= 0x1fac
-DefaultProduct=0x0032
-
-Configuration=2
-
-
-####################################################### 
-# Haier CE 100 
-
-DefaultVendor= 0x201e
-DefaultProduct=0x2009
-
-TargetClass=0xff
-
-MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
-MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
-
-NeedResponse=1
-
-
-#######################################################
-# Huawei BM358 WiMAX
-
-DefaultVendor= 0x12d1
-DefaultProduct=0x380b
-
-TargetClass=0x02
-
-MessageContent="5553424312345678000000000000061e000000000000000000000000000000"
-MessageContent2="5553424312345679000000000000061b000000020000000000000000000000"
-
-NeedResponse=1
-
-
-######################################################## 
-# Huawei E352
-#
-# Contributor: Antonio Talarico
-
-DefaultVendor= 0x12d1
-DefaultProduct=0x1449
-
-TargetVendor=  0x12d1
-TargetProduct= 0x1444
-
-MessageContent="55534243123456780000000000000011062000000100000000000000000000"
-
-
-######################################################## 
-# Huawei ET8282 
-#
-# Contributor: Emfox Zhou
-
-DefaultVendor= 0x12d1
-DefaultProduct=0x1da1
-
-DefaultVendor= 0x12d1
-TargetProduct= 0x1d09
-
-HuaweiMode=1
-
-
-######################################################## 
-# Huawei V725 Phone (aka Vodafone 725)
-
-DefaultVendor= 0x12d1 
-DefaultProduct=0x1009 
-
-TargetClass=0xff
-
-HuaweiMode=1
-
-
-########################################################
-# Onda MW836UP-K
-
-DefaultVendor= 0x1ee8
-DefaultProduct=0x0040
-
-TargetVendor=  0x1ee8
-TargetProduct= 0x003e
-
-MessageContent="555342431234567800000000000010ff000000000000000000000000000000"
-
-NeedResponse=1
-
-
-########################################################
-# ZTE MF637 (Variant for Orange France)
-#
-# Contributor: David Vigier
-
-DefaultVendor= 0x19d2
-DefaultProduct=0x0110
-
-TargetVendor=  0x19d2
-TargetProduct= 0x0121
-
-MessageContent="5553424302000000000000000000061b000000020000000000000000000000"
-
-NeedResponse=1
-
-
-########################################################
-# Prolink P2000 CDMA
-#
-# Test string: uMa=SSE
-
-DefaultVendor= 0x05c6
-DefaultProduct=0x1000
-
-TargetVendor=  0x05c6
-TargetProduct= 0x6000
-
-MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
-NeedResponse=1
-
-
-######################################################## 
-# Vibe 3G Modem 
-#
-# Contributor: Steven James Drinnan
-
-DefaultVendor= 0x1c9e
-DefaultProduct=0x6061
-
-TargetClass=0xff
-
-MessageContent="55534243123456780000000000000606f50402527000000000000000000000"
-
-
-########################################################
-# Vodafone/ZTE K3806-Z
-
-DefaultVendor= 0x19d2
-DefaultProduct=0x0013
-
-TargetVendor=  0x19d2
-TargetProduct= 0x0015
-
-MessageContent="5553424312345678000000000000061b000000020000000000000000000000"
-
-NeedResponse=1
+;MessageContent="555342431234567824000000800008ff524445564348470000000000000000"
 

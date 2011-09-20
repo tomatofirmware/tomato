@@ -251,7 +251,7 @@ sg.resetNewEditor = function() {
 }
 
 sg.setup = function() {
-	this.init('bs-grid', 'sort', 140, [
+	this.init('bs-grid', 'sort', 250, [
 		{ multi: [ { type: 'text', maxlen: 17 }, { type: 'text', maxlen: 17 } ] },
 		{ type: 'checkbox', prefix: '<div class="centered">', suffix: '</div>' },
 		{ type: 'text', maxlen: 15 },
@@ -304,16 +304,21 @@ function save() {
 
 	var fom = E('_fom');
 	fom.dhcpd_static.value = sdhcp;
+	fom.dhcpd_static_only.value = E('_f_dhcpd_static_only').checked ? '1' : '0';
 	fom.cstats_include.value = ipt;
 	form.submit(fom, 1);
 }
 
-function init()
-{
+function init() {
 	var c;
 	if (((c = cookie.get('basic_static_notes_vis')) != null) && (c == '1')) {
 		toggleVisibility("notes");
 	}
+
+	if (((c = cookie.get('basic_static_options_vis')) != null) && (c == '1')) {
+		toggleVisibility("options");
+	}
+
 	sg.recolor();
 }
 
@@ -327,6 +332,10 @@ function toggleVisibility(whichone) {
 		E('sesdiv' + whichone + 'showhide').innerHTML='(Click here to hide)';
 		cookie.set('basic_static_' + whichone + '_vis', 1);
 	}
+}
+
+function verifyFields(focused, quiet) {
+	return 1;
 }
 
 </script>
@@ -345,15 +354,29 @@ function toggleVisibility(whichone) {
 <!-- / / / -->
 
 <input type='hidden' name='_nextpage' value='basic-static.asp'>
-<input type='hidden' name='_service' value='dhcpd-restart,cstats-restart,arpbind-restart'>
+<input type='hidden' name='_service' value='dhcpd-restart,arpbind-restart,cstats-restart'>
 
 <input type='hidden' name='dhcpd_static'>
+<input type='hidden' name='dhcpd_static_only'>
 <input type='hidden' name='cstats_include'>
 
 <div class='section-title'>Static DHCP/ARP</div>
 <div class='section'>
 	<table class='tomato-grid' id='bs-grid'></table>
 </div>
+
+<!-- / / / -->
+
+<div class='section-title'>Options <small><i><a href='javascript:toggleVisibility("options");'><span id='sesdivoptionsshowhide'>(Click here to show)</span></a></i></small></div>
+<div class='section' id='sesdivoptions' style='display:none'>
+<script type='text/javascript'>
+createFieldTable('', [
+{ title: 'Ignore DHCP requests from unknown devices', name: 'f_dhcpd_static_only', type: 'checkbox', value: nvram.dhcpd_static_only == '1' }
+]);
+</script>
+</div>
+
+<!-- / / / -->
 
 <div class='section-title'>Notes <small><i><a href='javascript:toggleVisibility("notes");'><span id='sesdivnotesshowhide'>(Click here to show)</span></a></i></small></div>
 <div class='section' id='sesdivnotes' style='display:none'>
@@ -364,6 +387,11 @@ function toggleVisibility(whichone) {
 <li><b>IPTraffic</b> - Keep track of bandwidth usage for this IP address.</li>
 <li><b>Hostname</b> - Human-readable nickname/label assigned to this device on the network.</li>
 </ul>
+
+<ul>
+<li><b>Ignore DHCP requests (...)</b> - Unlisted MAC addresses won't be able to obtain an IP address through DHCP.</li>
+</ul>
+
 <small>
 <ul>
 <li><b>Other relevant notes/hints:</b>

@@ -30,7 +30,6 @@ textarea {
 
 //	<% nvram("cstats_enable,cstats_path,cstats_stime,cstats_offset,cstats_exclude,cstats_include,cstats_sshut,et0macaddr,cifs1,cifs2,jffs2_on,cstats_bak"); %>
 
-
 function fix(name)
 {
 	var i;
@@ -257,9 +256,8 @@ REMOVE-END */
 		suffix: ' &nbsp; <b id="newmsg" style="visibility:hidden"><small>(note: enable if this is a new file)</small></b>' },
 	{ title: 'Create Backups', indent: 2, name: 'f_bak', type: 'checkbox', value: nvram.cstats_bak == '1' },
 	{ title: 'First Day Of The Month', name: 'cstats_offset', type: 'text', value: nvram.cstats_offset, maxlen: 2, size: 4 },
-	{ title: 'Excluded IPs', name: 'cstats_exclude', type: 'text', value: nvram.cstats_exclude, maxlen: 2048, size: 50, suffix: '&nbsp;<small>(comma separated list)</small>' },
+	{ title: 'Excluded IPs', name: 'cstats_exclude', type: 'text', value: nvram.cstats_exclude, maxlen: 512, size: 50, suffix: '&nbsp;<small>(comma separated list)</small>' },
 	{ title: 'Included IPs', name: 'cstats_include', type: 'text', value: nvram.cstats_include, maxlen: 2048, size: 50, suffix: '&nbsp;<small>(comma separated list)</small>' }
-
 ]);
 </script>
 </form>

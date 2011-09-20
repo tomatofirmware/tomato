@@ -23,10 +23,6 @@
 #include <netdb.h>
 #include <net/route.h>
 
-#ifdef TCONFIG_IPV6
-#include <ifaddrs.h>
-#endif
-
 #include <wlioctl.h>
 #include <wlutils.h>
 
@@ -162,7 +158,7 @@ void asp_lanip(int argc, char **argv)
 		strcpy(s, nv);
 		if ((p = strrchr(s, '.')) != NULL) {
 			*p = 0;
-			web_puts((mode == '1') ? s : (mode == '2') ? (p + 1) : nv);
+            web_puts((mode == '1') ? s : (mode == '2') ? (p + 1) : nv);
 		}
 	}
 }
@@ -353,7 +349,6 @@ static void print_ipv6_addrs(void)
 }
 #endif
 
-
 int get_flashsize()
 {
 /*
@@ -392,7 +387,6 @@ mtd1: 007d0000 00010000 "linux"
 	}
 }
 
-
 void asp_sysinfo(int argc, char **argv)
 {
 	struct sysinfo si;
@@ -406,10 +400,6 @@ void asp_sysinfo(int argc, char **argv)
 	get_cpuinfo(system_type, cpu_model, bogomips, cpuclk);
 
 	web_puts("\nsysinfo = {\n");
-
-#ifdef TCONFIG_IPV6
-	print_ipv6_addrs();
-#endif
 	sysinfo(&si);
 	get_memory(&mem);
 	web_printf(

@@ -107,6 +107,9 @@ static int deconfig(char *ifname)
 {
 	TRACE_PT("begin\n");
 
+	int wan_proto;
+
+	wan_proto = get_wan_proto();
 	ifconfig(ifname, IFUP, "0.0.0.0", NULL);
 
 	if (using_dhcpc()) {
@@ -118,13 +121,14 @@ static int deconfig(char *ifname)
 	nvram_set("wan_routes2", "");
 	expires(0);
 
-	if (get_wan_proto() == WP_DHCP) {
+	if (wan_proto == WP_DHCP) {
 		nvram_set("wan_netmask", "0.0.0.0");
 		nvram_set("wan_gateway_get", "0.0.0.0");
 		nvram_set("wan_get_dns", "");
 	}
 
-	//	route_del(ifname, 0, NULL, NULL, NULL);
+	//	int i = 10;
+	//	while ((route_del(ifname, 0, NULL, NULL, NULL) == 0) && (i-- > 0)) { }
 
 	TRACE_PT("end\n");
 	return 0;
@@ -247,7 +251,6 @@ static int bound(char *ifname, int renew)
 	TRACE_PT("wan_routes1=%s\n", nvram_safe_get("wan_routes1"));
 	TRACE_PT("wan_routes2=%s\n", nvram_safe_get("wan_routes2"));
 
-	ifconfig(ifname, IFUP, "0.0.0.0", NULL);
 	ifconfig(ifname, IFUP, nvram_safe_get("wan_ipaddr"), netmask);
 
 	if (wan_proto != WP_DHCP) {
@@ -420,7 +423,7 @@ int dhcp6c_state_main(int argc, char **argv)
 
 	if (!wait_action_idle(10)) return 1;
 
-	nvram_set("ipv6_rtr_addr", getifaddr(nvram_safe_get("lan_ifname"), AF_INET6, 0));
+	nvram_set("ipv6_rtr_addr", getifaddr(nvram_safe_get("lan_ifname"), AF_INET6));
 
 	// extract prefix from configured IPv6 address
 	if (inet_pton(AF_INET6, nvram_safe_get("ipv6_rtr_addr"), &addr) > 0) {
@@ -440,9 +443,8 @@ int dhcp6c_state_main(int argc, char **argv)
 		start_dnsmasq();	// (re)start
 	}
 
-	// (re)start radvd and httpd
-	start_radvd();
-	start_httpd();
+	// notify radvd of possible change
+	killall("radvd", SIGHUP);
 
 	TRACE_PT("ipv6_get_dns=%s\n", nvram_safe_get("ipv6_get_dns"));
 	TRACE_PT("end\n");

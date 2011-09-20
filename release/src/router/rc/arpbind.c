@@ -1,10 +1,3 @@
-/*
-
-  Tomato Firmware
-  Copyright (C) 2006-2008 Jonathan Zarate
-
-*/
-
 #include "rc.h"
 
 void start_arpbind(void) {
@@ -14,6 +7,7 @@ void start_arpbind(void) {
 	const char *name, *bind;
 
 	nvp = nv = strdup(nvram_safe_get("dhcpd_static"));
+
 	if (!nv) return;
 
 // clear arp table first
@@ -50,5 +44,4 @@ void stop_arpbind(void) {
 	}
 
 }
-
 

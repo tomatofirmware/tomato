@@ -892,8 +892,6 @@ int control_finish (struct tunnel *t, struct call *c)
                 po = add_opt (po, c->lac->pppoptfile);
             }
         };
-	po = add_opt (po, "ipparam");
-        po = add_opt (po, IPADDY (t->peer.sin_addr));
         start_pppd (c, po);
         opt_destroy (po);
         if (c->lac)
@@ -966,8 +964,6 @@ int control_finish (struct tunnel *t, struct call *c)
             po = add_opt (po, "file");
             po = add_opt (po, c->lns->pppoptfile);
         }
-	po = add_opt (po, "ipparam");
-        po = add_opt (po, IPADDY (t->peer.sin_addr));
         start_pppd (c, po);
         opt_destroy (po);
         l2tp_log (LOG_NOTICE,
@@ -1026,8 +1022,6 @@ int control_finish (struct tunnel *t, struct call *c)
                 po = add_opt (po, c->lac->pppoptfile);
             }
         };
-	po = add_opt (po, "ipparam");
-        po = add_opt (po, IPADDY (t->peer.sin_addr));
         start_pppd (c, po);
 
         /*  jz: just show some information */
