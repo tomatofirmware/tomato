@@ -149,6 +149,9 @@ input[type='button']:hover {
 #navi a.indent2 {
 	padding: 2px 0 2px 25px;
 }
+#navi a.indent3 {
+	padding: 2px 0 2px 40px;
+}
 
 #navi .active {
 	font-weight: bold;
@@ -232,10 +235,13 @@ table.fields {
 	width: 150px;
 }
 .fields td.title.indent1 {
-	padding: 1px 15px 1px 0;
+	padding: 1px 25px 1px 0;
 }
 .fields td.title.indent2 {
-	padding: 1px 5px 1px 10px;
+	padding: 1px 15px 1px 10px;
+}
+.fields td.title.indent3 {
+	padding: 1px 5px 1px 20px;
 }
 .fields .spacer {
 	height: 8px;
