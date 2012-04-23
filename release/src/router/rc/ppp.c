@@ -199,7 +199,12 @@ int pppevent_main(int argc, char **argv)
 				f_write_string("/tmp/ppp/log", argv[i], 0, 0);
 				notice_set("wan", "Authentication failed");	// !!!
 				return 0;
-			}			
+			}
+			if ((strcmp(argv[i], "PADO_TIMEOUT") == 0) || (strcmp(argv[i], "PADS_TIMEOUT") == 0)) {
+				f_write_string("/tmp/ppp/log", argv[i], 0, 0);
+				notice_set("wan", "Timeout");
+				return 0;
+			}
 		}
 	}
 
