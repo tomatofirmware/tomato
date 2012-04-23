@@ -370,6 +370,7 @@ const aspapi_t aspapi[] = {
 	{ "lanip",				asp_lanip			},
 	{ "layer7",				asp_layer7			},
 	{ "link_uptime",		asp_link_uptime		},
+	{ "link_starttime",		asp_link_starttime	},
 	{ "lipp",				asp_lipp			},
 	{ "netdev",				asp_netdev			},
 	{ "iptraffic",			asp_iptraffic		},

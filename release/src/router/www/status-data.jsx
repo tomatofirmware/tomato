@@ -106,8 +106,8 @@ do {
 	stats.ip6_lan_ll = ((typeof(sysinfo.ip6_lan_ll) != 'undefined') ? sysinfo.ip6_lan_ll : '') + ''
 /* IPV6-END */
 
-	stats.wanstatus = '<% wanstatus(); %> <% notice("wan"); %>';
-	if (stats.wanstatus != 'Connected') stats.wanstatus = '<b>' + stats.wanstatus + '</b>';
+	stats.wanstatus = '<% wanstatus(); %>';
+	if (stats.wanstatus != 'Connected') stats.wanstatus = '<b>' + stats.wanstatus + ' <% link_starttime(); %></b>';
 
 	stats.channel = [];
 	stats.interference = [];
