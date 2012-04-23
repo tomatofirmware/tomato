@@ -911,6 +911,7 @@ static const nvset_t nvset_list[] = {
 	{ "https_crt_gen",		V_TEMP				},
 	{ "remote_management",	V_01				},
 	{ "remote_mgt_https",	V_01				},
+	{ "remote_mgt_nodefault",	V_01				},
 	{ "http_lanport",		V_PORT				},
 	{ "https_lanport",		V_PORT				},
 	{ "web_wl_filter",		V_01				},

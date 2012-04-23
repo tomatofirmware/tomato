@@ -944,7 +944,7 @@ static void filter_input(void)
 	do {
 		if ((c = strchr(p, ',')) != NULL) *c = 0;
 
-		if (ipt_source(p, s, "remote management", NULL)) {
+		if (!(nvram_match("remote_mgt_nodefault", "1") && strcmp(nvram_safe_get("http_passwd"), "admin") == 0) && ipt_source(p, s, "remote management", NULL)) {
 
 			if (remotemanage) {
 				ipt_write("-A INPUT -p tcp %s --dport %s -j %s\n",
@@ -1429,7 +1429,7 @@ static void filter6_input(void)
 	do {
 		if ((c = strchr(p, ',')) != NULL) *c = 0;
 
-		if (ip6t_source(p, s, "remote management", NULL)) {
+		if (!(nvram_match("remote_mgt_nodefault", "1") && strcmp(nvram_safe_get("http_passwd"), "admin") == 0) && ip6t_source(p, s, "remote management", NULL)) {
 
 			if (remotemanage) {
 				ip6t_write("-A INPUT -p tcp %s --dport %s -j %s\n",
@@ -1482,6 +1482,10 @@ static void filter_table(void)
 	);
 
 	filter_log();
+
+	if (nvram_match("remote_mgt_nodefault", "1") && strcmp(nvram_safe_get("http_passwd"), "admin") == 0) {
+		syslog(LOG_INFO, "Firewall not open for Remote Management due to default password being in effect");
+	}
 
 	filter_input();
 #ifdef TCONFIG_IPV6

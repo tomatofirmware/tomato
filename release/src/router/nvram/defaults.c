@@ -580,6 +580,7 @@ const defaults_t defaults[] = {
 	{ "http_id",			""				},
 	{ "web_mx",				""				},
 	{ "web_pb",				""				},
+	{ "remote_mgt_nodefault",	"1"				},	// Restrict remote management if password = 'admin'
 
 // admin-bwm
 	{ "rstats_enable",		"1"				},

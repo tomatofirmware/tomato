@@ -29,7 +29,7 @@ textarea {
 
 <script type='text/javascript'>
 
-//	<% nvram("http_enable,https_enable,http_lanport,https_lanport,remote_management,remote_mgt_https,web_wl_filter,web_css,sshd_eas,sshd_pass,sshd_remote,telnetd_eas,http_wanport,sshd_authkeys,sshd_port,sshd_rport,sshd_forwarding,telnetd_port,rmgt_sip,https_crt_cn,https_crt_save,lan_ipaddr,ne_shlimit"); %>
+//	<% nvram("http_enable,https_enable,http_lanport,https_lanport,remote_management,remote_mgt_https,web_wl_filter,web_css,sshd_eas,sshd_pass,sshd_remote,remote_mgt_nodefault,telnetd_eas,http_wanport,sshd_authkeys,sshd_port,sshd_rport,sshd_forwarding,telnetd_port,rmgt_sip,https_crt_cn,https_crt_save,lan_ipaddr,ne_shlimit"); %>
 
 changed = 0;
 tdup = parseInt('<% psup("telnetd"); %>');
@@ -206,6 +206,7 @@ function save()
 	fom.web_wl_filter.value = E('_f_http_wireless').checked ? 0 : 1;
 
 	fom.telnetd_eas.value = E('_f_telnetd_eas').checked ? 1 : 0;
+	fom.remote_mgt_nodefault.value = E('_f_remote_mgt_nodefault').checked ? 1 : 0;
 
 	fom.sshd_eas.value = E('_f_sshd_eas').checked ? 1 : 0;
 	fom.sshd_pass.value = E('_f_sshd_pass').checked ? 1 : 0;
@@ -258,6 +259,7 @@ function init()
 <input type='hidden' name='remote_mgt_https'>
 <input type='hidden' name='web_wl_filter'>
 <input type='hidden' name='telnetd_eas'>
+<input type='hidden' name='remote_mgt_nodefault'>
 <input type='hidden' name='sshd_eas'>
 <input type='hidden' name='sshd_pass'>
 <input type='hidden' name='sshd_remote'>
@@ -341,7 +343,8 @@ createFieldTable('', [
 	{ title: '', indent: 2, multi: [
 		{ name: 'f_limit_hit', type: 'text', maxlen: 4, size: 6, suffix: '&nbsp; every &nbsp;', value: shlimit[1] },
 		{ name: 'f_limit_sec', type: 'text', maxlen: 4, size: 6, suffix: '&nbsp; seconds', value: shlimit[2] }
-	] }	
+	] },
+	{ title: 'Block remote default password', name: 'f_remote_mgt_nodefault', type: 'checkbox', value: nvram.remote_mgt_nodefault == 1 }	
 ]);
 </script>
 </div>
