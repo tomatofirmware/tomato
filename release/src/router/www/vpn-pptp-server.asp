@@ -32,7 +32,7 @@ if (nvram.pptpd_forcemppe == '') nvram.pptpd_forcemppe = '1';
 
 var ul = new TomatoGrid();
 ul.setup = function() {
-	this.init('ul-grid', 'sort', 6, [
+	this.init('ul-grid', 'sort', 32, [
 		{ type: 'text', maxlen: 32, size: 32 },
 		{ type: 'text', maxlen: 32, size: 32 } ]);
 
