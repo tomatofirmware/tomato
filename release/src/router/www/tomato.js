@@ -2384,12 +2384,12 @@ function navi()
 /* TOR-BEGIN */
 			['TOR Project',			'tor.asp'],
 /* TOR-END */
-			['VLAN',			'vlan.asp'],
-			['LAN Access',			'access.asp'],
-			['Virtual Wireless',		'wlanvifs.asp'],
-			['Wireless',			'wireless.asp'] ] ],
-		['Port Forwarding', 		'forward', 0, [
-			['Basic',			'basic.asp'],
+			['VLANy',			'vlan.asp'],
+			['Dostęp LAN',			'access.asp'],
+			['Wirtualne Wi-Fi',		'wlanvifs.asp'],
+			['Wi-Fi',			'wireless.asp'] ] ],
+		['Przekierowanie portów',	'forward', 0, [
+			['Podstawowe',			'basic.asp'],
 /* IPV6-BEGIN */
 			['Basic IPv6',			'basic-ipv6.asp'],
 /* IPV6-END */

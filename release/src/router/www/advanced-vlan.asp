@@ -15,7 +15,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Advanced: VLAN</title>
+<title>[<% ident(); %>] Zaawansowane: Obsługa VLAN`ów</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
@@ -769,11 +769,11 @@ function init() {
 function toggleVisibility(whichone) {
 	if (E('sesdiv_' + whichone).style.display == '') {
 		E('sesdiv_' + whichone).style.display = 'none';
-		E('sesdiv_' + whichone + '_showhide').innerHTML = '(Click here to show)';
+		E('sesdiv_' + whichone + '_showhide').innerHTML = '(Pokaż)';
 		cookie.set('advanced_vlan_' + whichone + '_vis', 0);
 	} else {
 		E('sesdiv_' + whichone).style.display='';
-		E('sesdiv_' + whichone + '_showhide').innerHTML = '(Click here to hide)';
+		E('sesdiv_' + whichone + '_showhide').innerHTML = '(Ukryj)';
 		cookie.set('advanced_vlan_' + whichone + '_vis', 1);
 	}
 }
@@ -860,35 +860,35 @@ function earlyInit() {
 <input type='hidden' name='vlan15vid'>
 
 <div id='sesdiv' style='display:none'>
-<div class='section-title'>VLAN</div>
+<div class='section-title'>Obsługa VLAN`ów</div>
 <div class='section'>
   <table class='tomato-grid' cellspacing=1 id='vlan-grid'></table>
 </div>
 
 <!-- / / / -->
 
-<div class='section-title'>VID Offset <small><i><a href='javascript:toggleVisibility("vidmap");'><span id='sesdiv_vidmap_showhide'>(Click here to show)</span></a></i></small></div>
+<div class='section-title'>VID Offset <small><i><a href='javascript:toggleVisibility("vidmap");'><span id='sesdiv_vidmap_showhide'>(Pokaż)</span></a></i></small></div>
 <div class='section' id='sesdiv_vidmap' style='display:none'>
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: 'First 802.1Q VLAN tag', name: 'vlan0tag', type: 'text', maxlen:4, size:6,
+	{ title: 'Pierwszy 802.1Q VLAN tag', name: 'vlan0tag', type: 'text', maxlen:4, size:6,
 		value: fixInt(nvram.vlan0tag, 0, 4080, 0),
-		suffix: ' <small><i>(range: 0 - 4080; must be a multiple of 16; set to 0 to disable)</i></small>' }
+		suffix: ' <small><i>(zakres: 0 - 4080; musi być wielokrotnością 16; ustaw 0 aby dezaktywować)</i></small>' }
 ]);
 </script>
 </div>
 
 <!-- / / / -->
 
-<div class='section-title'>Wireless <small><i><a href='javascript:toggleVisibility("wireless");'><span id='sesdiv_wireless_showhide'>(Click here to show)</span></a></i></small></div>
+<div class='section-title'>Wi-Fi <small><i><a href='javascript:toggleVisibility("wireless");'><span id='sesdiv_wireless_showhide'>(Pokaż)</span></a></i></small></div>
 <div class='section' id='sesdiv_wireless' style='display:none'>
 <script type='text/javascript'>
 var f = [];
 for (var uidx = 0; uidx < wl_ifaces.length; ++uidx) {
   var u = wl_fface(uidx);
   f.push(
-    { title: ('Bridge ' + wl_ifaces[uidx][0] + ' to'), name: ('f_bridge_wlan'+u+'_to'), type: 'select', 
-     options: [[0,'LAN (br0)'],[1,'LAN1  (br1)'],[2,'LAN2 (br2)'],[3,'LAN3 (br3)'],[4,'none']], value: 4 } );
+    { title: ('Zmostkuj ' + wl_ifaces[uidx][0] + ' do'), name: ('f_bridge_wlan'+u+'_to'), type: 'select', 
+     options: [[0,'LAN (br0)'],[1,'LAN1  (br1)'],[2,'LAN2 (br2)'],[3,'LAN3 (br3)'],[4,'żaden']], value: 4 } );
 }
 createFieldTable('',f);
 if(port_vlan_supported) vlg.setup();
@@ -897,28 +897,28 @@ if(port_vlan_supported) vlg.setup();
 
 <!-- / / / -->
 
-<div class='section-title'>Notes <small><i><a href='javascript:toggleVisibility("notes");'><span id='sesdiv_notes_showhide'>(Click here to show)</span></a></i></small></div>
+<div class='section-title'>Notka <small><i><a href='javascript:toggleVisibility("notes");'><span id='sesdiv_notes_showhide'>(Pokaż)</span></a></i></small></div>
 <div class='section' id='sesdiv_notes' style='display:none'>
 <ul>
-<li><b>VLAN</b> - Unique identifier of a VLAN.</li>
-<li><b>VID</b> - <i>EXPERIMENTAL</i> - Allows overriding 'traditional' VLAN/VID mapping with arbitrary VIDs for each VLAN (set to '0' to use 'regular' VLAN/VID mappings instead). Warning: this hasn't been verified/tested on anything but a Cisco/Linksys E3000 and may not be supported by your particular device/model (<small><b><i>see notes on "VID Offset" below</i></b></small>).</li>
-<li><b>Ports 1-4 &amp; WAN</b> - Which ethernet ports on the router should be members of this VLAN.</li>
-<li><b>Tagged</b> - Enable 802.1Q tagging of ethernet frames on a particular port/VLAN
+<li><b>VLAN</b> - Unikatowy identyfikator VLAN.</li>
+<li><b>VID</b> - <i>EKSPERYMENTALNE</i> - Zezwala na nadpisywanie 'tradycyjnego' mapowania VLAN/VID dla dowolnych VID-ów dla każdego VLAN-u (ustaw '0' aby użyć 'tradycjnego' mapowania VLAN/VID). Ostrzeżenie: funkcja nie była testowana na innym sprzęcie, testowano tylko dla Cisco/Linksys E3000 i może nie wspierać Twojego urządzenia/modelu(<small><b><i>Patrz na poniższy opis "VID Offset"</i></b></small>).</li>
+<li><b>Porty 1-4 &amp; WAN</b> - Które porty ethernetowe powinny należeć do tego VLAN-u.</li>
+<li><b>Znakowany</b> - Aktywuj tagowanie 802.1Q ramek dla określonego portu/VLAN-u
 <script type='text/javascript'>
 if(!trunk_vlan_supported)
   W(' <i>(not known to be supported on this model)</i>');
 </script>
 </li>
-<li><b>Default</b> - VLAN ID assigned to untagged frames received by the router.</li>
-<li><b>Bridge</b> - Determines if this VLAN ID should be treated as WAN, part of a LAN bridge or just left alone (i.e. member of a 802.1Q trunk, being managed manually via scripts, etc...).</li>
+<li><b>Domyślny</b> - VLAN ID przypisany do nioznaczonych ramek otrzymanych przez ruter.</li>
+<li><b>Bridge</b> - Definiuje czy VLAN ID powinno być traktowane jako WAN, część mostu LAN czy pozostawiona samotna (np. członek trunk-u 802.1Q, zarządzany manualnie poprzez skrypt, itp...).</li>
 </ul>
 
 <ul>
-<li><b>VID Offset</b> - <i>EXPERIMENTAL</i> - First 802.1Q VLAN tag to be used as <i>base/initial tag/VID</i> for VLAN and VID assignments. This allows using VIDs larger than 15 on (older) devices such as the Linksys WRT54GL v1.1 (in contiguous blocks/ranges with up to 16 VLANs/VIDs). Set to '0' (zero) to disable this feature and VLANs will have the very same/identical value for its VID, as usual (from 0 to 15).</li>
+<li><b>VID Offset</b> - <i>EKSPERYMENTALNE</i> - Pierwszy 802.1Q VLAN tag do wykorzystania jako <i>base/initial tag/VID</i> dla VLAN oraz przypisania VID. Pozwala to na korzystanie z VID-ów większych niż 15 na użądzeniach (starszych) takic jak Linksys WRT54GL v1.1 (w ciągłych blokach/zakresach do 16 VLAN-ów/VID-ów). Ustaw '0' (zero) aby dezaktywować tą funkcjęoraz VLAN-y będą mieć tą samą wartość dla VID-ów, zazwyczaj (od 0 do 15).</li>
 </ul>
 
 <ul>
-<li><b>Wireless</b> - Assignments of wireless interfaces to different LAN briges. You should probably be using and/or check things on <a href=advanced-wlanvifs.asp>Advanced/Virtual Wireless</a> and <a href=basic-network.asp>Basic/Network</a>.</li>
+<li><b>Wi-Fi</b> - Przypisanie interfejsów bezprzewodowych do różnych LAN-ów. Prawdopodobnie powinieneś używąć wraz/lub z <a href=advanced-wlanvifs.asp>Zaawansowane/Wirtualne Wi-Fi</a> i <a href=basic-network.asp>Basic/Network</a>.</li>
 </ul>
 
 <small>
@@ -929,16 +929,16 @@ if(!trunk_vlan_supported)
 <li>One VID <i>must</i> be selected as the default.</li>
 <script type='text/javascript'>
 if((trunk_vlan_supported) || (nvram.trunk_vlan_so == '1')) {
-  W('<li>To prevent 802.1Q compatibility issues, avoid using VID "0" as 802.1Q specifies that frames with a tag of "0" do not belong to any VLAN (the tag contains only user priority information).</li>');
-  W('<li>It may be also recommended to avoid using VID "1" as some vendors consider it special/reserved (for management purposes).</li>');
+  W('<li>Aby uniknąć problemów ze zgodnością 802.1Q, unikaj używania VID "0" jako że 802.1Q określa że ramki oznaczone jako "0" nie należą do żadnego VLAN-u(TAG zawiera tylko informacje na temat priorytetów użytkownika).</li>');
+  W('<li>Zalecane jest również unikanie używania VID "1" jako że niektórzy producenci uważają go za specjalny/zastrzeżony(do celów zarządzania).</li>');
 }
 </script>
 </ul>
 <br>
 <ul>
-<li>This is highly <b>experimental</b> and hasn't been tested in anything but a Linksys WRT54GL v1.1 running a Teaman-ND K24 build and a Cisco/Linksys E3000 running a Teaman-RT K26 build.</li>
-<li>There's lots of things that could go wrong, please do think about what you're doing and take a backup before hitting the 'Save' button on this page!</li>
-<li>You've been warned!</li>
+<li>To jest bardzo mocno <b>eksperymentalna</b> wersja i nie została ona przetestowana na niczym innym niż Linksys WRT54GL v1.1 pracujący z softem Teaman-ND K24 oraz Cisco/Linksys E3000 z softem Teaman-RT K26.</li>
+<li>Jest tutaj wiele rzeczy które mogą pójść źle, proszę pomyśl o tym, co robisz i zrób kopię zapasową zanim klikniesz w przycisk "Zapisz" na tej stronie!</li>
+<li>Zostałeś ostrzeżony!</li>
 </ul>
 </ul>
 <div id='trunk_vlan_override' style='display:none'>

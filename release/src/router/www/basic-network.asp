@@ -1589,7 +1589,7 @@ createFieldTable('', [
 /* DNSCRYPT-BEGIN */
 	{ title: 'Use dnscrypt-proxy', name: 'f_dnscrypt_proxy', type: 'checkbox', value: (nvram.dnscrypt_proxy == 1) },
 /* DNSCRYPT-END */
-	{ title: 'WINS <i>(for DHCP)</i>', name: 'wan_wins', type: 'text', maxlen: 15, size: 17, value: nvram.wan_wins }
+	{ title: 'WINS <i>(dla DHCP)</i>', name: 'wan_wins', type: 'text', maxlen: 15, size: 17, value: nvram.wan_wins }
 ]);
 </script>
 </div>
@@ -1628,59 +1628,59 @@ if (wl_sunit(uidx)<0) {
 	W('<div class=\'section\'>');
 
 	f = [
-		{ title: 'Enable Wireless', name: 'f_wl'+u+'_radio', type: 'checkbox',
+		{ title: 'Włącz Wi-Fi', name: 'f_wl'+u+'_radio', type: 'checkbox',
 			value: (eval('nvram.wl'+u+'_radio') == '1') && (eval('nvram.wl'+u+'_net_mode') != 'disabled') },
-		{ title: 'MAC Address', text: '<a href="advanced-mac.asp">' + eval('nvram.wl'+u+'_hwaddr') + '</a>' },
-		{ title: 'Wireless Mode', name: 'f_wl'+u+'_mode', type: 'select',
-			options: [['ap', 'Access Point'],['apwds', 'Access Point + WDS'],['sta', 'Wireless Client'],['wet', 'Wireless Ethernet Bridge'],['wds', 'WDS']],
+		{ title: 'Adres MAC', text: '<a href="advanced-mac.asp">' + eval('nvram.wl'+u+'_hwaddr') + '</a>' },
+		{ title: 'Tryb Wi-Fi', name: 'f_wl'+u+'_mode', type: 'select',
+			options: [['ap', 'Punkt dostępu'],['apwds', 'Punkt dostępu + WDS'],['sta', 'Klient Wi-Fi'],['wet', 'Interfejs ethernetowy Wi-Fi'],['wds', 'WDS']],
 			value: ((eval('nvram.wl'+u+'_mode') == 'ap') && (eval('nvram.wl'+u+'_wds_enable') == '1')) ? 'apwds' : eval('nvram.wl'+u+'_mode') },
-		{ title: 'Radio Band', name: 'f_wl'+u+'_nband', type: 'select', options: bands[uidx],
+		{ title: 'Pasmo', name: 'f_wl'+u+'_nband', type: 'select', options: bands[uidx],
 			value: eval('nvram.wl'+u+'_nband') || '0' == '0' ? bands[uidx][0][0] : eval('nvram.wl'+u+'_nband') },
-		{ title: 'Wireless Network Mode', name: 'wl'+u+'_net_mode', type: 'select',
+		{ title: 'Standard Wi-Fi', name: 'wl'+u+'_net_mode', type: 'select',
 			value: (eval('nvram.wl'+u+'_net_mode') == 'disabled') ? 'mixed' : eval('nvram.wl'+u+'_net_mode'),
 			options: [], prefix: '<span id="__wl'+u+'_net_mode">', suffix: '</span>' },
 		{ title: 'SSID', name: 'wl'+u+'_ssid', type: 'text', maxlen: 32, size: 34, value: eval('nvram.wl'+u+'_ssid') },
-		{ title: 'Broadcast', indent: 2, name: 'f_wl'+u+'_bcast', type: 'checkbox', value: (eval('nvram.wl'+u+'_closed') == '0') },
-		{ title: 'Channel', name: 'wl'+u+'_channel', type: 'select', options: ghz[uidx], prefix: '<span id="__wl'+u+'_channel">', suffix: '</span> <input type="button" id="_f_wl'+u+'_scan" value="Scan" onclick="scanButton('+u+')"> <img src="spin.gif" id="spin'+u+'">',
+		{ title: 'Rozgłaszanie SSID', indent: 2, name: 'f_wl'+u+'_bcast', type: 'checkbox', value: (eval('nvram.wl'+u+'_closed') == '0') },
+		{ title: 'Kanał', name: 'wl'+u+'_channel', type: 'select', options: ghz[uidx], prefix: '<span id="__wl'+u+'_channel">', suffix: '</span> <input type="button" id="_f_wl'+u+'_scan" value="Skanuj" onclick="scanButton('+u+')"> <img src="spin.gif" id="spin'+u+'">',
 			value: eval('nvram.wl'+u+'_channel') },
-		{ title: 'Channel Width', name: 'wl'+u+'_nbw_cap', type: 'select', options: [['0','20 MHz'],['1','40 MHz']],
+		{ title: 'Szerokość kanały', name: 'wl'+u+'_nbw_cap', type: 'select', options: [['0','20 MHz'],['1','40 MHz']],
 			value: eval('nvram.wl'+u+'_nbw_cap') },
-		{ title: 'Control Sideband', name: 'f_wl'+u+'_nctrlsb', type: 'select', options: [['lower','Lower'],['upper','Upper']],
+		{ title: 'Pasmo kontrolne', name: 'f_wl'+u+'_nctrlsb', type: 'select', options: [['lower','Lower'],['upper','Upper']],
 			value: eval('nvram.wl'+u+'_nctrlsb') == 'none' ? 'lower' : eval('nvram.wl'+u+'_nctrlsb') },
 		null,
-		{ title: 'Security', name: 'wl'+u+'_security_mode', type: 'select',
-			options: [['disabled','Disabled'],['wep','WEP'],['wpa_personal','WPA Personal'],['wpa_enterprise','WPA Enterprise'],['wpa2_personal','WPA2 Personal'],['wpa2_enterprise','WPA2 Enterprise'],['wpaX_personal','WPA / WPA2 Personal'],['wpaX_enterprise','WPA / WPA2 Enterprise'],['radius','Radius']],
+		{ title: 'Zabezpieczenie', name: 'wl'+u+'_security_mode', type: 'select',
+			options: [['disabled','brak'],['wep','WEP'],['wpa_personal','WPA Personal'],['wpa_enterprise','WPA Enterprise'],['wpa2_personal','WPA2 Personal'],['wpa2_enterprise','WPA2 Enterprise'],['wpaX_personal','WPA / WPA2 Personal'],['wpaX_enterprise','WPA / WPA2 Enterprise'],['radius','Radius']],
 			value: eval('nvram.wl'+u+'_security_mode') },
-		{ title: 'Encryption', indent: 2, name: 'wl'+u+'_crypto', type: 'select',
+		{ title: 'Szyfrowanie', indent: 2, name: 'wl'+u+'_crypto', type: 'select',
 			options: [['tkip','TKIP'],['aes','AES'],['tkip+aes','TKIP / AES']], value: eval('nvram.wl'+u+'_crypto') },
-		{ title: 'Shared Key', indent: 2, name: 'wl'+u+'_wpa_psk', type: 'password', maxlen: 64, size: 66, peekaboo: 1,
-			suffix: ' <input type="button" id="_f_wl'+u+'_psk_random1" value="Random" onclick="random_psk(\'_wl'+u+'_wpa_psk\')">',
+		{ title: 'Klucz współdzielony', indent: 2, name: 'wl'+u+'_wpa_psk', type: 'password', maxlen: 64, size: 66, peekaboo: 1,
+			suffix: ' <input type="button" id="_f_wl'+u+'_psk_random1" value="Losowy" onclick="random_psk(\'_wl'+u+'_wpa_psk\')">',
 			value: eval('nvram.wl'+u+'_wpa_psk') },
-		{ title: 'Shared Key', indent: 2, name: 'wl'+u+'_radius_key', type: 'password', maxlen: 80, size: 32, peekaboo: 1,
-			suffix: ' <input type="button" id="_f_wl'+u+'_psk_random2" value="Random" onclick="random_psk(\'_wl'+u+'_radius_key\')">',
+		{ title: 'Klucz współdzielony', indent: 2, name: 'wl'+u+'_radius_key', type: 'password', maxlen: 80, size: 32, peekaboo: 1,
+			suffix: ' <input type="button" id="_f_wl'+u+'_psk_random2" value="Losowy" onclick="random_psk(\'_wl'+u+'_radius_key\')">',
 			value: eval('nvram.wl'+u+'_radius_key') },
-		{ title: 'Group Key Renewal', indent: 2, name: 'wl'+u+'_wpa_gtk_rekey', type: 'text', maxlen: 4, size: 6, suffix: ' <i>(seconds)</i>',
+		{ title: 'Odnawianie klucza w grupie co', indent: 2, name: 'wl'+u+'_wpa_gtk_rekey', type: 'text', maxlen: 4, size: 6, suffix: ' <i>(sekund)</i>',
 			value: eval('nvram.wl'+u+'_wpa_gtk_rekey') },
-		{ title: 'Radius Server', indent: 2, multi: [
+		{ title: 'Serwer Radius', indent: 2, multi: [
 			{ name: 'wl'+u+'_radius_ipaddr', type: 'text', maxlen: 15, size: 17, value: eval('nvram.wl'+u+'_radius_ipaddr') },
 			{ name: 'wl'+u+'_radius_port', type: 'text', maxlen: 5, size: 7, prefix: ' : ', value: eval('nvram.wl'+u+'_radius_port') } ] },
-		{ title: 'Encryption', indent: 2, name: 'wl'+u+'_wep_bit', type: 'select', options: [['128','128-bits'],['64','64-bits']],
+		{ title: 'Szyfrowanie', indent: 2, name: 'wl'+u+'_wep_bit', type: 'select', options: [['128','128-bits'],['64','64-bits']],
 			value: eval('nvram.wl'+u+'_wep_bit') },
-		{ title: 'Passphrase', indent: 2, name: 'wl'+u+'_passphrase', type: 'text', maxlen: 16, size: 20,
-			suffix: ' <input type="button" id="_f_wl'+u+'_wep_gen" value="Generate" onclick="generate_wep('+u+')"> <input type="button" id="_f_wl'+u+'_wep_random" value="Random" onclick="random_wep('+u+')">',
+		{ title: 'Hasło', indent: 2, name: 'wl'+u+'_passphrase', type: 'text', maxlen: 16, size: 20,
+			suffix: ' <input type="button" id="_f_wl'+u+'_wep_gen" value="Generuj" onclick="generate_wep('+u+')"> <input type="button" id="_f_wl'+u+'_wep_random" value="Losowy" onclick="random_wep('+u+')">',
 			value: eval('nvram.wl'+u+'_passphrase') }
 	];
 
 	for (i = 1; i <= 4; ++i)	{
 		f.push(
-			{ title: ('Key ' + i), indent: 2, name: ('wl'+u+'_key' + i), type: 'text', maxlen: 26, size: 34,
+			{ title: ('Klucz ' + i), indent: 2, name: ('wl'+u+'_key' + i), type: 'text', maxlen: 26, size: 34,
 				suffix: '<input type="radio" onchange="verifyFields(this,1)" onclick="verifyFields(this,1)" name="f_wl'+u+'_wepidx" id="_f_wl'+u+'_wepidx_' + i + '" value="' + i + '"' + ((eval('nvram.wl'+u+'_key') == i) ? ' checked>' : '>'),
 				value: nvram['wl'+u+'_key' + i] });
 	}
 
 	f.push(null,
 		{ title: 'WDS', name: 'f_wl'+u+'_lazywds', type: 'select',
-			 options: [['0','Link With...'],['1','Automatic']], value: nvram['wl'+u+'_lazywds'] } );
+			 options: [['0','Połącz z ...'],['1','Automatycznie']], value: nvram['wl'+u+'_lazywds'] } );
 	wds = eval('nvram.wl'+u+'_wds').split(/\s+/);
 	for (i = 0; i < 10; i += 2)	{
 		f.push({ title: (i ? '' : 'MAC Address'), indent: 2, multi: [

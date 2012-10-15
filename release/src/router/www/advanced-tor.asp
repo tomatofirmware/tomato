@@ -10,7 +10,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Advanced: TOR Project</title>
+<title>[<% ident(); %>] Zaawansowane: TOR</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <link rel='stylesheet' type='text/css' href='<% nv('web_css'); %>.css'>
 <script type='text/javascript' src='tomato.js'></script>
@@ -52,43 +52,43 @@ function verifyFields(focused, quiet)
 	var s = E('_tor_custom');
 
 	if (s.value.search(/SocksPort/) == 0)  {
-		ferror.set(s, 'Cannot set "SocksPort" option here. You can set it in Tomato GUI', quiet);
+		ferror.set(s, 'Nie możesz ustawiać opcji "SocksPort" tutaj. Możesz ją zdefiniować w GUI Tomato.', quiet);
 		ok = 0; }
 
 	if (s.value.search(/SocksBindAddress/) == 0)  {
-		ferror.set(s, 'Cannot set "SocksBindAddress" option here.', quiet);
+		ferror.set(s, 'Nie możesz ustawiać opcji "SocksBindAddress" tutaj.', quiet);
 		ok = 0; }
 
 	if (s.value.search(/AllowUnverifiedNodes/) == 0)  {
-		ferror.set(s, 'Cannot set "AllowUnverifiedNodes" option here.', quiet);
+		ferror.set(s, 'Nie możesz ustawiać opcji "AllowUnverifiedNodes" tutaj.', quiet);
 		ok = 0; }
 
 	if (s.value.search(/Log/) == 0)  {
-		ferror.set(s, 'Cannot set "Log" option here.', quiet);
+		ferror.set(s, 'Nie możesz ustawiać opcji "Log" tutaj.', quiet);
 		ok = 0; }
 
 	if (s.value.search(/DataDirectory/) == 0)  {
-		ferror.set(s, 'Cannot set "DataDirectory" option here. You can set it in Tomato GUI', quiet);
+		ferror.set(s, 'Nie możesz ustawiać opcji "DataDirectory" tutaj. Możesz ją zdefiniować w GUI Tomato.', quiet);
 		ok = 0; }
 
 	if (s.value.search(/TransPort/) == 0)  {
-		ferror.set(s, 'Cannot set "TransPort" option here. You can set it in Tomato GUI', quiet);
+		ferror.set(s, 'Nie możesz ustawiać opcji "TransPort" tutaj. Możesz ją zdefiniować w GUI Tomato.', quiet);
 		ok = 0; }
 
 	if (s.value.search(/TransListenAddress/) == 0)  {
-		ferror.set(s, 'Cannot set "TransListenAddress" option here.', quiet);
+		ferror.set(s, 'Nie możesz ustawiać opcji "TransListenAddress" tutaj.', quiet);
 		ok = 0; }
 
 	if (s.value.search(/DNSPort/) == 0)  {
-		ferror.set(s, 'Cannot set "DNSPort" option here. You can set it in Tomato GUI', quiet);
+		ferror.set(s, 'Nie możesz ustawiać opcji "DNSPort" tutaj. Możesz ją zdefiniować w GUI Tomato.', quiet);
 		ok = 0; }
 
 	if (s.value.search(/DNSListenAddress/) == 0)  {
-		ferror.set(s, 'Cannot set "DNSListenAddress" option here.', quiet);
+		ferror.set(s, 'Nie możesz ustawiać opcji "DNSListenAddress" tutaj.', quiet);
 		ok = 0; }
 
 	if (s.value.search(/User/) == 0)  {
-		ferror.set(s, 'Cannot set "User" option here.', quiet);
+		ferror.set(s, 'Nie możesz ustawiać opcji "User" tutaj.', quiet);
 		ok = 0; }
 
 	return ok;
@@ -119,12 +119,12 @@ function init()
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 <div class='title'>Tomato</div>
-<div class='version'>Version <% version(); %></div>
+<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
 <div id='ident'><% ident(); %></div>
-<div class='section-title'>TOR Settings</div>
+<div class='section-title'>Ustawienia TOR`a</div>
 <div class='section' id='config-section'>
 <form id='_fom' method='post' action='tomato.cgi'>
 <input type='hidden' name='_nextpage' value='advanced-tor.asp'>
@@ -133,34 +133,34 @@ function init()
 
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: 'Enable TOR', name: 'f_tor_enable', type: 'checkbox', value: nvram.tor_enable == '1' },
+	{ title: 'Włącz TOR`a', name: 'f_tor_enable', type: 'checkbox', value: nvram.tor_enable == '1' },
 	null,
-	{ title: 'Socks Port', name: 'tor_socksport', type: 'text', maxlen: 5, size: 7, value: fixPort(nvram.tor_socksport, 9050) },
-	{ title: 'Trans Port', name: 'tor_transport', type: 'text', maxlen: 5, size: 7, value: fixPort(nvram.tor_transport, 9040) },
-	{ title: 'DNS Port', name: 'tor_dnsport', type: 'text', maxlen: 5, size: 7, value: fixPort(nvram.tor_dnsport, 9053) },
-	{ title: 'Data Directory', name: 'tor_datadir', type: 'text', maxlen: 24, size: 28, value: nvram.tor_datadir },
+	{ title: 'Port Socks', name: 'tor_socksport', type: 'text', maxlen: 5, size: 7, value: fixPort(nvram.tor_socksport, 9050) },
+	{ title: 'Port Trans', name: 'tor_transport', type: 'text', maxlen: 5, size: 7, value: fixPort(nvram.tor_transport, 9040) },
+	{ title: 'Port DNS', name: 'tor_dnsport', type: 'text', maxlen: 5, size: 7, value: fixPort(nvram.tor_dnsport, 9053) },
+	{ title: 'Katalog', name: 'tor_datadir', type: 'text', maxlen: 24, size: 28, value: nvram.tor_datadir },
 	null,
-	{ title: 'Redirect all users from', multi: [
+	{ title: 'Przekieruj wszystkich użytkowników z', multi: [
 		{ name: 'tor_iface', type: 'select', options: [
 			['br0','LAN (br0)'],
 			['br1','LAN1 (br1)'],
 			['br2','LAN2 (br2)'],
 			['br3','LAN3 (br3)'],
-			['custom','Only selected IP`s']
+			['custom','Tylko wybrane adresy IP']
 				], value: nvram.tor_iface },
 		{ name: 'tor_users', type: 'text', maxlen: 512, size: 64, value: nvram.tor_users } ] },
 	null,
-	{ title: 'Custom Configuration', name: 'tor_custom', type: 'textarea', value: nvram.tor_custom }
+	{ title: 'Własna konfiguracja', name: 'tor_custom', type: 'textarea', value: nvram.tor_custom }
 ]);
 </script>
 </div>
-<div class='section-title'>Notes</div>
+<div class='section-title'>Notka</div>
 <div class='section'>
 <ul>
-	<li><b>Enable TOR</b> - Be patient. Running TOR can take from several seconds to several minutes.
-	<li><b>Only selected IP`s</b> - ex: 1.2.3.4,1.1.0/24,1.2.3.1-1.2.3.4
-	<li>Only connections to destination port 80 are redirected to TOR.
-	<li>Attention! - If your router has only 32MB RAM, you have to use swap.
+	<li><b>Włącz TOR`a</b> - Bądź cierpliwy. Uruchomienie TOR`a może trwać od kilku sekund do kilku minut.
+	<li><b>Tylko wybrane adresy IP</b> - np: 1.2.3.4,1.1.0/24,1.2.3.1-1.2.3.4
+	<li>Tylko połączenia na port docelowy 80 będą kierowane do sieci TOR.
+	<li>Uwaga! - Jeżeli twój router ma tylko 32MB pamięci RAM, musisz użyć SWAP.
 </ul>
 </div>
 </form>
@@ -169,8 +169,8 @@ createFieldTable('', [
 <tr><td id='footer' colspan=2>
  <form>
  <span id='footer-msg'></span>
- <input type='button' value='Save' id='save-button' onclick='save()'>
- <input type='button' value='Cancel' id='cancel-button' onclick='javascript:reloadPage();'>
+ <input type='button' value='Zapisz' id='save-button' onclick='save()'>
+ <input type='button' value='Anuluj' id='cancel-button' onclick='javascript:reloadPage();'>
  </form>
 </div>
 </td></tr>
