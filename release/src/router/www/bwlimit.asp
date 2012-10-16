@@ -15,7 +15,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] IP/Range BW Limiter</title>
+<title>[<% ident(); %>] Limiter Pasma</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <link rel='stylesheet' type='text/css' href='color.css'>
 <script type='text/javascript' src='tomato.js'></script>
@@ -44,9 +44,9 @@
 <script type='text/javascript'>
 // <% nvram("new_qoslimit_enable,qos_ibw,qos_obw,new_qoslimit_rules,lan_ipaddr,lan_netmask,qosl_enable,qosl_dlr,qosl_dlc,qosl_ulr,qosl_ulc,qosl_udp,qosl_tcp,limit_br1_enable,limit_br1_dlc,limit_br1_dlr,limit_br1_ulc,limit_br1_ulr,limit_br1_prio,limit_br2_enable,limit_br2_dlc,limit_br2_dlr,limit_br2_ulc,limit_br2_ulr,limit_br2_prio,limit_br3_enable,limit_br3_dlc,limit_br3_dlr,limit_br3_ulc,limit_br3_ulr,limit_br3_prio"); %>
 
-var class_prio = [['0','Highest'],['1','High'],['2','Normal'],['3','Low'],['4','Lowest']];
-var class_tcp = [['0','nolimit']];
-var class_udp = [['0','nolimit']];
+var class_prio = [['0','Najwyższy'],['1','Wysoki'],['2','Normalny'],['3','Niski'],['4','Najniższy']];
+var class_tcp = [['0','bez limitu']];
+var class_udp = [['0','bez limitu']];
 for (var i = 1; i <= 100; ++i) {
 	class_tcp.push([i*10, i*10+'']);
 	class_udp.push([i, i + '/s']);
@@ -63,7 +63,7 @@ qosg.setup = function() {
 		{ type: 'select', options: class_prio },
 		{ type: 'select', options: class_tcp },
 		{ type: 'select', options: class_udp }]);
-	this.headerSet(['IP | IP Range | MAC Address', 'DLRate', 'DLCeil', 'ULRate', 'ULCeil', 'Priority', 'TCP Limit', 'UDP Limit']);
+	this.headerSet(['IP | Zakres IP | Adres MAC', 'Gwarancja pobierania <br> DLRate', 'Maksimum pobierania<br> DLCeil', 'Gwarancja wysyłania<br> ULRate', 'Maksimum wysyłania<br> ULCeil', 'Priorytet', 'Limit TCP', 'Limit UDP']);
 	var qoslimitrules = nvram.new_qoslimit_rules.split('>');
 	for (var i = 0; i < qoslimitrules.length; ++i) {
 		var t = qoslimitrules[i].split('<');
@@ -153,45 +153,45 @@ qosg.verifyFields = function(row, quiet)
 /*
 	if (v_ip(f[0], quiet)) {
                if(this.existIP(f[0].value)) {
-                       ferror.set(f[0], 'duplicate IP address', quiet);
+                       ferror.set(f[0], 'zduplikowany adres IP', quiet);
 			ok = 0;
 		}
 	}
 */
 	if(v_macip(f[0], quiet, 0, nvram.lan_ipaddr, nvram.lan_netmask)) {
                if(this.existIP(f[0].value)) {
-                    ferror.set(f[0], 'duplicate IP or MAC address', quiet);
+                    ferror.set(f[0], 'zduplikowany adres IP lub MAC', quiet);
 			ok = 0;
 		}
 	}
      
 	if( this.checkRate(f[1].value)) {
-	        ferror.set(f[1], 'DLRate must between 1 and 99999', quiet);
+	        ferror.set(f[1], 'Gwarancja pobierania DLRate musi być pomiędzy 1 i 99999', quiet);
 		ok = 0;
 	}
 
 	if( this.checkRate(f[2].value)) {
-		ferror.set(f[2], 'DLCeil must between 1 and 99999', quiet);
+		ferror.set(f[2], 'Maksimum pobierania DLCeil musi być pomiędzy 1 i 99999', quiet);
 		ok = 0;
 	}
 
 	if( this.checkRateCeil(f[1].value, f[2].value)) {
-               ferror.set(f[2], 'DLCeil must be greater than DLRate', quiet);
+               ferror.set(f[2], 'Maksimum pobierania DLCeil musi być większe niż Gwarancja pobierania DLRate', quiet);
 		ok = 0;
 	}
 
 	if( this.checkRate(f[3].value)) {
-                ferror.set(f[3], 'ULRate must between 1 and 99999', quiet);
+                ferror.set(f[3], 'Gwarancja wysyłania ULRate musi być pomiędzy 1 i 99999', quiet);
 		ok = 0;
 	}
 
 	if( this.checkRate(f[4].value)) {
-                ferror.set(f[4], 'ULCeil must between 1 and 99999', quiet);
+                ferror.set(f[4], 'Maksimum wysyłania ULCeil musi być pomiędzy 1 i 99999', quiet);
 		ok = 0;
 	}
 
 	if( this.checkRateCeil(f[3].value, f[4].value)) {
-                    ferror.set(f[4], 'ULCeil must be greater than ULRate', quiet);
+                    ferror.set(f[4], 'Maksimum wysyłania ULCeil musi być większe niż Gwarancja wysyłania ULRate', quiet);
 			ok = 0;
 	}
 
@@ -255,7 +255,7 @@ function save()
 	var qoslimitrules = '';
 	var i;
 
-        if (data.length != 0) qoslimitrules += data[0].join('<'); 	
+        if (data.length != 0) qoslimitrules += data[0].join('<');
 	for (i = 1; i < data.length; ++i) {
 		qoslimitrules += '>' + data[i].join('<');
 	}
@@ -281,7 +281,7 @@ function init()
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -303,42 +303,42 @@ function init()
 
 <div id='bwlimit'>
 
-	<div class='section-title'>Bandwidth Limiter for LAN (br0)</div>
+	<div class='section-title'>Limitowanie pasma dla LAN (br0)</div>
 	<div class='section'>
 		<script type='text/javascript'>
 			createFieldTable('', [
-			{ title: 'Enable Limiter', name: 'f_new_qoslimit_enable', type: 'checkbox', value: nvram.new_qoslimit_enable != '0' },
-			{ title: 'Max Available Download <br><small>(same as used in QoS)</small>', indent: 2, name: 'qos_ibw', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.qos_ibw },
-			{ title: 'Max Available Upload <br><small>(same as used in QoS)</small>', indent: 2, name: 'qos_obw', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.qos_obw }
+			{ title: 'Włącz limitowanie', name: 'f_new_qoslimit_enable', type: 'checkbox', value: nvram.new_qoslimit_enable != '0' },
+			{ title: 'Maksymalne dostępne pasmo pobierania <br><small>(takie samo jak podano w QoS)</small>', indent: 2, name: 'qos_ibw', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.qos_ibw },
+			{ title: 'Maksymalne dostępne pasmo wysyłania <br><small>(takie samo jak podano w QoS)</small>', indent: 2, name: 'qos_obw', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.qos_obw }
 			]);
 		</script>
 		<br>
 		<table class='tomato-grid' id='qosg-grid'></table>
 		<div>
 			<ul>
-				<li><b>IP Address / IP Range:</b>
-				<li>Example: 192.168.1.5 for one IP.
-				<li>Example: 192.168.1.4-7 for IP 192.168.1.4 to 192.168.1.7
-				<li>Example: 4-7 for IP Range .4 to .7
-				<li><b>The IP Range devices will share the Bandwidth</b>
-				<li><b>MAC Address</b> Example: 00:2E:3C:6A:22:D8
+				<li><b>Adres IP / Zakres IP:</b>
+				<li>Przykład: 192.168.1.5 dla jednego adresu IP.
+				<li>Przykład: 192.168.1.4-7 dla zakresu od IP 192.168.1.4 do 192.168.1.7
+				<li>Przykład: 4-7 dla zapresu IP od .4 do .7
+				<li><b>Urządzenia z zakresu IP będą współdzielić pasmo</b>
+				<li><b>Adres MAC</b> Przykład: 00:2E:3C:6A:22:D8
 			</ul>
 		</div>
 	</div>
 	
 	<br>
 
-	<div class='section-title'>Default Class for unlisted MAC / IP's in LAN (br0)</div>
+	<div class='section-title'>Domyślna klasa gwaracji/maksimum dla pozostałych adresów MAC / IP w sieci LAN (br0)</div>
 	<div class='section'>
 		<script type='text/javascript'>
 			createFieldTable('', [
-				{ title: 'Enable', name: 'f_qosl_enable', type: 'checkbox', value: nvram.qosl_enable == '1'},
-				{ title: 'Download rate', indent: 2, name: 'qosl_dlr', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.qosl_dlr },
-				{ title: 'Download ceil', indent: 2, name: 'qosl_dlc', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.qosl_dlc },
-				{ title: 'Upload rate', indent: 2, name: 'qosl_ulr', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.qosl_ulr },
-				{ title: 'Upload ceil', indent: 2, name: 'qosl_ulc', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.qosl_ulc },
-				{ title: 'TCP Limit', indent: 2, name: 'qosl_tcp', type: 'select', options:
-					[['0', 'no limit'],
+				{ title: 'Włącz', name: 'f_qosl_enable', type: 'checkbox', value: nvram.qosl_enable == '1'},
+				{ title: 'Gwarancja pobierania (DL Rate)', indent: 2, name: 'qosl_dlr', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.qosl_dlr },
+				{ title: 'Maksimum pobierania (DL Ceil)', indent: 2, name: 'qosl_dlc', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.qosl_dlc },
+				{ title: 'Gwarancja wysyłania (UL Rate)', indent: 2, name: 'qosl_ulr', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.qosl_ulr },
+				{ title: 'Maksimum wysyłania (UL Ceil)', indent: 2, name: 'qosl_ulc', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.qosl_ulc },
+				{ title: 'Limit TCP', indent: 2, name: 'qosl_tcp', type: 'select', options:
+					[['0', 'bez limit'],
 					['1', '1'],
 					['2', '2'],
 					['5', '5'],
@@ -349,8 +349,8 @@ function init()
 					['200', '200'],
 					['500', '500'],
 					['1000', '1000']], value: nvram.qosl_tcp },
-				{ title: 'UDP limit', indent: 2, name: 'qosl_udp', type: 'select', options:
-					[['0', 'no limit'],
+				{ title: 'Limit UDP', indent: 2, name: 'qosl_udp', type: 'select', options:
+					[['0', 'bez limit'],
 					['1', '1/s'],
 					['2', '2/s'],
 					['5', '5/s'],
@@ -362,68 +362,68 @@ function init()
 		</script>
 		<div>
 			<ul>
-				<li><b>Default Class</b> - IP / MAC's non included in the list will take the Default Rate/Ceiling setting
-				<li><b>The bandwitdh will be shared by all unlisted hosts in br0</b>
+				<li><b>Domyślna klasa </b> - dla IP / MAC których nie ma na liście będą użyte powyższe ustawienia standardowe.
+				<li><b>Pasmo będzie dzielone pomiędzy wszystkie pozostałe hosty w sieci br0.</b>
 			</ul>
 		</div>
 	</div>
 
-	<div class='section-title'>Default Class for LAN1 (br1)</div>
+	<div class='section-title'>Domyślna klasa dla LAN1 (br1)</div>
 	<div class='section'>
 		<script type='text/javascript'>
 			createFieldTable('', [
-				{ title: 'Enable', name: 'f_limit_br1_enable', type: 'checkbox', value: nvram.limit_br1_enable == '1'},
-				{ title: 'Download rate', indent: 2, name: 'limit_br1_dlr', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.limit_br1_dlr },
-				{ title: 'Download ceil', indent: 2, name: 'limit_br1_dlc', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.limit_br1_dlc },
-				{ title: 'Upload rate', indent: 2, name: 'limit_br1_ulr', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.limit_br1_ulr },
-				{ title: 'Upload ceil', indent: 2, name: 'limit_br1_ulc', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.limit_br1_ulc },
-				{ title: 'Priority', indent: 2, name: 'limit_br1_prio', type: 'select', options:
-					[['0','Highest'],['1','High'],['2','Normal'],['3','Low'],['4','Lowest']], value: nvram.limit_br1_prio }
+				{ title: 'Włącz', name: 'f_limit_br1_enable', type: 'checkbox', value: nvram.limit_br1_enable == '1'},
+				{ title: 'Gwarancja pobierania (DL Rate)', indent: 2, name: 'limit_br1_dlr', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.limit_br1_dlr },
+				{ title: 'Maksimum pobierania (DL Ceil)', indent: 2, name: 'limit_br1_dlc', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.limit_br1_dlc },
+				{ title: 'Gwarancja wysyłania (UL Rate)', indent: 2, name: 'limit_br1_ulr', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.limit_br1_ulr },
+				{ title: 'Maksimum wysyłania (UL Ceil)', indent: 2, name: 'limit_br1_ulc', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.limit_br1_ulc },
+				{ title: 'Priorytet', indent: 2, name: 'limit_br1_prio', type: 'select', options:
+					[['0','Najwyższy'],['1','Wysoki'],['2','Normalny'],['3','Niski'],['4','Najniższy']], value: nvram.limit_br1_prio }
 			]);
 		</script>
 		<div>
 			<ul>
-				<li><b>The bandwitdh will be shared by all hosts in br1.</b>
+				<li><b>Pasmo będzie dzielone pomiędzy wszystkie pozostałe hosty w sieci br1.</b>
 			</ul>
 		</div>
 	</div>
 
-	<div class='section-title'>Default Class for LAN2 (br2)</div>
+	<div class='section-title'>Domyślna klasa dla LAN2 (br2)</div>
 	<div class='section'>
 		<script type='text/javascript'>
 			createFieldTable('', [
-				{ title: 'Enable', name: 'f_limit_br2_enable', type: 'checkbox', value: nvram.limit_br2_enable == '1'},
-				{ title: 'Download rate', indent: 2, name: 'limit_br2_dlr', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.limit_br2_dlr },
-				{ title: 'Download ceil', indent: 2, name: 'limit_br2_dlc', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.limit_br2_dlc },
-				{ title: 'Upload rate', indent: 2, name: 'limit_br2_ulr', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.limit_br2_ulr },
-				{ title: 'Upload ceil', indent: 2, name: 'limit_br2_ulc', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.limit_br2_ulc },
-				{ title: 'Priority', indent: 2, name: 'limit_br2_prio', type: 'select', options:
-					[['0','Highest'],['1','High'],['2','Normal'],['3','Low'],['4','Lowest']], value: nvram.limit_br2_prio }
+				{ title: 'Włącz', name: 'f_limit_br2_enable', type: 'checkbox', value: nvram.limit_br2_enable == '1'},
+				{ title: 'Gwarancja pobierania (DL Rate)', indent: 2, name: 'limit_br2_dlr', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.limit_br2_dlr },
+				{ title: 'Maksimum pobierania (DL Ceil)', indent: 2, name: 'limit_br2_dlc', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.limit_br2_dlc },
+				{ title: 'Gwarancja wysyłania (UL Rate)', indent: 2, name: 'limit_br2_ulr', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.limit_br2_ulr },
+				{ title: 'Maksimum wysyłania (UL Ceil)', indent: 2, name: 'limit_br2_ulc', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.limit_br2_ulc },
+				{ title: 'Priorytet', indent: 2, name: 'limit_br2_prio', type: 'select', options:
+					[['0','Najwyższy'],['1','Wysoki'],['2','Normalny'],['3','Niski'],['4','Najniższy']], value: nvram.limit_br2_prio }
 			]);
 		</script>
 		<div>
 			<ul>
-				<li><b>The bandwitdh will be shared by all hosts in br2.</b>
+				<li><b>Pasmo będzie dzielone pomiędzy wszystkie pozostałe hosty w sieci br2.</b>
 			</ul>
 		</div>
 	</div>
 
-	<div class='section-title'>Default Class for LAN3 (br3)</div>
+	<div class='section-title'>Domyślna klasa dla LAN3 (br3)</div>
 	<div class='section'>
 		<script type='text/javascript'>
 			createFieldTable('', [
-				{ title: 'Enable', name: 'f_limit_br3_enable', type: 'checkbox', value: nvram.limit_br3_enable == '1'},
-				{ title: 'Download rate', indent: 2, name: 'limit_br3_dlr', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.limit_br3_dlr },
-				{ title: 'Download ceil', indent: 2, name: 'limit_br3_dlc', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.limit_br3_dlc },
-				{ title: 'Upload rate', indent: 2, name: 'limit_br3_ulr', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.limit_br3_ulr },
-				{ title: 'Upload ceil', indent: 2, name: 'limit_br3_ulc', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.limit_br3_ulc },
-				{ title: 'Priority', indent: 2, name: 'limit_br3_prio', type: 'select', options:
-					[['0','Highest'],['1','High'],['2','Normal'],['3','Low'],['4','Lowest']], value: nvram.limit_br3_prio }
+				{ title: 'Włącz', name: 'f_limit_br3_enable', type: 'checkbox', value: nvram.limit_br3_enable == '1'},
+				{ title: 'Gwarancja pobierania (DL Rate)', indent: 2, name: 'limit_br3_dlr', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.limit_br3_dlr },
+				{ title: 'Maksimum pobierania (DL Ceil)', indent: 2, name: 'limit_br3_dlc', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.limit_br3_dlc },
+				{ title: 'Gwarancja wysyłania (UL Rate)', indent: 2, name: 'limit_br3_ulr', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.limit_br3_ulr },
+				{ title: 'Maksimum wysyłania (UL Ceil)', indent: 2, name: 'limit_br3_ulc', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.limit_br3_ulc },
+				{ title: 'Priorytet', indent: 2, name: 'limit_br3_prio', type: 'select', options:
+					[['0','Najwyższy'],['1','Wysoki'],['2','Normalny'],['3','Niski'],['4','Najniższy']], value: nvram.limit_br3_prio }
 			]);
 		</script>
 		<div>
 			<ul>
-				<li><b>The bandwitdh will be shared by all hosts in br3.</b>
+				<li><b>Pasmo będzie dzielone pomiędzy wszystkie pozostałe hosty w sieci br3.</b>
 			</ul>
 		</div>
 	</div>
@@ -434,8 +434,8 @@ function init()
 </td></tr>
 <tr><td id='footer' colspan=2>
 	<span id='footer-msg'></span>
-	<input type='button' value='Save' id='save-button' onclick='save()'>
-	<input type='button' value='Cancel' id='cancel-button' onclick='reloadPage();'>
+	<input type='button' value='Zapisz' id='save-button' onclick='save()'>
+	<input type='button' value='Anuluj' id='cancel-button' onclick='reloadPage();'>
 </td></tr>
 </table>
 </form>

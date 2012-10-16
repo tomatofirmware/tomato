@@ -1620,7 +1620,7 @@ if (wl_sunit(uidx)<0) {
 	W('<input type=\'hidden\' id=\'_wl'+u+'_nctrlsb\' name=\'wl'+u+'_nctrlsb\'>');
 	W('<input type=\'hidden\' id=\'_wl'+u+'_nbw\' name=\'wl'+u+'_nbw\'>');
 
-	W('<div class=\'section-title\'>Wireless');
+	W('<div class=\'section-title\'>Sieć bezprzewodowa');
 //	if (wl_ifaces.length > 1)
 		W(' (' + wl_display_ifname(uidx) + ')');
 	W('</div>');

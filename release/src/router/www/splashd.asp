@@ -42,10 +42,10 @@ function uploadButton()
  name = fix(E('upload-name').value);
  name = name.toLowerCase();
  if ((name.length <= 5) || (name.substring(name.length - 5, name.length).toLowerCase() != '.html')) {
- alert('Wrong filename, the correct extension is ".html".');
+ alert('Niewłaściwy plik, plik musi mieć rozszerzenie ".html".');
  return;
  }
- if (!confirm('Are you sure the file' + name + 'must be uploaded to the device?')) return;
+ if (!confirm('Czy jesteś pewien, że plik' + name + 'ma zostać wysłany do urządzenia?')) return;
  E('upload-button').disabled = 1;
  fields.disableAll(E('config-section'), 1);
  fields.disableAll(E('footer'), 1);
@@ -127,12 +127,12 @@ function init()
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
 <div id='ident'><% ident(); %></div>
-<div class='section-title'>Captive Portal Management</div>
+<div class='section-title'>Zarządzanie Captive Portal</div>
 <div class='section' id='config-section'>
 <form id='_fom' method='post' action='tomato.cgi'>
 <input type='hidden' name='_nextpage' value='splashd.asp'>
@@ -141,72 +141,71 @@ function init()
 <input type='hidden' name='NC_ForcedRedirect'>
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: 'Enable Function', name: 'f_NC_enable', type: 'checkbox', value: nvram.NC_enable == '1' },
-	{ title: 'Interface', multi: [
+	{ title: 'Włącz', name: 'f_NC_enable', type: 'checkbox', value: nvram.NC_enable == '1' },
+	{ title: 'Interfejs', multi: [
 		{ name: 'NC_BridgeLAN', type: 'select', options: [
 			['br0','LAN (br0)*'],
 			['br1','LAN1 (br1)'],
 			['br2','LAN2 (br2)'],
 			['br3','LAN3 (br3)']
 			], value: nvram.NC_BridgeLAN, suffix: ' <small>* default</small> ' } ] },
-	{ title: 'Gateway Name', name: 'NC_GatewayName', type: 'text', maxlen: 255, size: 34, value: nvram.NC_GatewayName },
-	{ title: 'Captive Site Forwarding', name: 'f_NC_ForcedRedirect', type: 'checkbox', value: (nvram.NC_ForcedRedirect == '1') },
-	{ title: 'Home Page', name: 'NC_HomePage', type: 'text', maxlen: 255, size: 34, value: nvram.NC_HomePage },
-	{ title: 'Welcome html Path', name: 'NC_DocumentRoot', type: 'text', maxlen: 255, size: 20, value: nvram.NC_DocumentRoot, suffix: '<span>&nbsp;/splash.html</span>' },
-	{ title: 'Logged Timeout', name: 'NC_LoginTimeout', type: 'text', maxlen: 8, size: 4, value: nvram.NC_LoginTimeout, suffix: ' <small>seconds</small>' },
-	{ title: 'Idle Timeout', name: 'NC_IdleTimeout', type: 'text', maxlen: 8, size: 4, value: nvram.NC_IdleTimeout, suffix: ' <small>seconds (0 - unlimited)</small>' },
-	{ title: 'Max Missed ARP', name: 'NC_MaxMissedARP', type: 'text', maxlen: 10, size: 2, value: nvram.NC_MaxMissedARP },
+	{ title: 'Nazwa bramy', name: 'NC_GatewayName', type: 'text', maxlen: 255, size: 34, value: nvram.NC_GatewayName },
+	{ title: 'Przekierowanie do Captive Site', name: 'f_NC_ForcedRedirect', type: 'checkbox', value: (nvram.NC_ForcedRedirect == '1') },
+	{ title: 'Strona domowa', name: 'NC_HomePage', type: 'text', maxlen: 255, size: 34, value: nvram.NC_HomePage },
+	{ title: 'Ścieżka do pliku powitalnego html', name: 'NC_DocumentRoot', type: 'text', maxlen: 255, size: 20, value: nvram.NC_DocumentRoot, suffix: '<span>&nbsp;/splash.html</span>' },
+	{ title: 'Limit czasu sesji', name: 'NC_LoginTimeout', type: 'text', maxlen: 8, size: 4, value: nvram.NC_LoginTimeout, suffix: ' <small>sekund</small>' },
+	{ title: 'Limit bezczynności', name: 'NC_IdleTimeout', type: 'text', maxlen: 8, size: 4, value: nvram.NC_IdleTimeout, suffix: ' <small>sekund (0 - brak limitu)</small>' },
+	{ title: 'Maksymalna ilość straconych ARP', name: 'NC_MaxMissedARP', type: 'text', maxlen: 10, size: 2, value: nvram.NC_MaxMissedARP },
 	null,
-	{ title: 'Log Info Level', name: 'NC_Verbosity', type: 'text', maxlen: 10, size: 2, value: nvram.NC_Verbosity },
-	{ title: 'Gateway Port', name: 'NC_GatewayPort', type: 'text', maxlen: 10, size: 7, value: fixPort(nvram.NC_GatewayPort, 5280) },
-	{ title: 'Excluded Ports to be redirected', name: 'NC_ExcludePorts', type: 'text', maxlen: 255, size: 34, value: nvram.NC_ExcludePorts },
-	{ title: 'Included Ports to be redirected', name: 'NC_IncludePorts', type: 'text', maxlen: 255, size: 34, value: nvram.NC_IncludePorts },
-	{ title: 'URL Excluded off Captive Portal', name: 'NC_AllowedWebHosts', type: 'text', maxlen: 255, size: 34, value: nvram.NC_AllowedWebHosts },
-	{ title: 'MAC Address Whitelist', name: 'NC_MACWhiteList', type: 'text', maxlen: 255, size: 34, value: nvram.NC_MACWhiteList }
+	{ title: 'Poziom logowania', name: 'NC_Verbosity', type: 'text', maxlen: 10, size: 2, value: nvram.NC_Verbosity },
+	{ title: 'Port bramy', name: 'NC_GatewayPort', type: 'text', maxlen: 10, size: 7, value: fixPort(nvram.NC_GatewayPort, 5280) },
+	{ title: 'Porty wyłączone z przekierowania', name: 'NC_ExcludePorts', type: 'text', maxlen: 255, size: 34, value: nvram.NC_ExcludePorts },
+	{ title: 'Porty włączone do przekierowania', name: 'NC_IncludePorts', type: 'text', maxlen: 255, size: 34, value: nvram.NC_IncludePorts },
+	{ title: 'Lista adresów URL ignorowanych przez Captive Portal', name: 'NC_AllowedWebHosts', type: 'text', maxlen: 255, size: 34, value: nvram.NC_AllowedWebHosts },
+	{ title: '"Biała lista" adresów MAC', name: 'NC_MACWhiteList', type: 'text', maxlen: 255, size: 34, value: nvram.NC_MACWhiteList }
 ]);
 </script>
 </form>
 </div>
 <br>
-<div class='section-title'>Customized Splash File Path</div>
+<div class='section-title'>Ścieżka do własnego pliku Splash</div>
 <div class='section' id='upload-section'>
  <form id='upload-form' method='post' action='uploadsplash.cgi?_http_id=<% nv(http_id); %>' encType='multipart/form-data'>
  <input type='file' size='40' id='upload-name' name='upload_name'>
- <input type='button' name='f_upload_button' id='upload-button' value='Upload' onclick='uploadButton()'>
+ <input type='button' name='f_upload_button' id='upload-button' value='Prześlij' onclick='uploadButton()'>
  <br>
  </form>
 </div>
 <hr>
 <span style='color:blue'>
-<b>Captive Portal. User Guide.</b><br>
+<b>Captive Portal. Podręcznik użytkownika.</b><br>
 <br>
-<b>*- Enable function:</b> When you tick and save the router will show a Welcome Banner when a computer access the Internet.<br>
-<b>*- Interface:</b> Select one of the bridges on which Captive Portal will listen.<br>
-<b>*- Gateway name:</b> The name of the Gateway appearing in the welcome banner<br>
-<b>*- Captive Site Forwarding:</b> When active, the 'Home Page' (read next line) will appear after you Agree in Welcome Banner.<br>
-<b>*- Home page:</b> The URL that will appear after you Agree the Welcome Banner.<br>
-<b>*- Welcome html Path:</b> The location where the Welcome banner is located<br>
-<b>*- Logged Timeout:</b> During this period of time no Welcome banner will appear when you access to the device. Default=3600 sec.(1 Hour).<br>
-<b>*- Idle Timeout:</b> Expired time where you can't access the device again.Default value=0.<br>
-<b>*- Max Missed ARP:</b> Number of lost ARP before considering the client has leaved the connection. Default = 5<br>
-<b>*- Log Info Level:</b> Messages from this module stored internally for better trace. Level 0=Silent, 10=Parrot, 2=Default.<br>
-<b>*- Gateway Port:</b> Port to be used by the Captive Portal for page redirection. Port 1 to 65534. Default=5280.<br>
-<b>*- Excluded/Included ports to be redirected:</b> When setting any port (included or excluded) leave a blank space between each port number, i.e; 25 110 4662 4672. Use prefereable one of the two option to avoid conflicts.<br>
-<b>*- URL excluded off the portal:</b> URL that will be accessed without Welcome banner screen appearing. When you set allowed url's also leave a blank space between each url. i.e; http://www.google.com http://www.google.es<br>
-<b>*- MAC address whitelist:</b> MAC addresses excluded of the feature. Leave a blank space between each MAC Address, i.e; 11:22:33:44:55:66 11:22:33:44:55:67<br>
-<b>*- Customized Splash File Path:</b> Here you can upload your personal Welcome banner that will overwrite the default one.<br><br>
-</span>
+<b>*- Włączenie funkcji:</b> Po zaznaczeniu i zapisaniu router będzie pokazywać Baner Powitalny (Welcome Banner) gdy komputer będzie się próbować łączyć do Internetu.<br>
+<b>*- Interfejs:</b> Interfejs (bridge), na którym Captive Portal ma pracować.<br>
+<b>*- Nazwa bramy:</b> Nazwa bramy pojawiająca się na banerze powitalnym.<br>
+<b>*- Przekierowanie do Captive Site:</b> Gdy włączone, to gdy zostanie naciśnięta zgoda (Agree) na Banerze Powitalnym, zostanie wyświetlona 'Strona domowa' (opis w następnej linijce).<br>
+<b>*- Strona domowa</b> URL który się pojawi po naciśnięciu zgody (Agree) na Banerze Powitalnym.<br>
+<b>*- Ścieżka do pliku html z Banerem Powitalnym:</b> Lokalizacja w której znajduje się Baner Powitalny <br>
+<b>*- Limit czasu sesji:</b> Przez ten okres czasu, gdy użytkownik korzysta z urządzenia, nie będzie się pojawiać Baner Powitalny . Domyślnie=3600 sek.(1 godzina).<br>
+<b>*- Limit oczekiwania:</b> Czas, jaki należy odczekać przed dalszym korzystaniem z urządzenia po wyczerpaniu Limitu czasu sesji. Domyślnie=0.<br>
+<b>*- Maksymalna ilość straconych ARP:</b>Liczba straconych ARP przed uznaniem, że klient zakończył połączenie. Domyślnie = 5<br>
+<b>*- Poziom logowania:</b> Informacje z tego modułu są gromadzone wewnętrznie. Poziomy 0=Cisza, 10=Papuga, 2=Domyślnie.<br>
+<b>*- Port bramy:</b> Port używany przez mechanizm Captive Portal do przekierowywania stron. Port od 1 do 65534. Domyślnie=5280.<br>
+<b>*- Porty włączone/wyłączone z przekierowania:</b> Ustawiając taki port (włączony lub wyłączony) pozostaw spację pomiędzy każdym portem, np.: 25 110 4662 4672. Użyj tylko jednej z tych opcji aby zapobiec konfliktom konfiguracji.<br>
+<b>*- Lista adresów URL ignorowanych przez Captive Portal:</b> Lista zawiera adresy URL które mają być dostępne bez pokazywania Banera Powitalnego. Wprowadzając kolejne adresy URL również pozostaw pomiędzy nimi spacje. np.; http://www.google.com http://www.google.es<br>
+<b>*- "Biała lista" adresów MAC :</b> Lista adresów MAC niepodlegających mechanizmowi Captive Portal. Poszczególne adresy MAC należy oddzielić spacjami , np.; 11:22:33:44:55:66 11:22:33:44:55:67<br>
+<b>*- Ścieżka do własnego pliku Splash:</b> Tu możesz umieścić swój własny Baner Powitalny który zostąpi baner domyślny.<br><br></span>
 <br>
 <span style='color:red'>
-<b> Note: If Login Time is expired you should re-enter again into the splash page to get a new lease period. Be aware, there is no notice about expired period so, you can loss Internet Access.</b><br>
+<b> Uwaga: Jeśli minie okres czasu określony w opcji Limit czasu sesji należy ponownie odwiedzić stronę z banerem żeby otrzymać nowy przydział czasu. Miej świadomość, że informacja o kończącym się Limicie czasu sesji nie jest wyświetlana, więc użytkownik może nagle utracić łączność z Internetem.</b><br>
 </span>
 <br>
 </td></tr>
 <tr><td id='footer' colspan=2>
  <form>
  <span id='footer-msg'></span>
- <input type='button' value='Save' id='save-button' onclick='save()'>
- <input type='button' value='Cancel' id='cancel-button' onclick='javascript:reloadPage();'>
+ <input type='button' value='Zapisz' id='save-button' onclick='save()'>
+ <input type='button' value='Anuluj' id='cancel-button' onclick='javascript:reloadPage();'>
  </form>
 </div>
 </td></tr>

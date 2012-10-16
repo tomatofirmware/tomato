@@ -226,12 +226,12 @@ createFieldTable('', [
 	{ title: 'CPU Freq', text: stats.cpumhz },
 	{ title: 'Flash Size', text: stats.flashsize },
 	null,
-	{ title: 'Time', rid: 'time', text: stats.time },
-	{ title: 'Uptime', rid: 'uptime', text: stats.uptime },
-	{ title: 'CPU Load <small>(1 / 5 / 15 mins)</small>', rid: 'cpu', text: stats.cpuload },
-	{ title: 'Total / Free Memory', rid: 'memory', text: stats.memory },
-	{ title: 'Total / Free Swap', rid: 'swap', text: stats.swap, hidden: (stats.swap == '') },
-	{ title: 'Total / Free NVRAM', text: scaleSize(nvstat.size) + ' / ' + scaleSize(nvstat.free) + ' <small>(' + (a).toFixed(2) + '%)</small>' }
+	{ title: 'Czas systemowy', rid: 'time', text: stats.time },
+	{ title: 'Uruchomiony od', rid: 'uptime', text: stats.uptime },
+	{ title: 'Obciążenie CPU <br><small>(1 / 5 / 15 min.)</small>', rid: 'cpu', text: stats.cpuload },
+	{ title: 'Całkowita/Wolna pamięć', rid: 'memory', text: stats.memory },
+	{ title: 'Całkowity/Wolny SWAP', rid: 'swap', text: stats.swap, hidden: (stats.swap == '') },
+	{ title: 'Całkowity/Wolny NVRAM', text: scaleSize(nvstat.size) + ' / ' + scaleSize(nvstat.free) + ' <small>(' + (a).toFixed(2) + '%)</small>' }
 ]);
 </script>
 </div>

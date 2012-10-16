@@ -10,7 +10,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Zaawansowane: TOR</title>
+<title>[<% ident(); %>] Zaawansowane: Projekt TOR</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <link rel='stylesheet' type='text/css' href='<% nv('web_css'); %>.css'>
 <script type='text/javascript' src='tomato.js'></script>
