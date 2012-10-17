@@ -140,8 +140,8 @@ createFieldTable('', [
 <div class='section'>
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: 'NAT loopback', name: 'nf_loopback', type: 'select', options: [[0,'All'],[1,'Forwarded Only'],[2,'Disabled']], value: fixInt(nvram.nf_loopback, 0, 2, 1) },
-	{ title: 'NAT target', name: 'ne_snat', type: 'select', options: [[0,'MASQUERADE'],[1,'SNAT']], value: nvram.ne_snat }
+	{ title: 'Pętla zwrotna NAT', name: 'nf_loopback', type: 'select', options: [[0,'Wszystkie'],[1,'Tylko przekierowane'],[2,'Wyłączona']], value: fixInt(nvram.nf_loopback, 0, 2, 1) },
+	{ title: 'Cel NAT', name: 'ne_snat', type: 'select', options: [[0,'MASQUERADE'],[1,'SNAT']], value: nvram.ne_snat }
 ]);
 </script>
 </div>
