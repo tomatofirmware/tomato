@@ -14,7 +14,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] VPN: PPTP Server</title>
+<title>[<% ident(); %>] VPN: Serwer PPTP</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
@@ -40,7 +40,7 @@ ul.setup = function() {
 		{ type: 'text', maxlen: 32, size: 32 },
 		{ type: 'text', maxlen: 32, size: 32 } ]);
 
-	this.headerSet(['Username', 'Password']);
+	this.headerSet(['Użytkownik', 'Hasło']);
 
 	var r = nvram.pptpd_users.split('>');
 	for (var i = 0; i < r.length; ++i) {
@@ -72,15 +72,15 @@ function v_pptpd_secret(e, quiet) {
 	if ((e = E(e)) == null) return 0;
 	s = e.value.trim().replace(/\s+/g, '');
 	if (s.length < 1) {
-		ferror.set(e, "Username and password can not be empty.", quiet);
+		ferror.set(e, "Pola Użytkownik i Hasło nie mogą być puste.", quiet);
 		return 0;
 	}
 	if (s.length > 32) {
-		ferror.set(e, "Invalid entry: max 32 characters are allowed.", quiet);
+		ferror.set(e, "Maksymalna dozwolona ilość znaków to 32.", quiet);
 		return 0;
 	}
 	if (s.search(/^[.a-zA-Z0-9_\- ]+$/) == -1) {
-		ferror.set(e, "Invalid entry. Only characters \"A-Z 0-9 . - _\" are allowed.", quiet);
+		ferror.set(e, "Tylko znaki \"A-Z 0-9 . - _\" są dozwolone.", quiet);
 		return 0;
 	}
 	e.value = s;
@@ -95,7 +95,7 @@ ul.verifyFields = function(row, quiet) {
 	if (!v_pptpd_secret(f[0], quiet)) return 0;
 
 	if (this.existUser(f[0].value)) {
-		ferror.set(f[0], 'Duplicate User', quiet);
+		ferror.set(f[0], 'Taki użytkownik już istnieje', quiet);
 		return 0;
 	}
 
@@ -105,7 +105,7 @@ ul.verifyFields = function(row, quiet) {
 }
 
 ul.dataToView = function(data) {
-	return [data[0], '<center><small><i>Secret</i></small></center>'];
+	return [data[0], '<center><small><i>Tajne</i></small></center>'];
 }
 
 function save() {
@@ -115,7 +115,7 @@ function save() {
 
 	if ((E('_f_pptpd_enable').checked) && (ul.getDataCount() < 1)) {
 		var e = E('footer-msg');
-		e.innerHTML = 'Cannot proceed: at least one user must be defined.';
+		e.innerHTML = 'Ostrzeżenie: conajmniej jeden użytkownik musi być zdefiniowany.';
 		e.style.visibility = 'visible';
 		setTimeout(
 			function() {
@@ -215,14 +215,14 @@ function verifyFields(focused, quiet) {
 	var brd = getBroadcastAddress(net, nvram.lan_netmask);
 
 	if ((aton(a.value) >= aton(brd)) || (aton(a.value) <= aton(net))) {
-		ferror.set(a, 'Invalid starting IP address (outside valid range).', quiet);
+		ferror.set(a, 'Błędny początkowy adres IP.', quiet);
 		return 0;
 	} else {
 		ferror.clear(a);
 	}
 
 	if ((aton(b.value) >= aton(brd)) || (aton(b.value) <= aton(net))) {
-		ferror.set(b, 'Invalid final IP address (outside valid range)', quiet);
+		ferror.set(b, 'Błędny końcowy adres IP', quiet);
 		return 0;
 	} else {
 		ferror.clear(b);
@@ -230,8 +230,8 @@ function verifyFields(focused, quiet) {
 */
 /* REMOVE-END */
 	if (Math.abs((aton(a.value) - (aton(b.value)))) > 5) {
-		ferror.set(a, 'Invalid range (max 6 IPs)', quiet);
-		ferror.set(b, 'Invalid range (max 6 IPs)', quiet);
+		ferror.set(a, 'Błędny zakres (maks. 6 adresów IP)', quiet);
+		ferror.set(b, 'Błędny zakres (maks. 6 adresów IP)', quiet);
 		elem.setInnerHTML('pptpd_count', '(?)');
 		return 0;
 	} else {
@@ -283,11 +283,11 @@ function init() {
 function toggleVisibility(whichone) {
 	if (E('sesdiv_' + whichone).style.display == '') {
 		E('sesdiv_' + whichone).style.display = 'none';
-		E('sesdiv_' + whichone + '_showhide').innerHTML = '(Click here to show)';
+		E('sesdiv_' + whichone + '_showhide').innerHTML = '(Pokaż)';
 		cookie.set('vpn_pptpd_' + whichone + '_vis', 0);
 	} else {
 		E('sesdiv_' + whichone).style.display='';
-		E('sesdiv_' + whichone + '_showhide').innerHTML = '(Click here to hide)';
+		E('sesdiv_' + whichone + '_showhide').innerHTML = '(Ukryj)';
 		cookie.set('vpn_pptpd_' + whichone + '_vis', 1);
 	}
 }
@@ -299,7 +299,7 @@ function toggleVisibility(whichone) {
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
   <div class='title'>Tomato</div>
-  <div class='version'>Version <% version(); %></div>
+  <div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -311,31 +311,31 @@ function toggleVisibility(whichone) {
 <input type='hidden' name='pptpd_enable'>
 <input type='hidden' name='pptpd_remoteip'>
 
-<div class='section-title'>PPTP Server Configuration <small><i><a href='javascript:toggleVisibility("settings");'><span id='sesdiv_settings_showhide'>(Click here to hide)</span></a></i></small></div>
+<div class='section-title'>Konfiguracja serwera PPTP<small><i><a href='javascript:toggleVisibility("settings");'><span id='sesdiv_settings_showhide'>(Ukryj)</span></a></i></small></div>
 <div class='section' id='sesdiv_settings'>
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: 'Enable', name: 'f_pptpd_enable', type: 'checkbox', value: nvram.pptpd_enable == '1' },
-	{ title: 'Local IP Address/Netmask', text: (nvram.lan_ipaddr + ' / ' + nvram.lan_netmask) },
-	{ title: 'Remote IP Address Range', multi: [
+	{ title: 'Włącz', name: 'f_pptpd_enable', type: 'checkbox', value: nvram.pptpd_enable == '1' },
+	{ title: 'Lokalny adres IP/maska', text: (nvram.lan_ipaddr + ' / ' + nvram.lan_netmask) },
+	{ title: 'Zakres zdalnych adresów IP', multi: [
 		{ name: 'f_pptpd_startip', type: 'text', maxlen: 15, size: 17, value: nvram.dhcpd_startip, suffix: '&nbsp;-&nbsp;' },
 		{ name: 'f_pptpd_endip', type: 'text', maxlen: 15, size: 17, value: nvram.dhcpd_endip, suffix: ' <i id="pptpd_count"></i>' }
 	] },
-	{ title: 'Broadcast Relay Mode', name: 'pptpd_broadcast', type: 'select', options: [['disable','Disabled'], ['br0','LAN to VPN Clients'], ['ppp','VPN Clients to LAN'], ['br0ppp','Both']], value: nvram.pptpd_broadcast },
-	{ title: 'Encryption', name: 'pptpd_forcemppe', type: 'select', options: [[0, 'None'], [1, 'MPPE-128']], value: nvram.pptpd_forcemppe },
-	{ title: 'DNS Servers', name: 'pptpd_dns1', type: 'text', maxlen: 15, size: 17, value: nvram.pptpd_dns1 },
+	{ title: 'Tryb Broadcast Relay', name: 'pptpd_broadcast', type: 'select', options: [['disable','Wyłączony'], ['br0','z LAN do klientów VPN'], ['ppp','od klinetów VPN do LAN'], ['br0ppp','Oba']], value: nvram.pptpd_broadcast },
+	{ title: 'Szyfrowanie', name: 'pptpd_forcemppe', type: 'select', options: [[0, 'Brak'], [1, 'MPPE-128']], value: nvram.pptpd_forcemppe },
+	{ title: 'Serwery DNS', name: 'pptpd_dns1', type: 'text', maxlen: 15, size: 17, value: nvram.pptpd_dns1 },
 	{ title: '', name: 'pptpd_dns2', type: 'text', maxlen: 15, size: 17, value: nvram.pptpd_dns2 },
-	{ title: 'WINS Servers', name: 'pptpd_wins1', type: 'text', maxlen: 15, size: 17, value: nvram.pptpd_wins1 },
+	{ title: 'Serwery WINS', name: 'pptpd_wins1', type: 'text', maxlen: 15, size: 17, value: nvram.pptpd_wins1 },
 	{ title: '', name: 'pptpd_wins2', type: 'text', maxlen: 15, size: 17, value: nvram.pptpd_wins2 },
 	{ title: 'MTU', name: 'pptpd_mtu', type: 'text', maxlen: 4, size: 6, value: (nvram.pptpd_mtu ? nvram.pptpd_mtu : 1450)},
 	{ title: 'MRU', name: 'pptpd_mru', type: 'text', maxlen: 4, size: 6, value: (nvram.pptpd_mru ? nvram.pptpd_mru : 1450)},
-	{ title: '<a href="http://poptop.sourceforge.net/" target="_new">Poptop</a><br>Custom configuration', name: 'pptpd_custom', type: 'textarea', value: nvram.pptpd_custom }
+	{ title: '<a href="http://poptop.sourceforge.net/" target="_new">Poptop</a><br>Własna konfiguracja', name: 'pptpd_custom', type: 'textarea', value: nvram.pptpd_custom }
 
 ]);
 </script>
 </div>
 
-<div class='section-title'>PPTP User List <small><i><a href='javascript:toggleVisibility("userlist");'><span id='sesdiv_userlist_showhide'>(Click here to hide)</span></a></i></small></div>
+<div class='section-title'>Lista użytkowników PPTP<small><i><a href='javascript:toggleVisibility("userlist");'><span id='sesdiv_userlist_showhide'>(Ukryj)</span></a></i></small></div>
 <!-- REMOVE-BEGIN -->
 <!-- <div class='section-title'>PPTP User List <small> <span id='user_count'></span> <i><a href='javascript:toggleVisibility("userlist");'><span id='sesdiv_userlist_showhide'>(Click here to hide)</span></a></i></small></div> -->
 <!--REMOVE-END -->
@@ -343,38 +343,38 @@ createFieldTable('', [
   <table class='tomato-grid' cellspacing=1 id='ul-grid'></table>
 </div>
 
-<div class='section-title'>Notes <small><i><a href='javascript:toggleVisibility("notes");'><span id='sesdiv_notes_showhide'>(Click here to show)</span></a></i></small></div>
+<div class='section-title'>Notka <small><i><a href='javascript:toggleVisibility("notes");'><span id='sesdiv_notes_showhide'>(Pokaż)</span></a></i></small></div>
 <div class='section' id='sesdiv_notes' style='display:none'>
 <ul>
-<li><b>Local IP Address/Netmask</b> - Address to be used at the local end of the tunnelled PPP links between the server and the VPN clients.</li>
-<li><b>Remote IP Address Range</b> - Remote IP addresses to be used on the tunnelled PPP links (max 6).</li>
-<li><b>Broadcast Relay Mode</b> - Turns on broadcast relay between VPN clients and LAN interface.</li>
-<li><b>Enable Encryption</b> - Enabling this option will turn on VPN channel encryption, but it might lead to reduced channel bandwidth.</li>
-<li><b>DNS Servers</b> - Allows defining DNS servers manually (if none are set, the router/local IP address should be used by VPN clients).</li>
-<li><b>WINS Servers</b> - Allows configuring extra WINS servers for VPN clients, in addition to the WINS server defined on <a href=basic-network.asp>Basic/Network</a>.</li>
-<li><b>MTU</b> - Maximum Transmission Unit. Max packet size the PPTP interface will be able to send without packet fragmentation.</li>
-<li><b>MRU</b> - Maximum Receive Unit. Max packet size the PPTP interface will be able to receive without packet fragmentation.</li>
+<li><b>Lokalny adres IP/maska</b> - Adres użyty jako lokalne zakończenie tunelów PPP pomiędzy serwerem a klinetami VPN.</li>
+<li><b>Remote IP Address Range</b> - Zdalne adresy użyte do tworzenia połączeń PPP (maks. 6).</li>
+<li><b>Broadcast Relay Mode</b> - Przekazywanie pakietów pomiędzy interfejsem LAN a klinetami VPN.</li>
+<li><b>Enable Encryption</b> - Włączenie tej opcji zezwoli na używanie szyfrowanie tunelu ale może spowodować zmniejszenie przepustowośći tunelu.</li>
+<li><b>DNS Servers</b> - Pozwala na ręcznie zdefiniowanie serwerów DNS (jeżeli niezdefiniowane, lokalne serwery routera będą używane przez klientów VPN).</li>
+<li><b>WINS Servers</b> - Pozwala na ręcznie zdefiniowanie serwerów WINS dla klientów VPN, niż te zdefiniowane w <a href=basic-network.asp>Podstawowe/Sieć</a>.</li>
+<li><b>MTU</b> - Maksymalny rozmiar pakietu, który może zostać wysłany bez jego fragmentacji.</li>
+<li><b>MRU</b> - Maksymalny rozmiar pakietu, który może zostać odebrany bez jego fragmentacji.</li>
 </ul>
 
 <small>
 <ul>
-<li><b>Other relevant notes/hints:</b>
+<li><b>Pozostałe uwagi:</b>
 <ul>
-<li>Try to avoid any conflicts and/or overlaps between the address ranges configured/available for DHCP and VPN clients on your local networks.</li>
+<li>Staraj się unikać wszelkich konfliktów miedzy zakresem DHCP a klientami VPN.</li>
 </ul>
 </small>
 </div>
 
 <br>
 <div style="float:right;text-align:right">
-&raquo; <a href="vpn-pptp-online.asp">PPTP Online</a>
+&raquo; <a href="vpn-pptp-online.asp">Aktywność PPTP</a>
 </div>
 
 </td></tr>
 <tr><td id='footer' colspan=2>
  <span id='footer-msg'></span>
- <input type='button' value='Save' id='save-button' onclick='save()'>
- <input type='button' value='Cancel' id='cancel-button' onclick='javascript:reloadPage();'>
+ <input type='button' value='Zapisz' id='save-button' onclick='save()'>
+ <input type='button' value='Anuluj' id='cancel-button' onclick='javascript:reloadPage();'>
 </td></tr>
 </table>
 </form>

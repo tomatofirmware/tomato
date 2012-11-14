@@ -226,12 +226,12 @@ createFieldTable('', [
 	{ title: 'CPU Freq', text: stats.cpumhz },
 	{ title: 'Flash Size', text: stats.flashsize },
 	null,
-	{ title: 'Time', rid: 'time', text: stats.time },
-	{ title: 'Uptime', rid: 'uptime', text: stats.uptime },
-	{ title: 'CPU Load <small>(1 / 5 / 15 mins)</small>', rid: 'cpu', text: stats.cpuload },
-	{ title: 'Total / Free Memory', rid: 'memory', text: stats.memory },
-	{ title: 'Total / Free Swap', rid: 'swap', text: stats.swap, hidden: (stats.swap == '') },
-	{ title: 'Total / Free NVRAM', text: scaleSize(nvstat.size) + ' / ' + scaleSize(nvstat.free) + ' <small>(' + (a).toFixed(2) + '%)</small>' }
+	{ title: 'Czas systemowy', rid: 'time', text: stats.time },
+	{ title: 'Uruchomiony od', rid: 'uptime', text: stats.uptime },
+	{ title: 'Obciążenie CPU <br><small>(1 / 5 / 15 min.)</small>', rid: 'cpu', text: stats.cpuload },
+	{ title: 'Całkowita/Wolna pamięć', rid: 'memory', text: stats.memory },
+	{ title: 'Całkowity/Wolny SWAP', rid: 'swap', text: stats.swap, hidden: (stats.swap == '') },
+	{ title: 'Całkowity/Wolny NVRAM', text: scaleSize(nvstat.size) + ' / ' + scaleSize(nvstat.free) + ' <small>(' + (a).toFixed(2) + '%)</small>' }
 ]);
 </script>
 </div>
@@ -338,10 +338,10 @@ for (var uidx = 0; uidx < wl_ifaces.length; ++uidx) {
 //	u = wl_unit(uidx);
 REMOVE-END */
 	u = wl_fface(uidx);
-	W('<div class=\'section-title\' id=\'wl'+u+'-title\'>Wireless');
+	W('<div class=\'section-title\' id=\'wl'+u+'-title\'>Sieć bezprzewodowa');
 	if (wl_ifaces.length > 0)
 		W(' (' + wl_display_ifname(uidx) + ')');
-	W(' <small><i><a href=\'javascript:toggleVisibility("wl_' + u + '");\'><span id=\'sesdiv_wl_' +u + '_showhide\'>(hide)</span></a></i></small>');
+	W(' <small><i><a href=\'javascript:toggleVisibility("wl_' + u + '");\'><span id=\'sesdiv_wl_' +u + '_showhide\'>(ukryj)</span></a></i></small>');
 	W('</div>');
 	W('<div class=\'section\' id=\'sesdiv_wl_'+u+'\'>');
 	sec = auth[nvram['wl'+u+'_security_mode']] + '';
@@ -351,28 +351,28 @@ REMOVE-END */
 	if ((nvram['wl'+u+'_mode'] == 'ap') && (nvram['wl'+u+'_wds_enable'] * 1)) wmode += ' + WDS';
 
 	createFieldTable('', [
-		{ title: 'MAC Address', text: nvram['wl'+u+'_hwaddr'] },
-		{ title: 'Wireless Mode', text: wmode },
-		{ title: 'Wireless Network Mode', text: bgmo[nvram['wl'+u+'_net_mode']], ignore: (wl_sunit(uidx)>=0) },
-		{ title: 'Interface Status', rid: 'ifstatus'+uidx, text: wlstats[uidx].ifstatus },
-		{ title: 'Radio', rid: 'radio'+uidx, text: (wlstats[uidx].radio == 0) ? '<b>Disabled</b>' : 'Enabled', ignore: (wl_sunit(uidx)>=0) },
+		{ title: 'Adres MAC', text: nvram['wl'+u+'_hwaddr'] },
+		{ title: 'Tryb pracy', text: wmode },
+		{ title: 'Standard Wi-Fi', text: bgmo[nvram['wl'+u+'_net_mode']], ignore: (wl_sunit(uidx)>=0) },
+		{ title: 'Status interfejsu', rid: 'ifstatus'+uidx, text: wlstats[uidx].ifstatus },
+		{ title: 'Status radia', rid: 'radio'+uidx, text: (wlstats[uidx].radio == 0) ? '<b>Wyłączone</b>' : 'Włączone', ignore: (wl_sunit(uidx)>=0) },
 /* REMOVE-BEGIN */
-//	{ title: 'SSID', text: (nvram['wl'+u+'_ssid'] + ' <small><i>' + ((nvram['wl'+u+'_mode'] != 'ap') ? '' : ((nvram['wl'+u+'_closed'] == 0) ? '(Broadcast Enabled)' : '(Broadcast Disabled)')) + '</i></small>') },
+//	{ title: 'SSID', text: (nvram['wl'+u+'_ssid'] + ' <small><i>' + ((nvram['wl'+u+'_mode'] != 'ap') ? '' : ((nvram['wl'+u+'_closed'] == 0) ? '(Rozgłaszanie włączone)' : '(Rozgłaszanie wyłączone)')) + '</i></small>') },
 /* REMOVE-END */
 		{ title: 'SSID', text: nvram['wl'+u+'_ssid'] },
-		{ title: 'Broadcast', text: (nvram['wl'+u+'_closed'] == 0) ? 'Enabled' : '<b>Disabled</b>', ignore: (nvram['wl'+u+'_mode'] != 'ap') },
-		{ title: 'Security', text: sec },
-		{ title: 'Channel', rid: 'channel'+uidx, text: stats.channel[uidx], ignore: (wl_sunit(uidx)>=0) },
-		{ title: 'Channel Width', rid: 'nbw'+uidx, text: wlstats[uidx].nbw, ignore: ((!nphy) || (wl_sunit(uidx)>=0)) },
-		{ title: 'Interference Level', rid: 'interference'+uidx, text: stats.interference[uidx], hidden: ((stats.interference[uidx] == '') || (wl_sunit(uidx)>=0)) },
-		{ title: 'Rate', rid: 'rate'+uidx, text: wlstats[uidx].rate, ignore: (wl_sunit(uidx)>=0) },
+		{ title: 'Rozgłaszanie SSID', text: (nvram['wl'+u+'_closed'] == 0) ? 'Włączone' : '<b>Wyłączone</b>', ignore: (nvram['wl'+u+'_mode'] != 'ap') },
+		{ title: 'Zabezpieczenie', text: sec },
+		{ title: 'Kanał', rid: 'channel'+uidx, text: stats.channel[uidx], ignore: (wl_sunit(uidx)>=0) },
+		{ title: 'Szerokość kanału', rid: 'nbw'+uidx, text: wlstats[uidx].nbw, ignore: ((!nphy) || (wl_sunit(uidx)>=0)) },
+		{ title: 'Poziom zakłóceń', rid: 'interference'+uidx, text: stats.interference[uidx], hidden: ((stats.interference[uidx] == '') || (wl_sunit(uidx)>=0)) },
+		{ title: 'Prędkość', rid: 'rate'+uidx, text: wlstats[uidx].rate, ignore: (wl_sunit(uidx)>=0) },
 		{ title: 'RSSI', rid: 'rssi'+uidx, text: wlstats[uidx].rssi || '', ignore: ((!wlstats[uidx].client) || (wl_sunit(uidx)>=0)) },
-		{ title: 'Noise', rid: 'noise'+uidx, text: wlstats[uidx].noise || '', ignore: ((!wlstats[uidx].client) || (wl_sunit(uidx)>=0)) },
-		{ title: 'Signal Quality', rid: 'qual'+uidx, text: stats.qual[uidx] || '', ignore: ((!wlstats[uidx].client) || (wl_sunit(uidx)>=0)) }
+		{ title: 'Poziom szumów', rid: 'noise'+uidx, text: wlstats[uidx].noise || '', ignore: ((!wlstats[uidx].client) || (wl_sunit(uidx)>=0)) },
+		{ title: 'Jakość sygnału', rid: 'qual'+uidx, text: stats.qual[uidx] || '', ignore: ((!wlstats[uidx].client) || (wl_sunit(uidx)>=0)) }
 	]);
 
-	W('<input type=\'button\' class=\'controls\' onclick=\'wlenable('+uidx+', 1)\' id=\'b_wl'+uidx+'_enable\' value=\'Enable\' style=\'display:none\'>');
-	W('<input type=\'button\' class=\'controls\' onclick=\'wlenable('+uidx+', 0)\' id=\'b_wl'+uidx+'_disable\' value=\'Disable\' style=\'display:none\'>');
+	W('<input type=\'button\' class=\'controls\' onclick=\'wlenable('+uidx+', 1)\' id=\'b_wl'+uidx+'_enable\' value=\'Włącz\' style=\'display:none\'>');
+	W('<input type=\'button\' class=\'controls\' onclick=\'wlenable('+uidx+', 0)\' id=\'b_wl'+uidx+'_disable\' value=\'Wyłącz\' style=\'display:none\'>');
 	W('</div>');
 }
 </script>

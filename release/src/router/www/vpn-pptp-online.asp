@@ -14,7 +14,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] VPN：PPTP Online</title>
+<title>[<% ident(); %>] VPN：Aktywność PPTP</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
@@ -88,7 +88,7 @@ function disconnect(a, pid) {
 		return;
 	}
 	a = E(a);
-	a.innerHTML = 'Disconnecting...';
+	a.innerHTML = 'Rozłączanie...';
 
 	xob.onCompleted = function(text, xml) {
 		a.innerHTML = '';
@@ -171,7 +171,7 @@ dg.populate = function() {
 
 	for (i = list.length - 1; i >= 0; --i) {
 		e = list[i];
-		hangup = '<div id="div_'+e.pid+'"><a href="javascript:disconnect(\'div_'+e.pid + '\',' + e.pid + ')" title="Disconnect" id="pid_' + e.pid + '">Disconnect</a></div>';
+		hangup = '<div id="div_'+e.pid+'"><a href="javascript:disconnect(\'div_'+e.pid + '\',' + e.pid + ')" title="Disconnect" id="pid_' + e.pid + '">Rozłącz</a></div>';
 /* REMOVE-BEGIN */
 //		this.insert(-1, e, [
 //			e.ifname, e.username, e.uptime, e.ip, e.sourceip, hangup], false);
@@ -182,7 +182,7 @@ dg.populate = function() {
 
 dg.setup = function() {
 	this.init('dev-grid', 'sort');
-	this.headerSet(['Interface', 'Username', 'Online Since', 'VPN IP Address', 'Source IP Address', 'Action']);
+	this.headerSet(['Interfejs', 'Użytkownik', 'Połączony od', 'Adres IP VPN', 'Źródł. adres IP', 'Akcja']);
 	this.populate();
 	this.sort(1);
 }
@@ -199,7 +199,7 @@ function dateTimeString(timestamp) {
 dg.dataToView = function(data) {
 	var l;
 	if (data[2] < 946684800) {
-		l = 'Not Available';
+		l = 'Brak danych';
 	} else {
 /* REMOVE-BEGIN */
 //		l = new Date(data[2] *1000);
@@ -229,17 +229,17 @@ function init() {
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
   <div class='title'>Tomato</div>
-  <div class='version'>Version <% version(); %></div>
+  <div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
 <div id='ident'><% ident(); %></div>
-<div class='section-title'>PPTP Users Online</div>
+<div class='section-title'>Aktywność PPTP</div>
 <div class='section'>
 <table id='dev-grid' class='tomato-grid' cellspacing=0></table>
 </div>
 <div style="float:right;text-align:right">
-&raquo; <a href="vpn-pptp-server.asp">Configure</a>
+&raquo; <a href="vpn-pptp-server.asp">Konfiguruj</a>
 </div>
 </td></tr>
 <tr><td id='footer' colspan=2><script type='text/javascript'>genStdRefresh(1,1,'ref.toggle()');</script></td></tr>
