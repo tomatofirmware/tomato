@@ -1561,7 +1561,7 @@ static int save_variables(int write)
 	int ok;
 	char s[256];
 	int dirty;
-	static const char *msgf = "The field \"%s\" is invalid. Please report this problem.";
+	static const char *msgf = "Pole \"%s\" jest błędne. Proszę zgłosić ten problem.";
 	nv_list_t nv;
 
 	dirty = 0;
@@ -1654,7 +1654,7 @@ static void wo_tomato(char *url)
 		}
 		commit = save_variables(1) && commit;
 
-		resmsg_set("Settings saved.");
+		resmsg_set("Ustawienia zapisano.");
 	}
 
 	rboot = atoi(webcgi_safeget("_reboot", "0"));
@@ -1680,7 +1680,7 @@ static void wo_tomato(char *url)
 
 	if ((v = webcgi_get("_service")) != NULL && *v != 0) {
 		if (!*red) {
-			if (ajax) web_printf(" Some services are being restarted...");
+			if (ajax) web_printf(" Niektóre usługi są wznawiane...");
 			web_close();
 		}
 		sleep(1);

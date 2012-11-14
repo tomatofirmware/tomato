@@ -101,7 +101,7 @@ void wi_restore(char *url, int len, char *boundary)
 
 	tmp[0] = 0;
 	buf = NULL;
-	error = "Error reading file";
+	error = "Błąd odczytu pliki";
 	ok = 0;
 
 	if (!skip_header(&len)) {
@@ -109,12 +109,12 @@ void wi_restore(char *url, int len, char *boundary)
 	}
 
 	if ((len < 64) || (len > (NVRAM_SPACE * 2))) {
-		error = "Invalid file";
+		error = "Błędny plik";
 		goto ERROR;
 	}
 
 	if ((buf = malloc(len)) == NULL) {
-		error = "Not enough memory";
+		error = "Brak wystarczającej ilości dostępnej pamięci";
 		goto ERROR;
 	}
 
@@ -124,7 +124,7 @@ void wi_restore(char *url, int len, char *boundary)
 	strcpy(tmp, "/tmp/restoreXXXXXX");
 	mktemp(tmp);
 	if (f_write(tmp, buf, n, 0, 0600) != n) {
-		error = "Error writing temporary file";
+		error = "Błąd zapisu do pliku tymczasowego";
 		goto ERROR;
 	}
 

@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
 	Copyright (C) 2006-2010 Jonathan Zarate
@@ -11,9 +11,9 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Forwarding: Triggered</title>
+<title>[<% ident(); %>] Przekierowanie: Porty inicjowane</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
-<link rel='stylesheet' type='text/css' href='color.css'>
+<% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
 
 <!-- / / / -->
@@ -64,7 +64,7 @@ tg.sortCompare = function(a, b) {
 }
 
 tg.dataToView = function(data) {
-	return [data[0] ? 'On' : '', ['TCP', 'UDP', 'Both'][data[1] - 1], data[2], data[3], data[4]];
+	return [data[0] ? 'Wł.' : '', ['TCP', 'UDP', 'Oba'][data[1] - 1], data[2], data[3], data[4]];
 }
 
 tg.fieldValuesToData = function(row) {
@@ -78,7 +78,7 @@ tg.verifyFields = function(row, quiet) {
 	if (!v_portrange(f[2], quiet)) return 0;
 	if (!v_portrange(f[3], quiet)) return 0;
 	f[4].value = f[4].value.replace(/>/g, '_');
-	if (!v_nodelim(f[4], quiet, 'Description')) return 0;
+	if (!v_nodelim(f[4], quiet, 'Opis')) return 0;
 	return 1;
 }
 
@@ -95,11 +95,11 @@ tg.resetNewEditor = function() {
 tg.setup = function() {
 	this.init('tg-grid', 'sort', 50, [
 		{ type: 'checkbox' },
-		{ type: 'select', options: [[1, 'TCP'],[2, 'UDP'],[3,'Both']] },
+		{ type: 'select', options: [[1, 'TCP'],[2, 'UDP'],[3,'Oba']] },
 		{ type: 'text', maxlen: 16 },
 		{ type: 'text', maxlen: 16 },
 		{ type: 'text', maxlen: 32 }]);
-	this.headerSet(['On', 'Protocol', 'Trigger Ports', 'Forwarded Ports', 'Description']);
+	this.headerSet(['Wł.', 'Protokół', 'Porty inicjujące', 'Porty przekierowane', 'Opis']);
 	var nv = nvram.trigforward.split('>');
 	for (var i = 0; i < nv.length; ++i) {
 		var r;
@@ -144,7 +144,7 @@ function init()
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -157,7 +157,7 @@ function init()
 
 <input type='hidden' name='trigforward'>
 
-<div class='section-title'>Triggered Port Forwarding</div>
+<div class='section-title'>Przekierowanie inicjowanych portów</div>
 <div class='section'>
 	<table class='tomato-grid' cellspacing=1 id='tg-grid'></table>
 	<script type='text/javascript'>tg.setup();</script>
@@ -165,10 +165,10 @@ function init()
 
 <div>
 <ul>
-<li>Use "-" to specify a range of ports (200-300).
-<li>Trigger Ports are the initial LAN to WAN "trigger".
-<li>Forwarded Ports are the WAN to LAN ports that are opened if the "trigger" is activated.
-<li>These ports are automatically closed after a few minutes of inactivity.
+<li>Użyj "-" żeby określić zakres portów (np. 200-300).
+<li>Porty inicjowane są inicjalizowane przez połączenie LAN do WAN.
+<li>Przekierowanie portów z WAN do portów LAN, jest realizowane gdy wyzwolenie jest aktywne.
+<li>Porty są automatycznie zamykane po kilku minutach braku aktywności.
 </ul>
 </div>
 
@@ -177,8 +177,8 @@ function init()
 </td></tr>
 <tr><td id='footer' colspan=2>
 	<span id='footer-msg'></span>
-	<input type='button' value='Save' id='save-button' onclick='save()'>
-	<input type='button' value='Cancel' id='cancel-button' onclick='reloadPage();'>
+	<input type='button' value='Zapisz' id='save-button' onclick='save()'>
+	<input type='button' value='Anuluj' id='cancel-button' onclick='reloadPage();'>
 </td></tr>
 </table>
 </form>

@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
 	Copyright (C) 2006-2010 Jonathan Zarate
@@ -11,9 +11,9 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Access Restrictions</title>
+<title>[<% ident(); %>] Ograniczenia dostępu</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
-<link rel='stylesheet' type='text/css' href='color.css'>
+<% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
 
 <!-- / / / -->
@@ -39,13 +39,13 @@
 //	<% nvram(''); %>	// http_id
 //	<% nvramseq("rrules", "rrule%d", 0, 49); %>
 
-var dowNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+var dowNames = ['Nie', 'Pon', 'Wto', 'Śro', 'Czw', 'Pią', 'Sob'];
 
 var og = new TomatoGrid();
 og.setup = function() {
 	this.init('res-over-grid', 'sort');
-	this.headerSet(['Description', 'Schedule']);
-	var r = this.footerSet(['<input type="button" value="Add" onclick="TGO(this).addEntry()" id="res-over-add">']);
+	this.headerSet(['Opis', 'Harmonogram']);
+	var r = this.footerSet(['<input type="button" value="Dodaj" onclick="TGO(this).addEntry()" id="res-over-add">']);
 	r.cells[0].colSpan = 2;
 }
 og.populate = function() {
@@ -63,7 +63,7 @@ og.populate = function() {
 
 		var s = '';
 		if (v[3] == 0x7F) {
-			s += 'Everyday';
+			s += 'Codziennie';
 		}
 		else {
 			for (var j = 0; j < 7; ++j) {
@@ -75,10 +75,10 @@ og.populate = function() {
 		}
 
 		if ((v[1] >= 0) && (v[2] >= 0)) {
-			s += '<br>' + timeString(v[1]) + ' to ' + timeString(v[2]);
-			if (v[2] <= v[1]) s += ' <small>(the following day)</small>';
+			s += '<br>' + timeString(v[1]) + ' do ' + timeString(v[2]);
+			if (v[2] <= v[1]) s += ' <small>(następujące dni)</small>';
 		}
-		if (v[0] != '1') s += '<br><i><b>Disabled</b></i>';
+		if (v[0] != '1') s += '<br><i><b>Wyłączone</b></i>';
 		this.insertData(-1, [i, v[8], s]);
 	}
 	og.sort(0);
@@ -111,7 +111,7 @@ function init()
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -123,7 +123,7 @@ function init()
 <input type='hidden' name='_commit' value='0'>
 <input type='hidden' name='rruleN' id='_rruleN' value=''>
 
-<div class='section-title'>Access Restriction Overview</div>
+<div class='section-title'>Zestawienie ograniczeń dostępu</div>
 <div class='section'>
 	<table class='tomato-grid' cellspacing=1 id='res-over-grid'></table>
 </div>

@@ -104,7 +104,7 @@ do {
 		stats.channel.push('<a href="tools-survey.asp">' + ((i) ? i + '' : 'Auto') +
 			((wlstats[uidx].mhz) ? ' - ' + (wlstats[uidx].mhz / 1000.0).toFixed(3) + ' <small>GHz</small>' : '') + '</a>' +
 			((a < 0) ? ' <small>(scanning...)</small>' : ''));
-		stats.interference.push((wlstats[uidx].intf >= 0) ? ((wlstats[uidx].intf) ? 'Severe' : 'Acceptable') : '');
+		stats.interference.push((wlstats[uidx].intf >= 0) ? ((wlstats[uidx].intf) ? 'Uporczywy' : 'Akceptowalny') : '');
 
 		a = wlstats[uidx].nbw * 1;
 		wlstats[uidx].nbw = (a > 0) ? (a + ' <small>MHz</small>') : 'Auto';

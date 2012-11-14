@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
 	Copyright (C) 2006-2010 Jonathan Zarate
@@ -11,9 +11,9 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Admin: Bandwidth Monitoring</title>
+<title>[<% ident(); %>] Administracja: Monitorowanie przepustowości</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
-<link rel='stylesheet' type='text/css' href='color.css'>
+<% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
 
 <!-- / / / -->
@@ -43,7 +43,7 @@ function backupButton()
 
 	name = fixFile(E('backup-name').value);
 	if (name.length <= 1) {
-		alert('Invalid filename');
+		alert('Niewłaściwa nazwa pliku');
 		return;
 	}
 	location.href = 'bwm/' + name + '.gz?_http_id=' + nvram.http_id;
@@ -58,10 +58,10 @@ function restoreButton()
 	name = fixFile(E('restore-name').value);
 	name = name.toLowerCase();
 	if ((name.length <= 3) || (name.substring(name.length - 3, name.length).toLowerCase() != '.gz')) {
-		alert('Incorrect filename. Expecting a ".gz" file.');
+		alert('Niewłaściwa nazwa pliku. Oczekiwany plik typu ".gz".');
 		return;
 	}
-	if (!confirm('Restore data from ' + name + '?')) return;
+	if (!confirm('Odtworzyć dane z ' + name + '?')) return;
 
 	E('restore-button').disabled = 1;
 	fields.disableAll(E('config-section'), 1);
@@ -118,7 +118,7 @@ function verifyFields(focused, quiet)
 /* JFFS2-BEGIN */
 	else if (v == '/jffs/') {
 		if (nvram.jffs2_on != '1') {
-			ferror.set(eLoc, 'JFFS2 is not enabled.', quiet);
+			ferror.set(eLoc, 'JFFS2 nie jest włączony.', quiet);
 			return 0;
 		}
 	}
@@ -126,7 +126,7 @@ function verifyFields(focused, quiet)
 /* CIFS-BEGIN */
 	else if (v.match(/^\/cifs(1|2)\/$/)) {
 		if (nvram['cifs' + RegExp.$1].substr(0, 1) != '1') {
-			ferror.set(eLoc, 'CIFS #' + RegExp.$1 + ' is not enabled.', quiet);
+			ferror.set(eLoc, 'CIFS #' + RegExp.$1 + ' nie jest włączony.', quiet);
 			return 0;
 		}
 	}
@@ -154,11 +154,11 @@ function save()
 		path = getPath();
 		if (((E('_rstats_stime').value * 1) <= 48) &&
 			((path == '*nvram') || (path == '/jffs/'))) {
-			if (!confirm('Frequent saving to NVRAM or JFFS2 is not recommended. Continue anyway?')) return;
+			if (!confirm('Częste zapisywanie do NVRAM lub JFFS2 nie jest zalecane ze względu na trwałość pamięci flash. Czy mimo wszystko kontynuować?')) return;
 		}
 		if ((nvram.rstats_path != path) && (fom.rstats_path.value != path) && (path != '') && (path != '*nvram') &&
 			(path.substr(path.length - 1, 1) != '/')) {
-			if (!confirm('Note: ' + path + ' will be treated as a file. If this is a directory, please use a trailing /. Continue anyway?')) return;
+			if (!confirm('Notka: ' + path + ' będzie traktowany jak plik. Jeśli to katalog, proszę użyć znaku ukośnika /. Czy kontynuować?')) return;
 		}
 		fom.rstats_path.value = path;
 
@@ -196,7 +196,7 @@ function init()
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -204,7 +204,7 @@ function init()
 
 <!-- / / / -->
 
-<div class='section-title'>Bandwidth Monitoring</div>
+<div class='section-title'>Monitorowanie przepustowości</div>
 <div class='section' id='config-section'>
 <form id='_fom' method='post' action='tomato.cgi'>
 <input type='hidden' name='_nextpage' value='admin-bwm.asp'>
@@ -228,28 +228,28 @@ default:
 	break;
 }
 createFieldTable('', [
-	{ title: 'Enable', name: 'f_rstats_enable', type: 'checkbox', value: nvram.rstats_enable == '1' },
-	{ title: 'Save History Location', multi: [
-		{ name: 'f_loc', type: 'select', options: [['','RAM (Temporary)'],['*nvram','NVRAM'],
+	{ title: 'Włączony', name: 'f_rstats_enable', type: 'checkbox', value: nvram.rstats_enable == '1' },
+	{ title: 'Miejsce zapisu historii', multi: [
+		{ name: 'f_loc', type: 'select', options: [['','RAM (tymczasowo)'],['*nvram','NVRAM'],
 /* JFFS2-BEGIN */
 			['/jffs/','JFFS2'],
 /* JFFS2-END */
 /* CIFS-BEGIN */
 			['/cifs1/','CIFS 1'],['/cifs2/','CIFS 2'],
 /* CIFS-END */
-			['*user','Custom Path']], value: loc },
+			['*user','Ścieżka użytkownika']], value: loc },
 		{ name: 'f_user', type: 'text', maxlen: 48, size: 50, value: nvram.rstats_path }
 	] },
-	{ title: 'Save Frequency', indent: 2, name: 'rstats_stime', type: 'select', value: nvram.rstats_stime, options: [
-		[1,'Every Hour'],[2,'Every 2 Hours'],[3,'Every 3 Hours'],[4,'Every 4 Hours'],[5,'Every 5 Hours'],[6,'Every 6 Hours'],
-		[9,'Every 9 Hours'],[12,'Every 12 Hours'],[24,'Every 24 Hours'],[48,'Every 2 Days'],[72,'Every 3 Days'],[96,'Every 4 Days'],
-		[120,'Every 5 Days'],[144,'Every 6 Days'],[168,'Every Week']] },
-	{ title: 'Save On Shutdown', indent: 2, name: 'f_sshut', type: 'checkbox', value: nvram.rstats_sshut == '1' },
-	{ title: 'Create New File<br><small>(Reset Data)</small>', indent: 2, name: 'f_new', type: 'checkbox', value: 0,
-		suffix: ' &nbsp; <b id="newmsg" style="visibility:hidden"><small>(note: enable if this is a new file)</small></b>' },
-	{ title: 'Create Backups', indent: 2, name: 'f_bak', type: 'checkbox', value: nvram.rstats_bak == '1' },
-	{ title: 'First Day Of The Month', name: 'rstats_offset', type: 'text', value: nvram.rstats_offset, maxlen: 2, size: 4 },
-	{ title: 'Excluded Interfaces', name: 'rstats_exclude', type: 'text', value: nvram.rstats_exclude, maxlen: 64, size: 50, suffix: '&nbsp;<small>(comma separated list)</small>' }
+	{ title: 'Częstotliwość zapisu', indent: 2, name: 'rstats_stime', type: 'select', value: nvram.rstats_stime, options: [
+		[1,'Co godzinę'],[2,'Co 2 godziny'],[3,'Co 3 godziny'],[4,'Co 4 godziny'],[5,'Co 5 godzin'],[6,'Co 6 godzin'],
+		[9,'Co 9 godzin'],[12,'Co 12 godzin'],[24,'Co 24 godziny'],[48,'Co 2 dni'],[72,'Co 3 dni'],[96,'Co 4 dni'],
+		[120,'Co 5 dni'],[144,'Co 6 dni'],[168,'Co tydzień']] },
+	{ title: 'Zapisz przy zamknięciu', indent: 2, name: 'f_sshut', type: 'checkbox', value: nvram.rstats_sshut == '1' },
+	{ title: 'Utwórz nowy plik<br><small>(zeruje dane)</small>', indent: 2, name: 'f_new', type: 'checkbox', value: 0,
+		suffix: ' &nbsp; <b id="newmsg" style="visibility:hidden"><small>(notka: zaznacz jeśli to nowy plik)</small></b>' },
+	{ title: 'Twórz kopie', indent: 2, name: 'f_bak', type: 'checkbox', value: nvram.rstats_bak == '1' },
+	{ title: 'Pierwszy dzień miesiąca', name: 'rstats_offset', type: 'text', value: nvram.rstats_offset, maxlen: 2, size: 4 },
+	{ title: 'Wyklucz interfejsy', name: 'rstats_exclude', type: 'text', value: nvram.rstats_exclude, maxlen: 64, size: 50, suffix: '&nbsp;<small>(lista oddzielona przecinkami)</small>' }
 ]);
 </script>
 </form>
@@ -257,24 +257,24 @@ createFieldTable('', [
 
 <br>
 
-<div class='section-title'>Backup</div>
+<div class='section-title'>Kopia zapasowa</div>
 <div class='section' id='backup-section'>
 	<form>
 	<script type='text/javascript'>
 	W("<input type='text' size='40' maxlength='64' id='backup-name' name='backup_name' onchange='backupNameChanged()' value='tomato_rstats_" + nvram.et0macaddr.replace(/:/g, '').toLowerCase() + "'>");
 	</script>
 	.gz &nbsp;
-	<input type='button' name='f_backup_button' id='backup-button' onclick='backupButton()' value='Backup'>
+	<input type='button' name='f_backup_button' id='backup-button' onclick='backupButton()' value='Zrób kopię'>
 	</form>
 	<a href='' id='backup-link'>Link</a>
 </div>
 <br>
 
-<div class='section-title'>Restore</div>
+<div class='section-title'>Przywracanie danych historycznych</div>
 <div class='section' id='restore-section'>
 	<form id='restore-form' method='post' action='bwm/restore.cgi?_http_id=<% nv(http_id); %>' encType='multipart/form-data'>
 		<input type='file' size='40' id='restore-name' name='restore_name'>
-		<input type='button' name='f_restore_button' id='restore-button' value='Restore' onclick='restoreButton()'>
+		<input type='button' name='f_restore_button' id='restore-button' value='Odtwórz' onclick='restoreButton()'>
 		<br>
 	</form>
 </div>
@@ -285,8 +285,8 @@ createFieldTable('', [
 <tr><td id='footer' colspan=2>
 	<form>
 	<span id='footer-msg'></span>
-	<input type='button' value='Save' id='save-button' onclick='save()'>
-	<input type='button' value='Cancel' id='cancel-button' onclick='javascript:reloadPage();'>
+	<input type='button' value='Zapisz' id='save-button' onclick='save()'>
+	<input type='button' value='Anuluj' id='cancel-button' onclick='javascript:reloadPage();'>
 	</form>
 </div>
 </td></tr>

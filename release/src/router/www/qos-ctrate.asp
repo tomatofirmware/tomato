@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
 	Copyright (C) 2006-2010 Jonathan Zarate
@@ -15,7 +15,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] QoS: View Per-Connection Transfer Rates</title>
+<title>[<% ident(); %>] QoS: Zestawienie transferów dla poszczególnych połączeń</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
@@ -205,7 +205,7 @@ grid.setName = function(ip, name) {
 				data[cols[j]] = name + ((ip.indexOf(':') != -1) ? '<br>' : ' ') + '<small>(' + ip + ')</small>';
 				row.setRowData(data);
 				if (E('_f_shortcuts').checked)
-					data[cols[j]] = data[cols[j]] + ' <small><a href="javascript:addExcludeList(\'' + ip + '\')" title="Exclude from List">[Hide]</a></small>';
+					data[cols[j]] = data[cols[j]] + ' <small><a href="javascript:addExcludeList(\'' + ip + '\')" title="Usuń z listy">[Ukryj]</a></small>';
 				row.cells[cols[j]].innerHTML = data[cols[j]];
 				row.style.cursor = 'default';
 			}
@@ -215,7 +215,7 @@ grid.setName = function(ip, name) {
 
 grid.setup = function() {
 	this.init('grid', 'sort');
-	this.headerSet(['Proto', 'Source', 'S Port', 'Destination', 'D Port', 'UL Rate', 'DL Rate']);
+	this.headerSet(['Protokół', 'Adres<br>źródłowy', ' Port źródłowy', 'Adres<br>docelowy', 'Port docelowy', 'Wysyłanie', 'Pobieranie']);
 }
 
 var ref = new TomatoRefresh('update.cgi', '', 0, 'qos_ctrate');
@@ -326,9 +326,9 @@ ref.refresh = function(text)
 			}
 			if (E('_f_shortcuts').checked) {
 				if (cache[ip] == null) {
-					b[cols[j]] = b[cols[j]] + ' <small><a href="javascript:addToResolveQueue(\'' + ip + '\')" title="Resolve the hostname of this address">[resolve]</a></small>';
+					b[cols[j]] = b[cols[j]] + ' <small><a href="javascript:addToResolveQueue(\'' + ip + '\')" title="Pokaż nazwę hosta dla tego adresu IP">[pokaż nazwę]</a></small>';
 				}
-				b[cols[j]] = b[cols[j]] + ' <small><a href="javascript:addExcludeList(\'' + ip + '\')" title="Filter out this IP">[hide]</a></small>';
+				b[cols[j]] = b[cols[j]] + ' <small><a href="javascript:addExcludeList(\'' + ip + '\')" title="Odfiltruj to IP">[ukryj]</a></small>';
 			}
 		}
 
@@ -349,9 +349,9 @@ ref.refresh = function(text)
 	if (resolveCB) resolve();
 
 	if (numconnshown != numconntotal)
-		E('numtotalconn').innerHTML='<small><i>(showing ' + numconnshown + ' out of ' + numconntotal + ' connections)</i></small>';
+		E('numtotalconn').innerHTML='<small><i>(showing ' + numconnshown + ' z ' + numconntotal + ' połączeń)</i></small>';
 	else
-		E('numtotalconn').innerHTML='<small><i>(' + numconntotal + ' connections)</i></small>';
+		E('numtotalconn').innerHTML='<small><i>(' + numconntotal + ' połączeń)</i></small>';
 }
 
 function addExcludeList(address) {
@@ -433,11 +433,11 @@ function dofilter() {
 function toggleVisibility(whichone) {
 	if(E('sesdiv' + whichone).style.display=='') {
 		E('sesdiv' + whichone).style.display='none';
-		E('sesdiv' + whichone + 'showhide').innerHTML='(Click here to show)';
+		E('sesdiv' + whichone + 'showhide').innerHTML='(Kliknij, żeby wyświetlić)';
 		cookie.set('qos_ctr_' + whichone + '_vis', 0);
 	} else {
 		E('sesdiv' + whichone).style.display='';
-		E('sesdiv' + whichone + 'showhide').innerHTML='(Click here to hide)';
+		E('sesdiv' + whichone + 'showhide').innerHTML='(Kliknij, żeby ukryć)';
 		cookie.set('qos_ctr_' + whichone + '_vis', 1);
 	}
 }
@@ -472,7 +472,7 @@ function verifyFields(focused, quiet) {
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -480,28 +480,28 @@ function verifyFields(focused, quiet) {
 
 <!-- / / / -->
 
-<div class='section-title' id='stitle' onclick='document.location="qos-graphs.asp"' style='cursor:pointer'>Transfer Rates: <span id='numtotalconn'></span></div>
+<div class='section-title' id='stitle' onclick='document.location="qos-graphs.asp"' style='cursor:pointer'>Prędkość transferu: <span id='numtotalconn'></span></div>
 <div class='section'>
 <table id='grid' class='tomato-grid' style="float:left" cellspacing=1></table>
 
-<div id='loading'><br><b>Loading...</b></div>
+<div id='loading'><br><b>Ładuję...</b></div>
 </div>
 
 <!-- / / / -->
 
-<div class='section-title'>Filters: <small><i><a href='javascript:toggleVisibility("filters");'><span id='sesdivfiltersshowhide'>(Toggle Visibility)</span></a></i></small></div>
+<div class='section-title'>Filtry: <small><i><a href='javascript:toggleVisibility("filters");'><span id='sesdivfiltersshowhide'>(Pokaż/Ukryj)</span></a></i></small></div>
 <div class='section' id='sesdivfilters' style='display:none'>
 <script type='text/javascript'>
 var c;
 c = [];
-c.push({ title: 'Show only these IPs', name: 'f_filter_ip', size: 50, maxlen: 255, type: 'text', suffix: ' <small>(Comma separated list)</small>' });
-c.push({ title: 'Exclude these IPs', name: 'f_filter_ipe', size: 50, maxlen: 255, type: 'text', suffix: ' <small>(Comma separated list)</small>' });
-c.push({ title: 'Exclude gateway traffic', name: 'f_excludegw', type: 'checkbox', value: ((nvram.t_hidelr) == '1' ? 1 : 0) });
-c.push({ title: 'Exclude IPv4 broadcast', name: 'f_excludebcast', type: 'checkbox' });
-c.push({ title: 'Exclude IPv4 multicast', name: 'f_excludemcast', type: 'checkbox' });
-c.push({ title: 'Ignore inactive connections', name: 'f_excludebythreshold', type: 'checkbox' });
-c.push({ title: 'Auto resolve addresses', name: 'f_autoresolve', type: 'checkbox' });
-c.push({ title: 'Show shortcuts', name: 'f_shortcuts', type: 'checkbox' });
+c.push({ title: 'Tylko wybrane adresy IP', name: 'f_filter_ip', size: 50, maxlen: 255, type: 'text', suffix: ' <small>(lista oddzielona przecinkami)</small>' });
+c.push({ title: 'Wyklucz te adresy IP', name: 'f_filter_ipe', size: 50, maxlen: 255, type: 'text', suffix: ' <small>(lista oddzielona przecinkami)</small>' });
+c.push({ title: 'Wyklucz ruch do bramy', name: 'f_excludegw', type: 'checkbox', value: ((nvram.t_hidelr) == '1' ? 1 : 0) });
+c.push({ title: 'Wyklucz IPv4 broadcast', name: 'f_excludebcast', type: 'checkbox' });
+c.push({ title: 'Wyklucz IPv4 multicast', name: 'f_excludemcast', type: 'checkbox' });
+c.push({ title: 'Ignoruj połączenia nieaktywne', name: 'f_excludebythreshold', type: 'checkbox' });
+c.push({ title: 'Automatycznie zamieniaj IP na nazwy', name: 'f_autoresolve', type: 'checkbox' });
+c.push({ title: 'Pokaż skróty', name: 'f_shortcuts', type: 'checkbox' });
 createFieldTable('',c);
 </script>
 </div>

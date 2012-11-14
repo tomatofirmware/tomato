@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato VLAN GUI
 	Copyright (C) 2011-2012 Augusto Bott
@@ -292,7 +292,7 @@ REMOVE-END */
   var e = E('footer-msg');
 
   if(vlg.countWan() != 1) {
-    e.innerHTML = 'Cannot proceed: one VID must be assigned to WAN.';
+    e.innerHTML = 'Nie można kontynuować: jeden VID musi być przypisany do WAN.';
     e.style.visibility = 'visible';
     setTimeout(
       function() {
@@ -303,7 +303,7 @@ REMOVE-END */
   }
 
   if(vlg.countLan(0) != 1) {
-    e.innerHTML = 'Cannot proceed: one and only one VID must be assigned to the primary LAN (br0).';
+    e.innerHTML = 'Nie można kontynuować: jeden i tylko jeden VID musi być przypisany do podstawowego LAN (br0).';
     e.style.visibility = 'visible';
     setTimeout(
       function() {
@@ -314,7 +314,7 @@ REMOVE-END */
   }
 
   if (v.length < 1) {
-    e.innerHTML = 'Cannot proceed without setting a default VID';
+    e.innerHTML = 'Nie można kontynuować bez przypisania domyślnego VID';
     e.style.visibility = 'visible';
     setTimeout(
       function() {
@@ -324,7 +324,7 @@ REMOVE-END */
     return;
   }
 
-  if (confirm("Router must be rebooted to proceed. Commit changes to NVRAM and reboot now?"))
+  if (confirm("Router musi zostać zrestartowany aby kontynuować. Czy chcesz zatwierdzić zmiany w NVRAM i zrestartować teraz?"))
     form.submit(fom, 0);
 }
 
@@ -350,9 +350,9 @@ if(port_vlan_supported) { // aka if(supported_hardware) block
     { type: 'checkbox', prefix: '<div class="centered">', suffix: '</div>' },
     { type: 'checkbox', prefix: '<div class="centered">', suffix: '</div>' },
     { type: 'checkbox', prefix: '<div class="centered">', suffix: '</div>' },
-    { type: 'select', options: [[1, 'none'],[2, 'WAN'],[3, 'LAN (br0)'],[4, 'LAN1 (br1)'],[5, 'LAN2 (br2)'],[6, 'LAN3 (br3)']], prefix: '<div class="centered">', suffix: '</div>' }]);
+    { type: 'select', options: [[1, 'brak'],[2, 'WAN'],[3, 'LAN (br0)'],[4, 'LAN1 (br1)'],[5, 'LAN2 (br2)'],[6, 'LAN3 (br3)']], prefix: '<div class="centered">', suffix: '</div>' }]);
 
-    this.headerSet(['VLAN', 'VID', 'Port 1', 'Tagged', 'Port 2', 'Tagged', 'Port 3', 'Tagged', 'Port 4', 'Tagged', 'WAN Port', 'Tagged', 'Default', 'Bridge']);
+    this.headerSet(['VLAN', 'VID', 'Port 1', 'Znakowany', 'Port 2', 'Znakowany', 'Port 3', 'Znakowany', 'Port 4', 'Znakowany', 'Port WAN', 'Znakowany', 'Domyślny', 'Bridge']);
 
 	vlg.populate();
     vlg.canDelete = false;
@@ -516,7 +516,7 @@ REMOVE-END */
 
     if ((f[COL_P0].checked == 1) && (this.countElem(COL_P0,1)>0)) {
       if (((this.countElem(COL_P0,1) != this.countElem(COL_P0T,1)) || (f[COL_P0T].checked==0))) {
-        ferror.set(f[COL_P0T], 'Port 1 cannot be assigned to more than one VLAN unless frames are tagged on all VLANs Port 1 is member', quiet);
+        ferror.set(f[COL_P0T], 'Port 1 nie może być przypisany do więcej niż jednego VLANu dopóki ramki nie będą znakowane we wszystkich VLANach których Port 1 jest członkiem', quiet);
         valid=0;
       } else {
         ferror.clear(f[COL_P0T]);
@@ -524,7 +524,7 @@ REMOVE-END */
     }
     if ((f[COL_P1].checked == 1) && (this.countElem(COL_P1,1)>0)) {
       if (((this.countElem(COL_P1,1) != this.countElem(COL_P1T,1)) || (f[COL_P1T].checked==0))) {
-        ferror.set(f[COL_P1T], 'Port 2 cannot be assigned to more than one VLAN unless frames are tagged on all VLANs Port 2 is member', quiet);
+        ferror.set(f[COL_P1T], 'Port 2 nie może być przypisany do więcej niż jednego VLANu dopóki ramki nie będą znakowane we wszystkich VLANach których Port 2 jest członkiem', quiet);
         valid=0;
       } else {
         ferror.clear(f[COL_P1T]);
@@ -532,7 +532,7 @@ REMOVE-END */
     }
     if ((f[COL_P2].checked == 1) && (this.countElem(COL_P2,1)>0)) {
       if (((this.countElem(COL_P2,1) != this.countElem(COL_P2T,1)) || (f[COL_P2T].checked==0))) {
-        ferror.set(f[COL_P2T], 'Port 3 cannot be assigned to more than one VLAN unless frames are tagged on all VLANs Port 3 is member', quiet);
+        ferror.set(f[COL_P2T], 'Port 3 nie może być przypisany do więcej niż jednego VLANu dopóki ramki nie będą znakowane we wszystkich VLANach których Port 3 jest członkiem', quiet);
         valid=0;
       } else {
         ferror.clear(f[COL_P2T]);
@@ -540,7 +540,7 @@ REMOVE-END */
     }
     if ((f[COL_P3].checked == 1) && (this.countElem(COL_P3,1)>0)) {
       if (((this.countElem(COL_P3,1) != this.countElem(COL_P3T,1)) || (f[COL_P3T].checked==0))) {
-        ferror.set(f[COL_P3T], 'Port 4 cannot be assigned to more than one VLAN unless frames are tagged on all VLANs Port 4 is member', quiet);
+        ferror.set(f[COL_P3T], 'Port 4 nie może być przypisany do więcej niż jednego VLANu dopóki ramki nie będą znakowane we wszystkich VLANach których Port 4 jest członkiem', quiet);
         valid=0;
       } else {
         ferror.clear(f[COL_P3T]);
@@ -548,7 +548,7 @@ REMOVE-END */
     }
     if ((f[COL_P4].checked == 1) && (this.countElem(COL_P4,1)>0)) {
       if (((this.countElem(COL_P4,1) != this.countElem(COL_P4T,1)) || (f[COL_P4T].checked==0))) {
-        ferror.set(f[COL_P4T], 'WAN port cannot be assigned to more than one VLAN unless frames are tagged on all VLANs WAN port is member', quiet);
+        ferror.set(f[COL_P4T], 'Port WAN nie może być przypisany do więcej niż jednego VLANu dopóki ramki nie będą znakowane we wszystkich VLANach których Port WAN jest członkiem', quiet);
         valid=0;
       } else {
         ferror.clear(f[COL_P4T]);
@@ -561,21 +561,21 @@ REMOVE-END */
     }
 
     if((this.countDefaultVID() > 0) && (f[COL_VID_DEF].checked ==1)) {
-      ferror.set(f[COL_VID_DEF], 'Only one VID can be selected as the default VID', quiet);
+      ferror.set(f[COL_VID_DEF], 'Tylko jeden VID może być domyślnym VID', quiet);
       valid = 0;
     } else {
       ferror.clear(f[COL_VID_DEF]);
     }
 
     if(this.countVID(f[COL_VID].selectedIndex) > 0) {
-      ferror.set(f[COL_VID], 'Cannot add more than one entry with VID ' + f[0].selectedIndex, quiet);
+      ferror.set(f[COL_VID], 'Nie można dodać więcej niż jednego wpisu dla VID ' + f[0].selectedIndex, quiet);
       valid = 0;
     } else {
       ferror.clear(f[COL_VID]);
     }
 
     if ((this.countWan() > 0) && (f[COL_BRI].selectedIndex == 1)) {
-      ferror.set(f[COL_BRI],'Only one VID can be used as WAN at any time', quiet);
+      ferror.set(f[COL_BRI],'Tylko jeden VID może być użyty jako WAN w danym czasie', quiet);
       valid = 0;
     } else {
       ferror.clear(f[COL_BRI]);
@@ -583,7 +583,7 @@ REMOVE-END */
 
     for(var i=0; i<4; i++) {
       if ((this.countLan(i) > 0) && (f[COL_BRI].selectedIndex == (i+2))) {
-        ferror.set(f[COL_BRI],'One and only one VID can be used for LAN' + ((i==0) ? '' : i ) + ' (br'+i+') at any time', quiet);
+        ferror.set(f[COL_BRI],'Jeden i tylko jeden VID może być użyty dla LAN' + ((i==0) ? '' : i ) + ' (br'+i+') at any time', quiet);
         valid = 0;
       } else {
         ferror.clear(f[COL_BRI]);
@@ -596,16 +596,16 @@ REMOVE-END */
   vlg.dataToView = function(data) {
     return [data[COL_VID],
     ((data[COL_MAP].toString() == '') || (data[COL_MAP].toString() == '0')) ? (parseInt(E('_vlan0tag').value) * 1 + data[COL_VID] *1 ).toString() : data[COL_MAP].toString(),
-    (data[COL_P0].toString() != '0') ? 'Yes' : '',
-    (data[COL_P0T].toString() != '0') ? 'On' : '',
-    (data[COL_P1].toString() != '0') ? 'Yes' : '',
-    (data[COL_P1T].toString() != '0') ? 'On' : '',
-    (data[COL_P2].toString() != '0') ? 'Yes' : '',
-    (data[COL_P2T].toString() != '0') ? 'On' : '',
-    (data[COL_P3].toString() != '0') ? 'Yes' : '',
-    (data[COL_P3T].toString() != '0') ? 'On' : '',
-    (data[COL_P4].toString() != '0') ? 'Yes' : '',
-    (data[COL_P4T].toString() != '0') ? 'On' : '',
+    (data[COL_P0].toString() != '0') ? 'Tak' : '',
+    (data[COL_P0T].toString() != '0') ? 'Wł.' : '',
+    (data[COL_P1].toString() != '0') ? 'Tak' : '',
+    (data[COL_P1T].toString() != '0') ? 'Wł.' : '',
+    (data[COL_P2].toString() != '0') ? 'Tak' : '',
+    (data[COL_P2T].toString() != '0') ? 'Wł.' : '',
+    (data[COL_P3].toString() != '0') ? 'Tak' : '',
+    (data[COL_P3T].toString() != '0') ? 'Wł.' : '',
+    (data[COL_P4].toString() != '0') ? 'Tak' : '',
+    (data[COL_P4T].toString() != '0') ? 'Wł' : '',
     (data[COL_VID_DEF].toString() != '0') ? '*' : '',
     ['', 'WAN', 'LAN (br0)', 'LAN1 (br1)', 'LAN2 (br2)', 'LAN3 (br3)' ][data[COL_BRI] - 1]];
   }
@@ -793,7 +793,7 @@ function earlyInit() {
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
   <div class='title'>Tomato</div>
-  <div class='version'>Version <% version(); %></div>
+  <div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -871,7 +871,7 @@ function earlyInit() {
 <div class='section' id='sesdiv_vidmap' style='display:none'>
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: 'Pierwszy 802.1Q VLAN tag', name: 'vlan0tag', type: 'text', maxlen:4, size:6,
+	{ title: 'First 802.1Q VLAN tag', name: 'vlan0tag', type: 'text', maxlen:4, size:6,
 		value: fixInt(nvram.vlan0tag, 0, 4080, 0),
 		suffix: ' <small><i>(zakres: 0 - 4080; musi być wielokrotnością 16; ustaw 0 aby dezaktywować)</i></small>' }
 ]);
@@ -906,7 +906,7 @@ if(port_vlan_supported) vlg.setup();
 <li><b>Znakowany</b> - Aktywuj tagowanie 802.1Q ramek dla określonego portu/VLAN-u
 <script type='text/javascript'>
 if(!trunk_vlan_supported)
-  W(' <i>(not known to be supported on this model)</i>');
+  W(' <i>(nie wiadomo czy będzie działać na tym modelu urządzenia)</i>');
 </script>
 </li>
 <li><b>Domyślny</b> - VLAN ID przypisany do nioznaczonych ramek otrzymanych przez ruter.</li>
@@ -923,10 +923,10 @@ if(!trunk_vlan_supported)
 
 <small>
 <ul>
-<li><b>Other relevant notes/hints:</b>
+<li><b>Pozostałe istotne uwagi/podpowiedzi:</b>
 <ul>
-<li>One VID <i>must</i> be assigned to WAN.</li>
-<li>One VID <i>must</i> be selected as the default.</li>
+<li>Jeden VID <i>musi</i> być przydzielony do WAN.</li>
+<li>Jeden VID <i>musi</i> być wybrany jako Domyślny.</li>
 <script type='text/javascript'>
 if((trunk_vlan_supported) || (nvram.trunk_vlan_so == '1')) {
   W('<li>Aby uniknąć problemów ze zgodnością 802.1Q, unikaj używania VID "0" jako że 802.1Q określa że ramki oznaczone jako "0" nie należą do żadnego VLAN-u(TAG zawiera tylko informacje na temat priorytetów użytkownika).</li>');
@@ -942,11 +942,11 @@ if((trunk_vlan_supported) || (nvram.trunk_vlan_so == '1')) {
 </ul>
 </ul>
 <div id='trunk_vlan_override' style='display:none'>
-<div class='section-title'>Trunk VLAN support override (experimental)</div>
+<div class='section-title'>Nadrzędna obsługa Trunk VLAN (eksperymentalna)</div>
 <div class='section'>
 <script type='text/javascript'>
 createFieldTable('', [
-  { title: 'Enable', name: 'f_trunk_vlan_so', type: 'checkbox', value: nvram.trunk_vlan_so == '1' },
+  { title: 'Włącz', name: 'f_trunk_vlan_so', type: 'checkbox', value: nvram.trunk_vlan_so == '1' },
 ]);
 </script>
 </div>
@@ -957,7 +957,7 @@ createFieldTable('', [
 </div>
 <script type='text/javascript'>
 if(!port_vlan_supported) 
-  W('<i>This feature is not supported on this router.</i>');
+  W('<i>Funkcjonalność nie obsługiwana przez ten router.</i>');
 else {
   E('sesdiv').style.display = '';
   if(!trunk_vlan_supported)
@@ -967,8 +967,8 @@ else {
 </td></tr>
 <tr><td id='footer' colspan=2>
  <span id='footer-msg'></span>
- <input type='button' value='Save' id='save-button' onclick='save()'>
- <input type='button' value='Cancel' id='cancel-button' onclick='javascript:reloadPage();'>
+ <input type='button' value='Zapisz' id='save-button' onclick='save()'>
+ <input type='button' value='Anuluj' id='cancel-button' onclick='javascript:reloadPage();'>
 </td></tr>
 </table>
 </form>

@@ -40,7 +40,7 @@ void prepare_upgrade(void)
 void wi_upgrade(char *url, int len, char *boundary)
 {
 	uint8 buf[1024];
-	const char *error = "Error reading file";
+	const char *error = "Błąd odczytu pliki";
 	int ok = 0;
 	int n;
 	int reset;
@@ -52,8 +52,8 @@ void wi_upgrade(char *url, int len, char *boundary)
 	// quickly check if JFFS2 is mounted by checking if /jffs/ is not squashfs
 	struct statfs sf;
 	if ((statfs("/jffs", &sf) != 0) || (sf.f_type != 0x73717368)) {
-		error = "JFFS2 is currently in use. Since an upgrade may overwrite the "
-			"JFFS2 partition, please backup the contents, disable JFFS2, then reboot the router";
+		error = "JFFS2 jest aktualnie w użyciu. W trakcie aktualizacji może być "
+			"nadpisana partycja JFFS2, proszę zrobić kopię zapasową zawartości, wyłączyć JFFS2 i ponownie uruchomić router";
 		goto ERROR;
 	}
 #endif
@@ -62,7 +62,7 @@ void wi_upgrade(char *url, int len, char *boundary)
 	if (!skip_header(&len)) goto ERROR;
 
 	if (len < (1 * 1024 * 1024)) {
-		error = "Invalid file";
+		error = "Błędny plik";
 		goto ERROR;
 	}
 
@@ -86,18 +86,18 @@ void wi_upgrade(char *url, int len, char *boundary)
 
 	if ((mktemp(fifo) == NULL) ||
 		(mkfifo(fifo, S_IRWXU) < 0)) {
-		error = "Unable to create a fifo";
+		error = "Nie można utworzyć kolejki fifo";
 		goto ERROR2;
 	}
 
 	char *wargv[] = { MTD_WRITE_CMD, "-w", "-i", fifo, "-d", "linux", NULL };
 	if (_eval(wargv, ">/tmp/.mtd-write", 0, &pid) != 0) {
-		error = "Unable to start flash program";
+		error = "Nie można uruchomić programu do aktualizacji";
 		goto ERROR2;
 	}
 
 	if ((f = fopen(fifo, "w")) == NULL) {
-		error = "Unable to start pipe for mtd write";
+		error = "Nie można uruchomić potoku do zapisu mtd";
 		goto ERROR2;
 	}
 
@@ -110,7 +110,7 @@ void wi_upgrade(char *url, int len, char *boundary)
 		 }
 		 len -= n;
 		 if (safe_fwrite(buf, 1, n, f) != n) {
-			 error = "Error writing to pipe";
+			 error = "Błąd zapisu do potoku";
 			 goto ERROR2;
 		 }
 	}

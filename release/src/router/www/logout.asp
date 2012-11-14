@@ -1,4 +1,4 @@
-<html>
+﻿<html>
 <!--
 	Tomato GUI
 	Copyright (C) 2006-2010 Jonathan Zarate
@@ -14,16 +14,16 @@
 <body style='background-color:#fff;font:13px sans-serif;color:#000' onload='setTimeout("go.submit()", 1200)'>
 
 <div style='width:300px;padding:50px;background:#eee'>
-<b>Logout</b><br>
+<b>Wylogowanie</b><br>
 <hr size=1><br>
-To clear the credentials cached by the browser:<br>
+Żeby wyczyścić dane logowania przechowywane przez przeglądarki:<br>
 <br>
 <b>Firefox, Internet Explorer, Opera, Safari</b><br>
-- Leave the password field blank.<br>
-- Click OK/Login<br>
+- Pozostaw puste pole hasła.<br>
+- Kliknij OK/Login<br>
 <br>
 <b>Chrome</b><br>
-- Select Cancel.<br>
+- Wybierz Anuluj.<br>
 </div>
 
 <form name='go' method='post' action='logout'>

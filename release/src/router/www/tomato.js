@@ -259,7 +259,7 @@ var form = {
 		}
 
 		if ((msg = E('footer-msg')) != null) {
-			msg.innerHTML = 'Saving...';
+			msg.innerHTML = 'Zapisywanie...';
 			msg.style.visibility = 'visible';
 		}
 
@@ -267,7 +267,7 @@ var form = {
 		this.xhttp.onCompleted = function(text, xml) {
 			if (msg) {
 				if (text.match(/@msg:(.+)/)) msg.innerHTML = escapeHTML(RegExp.$1);
-					else msg.innerHTML = 'Saved';
+					else msg.innerHTML = 'Zapisano';
 			}
 			setTimeout(
 				function() {
@@ -365,7 +365,7 @@ function _v_range(e, quiet, min, max, name)
 	if ((e = E(e)) == null) return 0;
 	var v = e.value;
 	if ((!v.match(/^ *[-\+]?\d+ *$/)) || (v < min) || (v > max)) {
-		ferror.set(e, 'Invalid ' + name + '. Valid range: ' + min + '-' + max, quiet);
+		ferror.set(e, 'Nieprawiłowy ' + name + '. Prawidłowy zakres: ' + min + '-' + max, quiet);
 		return 0;
 	}
 	e.value = v * 1;
@@ -403,7 +403,7 @@ function v_mins(e, quiet, min, max)
 			return _v_range(e, quiet, min, max, 'minutes');
 		}
 	}
-	ferror.set(e, 'Invalid number of minutes.', quiet);
+	ferror.set(e, 'Nieprawidlowa liczba minut.', quiet);
 	return 0;
 }
 
@@ -424,7 +424,7 @@ function v_macip(e, quiet, bok, lan_ipaddr, lan_netmask)
 				e.value = '';
 			}
 			else {
-				ferror.set(e, 'Invalid MAC or IP address');
+				ferror.set(e, 'Nie prawidlowy MAC lub adres IP');
 				return false;
 			}
 		}
@@ -436,7 +436,7 @@ function v_macip(e, quiet, bok, lan_ipaddr, lan_netmask)
 	a = s.split('-');
     
 	if (a.length > 2) {
-		ferror.set(e, 'Invalid IP address range', quiet);
+		ferror.set(e, 'Nieprawidlowy zakres adresow IP', quiet);
 		return false;
 	}
 	
@@ -455,18 +455,18 @@ function v_macip(e, quiet, bok, lan_ipaddr, lan_netmask)
 		b = a[i];    
 		b = fixIP(b);
 		if (!b) {
-			ferror.set(e, 'Invalid IP address', quiet);
+			ferror.set(e, 'Nieprawidlowy Adres IP', quiet);
 			return false;
 		}
 
 		if ((aton(b) & aton(lan_netmask))!=(aton(lan_ipaddr) & aton(lan_netmask))) {
-			ferror.set(e, 'IP address outside of LAN', quiet);
+			ferror.set(e, 'Adres IP jest poza LAN', quiet);
 			return false;
 		}
 
 		d = (b.split('.'))[3];
 		if (parseInt(d) <= parseInt(c)) {
-			ferror.set(e, 'Invalid IP address range', quiet);
+			ferror.set(e, 'Nieprawidlowy zakres adresow IP', quiet);
 			return false;
 		}
 
@@ -498,7 +498,7 @@ function v_ip(e, quiet, x)
 	if ((e = E(e)) == null) return 0;
 	ip = fixIP(e.value, x);
 	if (!ip) {
-		ferror.set(e, 'Invalid IP address', quiet);
+		ferror.set(e, 'Nieprawidlowy Adres IP', quiet);
 		return false;
 	}
 	e.value = ip;
@@ -525,17 +525,17 @@ function v_dns(e, quiet)
 			s.push(53);
 		}
 		else if (s.length != 2) {
-			ferror.set(e, 'Invalid IP address or port', quiet);
+			ferror.set(e, 'Błędny adres IP lub numer portu', quiet);
 			return false;
 		}
 		
 		if ((s[0] = fixIP(s[0])) == null) {
-			ferror.set(e, 'Invalid IP address', quiet);
+			ferror.set(e, 'Błędny adres IP', quiet);
 			return false;
 		}
 
 		if ((s[1] = fixPort(s[1], -1)) == -1) {
-			ferror.set(e, 'Invalid port', quiet);
+			ferror.set(e, 'Błędny numer portu', quiet);
 			return false;
 		}
 	
@@ -581,7 +581,7 @@ function _v_iptip(e, ip, quiet)
 		a = fixIP(RegExp.$1);
 		b = fixIP(RegExp.$2);
 		if ((a == null) || (b == null)) {
-			ferror.set(e, oip + ' - invalid IP address range', quiet);
+			ferror.set(e, oip + ' - błędny zakres adresów IP', quiet);
 			return null;
 		}
 		ferror.clear(e);
@@ -602,13 +602,13 @@ function _v_iptip(e, ip, quiet)
 		if (isNaN(ma)) {
 			ma = fixIP(b);
 			if ((ma == null) || (!_v_netmask(ma))) {
-				ferror.set(e, oip + ' - invalid netmask', quiet);
+				ferror.set(e, oip + ' - błędna maska podsieci', quiet);
 				return null;
 			}
 		}
 		else {
 			if ((ma < 0) || (ma > 32)) {
-				ferror.set(e, oip + ' - invalid netmask', quiet);
+				ferror.set(e, oip + ' - błędna maska podsieci', quiet);
 				return null;
 			}
 		}
@@ -616,7 +616,7 @@ function _v_iptip(e, ip, quiet)
 
 	ip = fixIP(ip);
 	if (!ip) {
-		ferror.set(e, oip + ' - invalid IP address', quiet);
+		ferror.set(e, oip + ' - błędny adres ip', quiet);
 		return null;
 	}
 
@@ -632,13 +632,13 @@ function v_iptip(e, quiet, multi)
 	v = e.value.split(',');
 	if (multi) {
 		if (v.length > multi) {
-			ferror.set(e, 'Too many IP addresses', quiet);
+			ferror.set(e, 'za dużo adresów IP', quiet);
 			return 0;
 		}
 	}
 	else {
 		if (v.length > 1) {
-			ferror.set(e, 'Invalid IP address', quiet);
+			ferror.set(e, 'Błędny adres IP', quiet);
 			return 0;
 		}
 	}
@@ -657,7 +657,7 @@ function _v_domain(e, dom, quiet)
 	if (s.length > 0) {
 		s = _v_hostname(e, s, 1, 1, 7, '.', true);
 		if (s == null) {
-			ferror.set(e, "Invalid name. Only characters \"A-Z 0-9 . -\" are allowed.", quiet);
+			ferror.set(e, "Błędna nazwa. Dozwolone są tylko znaki \"A-Z 0-9 . -\".", quiet);
 			return null;
 		}
 	}
@@ -775,7 +775,7 @@ function _v_ipv6_addr(e, ip, ipt, quiet)
 		a = CompressIPv6Address(a);
 		b = CompressIPv6Address(b);
 		if ((a == null) || (b == null)) {
-			ferror.set(e, oip + ' - invalid IPv6 address range', quiet);
+			ferror.set(e, oip + ' - błędny zakres adresów IPv6', quiet);
 			return null;
 		}
 		ferror.clear(e);
@@ -789,7 +789,7 @@ function _v_ipv6_addr(e, ip, ipt, quiet)
 		b = parseInt(RegExp.$2, 10);
 		a = ExpandIPv6Address(a);
 		if ((a == null) || (b == null)) {
-			ferror.set(e, oip + ' - invalid IPv6 address', quiet);
+			ferror.set(e, oip + ' - błędny adres IPv6', quiet);
 			return null;
 		}
 		if (b < 0 || b > 128) {
@@ -804,7 +804,7 @@ function _v_ipv6_addr(e, ip, ipt, quiet)
 
 	ip = CompressIPv6Address(oip);
 	if (!ip) {
-		ferror.set(e, oip + ' - invalid IPv6 address', quiet);
+		ferror.set(e, oip + ' - błędny adres IPv6', quiet);
 		return null;
 	}
 
@@ -840,7 +840,7 @@ function _v_portrange(e, quiet, v)
 		x = fixPort(x, -1);
 		y = fixPort(y, -1);
 		if ((x == -1) || (y == -1)) {
-			ferror.set(e, 'Invalid port range: ' + v, quiet);
+			ferror.set(e, 'Błędny zakres portów: ' + v, quiet);
 			return null;
 		}
 		if (x > y) {
@@ -855,7 +855,7 @@ function _v_portrange(e, quiet, v)
 
 	v = fixPort(v, -1);
 	if (v == -1) {
-		ferror.set(e, 'Invalid port', quiet);
+		ferror.set(e, 'Nieprawidłowy port', quiet);
 		return null;
 	}
 
@@ -883,11 +883,11 @@ function v_iptport(e, quiet)
 	a = e.value.split(/[,\.]/);
 
 	if (a.length == 0) {
-		ferror.set(e, 'Expecting a list of ports or port range.', quiet);
+		ferror.set(e, 'Spodziewano się  listy portów lub ich zakres.', quiet);
 		return 0;
 	}
 	if (a.length > 10) {
-		ferror.set(e, 'Only 10 ports/range sets are allowed.', quiet);
+		ferror.set(e, 'Dozwolony jest zbiór tylko 10 portów/zakresów.', quiet);
 		return 0;
 	}
 
@@ -932,7 +932,7 @@ function v_netmask(e, quiet)
 			return 1;
 		}
 	}
-	ferror.set(e, 'Invalid netmask', quiet);
+	ferror.set(e, 'Nieprawidłowa maska podsieci', quiet);
 	return 0;
 }
 
@@ -967,7 +967,7 @@ function v_mac(e, quiet)
 	if ((e = E(e)) == null) return 0;
 	mac = fixMAC(e.value);
 	if ((!mac) || (isMAC0(mac))) {
-		ferror.set(e, 'Invalid MAC address', quiet);
+		ferror.set(e, 'Nieprawidłowy adres MAC', quiet);
 		return 0;
 	}
 	e.value = mac;
@@ -982,7 +982,7 @@ function v_macz(e, quiet)
 	if ((e = E(e)) == null) return 0;
 	mac = fixMAC(e.value);
 	if (!mac) {
-		ferror.set(e, 'Invalid MAC address', quiet);
+		ferror.set(e, 'Nieprawidłowy adres MAC', quiet);
 		return false;
 	}
 	e.value = mac;
@@ -999,12 +999,12 @@ function v_length(e, quiet, min, max)
 	n = s.length;
 	if (min == undefined) min = 1;
 	if (n < min) {
-		ferror.set(e, 'Invalid length. Please enter at least ' + min + ' character' + (min == 1 ? '.' : 's.'), quiet);
+		ferror.set(e, 'Nieprawidłowa długosc. Proszę wprowadz conajmniej ' + min + ' znaków' + (min == 1 ? '.' : 's.'), quiet);
 		return 0;
 	}
 	max = max || e.maxlength;
 	if (n > max) {
-		ferror.set(e, 'Invalid length. Please reduce the length to ' + max + ' characters or less.', quiet);
+		ferror.set(e, 'Nieprawidłowa długość. Proszę zredukuj długosc do ' + max + ' znaków lub mniej.', quiet);
 		return 0;
 	}
 	e.value = s;
@@ -1020,13 +1020,13 @@ function _v_iptaddr(e, quiet, multi, ipv4, ipv6)
 	v = e.value.split(',');
 	if (multi) {
 		if (v.length > multi) {
-			ferror.set(e, 'Too many addresses', quiet);
+			ferror.set(e, 'Zbyt wiele adresów', quiet);
 			return 0;
 		}
 	}
 	else {
 		if (v.length > 1) {
-			ferror.set(e, 'Invalid domain name or IP address', quiet);
+			ferror.set(e, 'Błędna nazwa domeny lub adres IP', quiet);
 			return 0;
 		}
 	}
@@ -1045,7 +1045,7 @@ function _v_iptaddr(e, quiet, multi, ipv4, ipv6)
 					return 0;
 				}
 				if ((t = _v_iptip(e, v[i], 1)) == null) {
-					ferror.set(e, e._error_msg + ', or invalid domain name', quiet);
+					ferror.set(e, e._error_msg + ', lub błędna nazwa domeny', quiet);
 					return 0;
 				}
 /* IPV6-BEGIN */
@@ -1075,13 +1075,13 @@ function _v_hostname(e, h, quiet, required, multi, delim, cidr)
 
 	if (multi) {
 		if (v.length > multi) {
-			ferror.set(e, 'Too many hostnames.', quiet);
+			ferror.set(e, 'Zbyt wiele nazw hostów.', quiet);
 			return null;
 		}
 	}
 	else {
 		if (v.length > 1) {
-			ferror.set(e, 'Invalid hostname.', quiet);
+			ferror.set(e, 'Błędna nazwa hosta.', quiet);
 			return null;
 		}
 	}
@@ -1094,11 +1094,11 @@ function _v_hostname(e, h, quiet, required, multi, delim, cidr)
 			if (cidr && i == v.length-1)
 				re = /^[a-zA-Z0-9](([a-zA-Z0-9\-]{0,61})[a-zA-Z0-9]){0,1}(\/\d{1,3})?$/;
 			if (s.search(re) == -1 || s.search(/^\d+$/) != -1) {
-				ferror.set(e, 'Invalid hostname. Only "A-Z 0-9" and "-" in the middle are allowed (up to 63 characters).', quiet);
+				ferror.set(e, 'Błędna nazwa hosta. Tylko znaki "A-Z 0-9" i "-" w środku są dozwolone (do 63 znaków).', quiet);
 				return null;
 			}
 		} else if (required) {
-			ferror.set(e, 'Invalid hostname.', quiet);
+			ferror.set(e, 'Błędna nazwa hosta.', quiet);
 			return null;
 		}
 		v[i] = s;
@@ -1129,7 +1129,7 @@ function v_nodelim(e, quiet, name, checklist)
 	e.value = e.value.trim();
 	if (e.value.indexOf('<') != -1 ||
 	   (checklist && e.value.indexOf('>') != -1)) {
-		ferror.set(e, 'Invalid ' + name + ': \"<\" ' + (checklist ? 'or \">\" are' : 'is') + ' not allowed.', quiet);
+		ferror.set(e, 'Nieprawidłowa ' + name + ': \"<\" ' + (checklist ? 'lub \">\" nie są' : 'nie jest') + ' dozwolone.', quiet);
 		return 0;
 	}
 	ferror.clear(e);
@@ -1146,7 +1146,7 @@ function v_path(e, quiet, required)
 		return 1;
 	}
 	if (e.value.substr(0, 1) != '/') {
-		ferror.set(e, 'Please start at the / root directory.', quiet);
+		ferror.set(e, 'Proszę zacząć od / katalogu root.', quiet);
 		return 0;
 	}
 	ferror.clear(e);
@@ -1429,7 +1429,7 @@ TomatoGrid.prototype = {
 		if ((this.canMove) || (this.canEdit) || (this.canDelete)) {
 			e.onmouseover = this.rpMouIn;
 // ----			e.onmouseout = this.rpMouOut;
-			if (this.canEdit) e.title = 'Click to edit';
+			if (this.canEdit) e.title = 'Kliknij aby edytować';
 		}
 
 		return e;
@@ -1590,13 +1590,13 @@ TomatoGrid.prototype = {
 		c.colSpan = this.header.cells.length;
 		if (which == 'edit') {
 			c.innerHTML =
-				'<input type=button value="Delete" onclick="TGO(this).onDelete()"> &nbsp; ' +
+				'<input type=button value="Usuń" onclick="TGO(this).onDelete()"> &nbsp; ' +
 				'<input type=button value="OK" onclick="TGO(this).onOK()"> ' +
-				'<input type=button value="Cancel" onclick="TGO(this).onCancel()">';
+				'<input type=button value="Anuluj" onclick="TGO(this).onCancel()">';
 		}
 		else {
 			c.innerHTML =
-				'<input type=button value="Add" onclick="TGO(this).onAdd()">';
+				'<input type=button value="Dodaj" onclick="TGO(this).onAdd()">';
 		}
 		return r;
 	},
@@ -2065,7 +2065,7 @@ TomatoRefresh.prototype = {
 
 		b = (mode != 'stop') && (this.refreshTime > 0);
 		if ((e = E('refresh-button')) != null) {
-			e.value = b ? 'Stop' : 'Refresh';
+			e.value = b ? 'Stop' : 'Odśwież';
 			e.disabled = ((mode == 'start') && (!b));
 		}
 		if ((e = E('refresh-time')) != null) e.disabled = b;
@@ -2113,9 +2113,11 @@ function genStdTimeList(id, zero, min)
 			v = t[i];
 			if (v < min) continue;
 			b.push('<option value=' + v + '>');
-			if (v == 60) b.push('1 minute');
-				else if (v > 60) b.push((v / 60) + ' minutes');
-				else b.push(v + ' seconds');
+			if (v == 60) b.push('1 minuta');
+				else if (v > 60) b.push((v / 60) + ' minut');
+				else if (v == 3) b.push('3 sekundy');
+				else if (v == 4) b.push('4 sekundy');
+				else b.push(v + ' sekund');
 		}
 		b.push('</select> ');
 	}
@@ -2126,8 +2128,8 @@ function genStdRefresh(spin, min, exec)
 {
 	W('<div style="text-align:right">');
 	if (spin) W('<img src="spin.gif" id="refresh-spinner"> ');
-	genStdTimeList('refresh-time', 'Auto Refresh', min);
-	W('<input type="button" value="Refresh" onclick="' + (exec ? exec : 'refreshClick()') + '" id="refresh-button"></div>');
+	genStdTimeList('refresh-time', 'Autoodświeżanie', min);
+	W('<input type="button" value="Odśwież" onclick="' + (exec ? exec : 'refreshClick()') + '" id="refresh-button"></div>');
 }
 
 
@@ -2338,51 +2340,51 @@ function navi()
 {
 	var menu = [
 		['Status', 			'status', 0, [
-			['Overview',			'overview.asp'],
-			['Device List',			'devices.asp'],
-			['Web Usage',			'webmon.asp'],
-			['Logs',			'log.asp'] ] ],
-		['Bandwidth', 			'bwm', 0, [
-			['Real-Time',			'realtime.asp'],
-			['Last 24 Hours',		'24.asp'],
-			['Daily',			'daily.asp'],
-			['Weekly',			'weekly.asp'],
-			['Monthly',			'monthly.asp']
+			['Przegląd',			'overview.asp'],
+			['Lista urządzeń',		'devices.asp'],
+			['Monitor sieci',		'webmon.asp'],
+			['Logi',			'log.asp'] ] ],
+		['Przepustowość', 		'bwm', 0, [
+			['Aktualnie',			'realtime.asp'],
+			['Ostatnie 24H',		'24.asp'],
+			['Dziennie',			'daily.asp'],
+			['Tygodniowo',			'weekly.asp'],
+			['Miesięcznie',			'monthly.asp']
 			] ],
 		['IP Traffic',			'ipt', 0, [
-			['Real-Time',			'realtime.asp'],
-			['Last 24 Hours',		'24.asp'],
-			['View Graphs',			'graphs.asp'],
-			['Transfer Rates',		'details.asp'],
-			['Daily',			'daily.asp'],
-			['Monthly',			'monthly.asp']
+			['Aktualnie',			'realtime.asp'],
+			['Ostatnie 24H',		'24.asp'],
+			['Wykresy',			'graphs.asp'],
+			['Szczegóły',			'details.asp'],
+			['Dziennie',			'daily.asp'],
+			['Miesięcznie',			'monthly.asp']
 			] ],
-		['Tools', 			'tools', 0, [
+		['Narzędzia', 				'tools', 0, [
 			['Ping',			'ping.asp'],
-			['Trace',			'trace.asp'],
-			['System',			'shell.asp'],
-			['Wireless Survey',		'survey.asp'],
-			['WOL',				'wol.asp'] ] ],
+			['trasa',			'trace.asp'],
+			['Konsola',			'shell.asp'],
+			['Szukaj Wi-Fi',		'survey.asp'],
+			['Wzbudź przez LAN',		'wol.asp'] ] ],
 		null,
-		['Basic', 			'basic', 0, [
-			['Network',			'network.asp'],
+		['Podstawowe', 			'basic', 0, [
+			['Sieć',			'network.asp'],
 /* IPV6-BEGIN */
 			['IPv6',			'ipv6.asp'],
 /* IPV6-END */
-			['Identification',		'ident.asp'],
-			['Time',			'time.asp'],
-			['DDNS',			'ddns.asp'],
-			['Static DHCP/ARP/IPT',		'static.asp'],
-			['Wireless Filter',		'wfilter.asp'] ] ],
-		['Advanced', 			'advanced', 0, [
-			['Conntrack/Netfilter',		'ctnf.asp'],
+			['Identyfikacja',		'ident.asp'],
+			['Czas',			'time.asp'],
+			['Dynamiczny DNS',		'ddns.asp'],
+			['Statycz. DHCP/ARP/IPT',	'static.asp'],
+			['Filtrowanie Wi-Fi',		'wfilter.asp'] ] ],
+		['Zaawansowane',		'advanced', 0, [
+			['Powiązania / Filtr sieciowy',	'ctnf.asp'],
 			['DHCP/DNS',			'dhcpdns.asp'],
 			['Firewall',			'firewall.asp'],
-			['MAC Address',			'mac.asp'],
-			['Miscellaneous',		'misc.asp'],
+			['Adres MAC',			'mac.asp'],
+			['Różne',			'misc.asp'],
 			['Routing',			'routing.asp'],
 /* TOR-BEGIN */
-			['TOR Project',			'tor.asp'],
+			['Projekt TOR',			'tor.asp'],
 /* TOR-END */
 			['VLANy',			'vlan.asp'],
 			['Dostęp LAN',			'access.asp'],
@@ -2391,98 +2393,98 @@ function navi()
 		['Przekierowanie portów',	'forward', 0, [
 			['Podstawowe',			'basic.asp'],
 /* IPV6-BEGIN */
-			['Basic IPv6',			'basic-ipv6.asp'],
+			['Podstawowe IPv6',		'basic-ipv6.asp'],
 /* IPV6-END */
 			['DMZ',				'dmz.asp'],
-			['Triggered',			'triggered.asp'],
+			['Zainicjowane',		'triggered.asp'],
 			['UPnP/NAT-PMP',		'upnp.asp'] ] ],
-		['Access Restriction',		'restrict.asp'],
+		['Ustawienia dostępu',		'restrict.asp'],
 		['QoS',				'qos', 0, [
-			['Basic Settings',		'settings.asp'],
-			['Classification',		'classify.asp'],
-			['View Graphs',			'graphs.asp'],
-			['View Details',		'detailed.asp'],
-			['Transfer Rates',		'ctrate.asp']
+			['Ustawienia',			'settings.asp'],
+			['Klasyfikacja',		'classify.asp'],
+			['Wykresy',			'graphs.asp'],
+			['Szczegóły',			'detailed.asp'],
+			['Zużycie pasma',		'ctrate.asp']
 			] ],
-		['Bandwidth Limiter',		'bwlimit.asp'],
+		['Limiter pasma',		'bwlimit.asp'],
 		null,
 /* NOCAT-BEGIN */
 		['Captive Portal',		'splashd.asp'],
 /* NOCAT-END */
 /* REMOVE-BEGIN
-		['Scripts',				'sc', 0, [
-			['Startup',		'startup.asp'],
-			['Shutdown',		'shutdown.asp'],
-			['Firewall',		'firewall.asp'],
-			['WAN Up',		'wanup.asp']
+		['Scripts',			'sc', 0, [
+			['Startup',			'startup.asp'],
+			['Shutdown',			'shutdown.asp'],
+			['Firewall',			'firewall.asp'],
+			['WAN Up',			'wanup.asp']
 			] ],
 REMOVE-END */
 /* USB-BEGIN */
 // ---- !!TB - USB, FTP, Samba, Media Server
-		['USB and NAS',			'nas', 0, [
-			['USB Support',			'usb.asp']
+		['USB i NAS',			'nas', 0, [
+			['Obsługa USB',			'usb.asp']
 /* FTP-BEGIN */
-			,['FTP Server',			'ftp.asp']
+			,['Serwer FTP',			'ftp.asp']
 /* FTP-END */
 /* SAMBA-BEGIN */
-			,['File Sharing',		'samba.asp']
+			,['Serwer Samba',		'samba.asp']
 /* SAMBA-END */
 /* MEDIA-SRV-BEGIN */
-			,['Media Server',		'media.asp']
+			,['Serwer multimediów',		'media.asp']
 /* MEDIA-SRV-END */
 /* UPS-BEGIN */
 			,['UPS Monitor',		'ups.asp']
 /* UPS-END */
 /* BT-BEGIN */
-			,['BitTorrent Client',		'bittorrent.asp']
+			,['Klient torrent',		'bittorrent.asp']
 /* BT-END */
 			] ],
 /* USB-END */
 /* VPN-BEGIN */
-		['VPN Tunneling',			'vpn', 0, [
+		['Tunel VPN',			'vpn', 0, [
 /* OPENVPN-BEGIN */
-			['OpenVPN Server',		'server.asp'],
-			['OpenVPN Client',		'client.asp'],
+			['Serwer OpenVPN',		'server.asp'],
+			['Klient OpenVPN',		'client.asp'],
 /* OPENVPN-END */
 /* PPTPD-BEGIN */
-			['PPTP Server',			'pptp-server.asp'],
-			['PPTP Online',			'pptp-online.asp'],
-			['PPTP Client',			'pptp.asp']
+			['Serwer PPTP',			'pptp-server.asp'],
+			['Aktywność PPTP',		'pptp-online.asp'],
+			['Klient PPTP',			'pptp.asp']
 /* PPTPD-END */
 		] ],
 /* VPN-END */
 		null,
-		['Administration',		'admin', 0, [
-			['Admin Access',		'access.asp'],
-			['Bandwidth Monitoring',	'bwm.asp'],
-			['IP Traffic Monitoring',	'iptraffic.asp'],
-			['Buttons/LED',			'buttons.asp'],
+		['Administracja',		'admin', 0, [
+			['Dostęp administratora',	'access.asp'],
+			['Monitor przepustowości',	'bwm.asp'],
+			['Monitor IP Traffic',		'iptraffic.asp'],
+			['Przyciski / LED',		'buttons.asp'],
 /* CIFS-BEGIN */
-			['CIFS Client',			'cifs.asp'],
+			['Klient CIFS',			'cifs.asp'],
 /* CIFS-END */
 /* SDHC-BEGIN */
 			['SDHC/MMC',			'sdhc.asp'],
 /* SDHC-END */
-			['Configuration',		'config.asp'],
-			['Debugging',			'debug.asp'],
+			['Konfiguracja',		'config.asp'],
+			['Debugowanie',			'debug.asp'],
 /* JFFS2-BEGIN */
 			['JFFS',			'jffs2.asp'],
 /* JFFS2-END */
 /* NFS-BEGIN */
-			['NFS Server',			'nfs.asp'],
+			['Serwer NFS',			'nfs.asp'],
 /* NFS-END */
 /* SNMP-BEGIN */
 			['SNMP',			'snmp.asp'],
 /* SNMP-END */
-			['Logging',			'log.asp'],
-			['Scheduler',			'sched.asp'],
-			['Scripts',			'scripts.asp'],
-			['Upgrade',			'upgrade.asp'] ] ],
+			['Logowanie',			'log.asp'],
+			['Harmonogram',			'sched.asp'],
+			['Skrypty',			'scripts.asp'],
+			['Aktualizacja',		'upgrade.asp'] ] ],
 		null,
-		['About',			'about.asp'],
-		['Reboot...',			'javascript:reboot()'],
-		['Shutdown...',			'javascript:shutdown()'],
-		['Logout',			'javascript:logout()']
+		['O tomato',			'about.asp'],
+		['Restartuj...',		'javascript:reboot()'],
+		['Wyłącz...',			'javascript:shutdown()'],
+		['Wyloguj',			'javascript:logout()']
 	];
 	var name, base;
 	var i, j;
@@ -2708,12 +2710,12 @@ function reloadPage()
 
 function reboot()
 {
-	if (confirm("Reboot?")) form.submitHidden('tomato.cgi', { _reboot: 1, _commit: 0, _nvset: 0 });
+	if (confirm("Uruchomić ponownie?")) form.submitHidden('tomato.cgi', { _reboot: 1, _commit: 0, _nvset: 0 });
 }
 
 function shutdown()
 {
-	if (confirm("Shutdown?")) form.submitHidden('shutdown.cgi', { });
+	if (confirm("Wyłączyć router?")) form.submitHidden('shutdown.cgi', { });
 }
 
 function logout()

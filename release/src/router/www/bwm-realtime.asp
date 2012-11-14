@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
 	Copyright (C) 2006-2010 Jonathan Zarate
@@ -13,7 +13,7 @@
 <meta name='robots' content='noindex,nofollow'>
 <title>[<% ident(); %>] Pasmo: W czasie rzeczywistym</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
-<link rel='stylesheet' type='text/css' href='color.css'>
+<% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
 
 <!-- / / / -->
@@ -142,7 +142,7 @@ function init()
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -161,25 +161,25 @@ function init()
 	</script>
 
 	<div id='bwm-controls'>
-		<small>(10 minute window, 2 second interval)</small><br>
+		<small>(okno 10 minutowe, przedział czasowy: 2 sekundy)</small><br>
 		<br>
-		Avg:&nbsp;
-			<a href='javascript:switchAvg(1)' id='avg1'>Off</a>,
+		Uśrednienie&nbsp;
+			<a href='javascript:switchAvg(1)' id='avg1'>Wyłacz</a>,
 			<a href='javascript:switchAvg(2)' id='avg2'>2x</a>,
 			<a href='javascript:switchAvg(4)' id='avg4'>4x</a>,
 			<a href='javascript:switchAvg(6)' id='avg6'>6x</a>,
 			<a href='javascript:switchAvg(8)' id='avg8'>8x</a><br>
 		Max:&nbsp;
-			<a href='javascript:switchScale(0)' id='scale0'>Uniform</a>,
-			<a href='javascript:switchScale(1)' id='scale1'>Per IF</a><br>
-		Display:&nbsp;
-			<a href='javascript:switchDraw(0)' id='draw0'>Solid</a>,
-			<a href='javascript:switchDraw(1)' id='draw1'>Line</a><br>
-		Color:&nbsp; <a href='javascript:switchColor()' id='drawcolor'>-</a><br>
-		<small><a href='javascript:switchColor(1)' id='drawrev'>[reverse]</a></small><br>
+			<a href='javascript:switchScale(0)' id='scale0'>Całkowity</a>,
+			<a href='javascript:switchScale(1)' id='scale1'>Na interfejs</a><br>
+		Wyświetl:&nbsp;
+			<a href='javascript:switchDraw(0)' id='draw0'>Obszar</a>,
+			<a href='javascript:switchDraw(1)' id='draw1'>Linia</a><br>
+		Kolor:&nbsp; <a href='javascript:switchColor()' id='drawcolor'>-</a><br>
+		<small><a href='javascript:switchColor(1)' id='drawrev'>[odwróc]</a></small><br>
 
 		<br><br>
-		&nbsp; &raquo; <a href="admin-bwm.asp">Configure</a>
+		&nbsp; &raquo; <a href="admin-bwm.asp">Konfiguracja</a>
 	</div>
 
 	<br><br>
@@ -187,22 +187,22 @@ function init()
 	<tr>
 		<td width='8%' align='right' valign='top'><b style='border-bottom:blue 1px solid' id='rx-name'>RX</b></td>
 			<td width='15%' align='right' valign='top'><span id='rx-current'></span></td>
-		<td width='8%' align='right' valign='top'><b>Avg</b></td>
+		<td width='8%' align='right' valign='top'><b>Średnio</b></td>
 			<td width='15%' align='right' valign='top' id='rx-avg'></td>
-		<td width='8%' align='right' valign='top'><b>Peak</b></td>
+		<td width='8%' align='right' valign='top'><b>Szczyt</b></td>
 			<td width='15%' align='right' valign='top' id='rx-max'></td>
-		<td width='8%' align='right' valign='top'><b>Total</b></td>
+		<td width='8%' align='right' valign='top'><b>Łącznie</b></td>
 			<td width='14%' align='right' valign='top' id='rx-total'></td>
 		<td>&nbsp;</td>
 	</tr>
 	<tr>
 		<td width='8%' align='right' valign='top'><b style='border-bottom:blue 1px solid' id='tx-name'>TX</b></td>
 			<td width='15%' align='right' valign='top'><span id='tx-current'></span></td>
-		<td width='8%' align='right' valign='top'><b>Avg</b></td>
+		<td width='8%' align='right' valign='top'><b>Średnio</b></td>
 			<td width='15%' align='right' valign='top' id='tx-avg'></td>
-		<td width='8%' align='right' valign='top'><b>Peak</b></td>
+		<td width='8%' align='right' valign='top'><b>Szczyt</b></td>
 			<td width='15%' align='right' valign='top' id='tx-max'></td>
-		<td width='8%' align='right' valign='top'><b>Total</b></td>
+		<td width='8%' align='right' valign='top'><b>Łącznie</b></td>
 			<td width='14%' align='right' valign='top' id='tx-total'></td>
 		<td>&nbsp;</td>
 	</tr>
@@ -215,7 +215,7 @@ function init()
 
 </td></tr>
 <tr><td id='footer' colspan=2>
-	<span id='warnwd' style='display:none'>Warning: 10 second timeout, restarting...&nbsp;</span>
+	<span id='warnwd' style='display:none'>Uwaga: brak aktywności przez 10 sekund, restartowanie...&nbsp;</span>
 	<span id='dtime'></span>
 	<img src='spin.gif' id='refresh-spinner' onclick='javascript:debugTime=1'>
 </td></tr>

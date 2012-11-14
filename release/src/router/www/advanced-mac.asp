@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
 	Copyright (C) 2006-2010 Jonathan Zarate
@@ -11,7 +11,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Advanced: MAC Address</title>
+<title>[<% ident(); %>] Zaawansowane: Adresy MAC</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
@@ -105,7 +105,7 @@ function verifyFields(focused, quiet)
 		if (!v_mac(a, quiet)) return 0;
 
 		if (findPrevMAC(a.value, uidx)) {
-			ferror.set(a, 'Addresses must be unique', quiet);
+			ferror.set(a, 'Adresy muszą być unikalne', quiet);
 			return 0;
 		}
 	}
@@ -117,7 +117,7 @@ function save()
 	var u, uidx, v;
 
 	if (!verifyFields(null, false)) return;
-	if (!confirm("Warning: Changing the MAC address may require that you reboot all devices, computers or modem connected to this router. Continue anyway?")) return;
+	if (!confirm("Ostrzeżenie: Zmiana adresu MAC może wymagać restartu wszystkich urządzeń podłączonych do routera. Czy na pewno chcesz kontynuować?")) return;
 
 	var fom = E('_fom');
 	fom.mac_wan.value = (fom._f_wan_hwaddr.value == defmac('wan')) ? '' : fom._f_wan_hwaddr.value;
@@ -139,7 +139,7 @@ function save()
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -160,21 +160,21 @@ for (var uidx = 0; uidx < wl_ifaces.length; ++uidx) {
 }
 </script>
 
-<div class='section-title'>MAC Address</div>
+<div class='section-title'>Adresy MAC</div>
 <div class='section'>
 <script type='text/javascript'>
 
 f = [
-	{ title: 'WAN Port', indent: 1, name: 'f_wan_hwaddr', type: 'text', maxlen: 17, size: 20,
-		suffix: ' <input type="button" value="Default" onclick="bdefault(\'wan\')"> <input type="button" value="Random" onclick="brand(\'wan\')"> <input type="button" value="Clone PC" onclick="bclone(\'wan\')">',
+	{ title: 'Port WAN', indent: 1, name: 'f_wan_hwaddr', type: 'text', maxlen: 17, size: 20,
+		suffix: ' <input type="button" value="Domyślny" onclick="bdefault(\'wan\')"> <input type="button" value="Losuj" onclick="brand(\'wan\')"> <input type="button" value="Klonuj z PC" onclick="bclone(\'wan\')">',
 		value: nvram.mac_wan || defmac('wan') }
 ];
 
 for (var uidx = 0; uidx < wl_ifaces.length; ++uidx) {
 	var u = wl_fface(uidx);
 	f.push(
-		{ title: 'Wireless Interface ' + ((wl_ifaces.length > 1) ? wl_ifaces[uidx][0] : ''), indent: 1, name: 'f_wl'+u+'_hwaddr', type: 'text', maxlen: 17, size: 20,
-			suffix:' <input type="button" value="Default" onclick="bdefault(\'wl'+u+'\')"> <input type="button" value="Random" onclick="brand(\'wl'+u+'\')"> <input type="button" value="Clone PC" onclick="bclone(\'wl'+u+'\')">',
+		{ title: 'Interfejs bezprzewodowy ' + ((wl_ifaces.length > 1) ? wl_ifaces[uidx][0] : ''), indent: 1, name: 'f_wl'+u+'_hwaddr', type: 'text', maxlen: 17, size: 20,
+			suffix:' <input type="button" value="Domyślny" onclick="bdefault(\'wl'+u+'\')"> <input type="button" value="Losuj" onclick="brand(\'wl'+u+'\')"> <input type="button" value="Klonuj z  PC" onclick="bclone(\'wl'+u+'\')">',
 			value: nvram['wl'+u+'_hwaddr'] || defmac('wl' + u) }
 		);
 }
@@ -184,8 +184,8 @@ createFieldTable('', f);
 </script>
 <br>
 <table border=0 cellpadding=1>
-	<tr><td>Router's LAN MAC Address:</td><td><b><script type='text/javascript'>W(('<% nv('et0macaddr'); %>').toUpperCase());</script></b></td></tr>
-	<tr><td>Computer's MAC Address:</td><td><b><script type='text/javascript'>W(('<% compmac(); %>').toUpperCase());</script></b></td></tr>
+	<tr><td>Adres MAC interfejsu LAN routera:</td><td><b><script type='text/javascript'>W(('<% nv('et0macaddr'); %>').toUpperCase());</script></b></td></tr>
+	<tr><td>Adres MAC komputera PC:</td><td><b><script type='text/javascript'>W(('<% compmac(); %>').toUpperCase());</script></b></td></tr>
 </table>
 </div>
 
@@ -196,8 +196,8 @@ createFieldTable('', f);
 </td></tr>
 <tr><td id='footer' colspan=2>
 	<span id='footer-msg'></span>
-	<input type='button' value='Save' id='save-button' onclick='save()'>
-	<input type='button' value='Cancel' id='cancel-button' onclick='reloadPage();'>
+	<input type='button' value='Zapisz' id='save-button' onclick='save()'>
+	<input type='button' value='Anuluj' id='cancel-button' onclick='reloadPage();'>
 </td></tr>
 </table>
 </form>

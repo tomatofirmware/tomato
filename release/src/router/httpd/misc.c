@@ -99,7 +99,7 @@ char *reltime(char *buf, time_t t)
 	if (t < 0) t = 0;
 	days = t / 86400;
 	m = t / 60;
-	sprintf(buf, "%d day%s, %02d:%02d:%02d", days, ((days==1) ? "" : "s"), ((m / 60) % 24), (m % 60), (int)(t % 60));
+	sprintf(buf, "%d %s, %02d:%02d:%02d", days, ((days==1) ? "dzień" : "dni"), ((m / 60) % 24), (m % 60), (int)(t % 60));
 	return buf;
 }
 
@@ -585,7 +585,7 @@ void asp_time(int argc, char **argv)
 
 	t = time(NULL);
 	if (t < Y2K) {
-		web_puts("Not Available");
+		web_puts("Nie dostępny");
 	}
 	else {
 		strftime(s, sizeof(s), "%a, %d %b %Y %H:%M:%S %z", localtime(&t));
@@ -634,16 +634,16 @@ void asp_wanstatus(int argc, char **argv)
 	const char *p;
 
 	if ((using_dhcpc()) && (f_exists("/var/lib/misc/dhcpc.renewing"))) {
-		p = "Renewing...";
+		p = "Odnawianie...";
 	}
 	else if (check_wanup()) {
-		p = "Connected";
+		p = "Połączony";
 	}
 	else if (f_exists("/var/lib/misc/wan.connecting")) {
-		p = "Connecting...";
+		p = "Łączenie...";
 	}
 	else {
-		p = "Disconnected";
+		p = "Rozłączony";
 	}
 	web_puts(p);
 }

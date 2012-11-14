@@ -116,17 +116,17 @@ static const char *http_status_desc(int status)
 	case 200:
 		return "OK";
 	case 302:
-		return "Found";
+		return "Znaleziono";
 	case 400:
-		return "Invalid Request";
+		return "Błędne żądanie";
 	case 401:
-		return "Unauthorized";
+		return "Brak autoryzacji";
 	case 404:
-		return "Not Found";
+		return "Nie znaleziono";
 	case 501:
-		return "Not Implemented";
+		return "Nie zaimplementowano";
 	}
-	return "Unknown";
+	return "Nieznany";
 }
 
 void send_header(int status, const char* header, const char* mime, int cache)
@@ -152,7 +152,7 @@ void send_header(int status, const char* header, const char* mime, int cache)
 				 "Pragma: no-cache\r\n");
 	}
 	if (header) web_printf("%s\r\n", header);
-	web_puts("Connection: close\r\n\r\n");
+	web_puts("Połączenie zamknięte\r\n\r\n");
 
 	header_sent = 1;
 }
@@ -163,7 +163,7 @@ void send_error(int status, const char *header, const char *text)
 	send_header(status, header, mime_html, 0);
 	web_printf(
 		"<html>"
-		"<head><title>Error</title></head>"
+		"<head><title>Błąd</title></head>"
 		"<body>"
 		"<h2>%d %s</h2> %s"
 		"</body></html>",
@@ -530,7 +530,7 @@ static void handle_request(void)
 				return;
 			}
 		}
-		send_error(404, NULL, "Goodbye");
+		send_error(404, NULL, "Do widzenia");
 		return;
 	}
 

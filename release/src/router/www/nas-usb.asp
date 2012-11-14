@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
 	USB Support - !!TB
@@ -10,9 +10,9 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] NAS: USB Support</title>
+<title>[<% ident(); %>] NAS: Obsługa USB</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
-<link rel='stylesheet' type='text/css' href='color.css'>
+<% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
 
 <!-- / / / -->
@@ -47,7 +47,7 @@ textarea {
 
 <script type='text/javascript'>
 
-//	<% nvram("usb_enable,usb_uhci,usb_ohci,usb_usb2,usb_storage,usb_printer,usb_printer_bidirect,usb_automount,usb_fs_ext3,usb_fs_fat,usb_fs_ntfs,usb_fs_hfs,script_usbmount,script_usbumount,script_usbhotplug,idle_enable,usb_3g"); %>
+//	<% nvram("usb_enable,usb_uhci,usb_ohci,usb_usb2,usb_mmc,usb_storage,usb_printer,usb_printer_bidirect,usb_automount,usb_fs_ext3,usb_fs_fat,usb_fs_ntfs,usb_fs_hfs,script_usbmount,script_usbumount,script_usbhotplug,idle_enable,usb_3g"); %>
 //	<% usbdevices(); %>
 
 list = [];
@@ -80,13 +80,13 @@ function umountHost(a, host)
 	}
 
 	a = E(a);
-	a.innerHTML = 'Please wait...';
+	a.innerHTML = 'Proszę czekać...';
 
 	xob.onCompleted = function(text, xml) {
 		eval(text);
 		if (usb.length == 1) {
 			if (usb[0] != 0)
-				ferror.set(a, 'The device is busy. Please make sure no applications are using it, and try again.', 0);
+				ferror.set(a, 'Urządzenie jest zajęte. Upewnij się, że żadna aplikacja go nie używa i spróbuj ponownie.', 0);
 		}
 		xob = null;
 		_forceRefresh();
@@ -116,7 +116,7 @@ function mountHost(a, host)
 		eval(text);
 		if (usb.length == 1) {
 			if (usb[0] == 0)
-				ferror.set(a, 'Failed to mount. Verify the device is plugged in, and try again.', 0);
+				ferror.set(a, 'Zamontowanie nie powiodło się. Sprawdź, czy urządzeni jest podłączone i spróbuj ponownie.', 0);
 		}
 		xob = null;
 		_forceRefresh();
@@ -203,13 +203,13 @@ dg.populate = function()
 			s = '&nbsp<br><small>&nbsp</small>';
 		else {
 			if (xob)
-				s = ((e.is_mounted == 0) ? 'No' : 'Yes') + '<br><small>Please wait...</small>';
+				s = ((e.is_mounted == 0) ? 'Nie' : 'Tak') + '<br><small>Proszę czekać...</small>';
 			else if (e.is_mounted == 0)
-				s = 'No<br><small><a href="javascript:mountHost(\'L' + i + '\',\'' + e.host + '\')" title="Mount all Partitions of Storage Device" id="L' + i + '">[ Mount ]</a></small>';
+				s = 'Nie<br><small><a href="javascript:mountHost(\'L' + i + '\',\'' + e.host + '\')" title="Zamontuj wszystkie partycje z urządzenia pamięci masowej" id="L' + i + '">[ Zamontuj ]</a></small>';
 			else
-				s = 'Yes<br><small><a href="javascript:umountHost(\'L' + i + '\',\'' + e.host + '\')" title="Safely Remove Storage Device" id="L' + i + '">[ Unmount ]</a></small>';
+				s = 'Tak<br><small><a href="javascript:umountHost(\'L' + i + '\',\'' + e.host + '\')" title="Bezpiecznie odłącz urządzenie" id="L' + i + '">[ Odmontuj ]</a></small>';
 		}
-		desc = (e.vendor + ' ' + e.product).trim() + '<small>'; // + (e.serial == '' ? '' : '<br>Serial No: ' + e.serial);
+		desc = (e.vendor + ' ' + e.product).trim() + '<small>'; // + (e.serial == '' ? '' : '<br>Serial nr: ' + e.serial);
 		if (e.discs) {
 			for (j = 0; j <= e.discs.length - 1; ++j) {
 				d = e.discs[j];
@@ -217,12 +217,12 @@ dg.populate = function()
 				for (k = 0; k <= parts.length - 1; ++k) {
 					p = parts[k];
 					if (p) {
-						desc = desc + '<br>Partition \'' + p[0] + '\'' + (p[3] != '' ? ' ' + p[3] : '') +
+						desc = desc + '<br>Partycja \'' + p[0] + '\'' + (p[3] != '' ? ' ' + p[3] : '') +
 							((p[5] != 0) ? ' (' + doScaleSize(p[5], 0) + 
-							((p[1] == 1) ? ' / ' + doScaleSize(p[6], 0) + ' free' : '') +
-							')' : '') + ' is ' +
-							((p[1] != 0) ? '' : 'not ') + ((p[3] == 'swap') ? 'active' : 'mounted') +
-							((p[2] != '') ? ' on ' + p[2] : '');
+							((p[1] == 1) ? ' / ' + doScaleSize(p[6], 0) + ' wolne' : '') +
+							')' : '') + ' jest ' +
+							((p[1] != 0) ? '' : 'nie ') + ((p[3] == 'swap') ? 'aktywna' : 'zamontowana') +
+							((p[2] != '') ? ' na ' + p[2] : '');
 					}
 				}
 			}
@@ -237,7 +237,7 @@ dg.populate = function()
 dg.setup = function()
 {
 	this.init('dev-grid', 'sort');
-	this.headerSet(['Type', 'Host', 'Description', 'Mounted?']);
+	this.headerSet(['Typ', 'Host', 'Opis', 'Zamontowana?']);
 	this.populate();
 	this.sort(1);
 }
@@ -263,6 +263,13 @@ function verifyFields(focused, quiet)
 	E('_f_usb2').disabled = b;
 	E('_f_print').disabled = b;
 	E('_f_storage').disabled = b;
+
+/* LINUX26-BEGIN */
+/* MICROSD-BEGIN */
+	E('_f_mmc').disabled = a || b || nvram.usb_mmc == -1;
+	elem.display(PR('_f_mmc'), nvram.usb_mmc != -1);
+/* MICROSD-END */
+/* LINUX26-END */
 
 	E('_f_ext3').disabled = b || a;
 	E('_f_fat').disabled = b || a;
@@ -304,6 +311,13 @@ function save()
 	fom.usb_storage.value = E('_f_storage').checked ? 1 : 0;
 	fom.usb_printer.value = E('_f_print').checked ? 1 : 0;
 	fom.usb_printer_bidirect.value = E('_f_bprint').checked ? 1 : 0;
+
+/* LINUX26-BEGIN */
+/* MICROSD-BEGIN */
+	fom.usb_mmc.value = nvram.usb_mmc == -1 ? -1 : (E('_f_mmc').checked ? 1 : 0);
+/* MICROSD-END */
+/* LINUX26-END */
+
 	fom.usb_fs_ext3.value = E('_f_ext3').checked ? 1 : 0;
 	fom.usb_fs_fat.value = E('_f_fat').checked ? 1 : 0;
 /* NTFS-BEGIN */
@@ -333,7 +347,7 @@ function submit_complete()
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -348,6 +362,7 @@ function submit_complete()
 <input type='hidden' name='usb_uhci'>
 <input type='hidden' name='usb_ohci'>
 <input type='hidden' name='usb_usb2'>
+<input type='hidden' name='usb_mmc'>
 <input type='hidden' name='usb_storage'>
 <input type='hidden' name='usb_printer'>
 <input type='hidden' name='usb_printer_bidirect'>
@@ -360,28 +375,28 @@ NTFS-END -->
 <input type='hidden' name='usb_fs_hfs'>
 HFS-END -->
 <input type='hidden' name='usb_automount'>
-/* LINUX26-BEGIN */
+<!-- /* LINUX26-BEGIN */ -->
 <input type='hidden' name='idle_enable'>
 <input type='hidden' name='usb_3g'>
-/* LINUX26-END */
+<!-- /* LINUX26-END */ -->
 
-<div class='section-title'>USB Support</div>
+<div class='section-title'>Obsługa USB</div>
 <div class='section'>
 <script type='text/javascript'>
 
 createFieldTable('', [
-	{ title: 'Core USB Support', name: 'f_usb', type: 'checkbox', value: nvram.usb_enable == 1 },
-	{ title: 'USB 2.0 Support', indent: 2, name: 'f_usb2', type: 'checkbox', value: nvram.usb_usb2 == 1 },
-	{ title: 'USB 1.1 Support', indent: 2, multi: [
+	{ title: 'Włącz obsługę USB', name: 'f_usb', type: 'checkbox', value: nvram.usb_enable == 1 },
+	{ title: 'Obsługa USB 2.0', indent: 2, name: 'f_usb2', type: 'checkbox', value: nvram.usb_usb2 == 1 },
+	{ title: 'Obsługa USB 1.1', indent: 2, multi: [
 		{ suffix: '&nbsp; OHCI &nbsp;&nbsp;&nbsp;', name: 'f_ohci', type: 'checkbox', value: nvram.usb_ohci == 1 },
 		{ suffix: '&nbsp; UHCI &nbsp;',	name: 'f_uhci', type: 'checkbox', value: nvram.usb_uhci == 1 }
 	] },
 	null,
-	{ title: 'USB Printer Support', name: 'f_print', type: 'checkbox', value: nvram.usb_printer == 1 },
-		{ title: 'Bidirectional copying', indent: 2, name: 'f_bprint', type: 'checkbox', value: nvram.usb_printer_bidirect == 1 },
+	{ title: 'Obsługa drukarek USB', name: 'f_print', type: 'checkbox', value: nvram.usb_printer == 1 },
+		{ title: 'Obsługa dwukierunkowa (BiDirectional)', indent: 2, name: 'f_bprint', type: 'checkbox', value: nvram.usb_printer_bidirect == 1 },
 	null,
-	{ title: 'USB Storage Support', name: 'f_storage', type: 'checkbox', value: nvram.usb_storage == 1 },
-		{ title: 'File Systems Support', indent: 2, multi: [
+	{ title: 'Obsługa pamięci masowych USB', name: 'f_storage', type: 'checkbox', value: nvram.usb_storage == 1 },
+		{ title: 'Obsługa systemów plików', indent: 2, multi: [
 			{ suffix: '&nbsp; Ext2 / Ext3 &nbsp;&nbsp;&nbsp;', name: 'f_ext3', type: 'checkbox', value: nvram.usb_fs_ext3 == 1 },
 /* NTFS-BEGIN */
 			{ suffix: '&nbsp; NTFS &nbsp;&nbsp;&nbsp;', name: 'f_ntfs', type: 'checkbox', value: nvram.usb_fs_ntfs == 1 },
@@ -391,29 +406,34 @@ createFieldTable('', [
 			,{ suffix: '&nbsp; HFS / HFS+ &nbsp;', name: 'f_hfs', type: 'checkbox', value: nvram.usb_fs_hfs == 1 }
 /* HFS-END */
 		] },
-		{ title: 'Automount', indent: 2, name: 'f_automount', type: 'checkbox',
-			suffix: ' <small>Automatically mount all partitions to sub-directories in <i>/mnt</i>.</small>', value: nvram.usb_automount == 1 },
-	{ title: 'Run after mounting', indent: 2, name: 'script_usbmount', type: 'textarea', value: nvram.script_usbmount },
-	{ title: 'Run before unmounting', indent: 2, name: 'script_usbumount', type: 'textarea', value: nvram.script_usbumount },
+/* LINUX26-BEGIN */
+/* MICROSD-BEGIN */
+		{ title: 'Obsługa kard SD/MMC', indent: 2, name: 'f_mmc', type: 'checkbox', value: nvram.usb_mmc == 1 },
+/* MICROSD-END */
+/* LINUX26-END */
+		{ title: 'Automontowanie', indent: 2, name: 'f_automount', type: 'checkbox',
+			suffix: ' <small>Automatycznie zamontuj wszystkie partycje do podkatalogów w <i>/mnt</i>.</small>', value: nvram.usb_automount == 1 },
+	{ title: 'Uruchom po zamontowaniu', indent: 2, name: 'script_usbmount', type: 'textarea', value: nvram.script_usbmount },
+	{ title: 'Uruchom przed odmontowaniem', indent: 2, name: 'script_usbumount', type: 'textarea', value: nvram.script_usbumount },
 	null,
 /* LINUX26-BEGIN */
-	{ title: 'HDD Spindown', name: 'f_idle_enable', type: 'checkbox',
-		suffix: ' <small>Spin down each HDD when idle. No need to use with flashdrive.</small>', value: nvram.idle_enable == 1 },
+	{ title: 'Usypianie dysku twardego USB', name: 'f_idle_enable', type: 'checkbox',
+		suffix: ' <small>Usypia każdy podłączony USB HDD gdy jest bezczynny. Nie trzeba używać z pamięciami typu flash.</small>', value: nvram.idle_enable == 1 },
 	null,
-	{ title: 'USB 3G Modem support', name: 'f_usb_3g', type: 'checkbox',
-		suffix: ' <small>Before disconnecting 3G Modem from USB port, remember to uncheck box. If modem used usbserial module, you have to reboot router before unplug modem.</small>', value: nvram.usb_3g == 1 },
+	{ title: 'Obsługa modemów USB 3G', name: 'f_usb_3g', type: 'checkbox',
+		suffix: ' <small>Nie zapomnij odznaczyć tej opcji przed odłączeniem modemu 3G od portu USB. Jeśli modem używał modułu usbserial, musisz zrestartować router przed jego odłączeniem.</small>', value: nvram.usb_3g == 1 },
 	null,
 /* LINUX26-END */
-	{ title: 'Hotplug script<br><small>(called when any USB device is attached or removed)</small>', name: 'script_usbhotplug', type: 'textarea', value: nvram.script_usbhotplug },
+	{ title: 'Skrypt Hotplug<br><small>(wywoływany gdy jakiekolwiek urządzenie USB jest podłączane lub usuwane)</small>', name: 'script_usbhotplug', type: 'textarea', value: nvram.script_usbhotplug },
 	null,
-	{ text: '<small>Some of the changes will take effect only after a restart.</small>' }
+	{ text: '<small>Niektóre ze zmian będą aktywne dopiero po restarcie routera.</small>' }
 ]);
 </script>
 </div>
 
 <!-- / / / -->
 
-<div class='section-title'>Attached Devices</div>
+<div class='section-title'>Podłączone urządzenia USB</div>
 <div class='section'>
 <table id='dev-grid' class='tomato-grid' cellspacing=0></table>
 <div id='usb-controls'>
@@ -427,8 +447,8 @@ createFieldTable('', [
 </td></tr>
 <tr><td id='footer' colspan=2>
 	<span id='footer-msg'></span>
-	<input type='button' value='Save' id='save-button' onclick='save()'>
-	<input type='button' value='Cancel' id='cancel-button' onclick='javascript:reloadPage();'>
+	<input type='button' value='Zapisz' id='save-button' onclick='save()'>
+	<input type='button' value='Anuluj' id='cancel-button' onclick='javascript:reloadPage();'>
 </td></tr>
 </table>
 </form>

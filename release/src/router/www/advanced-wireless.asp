@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
 	Copyright (C) 2006-2010 Jonathan Zarate
@@ -11,7 +11,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Advanced: Wireless</title>
+<title>[<% ident(); %>] Zaawansowane: Wi-Fi</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
@@ -97,7 +97,7 @@ function save()
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -196,7 +196,7 @@ if (wl_sunit(uidx)<0) {
 			value: nvram['wl'+u+'_wme_no_ack'] },
 	{ title: 'APSD Mode', name: 'wl'+u+'_wme_apsd', indent: 2, type: 'select', options: [['off','Disable'],['on','Enable *']],
 		value: nvram['wl'+u+'_wme_apsd'] },
-	{ title: 'Wireless Multicast Forwarding', name: 'wl'+u+'_wmf_bss_enable', type: 'select', options: [['0','Disable *'],['1','Enable']],
+	{ title: 'Przekierowanie rozgłaszania (MCast) do Wi-Fi', name: 'wl'+u+'_wmf_bss_enable', type: 'select', options: [['0','Wyłączone *'],['1','Włączone']],
 		value: nvram['wl'+u+'_wmf_bss_enable'] }
 	]);
 	W('</div>');
@@ -204,15 +204,15 @@ if (wl_sunit(uidx)<0) {
 }
 </script>
 
-<small>The default settings are indicated with an asterisk <b style='font-size: 1.5em'>*</b> symbol.</small>
+<small>Domyślne ustawienia są zaznaczone symbolem <b style='font-size: 1.5em'>*</b> gwiazdki. Nie należy ich zmieniać bez konkretnego powodu.</small>
 
 <!-- / / / -->
 
 </td></tr>
 <tr><td id='footer' colspan=2>
 	<span id='footer-msg'></span>
-	<input type='button' value='Save' id='save-button' onclick='save()'>
-	<input type='button' value='Cancel' id='cancel-button' onclick='reloadPage();'>
+	<input type='button' value='Zapisz' id='save-button' onclick='save()'>
+	<input type='button' value='Anuluj' id='cancel-button' onclick='reloadPage();'>
 </td></tr>
 </table>
 </form>

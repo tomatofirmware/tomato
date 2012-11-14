@@ -1,18 +1,19 @@
-<html><head><title>Firmware Upgrade</title></head>
+﻿<html><head><title>Aktualizacja Firmware</title></head>
 <body>
-<h1>Firmware Upgrade</h1>
-<b>WARNING:</b>
+<h1>Aktualizacja Firmware</h1>
+<b>UWAGA, B. WAŻNE, DOKŁADNIE PRZECZYTAĆ!</b>
 <ul>
-<li>There is no upload status information in this page and there will be no
-change in the display after the Upgrade button is pushed. You will be shown a
-new page only after the upgrade completes.
-<li>It may take up to 3 minutes for the upgrade to complete. Do not interrupt
-the router or the browser during this time.
-</ul>
+<li><h2>Na tej stronie nie jest wyświetlana informacja o statusie postępu wgrywania nowego oprogramowania
+i jej zawartość nie ulega zmianom po wciśnięciu przycisku "Aktualizuj". Po poprawnym zakończeniu procesu aktualizacji
+zostanie wyświetlona nowa strona i dopiero to oznacza zakończenie aktualizacji.
+<li>Proces aktualizacji firmware może trwać do 3 minut. Pod żadnym pozorem nie wolno go przerywać w żaden sposób! Nie próbuj odświeżać
+tej strony ani dokonywać jakichkolwiek operacji na routerze aż do zakończenia procesu aktualizacji. Każda taka próba może się skończyć uszkodzeniem routera!
+Przed rozpoczęciem aktualizacji upewnij się, że plik firmware został dobrany odpowiednio dla Twojego urządzenia! Pomyłka spowoduje uszkodzenie Twojego sprzętu.
+</ul></h2>
 
 <br>
 <form name="firmware_upgrade" method="post" action="upgrade.cgi?<% nv(http_id) %>" encType="multipart/form-data">
-<input type="hidden" name="submit_button" value="Upgrade">
-Firmware: <input type="file" name="file"> <input type="submit" value="Upgrade">
+<input type="hidden" name="submit_button" value="Aktualizacja">
+Firmware: <input type="file" name="file"> <input type="submit" value="Aktualizuj">
 </form>
 </body></html>

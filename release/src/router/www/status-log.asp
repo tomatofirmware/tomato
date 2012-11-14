@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
 	Copyright (C) 2006-2010 Jonathan Zarate
@@ -11,9 +11,9 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Status: Logs</title>
+<title>[<% ident(); %>] Status: Logi</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
-<link rel='stylesheet' type='text/css' href='color.css'>
+<% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
 
 <!-- / / / -->
@@ -45,7 +45,7 @@ function init()
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -54,22 +54,22 @@ function init()
 <!-- / / / -->
 
 <div id='logging'>
-	<div class='section-title'>Logs</div>
+	<div class='section-title'>Logi</div>
 	<div class='section'>
-		<a href="logs/view.cgi?which=25&_http_id=<% nv(http_id) %>">View Last 25 Lines</a><br>
-		<a href="logs/view.cgi?which=50&_http_id=<% nv(http_id) %>">View Last 50 Lines</a><br>
-		<a href="logs/view.cgi?which=100&_http_id=<% nv(http_id) %>">View Last 100 Lines</a><br>
-		<a href="logs/view.cgi?which=all&_http_id=<% nv(http_id) %>">View All</a><br><br>
-		<a href="logs/syslog.txt?_http_id=<% nv(http_id) %>">Download Log File</a><br><br>
-		<input type="text" maxsize=32 size=33 id="find-text"> <input type="button" value="Find" onclick="find()"><br>
+		<a href="logs/view.cgi?which=25&_http_id=<% nv(http_id) %>">Pokaż ostatnie 25 linii</a><br>
+		<a href="logs/view.cgi?which=50&_http_id=<% nv(http_id) %>">Pokaż ostatnie 50 linii</a><br>
+		<a href="logs/view.cgi?which=100&_http_id=<% nv(http_id) %>">Pokaż ostatnie 100 linii</a><br>
+		<a href="logs/view.cgi?which=all&_http_id=<% nv(http_id) %>">Pokaż wszystkie</a><br><br>
+		<a href="logs/syslog.txt?_http_id=<% nv(http_id) %>">Pobierz plik logu</a><br><br>
+		<input type="text" maxsize=32 size=33 id="find-text"> <input type="button" value="Szukaj" onclick="find()"><br>
 		<br><br>
-		&raquo; <a href="admin-log.asp">Logging Configuration</a><br><br>
+		&raquo; <a href="admin-log.asp">Konfiguracja logowania</a><br><br>
 	</div>
 </div>
 
 <script type='text/javascript'>
 if (nvram.log_file != '1') {
-	W('<div class="note-disabled">Internal logging disabled.</b><br><br><a href="admin-log.asp">Enable &raquo;</a></div>');
+	W('<div class="note-disabled">Logowanie wewnętrzne wyłączone.</b><br><br><a href="admin-log.asp">Włącz &raquo;</a></div>');
 	E('logging').style.display = 'none';
 }
 </script>

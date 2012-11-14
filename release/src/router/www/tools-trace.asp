@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
 	Copyright (C) 2006-2010 Jonathan Zarate
@@ -11,9 +11,9 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Tools: Trace</title>
+<title>[<% ident(); %>] Narzędzia: Traceroute</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
-<link rel='stylesheet' type='text/css' href='color.css'>
+<% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
 
 <!-- / / / -->
@@ -46,7 +46,7 @@ var tracedata = '';
 var tg = new TomatoGrid();
 tg.setup = function() {
 	this.init('ttr-grid');
-	this.headerSet(['Hop', 'Address', 'Min (ms)', 'Max (ms)', 'Avg (ms)', '+/- (ms)']);
+	this.headerSet(['Hop', 'Adres', 'Min (ms)', 'Max (ms)', 'Śr. (ms)', '+/- (ms)']);
 }
 tg.populate = function() {
 	var seq = 1;
@@ -122,7 +122,7 @@ function verifyFields(focused, quiet)
 	e = E('_f_addr');
 	s = e.value.trim();
 	if (!s.match(/^[\w\.-]+$/)) {
-		ferror.set(e, 'Invalid address', quiet);
+		ferror.set(e, 'Błędny adres IP', quiet);
 		return 0;
 	}
 	ferror.clear(e);
@@ -158,7 +158,7 @@ function trace()
 	}
 	tracer.onError = function(x) {
 		spin(0);
-		E('trace-error').innerHTML = 'ERROR: ' + E('_f_addr').value + ' - ' + x;
+		E('trace-error').innerHTML = 'BŁĄD: ' + E('_f_addr').value + ' - ' + x;
 		E('trace-error').style.visibility = 'visible';
 	}
 
@@ -190,7 +190,7 @@ function init()
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -202,16 +202,15 @@ function init()
 <div class='section'>
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: 'Address', name: 'f_addr', type: 'text', maxlen: 64, size: 32, value: '', suffix: ' <input type="button" value="Trace" onclick="trace()" id="traceb">' },
-	{ title: 'Maximum Hops', name: 'f_hops', type: 'text', maxlen: 2, size: 4, value: '20' },
-	{ title: 'Maximum Wait Time', name: 'f_wait', type: 'text', maxlen: 2, size: 4, value: '3', suffix: ' <small>(seconds per hop)</small>' }
+	{ title: 'Adres', name: 'f_addr', type: 'text', maxlen: 64, size: 32, value: '', suffix: ' <input type="button" value="Trace" onclick="trace()" id="traceb">' },
+	{ title: 'Maksymalna liczba hopów', name: 'f_hops', type: 'text', maxlen: 2, size: 4, value: '20' },
+	{ title: 'Maksymalny czas oczekiwania', name: 'f_wait', type: 'text', maxlen: 2, size: 4, value: '3', suffix: ' <small>(sekund na  hop)</small>' }
 ]);
 </script>
 </div>
-
 <div style='visibility:hidden' id='trace-error'></div>
 
-<div style='visibility:hidden;text-align:right' id='wait'>Please wait... <img src='spin.gif' style='vertical-align:top'></div>
+<div style='visibility:hidden;text-align:right' id='wait'>Proszę czekać... <img src='spin.gif' style='vertical-align:top'></div>
 
 <table id='ttr-grid' class='tomato-grid' cellspacing=1></table>
 

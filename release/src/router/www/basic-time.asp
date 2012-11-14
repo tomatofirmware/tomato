@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
 	Copyright (C) 2006-2010 Jonathan Zarate
@@ -11,9 +11,9 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Basic: Time</title>
+<title>[<% ident(); %>] Podstawowe: Czas</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
-<link rel='stylesheet' type='text/css' href='color.css'>
+<% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
 
 <!-- / / / -->
@@ -26,15 +26,15 @@
 
 
 var ntpList = [
-	['custom', 'Custom...'],
-	['', 'Default'],
-	['africa', 'Africa'],
-	['asia', 'Asia'],
-	['europe', 'Europe'],
+	['custom', 'Wybór użytkownika...'],
+	['', 'Domyślny'],
+	['africa', 'Afryka'],
+	['asia', 'Azja'],
+	['europe', 'Europa'],
 	['oceania', 'Oceania'],
-	['north-america', 'North America'],
-	['south-america', 'South America'],
-	['us', 'US']
+	['north-america', 'Ameryka Północna'],
+	['south-america', 'Ameryka Południowa'],
+	['us', 'USA']
 ];
 
 function ntpString(name)
@@ -90,7 +90,7 @@ function verifyFields(focused, quiet)
 
 	if (a) {
 		if ((E('_f_ntp_1').value == '') && (E('_f_ntp_2').value == '') && ((E('_f_ntp_3').value == ''))) {
-			ferror.set('_f_ntp_1', 'At least one NTP server is required', quiet);
+			ferror.set('_f_ntp_1', 'Wymagany jest co najmniej jeden serwer NTP', quiet);
 			return 0;
 		}
 	}
@@ -144,7 +144,7 @@ function earlyInit()
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -164,7 +164,7 @@ function earlyInit()
 <input type='hidden' name='ntp_kiss' value='' disabled>
 
 
-<div class='section-title'>Time</div>
+<div class='section-title'>Czas</div>
 <div class='section'>
 <script type='text/javascript'>
 
@@ -202,71 +202,71 @@ http://www.timeanddate.com/library/abbreviations/timezones/au/
 REMOVE-END */
 
 createFieldTable('', [
-	{ title: 'Router Time', text: '<span id="clock"><% time(); %></span>' },
+	{ title: 'Czas routera', text: '<span id="clock"><% time(); %></span>' },
 	null,
-	{ title: 'Time Zone', name: 'tm_sel', type: 'select', options: [
-		['custom','Custom...'],
+	{ title: 'Strefa czasowa', name: 'tm_sel', type: 'select', options: [
+		['custom','Wybór użytkownika...'],
 		['UTC12','UTC-12:00 Kwajalein'],
-		['UTC11','UTC-11:00 Midway Island, Samoa'],
-		['UTC10','UTC-10:00 Hawaii'],
+		['UTC11','UTC-11:00 Wyspy Midway, Samoa'],
+		['UTC10','UTC-10:00 Hawaje'],
 		['NAST9NADT,M3.2.0/2,M11.1.0/2','UTC-09:00 Alaska'],
 		['PST8PDT,M3.2.0/2,M11.1.0/2','UTC-08:00 Pacific Time'],
 		['UTC7','UTC-07:00 Arizona'],
 		['MST7MDT,M3.2.0/2,M11.1.0/2','UTC-07:00 Mountain Time'],
-		['UTC6','UTC-06:00 Mexico'],
+		['UTC6','UTC-06:00 Meksyk'],
 		['CST6CDT,M3.2.0/2,M11.1.0/2','UTC-06:00 Central Time'],
-		['UTC5','UTC-05:00 Colombia, Panama'],
+		['UTC5','UTC-05:00 Kolumbia, Panama'],
 		['EST5EDT,M3.2.0/2,M11.1.0/2','UTC-05:00 Eastern Time'],
-		['VET4:30','UTC-04:30 Venezuela'],
-		['UTC4','UTC-04:00 Aruba, Bermuda, Guyana, Puerto Rico'],
-		['BOT4','UTC-04:00 Bolivia'],
+		['VET4:30','UTC-04:30 Wenezuela'],
+		['UTC4','UTC-04:00 Aruba, Bermudy, Gujana, Portoryko'],
+		['BOT4','UTC-04:00 Boliwia'],
 		['AST4ADT,M3.2.0/2,M11.1.0/2','UTC-04:00 Atlantic Time'],
-		['BRWST4BRWDT,M10.3.0/0,M2.5.0/0','UTC-04:00 Brazil West'],
-		['NST3:30NDT,M3.2.0/0:01,M11.1.0/0:01','UTC-03:30 Newfoundland'],
-		['WGST3WGDT,M3.5.6/22,M10.5.6/23','UTC-03:00 Greenland'],
-		['BRST3BRDT,M10.3.0/0,M2.5.0/0','UTC-03:00 Brazil East'],
-		['UTC3','UTC-03:00 Argentina, French Guiana, Surinam'],
+		['BRWST4BRWDT,M10.3.0/0,M2.5.0/0','UTC-04:00 Brazylia Zachodnia'],
+		['NST3:30NDT,M3.2.0/0:01,M11.1.0/0:01','UTC-03:30 Nowa Funlandia'],
+		['WGST3WGDT,M3.5.6/22,M10.5.6/23','UTC-03:00 Grenlandia'],
+		['BRST3BRDT,M10.3.0/0,M2.5.0/0','UTC-03:00 Brazylia Wschodnia'],
+		['UTC3','UTC-03:00 Argentyna, Gujana Francuska, Surinam'],
 		['UTC2','UTC-02:00 Mid-Atlantic'],
-		['STD1DST,M3.5.0/2,M10.5.0/2','UTC-01:00 Azores'],
-		['UTC0','UTC+00:00 Gambia, Liberia, Morocco'],
-		['GMT0BST,M3.5.0/2,M10.5.0/2','UTC+00:00 England'],
-		['UTC-1','UTC+01:00 Tunisia'],
-		['CET-1CEST,M3.5.0/2,M10.5.0/3','UTC+01:00 France, Germany, Italy, Poland, Spain, Sweden'],
-		['EET-2EEST-3,M3.5.0/3,M10.5.0/4','UTC+02:00 Estonia, Finland, Latvia, Lithuania'],
-		['UTC-2','UTC+02:00 South Africa, Israel'],
-		['STD-2DST,M3.5.0/2,M10.5.0/2','UTC+02:00 Greece, Ukraine, Romania, Turkey, Latvia'],
-		['UTC-3','UTC+03:00 Iraq, Jordan, Kuwait'],
-		['MSK-3MSD,M3.5.0,M10.5.0/3','UTC+03:00 Moscow'],
-		['UTC-4','UTC+04:00 Oman, UAE'],
+		['STD1DST,M3.5.0/2,M10.5.0/2','UTC-01:00 Azory'],
+		['UTC0','UTC+00:00 Gambia, Liberia, Maroko'],
+		['GMT0BST,M3.5.0/2,M10.5.0/2','UTC+00:00 Anglia'],
+		['UTC-1','UTC+01:00 Tunezja'],
+		['CET-1CEST,M3.5.0/2,M10.5.0/3','UTC+01:00 Francja, Niemcy, Włochy, Polska, Hiszpania, Szwecja'],
+		['EET-2EEST-3,M3.5.0/3,M10.5.0/4','UTC+02:00 Estonia, Finlandia, Łotwa, Litwa'],
+		['UTC-2','UTC+02:00 Afryka Południowa, Izrael'],
+		['STD-2DST,M3.5.0/2,M10.5.0/2','UTC+02:00 Grecja, Ukraina, Rumunia, Turcja'],
+		['UTC-3','UTC+03:00 Irak, Jordania, Kuwejt'],
+		['MSK-3MSD,M3.5.0,M10.5.0/3','UTC+03:00 Moskwa'],
+		['UTC-4','UTC+04:00 Oman, Zjednoczone Emiraty Arabskie'],
 		['AMT-4AMST,M3.5.0,M10.5.0/3','UTC+04:00 Armenia'],
 		['UTC-4:30','UTC+04:30 Kabul'],
 		['UTC-5','UTC+05:00 Pakistan'],
-		['YEKT-5YEKST,M3.5.0,M10.5.0/3','UTC+05:00 Russia, Yekaterinburg'],
-		['UTC-5:30','UTC+05:30 Bombay, Calcutta, Madras, New Delhi'],
-		['UTC-6','UTC+06:00 Bangladesh'],
-		['NOVT-6NOVST,M3.5.0,M10.5.0/3','UTC+06:00 Russia, Novosibirsk'],
-		['UTC-7','UTC+07:00 Thailand'],
-		['KRAT-7KRAST,M3.5.0,M10.5.0/3','UTC+07:00 Russia, Krasnoyarsk'],
-		['UTC-8','UTC+08:00 China, Hong Kong, Western Australia, Singapore, Taiwan'],
-		['IRKT-8IRKST,M3.5.0,M10.5.0/3','UTC+08:00 Russia, Irkutsk'],
-		['UTC-9','UTC+09:00 Japan, Korea'],
-		['YAKT-9YAKST,M3.5.0,M10.5.0/3','UTC+09:00 Russia, Yakutsk'],
-		['ACST-9:30ACDT,M10.1.0/2,M4.1.0/3', 'UTC+09:30 South Australia'],
+		['YEKT-5YEKST,M3.5.0,M10.5.0/3','UTC+05:00 Rosja, Jekaterenburg'],
+		['UTC-5:30','UTC+05:30 Bombaj, Kalkuta, Madras, New Delhi'],
+		['UTC-6','UTC+06:00 Bangladesz'],
+		['NOVT-6NOVST,M3.5.0,M10.5.0/3','UTC+06:00 Rosja, Nowosybirsk'],
+		['UTC-7','UTC+07:00 Tajlandia'],
+		['KRAT-7KRAST,M3.5.0,M10.5.0/3','UTC+07:00 Rosja, Krasnojarsk'],
+		['UTC-8','UTC+08:00 Chiny, Hong Kong, Australia Zachodnia, Singapur, Tajwan'],
+		['IRKT-8IRKST,M3.5.0,M10.5.0/3','UTC+08:00 Rosja, Irkuck'],
+		['UTC-9','UTC+09:00 Japonia, Korea'],
+		['YAKT-9YAKST,M3.5.0,M10.5.0/3','UTC+09:00 Rosja, Jakuck'],
+		['ACST-9:30ACDT,M10.1.0/2,M4.1.0/3', 'UTC+09:30 Australia Południowa'],
 		['ACST-9:30', 'UTC+09:30 Darwin'],
-		['UTC-10','UTC+10:00 Guam, Russia'],
+		['UTC-10','UTC+10:00 Guam, Rosja'],
 		['AEST-10AEDT,M10.1.0,M4.1.0/3', 'UTC+10:00 Australia'],
 		['AEST-10', 'UTC+10:00 Brisbane'],
-		['UTC-11','UTC+11:00 Solomon Islands'],
-		['UTC-12','UTC+12:00 Fiji'],
-		['NZST-12NZDT,M9.5.0/2,M4.1.0/3','UTC+12:00 New Zealand']
+		['UTC-11','UTC+11:00 Wyspy Solomona'],
+		['UTC-12','UTC+12:00 Fidżi'],
+		['NZST-12NZDT,M9.5.0/2,M4.1.0/3','UTC+12:00 Nowa Zelandia']
 	], value: nvram.tm_sel },
-	{ title: 'Auto Daylight Savings Time', indent: 2, name: 'f_tm_dst', type: 'checkbox', value: nvram.tm_dst != '0' },
-	{ title: 'Custom TZ String', indent: 2, name: 'f_tm_tz', type: 'text', maxlen: 32, size: 34, value: nvram.tm_tz || '' },
+	{ title: 'Automatyczny Czas Letni', indent: 2, name: 'f_tm_dst', type: 'checkbox', value: nvram.tm_dst != '0' },
+	{ title: 'Strefa Czasowa użytkownika', indent: 2, name: 'f_tm_tz', type: 'text', maxlen: 32, size: 34, value: nvram.tm_tz || '' },
 	null,
-	{ title: 'Auto Update Time', name: 'ntp_updates', type: 'select', options: [[-1,'Never'],[0,'Only at startup'],[1,'Every hour'],[2,'Every 2 hours'],[4,'Every 4 hours'],[6,'Every 6 hours'],[8,'Every 8 hours'],[12,'Every 12 hours'],[24,'Every 24 hours']],
+	{ title: 'Automatyczna aktualizacja czasu', name: 'ntp_updates', type: 'select', options: [[-1,'Nigdy'],[0,'Tylko podczas startu'],[1,'Co godzinę'],[2,'Co 2 godziny'],[4,'Co 4 godziny'],[6,'Co 6 godzin'],[8,'Co 8 godzin'],[12,'Co 12 godzin'],[24,'Co 24 godziny']],
 		value: nvram.ntp_updates },
-	{ title: 'Trigger Connect On Demand', indent: 2, name: 'f_ntp_tdod', type: 'checkbox', value: nvram.ntp_tdod != '0' },
-	{ title: 'NTP Time Server', name: 'f_ntp_server', type: 'select', options: ntpList, value: ntpSel },
+	{ title: 'Wymuś połączenie w celu aktualizacji', indent: 2, name: 'f_ntp_tdod', type: 'checkbox', value: nvram.ntp_tdod != '0', suffix: ' <small>Dotyczy aktualizacji czasu w przypadku łączy zestawianych na żądanie (np. 3G, Neostrada itd.)</small>' },
+	{ title: 'Serwer czasu NTP', name: 'f_ntp_server', type: 'select', options: ntpList, value: ntpSel },
 	{ title: '&nbsp;', text: '<small><span id="ntp-preset">xx</span></small>', hidden: 1 },
 	{ title: '', name: 'f_ntp_1', type: 'text', maxlen: 48, size: 50, value: ntp[0] || 'pool.ntp.org', hidden: 1 },
 	{ title: '', name: 'f_ntp_2', type: 'text', maxlen: 48, size: 50, value: ntp[1] || '', hidden: 1 },
@@ -277,7 +277,7 @@ createFieldTable('', [
 <br><br>
 
 <div id='ntpkiss' style='display:none'>
-The following NTP servers have been automatically blocked by request from the server:
+Następujące serwery NTP ziostały automatycznie zablokowane przez żądanie z serwera:
 <b id='ntpkiss-ip'></b>
 <div>
 	<input type='button' value='Clear' onclick='save(1)'>
@@ -289,8 +289,8 @@ The following NTP servers have been automatically blocked by request from the se
 </td></tr>
 <tr><td id='footer' colspan=2>
 	<span id='footer-msg'></span>
-	<input type='button' value='Save' id='save-button' onclick='save(0)'>
-	<input type='button' value='Cancel' id='cancel-button' onclick='reloadPage();'>
+	<input type='button' value='Zapisz' id='save-button' onclick='save(0)'>
+	<input type='button' value='Anuluj' id='cancel-button' onclick='reloadPage();'>
 </td></tr>
 </table>
 </form>

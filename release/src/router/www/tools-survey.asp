@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
 	Copyright (C) 2006-2010 Jonathan Zarate
@@ -11,12 +11,13 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Tools: Wireless Survey</title>
+<title>[<% ident(); %>] Narzędzia: Wyszukiwanie sieci Wi-Fi</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
-<link rel='stylesheet' type='text/css' href='color.css'>
+<% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
 
 <!-- / / / -->
+
 <style type='text/css'>
 #survey-grid .brate {
 	color: blue;
@@ -54,7 +55,7 @@
 
 var wlscandata = [];
 var entries = [];
-var dayOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+var dayOfWeek = ['Nie', 'Pon', 'Wto', 'Śro', 'Czw', 'Pią', 'Sob'];
 
 Date.prototype.toWHMS = function() {
 	return dayOfWeek[this.getDay()] + ' ' + this.getHours() + ':' + this.getMinutes().pad(2)+ ':' + this.getSeconds().pad(2);
@@ -101,8 +102,10 @@ sg.rateSorter = function(a, b)
 
 sg.populate = function()
 {
-	var caps = ['infra', 'adhoc', 'poll', 'pollreq', 'wep', 'shortpre', 'pbcc', 'agility', 'X', 'Y', 'shortslot'];
+	var caps = ['infra', 'adhoc', 'poll', 'pollreq', 'wep', 'shortpre', 'pbcc', 'agility', 'spectrum', null, 'shortslot', null, null, 'cck-ofdm'];
+	var ncaps = [null, null /*40MHz*/, null, null, 'gf', 'sgi20', 'sgi40', 'stbc'];
 	var ncap = '802.11n';
+	var cap_maxlen = 14;
 	var added = 0;
 	var removed = 0;
 	var i, j, k, t, e, s;
@@ -132,6 +135,9 @@ sg.populate = function()
 		e.bssid = s[0];
 		e.ssid = s[1];
 		e.channel = s[2];
+		if (s[7] != 0 && s[9] != 0) {
+			e.channel = e.channel + '<br><small>' + s[9] + ' MHz</small>';
+		}
 		e.rssi = s[4];
 		e.noise = s[5];
 		e.saw = 1;
@@ -141,7 +147,7 @@ sg.populate = function()
 		for (j = 0; j < caps.length; ++j) {
 			if ((s[3] & (1 << j)) && (caps[j])) {
 				k += caps[j].length;
-				if (k > 12) {
+				if (k > cap_maxlen) {
 					t += '<br>';
 					k = caps[j].length;
 				}
@@ -149,10 +155,29 @@ sg.populate = function()
 				t += caps[j];
 			}
 		}
+
 		if (s[7] != 0) {
 			k += ncap.length;
-			t += ((k > 12) ? '<br>' : ' ') + ncap;
-		} 
+			if (k > cap_maxlen) {
+				t += '<br>';
+				k = ncap.length;
+			}
+			else t += ' ';
+			t += ncap;
+		}
+
+		for (j = 0; j < ncaps.length; ++j) {
+			if ((s[8] & (1 << j)) && (ncaps[j])) {
+				k += ncaps[j].length;
+				if (k > cap_maxlen) {
+					t += '<br>';
+					k = ncaps[j].length;
+				}
+				else t += ' ';
+				t += ncaps[j];
+			}
+		}
+
 		e.cap = t;
 
 		t = '';
@@ -206,12 +231,12 @@ sg.populate = function()
 		seen = e.lastSeen.toWHMS();
 		if (useAjax()) {
 			m = Math.floor(((new Date()).getTime() - e.firstSeen.getTime()) / 60000);
-			if (m <= 10) seen += '<br> <b><small>NEW (' + -m + 'm)</small></b>';
+			if (m <= 10) seen += '<br> <b><small>NOWA (' + -m + 'm)</small></b>';
 		}
 
 		mac = e.bssid;
 		if (mac.match(/^(..):(..):(..)/))
-			mac = '<a href="http://standards.ieee.org/cgi-bin/ouisearch?' + RegExp.$1 + '-' + RegExp.$2 + '-' + RegExp.$3 + '" target="_new" title="OUI search">' + mac + '</a>';
+			mac = '<a href="http://standards.ieee.org/cgi-bin/ouisearch?' + RegExp.$1 + '-' + RegExp.$2 + '-' + RegExp.$3 + '" target="_new" title="Szukaj OUI">' + mac + '</a>';
 
 		sg.insert(-1, e, [
 			'<small>' + seen + '</small>',
@@ -226,10 +251,10 @@ sg.populate = function()
 	}
 
 	s = '';
-	if (useAjax()) s = added + ' added, ' + removed + ' removed, ';
-	s += entries.length + ' total.';
+	if (useAjax()) s = added + ' dodanych, ' + removed + ' usuniętych, ';
+	s += entries.length + ' łącznie.';
 
-	s += '<br><br><small>Last updated: ' + (new Date()).toWHMS() + '</small>';
+	s += '<br><br><small>Ostatnia aktualizacja: ' + (new Date()).toWHMS() + '</small>';
 	setMsg(s);
 
 	wlscandata = [];
@@ -237,7 +262,7 @@ sg.populate = function()
 
 sg.setup = function() {
 	this.init('survey-grid', 'sort');
-	this.headerSet(['Last Seen', 'SSID', 'BSSID', 'RSSI &nbsp; &nbsp; ', 'Noise &nbsp; &nbsp; ', 'Quality', 'Ch', 'Capabilities', 'Rates']);
+	this.headerSet(['Ostatnio widziana', 'SSID', 'BSSID', 'RSSI &nbsp; &nbsp; ', 'Szum &nbsp; &nbsp; ', 'Jakość', 'Kanał', 'Właściwości', 'Prędkość']);
 	this.populate();
 	this.sort(0);
 }
@@ -282,7 +307,7 @@ function init()
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -290,23 +315,23 @@ function init()
 
 <!-- / / / -->
 
-<div class='section-title'>Wireless Site Survey</div>
+<div class='section-title'>Wyszukiwanie sieci Wi-Fi</div>
 <div class='section'>
 	<table id='survey-grid' class='tomato-grid' cellspacing=0></table>
 	<div id='survey-msg'></div>
 	<div id='survey-controls'>
 		<img src="spin.gif" id="refresh-spinner">
 		<script type='text/javascript'>
-		genStdTimeList('expire-time', 'Auto Expire', 0);
-		genStdTimeList('refresh-time', 'Auto Refresh', 0);
+		genStdTimeList('expire-time', 'Autowygasanie', 0);
+		genStdTimeList('refresh-time', 'Autoodświeżanie', 0);
 		</script>
-		<input type="button" value="Refresh" onclick="ref.toggle()" id="refresh-button">
+		<input type="button" value="Odśwież" onclick="ref.toggle()" id="refresh-button">
 	</div>
 
 	<br><br><br><br>
 	<script type='text/javascript'>
 	if ('<% wlclient(); %>' == '0') {
-		document.write('<small>Warning: Wireless connections to this router may be disrupted while using this tool.</small>');
+		document.write('<small>Ostrzeżenie: Połączenia bezprzewodowe do tego routera mogą zostać przerwane podczas używania tego narzędzia.</small>');
 	}
 	</script>
 </div>

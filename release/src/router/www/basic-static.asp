@@ -15,7 +15,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Basic: Static DHCP/ARP/IPT</title>
+<title>[<% ident(); %>] Podstawowe: DHCP/ARP statyczne oraz monitorowanie pasma klientów LAN</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
@@ -80,11 +80,11 @@ sg.dataToView = function(data) {
 	var v = [];
 	var s = (data[0] == '00:00:00:00:00:00') ? '' : data[0];
 	if (!isMAC0(data[1])) s += '<br>' + data[1];
-	v.push((s == '') ? '<center><small><i>(unset)</i></small></center>' : s);
+	v.push((s == '') ? '<center><small><i>(nie ustawione)</i></small></center>' : s);
 
-	v.push((data[2].toString() != '0') ? '<small><i>Enabled</i></small>' : '');
+	v.push((data[2].toString() != '0') ? '<small><i>Włączone</i></small>' : '');
 	v.push(escapeHTML('' + data[3]));
-	v.push((data[4].toString() != '0') ? '<small><i>Enabled</i></small>' : '');
+	v.push((data[4].toString() != '0') ? '<small><i>Włączone</i></small>' : '');
 	v.push(escapeHTML('' + data[5]));
 	return v;
 }
@@ -154,7 +154,7 @@ sg.verifyFields = function(row, quiet) {
 
 	for (i = 0; i < 2; ++i) {
 		if (this.existMAC(f[i].value)) {
-			ferror.set(f[i], 'Duplicate MAC address', quiet);
+			ferror.set(f[i], 'Zduplikowany adres MAC', quiet);
 			return 0;
 		}
 	}
@@ -162,14 +162,14 @@ sg.verifyFields = function(row, quiet) {
 	if (f[3].value.indexOf('.') == -1) {
 		s = parseInt(f[3].value, 10)
 		if (isNaN(s) || (s <= 0) || (s >= 255)) {
-			ferror.set(f[3], 'Invalid IP address', quiet);
+			ferror.set(f[3], 'Nieprawidłowy adres IP', quiet);
 			return 0;
 		}
 		f[3].value = ipp + s;
 	}
 
 	if ((!isMAC0(f[0].value)) && (this.inStatic(f[3].value))) {
-		ferror.set(f[3], 'Duplicate IP address', quiet);
+		ferror.set(f[3], 'Zduplikowany adres IP', quiet);
 		return 0;
 	}
 
@@ -181,11 +181,11 @@ REMOVE-END */
 
 	if (s.length > 0) {
 		if (s.search(/^[.a-zA-Z0-9_\- ]+$/) == -1) {
-			ferror.set(f[5], 'Invalid hostname. Only characters "A-Z 0-9 . - _" are allowed.', quiet);
+			ferror.set(f[5], 'Nieprawidłowa nazwa hosta. Dopuszczalne są jedynie znaki "A-Z 0-9 . - _".', quiet);
 			return 0;
 		}
 		if (this.existName(s)) {
-			ferror.set(f[5], 'Duplicate hostname.', quiet);
+			ferror.set(f[5], 'Zduplikowana nazwa hosta.', quiet);
 			return 0;
 		}
 		f[5].value = s;
@@ -193,7 +193,7 @@ REMOVE-END */
 
 	if (isMAC0(f[0].value)) {
 		if (s == '') {
-			s = 'Both MAC address and name fields must not be empty.';
+			s = 'Pola zarówno adresu MAC jak i nazwy nie mogą być puste.';
 			ferror.set(f[0], s, 1);
 			ferror.set(f[5], s, quiet);
 			return 0;
@@ -258,7 +258,7 @@ sg.setup = function() {
 		{ type: 'checkbox', prefix: '<div class="centered">', suffix: '</div>' },
 		{ type: 'text', maxlen: 50 } ] );
 
-	this.headerSet(['MAC Address', 'Bound to', 'IP Address', 'IPTraffic', 'Hostname']);
+	this.headerSet(['Adres MAC', 'Powiązany z', 'Adres IP', 'IP Traffic', 'Nazwa hosta']);
 
 	var ipt = nvram.cstats_include.split(',');
 	var s = nvram.dhcpd_static.split('>');
@@ -326,11 +326,11 @@ function init()
 function toggleVisibility(whichone) {
 	if(E('sesdiv' + whichone).style.display=='') {
 		E('sesdiv' + whichone).style.display='none';
-		E('sesdiv' + whichone + 'showhide').innerHTML='(Click here to show)';
+		E('sesdiv' + whichone + 'showhide').innerHTML='(Kliknij tu, aby pokazać)';
 		cookie.set('basic_static_' + whichone + '_vis', 0);
 	} else {
 		E('sesdiv' + whichone).style.display='';
-		E('sesdiv' + whichone + 'showhide').innerHTML='(Click here to hide)';
+		E('sesdiv' + whichone + 'showhide').innerHTML='(Kliknij tu, aby ukryć)';
 		cookie.set('basic_static_' + whichone + '_vis', 1);
 	}
 }
@@ -346,7 +346,7 @@ function verifyFields(focused, quiet) {
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -361,38 +361,38 @@ function verifyFields(focused, quiet) {
 <input type='hidden' name='dhcpd_static_only'>
 <input type='hidden' name='cstats_include'>
 
-<div class='section-title'>Static DHCP/ARP/IPT</div>
+<div class='section-title'>Podstawowe: DHCP/ARP statyczne oraz monitorowanie pasma klientów LAN</div>
 <div class='section'>
 	<table class='tomato-grid' id='bs-grid'></table>
 </div>
 
 <!-- / / / -->
 
-<div class='section-title'>Options <small><i><a href='javascript:toggleVisibility("options");'><span id='sesdivoptionsshowhide'>(Click here to show)</span></a></i></small></div>
+<div class='section-title'>Opcje <small><i><a href='javascript:toggleVisibility("options");'><span id='sesdivoptionsshowhide'>(Kliknij tu aby pokazać)</span></a></i></small></div>
 <div class='section' id='sesdivoptions' style='display:none'>
 <script type='text/javascript'>
 createFieldTable('', [
-{ title: 'Ignore DHCP requests from unknown devices', name: 'f_dhcpd_static_only', type: 'checkbox', value: nvram.dhcpd_static_only == '1' }
+{ title: 'Ignoruj żądania DHCP od nieznanych urządzeń', name: 'f_dhcpd_static_only', type: 'checkbox', value: nvram.dhcpd_static_only == '1' }
 ]);
 </script>
 </div>
-<div class='section-title'>Notes <small><i><a href='javascript:toggleVisibility("notes");'><span id='sesdivnotesshowhide'>(Click here to show)</span></a></i></small></div>
+<div class='section-title'>Uwagi <small><i><a href='javascript:toggleVisibility("notes");'><span id='sesdivnotesshowhide'>(Kliknij tu aby pokazać)</span></a></i></small></div>
 <div class='section' id='sesdivnotes' style='display:none'>
 <ul>
-<li><b>MAC Address</b> - Unique identifier associated to a network interface on this particular device.</li>
-<li><b>Bound to</b> - Enforce static ARP binding of this particular IP/MAC address pair.</li>
-<li><b>IP Address</b> - Network address assigned to this device on the local network.</li>
-<li><b>IPTraffic</b> - Keep track of bandwidth usage for this IP address.</li>
-<li><b>Hostname</b> - Human-readable nickname/label assigned to this device on the network.</li>
+<li><b>Adres MAC</b> - Unikalny identyfikator skojarzony z interfejsem sieciowym na tym konkretnym urządzeniu.</li>
+<li><b>Powiąż z</b> - Wymuś statyczne powiązanie tej konkretnej pary adresów IP/MAC.</li>
+<li><b>Adres IP</b> - Adres sieciowy przypisany do tego urządzenia w sieci lokalnej.</li>
+<li><b>IP Traffic</b> - Śledzenie wykorzystania pasma przez ten adres IP.</li>
+<li><b>Nazwa hosta</b> - Czytelny nick/etykietka przypisany do tego urządzenia w sieci.</li>
 </ul>
 <small>
 <ul>
-<li><b>Other relevant notes/hints:</b>
+<li><b>Inne istotne uwagi/wskazówki</b>
 <ul>
-<li>To specify multiple hostnames for a device, separate them with spaces.</li>
-<li>To enable/enforce static ARP binding for a particular device, it must have only one MAC associated with that particular IP address (i.e. you can't have two MAC addresses linked to the same hostname/device in the table above).</li>
-<li>When ARP binding is enabled for a particular MAC/IP address pair, that device will always be shown as "active" in the <a href="tools-wol.asp">Wake On LAN</a> table.</li>
-<li>See also the <a href='advanced-dhcpdns.asp'>Advanced DHCP/DNS</a> settings page for more DHCP-related configuration options.</li>
+<li>Aby określić wiele nazw hostów dla urządzenia, rozdziel je spacjami.</li>
+<li>Aby umożliwić/wymusić statyczne powiązanie ARP dla konkretnego urządzenia, musi ono mieć określony tylko jeden adres MAC skojarzony z odpowiednim adresem IP (tzn. nie możesz mieć dwóch adresów MAC przyporządkowanych do tej samej nazwy hosta w tabeli powyżej).</li>
+<li>Gdy powiązanie ARP włączone jest dla danej pary adresów MAC/IP, odpowiednie urządzenie zawsze będzie pokazywane jako "aktywne" w tabeli <a href="tools-wol.asp">Wake On LAN</a></li>
+<li>Patrz również na stronie ustawień <a href='advanced-dhcpdns.asp'>Zaawansowany DHCP/DNS</a> więcej opcji konfiguracyjnych dotyczących DHCP.</li>
 </ul>
 </ul>
 </small>
@@ -404,8 +404,8 @@ createFieldTable('', [
 </td></tr>
 <tr><td id='footer' colspan=2>
 	<span id='footer-msg'></span>
-	<input type='button' value='Save' id='save-button' onclick='save()'>
-	<input type='button' value='Cancel' id='cancel-button' onclick='javascript:reloadPage();'>
+	<input type='button' value='Zapisz' id='save-button' onclick='save()'>
+	<input type='button' value='Anuluj' id='cancel-button' onclick='javascript:reloadPage();'>
 </td></tr>
 </table>
 </form>

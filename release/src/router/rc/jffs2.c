@@ -27,7 +27,7 @@ static void error(const char *message)
 {
 	char s[512];
 
-	snprintf(s, sizeof(s), "Error %s JFFS. Check the logs to see if they contain more details about this error.", message);
+	snprintf(s, sizeof(s), "Błąd %s JFFS. Sprawdź logi by uzyskać więcej informacji odnośnie tego błędu.", message);
 	notice_set("jffs", s);
 }
 
@@ -75,7 +75,7 @@ void start_jffs2(void)
 
 	if ((statfs("/jffs", &sf) == 0) && (sf.f_type != 0x73717368 /* squashfs */)) {
 		// already mounted
-		notice_set("jffs", format ? "Formatted" : "Loaded");
+		notice_set("jffs", format ? "Sformatowany" : "Zamontowany");
 		return;
 	}
 
@@ -111,7 +111,7 @@ void start_jffs2(void)
 	}
 #endif
 
-	notice_set("jffs", format ? "Formatted" : "Loaded");
+	notice_set("jffs", format ? "Sformatowany" : "Zamontowany");
 
 	if (((p = nvram_get("jffs2_exec")) != NULL) && (*p != 0)) {
 		chdir("/jffs");

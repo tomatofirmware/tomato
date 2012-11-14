@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
 	Copyright (C) 2006-2010 Jonathan Zarate
@@ -15,7 +15,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] IP Traffic: Daily History</title>
+<title>[<% ident(); %>] IP Traffic: Dzienna historia</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
@@ -86,7 +86,7 @@ var dg = new TomatoGrid();
 
 dg.setup = function() {
 	this.init('daily-grid', 'sort');
-	this.headerSet(['Date', 'Host', 'Download', 'Upload', 'Total']);
+	this.headerSet(['Data', 'Host', 'Pobrano', 'Wysłano', 'Suma']);
 }
 
 function redraw() {
@@ -180,10 +180,10 @@ function redraw() {
 			}
 			if (E('_f_shortcuts').checked) {
 				h = h + '<br><small>';
-				h = h + '<a href="javascript:viewQosDetail(' + i + ')" title="View QoS Details">[qosdetails]</a>';
-				h = h + '<a href="javascript:viewQosCTrates(' + i + ')" title="View transfer rates per connection">[qosrates]</a>';
-				h = h + '<a href="javascript:viewIptDetail(' + i + ')" title="View real-time IP Traffic for this address">[iptraf]</a>';
-				h = h + '<a href="javascript:addExcludeList(' + i + ')" title="Filter out this address">[hide]</a>';
+				h = h + '<a href="javascript:viewQosDetail(' + i + ')" title="Pokaż szczegóły QoS">[qosdetails]</a>';
+				h = h + '<a href="javascript:viewQosCTrates(' + i + ')" title="Pokaż limity transferu na połączenie">[qosrates]</a>';
+				h = h + '<a href="javascript:viewIptDetail(' + i + ')" title="Pokaż aktualny ruch dla tego adresu">[iptraf]</a>';
+				h = h + '<a href="javascript:addExcludeList(' + i + ')" title="Odfiltruj ten adres">[hide]</a>';
 				h = h + '</small>';
 			}
 			var ymd = getYMD(b[0]);
@@ -194,13 +194,13 @@ function redraw() {
 		dg.resort();
 		dg.recolor();
 		dg.footerSet([
-			'Total', 
+			'Suma', 
 			('<small><i>(' +
 			(((hostslisted.length > 0) || (subnetslisted.length > 0)) ? 
-				((hostslisted.length > 0) ? (hostslisted.length + ' hosts') : '') +
+				((hostslisted.length > 0) ? (hostslisted.length + ' hostów') : '') +
 				(((hostslisted.length > 0) && (subnetslisted.length > 0)) ? ', ' : '') +
-				((subnetslisted.length > 0) ? (subnetslisted.length + ' subnets') : '')
-			: 'no data') +
+				((subnetslisted.length > 0) ? (subnetslisted.length + ' podsieć') : '')
+			: 'brak danych') +
 			')</i></small>'),
 			rescale(rx), 
 			rescale(tx), 
@@ -359,11 +359,11 @@ function init() {
 function toggleVisibility(whichone) {
 	if(E('sesdiv' + whichone).style.display=='') {
 		E('sesdiv' + whichone).style.display='none';
-		E('sesdiv' + whichone + 'showhide').innerHTML='(Click here to show)';
+		E('sesdiv' + whichone + 'showhide').innerHTML='(Kliknij aby wyświetlić)';
 		cookie.set('ipt_history_' + whichone + '_vis', 0);
 	} else {
 		E('sesdiv' + whichone).style.display='';
-		E('sesdiv' + whichone + 'showhide').innerHTML='(Click here to hide)';
+		E('sesdiv' + whichone + 'showhide').innerHTML='(Kliknij aby ukryć)';
 		cookie.set('ipt_history_' + whichone + '_vis', 1);
 	}
 }
@@ -437,7 +437,7 @@ function verifyFields(focused, quiet) {
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -446,31 +446,31 @@ function verifyFields(focused, quiet) {
 <!-- / / / -->
 
 <div id='cstats'>
-<div class='section-title'>IP Traffic Daily History</div>
+<div class='section-title'>IP Traffic: Dzienna historia</div>
 <div class='section'>
 <table id='daily-grid' class='tomato-grid' cellspacing=0 style='height:auto'></table>
 </div>
 
-<div class='section-title'>Options <small><i><a href='javascript:toggleVisibility("options");'><span id='sesdivoptionsshowhide'>(Click here to show)</span></a></i></small></div>
+<div class='section-title'>Opcje <small><i><a href='javascript:toggleVisibility("options");'><span id='sesdivoptionsshowhide'>(Kliknij aby pokazać)</span></a></i></small></div>
 <div class='section' id='sesdivoptions' style='display:none'>
 <script type='text/javascript'>
 var c;
 c = [];
-c.push({ title: 'List only these IPs', name: 'f_filter_ip', size: 50, maxlen: 255, type: 'text', suffix: ' <small>(Comma separated list)</small>' });
-c.push({ title: 'Exclude these IPs', name: 'f_filter_ipe', size: 50, maxlen: 255, type: 'text', suffix: ' <small>(Comma separated list)</small>' });
-c.push({ title: 'Date Range', multi: [ { name: 'f_begin_date', type: 'select', options: [['0', 'Any']], suffix: ' - ' }, { name: 'f_end_date', type: 'select', options: [['0', 'Any']] } ] } );
-c.push({ title: 'Date Format', name: 'f_dafm', type: 'select', options: [['0', 'yyyy-mm-dd'], ['1', 'mm-dd-yyyy'], ['2', 'mmm dd, yyyy'], ['3', 'dd.mm.yyyy']] });
-c.push({ title: 'Scale', name: 'f_scale', type: 'select', options: [['0', 'KB'], ['1', 'MB'], ['2', 'GB']] });
-c.push({ title: 'Show subnet totals', name: 'f_subnet', type: 'checkbox', suffix: ' <small>(Not considered when calculating total traffic on the last line)</small>' });
-c.push({ title: 'Hide IPs without traffic', name: 'f_ignorezeroes', type: 'checkbox' });
-c.push({ title: 'Show known hostnames', name: 'f_hostnames', type: 'checkbox' });
-c.push({ title: 'Show shortcuts', name: 'f_shortcuts', type: 'checkbox' });
+c.push({ title: 'Wyświetl tylko te adresy IP', name: 'f_filter_ip', size: 50, maxlen: 255, type: 'text', suffix: ' <small>(Oddzielone spacją)</small>' });
+c.push({ title: 'Wyklucz te adresy IP', name: 'f_filter_ipe', size: 50, maxlen: 255, type: 'text', suffix: ' <small>(Oddzielone spacją)</small>' });
+c.push({ title: 'Zakres dat', multi: [ { name: 'f_begin_date', type: 'select', options: [['0', 'Każdy']], suffix: ' - ' }, { name: 'f_end_date', type: 'select', options: [['0', 'Każdy']] } ] } );
+c.push({ title: 'Format daty', name: 'f_dafm', type: 'select', options: [['0', 'yyyy-mm-dd'], ['1', 'mm-dd-yyyy'], ['2', 'mmm dd, yyyy'], ['3', 'dd.mm.yyyy']] });
+c.push({ title: 'Skala', name: 'f_scale', type: 'select', options: [['0', 'KB'], ['1', 'MB'], ['2', 'GB']] });
+c.push({ title: 'Pokaż sumy w podsieciach', name: 'f_subnet', type: 'checkbox', suffix: ' <small>(Nie uwzględniane przy wyliczaniu ruchu w ostatniej lini.)</small>' });
+c.push({ title: 'Ukryj IP bez ruchu', name: 'f_ignorezeroes', type: 'checkbox' });
+c.push({ title: 'Pokaż znane nazwy hostów', name: 'f_hostnames', type: 'checkbox' });
+c.push({ title: 'Pokaż skróty', name: 'f_shortcuts', type: 'checkbox' });
 createFieldTable('',c);
 </script>
 <div style="float:right;text-align:right">
-&raquo; <a href="javascript:genData()">Data</a>
+&raquo; <a href="javascript:genData()">Dane</a>
 <br>
-&raquo; <a href="admin-iptraffic.asp">Configure</a>
+&raquo; <a href="admin-iptraffic.asp">Konfiguruj</a>
 </div>
 </div>
 </div>
@@ -482,7 +482,7 @@ createFieldTable('',c);
 
 </td></tr>
 <tr><td id='footer' colspan=2>
-<input type='button' value='Refresh' onclick='reloadPage()'>
+<input type='button' value='Odśwież' onclick='reloadPage()'>
 </td></tr>
 </table>
 </form>

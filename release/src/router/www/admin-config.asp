@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
 	Copyright (C) 2006-2010 Jonathan Zarate
@@ -11,9 +11,9 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Admin: Configuration</title>
+<title>[<% ident(); %>] Administracja: Konfiguracja</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
-<link rel='stylesheet' type='text/css' href='color.css'>
+<% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
 
 <!-- / / / -->
@@ -53,10 +53,10 @@ function restoreButton()
 	name = fixFile(E('restore-name').value);
 	name = name.toLowerCase();
 	if ((name.indexOf('.cfg') != (name.length - 4)) && (name.indexOf('.cfg.gz') != (name.length - 7))) {
-		alert('Incorrect filename. Expecting a ".cfg" file.');
+		alert('Niewłaściwy plik. Spodziewany plik z rozszerzeniem ".cfg".');
 		return;
 	}
-	if (!confirm('Are you sure?')) return;
+	if (!confirm('Czy jesteś pewien?')) return;
 	E('restore-button').disabled = 1;
 
 	f = E('restore-form');
@@ -71,9 +71,9 @@ function resetButton()
 	i = E('restore-mode').value;
 	if (i == 0) return;
 	if ((i == 2) && (features('!nve'))) {
-		if (!confirm('WARNING: Erasing the NVRAM on a ' + nvram.t_model_name + ' router may be harmful. It may not be able to re-setup the NVRAM correctly after a complete erase. Proceeed anyway?')) return;
+		if (!confirm('OSTRZEŻENIE: Kasowanie zawartości NVRAM na routerze ' + nvram.t_model_name + ' może go uszkodzić. Może nie być możliwości ponownego poprawnego ustawienia NVRAM po jej całkowitym wykasowaniu. Czy mimo wszystko kontunuować?')) return;
 	}
-	if (!confirm('Are you sure?')) return;
+	if (!confirm('Czy jesteś CAŁKOWICIE pewien?')) return;
 	E('reset-button').disabled = 1;
 	form.submit('aco-reset-form');
 }
@@ -83,7 +83,7 @@ function resetButton()
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -91,38 +91,39 @@ function resetButton()
 
 <!-- / / / -->
 
-<div class='section-title'>Backup Configuration</div>
+<div class='section-title'>Kopia zapasowa konfiguracji</div>
 <div class='section'>
 	<form>
 		<script type='text/javascript'>
 		W("<input type='text' size='40' maxlength='64' id='backup-name' onchange='backupNameChanged()' value='tomato_v" + ('<% version(); %>'.replace(/\./g, '')) + "_m" + nvram.et0macaddr.replace(/:/g, '').substring(6, 12) + "'>");
 		</script>
 		.cfg &nbsp;
-		<input type='button' name='f_backup_button' onclick='backupButton()' value='Backup'><br>
+		<input type='button' name='f_backup_button' onclick='backupButton()' value='Zapisz kopię'><br>
 		<a href='' id='backup-link'>Link</a>
 	</form>
 </div>
 
 <br><br>
 
-<div class='section-title'>Restore Configuration</div>
+<div class='section-title'>Przywracanie konfiguracji</div>
 <div class='section'>
 	<form id='restore-form' method='post' action='cfg/restore.cgi' encType='multipart/form-data'>
-		Select the configuration file to restore:<br>
-		<input type='file' size='40' id='restore-name' name='filename'> <input type='button' name='f_restore_button' id='restore-button' value='Restore' onclick='restoreButton()'>
+		Wybierz plik z konfiguracją do przywrócenia:<br>
+		<input type='file' size='40' id='restore-name' name='filename'> <input type='button' name='f_restore_button' id='restore-button' value='Odtwórz' onclick='restoreButton()'>
 		<br>
 	</form>
+	Nie jest zalecane odtwarzanie konfiguracji z innej wersji Tomato niż aktualnie zainstalowana.
 </div>
 
 <br><br>
 
-<div class='section-title'>Restore Default Configuration</div>
+<div class='section-title'>Przywracanie ustawień standardowych</div>
 <div class='section'>
 	<form id='aco-reset-form' method='post' action='cfg/defaults.cgi'>
 	<select name='mode' id='restore-mode'>
-		<option value=0>Select...</option>
-		<option value=1>Restore default router settings (normal)</option>
-		<option value=2>Erase all data in NVRAM memory (thorough)</option>
+		<option value=0>Wybierz...</option>
+		<option value=1>Przywróć domyślne ustawienia routera (tryb normalny)</option>
+		<option value=2>Usuń wszystkie dane z pamięci NVRAM (niebezpieczne)</option>
 	</select>
 	<input type='button' value='OK' onclick='resetButton()' id='reset-button'>
 	</form>
@@ -135,14 +136,14 @@ function resetButton()
 <script type='text/javascript'>
 var a = nvstat.free / nvstat.size * 100.0;
 createFieldTable('', [
-	{ title: 'Total / Free NVRAM:', text: scaleSize(nvstat.size) + ' / ' + scaleSize(nvstat.free) + ' <small>(' + (a).toFixed(2) + '%)</small>' }
+	{ title: 'Całkowita / Dostępna NVRAM:', text: scaleSize(nvstat.size) + ' / ' + scaleSize(nvstat.free) + ' <small>(' + (a).toFixed(2) + '%)</small>' }
 ]);
 
 if (a <= 5) {
 	document.write('<br><div id="notice1">' +
-		'The NVRAM free space is very low. It is strongly recommended to ' +
-		'erase all data in NVRAM memory, and reconfigure the router manually ' +
-		'in order to clean up all unused and obsolete entries.' +
+		'Wolny obszar NVRAM jest bardzo mały. Jest wysoce wskazane, żeby ' +
+		'usunąc wszystkie dane z pamięci NVRAM i skonfigurować router ręcznie ' +
+		'Pozwoli to usunąć niepotrzebne i przestarzałe dane.' +
 		'</div><br style="clear:both">');
 }
 </script>
