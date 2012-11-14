@@ -115,6 +115,26 @@ switch(nvram['boardtype']) {
     COL_P3N = '1';
     COL_P4N = '0';
     break;
+  case '0xf53a':  // E1000v2.1/E1200v1
+  case '0xf53b':   // E1000v2/E1500
+   if (((nvram['boot_hw_model'] == 'E1200') && (nvram['boot_hw_ver'] == '1.0')) || (nvram['boot_hw_model'] == 'E1500')) {
+     COL_P0N = '0';
+     COL_P1N = '1';
+     COL_P2N = '2';
+     COL_P3N = '3';
+     COL_P4N = '4';
+   break;
+   }
+   COL_P0N = '1';
+   COL_P1N = '2';
+   COL_P2N = '3';
+   COL_P3N = '4';
+   COL_P4N = '0';
+   break;
+  case '0xc550':  // E1550
+  case '0xf550':  // E2500
+  case '0x058e':  // E900
+  case '0xf52a':  // E3200
   case '0xf52c':  // E4200v1
     COL_P0N = '0';
     COL_P1N = '1';
@@ -122,6 +142,23 @@ switch(nvram['boardtype']) {
     COL_P3N = '3';
     COL_P4N = '4';
     break;
+  case '0x052b':
+   if (nvram['boardrev'] == '02') { //WNR3500Lv2
+    COL_P0N = '4';
+    COL_P1N = '3';
+    COL_P2N = '2';
+    COL_P3N = '1';
+    COL_P4N = '0';
+    break;
+   }
+   if (nvram['boardrev'] == '0x1204') { //rt-n15u
+    COL_P0N = '3';
+    COL_P1N = '2';
+    COL_P2N = '1';
+    COL_P3N = '0';
+    COL_P4N = '4';
+    break;
+   }
 // should work on WRT54G v2/v3, WRT54GS v1/v2 and others
   default:
     COL_P0N = '1';

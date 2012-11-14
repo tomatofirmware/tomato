@@ -1,15 +1,21 @@
 /*
  * BCM47XX Sonics SiliconBackplane SDRAM/MEMC core initialization
  *
- * Copyright (C) 2009, Broadcom Corporation
- * All Rights Reserved.
+ * Copyright (C) 2010, Broadcom Corporation. All Rights Reserved.
  * 
- * THIS SOFTWARE IS OFFERED "AS IS", AND BROADCOM GRANTS NO WARRANTIES OF ANY
- * KIND, EXPRESS OR IMPLIED, BY STATUTE, COMMUNICATION OR OTHERWISE. BROADCOM
- * SPECIFICALLY DISCLAIMS ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
- * FOR A SPECIFIC PURPOSE OR NONINFRINGEMENT CONCERNING THIS SOFTWARE.
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+ * SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+ * OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+ * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $Id: sbsdram.S,v 1.43.2.2 2008/11/14 18:18:20 Exp $
+ * $Id: sbsdram.S,v 1.45 2008-11-14 17:51:32 Exp $
  */
 
 #include <hndsoc.h>
@@ -45,9 +51,29 @@
 /* Debug macro - write a number to a chipc reg - use it with caution,
  *  it changes k0 and k1 registers.
  */
+#ifdef	BCMDBG
+
+#define	FLADDR_OFF	4
+#define	FLDATA_OFF	8
+
+#define TRACEINIT(x) \
+	li	k0,KSEG1ADDR(0x18000040); \
+	li	k1,x; \
+	sw	k1,FLADDR_OFF(k0)
+	
+#define TRACE(x) \
+	li	k1,x; \
+	sw	k1,FLADDR_OFF(k0)
+
+#define TRACE2(x) \
+	li	k1,x; \
+	sw	k1,FLDATA_OFF(k0)
+
+#else
 #define TRACEINIT(x)
 #define TRACE(x)
 #define TRACE2(x)
+#endif	/* BCMDBG */
 
 /*
  * Register usage within this file:

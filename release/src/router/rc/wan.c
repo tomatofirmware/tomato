@@ -202,7 +202,6 @@ static int config_pppd(int wan_proto, int num)
 		if (nvram_match("ppp_mlppp", "1")) {
 			fprintf(fp, "mp\n");
 		}
-
 		break;
 #ifdef LINUX26
 #ifdef TCONFIG_USB
@@ -540,11 +539,15 @@ void start_l2tp(void)
 		"redial = yes\n"
 		"max redials = 32767\n"
 		"redial timeout = %d\n"
-		"ppp debug = %s\n",
+		"tunnel rws = 8\n"
+		"ppp debug = %s\n"
+		"%s\n",
 		nvram_safe_get("l2tp_server_ip"),
 		ppp_optfile,
 		demand ? 30 : (nvram_get_int("ppp_redialperiod") ? : 30),
-		nvram_get_int("debug_ppp") ? "yes" : "no");
+		nvram_get_int("debug_ppp") ? "yes" : "no",
+		nvram_safe_get("xl2tpd_custom"));
+	fappend(fp, "/etc/xl2tpd.custom");
 	fclose(fp);
 
 	enable_ip_forward();

@@ -31,6 +31,12 @@ WRTSL54GS           BCM4704_BCM5325F      0x042f       42        0x10      0x001
 WTR54GS v1, v2      BCM5350               0x456        56        0x10      0xb18       (source: BaoWeiQuan)
 WRT160Nv1           BCM4704_BCM5325F_EWC  0x0472       42        0x11      0x0010      boot_hw_model=WRT160N boot_hw_ver=1.0
 WRT160Nv3, M10      BCM4716               0x04cd       42        0x1700                boot_hw_model=WRT160N boot_hw_ver=3.0 (M10: boot_hw_model=M10 boot_hw_ver=1.0)
+E900                BCM53572              0x058e       42        0x1155                (64k/8MB flash)
+E1000v2/E1500       BCM5357               0xf53b       42        0x1100    0x0710      E1500(64k/8MB flash)
+E1000v2.1/E1200v1   BCM5357               0xf53a       42        0x1100    0x0710      E1200v1(64k/4MB flash)
+E1550               BCM5358U              0xc550       42        0x1100    0x0710      (60k/16MB flash)
+E2500               BCM5358U              0xf550       42        0x1101    0x0710      (60k/16MB)
+E3200               BCM47186              0xf52a       42        0x1100                (60k/16MB)
 WRT320N/E2000       BCM4717               0x04ef       42/66     0x1304/0x1305/0x1307  boardflags: 0x0040F10 / 0x00000602 (??)
 WRT610Nv2/E3000     BCM4718               0x04cf       42/??     ??                    boot_hw_model=WRT610N/E300
 E4200               BCM4718               0xf52c       42        0x1101                boot_hw_model=E4200
@@ -65,10 +71,16 @@ ZTE H618B			HW_BCM5354G           0x048e     1105        0x35      0x0750
 Ovislink WL1600GL		HW_BCM5354G           0x048E        8        0x11
 
 RT-N16				BCM4718               0x04cf       45        0x1218    0x0310      hardware_version=RT-N16-00-07-01-00 regulation_domain=0X10US sdram_init=0x419
+RT-N15U				BCM5357               0x052b       45        0x1204    0x80001710|0x1000
 RT-N12				BCM4716               0x04cd       45        0x1201    0x????
+RT-N12B1			BCM5357               0x054d       45        0x1101    0x710
 RT-N10				BCM5356               0x04ec       45        0x1402    0x????
+RT-N10U				BCM5357               0x0550       45        0x1102    0x710
+RT-N53				BCM5357               0x0550       45        0x1442    0x710
+RT-N66U				BCM4706               0xf5b2       00        0x1100    0x0110
 
 WNR3500L			BCM4718               0x04cf       3500      0x1213|02 0x0710|0x1710
+WNR3500Lv2			BCM47186              0x052b       3500(L)   02        0x710|0x1000
 WNR2000v2			BCM4716B0             0xe4cd       1         0x1700
 
 F7D4301 v1			BCM4718               0xd4cf       12345     0x1204
@@ -152,6 +164,24 @@ int check_hw_type(void)
 	case 0xd4cf:
 	case 0xf52c:
 		return HW_BCM4718;
+	case 0xf5b2:
+		return HW_BCM4706;
+	case 0x052b:
+		if (nvram_match("boardrev", "0x1204")) return HW_BCM5357; //rt-n15u
+		if (nvram_match("boardrev", "02")) return HW_BCM47186; //WNR3500Lv2
+	case 0xf53a:
+	case 0xf53b:
+	case 0x0550: //RT-N10U and RT-N53
+	case 0x054d:
+		return HW_BCM5357;
+	case 0xf52a:
+		return HW_BCM47186;
+	case 0xf550:
+	case 0xc500:
+	case 0xc550:
+		return HW_BCM5358U;
+	case 0x058e:
+		return HW_BCM53572;
 #endif
 	}
 
@@ -290,6 +320,26 @@ int get_model(void)
 			return MODEL_WRT320N;
 		case HW_BCM4718:
 			return MODEL_WRT610Nv2;
+		case HW_BCM47186:
+			if (nvram_match("boot_hw_model", "E3200")) return MODEL_E3200;
+			break;
+		case HW_BCM5357:
+			if (nvram_match("boot_hw_model", "M10") && nvram_match("boot_hw_ver", "2.0"))
+				return MODEL_E1000v2;
+			if (nvram_match("boot_hw_model", "E1000")) return MODEL_E1000v2;
+			if (nvram_match("boot_hw_model", "E1200") && nvram_match("boot_hw_ver", "1.0"))
+				return MODEL_E1500;
+			if (nvram_match("boot_hw_model", "E1500")) return MODEL_E1500;
+			break;
+		case HW_BCM53572:
+			if (nvram_match("boot_hw_model", "E900")) return MODEL_E900;
+			if (nvram_match("boot_hw_model", "E1200") && nvram_match("boot_hw_ver", "2.0"))
+				return MODEL_E900;
+			break;
+		case HW_BCM5358U:
+			if (nvram_match("boot_hw_model", "E1550")) return MODEL_E1550;
+			if (nvram_match("boot_hw_model", "E2500")) return MODEL_E2500;
+			break;
 #endif
 		}
 		return MODEL_WRT54G;
@@ -310,6 +360,12 @@ int get_model(void)
 #ifdef CONFIG_BCMWL5
 		case HW_BCM5356:
 			if (nvram_match("boardrev", "0x1402")) return MODEL_RTN10;
+			break;
+		case HW_BCM5357:
+			if (nvram_match("boardrev", "0x1102")) return MODEL_RTN10U;
+			if (nvram_match("boardrev", "0x1101")) return MODEL_RTN12B1;
+			if (nvram_match("boardrev", "0x1204")) return MODEL_RTN15U;
+			if (nvram_match("boardrev", "0x1442")) return MODEL_RTN53;
 			break;
 		case HW_BCM4716:
 			if (nvram_match("boardrev", "0x1201")) return MODEL_RTN12;
@@ -339,6 +395,10 @@ int get_model(void)
 		case HW_BCM4718:
 			//if (nvram_match("boardrev", "0x1213") || nvram_match("boardrev", "02"))
 			return MODEL_WNR3500L;
+			break;
+		case HW_BCM47186:
+			return MODEL_WNR3500LV2;
+			break;
 		}
 		break;
 #endif
@@ -346,6 +406,9 @@ int get_model(void)
 		switch (hw) {
 		case HW_BCM5354G:
 			if (nvram_match("boardrev", "0x35")) return MODEL_DIR320;
+			break;
+		case HW_BCM4706:
+			if (nvram_match("boardrev", "0x1100")) return MODEL_RTN66U;
 			break;
 		}
 		break;

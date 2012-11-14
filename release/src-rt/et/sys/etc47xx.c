@@ -4,14 +4,14 @@
  * This file implements the chip-specific routines
  * for Broadcom HNBU Sonics SiliconBackplane enet cores.
  *
- * Copyright (C) 2009, Broadcom Corporation
+ * Copyright (C) 2010, Broadcom Corporation
  * All Rights Reserved.
  * 
  * This is UNPUBLISHED PROPRIETARY SOURCE CODE of Broadcom Corporation;
  * the contents of this file may not be disclosed to third parties, copied
  * or duplicated in any form, in whole or in part, without the prior
  * written permission of Broadcom Corporation.
- * $Id: etc47xx.c,v 1.164.2.5 2009/01/23 01:55:15 Exp $
+ * $Id: etc47xx.c,v 1.172.58.1 2010-07-01 23:25:46 Exp $
  */
 
 #include <typedefs.h>
@@ -81,7 +81,7 @@ static void chipintrsoff(ch_t *ch);
 static void chiptxreclaim(ch_t *ch, bool all);
 static void chiprxreclaim(ch_t *ch);
 static void chipstatsupd(ch_t *ch);
-static void chipdumpmib(ch_t *ch, struct bcmstrbuf *b);
+static void chipdumpmib(ch_t *ch, struct bcmstrbuf *b, bool clear);
 static void chipenablepme(ch_t *ch);
 static void chipdisablepme(ch_t *ch);
 static void chipphyreset(ch_t *ch, uint phyaddr);
@@ -96,9 +96,12 @@ static void chipphyor(struct bcm4xxx *ch, uint phyaddr, uint reg, uint16 v);
 static void chipphyand(struct bcm4xxx *ch, uint phyaddr, uint reg, uint16 v);
 static void chipphyforce(struct bcm4xxx *ch, uint phyaddr);
 static void chipphyadvertise(struct bcm4xxx *ch, uint phyaddr);
+#ifdef BCMDBG
+static void chipdumpregs(struct bcm4xxx *ch, bcmenetregs_t *regs, struct bcmstrbuf *b);
+#endif /* BCMDBG */
 
 /* chip interrupt bit error summary */
-#define	I_ERRORS	(I_PC | I_PD | I_DE | I_RU | I_RO | I_XU | I_TO)
+#define	I_ERRORS	(I_PC | I_PD | I_DE | I_RU | I_RO | I_XU)
 #define	DEF_INTMASK	(I_XI | I_RI | I_ERRORS)
 
 struct chops bcm47xx_et_chops = {
@@ -130,8 +133,6 @@ struct chops bcm47xx_et_chops = {
 
 static uint devices[] = {
 	BCM47XX_ENET_ID,
-	BCM4402_ENET_ID,
-	BCM4401_ENET_ID,
 	0x0000 };
 
 static bool
@@ -154,7 +155,6 @@ chipattach(etc_info_t *etc, void *osh, void *regsva)
 {
 	struct bcm4xxx *ch;
 	bcmenetregs_t *regs;
-	uint i;
 	char name[16];
 	char *var;
 	uint boardflags, boardtype;
@@ -205,29 +205,8 @@ chipattach(etc_info_t *etc, void *osh, void *regsva)
 	etc->coreunit = si_coreunit(ch->sih);
 	etc->boardflags = getintvar(ch->vars, "boardflags");
 
-	/* set boardflags for 5365 and 5350 */
-	if (etc->chip == BCM5365_CHIP_ID || etc->chip == BCM5350_CHIP_ID)
-		etc->boardflags |= BFL_ENETROBO | BFL_ENETVLAN;
-
 	boardflags = etc->boardflags;
 	boardtype = ch->sih->boardtype;
-
-	/* configure pci core */
-	si_pci_setup(ch->sih, (1 << si_coreidx(ch->sih)));
-
-	/* reset the enet core */
-	chipreset(ch);
-
-	/* dma attach */
-	sprintf(name, "et%d", etc->coreunit);
-	if ((ch->di = dma_attach(osh, name, ch->sih,
-	                         (void *)&regs->dmaregs.xmt, (void *)&regs->dmaregs.rcv,
-	                         NTXD, NRXD, RXBUFSZ, -1, NRXBUFPOST, HWRXOFF,
-	                         &et_msg_level)) == NULL) {
-		ET_ERROR(("et%d: chipattach: dma_attach failed\n", etc->unit));
-		goto fail;
-	}
-	etc->txavail[TX_Q0] = (uint *)&ch->di->txavail;
 
 	/* get our local ether addr */
 	sprintf(name, "et%dmacaddr", etc->coreunit);
@@ -273,27 +252,25 @@ chipattach(etc_info_t *etc, void *osh, void *regsva)
 	}
 	etc->mdcport = bcm_atoi(var);
 
+	/* configure pci core */
+	si_pci_setup(ch->sih, (1 << si_coreidx(ch->sih)));
+
+	/* reset the enet core */
+	chipreset(ch);
+
+	/* dma attach */
+	sprintf(name, "et%d", etc->coreunit);
+	if ((ch->di = dma_attach(osh, name, ch->sih,
+	                         (void *)&regs->dmaregs.xmt, (void *)&regs->dmaregs.rcv,
+	                         NTXD, NRXD, RXBUFSZ, -1, NRXBUFPOST, HWRXOFF,
+	                         &et_msg_level)) == NULL) {
+		ET_ERROR(("et%d: chipattach: dma_attach failed\n", etc->unit));
+		goto fail;
+	}
+	etc->txavail[TX_Q0] = (uint *)&ch->di->txavail;
+
 	/* set default sofware intmask */
 	ch->intmask = DEF_INTMASK;
-
-	/*
-	 * GPIO bits 2 and 6 on bcm94710r1 and bcm94710dev reset the
-	 * external phys to a known good state. bcm94710r4 uses only
-	 * GPIO 6 but GPIO 2 is not connected. Just reset both of them
-	 * whenever this function is called.
-	 */
-	if ((boardtype == BCM94710D_BOARD) ||
-	    (boardtype == BCM94710AP_BOARD) ||
-	    (boardtype == BCM94710R1_BOARD) ||
-	    (boardtype == BCM94710R4_BOARD)) {
-		si_gpioout(ch->sih, 0x44, 0, GPIO_DRV_PRIORITY);
-		si_gpioouten(ch->sih, 0x44, 0x44, GPIO_DRV_PRIORITY);
-		/* Hold phys in reset for a nice long 2 ms */
-		for (i = 0; i < 2; i++)
-			OSL_DELAY(1000);
-		si_gpioout(ch->sih, 0x44, 0x44, GPIO_DRV_PRIORITY);
-		si_gpioouten(ch->sih, 0x44, 0, GPIO_DRV_PRIORITY);
-	}
 
 	/*
 	 * For the 5222 dual phy shared mdio contortion, our phy is
@@ -308,9 +285,7 @@ chipattach(etc_info_t *etc, void *osh, void *regsva)
 	/*
 	 * Broadcom Robo ethernet switch.
 	 */
-	if (((boardflags & BFL_ENETROBO) ||
-	     (boardtype == BCM94710AP_BOARD) ||
-	     (boardtype == BCM94702MN_BOARD)) &&
+	if ((boardflags & BFL_ENETROBO) &&
 	    (etc->phyaddr == EPHY_NOREG)) {
 		/* Attach to the switch */
 		if (!(etc->robo = bcm_robo_attach(ch->sih, ch, ch->vars,
@@ -415,24 +390,117 @@ chiplongname(struct bcm4xxx *ch, char *buf, uint bufsize)
 	char *s;
 
 	switch (ch->etc->deviceid) {
-	case BCM4402_ENET_ID:
-		s = "BCM4402";
-		break;
 	case BCM47XX_ENET_ID:
 	default:
-		s = "BCM47xx";
+		s = "Broadcom BCM47xx 10/100 Mbps Ethernet Controller";
 		break;
 	}
 
-	snprintf(buf, bufsize, "Broadcom %s 10/100 Mbps Ethernet Controller", s);
+	strncpy(buf, s, bufsize);
 	buf[bufsize - 1] = '\0';
 }
 
 static void
 chipdump(struct bcm4xxx *ch, struct bcmstrbuf *b)
 {
+#ifdef BCMDBG
+	bcm_bprintf(b, "regs 0x%x etphy 0x%x ch->intstatus 0x%x intmask 0x%x\n",
+		(ulong)ch->regs, (ulong)ch->etphy, ch->intstatus, ch->intmask);
+	bcm_bprintf(b, "\n");
+
+	/* dma engine state */
+	dma_dump(ch->di, b, FALSE);
+	bcm_bprintf(b, "\n");
+
+	/* registers */
+	chipdumpregs(ch, ch->regs, b);
+	bcm_bprintf(b, "\n");
+
+	/* switch registers */
+#ifdef ETROBO
+	if (ch->etc->robo)
+		robo_dump_regs(ch->etc->robo, b);
+#endif /* ETROBO */
+#ifdef ETADM
+	if (ch->adm)
+		adm_dump_regs(ch->adm, b->buf);
+#endif /* ETADM */
+#endif	/* BCMDBG */
 }
 
+#ifdef BCMDBG
+
+#define	PRREG(name)	bcm_bprintf(b, #name " 0x%x ", R_REG(ch->osh, &regs->name))
+#define	PRMIBREG(name)	bcm_bprintf(b, #name " 0x%x ", R_REG(ch->osh, &regs->mib.name))
+
+static void
+chipdumpregs(struct bcm4xxx *ch, bcmenetregs_t *regs, struct bcmstrbuf *b)
+{
+	uint phyaddr;
+
+	phyaddr = ch->etc->phyaddr;
+
+	PRREG(devcontrol); PRREG(biststatus); PRREG(wakeuplength);
+	bcm_bprintf(b, "\n");
+	PRREG(intstatus); PRREG(intmask); PRREG(gptimer);
+	bcm_bprintf(b, "\n");
+	PRREG(emactxmaxburstlen); PRREG(emacrxmaxburstlen);
+	PRREG(emaccontrol); PRREG(emacflowcontrol);
+	bcm_bprintf(b, "\n");
+	PRREG(intrecvlazy);
+	bcm_bprintf(b, "\n");
+
+	/* emac registers */
+	PRREG(rxconfig); PRREG(rxmaxlength); PRREG(txmaxlength);
+	bcm_bprintf(b, "\n");
+	PRREG(mdiocontrol); PRREG(camcontrol); PRREG(enetcontrol);
+	bcm_bprintf(b, "\n");
+	PRREG(txcontrol); PRREG(txwatermark); PRREG(mibcontrol);
+	bcm_bprintf(b, "\n");
+
+	/* mib registers */
+	PRMIBREG(tx_good_octets); PRMIBREG(tx_good_pkts); PRMIBREG(tx_octets); PRMIBREG(tx_pkts);
+	bcm_bprintf(b, "\n");
+	PRMIBREG(tx_broadcast_pkts); PRMIBREG(tx_multicast_pkts);
+	bcm_bprintf(b, "\n");
+	PRMIBREG(tx_jabber_pkts); PRMIBREG(tx_oversize_pkts); PRMIBREG(tx_fragment_pkts);
+	bcm_bprintf(b, "\n");
+	PRMIBREG(tx_underruns); PRMIBREG(tx_total_cols); PRMIBREG(tx_single_cols);
+	bcm_bprintf(b, "\n");
+	PRMIBREG(tx_multiple_cols); PRMIBREG(tx_excessive_cols); PRMIBREG(tx_late_cols);
+	bcm_bprintf(b, "\n");
+	PRMIBREG(tx_defered); PRMIBREG(tx_carrier_lost); PRMIBREG(tx_pause_pkts);
+	bcm_bprintf(b, "\n");
+
+	PRMIBREG(rx_good_octets); PRMIBREG(rx_good_pkts); PRMIBREG(rx_octets); PRMIBREG(rx_pkts);
+	bcm_bprintf(b, "\n");
+	PRMIBREG(rx_broadcast_pkts); PRMIBREG(rx_multicast_pkts);
+	bcm_bprintf(b, "\n");
+	PRMIBREG(rx_jabber_pkts); PRMIBREG(rx_oversize_pkts); PRMIBREG(rx_fragment_pkts);
+	bcm_bprintf(b, "\n");
+	PRMIBREG(rx_missed_pkts); PRMIBREG(rx_crc_align_errs); PRMIBREG(rx_undersize);
+	bcm_bprintf(b, "\n");
+	PRMIBREG(rx_crc_errs); PRMIBREG(rx_align_errs); PRMIBREG(rx_symbol_errs);
+	bcm_bprintf(b, "\n");
+	PRMIBREG(rx_pause_pkts); PRMIBREG(rx_nonpause_pkts);
+	bcm_bprintf(b, "\n");
+
+	if (phyaddr != EPHY_NOREG) {
+		/* print a few interesting phy registers */
+		bcm_bprintf(b, "phy0 0x%x phy1 0x%x phy2 0x%x phy3 0x%x\n",
+		               chipphyrd(ch, phyaddr, 0),
+		               chipphyrd(ch, phyaddr, 1),
+		               chipphyrd(ch, phyaddr, 2),
+		               chipphyrd(ch, phyaddr, 3));
+		bcm_bprintf(b, "phy4 0x%x phy5 0x%x phy24 0x%x phy25 0x%x\n",
+		               chipphyrd(ch, phyaddr, 4),
+		               chipphyrd(ch, phyaddr, 5),
+		               chipphyrd(ch, phyaddr, 24),
+		               chipphyrd(ch, phyaddr, 25));
+	}
+
+}
+#endif	/* BCMDBG */
 
 #define	MDC_RATIO	5000000
 
@@ -535,9 +603,6 @@ chipinreset:
 			          "using 100Mhz\n",
 			          ch->etc->unit));
 		}
-	} else if (ch->etc->deviceid == BCM4402_ENET_ID) {
-		/* 4402 has 62.5Mhz SB clock and internal phy */
-		W_REG(ch->osh, &regs->mdiocontrol, 0x8d);
 	}
 
 	/* some chips have internal phy, some don't */
@@ -570,9 +635,6 @@ chipinit(struct bcm4xxx *ch, uint options)
 	idx = 0;
 
 	ET_TRACE(("et%d: chipinit\n", etc->unit));
-
-	/* Do timeout fixup */
-	si_core_tofixup(ch->sih);
 
 	/* enable crc32 generation */
 	OR_REG(ch->osh, &regs->emaccontrol, EMC_CG);
@@ -607,17 +669,11 @@ chipinit(struct bcm4xxx *ch, uint options)
 		OR_REG(ch->osh, &regs->rxconfig, ERC_LE);
 
 	/* set max frame lengths - account for possible vlan tag */
-//	W_REG(ch->osh, &regs->rxmaxlength, ETHER_MAX_LEN + 32);
-//	W_REG(ch->osh, &regs->txmaxlength, ETHER_MAX_LEN + 32);
-
-	W_REG(ch->osh, &regs->rxmaxlength, 4000 + 32);
-	W_REG(ch->osh, &regs->txmaxlength, 4000 + 32);
+	W_REG(ch->osh, &regs->rxmaxlength, ETHER_MAX_LEN + 32);
+	W_REG(ch->osh, &regs->txmaxlength, ETHER_MAX_LEN + 32);
 
 	/* set tx watermark */
 	W_REG(ch->osh, &regs->txwatermark, 56);
-
-	/* set tx duplex */
-	W_REG(ch->osh, &regs->txcontrol, etc->duplex ? EXC_FD : 0);
 
 	/*
 	 * Optionally, disable phy autonegotiation and force our speed/duplex
@@ -635,9 +691,6 @@ chipinit(struct bcm4xxx *ch, uint options)
 
 		/* post dma receive buffers */
 		dma_rxfill(ch->di);
-
-		/* setup timer interrupt */
-		W_REG(ch->osh, &regs->gptimer, 0);
 
 		/* lastly, enable interrupts */
 		if (options & ET_INIT_INTRON)
@@ -751,15 +804,6 @@ chipgetintrevents(struct bcm4xxx *ch, bool in_isr)
 	if (intstatus & I_TO)
 		events |= INTR_TO;
 
-	/* check for rx after tx for 3 seconds on the unit 1, */
-	/* schedule reset if it's missing - possible rx stuck */
-	if (ch->etc->chip == BCM4710_CHIP_ID && ch->etc->unit == 1) {
-		if (intstatus & I_RI)
-			W_REG(ch->osh, &regs->gptimer, 0);
-		else if (!R_REG(ch->osh, &regs->gptimer))
-			W_REG(ch->osh, &regs->gptimer, 3 * 125000000);
-	}
-
 	return (events);
 }
 
@@ -821,10 +865,6 @@ chiperrors(struct bcm4xxx *ch)
 		etc->rxoflo++;
 	}
 
-	if (intstatus & I_TO) {
-                ET_ERROR(("et%d: rx stuck suspected\n", etc->unit));
-	}
-
 	if (intstatus & I_XU) {
 		ET_ERROR(("et%d: transmit fifo underflow\n", etc->unit));
 		etc->txuflo++;
@@ -852,7 +892,7 @@ chipwrcam(struct bcm4xxx *ch, struct ether_addr *ea, uint camindex)
 	W_REG(ch->osh, &ch->regs->camcontrol, ((camindex << CC_INDEX_SHIFT) | CC_WR));
 
 	/* spin until done */
-	SPINWAIT((R_REG(ch->osh, &ch->regs->camcontrol) & CC_CB), 100);
+	SPINWAIT((R_REG(ch->osh, &ch->regs->camcontrol) & CC_CB), 1000);
 
 	/*
 	 * This assertion is usually caused by the phy not providing a clock
@@ -938,11 +978,16 @@ chipstatsupd(struct bcm4xxx *ch)
 }
 
 static void
-chipdumpmib(ch_t *ch, struct bcmstrbuf *b)
+chipdumpmib(ch_t *ch, struct bcmstrbuf *b, bool clear)
 {
 	bcmenetmib_t *m;
 
 	m = &ch->mib;
+
+	if (clear) {
+		bzero((char *)m, sizeof(bcmenetmib_t));
+		return;
+	}
 
 	bcm_bprintf(b, "tx_broadcast_pkts %d tx_multicast_pkts %d tx_jabber_pkts %d "
 	               "tx_oversize_pkts %d\n",
@@ -1145,17 +1190,9 @@ chipphyinit(struct bcm4xxx *ch, uint phyaddr)
 
 	phyid = chipphyrd(ch, phyaddr, 0x2);
 	phyid |=  chipphyrd(ch, phyaddr, 0x3) << 16;
-
 	if (phyid == 0x55210022) {
-		chipphywr(ch, phyaddr, 28, (uint16) (chipphyrd(ch, phyaddr, 28) & 0x0fff));
 		chipphywr(ch, phyaddr, 30, (uint16) (chipphyrd(ch, phyaddr, 30) | 0x3000));
 		chipphywr(ch, phyaddr, 22, (uint16) (chipphyrd(ch, phyaddr, 22) & 0xffdf));
-
-		chipphywr(ch, phyaddr, 28, (uint16) ((chipphyrd(ch, phyaddr, 28) & 0x0fff) | 0x1000));
-		chipphywr(ch, phyaddr, 29, 1);
-		chipphywr(ch, phyaddr, 30, 4);
-
-		chipphywr(ch, phyaddr, 28, (uint16) (chipphyrd( ch, phyaddr, 28) & 0x0fff));
 	}
 }
 
@@ -1196,13 +1233,6 @@ chipphyforce(struct bcm4xxx *ch, uint phyaddr)
 	}
 
 	chipphywr(ch, phyaddr, 0, ctl);
-
-	/* force Auto MDI-X for the AC101L phy */
-	if (chipphyrd(ch, phyaddr, 2) == 0x0022 && 
-		chipphyrd(ch, phyaddr, 3) == 0x5521)
-	{
-		chipphywr(ch, phyaddr, 23, 0x8000);
-	}
 }
 
 /* set selected capability bits in autonegotiation advertisement */

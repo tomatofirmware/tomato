@@ -404,18 +404,29 @@ static int init_vlan_ports(void)
 #ifdef CONFIG_BCMWL5
 	case MODEL_WNR3500L:
 	case MODEL_WRT320N:
+	case MODEL_WNR3500LV2:
 	case MODEL_RTN16:
+	case MODEL_RTN66U:
 		dirty |= check_nv("vlan1ports", "4 3 2 1 8*");
 		dirty |= check_nv("vlan2ports", "0 8");
 		break;
+	case MODEL_RTN53:
+		dirty |= check_nv("vlan2ports", "0 1 2 3 5*");
+		dirty |= check_nv("vlan1ports", "4 5");
+		break;
 	case MODEL_WNR2000v2:
-		dirty |= check_nv("vlan0ports", "4 3 2 1 5*");
-		dirty |= check_nv("vlan1ports", "0 5");
+		dirty |= check_nv("vlan1ports", "4 3 2 1 5*");
+		dirty |= check_nv("vlan2ports", "0 5");
 		break;
 	case MODEL_RTN10:
 		dirty |= check_nv("vlan1ports", "4 5");
 		break;
+	case MODEL_RTN10U:
+		dirty |= check_nv("vlan0ports", "1 2 3 4 5*");
+		dirty |= check_nv("vlan1ports", "0 5");
+		break;
 	case MODEL_RTN12:
+	case MODEL_RTN12B1:
 		dirty |= check_nv("vlan0ports", "3 2 1 0 5*");
 		dirty |= check_nv("vlan1ports", "4 5");
 		break;
@@ -429,11 +440,21 @@ static int init_vlan_ports(void)
 		dirty |= check_nv("vlan1ports", "3 2 1 0 8*");
 		dirty |= check_nv("vlan2ports", "4 8");
 		break;
+	case MODEL_E900:
+	case MODEL_E1500:
+	case MODEL_E1550:
+	case MODEL_E2500:
 	case MODEL_F7D3302:
 	case MODEL_F7D4302:
 		dirty |= check_nv("vlan1ports", "0 1 2 3 5*");
 		dirty |= check_nv("vlan2ports", "4 5");
 		break;
+	case MODEL_E1000v2:
+		dirty |= check_nv("vlan1ports", "1 2 3 4 5*");
+		dirty |= check_nv("vlan2ports", "0 5");
+		break;
+	case MODEL_RTN15U:
+	case MODEL_E3200:
 	case MODEL_E4200:
 		dirty |= check_nv("vlan1ports", "0 1 2 3 8*");
 		dirty |= check_nv("vlan2ports", "4 8");
@@ -537,6 +558,9 @@ static void check_bootnv(void)
 		dirty |= check_nv("vlan2hwname", "et0");
 		dirty |= check_nv("ledbh0", "7");
 		break;
+	case MODEL_WNR3500LV2:
+		dirty |= check_nv("vlan2hwname", "et0");
+		break;
 	case MODEL_WNR2000v2:
 		dirty |= check_nv("ledbh5", "8");
 		break;
@@ -581,6 +605,12 @@ static void check_bootnv(void)
 			dirty |= check_nv("pci/1/1/macaddr", mac);
 		}
 		break;
+	case MODEL_E900:
+	case MODEL_E1000v2:
+	case MODEL_E1500:
+	case MODEL_E1550:
+	case MODEL_E2500:
+	case MODEL_E3200:
 	case MODEL_WRT160Nv3:
 		dirty |= check_nv("vlan2hwname", "et0");
 		break;
@@ -681,6 +711,7 @@ static int init_nvram(void)
 	int model;
 	const char *mfr;
 	const char *name;
+	const char *ver;
 	char s[256];
 	unsigned long bf;
 	unsigned long n;
@@ -691,6 +722,7 @@ static int init_nvram(void)
 
 	mfr = "Broadcom";
 	name = NULL;
+	ver = NULL;
 	features = 0;
 	switch (model) {
 	case MODEL_WRT54G:
@@ -945,6 +977,19 @@ static int init_nvram(void)
 			nvram_set("wl_ifname", "eth1");
 		}
 		break;
+	case MODEL_RTN10U:
+		mfr = "Asus";
+		name = "RT-N10U";
+		features = SUP_SES | SUP_80211N;
+#ifdef TCONFIG_USB
+		nvram_set("usb_uhci", "-1");
+#endif
+		if (!nvram_match("t_fix1", (char *)name)) {
+			nvram_set("lan_ifnames", "vlan0 eth1");
+			nvram_set("wan_ifnameX", "vlan1");
+			nvram_set("wl_ifname", "eth1");
+		}
+		break;
 	case MODEL_RTN12:
 		mfr = "Asus";
 		name = "RT-N12";
@@ -952,6 +997,32 @@ static int init_nvram(void)
 		if (!nvram_match("t_fix1", (char *)name)) {
 			nvram_set("lan_ifnames", "vlan0 eth1");
 			nvram_set("wan_ifnameX", "vlan1");
+			nvram_set("wl_ifname", "eth1");
+		}
+		break;
+	case MODEL_RTN12B1:
+		mfr = "Asus";
+		name = "RT-N12 B1";
+		features = SUP_80211N;
+		if (!nvram_match("t_fix1", (char *)name)) {
+			nvram_set("lan_ifnames", "vlan0 eth1");
+			nvram_set("wan_ifnameX", "vlan1");
+			nvram_set("wl_ifname", "eth1");
+		}
+		break;
+	case MODEL_RTN15U:
+		mfr = "Asus";
+		name = "RT-N15U";
+		features = SUP_SES | SUP_80211N | SUP_1000ET;
+#ifdef TCONFIG_USB
+		nvram_set("usb_uhci", "-1");
+#endif
+		if (!nvram_match("t_fix1", (char *)name)) {
+			nvram_set("lan_ifnames", "vlan1 eth1");
+			nvram_set("wan_iface", "vlan2");
+			nvram_set("wan_ifname", "vlan2");
+			nvram_set("wan_ifnameX", "vlan2");
+			nvram_set("wan_ifnames", "vlan2");
 			nvram_set("wl_ifname", "eth1");
 		}
 		break;
@@ -969,12 +1040,55 @@ static int init_nvram(void)
 			nvram_set("vlan_enable", "1");
 		}
 		break;
+	case MODEL_RTN53:
+		mfr = "Asus";
+		name = "RT-N53";
+		features = SUP_SES | SUP_80211N;
+		if (!nvram_match("t_fix1", (char *)name)) {
+			nvram_set("lan_ifnames", "vlan2 eth1");
+			nvram_set("wan_ifnameX", "vlan1");
+			nvram_set("landevs", "vlan2 wl0");
+			nvram_set("wandevs", "vlan1");
+			nvram_unset("vlan0ports");
+		}
+		break;
+	case MODEL_RTN66U:
+		mfr = "Asus";
+		name = "RT-N66U";
+		features = SUP_SES | SUP_80211N | SUP_1000ET;
+#ifdef TCONFIG_USB
+		nvram_set("usb_uhci", "-1");
+#if defined(LINUX26) && defined(TCONFIG_MICROSD)
+		if (nvram_get_int("usb_mmc") == -1) nvram_set("usb_mmc", "1");
+#endif
+#endif
+		if (!nvram_match("t_fix1", (char *)name)) {
+			nvram_set("lan_ifnames", "vlan1 eth1 eth2");
+			nvram_set("wan_ifnameX", "vlan2");
+			nvram_set("wl_ifnames", "eth1 eth2");
+			nvram_set("landevs", "vlan1 wl0 wl1");
+			nvram_set("wandevs", "vlan2");
+#if defined(LINUX26) && defined(TCONFIG_USB)
+			nvram_set("usb_noled", "1-1.4"); /* SD/MMC Card */
+#endif
+		}
+		break;
 	case MODEL_WNR3500L:
 		mfr = "Netgear";
 		name = "WNR3500L/U/v2";
 		features = SUP_SES | SUP_AOSS_LED | SUP_80211N | SUP_1000ET;
 		if (!nvram_match("t_fix1", (char *)name)) {
 			nvram_set("sromrev", "3");
+			nvram_set("lan_ifnames", "vlan1 eth1");
+			nvram_set("wan_ifnameX", "vlan2");
+			nvram_set("wl_ifname", "eth1");
+		}
+		break;
+	case MODEL_WNR3500LV2:
+		mfr = "Netgear";
+		name = "WNR3500L v2";
+		features = SUP_SES | SUP_AOSS_LED | SUP_80211N | SUP_1000ET;
+		if (!nvram_match("t_fix1", (char *)name)) {
 			nvram_set("lan_ifnames", "vlan1 eth1");
 			nvram_set("wan_ifnameX", "vlan2");
 			nvram_set("wl_ifname", "eth1");
@@ -1024,12 +1138,69 @@ static int init_nvram(void)
 			nvram_set("wandevs", "vlan2");
 		}
 		break;
+	case MODEL_E900:
+	case MODEL_E1500:
+		mfr = "Linksys";
+		name = nvram_safe_get("boot_hw_model");
+		ver = nvram_safe_get("boot_hw_ver");
+		features = SUP_SES | SUP_80211N;
+		if (!nvram_match("t_fix1", (char *)name)) {
+			nvram_set("lan_ifnames", "vlan1 eth1");
+			nvram_set("wan_ifnameX", "vlan2");
+			nvram_set("wl_ifname", "eth1");
+		}
+		break;
+	case MODEL_E1550:
+		mfr = "Linksys";
+		name = nvram_safe_get("boot_hw_model");
+		ver = nvram_safe_get("boot_hw_ver");
+		features = SUP_SES | SUP_80211N;
+#ifdef TCONFIG_USB
+		nvram_set("usb_uhci", "-1");
+#endif
+		if (!nvram_match("t_fix1", (char *)name)) {
+			nvram_set("lan_ifnames", "vlan1 eth1");
+			nvram_set("wan_ifnameX", "vlan2");
+			nvram_set("wl_ifname", "eth1");
+		}
+		break;
+	case MODEL_E2500:
+		mfr = "Linksys";
+		name = nvram_safe_get("boot_hw_model");
+		ver = nvram_safe_get("boot_hw_ver");
+		features = SUP_SES | SUP_80211N;
+		if (!nvram_match("t_fix1", (char *)name)) {
+			nvram_set("lan_ifnames", "vlan1 eth1 eth2");
+			nvram_set("wan_ifnameX", "vlan2");
+			nvram_set("wl_ifname", "eth1");
+		}
+		break;
+	case MODEL_E3200:
+		mfr = "Linksys";
+		name = nvram_safe_get("boot_hw_model");
+		ver = nvram_safe_get("boot_hw_ver");
+		features = SUP_SES | SUP_80211N | SUP_1000ET;
+#ifdef TCONFIG_USB
+		nvram_set("usb_uhci", "-1");
+#endif
+		if (!nvram_match("t_fix1", (char *)name)) {
+			nvram_set("lan_ifnames", "vlan1 eth1 eth2");
+			nvram_set("wan_ifnameX", "vlan2");
+			nvram_set("wl_ifname", "eth1");
+		}
+		break;
+	case MODEL_E1000v2:
 	case MODEL_WRT160Nv3:
 		// same as M10, M20, WRT310Nv2, E1000v1
 		mfr = "Linksys";
 		name = nvram_safe_get("boot_hw_model");
-		if (strcmp(name, "E100") == 0)
-			name = "E1000 v1";
+		ver = nvram_safe_get("boot_hw_ver");
+		if (nvram_match("boot_hw_model", "E100")){
+			name = "E1000";
+		}
+		if (nvram_match("boot_hw_model", "M10") || nvram_match("boot_hw_model", "M20")){
+			mfr = "Cisco";
+		}
 		features = SUP_SES | SUP_80211N | SUP_WHAM_LED;
 		if (!nvram_match("t_fix1", (char *)name)) {
 			nvram_set("lan_ifnames", "vlan1 eth1");
@@ -1168,7 +1339,12 @@ static int init_nvram(void)
 
 	if (name) {
 		nvram_set("t_fix1", name);
-		sprintf(s, "%s %s", mfr, name);
+		/* Don't show the version information if it's empty (null or empty string) */
+		if (ver == NULL || strcmp(ver, "") == 0) {
+			sprintf(s, "%s %s", mfr, name);
+		} else {
+			sprintf(s, "%s %s v%s", mfr, name, ver);
+		}
 	}
 	else {
 		snprintf(s, sizeof(s), "%s %d/%s/%s/%s/%s", mfr, check_hw_type(),

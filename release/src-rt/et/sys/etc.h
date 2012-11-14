@@ -2,7 +2,7 @@
  * Common [OS-independent] header file for
  * Broadcom BCM47XX 10/100Mbps Ethernet Device Driver
  *
- * Copyright (C) 2009, Broadcom Corporation
+ * Copyright (C) 2010, Broadcom Corporation
  * All Rights Reserved.
  * 
  * This is UNPUBLISHED PROPRIETARY SOURCE CODE of Broadcom Corporation;
@@ -10,14 +10,13 @@
  * or duplicated in any form, in whole or in part, without the prior
  * written permission of Broadcom Corporation.
  *
- * $Id: etc.h,v 1.66.96.4 2009/07/07 19:25:16 Exp $
+ * $Id: etc.h,v 1.72.18.1 2010-07-01 23:24:44 Exp $
  */
 
 #ifndef _etc_h_
 #define _etc_h_
 
 #include <etioctl.h>
-#include <proto/802.1d.h>
 
 #define	MAXMULTILIST	32
 
@@ -27,7 +26,7 @@
 
 #define NUMTXQ		4
 
-#define TXREC_THR	8
+#define TXREC_THR       8
 
 struct etc_info;	/* forward declaration */
 struct bcmstrbuf;	/* forward declaration */
@@ -49,7 +48,7 @@ struct chops {
 	void (*txreclaim)(ch_t *ch, bool all);		/* reclaim transmit resources */
 	void (*rxreclaim)(ch_t *ch);			/* reclaim receive resources */
 	void (*statsupd)(ch_t *ch);			/* update sw stat counters */
-	void (*dumpmib)(ch_t *ch, struct bcmstrbuf *);	/* get sw mib counters */
+	void (*dumpmib)(ch_t *ch, struct bcmstrbuf *, bool clear);	/* get sw mib counters */
 	void (*enablepme)(ch_t *ch);			/* enable PME */
 	void (*disablepme)(ch_t *ch);			/* disable PME */
 	void (*phyreset)(ch_t *ch, uint phyaddr);	/* reset phy */
@@ -194,7 +193,7 @@ etc_up2tc(uint32 up)
 {
 	extern uint32 up2tc[];
 
-	return (up2tc[(up) & MAXPRIO]);
+	return (up2tc[up]);
 }
 
 static inline uint32
@@ -248,5 +247,8 @@ extern void etc_qos(etc_info_t *etc, uint on);
 extern void etc_dump(etc_info_t *etc, struct bcmstrbuf *b);
 extern void etc_watchdog(etc_info_t *etc);
 extern uint etc_totlen(etc_info_t *etc, void *p);
+#ifdef ETROBO
+extern void *etc_bcm53115_war(etc_info_t *etc, void *p);
+#endif /* ETROBO */
 
 #endif	/* _etc_h_ */

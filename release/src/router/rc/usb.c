@@ -84,6 +84,10 @@ void start_usb(void)
 	char param[32];
 	int i;
 
+	if (nvram_match("boardtype", "0x052b")) { // Netgear WNR3500L v2 - initialize USB port
+		xstart("gpio", "enable", "20");
+	}
+
 	_dprintf("%s\n", __FUNCTION__);
 	tune_bdflush();
 
@@ -129,6 +133,15 @@ void start_usb(void)
 			if (nvram_get_int("usb_fs_hfs")) {
 				modprobe("hfs");
 				modprobe("hfsplus");
+			}
+#endif
+
+#if defined(LINUX26) && defined(TCONFIG_MICROSD)
+			if (nvram_get_int("usb_mmc") == 1) {
+				/* insert SD/MMC modules if present */
+				modprobe("mmc_core");
+				modprobe("mmc_block");
+				modprobe("sdhci");
 			}
 #endif
 		}
@@ -204,6 +217,7 @@ void stop_usb(void)
 		modprobe_r("hfsplus");
 #endif
 		sleep(1);
+
 #ifdef TCONFIG_SAMBASRV
 		modprobe_r("nls_cp437");
 		modprobe_r("nls_cp850");
@@ -223,6 +237,14 @@ void stop_usb(void)
 #endif
 		modprobe_r(SCSI_MOD);
 	}
+
+#if defined(LINUX26) && defined(TCONFIG_MICROSD)
+	if (disabled || !nvram_get_int("usb_storage") || nvram_get_int("usb_mmc") != 1) {
+		modprobe_r("sdhci");
+		modprobe_r("mmc_block");
+		modprobe_r("mmc_core");
+	}
+#endif
 
 	if (disabled || nvram_get_int("usb_ohci") != 1) modprobe_r(USBOHCI_MOD);
 	if (disabled || nvram_get_int("usb_uhci") != 1) modprobe_r(USBUHCI_MOD);
@@ -271,6 +293,11 @@ void stop_usb(void)
 			modprobe_r("usbserial");
 		}
 */
+
+	if (nvram_match("boardtype", "0x052b")) { // Netgear WNR3500L v2 - disable USB port
+		xstart("gpio", "disable", "20");
+	}
+
 	}
 #endif
 

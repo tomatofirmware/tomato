@@ -35,7 +35,6 @@
 
 #ifdef HNDCTF
 #include <ctf/hndctf.h>
-extern ctf_t *kcih;
 extern int ip_conntrack_ipct_delete(struct nf_conn *ct, int ct_timeout);
 #endif /* HNDCTF */
 
@@ -769,11 +768,6 @@ static int tcp_error(struct sk_buff *skb,
 	unsigned int tcplen = skb->len - dataoff;
 	u_int8_t tcpflags;
 
-#if defined(CONFIG_BCM_NAT) || defined(CONFIG_BCM_NAT_MODULE)
-	if (ipv4_conntrack_fastnat)
-		return NF_ACCEPT;
-#endif
-
 	/* Smaller that minimal TCP header? */
 	th = skb_header_pointer(skb, dataoff, sizeof(_tcph), &_tcph);
 	if (th == NULL) {
@@ -790,6 +784,11 @@ static int tcp_error(struct sk_buff *skb,
 				"nf_ct_tcp: truncated/malformed packet ");
 		return -NF_ACCEPT;
 	}
+
+#if defined(CONFIG_BCM_NAT) || defined(CONFIG_BCM_NAT_MODULE)
+	if (ipv4_conntrack_fastnat)
+		return NF_ACCEPT;
+#endif
 
 	/* Checksum invalid? Ignore.
 	 * We skip checking packets on the outgoing path
@@ -959,9 +958,11 @@ static int tcp_packet(struct nf_conn *conntrack,
 
 #ifdef HNDCTF
 	/* Remove the ipc entries on receipt of FIN or RST */
-	if (CTF_ENAB(kcih) && (th->fin || th->rst)) {
+	if (CTF_ENAB(kcih)) {
 		if (conntrack->ctf_flags & CTF_FLAGS_CACHED) {
-			ip_conntrack_ipct_delete(conntrack, 0);
+			if (th->fin || th->rst) {
+				ip_conntrack_ipct_delete(conntrack, 0);
+			}
 			goto in_window;
 		}
 	}

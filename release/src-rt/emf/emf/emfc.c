@@ -6,7 +6,7 @@
  * updated by IGMP Snooping layer to do the optimal forwarding. This file
  * contains the common code routines of EMFL.
  *
- * Copyright (C) 2009, Broadcom Corporation
+ * Copyright (C) 2010, Broadcom Corporation
  * All Rights Reserved.
  * 
  * This is UNPUBLISHED PROPRIETARY SOURCE CODE of Broadcom Corporation;
@@ -14,7 +14,7 @@
  * or duplicated in any form, in whole or in part, without the prior
  * written permission of Broadcom Corporation.
  *
- * $Id: emfc.c,v 1.4 2010/02/17 23:36:15 Exp $
+ * $Id: emfc.c 241182 2011-02-17 21:50:03Z gmo $
  */
 #include <typedefs.h>
 #include <bcmdefs.h>
@@ -33,6 +33,16 @@
 #include "emfc_export.h"
 #include "emfc.h"
 #include "emf_export.h"
+
+/* BH-enabled helpers */
+#define EMF_RELOCK(lock) do {		\
+	OSL_UNLOCK(lock);		\
+	spin_lock(&((lock)->slock));	\
+} while (0)
+#define OSL_RELOCK(lock) do {		\
+	spin_unlock(&((lock)->slock));	\
+	OSL_LOCK(lock);			\
+} while (0)
 
 static CLIST_DECL_INIT(emfc_list_head);
 static osl_lock_t emfc_list_lock;
@@ -187,6 +197,8 @@ emfc_unreg_frame_handle(emfc_info_t *emfc, void *sdu, void *ifp, uint8 proto,
 	/* Flood the frame on to user specified ports */
 	for (ptr = emfc->iflist_head; ptr != NULL; ptr = ptr->next)
 	{
+		int32 res;
+
 		/* Dont forward the frame on to the port on which it
 		 * was received.
 		 */
@@ -216,8 +228,11 @@ emfc_unreg_frame_handle(emfc_info_t *emfc, void *sdu, void *ifp, uint8 proto,
 			return (EMF_DROP);
 		}
 
-		if (emfc->wrapper.forward_fn(emfc->emfi, sdu_clone, dest_ip,
-		                ptr->ifp, rt_port) != SUCCESS)
+		EMF_RELOCK(emfc->iflist_lock);
+		res = emfc->wrapper.forward_fn(emfc->emfi, sdu_clone, dest_ip,
+		                ptr->ifp, rt_port);
+		OSL_RELOCK(emfc->iflist_lock);
+		if (res != SUCCESS)
 		{
 			EMF_INFO("Unable to flood the unreg frame on to %s\n",
 			         DEV_IFNAME(ptr->ifp));
@@ -346,6 +361,7 @@ emfc_input(emfc_info_t *emfc, void *sdu, void *ifp, uint8 *iph, bool rt_port)
 		emfc_mgrp_t *mgrp;
 		emfc_mi_t *mi;
 		void *sdu_clone;
+		int32 res;
 
 		EMF_DEBUG("Received frame with proto %d\n", IPV4_PROT(iph));
 
@@ -397,7 +413,9 @@ emfc_input(emfc_info_t *emfc, void *sdu, void *ifp, uint8 *iph, bool rt_port)
 				return (EMF_DROP);
 			}
 
+			EMF_RELOCK(emfc->fdb_lock);
 			emfc->wrapper.sendup_fn(emfc->emfi, sdu_clone);
+			OSL_RELOCK(emfc->fdb_lock);
 			EMFC_STATS_INCR(emfc, mcast_data_sentup);
 		}
 
@@ -424,9 +442,11 @@ emfc_input(emfc_info_t *emfc, void *sdu, void *ifp, uint8 *iph, bool rt_port)
 				return (EMF_DROP);
 			}
 
-			emfc->wrapper.forward_fn(emfc->emfi, sdu_clone,
-			            dest_ip, mi->mi_mhif->mhif_ifp, rt_port) ?
-			            EMFC_STATS_INCR(emfc, mcast_data_dropped) :
+			EMF_RELOCK(emfc->fdb_lock);
+			res = emfc->wrapper.forward_fn(emfc->emfi, sdu_clone,
+			            dest_ip, mi->mi_mhif->mhif_ifp, rt_port);
+			OSL_RELOCK(emfc->fdb_lock);
+			res ? EMFC_STATS_INCR(emfc, mcast_data_dropped) :
 			            mi->mi_mhif->mhif_data_fwd++,
 			            mi->mi_data_fwd++;
 		}
@@ -439,9 +459,11 @@ emfc_input(emfc_info_t *emfc, void *sdu, void *ifp, uint8 *iph, bool rt_port)
 		{
 			EMF_DEBUG("Sending the original packet buffer\n");
 
-			emfc->wrapper.forward_fn(emfc->emfi, sdu, dest_ip,
-			            mi->mi_mhif->mhif_ifp, rt_port) ?
-			            EMFC_STATS_INCR(emfc, mcast_data_dropped) :
+			EMF_RELOCK(emfc->fdb_lock);
+			res = emfc->wrapper.forward_fn(emfc->emfi, sdu, dest_ip,
+			            mi->mi_mhif->mhif_ifp, rt_port);
+			OSL_RELOCK(emfc->fdb_lock);
+			res ? EMFC_STATS_INCR(emfc, mcast_data_dropped) :
 			            mi->mi_mhif->mhif_data_fwd++,
 			            mi->mi_data_fwd++;
 		}
@@ -586,22 +608,18 @@ emfc_mfdb_mhif_add(emfc_info_t *emfc, void *ifp)
 {
 	emfc_mhif_t *ptr, *mhif;
 
-	OSL_LOCK(emfc->fdb_lock);
-
 	for (ptr = emfc->mhif_head; ptr != NULL; ptr = ptr->next)
 	{
 		if (ptr->mhif_ifp == ifp)
 		{
-			OSL_UNLOCK(emfc->fdb_lock);
 			return (ptr);
 		}
 	}
 
 	/* Add new entry */
-	mhif = MALLOC(emfc->osh, sizeof(emfc_mgrp_t));
+	mhif = MALLOC(emfc->osh, sizeof(emfc_mhif_t));
 	if (mhif == NULL)
 	{
-		OSL_UNLOCK(emfc->fdb_lock);
 		EMF_ERROR("Failed to alloc mem size %d for mhif entry\n",
 		          sizeof(emfc_mhif_t));
 		return (NULL);
@@ -611,8 +629,6 @@ emfc_mfdb_mhif_add(emfc_info_t *emfc, void *ifp)
 	mhif->mhif_data_fwd = 0;
 	mhif->next = emfc->mhif_head;
 	emfc->mhif_head = mhif;
-
-	OSL_UNLOCK(emfc->fdb_lock);
 
 	return (mhif);
 }

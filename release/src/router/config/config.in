@@ -159,6 +159,10 @@ config TCONFIG_DNSCRYPT
 	bool "  DNScrypt-proxy"
 	default n
 
+config TCONFIG_NVRAM_64K
+	bool "NVRAM_64K"
+	default n
+
 config TCONFIG_TOR
 	bool "  TOR Project"
 	default n
@@ -174,3 +178,8 @@ config TCONFIG_RAID
 config TCONFIG_THEMES
 	bool "Extra themes"
 	default y
+
+config TCONFIG_MICROSD
+	bool "Support SD card (RT-N66u only)"
+	depends on TCONFIG_USB
+	default n
