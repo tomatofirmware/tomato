@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
 	Copyright (C) 2006-2010 Jonathan Zarate
@@ -11,9 +11,9 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Tools: Ping</title>
+<title>[<% ident(); %>] Narzędzia: Ping</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
-<link rel='stylesheet' type='text/css' href='color.css'>
+<% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
 
 <!-- / / / -->
@@ -46,7 +46,7 @@ var pingdata = '';
 var pg = new TomatoGrid();
 pg.setup = function() {
 	this.init('tp-grid');
-	this.headerSet(['Seq', 'Address', 'RX Bytes', 'TTL', 'RTT (ms)', '+/- (ms)']);
+	this.headerSet(['Lp.', 'Adres', 'Bajtów odebranych', 'TTL', 'RTT (ms)', '+/- (ms)']);
 }
 pg.populate = function()
 {
@@ -102,10 +102,10 @@ REMOVE-END */
 			resolv[RegExp.$2] = RegExp.$1;
 		}
 		else if (buf[i].match(/^(\d+) packets.+, (\d+) packets.+, (\d+%)/)) {
-			stats = '   Packets: ' + RegExp.$1 + ' transmitted, ' + RegExp.$2 + ' received, ' + RegExp.$3 + ' lost<br>';
+			stats = '   Pakiety: ' + RegExp.$1 + ' wysłanych, ' + RegExp.$2 + ' odebranych, ' + RegExp.$3 + ' utraconych<br>';
 		}
 		else if (buf[i].match(/^round.+ (\d+\.\d+)\/(\d+\.\d+)\/(\d+\.\d+)/)) {
-			stats = 'Round-Trip: ' + RegExp.$1 + ' min, ' + RegExp.$2 + ' avg, ' + RegExp.$3 + ' max (ms)<br>' + stats;
+			stats = 'Statystyka czasów: ' + RegExp.$1 + ' min, ' + RegExp.$2 + ' Śred., ' + RegExp.$3 + ' maks. (ms)<br>' + stats;
 		}
 	}
 
@@ -123,7 +123,7 @@ function verifyFields(focused, quiet)
 	e = E('_f_addr');
 	s = e.value.trim();
 	if (!s.match(/^[\w\.-]+$/)) {
-		ferror.set(e, 'Invalid address', quiet);
+		ferror.set(e, 'Błędny adres IP', quiet);
 		return 0;
 	}
 	ferror.clear(e);
@@ -191,7 +191,7 @@ function init()
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -203,15 +203,15 @@ function init()
 <div class='section'>
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: 'Address', name: 'f_addr', type: 'text', maxlen: 64, size: 32, value: '',
+	{ title: 'Adres', name: 'f_addr', type: 'text', maxlen: 64, size: 32, value: '',
 		suffix: ' <input type="button" value="Ping" onclick="ping()" id="pingb">' },
-	{ title: 'Ping Count', name: 'f_count', type: 'text', maxlen: 2, size: 7, value: '5' },
-	{ title: 'Packet Size', name: 'f_size', type: 'text', maxlen: 5, size: 7, value: '56', suffix: ' <small>(bytes)</small>' }
+	{ title: 'Ilość pingów', name: 'f_count', type: 'text', maxlen: 2, size: 7, value: '5' },
+	{ title: 'Wielkość pakietu', name: 'f_size', type: 'text', maxlen: 5, size: 7, value: '56', suffix: ' <small>(bajtów)</small>' }
 ]);
 </script>
 </div>
 
-<div style="visibility:hidden;text-align:right" id="wait">Please wait... <img src='spin.gif' style="vertical-align:top"></div>
+<div style="visibility:hidden;text-align:right" id="wait">Proszę czekać... <img src='spin.gif' style="vertical-align:top"></div>
 
 <table id='tp-grid' class='tomato-grid' cellspacing=1></table>
 <pre id='stats'></pre>

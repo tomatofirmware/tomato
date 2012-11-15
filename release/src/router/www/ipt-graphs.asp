@@ -11,7 +11,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] IP Traffic: View Graphs</title>
+<title>[<% ident(); %>] IP Traffic: Wykresy</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
@@ -297,7 +297,7 @@ function init() {
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -305,7 +305,7 @@ function init() {
 
 <!-- / / / -->
 
-<div class="section-title">Connections Distribution (TCP/UDP)</div>
+<div class="section-title">Rozkład połączeń (TCP/UDP)</div>
 <div class="section">
 <table border=0 width="100%"><tr><td>
 	<table style="width:250px">
@@ -318,7 +318,7 @@ for (i = 0; i < 11; ++i) {
 		'<td id="cpct' + i + '" class="pct"></td></tr>');
 }
 </script>
-	<tr><td>&nbsp;</td><td class="total">Total</a></td><td id="ccnt-total" class="total count"></td><td class="total pct">100%</td></tr>
+	<tr><td>&nbsp;</td><td class="total">Łącznie</a></td><td id="ccnt-total" class="total count"></td><td class="total pct">100%</td></tr>
 	</table>
 </td><td style="margin-right:150px">
 <script type='text/javascript'>
@@ -332,7 +332,7 @@ if (nvram.web_svg != '0') {
 
 <!-- / / / -->
 
-<div class="section-title">Bandwidth Distribution (Inbound)</div>
+<div class="section-title">Rozkład pasma przychodzącego</div>
 <div class="section">
 <table border=0 width="100%"><tr><td>
 	<table style="width:250px">
@@ -347,7 +347,7 @@ for (i = 0; i < 11; ++i) {
 		'<td id="bpct' + i + '" class="pct"></td></tr>');
 }
 </script>
-	<tr><td>&nbsp;</td><td class="total">Total</a></td><td id="bcnt-total" class="total count"></td><td id="bcntx-total" class="total count"></td><td class="total pct">100%</td></tr>
+	<tr><td>&nbsp;</td><td class="total">Łącznie</a></td><td id="bcnt-total" class="total count"></td><td id="bcntx-total" class="total count"></td><td class="total pct">100%</td></tr>
 	</table>
 </td><td style="margin-right:150px">
 <script type='text/javascript'>
@@ -361,7 +361,7 @@ if (nvram.web_svg != '0') {
 
 <!-- / / / -->
 
-<div class="section-title">Bandwidth Distribution (Outbound)</div>
+<div class="section-title">Rozkład pasma wychodzącego</div>
 <div class="section">
 <table border=0 width="100%"><tr><td>
 	<table style="width:250px">
@@ -376,7 +376,7 @@ for (i = 0; i < 11; ++i) {
 		'<td id="obpct' + i + '" class="pct"></td></tr>');
 }
 </script>
-	<tr><td>&nbsp;</td><td class="total">Total</a></td><td id="obcnt-total" class="total count"></td><td id="obcntx-total" class="total count"></td><td class="total pct">100%</td></tr>
+	<tr><td>&nbsp;</td><td class="total">Łącznie</a></td><td id="obcnt-total" class="total count"></td><td id="obcntx-total" class="total count"></td><td class="total pct">100%</td></tr>
 	</table>
 </td><td style="margin-right:150px">
 <script type='text/javascript'>
@@ -392,7 +392,7 @@ if (nvram.web_svg != '0') {
 
 <script type='text/javascript'>
 if (nvram.cstats_enable != '1') {
-	W('<div class="note-disabled"><b>IP Traffic monitoring disabled.</b> &nbsp; <a href="admin-iptraffic.asp">Enable&nbsp;&raquo;</a></div>');
+	W('<div class="note-disabled"><b>IP Traffic wyłączony</b> &nbsp; <a href="admin-iptraffic.asp">Włącz&nbsp;&raquo;</a></div>');
 }
 </script>
 

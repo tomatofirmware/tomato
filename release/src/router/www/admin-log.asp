@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
 	Copyright (C) 2006-2010 Jonathan Zarate
@@ -11,9 +11,9 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Admin: Logging</title>
+<title>[<% ident(); %>] Administracja: Logowanie</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
-<link rel='stylesheet' type='text/css' href='color.css'>
+<% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
 
 <!-- / / / -->
@@ -128,7 +128,7 @@ function save()
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -150,7 +150,7 @@ function save()
 <script type='text/javascript'>
 </script>
 
-<div class='section-title'>Syslog</div>
+<div class='section-title'>Logi systemowe</div>
 <div class='section'>
 <script type='text/javascript'>
 
@@ -164,43 +164,43 @@ if (nvram.log_mark >= 120) nvram.log_mark = 120;
 REMOVE-END */
 
 createFieldTable('', [
-	{ title: 'Log Internally', name: 'f_log_file', type: 'checkbox', value: nvram.log_file == 1 },
-	{ title: 'Max size before rotate', name: 'log_file_size', type: 'text', maxlen: 5, size: 6, value: nvram.log_file_size || 50, suffix: ' <small>KB</small>' },
-	{ title: 'Number of rotated logs to keep', name: 'log_file_keep', type: 'text', maxlen: 2, size: 3, value: nvram.log_file_keep || 1 },
-	{ title: 'Custom Log File Path', multi: [
+	{ title: 'Loguj wewnętrznie', name: 'f_log_file', type: 'checkbox', value: nvram.log_file == 1 },
+	{ title: 'Rotuj plik gdy osiągnie rozmiar', name: 'log_file_size', type: 'text', maxlen: 5, size: 6, value: nvram.log_file_size || 50, suffix: ' <small>KB</small>' },
+	{ title: 'Ilość zrotowanym plików', name: 'log_file_keep', type: 'text', maxlen: 2, size: 3, value: nvram.log_file_keep || 1 },
+	{ title: 'Własna ścieżka do pliku z logami', multi: [
 		{ name: 'f_log_file_custom', type: 'checkbox', value: nvram.log_file_custom == 1, suffix: '  ' },
-		{ name: 'log_file_path', type: 'text', maxlen: 50, size: 30, value: nvram.log_file_path, suffix: ' <small>(make sure the directory exists and is writable)</small>' }
+		{ name: 'log_file_path', type: 'text', maxlen: 50, size: 30, value: nvram.log_file_path, suffix: ' <small>(upewnij się że katalog istnieje i jest zapisywalny)</small>' }
 		] },
-	{ title: 'Log To Remote System', name: 'f_log_remote', type: 'checkbox', value: nvram.log_remote == 1 },
-	{ title: 'Host or IP Address / Port', indent: 2, multi: [
+	{ title: 'Loguj na zdalny system', name: 'f_log_remote', type: 'checkbox', value: nvram.log_remote == 1 },
+	{ title: 'Nazwa hosta lub adres IP / Port', indent: 2, multi: [
 		{ name: 'log_remoteip', type: 'text', maxlen: 15, size: 17, value: nvram.log_remoteip, suffix: ':' },
 		{ name: 'log_remoteport', type: 'text', maxlen: 5, size: 7, value: nvram.log_remoteport } ]},
-	{ title: 'Generate Marker', name: 'log_mark', type: 'select', options: [[0,'Disabled'],[30,'Every 30 Minutes'],[60,'Every 1 Hour'],[120,'Every 2 Hours'],[360,'Every 6 Hours'],[720,'Every 12 Hours'],[1440,'Every 1 Day'],[10080,'Every 7 Days']], value: nvram.log_mark },
-	{ title: 'Events Logged', text: '<small>(some of the changes will take effect after a restart)</small>' },
-		{ title: 'Access Restriction', indent: 2, name: 'f_log_acre', type: 'checkbox', value: (nvram.log_events.indexOf('acre') != -1) },
+	{ title: 'Generuj znacznik', name: 'log_mark', type: 'select', options: [[0,'Wyłączone'],[30,'Co 30 minut'],[60,'Co godzinę'],[120,'Co 2 godziny'],[360,'Co 6 godzin'],[720,'Co 12 godzin'],[1440,'Codziennie'],[10080,'Co 7 dni']], value: nvram.log_mark },
+	{ title: 'Logowane zdarzenia', text: '<small>(niektóre zmiany będą aktywne dopiero po restarcie)</small>' },
+		{ title: 'Ograniczenia dostępu', indent: 2, name: 'f_log_acre', type: 'checkbox', value: (nvram.log_events.indexOf('acre') != -1) },
 		{ title: 'Cron', indent: 2, name: 'f_log_crond', type: 'checkbox', value: (nvram.log_events.indexOf('crond') != -1) },
-		{ title: 'DHCP Client', indent: 2, name: 'f_log_dhcpc', type: 'checkbox', value: (nvram.log_events.indexOf('dhcpc') != -1) },
+		{ title: 'Klienci DHCP', indent: 2, name: 'f_log_dhcpc', type: 'checkbox', value: (nvram.log_events.indexOf('dhcpc') != -1) },
 		{ title: 'NTP', indent: 2, name: 'f_log_ntp', type: 'checkbox', value: (nvram.log_events.indexOf('ntp') != -1) },
-		{ title: 'Scheduler', indent: 2, name: 'f_log_sched', type: 'checkbox', value: (nvram.log_events.indexOf('sched') != -1) },
-	{ title: 'Connection Logging' },
-		{ title: 'Inbound', indent: 2, name: 'log_in', type: 'select', options: [[0,'Disabled (recommended)'],[1,'If Blocked By Firewall'],[2,'If Allowed By Firewall'],[3,'Both']], value: nvram.log_in },
-		{ title: 'Outbound', indent: 2, name: 'log_out', type: 'select', options: [[0,'Disabled (recommended)'],[1,'If Blocked By Firewall'],[2,'If Allowed By Firewall'],[3,'Both']], value: nvram.log_out },
-		{ title: 'Limit', indent: 2, name: 'log_limit', type: 'text', maxlen: 4, size: 5, value: nvram.log_limit, suffix: ' <small>(messages per minute / 0 for unlimited)</small>' }
+		{ title: 'Harmonogram', indent: 2, name: 'f_log_sched', type: 'checkbox', value: (nvram.log_events.indexOf('sched') != -1) },
+	{ title: 'Logowanie połączeń' },
+		{ title: 'Wchodzących', indent: 2, name: 'log_in', type: 'select', options: [[0,'Wyłączone (zalecane)'],[1,'Jeśli zablokowane przez Firewall'],[2,'Jeśli przepuszczone przez Firewall'],[3,'Oba']], value: nvram.log_in },
+		{ title: 'Wychodzących', indent: 2, name: 'log_out', type: 'select', options: [[0,'Wyłączone (zalecane)'],[1,'Jeśli zablokowane przez Firewall'],[2,'Jeśli przepuszczone przez Firewall'],[3,'Oba']], value: nvram.log_out },
+		{ title: 'Limit', indent: 2, name: 'log_limit', type: 'text', maxlen: 4, size: 5, value: nvram.log_limit, suffix: ' <small>(zdarzeń na minutę / 0 - brak limitu)</small>' }
 ]);
 </script>
 </div>
 
-<div class='section-title'>Web Monitor</div>
+<div class='section-title'>Monitor sieci Web</div>
 <div class='section'>
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: 'Monitor Web Usage', name: 'f_log_wm', type: 'checkbox', value: nvram.log_wm == 1 },
-	{ title: 'Monitor', name: 'log_wmtype', type: 'select', options: [[0,'All Computers / Devices'],[1,'The Following...'],[2,'All Except...']], value: nvram.log_wmtype },
-		{ title: 'IP Address(es)', indent: 2,  name: 'f_log_wmip', type: 'text', maxlen: 512, size: 64, value: nvram.log_wmip,
-		  suffix: '<br><small>(ex: "1.1.1.1", "1.1.1.0/24" or "1.1.1.1 - 2.2.2.2")</small>' },
-	{ title: 'Number of Entries to remember' },
-		{ title: 'Domains', indent: 2,  name: 'log_wmdmax', type: 'text', maxlen: 4, size: 6, value: nvram.log_wmdmax, suffix: ' <small>(0 to disable)</small>' },
-		{ title: 'Searches', indent: 2, name: 'log_wmsmax', type: 'text', maxlen: 4, size: 6, value: nvram.log_wmsmax, suffix: ' <small>(0 to disable)</small>' }
+	{ title: 'Użyj monitora sieci Web', name: 'f_log_wm', type: 'checkbox', value: nvram.log_wm == 1 },
+	{ title: 'Monitoruj', name: 'log_wmtype', type: 'select', options: [[0,'Wszystkie urządzenia'],[1,'Następujące...'],[2,'Wszystkie, z wyjątkiem...']], value: nvram.log_wmtype },
+		{ title: 'Adres(y) IP', indent: 2,  name: 'f_log_wmip', type: 'text', maxlen: 512, size: 64, value: nvram.log_wmip,
+		  suffix: '<br><small>(np: "1.1.1.1", "1.1.1.0/24" lub "1.1.1.1 - 2.2.2.2")</small>' },
+	{ title: 'Ilość pozycji do zapamiętania' },
+		{ title: 'Domeny', indent: 2,  name: 'log_wmdmax', type: 'text', maxlen: 4, size: 6, value: nvram.log_wmdmax, suffix: ' <small>(0 żeby wyłączyć)</small>' },
+		{ title: 'Wyszukiwania', indent: 2, name: 'log_wmsmax', type: 'text', maxlen: 4, size: 6, value: nvram.log_wmsmax, suffix: ' <small>(0 żeby wyłączyć)</small>' }
 ]);
 </script>
 </div>
@@ -210,8 +210,8 @@ createFieldTable('', [
 </td></tr>
 <tr><td id='footer' colspan=2>
 	<span id='footer-msg'></span>
-	<input type='button' value='Save' id='save-button' onclick='save()'>
-	<input type='button' value='Cancel' id='cancel-button' onclick='javascript:reloadPage();'>
+	<input type='button' value='Zapisz' id='save-button' onclick='save()'>
+	<input type='button' value='Anuluj' id='cancel-button' onclick='javascript:reloadPage();'>
 </td></tr>
 </table>
 </form>

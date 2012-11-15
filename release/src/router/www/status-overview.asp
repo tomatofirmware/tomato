@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
 	Copyright (C) 2006-2010 Jonathan Zarate
@@ -15,7 +15,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Status: Overview</title>
+<title>[<% ident(); %>] Status: Przegląd</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
@@ -37,10 +37,10 @@
 
 //	<% nvstat(); %>
 
-wmo = {'ap':'Access Point','sta':'Wireless Client','wet':'Wireless Ethernet Bridge','wds':'WDS'};
+wmo = {'ap':'Punkt dostępu','sta':'Klient WiFi','wet':'Most WiFi (bridge)','wds':'WDS'};
 auth = {'disabled':'-','wep':'WEP','wpa_personal':'WPA Personal (PSK)','wpa_enterprise':'WPA Enterprise','wpa2_personal':'WPA2 Personal (PSK)','wpa2_enterprise':'WPA2 Enterprise','wpaX_personal':'WPA / WPA2 Personal','wpaX_enterprise':'WPA / WPA2 Enterprise','radius':'Radius'};
 enc = {'tkip':'TKIP','aes':'AES','tkip+aes':'TKIP / AES'};
-bgmo = {'disabled':'-','mixed':'Auto','b-only':'B Only','g-only':'G Only','bg-mixed':'B/G Mixed','lrs':'LRS','n-only':'N Only'};
+bgmo = {'disabled':'-','mixed':'Auto','b-only':'Tylko B','g-only':'Tylko G','bg-mixed':'Mieszane B/G','lrs':'LRS','n-only':'Tylko N'};
 </script>
 
 <script type='text/javascript' src='wireless.jsx?_http_id=<% nv(http_id); %>'></script>
@@ -138,7 +138,7 @@ function show()
 
 	for (var uidx = 0; uidx < wl_ifaces.length; ++uidx) {
 		if (wl_sunit(uidx)<0) {
-			c('radio'+uidx, wlstats[uidx].radio ? 'Enabled' : '<b>Disabled</b>');
+			c('radio'+uidx, wlstats[uidx].radio ? 'Włączone' : '<b>Wyłączone</b>');
 			c('rate'+uidx, wlstats[uidx].rate);
 			if (show_radio[uidx]) {
 				E('b_wl'+uidx+'_enable').disabled = wlstats[uidx].radio;
@@ -190,11 +190,11 @@ function init()
 function toggleVisibility(whichone) {
 	if (E('sesdiv_' + whichone).style.display == '') {
 		E('sesdiv_' + whichone).style.display = 'none';
-		E('sesdiv_' + whichone + '_showhide').innerHTML = '(show)';
+		E('sesdiv_' + whichone + '_showhide').innerHTML = '(pokaż)';
 		cookie.set('status_overview_' + whichone + '_vis', 0);
 	} else {
 		E('sesdiv_' + whichone).style.display='';
-		E('sesdiv_' + whichone + '_showhide').innerHTML = '(hide)';
+		E('sesdiv_' + whichone + '_showhide').innerHTML = '(ukryj)';
 		cookie.set('status_overview_' + whichone + '_vis', 1);
 	}
 }
@@ -207,7 +207,7 @@ function toggleVisibility(whichone) {
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -215,16 +215,16 @@ function toggleVisibility(whichone) {
 
 <!-- / / / -->
 
-<div class='section-title'>System <small><i><a href='javascript:toggleVisibility("system");'><span id='sesdiv_system_showhide'>(hide)</span></a></i></small></div>
+<div class='section-title'>System <small><i><a href='javascript:toggleVisibility("system");'><span id='sesdiv_system_showhide'>(ukryj)</span></a></i></small></div>
 <div class='section' id='sesdiv_system'>
 <script type='text/javascript'>
 var a = nvstat.free / nvstat.size * 100.0;
 createFieldTable('', [
-	{ title: 'Name', text: nvram.router_name },
+	{ title: 'Nazwa', text: nvram.router_name },
 	{ title: 'Model', text: nvram.t_model_name },
 	{ title: 'Chipset', text: stats.systemtype },
-	{ title: 'CPU Freq', text: stats.cpumhz },
-	{ title: 'Flash Size', text: stats.flashsize },
+	{ title: 'Zegar CPU', text: stats.cpumhz },
+	{ title: 'Rozmiar pamięci Flash', text: stats.flashsize },
 	null,
 	{ title: 'Czas systemowy', rid: 'time', text: stats.time },
 	{ title: 'Uruchomiony od', rid: 'uptime', text: stats.uptime },
@@ -236,36 +236,36 @@ createFieldTable('', [
 </script>
 </div>
 
-<div class='section-title' id='wan-title'>WAN <small><i><a href='javascript:toggleVisibility("wan");'><span id='sesdiv_wan_showhide'>(hide)</span></a></i></small></div>
+<div class='section-title' id='wan-title'>WAN <small><i><a href='javascript:toggleVisibility("wan");'><span id='sesdiv_wan_showhide'>(ukryj)</span></a></i></small></div>
 <div class='section' id='sesdiv_wan'>
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: 'MAC Address', text: nvram.wan_hwaddr },
-	{ title: 'Connection Type', text: { 'dhcp':'DHCP', 'static':'Static IP', 'pppoe':'PPPoE', 'pptp':'PPTP', 'l2tp':'L2TP', 'ppp3g':'3G Modem' }[nvram.wan_proto] || '-' },
-	{ title: 'IP Address', rid: 'wanip', text: stats.wanip },
-	{ title: 'Subnet Mask', rid: 'wannetmask', text: stats.wannetmask },
-	{ title: 'Gateway', rid: 'wangateway', text: stats.wangateway },
+	{ title: 'Adres MAC', text: nvram.wan_hwaddr },
+	{ title: 'Typ połączenia', text: { 'dhcp':'DHCP', 'static':'Statyczny IP', 'pppoe':'PPPoE', 'pptp':'PPTP', 'l2tp':'L2TP', 'ppp3g':'Modem 3G' }[nvram.wan_proto] || '-' },
+	{ title: 'Adres IP', rid: 'wanip', text: stats.wanip },
+	{ title: 'Maska podsieci', rid: 'wannetmask', text: stats.wannetmask },
+	{ title: 'Brama', rid: 'wangateway', text: stats.wangateway },
 /* IPV6-BEGIN */
-	{ title: 'IPv6 Address', rid: 'ip6_wan', text: stats.ip6_wan, hidden: (stats.ip6_wan == '') },
+	{ title: 'Adres IPv6', rid: 'ip6_wan', text: stats.ip6_wan, hidden: (stats.ip6_wan == '') },
 /* IPV6-END */
 	{ title: 'DNS', rid: 'dns', text: stats.dns },
 	{ title: 'MTU', text: nvram.wan_run_mtu },
 	null,
 	{ title: 'Status', rid: 'wanstatus', text: stats.wanstatus },
-	{ title: 'Connection Uptime', rid: 'wanuptime', text: stats.wanuptime },
-	{ title: 'Remaining Lease Time', rid: 'wanlease', text: stats.wanlease, ignore: !show_dhcpc }
+	{ title: 'Podłączony od', rid: 'wanuptime', text: stats.wanuptime },
+	{ title: 'Pozostały czas dzierżawy', rid: 'wanlease', text: stats.wanlease, ignore: !show_dhcpc }
 ]);
 </script>
 <span id='b_dhcpc' style='display:none'>
-	<input type='button' class='controls' onclick='dhcpc("renew")' value='Renew'>
-	<input type='button' class='controls' onclick='dhcpc("release")' value='Release'> &nbsp;
+	<input type='button' class='controls' onclick='dhcpc("renew")' value='Odnów IP'>
+	<input type='button' class='controls' onclick='dhcpc("release")' value='Zwolnij IP'> &nbsp;
 </span>
-<input type='button' class='controls' onclick='wan_connect()' value='Connect' id='b_connect' style='display:none'>
-<input type='button' class='controls' onclick='wan_disconnect()' value='Disconnect' id='b_disconnect' style='display:none'>
+<input type='button' class='controls' onclick='wan_connect()' value='Połącz' id='b_connect' style='display:none'>
+<input type='button' class='controls' onclick='wan_disconnect()' value='Rozłącz' id='b_disconnect' style='display:none'>
 </div>
 
 
-<div class='section-title'>LAN <small><i><a href='javascript:toggleVisibility("lan");'><span id='sesdiv_lan_showhide'>(hide)</span></a></i></small></div>
+<div class='section-title'>LAN <small><i><a href='javascript:toggleVisibility("lan");'><span id='sesdiv_lan_showhide'>(ukryj)</span></a></i></small></div>
 <div class='section' id='sesdiv_lan'>
 <script type='text/javascript'>
 
@@ -309,21 +309,20 @@ for (var i = 0 ; i <= MAX_BRIDGE_ID ; i++) {
 			s += '<b>br' + i + '</b> (LAN' + j + ') - ' + nvram['dhcpd' + j + '_startip'] + ' - ' + nvram['dhcpd' + j + '_endip'];
 		} else {
 			s += ((s.length>0)&&(s.charAt(s.length-1) != ' ')) ? '<br>' : '';
-			s += '<b>br' + i + '</b> (LAN' + j + ') - Disabled';
+			s += '<b>br' + i + '</b> (LAN' + j + ') - wyłączony';
 		}
 		t += ((t.length>0)&&(t.charAt(t.length-1) != ' ')) ? '<br>' : '';
 		t += '<b>br' + i + '</b> (LAN' + j + ') - ' + nvram['lan' + j + '_ipaddr'] + '/' + numberOfBitsOnNetMask(nvram['lan' + j + '_netmask']);
-		
 	}
 }
 
 createFieldTable('', [
-	{ title: 'Router MAC Address', text: nvram.et0macaddr },
-	{ title: 'Router IP Addresses', text: t },
-	{ title: 'Gateway', text: nvram.lan_gateway, ignore: nvram.wan_proto != 'disabled' },
+	{ title: 'Adres MAC routera', text: nvram.et0macaddr },
+	{ title: 'Adres IP routera', text: t },
+	{ title: 'Brama', text: nvram.lan_gateway, ignore: nvram.wan_proto != 'disabled' },
 /* IPV6-BEGIN */
-	{ title: 'Router IPv6 Address', rid: 'ip6_lan', text: stats.ip6_lan, hidden: (stats.ip6_lan == '') },
-	{ title: 'IPv6 Link-local Address', rid: 'ip6_lan_ll', text: stats.ip6_lan_ll, hidden: (stats.ip6_lan_ll == '') },
+	{ title: 'Adres IPv6 routera', rid: 'ip6_lan', text: stats.ip6_lan, hidden: (stats.ip6_lan == '') },
+	{ title: 'Adres IPv6 Link-local', rid: 'ip6_lan_ll', text: stats.ip6_lan_ll, hidden: (stats.ip6_lan_ll == '') },
 /* IPV6-END */
 	{ title: 'DNS', rid: 'dns', text: stats.dns, ignore: nvram.wan_proto != 'disabled' },
 	{ title: 'DHCP', text: s }

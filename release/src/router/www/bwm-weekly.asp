@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
 	Copyright (C) 2006-2010 Jonathan Zarate
@@ -13,7 +13,7 @@
 <meta name='robots' content='noindex,nofollow'>
 <title>[<% ident(); %>] Pasmo: Tygodniowo</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
-<link rel='stylesheet' type='text/css' href='color.css'>
+<% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
 
 <!-- / / / -->
@@ -36,8 +36,8 @@ if (typeof(daily_history) == 'undefined') {
 	rstats_busy = 1;
 }
 
-var weeks = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-var weeksShort = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+var weeks = ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'];
+var weeksShort = ['Nie', 'Pon', 'Wto', 'Śro', 'Czw', 'Pią', 'Sob'];
 var startwk = 0;
 var summary = 1;
 
@@ -102,7 +102,7 @@ function redraw()
 
 	if (summary) {
 		grid = '<table class="bwmg" cellspacing="1">';
-		grid += makeRow('header', 'Date', 'Download', 'Upload', 'Total');
+		grid += makeRow('header', 'Data', 'Pobieranie', 'Wysyłanie', 'Razem');
 	}
 	else {
 		grid = '';
@@ -112,9 +112,9 @@ function redraw()
 	{
 		grid += '<b>' + dbeg + ' to ' + dend + '</b>' +
 				'<table class="bwmg" cellspacing="1">' +
-				makeRow('header', 'Date', 'Download', 'Upload', 'Total') +
+				makeRow('header', 'Data', 'Pobieranie', 'Wysyłanie', 'Razem') +
 				block.join('') +
-				makeRow('footer', 'Total', rescale(dl), rescale(ul), rescale(dl + ul)) +
+				makeRow('footer', 'Razem', rescale(dl), rescale(ul), rescale(dl + ul)) +
 				'</table><br>';
 	}
 
@@ -232,7 +232,7 @@ function init()
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -240,15 +240,15 @@ function init()
 
 <!-- / / / -->
 
-<div class='section-title'>WAN Bandwidth - Weekly</div>
+<div class='section-title'>Pasmo WAN - tygodniowo</div>
 <div id='bwm-weekly-grid' style='float:left'></div>
 <div style="float:right;text-align:right">
-<b>Show</b> <select onchange='changeMode(this)' id='shmode'><option value=1 selected>Summary<option value=0>Full</select><br>
-<b>Date</b> <select onchange='changeDate(this, "ymd")' id='dafm'><option value=0>yyyy-mm-dd</option><option value=1>mm-dd-yyyy</option><option value=2>mmm dd, yyyy</option><option value=3>dd.mm.yyyy</option></select><br>
-<b>Start</b> <select onchange='changeStart(this)' id='startwk'><option value=0 selected>Sun<option value=1>Mon<option value=2>Tue<option value=3>Wed<option value=4>Thu<option value=5>Fri<option value=6>Sat</select><br>
-<b>Scale</b> <select onchange='changeScale(this)' id='scale'><option value=0>KB</option><option value=1>MB</option><option value=2 selected>GB</option></select><br>
+<b>Pokaż</b> <select onchange='changeMode(this)' id='shmode'><option value=1 selected>Podsumowanie<option value=0>Pełne dane</select><br>
+<b>Data</b> <select onchange='changeDate(this, "ymd")' id='dafm'><option value=0>rrrr-mm-dd</option><option value=1>mm-dd-rrrr</option><option value=2>mmm dd, rrrr</option><option value=3>dd.mm.rrrr</option></select><br>
+<b>Start</b> <select onchange='changeStart(this)' id='startwk'><option value=0 selected>Nie<option value=1>Pon<option value=2>Wto<option value=3>Śro<option value=4>Czw<option value=5>Pią<option value=6>Sob</select><br>
+<b>Skala</b> <select onchange='changeScale(this)' id='scale'><option value=0>KB</option><option value=1>MB</option><option value=2 selected>GB</option></select><br>
 <br>
-&raquo; <a href="admin-bwm.asp">Configure</a>
+&raquo; <a href="admin-bwm.asp">Konfiguracja</a>
 <br><br><br>
 </div>
 <br>
@@ -259,7 +259,7 @@ function init()
 
 </td></tr>
 <tr><td id='footer' colspan=2>
-<input type='button' value='Refresh' onclick='reloadPage()'>
+<input type='button' value='Odśwież' onclick='reloadPage()'>
 </td></tr>
 </table>
 </form>

@@ -318,7 +318,7 @@ int mount_r(char *mnt_dev, char *mnt_dir, char *type)
 	int dir_made;
 
 	if ((mnt = findmntents(mnt_dev, 0, NULL, 0))) {
-		syslog(LOG_INFO, "USB partition at %s already mounted on %s",
+		syslog(LOG_INFO, "Partycja %s jest aktualnie zamontowana pod %s",
 			mnt_dev, mnt->mnt_dir);
 		return MOUNT_VAL_EXIST;
 	}

@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
 	Media Server Settings - !!TB
@@ -10,9 +10,9 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] NAS: Media Server</title>
+<title>[<% ident(); %>] NAS: Serwer multimediów</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
-<link rel='stylesheet' type='text/css' href='color.css'>
+<% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
 
 <!-- / / / -->
@@ -38,7 +38,7 @@
 changed = 0;
 mdup = parseInt('<% psup("minidlna"); %>');
 
-var mediatypes = [['', 'All Media Files'], ['A', 'Audio only'], ['V', 'Video only'], ['P', 'Images only']];
+var mediatypes = [['', 'Wszystkie pliki multimediów'], ['A', 'Tylko pliki audio'], ['V', 'Tylko pliki wideo'], ['P', 'Tylko pliki graficzne']];
 var msg = new TomatoGrid();
 
 msg.dataToView = function(data) {
@@ -61,7 +61,7 @@ msg.verifyFields = function(row, quiet)
 	var f;
 	f = fields.getAll(row);
 
-	if (!v_nodelim(f[0], quiet, 'Directory', 1) || !v_path(f[0], quiet, 1))
+	if (!v_nodelim(f[0], quiet, 'Katalog', 1) || !v_path(f[0], quiet, 1))
 		ok = 0;
 
 	changed |= ok;
@@ -84,7 +84,7 @@ msg.setup = function()
 		{ type: 'text', maxlen: 256 },
 		{ type: 'select', options: mediatypes }
 	]);
-	this.headerSet(['Directory', 'Content Filter']);
+	this.headerSet(['Katalog', 'Filtr zawartości']);
 
 	var s = ('' + nvram.ms_dirs).split('>');
 	for (var i = 0; i < s.length; ++i) {
@@ -144,7 +144,7 @@ function verifyFields(focused, quiet)
 /* JFFS2-BEGIN */
 	else if (v == '/jffs/dlna') {
 		if (nvram.jffs2_on != '1') {
-			ferror.set(eLoc, 'JFFS is not enabled.', quiet || !ok);
+			ferror.set(eLoc, 'JFFS nie włączone.', quiet || !ok);
 			ok = 0;
 		}
 		else ferror.clear(eLoc);
@@ -154,7 +154,7 @@ function verifyFields(focused, quiet)
 /* CIFS-BEGIN */
 	else if (v.match(/^\/cifs(1|2)\/dlna$/)) {
 		if (nvram['cifs' + RegExp.$1].substr(0, 1) != '1') {
-			ferror.set(eLoc, 'CIFS #' + RegExp.$1 + ' is not enabled.', quiet || !ok);
+			ferror.set(eLoc, 'CIFS #' + RegExp.$1 + ' nie włączone.', quiet || !ok);
 			ok = 0;
 		}
 		else ferror.clear(eLoc);
@@ -193,7 +193,7 @@ function save()
 function restart(isup)
 {
 	if (changed) {
-		if (!confirm("Unsaved changes will be lost. Continue anyway?")) return;
+		if (!confirm("Niezapisane zmiany zostaną utracone. Czy chcesz kontynuować?")) return;
 	}
 	E('_restart_button').disabled = true;
 	form.submitHidden('tomato.cgi', {
@@ -246,7 +246,7 @@ function init()
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -265,7 +265,7 @@ function init()
 <input type='hidden' name='ms_rescan'>
 <input type='hidden' name='ms_sas'>
 
-<div class='section-title'>Media / DLNA Server</div>
+<div class='section-title'>Serwer Multimediów / DLNA</div>
 <div class='section'>
 <script type='text/javascript'>
 
@@ -282,10 +282,10 @@ switch (nvram.ms_dbdir) {
 }
 
 createFieldTable('', [
-	{ title: 'Enable', name: 'f_ms_enable', type: 'checkbox', value: nvram.ms_enable == '1' },
-	{ title: 'Port', name: 'ms_port', type: 'text', maxlen: 5, size: 6, value: nvram.ms_port, suffix: '<small>(range: 0 - 65535; default (random) set 0)</small>' },
-	{ title: 'Database Location', multi: [
-		{ name: 'f_loc', type: 'select', options: [['','RAM (Temporary)'],
+	{ title: 'Włączony', name: 'f_ms_enable', type: 'checkbox', value: nvram.ms_enable == '1' },
+	{ title: 'Port', name: 'ms_port', type: 'text', maxlen: 5, size: 6, value: nvram.ms_port, suffix: '<small>(zakres: 0 - 65535; domyślnie (losowany) ustawione 0)</small>' },
+	{ title: 'Lokalizacja bazy danych', multi: [
+		{ name: 'f_loc', type: 'select', options: [['','RAM (tymczasowo)'],
 
 /* JFFS2-BEGIN */
 			['/jffs/dlna','JFFS'],
@@ -295,23 +295,23 @@ createFieldTable('', [
 			['/cifs1/dlna','CIFS 1'],['/cifs2/dlna','CIFS 2'],
 /* CIFS-END */
 /* REMOVE-END */
-			['*user','Custom Path']], value: loc },
+			['*user','Ścieżka użytkownika']], value: loc },
 		{ name: 'f_user', type: 'text', maxlen: 256, size: 60, value: nvram.ms_dbdir }
 	] },
-	{ title: 'Scan Media at Startup*', indent: 2, name: 'f_ms_sas', type: 'checkbox', value: nvram.ms_sas == '1', hidden: 1 },
-	{ title: 'Rescan on the next run*', indent: 2, name: 'f_ms_rescan', type: 'checkbox', value: 0,
-		suffix: '<br><small>* Media scan may take considerable time to complete.</small>' },
+	{ title: 'Skanuj media przy starcie*', indent: 2, name: 'f_ms_sas', type: 'checkbox', value: nvram.ms_sas == '1', hidden: 1 },
+	{ title: 'Przeskanuj ponownie przy następnym uruchomieniu*', indent: 2, name: 'f_ms_rescan', type: 'checkbox', value: 0,
+		suffix: '<br><small>* Szukanie multimedów może zabrać znacząco dużo czasu.</small>' },
 	null,
-	{ title: 'TiVo Support', name: 'f_ms_tivo', type: 'checkbox', value: nvram.ms_tivo == '1' },
-	{ title: 'Strictly adhere to DLNA standards', name: 'f_ms_stdlna', type: 'checkbox', value: nvram.ms_stdlna == '1' }
+	{ title: 'Obsługa TiVo', name: 'f_ms_tivo', type: 'checkbox', value: nvram.ms_tivo == '1' },
+	{ title: 'Ściśle przestrzegaj standardów DLNA', name: 'f_ms_stdlna', type: 'checkbox', value: nvram.ms_stdlna == '1' }
 ]);
-W('<br><input type="button" value="' + (mdup ? 'Res' : 'S') + 'tart Now" onclick="restart(mdup)" id="_restart_button">');
+W('<br><input type="button" value="' + (mdup ? 'Res' : 'S') + 'tartuj teraz" onclick="restart(mdup)" id="_restart_button">');
 </script>
 </div>
 <span id="notice-msg"></span>
 <br>
 
-<div class='section-title'>Media Directories</div>
+<div class='section-title'>Katalogi multimediów</div>
 <div class='section'>
 	<table class='tomato-grid' cellspacing=1 id='ms-grid'></table>
 	<script type='text/javascript'>msg.setup();</script>
@@ -323,8 +323,8 @@ W('<br><input type="button" value="' + (mdup ? 'Res' : 'S') + 'tart Now" onclick
 </td></tr>
 <tr><td id='footer' colspan=2>
 	<span id='footer-msg'></span>
-	<input type='button' value='Save' id='save-button' onclick='save()'>
-	<input type='button' value='Cancel' id='cancel-button' onclick='javascript:reloadPage();'>
+	<input type='button' value='Zapisz' id='save-button' onclick='save()'>
+	<input type='button' value='Anuluj' id='cancel-button' onclick='javascript:reloadPage();'>
 </td></tr>
 </table>
 </form>

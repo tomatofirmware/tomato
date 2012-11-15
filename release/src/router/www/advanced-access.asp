@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
 	Copyright (C) 2006-2007 Jonathan Zarate
@@ -11,7 +11,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Advanced: LAN Access</title>
+<title>[<% ident(); %>] Zaawansowane: Komunikacja w LAN</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
@@ -53,7 +53,7 @@ la.setup = function() {
 	{ type: 'select', options: [[0, 'LAN (br0)'],[1, 'LAN1 (br1)'],[2, 'LAN2 (br2)'],[3, 'LAN3 (br3)']], prefix: '<div class="centered">', suffix: '</div>' },
 	{ type: 'text', maxlen: 32 },
 	{ type: 'text', maxlen: 32 }]);
-	this.headerSet(['On', 'Src', 'Src Address', 'Dst', 'Dst Address', 'Description']);
+	this.headerSet(['Wł.', 'Źródło', 'Adres źródłowy', 'Cel', 'Adres docelowy', 'Opis']);
 
 	var r = nvram.lan_access.split('>');
 	for (var i = 0; i < r.length; ++i) {
@@ -131,7 +131,7 @@ la.verifyFields = function(row, quiet) {
 	}
 
 	if(f[1].selectedIndex == f[3].selectedIndex) {
-		var m = 'Source and Destination interfaces must be different';
+		var m = 'Interfejsy źródłowy i docelowy muszą być różne';
 		ferror.set(f[1], m, quiet);
 		ferror.set(f[3], m, quiet);
 		return 0;
@@ -149,7 +149,7 @@ la.verifyFields = function(row, quiet) {
 	ferror.clear(f[4]);
 
 	f[5].value = f[5].value.replace(/>/g, '_');
-	if (!v_nodelim(f[5], quiet, 'Description')) return 0;
+	if (!v_nodelim(f[5], quiet, 'Opis')) return 0;
 
 	return 1;
 }
@@ -224,7 +224,7 @@ function toggleVisibility(whichone) {
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
   <div class='title'>Tomato</div>
-  <div class='version'>Version <% version(); %></div>
+  <div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -234,27 +234,27 @@ function toggleVisibility(whichone) {
 <input type='hidden' name='_service' value='firewall-restart'>
 <input type='hidden' name='lan_access'>
 
-<div class='section-title'>LAN Access</div>
+<div class='section-title'>Komunikacja w LAN</div>
 <div class='section'>
   <table class='tomato-grid' cellspacing=1 id='la-grid'></table>
 </div>
 </div>
 
-<div class='section-title'>Notes <small><i><a href='javascript:toggleVisibility("notes");'><span id='sesdiv_notes_showhide'>(Click here to show)</span></a></i></small></div>
+<div class='section-title'>Notka <small><i><a href='javascript:toggleVisibility("notes");'><span id='sesdiv_notes_showhide'>(pokaż)</span></a></i></small></div>
 <div class='section' id='sesdiv_notes' style='display:none'>
 <ul>
-<li><b>Src</b> - Source LAN bridge.</li>
-<li><b>Src Address</b> <i>(optional)</i> - Source address allowed. Ex: "1.2.3.4", "1.2.3.4 - 2.3.4.5", "1.2.3.0/24".</li>
-<li><b>Dst</b> - Destination LAN bridge.</li>
-<li><b>Dst Address</b> <i>(optional)</i> - Destination address inside the LAN.</li>
+<li><b>Źródło</b> - Źródłowy interfejs do zmostkowania w LAN.</li>
+<li><b>Adres źródłowy</b> <i>(opcjonalnie)</i> - Dozwolony adres IP. np: "1.2.3.4", "1.2.3.4 - 2.3.4.5", "1.2.3.0/24".</li>
+<li><b>Cel</b> - Docelowy interfejs do zmostkowania w LAN.</li>
+<li><b>Adres docelowy</b> <i>(opcjonalnie)</i> - Docelowy adres IP wewnątrz LAN.</li>
 </ul>
 </div>
 
 </td></tr>
 <tr><td id='footer' colspan=2>
  <span id='footer-msg'></span>
- <input type='button' value='Save' id='save-button' onclick='save()'>
- <input type='button' value='Cancel' id='cancel-button' onclick='javascript:reloadPage();'>
+ <input type='button' value='Zapisz' id='save-button' onclick='save()'>
+ <input type='button' value='Anuluj' id='cancel-button' onclick='javascript:reloadPage();'>
 </td></tr>
 </table>
 </form>

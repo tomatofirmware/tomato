@@ -11,7 +11,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Basic: Network</title>
+<title>[<% ident(); %>] Podstawowe: Sieci</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
@@ -57,7 +57,7 @@ lg.setup = function() {
 	{ type: 'checkbox', prefix: '<div class="centered">', suffix: '</div>' },
 	{ multi: [ { type: 'text', maxlen: 15, size: 17}, { type: 'text', maxlen: 15, size: 17 } ] },
 	{ type: 'text', maxlen: 6, size: 8 }] );
-	this.headerSet(['Bridge', 'STP', 'IP Address', 'Netmask', 'DHCP', 'IP&nbsp;Range&nbsp;<i>(first/last)</i>', 'Lease&nbsp;Time&nbsp;<i>(mins)</i>']);
+	this.headerSet(['Interfejs', 'STP', 'Adres IP', 'Maska', 'DHCP', 'Zakres&nbsp;IP&nbsp;<i>(pierwszy/ostatni)</i>', 'Czas&nbsp;dzierżawy&nbsp;<i>(minuty)</i>']);
 
 	var numBridges = 0;
 	for (var i = 0 ; i <= MAX_BRIDGE_ID ; i++) {
@@ -92,10 +92,10 @@ lg.setup = function() {
 
 lg.dataToView = function(data) {
 	return ['br' + data[0],
-	(data[1].toString() == '1') ? '<small><i>Enabled</i></small>' : '<small><i>Disabled</i></small>',
+	(data[1].toString() == '1') ? '<small><i>Włączony</i></small>' : '<small><i>Wyłączony</i></small>',
 	data[2],
 	data[3],
-	(data[4].toString() == '1') ? '<small><i>Enabled</i></small>' : '<small><i>Disabled</i></small>',
+	(data[4].toString() == '1') ? '<small><i>Włączony</i></small>' : '<small><i>Wyłączony</i></small>',
 	(data[5].toString() + ((numberOfBitsOnNetMask(data[3])>=24) ? (' - ' + data[6].split('.').splice(3, 1).toString()) : ('<br>' + data[6].toString()) )),
 	(((data[7] != null) && (data[7] != '')) ? data[7] : '') ];
 }
@@ -238,7 +238,7 @@ lg.verifyFields = function(row, quiet) {
 	}
 
 	if(this.countBridge(f[0].selectedIndex) > 0) {
-		ferror.set(f[0], 'Cannot add another entry for bridge br' + f[0].selectedIndex, quiet);
+		ferror.set(f[0], 'Nie można dodać kolejnego wpisu dla interfejsu br' + f[0].selectedIndex, quiet);
 		ok = 0;
 	} else {
 		ferror.clear(f[0]);
@@ -256,25 +256,25 @@ lg.verifyFields = function(row, quiet) {
 		} else {
 // should be 22 bits or smaller network
 			if ((numberOfBitsOnNetMask(f[3].value) < 22) && (nvram.cstats_enable == '1' )) {
-				if (!confirm("Netmask should have at least 22 bits (255.255.252.0). You may continue anyway but remember - you was warned")) return;
+				if (!confirm("Maska podsieci powinna mieć conajmniej 22 bity (255.255.252.0). Możesz kontynuować jeżeli chcesz ale pamiętaj - zostałeś ostrzeżony")) return;
 			} else {
 				ferror.clear(f[3]);
 			}
 		}
 		if(f[2].value == getNetworkAddress(f[2].value, f[3].value)) {
-			var s = 'Invalid IP address or subnet mask (the address of the network cannot be used)';
+			var s = 'Nieprawidłowy adres IP lub maska podsieci (nie mona uzyć adresu sieci)';
 			ferror.set(f[2], s, quiet);
 			ferror.set(f[3], s, quiet);
 			return 0;
 		} else 
 		if(f[2].value == getBroadcastAddress(getNetworkAddress(f[2].value, f[3].value), f[3].value)) {
-			var s = 'Invalid IP address or subnet mask (the broadcast address cannot be used)';
+			var s = 'Nieprawidłowy adres IP lub maska podsieci (nie mona uzyć adresu rozgłoszeniowego sieci)';
 			ferror.set(f[2], s, quiet);
 			ferror.set(f[3], s, quiet);
 			return 0;
 		} else
 		if (this.countOverlappingNetworks(f[2].value) > 0) {
-			var s = 'Invalid IP address or subnet mask (conflicts/overlaps with another LAN bridge)';
+			var s = 'Nieprawidłowy adres IP lub maska podsieci (konflikt/pokrycie z innym interfejsem LAN)';
 			ferror.set(f[2], s, quiet);
 			ferror.set(f[3], s, quiet);
 			return 0;
@@ -325,7 +325,7 @@ lg.verifyFields = function(row, quiet) {
 			(f[5].value == getBroadcastAddress(getNetworkAddress(f[2].value, f[3].value), f[3].value)) ||
 			(f[5].value == getNetworkAddress(f[2].value, f[3].value)) ||
 			(f[2].value == f[5].value)) {
-			ferror.set(f[5], 'Invalid first IP address or subnet mask', quiet || !ok);
+			ferror.set(f[5], 'Błędny pierwszy adres IP lub maska podsieci', quiet || !ok);
 			return 0;
 		} else {
 			ferror.clear(f[5]);
@@ -335,7 +335,7 @@ lg.verifyFields = function(row, quiet) {
 			(f[6].value == getBroadcastAddress(getNetworkAddress(f[2].value, f[3].value), f[3].value)) ||
 			(f[6].value == getNetworkAddress(f[2].value, f[3].value)) ||
 			(f[2].value == f[6].value)) {
-			ferror.set(f[6], 'Invalid last IP address or subnet mask', quiet || !ok);
+			ferror.set(f[6], 'Błędny ostatni adres IP lub maska podsieci', quiet || !ok);
 			return 0;
 		} else {
 			ferror.clear(f[6]);
@@ -419,19 +419,19 @@ function refreshNetModes(uidx)
 	if (uidx >= wl_ifaces.length) return;
 	var u = wl_unit(uidx);
 
-	var m = [['mixed','Auto']];
+	var m = [['mixed','Automatyczny']];
 	if (selectedBand(uidx) == '1') {
-		m.push(['a-only','A Only']);
+		m.push(['a-only','Tylko A']);
 		if (nphy) {
-			m.push(['n-only','N Only']);
+			m.push(['n-only','Tylko N']);
 		}
 	}
 	else {
-		m.push(['b-only','B Only']);
-		m.push(['g-only','G Only']);
+		m.push(['b-only','Tylko B']);
+		m.push(['g-only','Tylko G']);
 		if (nphy) {
-			m.push(['bg-mixed','B/G Mixed']);
-			m.push(['n-only','N Only']);
+			m.push(['bg-mixed','B+G']);
+			m.push(['n-only','Tylko N']);
 		}
 	}
 
@@ -554,7 +554,7 @@ function scan()
 			for (i = 1; i < ghz[uidx].length; ++i) {
 				var s = ghz[uidx][i][1];
 				var u = wscan.inuse[ghz[uidx][i][0]];
-				if (u) s += ' (' + u.count + ' AP' + (u.count == 1 ? '' : 's') + ' / strongest: "' + escapeHTML(ellipsis(u.ssid, 15)) + '" ' + u.rssi + ' dBm)';
+				if (u) s += ' (' + u.count + ' AP' + (u.count == 1 ? '' : 's') + ' / najmocniejszy: "' + escapeHTML(ellipsis(u.ssid, 15)) + '" ' + u.rssi + ' dBm)';
 				e.options[i].innerHTML = s;
 			}
 			e.style.width = '400px';
@@ -637,7 +637,7 @@ function v_wep(e, quiet)
 	else {
 		s = s.toUpperCase().replace(/[^0-9A-F]/g, '');
 		if (s.length != e.maxLength) {
-			ferror.set(e, 'Invalid WEP key. Expecting ' + e.maxLength + ' hex or ' + (e.maxLength >> 1) + ' ASCII characters.', quiet);
+			ferror.set(e, 'Błędny klucz WEP. Spodziewano się ' + e.maxLength + ' hex lub ' + (e.maxLength >> 1) + ' znaków ASCII.', quiet);
 			return 0;
 		}
 	}
@@ -1104,7 +1104,7 @@ REMOVE-END */
 			case 'mixed':
 			case 'n-only':
 				if (nphy && (a.value == 'tkip') && (sm2.indexOf('wpa') != -1)) {
-					ferror.set(a, 'TKIP encryption is not supported with WPA / WPA2 in N mode.', quiet || !ok);
+					ferror.set(a, 'Szyfrowanie TKIP ne jest obsługiwane z WPA / WPA2 w trybie N.', quiet || !ok);
 					ok = 0;
 				}
 				else ferror.clear(a);
@@ -1118,11 +1118,11 @@ REMOVE-END */
 			if ((wmode == 'sta') || (wmode == 'wet')) {
 				++wlclnt;
 				if (wlclnt > 1) {
-					ferror.set(b, 'Only one wireless interface can be configured in client mode.', quiet || !ok);
+					ferror.set(b, 'Tylko jeden interfejs Wi-Fi może być ustawiony w trybie Klient.', quiet || !ok);
 					ok = 0;
 				}
 				else if (a.value == 'n-only') {
-					ferror.set(a, 'N-only is not supported in wireless client modes, use Auto.', quiet || !ok);
+					ferror.set(a, 'W trybie Tylko N nie można uzywać ustawienia trybu Klient bezprzewodowy, użyj Auto.', quiet || !ok);
 					ok = 0;
 				}
 			}
@@ -1138,14 +1138,14 @@ REMOVE-END */
 
 			// wl channel
 			if (((wmode == 'wds') || (wmode == 'apwds')) && (wl_vis[uidx]._wl_channel == 1) && (E('_wl'+u+'_channel').value == '0')) {
-				ferror.set('_wl'+u+'_channel', 'Fixed wireless channel required in WDS mode.', quiet || !ok);
+				ferror.set('_wl'+u+'_channel', 'Ustalony kanał sieci Wi-Fi wymagany w trybie WDS.', quiet || !ok);
 				ok = 0;
 			}
 			else ferror.clear('_wl'+u+'_channel');
 
 			if (E('_f_wl'+u+'_mode').value == 'sta') {
 				if ((wan == 'disabled') && (E('_f_wl'+u+'_radio').checked)) {
-					ferror.set('_wan_proto', 'Wireless Client mode requires a valid WAN setting (usually DHCP).', quiet || !ok);
+					ferror.set('_wan_proto', 'Tryb Klienta bezprzewodowego wymaga poprawnej konfiguracji WAN (zwykle DHCP).', quiet || !ok);
 					ok = 0;
 				}
 			}
@@ -1228,7 +1228,7 @@ REMOVE-END */
 						else if (!isMAC0(a.value)) b = 1;
 				}
 				if (!b) {
-					ferror.set('_f_wl'+u+'_wds_0', 'WDS MAC address required.', quiet || !ok);
+					ferror.set('_f_wl'+u+'_wds_0', 'Wymagany jest adres MAC WDS-u.', quiet || !ok);
 					ok = 0;
 				}
 			}
@@ -1399,7 +1399,7 @@ function save()
 	for (var i = 0; i < d.length; ++i) {
 
 		if (lg.countOverlappingNetworks(d[i][2]) > 1) {
-			var s = 'Cannot proceed: two or more LAN bridges have conflicting IP addresses or overlapping subnets';
+			var s = 'Nie można kontynuować: dwa lub więcej interfejsów LAN wykazują konflikt adresów IP lub nakładających się podsieci.';
 			alert(s);
 			var e = E('footer-msg');
 			e.innerHTML = s;
@@ -1441,7 +1441,7 @@ alert('lan' + j + '_ifname=' + fom['lan' + j + '_ifname'].value + '\n' +
 	var e = E('footer-msg');
 	var t = fixIP(fom['lan_ipaddr'].value);
 	if ((fom['lan_ifname'].value != 'br0') || (fom['lan_ipaddr'].value == '0.0.0.0') || (!t)) {
-		e.innerHTML = 'Bridge br0 must be always defined and have a valid IP address set.';
+		e.innerHTML = 'Interfejs br0 musi być zawsze zdefiniowany oraz musi mieć poprawny adres IP.';
 		e.style.visibility = 'visible';
 		setTimeout(
 			function() {
@@ -1485,7 +1485,7 @@ function init()
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -1528,42 +1528,39 @@ W('<input type=\'hidden\' id=\'dhcpd' + j + '_endip\' name=\'dhcpd' + j + '_endi
 <div class='section'>
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: 'Type', name: 'wan_proto', type: 'select', options: [['dhcp','DHCP'],['pppoe','PPPoE'],['static','Static'],['pptp','PPTP'],['l2tp','L2TP'],
+	{ title: 'Typ', name: 'wan_proto', type: 'select', options: [['dhcp','DHCP'],['pppoe','PPPoE'],['static','Statyczny'],['pptp','PPTP'],['l2tp','L2TP'],
 /* LINUX26-BEGIN */
 /* USB-BEGIN */
-		['ppp3g','3G Modem'],
+		['ppp3g','Modem 3G'],
 /* USB-END */
 /* LINUX26-END */
-		['disabled','Disabled']],
-		value: nvram.wan_proto },
-	{ title: 'Modem device', name: 'modem_dev', type: 'select', options: [['ttyUSB0', '/dev/ttyUSB0'],['ttyUSB1', '/dev/ttyUSB1'],['ttyUSB2', '/dev/ttyUSB2'],['ttyUSB3', '/dev/ttyUSB3']], value: nvram.modem_dev },
-	{ title: 'PIN Code', name: 'modem_pin', type: 'text', maxlen: 6, size: 8, value: nvram.modem_pin },
-	{ title: 'Modem init string', name: 'modem_init', type: 'text', maxlen: 25, size: 32, value: nvram.modem_init },
+		['disabled','Wyłączony']], value: nvram.wan_proto },
+	{ title: 'Urządzenie 3G', name: 'modem_dev', type: 'select', options: [['ttyUSB0', '/dev/ttyUSB0'],['ttyUSB1', '/dev/ttyUSB1'],['ttyUSB2', '/dev/ttyUSB2'],['ttyUSB3', '/dev/ttyUSB3'],['ttyACM0', '/dev/ttyACM0']], value: nvram.modem_dev },
+	{ title: 'Kod PIN', name: 'modem_pin', type: 'text', maxlen: 6, size: 8, value: nvram.modem_pin },
+	{ title: 'Ciąg inicjujący modemu', name: 'modem_init', type: 'text', maxlen: 25, size: 32, value: nvram.modem_init },
 	{ title: 'APN', name: 'modem_apn', type: 'text', maxlen: 25, size: 32, value: nvram.modem_apn },
-	{ title: 'Username', name: 'ppp_username', type: 'text', maxlen: 60, size: 64, value: nvram.ppp_username },
-	{ title: 'Password', name: 'ppp_passwd', type: 'password', maxlen: 60, size: 64, peekaboo: 1, value: nvram.ppp_passwd },
-	{ title: 'Service Name', name: 'ppp_service', type: 'text', maxlen: 50, size: 64, value: nvram.ppp_service },
-	{ title: 'L2TP Server', name: 'l2tp_server_ip', type: 'text', maxlen: 128, size: 64, value: nvram.l2tp_server_ip },
-	{ title: 'Use DHCP', name: 'f_pptp_dhcp', type: 'checkbox', value: (nvram.pptp_dhcp == 1) },
-	{ title: 'IP Address', name: 'wan_ipaddr', type: 'text', maxlen: 15, size: 17, value: nvram.wan_ipaddr },
-	{ title: 'Subnet Mask', name: 'wan_netmask', type: 'text', maxlen: 15, size: 17, value: nvram.wan_netmask },
-	{ title: 'Gateway', name: 'wan_gateway', type: 'text', maxlen: 15, size: 17, value: nvram.wan_gateway },
-	{ title: 'PPTP Gateway', name: 'pptp_server_ip', type: 'text', maxlen: 128, size: 64, value: nvram.pptp_server_ip },
-	{ title: 'Options', name: 'ppp_custom', type: 'text', maxlen: 256, size: 64, value: nvram.ppp_custom },
-	{ title: 'Connect Mode', name: 'ppp_demand', type: 'select', options: [['1', 'Connect On Demand'],['0', 'Keep Alive']],
+	{ title: 'Nazwa użytkownika', name: 'ppp_username', type: 'text', maxlen: 60, size: 64, value: nvram.ppp_username },
+	{ title: 'Hasło', name: 'ppp_passwd', type: 'password', maxlen: 60, size: 64, peekaboo: 1, value: nvram.ppp_passwd },
+	{ title: 'Nazwa usługi', name: 'ppp_service', type: 'text', maxlen: 50, size: 64, value: nvram.ppp_service },
+	{ title: 'Serwer L2TP', name: 'l2tp_server_ip', type: 'text', maxlen: 128, size: 64, value: nvram.l2tp_server_ip },
+	{ title: 'Użyj DHCP', name: 'f_pptp_dhcp', type: 'checkbox', value: (nvram.pptp_dhcp == 1) },
+	{ title: 'Adres IP', name: 'wan_ipaddr', type: 'text', maxlen: 15, size: 17, value: nvram.wan_ipaddr },
+	{ title: 'Maska podsieci', name: 'wan_netmask', type: 'text', maxlen: 15, size: 17, value: nvram.wan_netmask },
+	{ title: 'Brama', name: 'wan_gateway', type: 'text', maxlen: 15, size: 17, value: nvram.wan_gateway },
+	{ title: 'Brama PPTP', name: 'pptp_server_ip', type: 'text', maxlen: 128, size: 64, value: nvram.pptp_server_ip },
+	{ title: 'Opcje', name: 'ppp_custom', type: 'text', maxlen: 256, size: 64, value: nvram.ppp_custom },
+	{ title: 'Tryb połączenia', name: 'ppp_demand', type: 'select', options: [['1', 'Łącz na żądanie'],['0', 'Utrzymuj połączenie']],
 		value: nvram.ppp_demand },
-	{ title: 'Max Idle Time', indent: 2, name: 'ppp_idletime', type: 'text', maxlen: 5, size: 7, suffix: ' <i>(minutes)</i>',
+	{ title: 'Maks. czas bezczynności', indent: 2, name: 'ppp_idletime', type: 'text', maxlen: 5, size: 7, suffix: ' <i>(minut)</i>',
 		value: nvram.ppp_idletime },
-	{ title: 'Check Interval', indent: 2, name: 'ppp_redialperiod', type: 'text', maxlen: 5, size: 7, suffix: ' <i>(seconds)</i>',
+	{ title: 'Sprawdzaj co', indent: 2, name: 'ppp_redialperiod', type: 'text', maxlen: 5, size: 7, suffix: ' <i>(sekund)</i>',
 		value: nvram.ppp_redialperiod },
 	{ title: 'MTU', multi: [
-		{ name: 'mtu_enable', type: 'select', options: [['0', 'Default'],['1','Manual']], value: nvram.mtu_enable },
+		{ name: 'mtu_enable', type: 'select', options: [['0', 'Domyślny'],['1','Ręczny']], value: nvram.mtu_enable },
 		{ name: 'f_wan_mtu', type: 'text', maxlen: 4, size: 6, value: nvram.wan_mtu } ] },
-	{ title: 'Single Line MLPPP', name: 'f_ppp_mlppp', type: 'checkbox', value: (nvram.ppp_mlppp == 1) },
-
-	{ title: 'Route Modem IP', name: 'modem_ipaddr', type: 'text', maxlen: 15, size: 17, suffix: ' <i>(must be in different subnet to router, 0.0.0.0 to disable)</i>', value: nvram.modem_ipaddr },
-
-	{ title: 'Bridge WAN port to primary LAN (br0)', name: 'f_wan_islan', type: 'checkbox', value: (nvram.wan_islan == 1) }
+	{ title: 'Jednoliniowy MLPPP', name: 'f_ppp_mlppp', type: 'checkbox', value: (nvram.ppp_mlppp == 1) },
+	{ title: 'IP routera/modemu', name: 'modem_ipaddr', type: 'text', maxlen: 15, size: 17, suffix: ' <i>(musi być inny niż adres podsieci routera, 0.0.0.0 by wyłączyć)</i>', value: nvram.modem_ipaddr },
+	{ title: 'Mostkuj port WAN do podstawowego LAN (br0)', name: 'f_wan_islan', type: 'checkbox', value: (nvram.wan_islan == 1) }
 ]);
 
 </script>
@@ -1581,12 +1578,12 @@ dns = nvram.wan_dns.split(/\s+/);
 //ipp = nvram.lan_ipaddr.split('.').splice(0, 3).join('.');
 REMOVE-END */
 createFieldTable('', [
-	{ title: 'Default Gateway', name: 'lan_gateway', type: 'text', maxlen: 15, size: 17, value: nvram.lan_gateway },
-	{ title: 'Static DNS', suffix: '&nbsp; <i>(IP:port)</i>', name: 'f_dns_1', type: 'text', maxlen: 21, size: 25, value: dns[0] || '0.0.0.0' },
+	{ title: 'Brama domyślna', name: 'lan_gateway', type: 'text', maxlen: 15, size: 17, value: nvram.lan_gateway },
+	{ title: 'DNS statyczny', suffix: '&nbsp; <i>(IP:port)</i>', name: 'f_dns_1', type: 'text', maxlen: 21, size: 25, value: dns[0] || '0.0.0.0' },
 	{ title: '', name: 'f_dns_2', type: 'text', maxlen: 21, size: 25, value: dns[1] || '0.0.0.0' },
 	{ title: '', name: 'f_dns_3', type: 'text', maxlen: 21, size: 25, value: dns[2] || '0.0.0.0' },
 /* DNSCRYPT-BEGIN */
-	{ title: 'Use dnscrypt-proxy', name: 'f_dnscrypt_proxy', type: 'checkbox', value: (nvram.dnscrypt_proxy == 1) },
+	{ title: 'Użyj dnscrypt-proxy', name: 'f_dnscrypt_proxy', type: 'checkbox', value: (nvram.dnscrypt_proxy == 1) },
 /* DNSCRYPT-END */
 	{ title: 'WINS <i>(dla DHCP)</i>', name: 'wan_wins', type: 'text', maxlen: 15, size: 17, value: nvram.wan_wins }
 ]);
@@ -1699,8 +1696,8 @@ if (wl_sunit(uidx)<0) {
 </td></tr>
 <tr><td id='footer' colspan=2>
 	<span id='footer-msg'></span>
-	<input type='button' value='Save' id='save-button' onclick='save()'>
-	<input type='button' value='Cancel' id='cancel-button' onclick='reloadPage();'>
+	<input type='button' value='Zapisz' id='save-button' onclick='save()'>
+	<input type='button' value='Anuluj' id='cancel-button' onclick='reloadPage();'>
 </td></tr>
 </table>
 </form>

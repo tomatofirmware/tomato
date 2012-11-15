@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
 	For use with Tomato Firmware only.
@@ -8,7 +8,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] NAS: UPS Monitor</title>
+<title>[<% ident(); %>] NAS: Monitor UPS</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
@@ -79,7 +79,7 @@ function clientSideInclude(id, url) {
     element.innerHTML = req.responseText;
   } else {
     element.innerHTML =
-   "Sorry, your browser does not support " +
+   "Niestety, Twoja przeglądarka nie jest obsługiwana " +
       "XMLHTTPRequest objects. This page requires " +
       "Internet Explorer 5 or better for Windows, " +
       "or Firefox for any system, or Safari. Other " +
@@ -93,17 +93,17 @@ function clientSideInclude(id, url) {
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi' style="height: 188px"><script type='text/javascript'>navi()</script></td>
 <td id='content' style="height: 188px">
 	<div id='ident'><% ident(); %></div>
 	<input type='hidden' name='_nextpage' value='nas-ups.asp'>
-	<div class='section-title'>APC UPS Status</div>
+	<div class='section-title'>Status APC UPS</div>
 	<div class='section'>
 		<span id="ups-status"></span>
 	</div>
-	<div class='section-title'>APC UPS Response</div>
+	<div class='section-title'>Odpowiedź APC UPS</div>
 	<div class='section'>
 		<span id="ups-data"></span>
 	</div>

@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
 	Copyright (C) 2006-2010 Jonathan Zarate
@@ -15,7 +15,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Basic: Wireless Filter</title>
+<title>[<% ident(); %>] Podstawowe:  Filtr Wi-Fi</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
@@ -78,7 +78,7 @@ smg.setup = function() {
 		{ type: 'text', maxlen: 17 },
 		{ type: 'text', maxlen: 48 }
 	]);
-	this.headerSet(['MAC Address', 'Description']);
+	this.headerSet(['Adres MAC', 'Opis']);
 	macs = nvram.wl_maclist.split(/\s+/);
 	names = nvram.macnames.split('>');
 	for (i = 0; i < macs.length; ++i) {
@@ -155,7 +155,7 @@ function init()
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -179,11 +179,11 @@ for (var uidx = 0; uidx < wl_ifaces.length; ++uidx) {
 }
 </script>
 
-<div class='section-title'>Wireless Client Filter</div>
+<div class='section-title'>Filtr Wi-Fi</div>
 <div class='section'>
-	<input type='radio' name='f_type' id='_f_disable' value='disabled'> <label for='_f_disable'>Disable filter</label><br>
-	<input type='radio' name='f_type' id='_f_allow' value='allow'> <label for='_f_allow'>Permit only the following clients</label><br>
-	<input type='radio' name='f_type' id='_f_deny' value='deny'> <label for='_f_deny'>Block the following clients</label><br>
+	<input type='radio' name='f_type' id='_f_disable' value='disabled'> <label for='_f_disable'>Wyłącz filtrowanie</label><br>
+	<input type='radio' name='f_type' id='_f_allow' value='allow'> <label for='_f_allow'>Zezwól na dostęp następującym klientom</label><br>
+	<input type='radio' name='f_type' id='_f_deny' value='deny'> <label for='_f_deny'>Zablokuj następujących klientów</label><br>
 	<br>
 	<table id='sm-grid' class='tomato-grid'></table>
 </div>
@@ -194,8 +194,8 @@ for (var uidx = 0; uidx < wl_ifaces.length; ++uidx) {
 </td></tr>
 <tr><td id='footer' colspan=2>
 	<span id='footer-msg'></span>
-	<input type='button' value='Save' id='save-button' onclick='save()'>
-	<input type='button' value='Cancel' id='cancel-button' onclick='reloadPage();'>
+	<input type='button' value='Zapisz' id='save-button' onclick='save()'>
+	<input type='button' value='Anuluj' id='cancel-button' onclick='reloadPage();'>
 </td></tr>
 </table>
 </form>

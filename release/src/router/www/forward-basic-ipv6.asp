@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
 	Copyright (C) 2006-2010 Jonathan Zarate
@@ -11,9 +11,9 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Forwarding: Basic IPv6</title>
+<title>[<% ident(); %>] Przekierowanie: Podstawowe IPv6</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
-<link rel='stylesheet' type='text/css' href='color.css'>
+<% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
 
 <!-- / / / -->
@@ -69,7 +69,7 @@ fog.sortCompare = function(a, b) {
 }
 
 fog.dataToView = function(data) {
-	return [(data[0] != '0') ? 'On' : '', ['TCP', 'UDP', 'Both'][data[1] - 1], (data[2].match(/(.+)-(.+)/)) ? (RegExp.$1 + ' -<br>' + RegExp.$2) : data[2], data[3], data[4], data[5]];
+	return [(data[0] != '0') ? 'Wł.' : '', ['TCP', 'UDP', 'Oba'][data[1] - 1], (data[2].match(/(.+)-(.+)/)) ? (RegExp.$1 + ' -<br>' + RegExp.$2) : data[2], data[3], data[4], data[5]];
 }
 
 fog.fieldValuesToData = function(row) {
@@ -91,7 +91,7 @@ fog.verifyFields = function(row, quiet) {
 	if (!v_iptport(f[4], quiet)) return 0;
 
 	f[5].value = f[5].value.replace(/>/g, '_');
-	if (!v_nodelim(f[5], quiet, 'Description')) return 0;
+	if (!v_nodelim(f[5], quiet, 'Opis')) return 0;
 	return 1;
 }
 
@@ -109,12 +109,12 @@ fog.resetNewEditor = function() {
 fog.setup = function() {
 	this.init('fo-grid', 'sort', 50, [
 		{ type: 'checkbox' },
-		{ type: 'select', options: [[1, 'TCP'],[2, 'UDP'],[3,'Both']] },
+		{ type: 'select', options: [[1, 'TCP'],[2, 'UDP'],[3,'Oba']] },
 		{ type: 'text', maxlen: 140 },
 		{ type: 'text', maxlen: 140 },
 		{ type: 'text', maxlen: 16 },
 		{ type: 'text', maxlen: 32 }]);
-	this.headerSet(['On', 'Proto', 'Src Address', 'Dest Address', 'Dest Ports', 'Description']);
+	this.headerSet(['Wł.', 'Protokół', 'Adres źródłowy', 'Adres docelowy', 'Porty docelowe', 'Opis']);
 	var nv = nvram.ipv6_portforward.split('>');
 	for (var i = 0; i < nv.length; ++i) {
 		var r;
@@ -164,7 +164,7 @@ function init()
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -177,18 +177,18 @@ function init()
 
 <input type='hidden' name='ipv6_portforward'>
 
-<div class='section-title'>IPv6 Port Forwarding</div>
+<div class='section-title'>Przekierowanie portów IPv6</div>
 <div class='section'>
 	<table class='tomato-grid' cellspacing=1 id='fo-grid'></table>
 	<script type='text/javascript'>fog.setup();</script>
 </div>
 
 <div>
-Opens access to ports on machines inside the LAN, but does <b>not</b> re-map ports.
+Otwiera dostęp do portów na urządzeniach wewnątrz LAN, ale <b>nie</b> przemapowuje portów. Port zewnętrzny zawsze równa się portowi docelowemu.
 <ul>
-<li><b>Src Address</b> <i>(optional)</i> - Forward only if from this address. Ex: "2001:4860:800b::/48", "me.example.com".
-<li><b>Dest Address</b> <i>(optional)</i> - The destination address inside the LAN.
-<li><b>Dest Ports</b> - The ports to be opened for forwarding. Ex: "2345", "200,300", "200-300,400".
+<li><b>Adres źródłowy</b> <i>(opcjonalnie)</i> - Przekieruj tylko gdy połączenie nawiązano z podanego adresu. Np: "2001:4860:800b::/48", "me.example.com".
+<li><b>Adres docelowy</b> <i>(opcjonalnie)</i> - Adres IPv6 urządzenia wewnętrz LAN.
+<li><b>Porty docelowe</b> - Porty otwarte i przekierowane do LAN. Np: "2345", "200,300", "200-300,400".
 </ul>
 </div>
 
@@ -200,8 +200,8 @@ Opens access to ports on machines inside the LAN, but does <b>not</b> re-map por
 </td></tr>
 <tr><td id='footer' colspan=2>
 	<span id='footer-msg'></span>
-	<input type='button' value='Save' id='save-button' onclick='save()'>
-	<input type='button' value='Cancel' id='cancel-button' onclick='reloadPage();'>
+	<input type='button' value='Zapisz' id='save-button' onclick='save()'>
+	<input type='button' value='Anuluj' id='cancel-button' onclick='reloadPage();'>
 </td></tr>
 </table>
 </form>

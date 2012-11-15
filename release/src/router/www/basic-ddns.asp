@@ -11,9 +11,9 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Basic: DDNS</title>
+<title>[<% ident(); %>] Podstawowe: DDNS</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
-<link rel='stylesheet' type='text/css' href='color.css'>
+<% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
 
 <!-- / / / -->
@@ -44,34 +44,33 @@ s = save state checkbox
 REMOVE-END */
 
 var services = [
-	['', 'None', '', ''],
+	['', '-- brak --', '', ''],
 	['3322', '3322', 'http://www.3322.org/', 'uhwmb'],
 	['3322-static', '3322 - Static', 'http://www.3322.org/', 'uhwmb'],
 	['dnsexit', 'DNS Exit', 'http://www.dnsexit.com/', 'uh'],
 	['dnsomatic', 'DNS-O-Matic', 'http://www.dnsomatic.com/', 'uj'],
-	['dyndns', 'DynDNS - Dynamic', 'http://www.dyndns.com/', 'uhwmbs'],
-	['dyndns-static', 'DynDNS - Static', 'http://www.dyndns.com/', 'uhwmbs'],
-	['dyndns-custom', 'DynDNS - Custom', 'http://www.dyndns.com/', 'uhwmbs'],
-	['sdyndns', 'DynDNS (https) - Dynamic', 'http://www.dyndns.com/', 'uhwmbs'],
-	['sdyndns-static', 'DynDNS (https) - Static', 'http://www.dyndns.com/', 'uhwmbs'],
-	['sdyndns-custom', 'DynDNS (https) - Custom', 'http://www.dyndns.com/', 'uhwmbs'],
+	['dyndns', 'DynDNS - dynamiczny', 'http://www.dyndns.com/', 'uhwmbs'],
+	['dyndns-static', 'DynDNS - statyczny', 'http://www.dyndns.com/', 'uhwmbs'],
+	['dyndns-custom', 'DynDNS - użykownika', 'http://www.dyndns.com/', 'uhwmbs'],
+	['sdyndns', 'DynDNS (https) - dynamiczny', 'http://www.dyndns.com/', 'uhwmbs'],
+	['sdyndns-static', 'DynDNS (https) - statyczny', 'http://www.dyndns.com/', 'uhwmbs'],
+	['sdyndns-custom', 'DynDNS (https) - użytkownika', 'http://www.dyndns.com/', 'uhwmbs'],
 	['dyns', 'DyNS', 'http://www.dyns.cx/', 'uh'],
 	['easydns', 'easyDNS', 'http://www.easydns.com/', 'uhwm'],
 	['seasydns', 'easyDNS (https)', 'http://www.easydns.com/', 'uhwm'],
 	['editdns', 'EditDNS', 'http://www.editdns.net/', 'tpz'],
-	['everydns', 'EveryDNS', 'http://www.everydns.net/', 'uj', null, null, 'Domain <small>(optional)</small>'],
+	['everydns', 'EveryDNS', 'http://www.everydns.net/', 'uj', null, null, 'Domena <small>(opcjonalne)</small>'],
 	['minidns', 'miniDNS', 'http://www.minidns.net/', 'uh'],
-	['enom', 'eNom', 'http://www.enom.com/', 'ut', 'Domain'],
+	['enom', 'eNom', 'http://www.enom.com/', 'ut', 'Domena'],
 	['afraid', 'FreeDNS (afraid.org)', 'http://freedns.afraid.org/', 'az'],
-	['heipv6tb', 'HE.net IPv6 Tunnel Broker', 'http://www.tunnelbroker.net/', 'uh', 'User ID <small>(not your username)</small>', null, 'Global Tunnel ID'],
-	['ieserver', 'ieServer.net', 'http://www.ieserver.net/', 'uhz', 'Username / Hostname', null, 'Domain'],
-	['namecheap', 'namecheap', 'http://www.namecheap.com/', 'ut', 'Domain'],
-	['noip', 'No-IP.com', 'http://www.no-ip.com/', 'uh', 'Email Address', null, 'Hostname / Group'],
-	['opendns', 'OpenDNS', 'http://www.opendns.com/', 'uhoz', null, null, 'Network <small>(optional)</small>'],
-	['tzo', 'TZO', 'http://www.tzo.com/', 'uh', 'Email Address', 'Password'],
-	['zoneedit', 'ZoneEdit', 'http://www.zoneedit.com/', 'uh'],
+	['heipv6tb', 'HE.net IPv6 Tunnel Broker', 'http://www.tunnelbroker.net/', 'uh', 'ID użytkownika<small> (nie nazwa użytkownika)</small>', null, 'Globalny ID tunelu'],
+	['ieserver', 'ieServer.net', 'http://www.ieserver.net/', 'uhz', 'Nazwa użytkownika / Nazwa hosta', null, 'Domena'],
+	['namecheap', 'namecheap', 'http://www.namecheap.com/', 'ut', 'Domena'],
+	['noip', 'No-IP.com', 'http://www.no-ip.com/', 'uh', 'Addres email', null, 'Nazwa hosta / Grupa'],
+	['opendns', 'OpenDNS', 'http://www.opendns.com/', 'uhoz', null, null, 'Sieć <small>(opcjonalny)</small>'],
+	['tzo', 'TZO', 'http://www.tzo.com/', 'uh', 'Addres email', 'Hasło'],
 	['szoneedit', 'ZoneEdit (https)', 'http://www.zoneedit.com/', 'uh'],
-	['custom', 'Custom URL', '', 'c']];
+	['custom', 'URL użytkownika', '', 'c']];
 
 var opendns = ['208.67.222.222', '208.67.220.220'];
 var opendnsInUse = 0;
@@ -84,7 +83,7 @@ function msgLoc(s)
 	if (r = s.match(/^(.*?): (.*)/)) {
 		r[2] = r[2].replace(/#RETRY (\d+) (\d+)/,
 			function(s, min, num) {
-				return '<br><small>(' + ((num >= 1) ? (num + '/3: ') : '') + 'Automatically retrying in ' + min + ' minutes)</small>';
+				return '<br><small>(' + ((num >= 1) ? (num + '/3: ') : '') + 'Automatyczne próby co '     + min + ' minuty)</small>';
 			}
 		);
 		return '<small>' + (new Date(r[1])).toLocaleString() + ':</small><br>' + r[2];
@@ -148,9 +147,9 @@ function verifyFields(focused, quiet)
 		elem.display('last-update' + i, enabled && !op.z);
 
 		if (enabled) {
-			PR('_f_user' + i).cells[0].innerHTML = data[4] || 'Username';
-			PR('_f_pass' + i).cells[0].innerHTML = data[5] || 'Password';
-			PR('_f_host' + i).cells[0].innerHTML = data[6] || 'Hostname';
+			PR('_f_user' + i).cells[0].innerHTML = data[4] || 'Nazwa użytkownika';
+			PR('_f_pass' + i).cells[0].innerHTML = data[5] || 'Hasło';
+			PR('_f_host' + i).cells[0].innerHTML = data[6] || 'Nazwa hosta';
 
 			e = E('url' + i);
 			e.href = data[2];
@@ -163,7 +162,7 @@ function verifyFields(focused, quiet)
 					e.value = 'http://';
 				}
 				if (e.value.search(/http(s?):\/\/./) != 0)  {
-					ferror.set(e, 'Expecting a URL -- http://... or https://...', quiet)
+					ferror.set(e, 'Oczekiwano adresu -- http://... lub https://...', quiet)
 					r = 0;
 				}
 				else {
@@ -178,7 +177,7 @@ function verifyFields(focused, quiet)
 					e.value = RegExp.$1;
 				}
 				if (e.value.search(/^[A-Za-z0-9]+/) == -1) {
-					ferror.set(e, 'Invalid hash or URL', quiet)
+					ferror.set(e, 'Nieprawidłowy hash lub URL', quiet)
 					r = 0;
 				}
 				else {
@@ -333,7 +332,7 @@ function init()
 {
 	if ('<% psup("ddns-update"); %>' != 0) {
 		var e = E('footer-msg');
-		e.innerHTML = 'DDNS update is running. Please refresh after a few seconds.';
+		e.innerHTML = 'Aktualizacja DDNS w toku. Proszę odśwież po kilku sekundach.';
 		e.style.visibility = 'visible';
 	}
 }
@@ -345,7 +344,7 @@ function init()
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -366,25 +365,25 @@ function init()
 <input type='hidden' name='ddnsx_save' value=''>
 
 
-<div class='section-title'>Dynamic DNS</div>
+<div class='section-title'>Dynamiczny DNS</div>
 <div class='section'>
 <script type='text/javascript'>
 s = nvram.ddnsx_ip;
 a = (s != '') && (s.indexOf('@') != 0) && (s != '0.0.0.0') && (s != '1.1.1.1') && (s != '10.1.1.1');
 createFieldTable('', [
-	{ title: 'IP address', name: 'f_ddnsx_ip', type: 'select',
+	{ title: 'Adres IP', name: 'f_ddnsx_ip', type: 'select',
 		options: [
-			['', 'Use WAN IP Address ' + ddnsx_ip + ' (recommended)'],
-			['@', 'Use External IP Address Checker (every 10 minutes)'],
-			['0.0.0.0', 'Offline (0.0.0.0)'],
-			['1.1.1.1', 'Offline (1.1.1.1)'],
-			['10.1.1.1', 'Offline (10.1.1.1)'],
-			['custom', 'Custom IP Address...']
+			['', 'Użyj adresu IP WAN ' + ddnsx_ip + ' (rekomendowane)'],
+			['@', 'Użyj zewnętrznego sprawdzacza adresu IP (co 10 minut)'],
+			['0.0.0.0', 'Wyłączony (0.0.0.0)'],
+			['1.1.1.1', 'Wyłączony (1.1.1.1)'],
+			['10.1.1.1', 'Wyłączony (10.1.1.1)'],
+			['custom', 'Własny adres IP...']
 			],
 		value: a ? 'custom' : nvram.ddnsx_ip },
-	{ title: 'Custom IP address', indent: 2, name: 'f_custom_ip', type: 'text', maxlen: 15, size: 20,
+	{ title: 'Własny adres IP', indent: 2, name: 'f_custom_ip', type: 'text', maxlen: 15, size: 20,
 		value: a ? nvram.ddnsx_ip : '', hidden: !a },
-	{ title: 'Auto refresh every', name: 'ddnsx_refresh', type: 'text', maxlen: 8, size: 8, suffix: ' days <small>(0 = disable)</small>', value: fixInt(nvram.ddnsx_refresh, 0, 90, 28) }
+	{ title: 'Automatyczne odświeżanie co', name: 'ddnsx_refresh', type: 'text', maxlen: 8, size: 8, suffix: ' dni <small>(0 = zablokowane)</small>', value: fixInt(nvram.ddnsx_refresh, 0, 90, 28) }
 ]);
 </script>
 </div>
@@ -426,28 +425,28 @@ for (i = 0; i < 2; ++i) {
 	if (u.length != 2) u = ['', ''];
 	h = (v[0] == '');
 
-	W('<div class="section-title">Dynamic DNS ' + (i + 1) + '</div><div class="section">');
+	W('<div class="section-title">Dynamiczny DNS ' + (i + 1) + '</div><div class="section">');
 	createFieldTable('', [
-		{ title: 'Service', name: 'f_service' + i, type: 'select', options: services, value: v[0] },
+		{ title: 'Usługa', name: 'f_service' + i, type: 'select', options: services, value: v[0] },
 		{ title: 'URL', indent: 2, text: '<a href="" id="url' + i + '" target="tomato-ext-ddns"></a>', hidden: 1 },
-		{ title: '&nbsp;', text: '<small>* This service determines the IP address using its own method.</small>', hidden: 1, rid: 'row_z' + i },
-		{ title: 'Hostname', name: 'f_hosttop' + i, type: 'text', maxlen: 96, size: 35, value: v[2], hidden: 1 },
-		{ title: 'Username', name: 'f_user' + i, type: 'text', maxlen: 64, size: 35, value: u[0], hidden: 1 },
-		{ title: 'Password', name: 'f_pass' + i, type: 'password', maxlen: 64, size: 35, peekaboo: 1, value: u[1], hidden: 1 },
-		{ title: 'Hostname', name: 'f_host' + i, type: 'text', maxlen: 255, size: 80, value: v[2], hidden: 1 },
+		{ title: '&nbsp;', text: '<small>* Usługa ta określa adres IP za pomocą własnej metody.</small>', hidden: 1, rid: 'row_z' + i },
+		{ title: 'Nazwa hosta', name: 'f_hosttop' + i, type: 'text', maxlen: 96, size: 35, value: v[2], hidden: 1 },
+		{ title: 'Nazwa użytkownika', name: 'f_user' + i, type: 'text', maxlen: 64, size: 35, value: u[0], hidden: 1 },
+		{ title: 'Hasło', name: 'f_pass' + i, type: 'password', maxlen: 64, size: 35, peekaboo: 1, value: u[1], hidden: 1 },
+		{ title: 'Nazwa hosta', name: 'f_host' + i, type: 'text', maxlen: 255, size: 80, value: v[2], hidden: 1 },
 		{ title: 'URL', name: 'f_cust' + i, type: 'text', maxlen: 255, size: 80, value: v[6], hidden: 1 },
-		{ title: ' ', text: '(Use @IP for the current IP address)', rid: ('custmsg' + i), hidden: 1 },
-		{ title: 'Wildcard', indent: 2, name: 'f_wild' + i, type: 'checkbox', value: v[3] != '0', hidden: 1 },
+		{ title: ' ', text: '(Użyj @IP dla aktualnego adresu IP)', rid: ('custmsg' + i), hidden: 1 },
+		{ title: 'Maska', indent: 2, name: 'f_wild' + i, type: 'checkbox', value: v[3] != '0', hidden: 1 },
 		{ title: 'MX', name: 'f_mx' + i, type: 'text', maxlen: 32, size: 35, value: v[4], hidden: 1 },
-		{ title: 'Backup MX', indent: 2, name: 'f_bmx' + i, type: 'checkbox', value: v[5] != '0', hidden: 1 },
-		{ title: 'Use as DNS', name: 'f_opendns' + i, type: 'checkbox', value: (opendnsInUse == opendns.length),
-			suffix: '<br><small>(Current DNS: ' + dns  + ')</small>', hidden: 1 },
+		{ title: 'Zapasowy MX', indent: 2, name: 'f_bmx' + i, type: 'checkbox', value: v[5] != '0', hidden: 1 },
+		{ title: 'Użyj jako DNS', name: 'f_opendns' + i, type: 'checkbox', value: (opendnsInUse == opendns.length),
+			suffix: '<br><small>(Aktualny DNS: ' + dns  + ')</small>', hidden: 1 },
 		{ title: 'Token / URL', name: 'f_afraid' + i, type: 'text', maxlen: 255, size: 80, value: v[6], hidden: 1 },
-		{ title: 'Save state when IP changes (nvram commit)', name: 'f_ddnsx_save' + i, type: 'checkbox', value: nvram.ddnsx_save == '1', hidden: 1 },
-		{ title: 'Force next update', name: 'f_force' + i, type: 'checkbox', value: 0, hidden: 1 },
+		{ title: 'Zapisz stan kiedy zmieni się IP (nvram commit)', name: 'f_ddnsx_save' + i, type: 'checkbox', value: nvram.ddnsx_save == '1', hidden: 1 },
+		{ title: 'Wymuś aktualizację', name: 'f_force' + i, type: 'checkbox', value: 0, hidden: 1 },
 		null,
-		{ title: 'Last IP Address', custom: msgLoc(ddnsx_last[i]), rid: 'last-update' + i, hidden: 1 },
-		{ title: 'Last Result', custom: msgLoc(ddnsx_msg[i]), rid: 'last-response' + i, hidden: h }
+		{ title: 'Ostatni adres IP', custom: msgLoc(ddnsx_last[i]), rid: 'last-update' + i, hidden: 1 },
+		{ title: 'Ostatni wynik', custom: msgLoc(ddnsx_msg[i]), rid: 'last-response' + i, hidden: h }
 	]);
 	W('</div>');
 }
@@ -459,8 +458,8 @@ for (i = 0; i < 2; ++i) {
 </td></tr>
 <tr><td id='footer' colspan=2>
 	<span id='footer-msg'></span>
-	<input type='button' value='Save' id='save-button' onclick='save()'>
-	<input type='button' value='Cancel' id='cancel-button' onclick='reloadPage();'>
+	<input type='button' value='Zapisz' id='save-button' onclick='save()'>
+	<input type='button' value='Anuluj' id='cancel-button' onclick='reloadPage();'>
 </td></tr>
 </table>
 <script type='text/javascript'>verifyFields(null, 1);</script>

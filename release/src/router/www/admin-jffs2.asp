@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
 	Copyright (C) 2006-2010 Jonathan Zarate
@@ -11,9 +11,9 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Admin: JFFS</title>
+<title>[<% ident(); %>] Administracja: JFFS2</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
-<link rel='stylesheet' type='text/css' href='color.css'>
+<% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
 
 <!-- / / / -->
@@ -37,14 +37,14 @@ function verifyFields(focused, quiet)
 function formatClicked()
 {
 	if (!verifyFields(null, 0)) return;
-	if (!confirm("Format the JFFS partition?")) return;
+	if (!confirm("Czy chcesz sformatować partycję JFFS2?")) return;
 	save(1);
 }
 
 function formatClock()
 {
 	if (ftime == 0) {
-		E('fclock').innerHTML = 'a few more seconds';
+		E('fclock').innerHTML = 'kilka sekund';
 	}
 	else {
 		E('fclock').innerHTML = ((ftime > 0) ? 'about ' : '') + ftime + ' second' + ((ftime == 1) ? '' : 's');
@@ -92,7 +92,7 @@ function submit_complete()
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -115,13 +115,13 @@ function submit_complete()
 
 jfon = (nvram.jffs2_on == 1);
 createFieldTable('', [
-	{ title: 'Enable', name: 'f_jffs2_on', type: 'checkbox', value: jfon },
-	{ title: 'Execute When Mounted', name: 'jffs2_exec', type: 'text', maxlen: 64, size: 34, value: nvram.jffs2_exec },
+	{ title: 'Włączone', name: 'f_jffs2_on', type: 'checkbox', value: jfon },
+	{ title: 'Wykonaj po zamontowaniu', name: 'jffs2_exec', type: 'text', maxlen: 64, size: 34, value: nvram.jffs2_exec },
 	null,
-	{ title: 'Total / Free Size', text: (((jffs2.mnt) || (jffs2.size > 0)) ? scaleSize(jffs2.size) : '') + ((jffs2.mnt) ? ' / ' + scaleSize(jffs2.free) : ' (not mounted)') },
+	{ title: 'Całkowite / Dostępne miejsce', text: (((jffs2.mnt) || (jffs2.size > 0)) ? scaleSize(jffs2.size) : '') + ((jffs2.mnt) ? ' / ' + scaleSize(jffs2.free) : ' (nie zamontowano)') },
 	null,
-	{ title: '', custom: '<input type="button" value="Format / Erase..." onclick="formatClicked()" id="format"><br><br>' +
-		'<span style="background:#b55;color:#fff;padding:1px 8px;visibility:hidden" id="fmsg">Please wait for <span id="fclock">about 60 seconds</span>...</span>' }
+	{ title: '', custom: '<input type="button" value="Formatuj / Wykasuj..." onclick="formatClicked()" id="format"><br><br>' +
+		'<span style="background:#b55;color:#fff;padding:1px 8px;visibility:hidden" id="fmsg">Proszę czekać <span id="fclock">około 60 sekund</span>...</span>' }
 ]);
 </script>
 </div>
@@ -133,8 +133,8 @@ createFieldTable('', [
 </td></tr>
 <tr><td id='footer' colspan=2>
 	<span id='footer-msg'></span>
-	<input type='button' value='Save' id='save-button' onclick='save()'>
-	<input type='button' value='Cancel' id='cancel-button' onclick='javascript:reloadPage();'>
+	<input type='button' value='Zapisz' id='save-button' onclick='save()'>
+	<input type='button' value='Anuluj' id='cancel-button' onclick='javascript:reloadPage();'>
 </td></tr>
 </table>
 </form>

@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
 	Copyright (C) 2006-2010 Jonathan Zarate
@@ -11,9 +11,9 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Forwarding: Basic</title>
+<title>[<% ident(); %>] Przekierowanie: Podstawowe</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
-<link rel='stylesheet' type='text/css' href='color.css'>
+<% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
 
 <!-- / / / -->
@@ -78,7 +78,7 @@ fog.sortCompare = function(a, b) {
 }
 
 fog.dataToView = function(data) {
-	return [(data[0] != '0') ? 'On' : '', ['TCP', 'UDP', 'Both'][data[1] - 1], (data[2].match(/(.+)-(.+)/)) ? (RegExp.$1 + ' -<br>' + RegExp.$2) : data[2], data[3], data[4], data[5], data[6]];
+	return [(data[0] != '0') ? 'Wł.' : '', ['TCP', 'UDP', 'Oba'][data[1] - 1], (data[2].match(/(.+)-(.+)/)) ? (RegExp.$1 + ' -<br>' + RegExp.$2) : data[2], data[3], data[4], data[5], data[6]];
 }
 
 fog.fieldValuesToData = function(row) {
@@ -114,7 +114,7 @@ fog.verifyFields = function(row, quiet) {
 	if (!v_ip(f[5], quiet, 1)) return 0;
 
 	f[6].value = f[6].value.replace(/>/g, '_');
-	if (!v_nodelim(f[6], quiet, 'Description')) return 0;
+	if (!v_nodelim(f[6], quiet, 'Opis')) return 0;
 	return 1;
 }
 
@@ -133,13 +133,13 @@ fog.resetNewEditor = function() {
 fog.setup = function() {
 	this.init('fo-grid', 'sort', 50, [
 		{ type: 'checkbox' },
-		{ type: 'select', options: [[1, 'TCP'],[2, 'UDP'],[3,'Both']] },
+		{ type: 'select', options: [[1, 'TCP'],[2, 'UDP'],[3,'Oba']] },
 		{ type: 'text', maxlen: 32 },
 		{ type: 'text', maxlen: 16 },
 		{ type: 'text', maxlen: 5 },
 		{ type: 'text', maxlen: 15 },
 		{ type: 'text', maxlen: 32 }]);
-	this.headerSet(['On', 'Proto', 'Src Address', 'Ext Ports', 'Int Port', 'Int Address', 'Description']);
+	this.headerSet(['Wł.', 'Protokół', 'Adres źródłowy', 'Porty zewn.', 'Port wewn.', 'Adres wewnętrzny', 'Opis']);
 	var nv = nvram.portforward.split('>');
 	for (var i = 0; i < nv.length; ++i) {
 		var r;
@@ -199,7 +199,7 @@ function init()
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -212,7 +212,7 @@ function init()
 
 <input type='hidden' name='portforward'>
 
-<div class='section-title'>Port Forwarding</div>
+<div class='section-title'>Przekierowanie portów</div>
 <div class='section'>
 	<table class='tomato-grid' cellspacing=1 id='fo-grid'></table>
 	<script type='text/javascript'>fog.setup();</script>
@@ -220,12 +220,11 @@ function init()
 
 <div>
 <ul>
-<li><b>Src Address</b> <i>(optional)</i> - Forward only if from this address. Ex: "1.2.3.4", "1.2.3.4 - 2.3.4.5", "1.2.3.0/24", "me.example.com".
-<li><b>Ext Ports</b> - The ports to be forwarded, as seen from the WAN. Ex: "2345", "200,300", "200-300,400".
-<li><b>Int Port</b> <i>(optional)</i> - The destination port inside the LAN. If blank, the destination port
-is the same as <i>Ext Ports</i>. Only one port per entry is supported when forwarding to a different internal
-port.
-<li><b>Int Address</b> - The destination address inside the LAN.
+<li><b>Adres źródłowy</b> <i>(opcjonalnie)</i> - Przekieruj tylko gdy połączenie nawiązano z podanego adresu, np: "1.2.3.4", "1.2.3.4 - 2.3.4.5", "1.2.3.0/24".
+<li><b>Zewn. porty</b> - Przekierowywane porty widziane od strony WAN, np: "2345", "200,300", "200-300,400".
+<li><b>Wewn. port</b> <i>(opcjonalnie)</i> - Port docelowy wewnątrz LAN. Jeśli pozostanie pusty, port docelowy
+będzie taki sam jak <i>Porty zewn.</i>. Tylko jeden port per wpis jest dozwolony, jeśli przekierowanie jest do różnych portów wewnętrznych.
+<li><b>Adres wewnętrzny</b> - Adres IP urządzenia wewnętrz LAN.
 </ul>
 </div>
 
@@ -237,8 +236,8 @@ port.
 </td></tr>
 <tr><td id='footer' colspan=2>
 	<span id='footer-msg'></span>
-	<input type='button' value='Save' id='save-button' onclick='save()'>
-	<input type='button' value='Cancel' id='cancel-button' onclick='reloadPage();'>
+	<input type='button' value='Zapisz' id='save-button' onclick='save()'>
+	<input type='button' value='Anuluj' id='cancel-button' onclick='reloadPage();'>
 </td></tr>
 </table>
 </form>

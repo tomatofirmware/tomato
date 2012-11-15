@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
 	Copyright (C) 2006-2010 Jonathan Zarate
@@ -11,9 +11,9 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Basic: IPv6</title>
+<title>[<% ident(); %>] Podstawowe: IPv6</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
-<link rel='stylesheet' type='text/css' href='color.css'>
+<% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
 
 <!-- / / / -->
@@ -269,7 +269,7 @@ function save()
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -288,40 +288,40 @@ function save()
 <input type='hidden' name='ipv6_rtr_addr'>
 <input type='hidden' name='ipv6_accept_ra'>
 
-<div class='section-title'>IPv6 Configuration</div>
+<div class='section-title'>Konfiguracja IPv6</div>
 <div class='section'>
 <script type='text/javascript'>
 dns = nvram.ipv6_dns.split(/\s+/);
 
 createFieldTable('', [
-	{ title: 'IPv6 Service Type', name: 'ipv6_service', type: 'select', 
-		options: [['', 'Disabled'],['native','Native IPv6 from ISP'],['native-pd','DHCPv6 with Prefix Delegation'],['6to4','6to4 Anycast Relay'],['sit','6in4 Static Tunnel'],['6rd-pd','6rd from DHCPv4 (Option 212)'],['other','Other (Manual Configuration)']],
+	{ title: 'Typ usługi IPv6', name: 'ipv6_service', type: 'select', 
+		options: [['', '-- brak --'],['native','IPv6 natywny z ISP'],['native-pd','DHCPv6 z delegacja prefiksu'],['6to4','6to4 Anycast Relay'],['sit','Tunel statyczny 6in4'],['6rd-pd','6rd z DHCPv4 (Opcja 212)'],['other','Inne (konfiguracja ręczna)']],
 		value: nvram.ipv6_service },
-	{ title: 'IPv6 WAN Interface', name: 'ipv6_ifname', type: 'text', maxlen: 8, size: 10, value: nvram.ipv6_ifname },
+	{ title: 'Interfejs WAN IPv6', name: 'ipv6_ifname', type: 'text', maxlen: 8, size: 10, value: nvram.ipv6_ifname },
 	null,
-	{ title: 'Assigned / Routed Prefix', name: 'f_ipv6_prefix', type: 'text', maxlen: 46, size: 48, value: nvram.ipv6_prefix },
-	{ title: 'Prefix Length', name: 'f_ipv6_prefix_length', type: 'text', maxlen: 3, size: 5, value: nvram.ipv6_prefix_length },
-	{ title: 'Router IPv6 Address', multi: [
-		{ name: 'f_ipv6_rtr_addr_auto', type: 'select', options: [['0', 'Default'],['1','Manual']], value: (nvram.ipv6_rtr_addr == '' ? '0' : '1') },
+	{ title: 'Prefiks przypisany / routowalny', name: 'f_ipv6_prefix', type: 'text', maxlen: 46, size: 48, value: nvram.ipv6_prefix },
+	{ title: 'Długość prefiksu', name: 'f_ipv6_prefix_length', type: 'text', maxlen: 3, size: 5, value: nvram.ipv6_prefix_length },
+	{ title: 'Adres IPv6 routera', multi: [
+		{ name: 'f_ipv6_rtr_addr_auto', type: 'select', options: [['0', 'Domyślny'],['1','Ręczny']], value: (nvram.ipv6_rtr_addr == '' ? '0' : '1') },
 		{ name: 'f_ipv6_rtr_addr', type: 'text', maxlen: 46, size: 48, value: nvram.ipv6_rtr_addr }
 	] },
-	{ title: 'Static DNS', name: 'f_ipv6_dns_1', type: 'text', maxlen: 46, size: 48, value: dns[0] || '' },
+	{ title: 'DNS statyczny', name: 'f_ipv6_dns_1', type: 'text', maxlen: 46, size: 48, value: dns[0] || '' },
 	{ title: '',           name: 'f_ipv6_dns_2', type: 'text', maxlen: 46, size: 48, value: dns[1] || '' },
 	{ title: '',           name: 'f_ipv6_dns_3', type: 'text', maxlen: 46, size: 48, value: dns[2] || '' },
-	{ title: 'Enable Router Advertisements', name: 'f_ipv6_radvd', type: 'checkbox', value: nvram.ipv6_radvd == '1' },
-	{ title: 'Accept RA from', multi: [
+	{ title: 'Włącz rozgłoszenia routera', name: 'f_ipv6_radvd', type: 'checkbox', value: nvram.ipv6_radvd == '1' },
+	{ title: 'Akceptuj rozgłoszenia routera z', multi: [
 		{ suffix: '&nbsp; WAN &nbsp;&nbsp;&nbsp;', name: 'f_ipv6_accept_ra_wan', type: 'checkbox', value: (nvram.ipv6_accept_ra & 1) },
 		{ suffix: '&nbsp; LAN &nbsp;',	name: 'f_ipv6_accept_ra_lan', type: 'checkbox', value: (nvram.ipv6_accept_ra & 2) }
 	] },
 	null,
-	{ title: 'Tunnel Remote Endpoint (IPv4 Address)', name: 'ipv6_tun_v4end', type: 'text', maxlen: 15, size: 17, value: nvram.ipv6_tun_v4end },
-	{ title: 'Relay Anycast Address', name: 'ipv6_relay', type: 'text', maxlen: 3, size: 5, prefix: '192.88.99.&nbsp&nbsp', value: nvram.ipv6_relay },
-	{ title: 'Tunnel Client IPv6 Address', multi: [
+	{ title: 'Zdalny koniec tunelu (adres IPv4)', name: 'ipv6_tun_v4end', type: 'text', maxlen: 15, size: 17, value: nvram.ipv6_tun_v4end },
+	{ title: 'Adres Relay Anycast', name: 'ipv6_relay', type: 'text', maxlen: 3, size: 5, prefix: '192.88.99.&nbsp&nbsp', value: nvram.ipv6_relay },
+	{ title: 'Adres IPv6 tunelu od strony klienta', multi: [
 		{ name: 'ipv6_tun_addr', type: 'text', maxlen: 46, size: 48, value: nvram.ipv6_tun_addr, suffix: ' / ' },
 		{ name: 'ipv6_tun_addrlen', type: 'text', maxlen: 3, size: 5, value: nvram.ipv6_tun_addrlen }
 	] },
-	{ title: 'Tunnel MTU', name: 'ipv6_tun_mtu', type: 'text', maxlen: 4, size: 8, value: nvram.ipv6_tun_mtu, suffix: ' <small>(0 for default)</small>' },
-	{ title: 'Tunnel TTL', name: 'ipv6_tun_ttl', type: 'text', maxlen: 3, size: 8, value: nvram.ipv6_tun_ttl }
+	{ title: 'MTU tunelu', name: 'ipv6_tun_mtu', type: 'text', maxlen: 4, size: 8, value: nvram.ipv6_tun_mtu, suffix: ' <small>(0 dla domyślnego)</small>' },
+	{ title: 'TTL tunelu', name: 'ipv6_tun_ttl', type: 'text', maxlen: 3, size: 8, value: nvram.ipv6_tun_ttl }
 ]);
 </script>
 </div>
@@ -334,8 +334,8 @@ createFieldTable('', [
 </td></tr>
 <tr><td id='footer' colspan=2>
 	<span id='footer-msg'></span>
-	<input type='button' value='Save' id='save-button' onclick='save()'>
-	<input type='button' value='Cancel' id='cancel-button' onclick='reloadPage();'>
+	<input type='button' value='Zapisz' id='save-button' onclick='save()'>
+	<input type='button' value='Anuluj' id='cancel-button' onclick='reloadPage();'>
 </td></tr>
 </table>
 </form>

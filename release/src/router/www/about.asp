@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
 	Copyright (C) 2006-2010 Jonathan Zarate
@@ -11,7 +11,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] About</title>
+<title>[<% ident(); %>] O Tomato</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
@@ -77,7 +77,7 @@ function init()
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -88,52 +88,61 @@ function init()
 <div style='float:right;margin:20px 20px;text-align:center'>
 <img src='tux.png' alt='Linux &amp; Tomato' id='tux'>
 </div>
+<div style='margin:20px 20px;font-size:14px;color:#555;'>
 <div class='about'>
-<b>Tomato Firmware <% version(1); %></b><br>
+<b>Oprogramowanie Tomato PL <% version(1); %></b><br>
+<br>
+<b>Wersja spolszczona</b> dzięki ciężkiej pracy użytkowników portalu <a href='http://openlinksys.info' target='_new'>http://openlinksys.info</a><br>
+Wielkie podziękowania dla:<br>
+- tristan<br>
+- shibby<br>
+- marny<br>
+- buniaczek<br>
 
+<br>
 <!-- USB-BEGIN -->
-<br>USB support integration and GUI,<br>
+<br>Obsługa USB i integracja z GUI,<br>
 <!-- USB-END -->
 <!-- IPV6-BEGIN -->
-IPv6 support,
+Obsługa IPv6,
 <!-- IPV6-END -->
 <br>
-Linux kernel <% version(2); %> and Broadcom Wireless Driver <% version(3); %> updates,<br>
-support for additional router models, dual-band and Wireless-N mode.<br>
+Kernel linuxa <% version(2); %> i sterownik Wi-Fi broadcom <% version(3); %>,<br>
+Wsparcie dodatkowych modeli routerów, obsługa dual-band i trybu N.<br>
 Copyright (C) 2008-2011 Fedor Kozhevnikov, Ray Van Tassle, Wes Campaigne<br>
 <a href='http://www.tomatousb.org/' target='_new'>http://www.tomatousb.org</a><br>
 <!-- / / / -->
 <br>
 
 <!-- OPENVPN-BEGIN -->
-<b>OpenVPN integration and GUI,</b><br>
+<b>OpenVPN i integracja z GUI,</b><br>
 Copyright (C) 2010 Keith Moyer,<br>
 <a href='mailto:tomatovpn@keithmoyer.com'>tomatovpn@keithmoyer.com</a><br>
 <br>
 <!-- OPENVPN-END -->
 
-<b>"Shibby" features:</b><br>
+<b>"Shibby":</b><br>
 <!-- BBT-BEGIN -->
-- Transmission 2.71 integration<br>
+- Transmission 2.71<br>
 <!-- BBT-END -->
 <!-- BT-BEGIN -->
-- GUI for Transmission<br>
+- Integracja Transmission z GUI<br>
 <!-- BT-END -->
 <!-- NFS-BEGIN -->
-- NFS utils integration and GUI<br>
+- NFS utils i integracja z GUI<br>
 <!-- NFS-END -->
-- Custom log file path<br>
+- Własna ścieżka dla logów<br>
 <!-- LINUX26-BEGIN -->
-- SD-idle tool integration for kernel 2.6<br>
+- SD-idle i integracja z GUI dla kernela 2.6<br>
 <!-- USB-BEGIN -->
-- 3G Modem support (big thanks for @LDevil)<br>
+- Obsługa modemów 3G (wielkie dzięki @LDevil)<br>
 <!-- USB-END -->
 <!-- LINUX26-END -->
 <!-- SNMP-BEGIN -->
-- SNMP integration and GUI<br>
+- SNMP i integracja z GUI<br>
 <!-- SNMP-END -->
 <!-- UPS-BEGIN -->
-- APCUPSD integration and GUI (implemented by @arrmo)<br>
+- APCUPSD i integracja z GUI(implementacja @arrmo)<br>
 <!-- UPS-END -->
 <!-- DNSCRYPT-BEGIN -->
 - DNScrypt-proxy 1.0 i integracja z GUI<br>
@@ -148,68 +157,68 @@ Copyright (C) 2011 Michał Rupental<br>
 <!-- VPN-BEGIN -->
 <b>"JYAvenard" Features:</b><br>
 <!-- OPENVPN-BEGIN -->
-- OpenVPN enhancements &amp; username/password only authentication<br>
+- ulepszenia do OpenVPN &amp; autoryzacja za pomocą loginu/hasła<br>
 <!-- OPENVPN-END -->
 <!-- PPTPD-BEGIN -->
-- PPTP VPN Client integration and GUI<br>
+- Klient PPTP i integracja z GUI<br>
 <!-- PPTPD-END -->
 Copyright (C) 2010-2012 Jean-Yves Avenard<br>
 <a href='mailto:jean-yves@avenard.org'>jean-yves@avenard.org</a><br>
 <br>
 <!-- VPN-END -->
 
-<b>"Victek" features:</b><br>
-- Extended Sysinfo<br>
+<b>"Victek":</b><br>
+- Rozszerzone Sysinfo<br>
 <!-- NOCAT-BEGIN -->
-- Captive Portal. (Based in NocatSplash)<br>
+- Captive Portal. (bazujący na NocatSplash)<br>
 <!-- NOCAT-END -->
 <!-- HFS-BEGIN -->
-- HFS / HFS+ filesystem integration<br>
+- Obsługa systemu plików HFS / HFS+ <br>
 <!-- HFS-END -->
 Copyright (C) 2007-2011 Ofer Chen & Vicente Soriano<br>
 <a href='http://victek.is-a-geek.com' target='_new'>http://victek.is-a-geek.com</a><br>
 <br>
 
-<b>"Teaman" features:</b><br>
-- QOS-detailed & ctrate filters<br>
-- Realtime bandwidth monitoring of LAN clients<br>
-- Static ARP binding<br>
-- VLAN administration GUI<br>
-- Multiple LAN support integration and GUI<br>
-- Multiple/virtual SSID support (experimental)<br>
-- UDPxy integration and GUI<br>
+<b>"Teaman":</b><br>
+- Filtry, poprawki dla QoS<br>
+- Statystyki użytkowników sieci<br>
+- Statyczny ARP<br>
+- Obsługa VLAN i integracja z GUI<br>
+- Obsługa wielu sieci LAN i integracja z GUI<br>
+- Obsługa MultiSSID (eksperymentalnie)<br>
+- UDPxy i integracja z GUI<br>
 <!-- PPTPD-BEGIN -->
-- PPTP Server integration and GUI<br>
+- Serwer PPTP i integracja z GUI<br>
 <!-- PPTPD-END -->
 Copyright (C) 2011 Augusto Bott<br>
 <a href='http://code.google.com/p/tomato-sdhc-vlan/' target='_new'>Tomato-sdhc-vlan Homepage</a><br>
 <br>
 
 <b>"Toastman" features:</b><br>
-- Configurable QOS class names<br>
-- Comprehensive QOS rule examples set by default<br>
+- Konfigurowalne nazwy klas QoS<br>
+- Definicje klas QoS<br>
 Copyright (C) 2011 Toastman<br>
-<a href='http://www.linksysinfo.org/index.php?threads/using-qos-tutorial-and-discussion.28349/' target='_new'>Using QoS - Tutorial and discussion</a><br>
+<a href='http://www.linksysinfo.org/index.php?threads/using-qos-tutorial-and-discussion.28349/' target='_new'>QoS - Tutorial i dyskusja</a><br>
 <br>
 
 <!-- SDHC-BEGIN -->
-<b>"Slodki" feature:</b><br>
-- SDHC integration and GUI<br>
+<b>"Slodki":</b><br>
+- Obsługa SDHC i integracja z GUI<br>
 Copyright (C) 2009 Tomasz Słodkowicz<br>
 <a href='http://gemini.net.pl/~slodki/tomato-sdhc.html' target='_new'>tomato-sdhc</a><br>
 <br>
 <!-- SDHC-END -->
 
-<b>"Victek/PrinceAMD/Phykris/Shibby" feature:</b><br>
-- Revised IP/MAC Bandwidth Limiter<br>
+<b>"Victek/PrinceAMD/Phykris/Shibby":</b><br>
+- Odświeżone narzędzie "Limiter pasma" <br>
 <br>
 
 <br>
-Based on Tomato Firmware v<% version(); %><br>
+Wzorowany na Tomato Firmware v<% version(); %><br>
 Copyright (C) 2006-2010 Jonathan Zarate<br>
 <a href='http://www.polarcloud.com/tomato/' target='_new'>http://www.polarcloud.com/tomato/</a><br>
 <br>
-Built on <% build_time(); %> by Shibby, <a href='http://openlinksys.info' target='_new'>http://openlinksys.info</a><br><br>
+Skompilowany <% build_time(); %> przez Shibby, <a href='http://openlinksys.info' target='_new'>http://openlinksys.info</a><br><br>
 <br><br>
 
 <!--
@@ -228,8 +237,8 @@ Built on <% build_time(); %> by Shibby, <a href='http://openlinksys.info' target
 </form>
 
 <div style='border-top:1px solid #e7e7e7;margin:4em 0;padding:2em 0;font-size:12px'>
-<b>Thanks to everyone who risked their routers, tested, reported bugs, made
-suggestions and contributed to this project. ^ _ ^</b><br>
+<b>Dziekuję wszystkim, którzy ryzykują swoje routery, testują, zgłaszają błędy i
+sugestie oraz przyczyniły się do tego projektu. ^ _ ^</b><br>
 </div>
 
 </div>

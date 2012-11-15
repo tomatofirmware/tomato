@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
 	Copyright (C) 2006-2010 Jonathan Zarate
@@ -11,7 +11,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Advanced: DHCP / DNS</title>
+<title>[<% ident(); %>] Zaawansowane: DHCP / DNS</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
@@ -94,11 +94,11 @@ function save()
 function toggleVisibility(whichone) {
 	if(E('sesdiv' + whichone).style.display=='') {
 		E('sesdiv' + whichone).style.display='none';
-		E('sesdiv' + whichone + 'showhide').innerHTML='(Click here to show)';
+		E('sesdiv' + whichone + 'showhide').innerHTML='(Kliknij, żeby wyświetlić)';
 		cookie.set('adv_dhcpdns_' + whichone + '_vis', 0);
 	} else {
 		E('sesdiv' + whichone).style.display='';
-		E('sesdiv' + whichone + 'showhide').innerHTML='(Click here to hide)';
+		E('sesdiv' + whichone + 'showhide').innerHTML='(Kliknij, żeby ukryć)';
 		cookie.set('adv_dhcpdns_' + whichone + '_vis', 1);
 	}
 }
@@ -117,7 +117,7 @@ function init() {
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -137,65 +137,63 @@ function init() {
 <input type='hidden' name='dhcpc_minpkt'>
 <input type='hidden' name='dhcpd_static_only'>
 
-<div class='section-title'>DHCP / DNS Server (LAN)</div>
+<div class='section-title'>Serwer DHCP / DNS (LAN)</div>
 <div class='section'>
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: 'Use internal DNS', name: 'f_dhcpd_dmdns', type: 'checkbox', value: nvram.dhcpd_dmdns == '1' },
-	{ title: 'Use received DNS with user-entered DNS', name: 'f_dns_addget', type: 'checkbox', value: nvram.dns_addget == '1' },
-	{ title: 'Prevent DNS-rebind attacks', name: 'f_dns_norebind', type: 'checkbox', value: nvram.dns_norebind == '1' },
-	{ title: 'Intercept DNS port<br>(UDP 53)', name: 'f_dns_intcpt', type: 'checkbox', value: nvram.dns_intcpt == '1' },
-	{ title: 'Use user-entered gateway if WAN is disabled', name: 'f_dhcpd_gwmode', type: 'checkbox', value: nvram.dhcpd_gwmode == '1' },
-	{ title: 'Ignore DHCP requests from unknown devices', name: 'f_dhcpd_static_only', type: 'checkbox', value: nvram.dhcpd_static_only == '1' },
-	{ title: 'Maximum active DHCP leases', name: 'dhcpd_lmax', type: 'text', maxlen: 5, size: 8, value: nvram.dhcpd_lmax },
-	{ title: 'Static lease time', multi: [
-		{ name: 'f_dhcpd_sltsel', type: 'select', options: [[0,'Same as normal lease time'],[-1,'"Infinite"'],[1,'Custom']],
+	{ title: 'Użyj wewnętrznego DNS', name: 'f_dhcpd_dmdns', type: 'checkbox', value: nvram.dhcpd_dmdns == '1' },
+	{ title: 'Użyj otrzymanego DNS razem z DNS użytkownika', name: 'f_dns_addget', type: 'checkbox', value: nvram.dns_addget == '1' },
+	{ title: 'Zapobiegaj atakom DNS-rebind', name: 'f_dns_norebind', type: 'checkbox', value: nvram.dns_norebind == '1' },
+	{ title: 'Przechwyć port DNS<br>(UDP 53)', name: 'f_dns_intcpt', type: 'checkbox', value: nvram.dns_intcpt == '1' },
+	{ title: 'Użyj bramy wprowadzonej przez użytkownika jeśli WAN jest wyłączony', name: 'f_dhcpd_gwmode', type: 'checkbox', value: nvram.dhcpd_gwmode == '1' },
+	{ title: 'Ignoruj zapytania DHCP od nieznanych urządzeń', name: 'f_dhcpd_static_only', type: 'checkbox', value: nvram.dhcpd_static_only == '1' },
+	{ title: 'Maksymalna liczba aktywnych klientów DHCP', name: 'dhcpd_lmax', type: 'text', maxlen: 5, size: 8, value: nvram.dhcpd_lmax },
+	{ title: 'Czas dzierżawy statycznej', multi: [
+		{ name: 'f_dhcpd_sltsel', type: 'select', options: [[0,'Taki sam jak normalny czas dzierżawy'],[-1,'"Nieskończony"'],[1,'Własny']],
 			value: (nvram.dhcpd_slt < 1) ? nvram.dhcpd_slt : 1 },
-		{ name: 'f_dhcpd_slt', type: 'text', maxlen: 5, size: 8, prefix: '<span id="_dhcpd_sltman"> ', suffix: ' <i>(minutes)</i></span>',
+		{ name: 'f_dhcpd_slt', type: 'text', maxlen: 5, size: 8, prefix: '<span id="_dhcpd_sltman"> ', suffix: ' <i>(minut)</i></span>',
 			value: (nvram.dhcpd_slt >= 1) ? nvram.dhcpd_slt : 3600 } ] },
-	{ title: '<a href="http://www.thekelleys.org.uk/" target="_new">Dnsmasq</a><br>Custom configuration', name: 'dnsmasq_custom', type: 'textarea', value: nvram.dnsmasq_custom }
+	{ title: '<a href="http://www.thekelleys.org.uk/" target="_new">Dnsmasq</a><br>Własna konfiguracja', name: 'dnsmasq_custom', type: 'textarea', value: nvram.dnsmasq_custom }
 ]);
 </script>
 
 <!-- / / / -->
 
-<div class='section-title'>DHCP Client (WAN)</div>
+<div class='section-title'>Klient DHCP (WAN)</div>
 <div class='section'>
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: 'DHCPC Options', name: 'dhcpc_custom', type: 'text', maxlen: 80, size: 34, value: nvram.dhcpc_custom },
-	{ title: 'Reduce packet size', name: 'f_dhcpc_minpkt', type: 'checkbox', value: nvram.dhcpc_minpkt == '1' }
+	{ title: 'Opcje DHCPC', name: 'dhcpc_custom', type: 'text', maxlen: 80, size: 34, value: nvram.dhcpc_custom },
+	{ title: 'Redukuj rozmar pakietu', name: 'f_dhcpc_minpkt', type: 'checkbox', value: nvram.dhcpc_minpkt == '1' }
 ]);
 </script>
 </div>
 
 <!-- / / / -->
 
-<div class='section-title'>Notes <small><i><a href='javascript:toggleVisibility("notes");'><span id='sesdivnotesshowhide'>(Click here to show)</span></a></i></small></div>
+<div class='section-title'>Opis opcji <small><i><a href='javascript:toggleVisibility("notes");'><span id='sesdivnotesshowhide'>(Kliknij, żeby wyświetlić)</span></a></i></small></div>
 <div class='section' id='sesdivnotes' style='display:none'>
 
-<i>DHCP / DNS Server (LAN):</i><br>
+<i>Serwer DHCP / DNS (LAN):</i><br>
 <ul>
-<li><b>Use internal DNS</b> - Allow dnsmasq to be your DNS server on LAN.</li>
-<li><b>Use received DNS with user-entered DNS</b> - Add DNS servers received from your WAN connection to the static DNS server list (see <a href='basic-network.asp'>Network</a> configuration).</li>
-<li><b>Prevent DNS-rebind attacks</b> - Enable DNS rebinding protection on Dnsmasq.</li>
-<li><b>Intercept DNS port</b> - Any DNS requests/packets sent out to UDP port 53 are redirected to the internal DNS server.</li>
-<li><b>Use user-entered gateway if WAN is disabled</b> - DHCP will use the IP address of the router as the default gateway on each LAN.</li>
-<li><b>Ignore DHCP requests (...)</b> - Dnsmasq will ignore DHCP requests  to Only MAC addresses listed on the <a href='basic-static.asp'>Static DHCP/ARP</a> page won't be able to obtain an IP address through DHCP.</li>
-<li><b>Maximum active DHCP leases</b> - Self-explanatory.</li>
-<li><b>Static lease time</b> - Absolute maximum amount of time allowed for any DHCP lease to be valid.</li>
-<li><b>Custom configuration</b> - Extra options to be added to the Dnsmasq configuration file.</li>
+<li><b>Użyj wewnętrznego DNS</b> - Pozwala dnsmasq na bycie serwerem DNS dla LAN.</li>
+<li><b>Użyj otrzymanego DNS razem z DNS użytkownika</b> - Dodaje otrzymane od Twojego ISP(z WAN) serwery DNS do statycznej listy serwerów DNS(zobacz <a href='basic-network.asp'>Konfiguracja sieciowa</a>).</li>
+<li><b>Zapobiegaj atakom DNS-rebind</b> - Włącza ochronę DNS rebinding w Dnsmasq.</li>
+<li><b>Przechwyć port DNS</b> - Każde zapytanie/pakiet DNS wysłany do portu 53 UDP zostanie przekierowane do wewnętrznego serwera DNS.</li>
+<li><b>Użyj bramy wprowadzonej przez użytkownika jeśli WAN jest wyłączony</b> - DHCP będzie używać adresu IP routera jako domyślną bramę dla każdego w LAN.</li>
+<li><b>Ignoruj zapytania DNS (...)</b> - Dnsmasq będzie ignorować zapytania DHCP od urządzeń innych niż mające swoje adresy MAC wpisane w <a href='basic-static.asp'>Statyczne DHCP/ARP</a>. Urządzenia nie uwzględnione w tej tablicy nie otrzymają adresu IP.</li>
+<li><b>Czas dzierżawy statycznej</b> - Absolutnie maksymalny dopuszczalny czas dzierżawy DHCP.</li>
+<li><b>Własna konfiguracja</b> - Dodatkowe opcje które zostaną dodane do pliku konfiguracyjnego Dnsmasq.</li>
 </ul>
 
-<i>DHCP Client (WAN):</i><br>
+<i>Klient DHCP (WAN):</i><br>
 <ul>
-<li><b>DHCPC Options</b> - Extra options for the DHCP client.</li>
-<li><b>Reduce packet size</b> - Self-explanatory.</li>
+<li><b>Opcje DHCPC</b> - Dodatkowe opcjie klienta DHCP.</li>
 </ul>
 
-<i>Other relevant notes/hints:</i><br>
+<i>Inne powiązane uwagi/podpowiedzi:</i><br>
 <ul>
-<li>The contents of file /etc/dnsmasq.custom are also added to the end of Dnsmasq's configuration file (if it exists).</li>
+<li>Zawartość pliku /etc/dnsmasq.custom (jeśli takowy istnieje) jest dodawana na końcu pliku konfiguracyjnego Dnsmasq.</li>
 </ul>
 
 </div>
@@ -205,8 +203,8 @@ createFieldTable('', [
 </td></tr>
 <tr><td id='footer' colspan=2>
 	<span id='footer-msg'></span>
-	<input type='button' value='Save' id='save-button' onclick='save()'>
-	<input type='button' value='Cancel' id='cancel-button' onclick='javascript:reloadPage();'>
+	<input type='button' value='Zapisz' id='save-button' onclick='save()'>
+	<input type='button' value='Anuluj' id='cancel-button' onclick='javascript:reloadPage();'>
 </td></tr>
 </table>
 </form>

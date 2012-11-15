@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
 	Copyright (C) 2006-2010 Jonathan Zarate
@@ -15,7 +15,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] IP Traffic: Details</title>
+<title>[<% ident(); %>] IP Traffic: Szczegóły</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
@@ -203,10 +203,10 @@ grid.populate = function() {
 
 		if (E('_f_shortcuts').checked) {
 			h = h + '<br><small>';
-			h = h + '<a href="javascript:viewQosDetail(' + i + ')" title="View QoS Details">[qosdetails]</a>';
-			h = h + '<a href="javascript:viewQosCTrates(' + i + ')" title="View transfer rates per connection">[qosrates]</a>';
-			h = h + '<a href="javascript:viewIptHistory(' + i + ')" title="View IP Traffic History">[history]</a>';
-			h = h + '<a href="javascript:addExcludeList(' + i + ')" title="Filter out this address">[hide]</a>';
+			h = h + '<a href="javascript:viewQosDetail(' + i + ')" title="Pokaż szczegóły QoS">[qosdetails]</a>';
+			h = h + '<a href="javascript:viewQosCTrates(' + i + ')" title="Pokaż limity transferu na każde połączenie">[qosrates]</a>';
+			h = h + '<a href="javascript:viewIptHistory(' + i + ')" title="Pokaż historię IP Traffic">[history]</a>';
+			h = h + '<a href="javascript:addExcludeList(' + i + ')" title="Odfiltruj ten adres">[hide]</a>';
 			h = h + '</small>';
 		}
 
@@ -227,7 +227,7 @@ grid.populate = function() {
 
 	grid.resort();
 	grid.recolor();
-	grid.footerSet([ 'Total ' + ('<small><i>(' + ((hostslisted.length > 0) ? (hostslisted.length + ' hosts') : 'no data') + ')</i></small>'),
+	grid.footerSet([ 'Łącznie ' + ('<small><i>(' + ((hostslisted.length > 0) ? (hostslisted.length + ' hostów') : 'brak danych') + ')</i></small>'),
 		rescale((rx/1024).toFixed(2)).toString(),
 		rescale((tx/1024).toFixed(2)).toString(),
 		tcpi.toFixed(0).toString() + '/' + tcpo.toFixed(0).toString(),
@@ -312,7 +312,7 @@ grid.dataToView = function(data) {
 
 grid.setup = function() {
 	this.init('grid', 'sort');
-	this.headerSet(['Host', 'Download (bytes/s)', 'Upload (bytes/s)', 'TCP IN/OUT (pkt/s)', 'UDP IN/OUT (pkt/s)', 'ICMP IN/OUT (pkt/s)', 'TCP Connections', 'UDP Connections']);
+	this.headerSet(['Host', 'Pobrano (bajtów/s)', 'Wysłano (bajtów/s)', 'TCP IN/OUT (pkt/s)', 'UDP IN/OUT (pkt/s)', 'ICMP IN/OUT (pkt/s)', 'Połączenia TCP', 'Połączenia UDP']);
 }
 
 function init() {
@@ -429,11 +429,11 @@ function verifyFields(focused, quiet) {
 function toggleVisibility(whichone) {
 	if(E('sesdiv' + whichone).style.display=='') {
 		E('sesdiv' + whichone).style.display='none';
-		E('sesdiv' + whichone + 'showhide').innerHTML='(Click here to show)';
+		E('sesdiv' + whichone + 'showhide').innerHTML='(Kliknij aby pokazać)';
 		cookie.set('ipt_details_' + whichone + '_vis', 0);
 	} else {
 		E('sesdiv' + whichone).style.display='';
-		E('sesdiv' + whichone + 'showhide').innerHTML='(Click here to hide)';
+		E('sesdiv' + whichone + 'showhide').innerHTML='(Kliknij aby ukryć)';
 		cookie.set('ipt_details_' + whichone + '_vis', 1);
 	}
 }
@@ -446,7 +446,7 @@ function toggleVisibility(whichone) {
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -455,30 +455,30 @@ function toggleVisibility(whichone) {
 <div id='cstats'>
 <!-- / / / -->
 
-<div class='section-title'>IP Traffic Details</div>
+<div class='section-title'>Szczegóły IP Traffic</div>
 <div class='section'>
 <table id='grid' class='tomato-grid' style="float:left" cellspacing=1></table>
 
-<div id='loading'><br><b>Loading...</b></div>
+<div id='loading'><br><b>Ładowanie...</b></div>
 </div>
 
 <!-- / / / -->
 
-<div class='section-title'>Options <small><i><a href='javascript:toggleVisibility("options");'><span id='sesdivoptionsshowhide'>(Click here to show)</span></a></i></small></div>
+<div class='section-title'>Opcje <small><i><a href='javascript:toggleVisibility("options");'><span id='sesdivoptionsshowhide'>(Kliknij aby pokazać)</span></a></i></small></div>
 <div class='section' id='sesdivoptions' style='display:none'>
 <script type='text/javascript'>
 var c;
 c = [];
-c.push({ title: 'Only these IPs', name: 'f_filter_ip', size: 50, maxlen: 255, type: 'text', suffix: ' <small>(Comma separated list)</small>' });
-c.push({ title: 'Exclude these IPs', name: 'f_filter_ipe', size: 50, maxlen: 255, type: 'text', suffix: ' <small>(Comma separated list)</small>' });
-c.push({ title: 'Scale', name: 'f_scale', type: 'select', options: [['0', 'KB'], ['1', 'MB'], ['2', 'GB']] });
-c.push({ title: 'Ignore inactive hosts', name: 'f_onlyactive', type: 'checkbox' });
-c.push({ title: 'Show hostnames', name: 'f_hostnames', type: 'checkbox' });
-c.push({ title: 'Show shortcuts', name: 'f_shortcuts', type: 'checkbox' });
+c.push({ title: 'Tylko te IP', name: 'f_filter_ip', size: 50, maxlen: 255, type: 'text', suffix: ' <small>(oddzielone przecinkami)</small>' });
+c.push({ title: 'Wyklucz te IP', name: 'f_filter_ipe', size: 50, maxlen: 255, type: 'text', suffix: ' <small>(oddzielone przecinkami)</small>' });
+c.push({ title: 'Skala', name: 'f_scale', type: 'select', options: [['0', 'KB'], ['1', 'MB'], ['2', 'GB']] });
+c.push({ title: 'Ignoruj nieaktywne hosty', name: 'f_onlyactive', type: 'checkbox' });
+c.push({ title: 'Pokaż nazwy hostów', name: 'f_hostnames', type: 'checkbox' });
+c.push({ title: 'Pokaż skróty', name: 'f_shortcuts', type: 'checkbox' });
 createFieldTable('',c);
 </script>
 <div style="float:right;text-align:right">
-&raquo; <a href="admin-iptraffic.asp">Configure</a>
+&raquo; <a href="admin-iptraffic.asp">Konfiguruj</a>
 </div>
 </div>
 

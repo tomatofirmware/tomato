@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
 	Copyright (C) 2006-2010 Jonathan Zarate
@@ -15,7 +15,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Advanced: Firewall</title>
+<title>[<% ident(); %>] Zaawansowane: Firewall</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
@@ -96,7 +96,7 @@ function save()
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -126,12 +126,14 @@ function save()
 <div class='section'>
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: 'Respond to ICMP ping', name: 'f_icmp', type: 'checkbox', value: nvram.block_wan == '0' },
-	{ title: 'Limits per second', name: 'f_icmp_limit', type: 'checkbox', value: nvram.block_wan_limit != '0' },
-	{ title: 'ICMP', indent: 2, name: 'f_icmp_limit_icmp', type: 'text', maxlen: 3, size: 3, suffix: ' <small> request per second</small>', value: fixInt(nvram.block_wan_limit_icmp || 1, 1, 300, 5) },
-	{ title: 'Traceroute', indent: 2, name: 'f_icmp_limit_traceroute', type: 'text', maxlen: 3, size: 3, suffix: ' <small> request per second</small>', value: fixInt(nvram.block_wan_limit_tr || 5, 1, 300, 5) },
+	{ title: 'Odpowiadaj na pingi ICMP', name: 'f_icmp', type: 'checkbox', value: nvram.block_wan == '0' },
+	{ title: 'Limity na sekundę', name: 'f_icmp_limit', type: 'checkbox', value: nvram.block_wan_limit != '0' },
+	{ title: 'ICMP', indent: 2, name: 'f_icmp_limit_icmp', type: 'text', maxlen: 3, size: 3, suffix: ' <small> żądań na sekundę</small>', value: fixInt(nvram.block_wan_limit_icmp || 1, 1, 300, 5) },
+	{ title: 'Traceroute', indent: 2, name: 'f_icmp_limit_traceroute', type: 'text', maxlen: 3, size: 3, suffix: ' <small> żądań na sekundę</small>', value: fixInt(nvram.block_wan_limit_tr || 5, 1, 300, 5) },
 	null,
-	{ title: 'Enable SYN cookies', name: 'f_syncookies', type: 'checkbox', value: nvram.ne_syncookies != '0' }
+	{ title: 'Włącz SYN cookies', name: 'f_syncookies', type: 'checkbox', value: nvram.ne_syncookies != '0' },
+	null,
+	{ title: 'Pętla zwrotna NAT', name: 'nf_loopback', type: 'select', options: [[0,'Wszystkie'],[1,'Tylko przekierowane'],[2,'Wyłączona']], value: fixInt(nvram.nf_loopback, 0, 2, 1) }
 ]);
 </script>
 </div>
@@ -150,17 +152,16 @@ createFieldTable('', [
 <div class='section'>
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: 'Enable IGMPproxy', name: 'f_multicast', type: 'checkbox', value: nvram.multicast_pass == '1' },
+	{ title: 'Włącz IGMPproxy', name: 'f_multicast', type: 'checkbox', value: nvram.multicast_pass == '1' },
 	{ title: 'LAN', indent: 2, name: 'f_multicast_lan', type: 'checkbox', value: (nvram.multicast_lan == '1') },
 	{ title: 'LAN1', indent: 2, name: 'f_multicast_lan1', type: 'checkbox', value: (nvram.multicast_lan1 == '1') },
 	{ title: 'LAN2', indent: 2, name: 'f_multicast_lan2', type: 'checkbox', value: (nvram.multicast_lan2 == '1') },
 	{ title: 'LAN3', indent: 2, name: 'f_multicast_lan3', type: 'checkbox', value: (nvram.multicast_lan3 == '1') },
 	null,
-	{ title: 'Enable Udpxy', name: 'f_udpxy_enable', type: 'checkbox', value: (nvram.udpxy_enable == '1') },
-	{ title: 'Enable client statistics', indent: 2, name: 'f_udpxy_stats', type: 'checkbox', value: (nvram.udpxy_stats == '1') },
-	{ title: 'Max clients', indent: 2, name: 'f_udpxy_clients', type: 'text', maxlen: 4, size: 6, value: fixInt(nvram.udpxy_clients || 3, 1, 5000, 3) },
-	{ title: 'Udpxy port', indent: 2, name: 'f_udpxy_port', type: 'text', maxlen: 5, size: 7, value: fixPort(nvram.udpxy_port, 4022) }
-
+	{ title: 'Włącz Udpxy', name: 'f_udpxy_enable', type: 'checkbox', value: (nvram.udpxy_enable == '1') },
+	{ title: 'Statystyki klientów', indent: 2, name: 'f_udpxy_stats', type: 'checkbox', value: (nvram.udpxy_stats == '1') },
+	{ title: 'Maks. liczka klientów', indent: 2, name: 'f_udpxy_clients', type: 'text', maxlen: 4, size: 6, value: fixInt(nvram.udpxy_clients || 3, 1, 5000, 3) },
+	{ title: 'Port Udpxy', indent: 2, name: 'f_udpxy_port', type: 'text', maxlen: 5, size: 7, value: fixPort(nvram.udpxy_port, 4022) }
 ]);
 </script>
 </div>
@@ -170,8 +171,8 @@ createFieldTable('', [
 </td></tr>
 <tr><td id='footer' colspan=2>
 	<span id='footer-msg'></span>
-	<input type='button' value='Save' id='save-button' onclick='save()'>
-	<input type='button' value='Cancel' id='cancel-button' onclick='reloadPage();'>
+	<input type='button' value='Zapisz' id='save-button' onclick='save()'>
+	<input type='button' value='Anuluj' id='cancel-button' onclick='reloadPage();'>
 </td></tr>
 </table>
 </form>

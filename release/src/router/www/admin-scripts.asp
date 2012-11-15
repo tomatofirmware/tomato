@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
 	Copyright (C) 2006-2010 Jonathan Zarate
@@ -13,14 +13,14 @@
 <meta name='robots' content='noindex,nofollow'>
 <title>[<% ident(); %>] Administracja: Skrypty</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
-<link rel='stylesheet' type='text/css' href='color.css'>
+<% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
 
 <!-- / / / -->
 <style type='text/css'>
 .as-script {
 	font: 12px monospace;
-	width: 99%;
+	width: 100%;
 	height: 400px;
 	overflow: scroll;
 	border: 1px solid #eee;
@@ -34,7 +34,7 @@
 
 //	<% nvram("script_init,script_shut,script_fire,script_wanup"); %>
 
-tabs = [['as-init', 'Init'],['as-shut', 'Shutdown'],['as-fire','Firewall'],['as-wanup', 'WAN Up']];
+tabs = [['as-init', 'Init'],['as-shut', 'Zamknięcie'],['as-fire','Firewall'],['as-wanup', 'Start WAN']];
 
 function tabSelect(name)
 {
@@ -71,7 +71,7 @@ function save()
 		x = (t[0] == 'as-fire') ? 8192 : 4096;
 		if (n > x) {
 			tabSelect(t[0]);
-			alert(t[1] + ' script is too long. Maximum allowed is ' + x + ' bytes.');
+			alert(t[1] + ' script jest zbyt długi. Dozwolone maksimum to ' + x + ' bajtów.');
 			return;
 		}
 	}
@@ -94,7 +94,7 @@ function earlyInit()
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -115,7 +115,7 @@ for (i = 0; i < tabs.length; ++i) {
 	W('<textarea class="as-script" name="script_' + t.replace('as-', '') + '" id="' + t + '-text" wrap=' + (wrap ? 'virtual' : 'off') + ' style="' + s + '"></textarea>');
 }
 W('<br><input type="checkbox" id="as-wordwrap" onclick="wordWrap()" onchange="wordWrap()" ' +
-  (wrap ? 'checked' : '') + '> Word Wrap');
+  (wrap ? 'checked' : '') + '> zawijanie wierszy');
 </script>
 
 <!-- / / / -->
@@ -123,8 +123,8 @@ W('<br><input type="checkbox" id="as-wordwrap" onclick="wordWrap()" onchange="wo
 </td></tr>
 <tr><td id='footer' colspan=2>
 	<span id='footer-msg'></span>
-	<input type='button' value='Save' id='save-button' onclick='save()'>
-	<input type='button' value='Cancel' id='cancel-button' onclick='reloadPage();'>
+	<input type='button' value='Zapisz' id='save-button' onclick='save()'>
+	<input type='button' value='Anuluj' id='cancel-button' onclick='reloadPage();'>
 </td></tr>
 </table>
 </form>

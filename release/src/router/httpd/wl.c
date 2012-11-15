@@ -239,7 +239,7 @@ void asp_wlscan(int argc, char **argv)
 	// scan
 
 	if (foreach_wif(0, &rp, start_scan) == 0) {
-		web_puts("[null,'Unable to start scan.']];\n");
+		web_puts("[null,'Nie można uruchomić skanowania.']];\n");
 		return;
 	}
 	sleep(1);
@@ -247,7 +247,7 @@ void asp_wlscan(int argc, char **argv)
 	// get results
 
 	if (foreach_wif(0, &rp, get_scan_results) == 0) {
-		web_puts("[null,'Unable to obtain scan results.']];\n");
+		web_puts("[null,'Nie można określić wyniku skanowania.']];\n");
 		return;
 	}
 

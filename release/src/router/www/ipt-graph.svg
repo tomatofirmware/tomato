@@ -207,6 +207,6 @@ function mOut()
 
 <g id="tip-group" visibility="hidden">
 	<rect id="tip-mask" x="0" y="0" width="160" height="18" />
-	<text id="tip-text" x="5" y="13">Unclassified 100.00% (9999)</text>
+	<text id="tip-text" x="5" y="13">Niesklasyfikowano 100.00% (9999)</text>
 </g>
 </svg>

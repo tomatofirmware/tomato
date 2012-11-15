@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
 	Copyright (C) 2006-2010 Jonathan Zarate
@@ -11,9 +11,9 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] QoS: View Graphs</title>
+<title>[<% ident(); %>] QoS: Wyświetlanie wykresów</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
-<link rel='stylesheet' type='text/css' href='color.css'>
+<% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
 
 <!-- / / / -->
@@ -50,7 +50,7 @@
 
 var svgReady = 0;
 
-var Unclassified = ['Unclassified'];
+var Unclassified = ['Nieklasyfikowany'];
 var classNames = nvram.qos_classnames.split(' ');		// Toastman - configurable class names
 var abc = Unclassified.concat(classNames);
 
@@ -171,7 +171,7 @@ function init()
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -179,7 +179,7 @@ function init()
 
 <!-- / / / -->
 
-<div class="section-title">Connections Distribution</div>
+<div class="section-title">Przydział połączeń pomiędzy klasami</div>
 <div class="section">
 <table border=0 width="100%"><tr><td>
 	<table style="width:250px">
@@ -192,7 +192,7 @@ for (i = 0; i < 11; ++i) {
 		'<td id="cpct' + i + '" class="pct"></td></tr>');
 }
 </script>
-	<tr><td>&nbsp;</td><td class="total">Total</a></td><td id="ccnt-total" class="total count"></td><td class="total pct">100%</td></tr>
+	<tr><td>&nbsp;</td><td class="total">Łącznie</a></td><td id="ccnt-total" class="total count"></td><td class="total pct">100%</td></tr>
 	</table>
 </td><td style="margin-right:150px">
 <script type='text/javascript'>
@@ -204,7 +204,7 @@ if (nvram.web_svg != '0') {
 </table>
 </div>
 
-<div class="section-title">Bandwidth Distribution (Outbound)</div>
+<div class="section-title">Przydział pasma (Połączenia wychodzące)</div>
 <div class="section">
 <table border=0 width="100%"><tr><td>
 	<table style="width:250px">
@@ -219,7 +219,7 @@ for (i = 1; i < 11; ++i) {
 		'<td id="bpct' + i + '" class="pct"></td></tr>');
 }
 </script>
-	<tr><td>&nbsp;</td><td class="total">Total</a></td><td id="bcnt-total" class="total count"></td><td id="bcntx-total" class="total count"></td><td class="total pct">100%</td></tr>
+	<tr><td>&nbsp;</td><td class="total">Łącznie</a></td><td id="bcnt-total" class="total count"></td><td id="bcntx-total" class="total count"></td><td class="total pct">100%</td></tr>
 	</table>
 </td><td style="margin-right:150px">
 <script type='text/javascript'>
@@ -233,7 +233,7 @@ if (nvram.web_svg != '0') {
 
 <script type='text/javascript'>
 if (nvram.qos_enable != '1') {
-	W('<div class="note-disabled"><b>QoS disabled.</b> &nbsp; <a href="qos-settings.asp">Enable &raquo;</a></div>');
+	W('<div class="note-disabled"><b>QoS wyłączony.</b> &nbsp; <a href="qos-settings.asp">Włącz &raquo;</a></div>');
 }
 </script>
 

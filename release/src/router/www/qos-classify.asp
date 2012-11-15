@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
+﻿<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 	Tomato GUI
 	Copyright (C) 2006-2010 Jonathan Zarate
@@ -11,9 +11,9 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] QoS: Classification</title>
+<title>[<% ident(); %>] QoS: Klasyfikacja</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
-<link rel='stylesheet' type='text/css' href='color.css'>
+<% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
 <script type='text/javascript' src='protocols.js'></script>
 
@@ -114,25 +114,25 @@ var abc = nvram.qos_classnames.split(' ');		// Toastman - configurable class nam
 
 
 var ipp2p = [
-	[0,'IPP2P (disabled)'],[0xFFF,'All IPP2P filters'],[1,'AppleJuice'],[2,'Ares'],[4,'BitTorrent'],[8,'Direct Connect'],
+	[0,'IPP2P (wyłączone)'],[0xFFF,'Wszystkie filtry IPP2P'],[1,'AppleJuice'],[2,'Ares'],[4,'BitTorrent'],[8,'Direct Connect'],
 	[16,'eDonkey'],[32,'Gnutella'],[64,'Kazaa'],[128,'Mute'],[256,'SoulSeek'],[512,'Waste'],[1024,'WinMX'],[2048,'XDCC']];
 
 var dscp = [
-	['','DSCP (any)'],['0x00','BE'],
+	['','DSCP (każdy)'],['0x00','BE'],
 	['0x08','CS1'],['0x10','CS2'],['0x18','CS3'],['0x20','CS4'],['0x28','CS5'],['0x30','CS6'],['0x38','CS7'],
 	['0x0a','AF11'],['0x0c','AF12'],['0x0e','AF13'],['0x12','AF21'],['0x14','AF22'],['0x16','AF23'],
 	['0x1a','AF31'],['0x1c','AF32'],['0x1e','AF33'],['0x22','AF41'],['0x24','AF42'],['0x26','AF43'],
-	['0x2e','EF'],['*','DSCP value']];
+	['0x2e','EF'],['*','Wartość DSCP']];
 for (i = 1; i < dscp.length - 1; ++i)
-	dscp[i][1] = 'DSCP Class ' + dscp[i][1];
+	dscp[i][1] = 'Klasa DSCP ' + dscp[i][1];
 
 // <% layer7(); %>
 layer7.sort();
 for (i = 0; i < layer7.length; ++i)
 	layer7[i] = [layer7[i],layer7[i]];
-layer7.unshift(['', 'Layer 7 (disabled)']);
+layer7.unshift(['', 'Layer 7 (wyłączone)']);
 
-var class1 = [[-1,'Disabled']];
+var class1 = [[-1,'Wyłączone']];
 for (i = 0; i < 10; ++i) class1.push([i, abc[i]]);
 var class2 = class1.slice(1);
 var ruleCounter = 0;
@@ -159,7 +159,7 @@ qosg.dataToView = function(data) {
 	var s, i;
 
 	if (data[0] != 0) {
-		b.push(((data[0] == 1) ? 'To ' : 'From ') + data[1]);
+		b.push(((data[0] == 1) ? 'Do ' : 'Z ') + data[1]);
 	}
 	if (data[2] >= -1) {
 		if (data[2] == -1) b.push('TCP/UDP');
@@ -186,11 +186,11 @@ qosg.dataToView = function(data) {
 	if (data[9] != '') {
 		s = dscpClass(data[9]);
 		if (s != '') b.push(s);
-		else b.push('DSCP Value: ' + data[9]);
+		else b.push('Wartość DSCP: ' + data[9]);
 	}
 
 	if (data[7] != '') {
-		b.push('Transferred: ' + data[7] + ((data[8] == '') ? '<small>KB+</small>' : (' - ' + data[8] + '<small>KB</small>')));
+		b.push('Przesłano: ' + data[7] + ((data[8] == '') ? '<small>KB+</small>' : (' - ' + data[8] + '<small>KB</small>')));
 	}
 
 	return [b.join('<br>'), class1[(data[10] * 1) + 1][1], escapeHTML(data[11]), (ruleCounter >= 0) ? ''+ ++ruleCounter : ''];
@@ -268,7 +268,7 @@ function v_dscp(e, quiet)
 	if ((e = E(e)) == null) return 0;
 	var v = e.value;
 	if ((!v.match(/^ *(0x)?[0-9A-Fa-f]+ *$/)) || (v < 0) || (v > 63)) {
-		ferror.set(e, 'Invalid DSCP value. Valid range: 0x00-0x3F', quiet);
+		ferror.set(e, 'Błędna wartość DSCP. Dostępny zakres: 0x00-0x3F', quiet);
 		return 0;
 	}
 	e.value = '0x' + (v * 1).hex(2);
@@ -315,7 +315,7 @@ qosg.verifyFields = function(row, quiet) {
 	}
 
 	if ((b != '') && (a >= b)) {
-		ferror.set(f[9], 'Invalid range', quiet);
+		ferror.set(f[9], 'Błędny zakres', quiet);
 		return 0;
 	}
 
@@ -324,13 +324,13 @@ qosg.verifyFields = function(row, quiet) {
 	}
 	else f[8].value = f[7].value;
 
-	if (!v_nodelim(f[12], quiet, 'Description', 1)) return 0;
+	if (!v_nodelim(f[12], quiet, 'Opis', 1)) return 0;
 	return v_length(f[12], quiet);
 }
 
 qosg.setup = function() {
 	var i, a, b;
-	a = [[-2, 'Any Protocol'],[-1,'TCP/UDP'],[6,'TCP'],[17,'UDP']];
+	a = [[-2, 'Dowolny protokół'],[-1,'TCP/UDP'],[6,'TCP'],[17,'UDP']];
 	for (i = 0; i < 256; ++i) {
 		if ((i != 6) && (i != 17)) a.push([i, protocols[i] || i]);
 	}
@@ -338,13 +338,13 @@ qosg.setup = function() {
 	// what a mess...
 	this.init('qg', 'move', 80, [
 		{ multi: [
-			{ type: 'select', options: [[0,'Any Address'],[1,'Dst IP'],[2,'Src IP'],[3,'Src MAC']],
+			{ type: 'select', options: [[0,'Dowolny adres'],[1,'Źródł. IP'],[2,'Docel. IP'],[3,'Źródł. MAC']],
 				prefix: '<div class="x1a">', suffix: '</div>' },
 			{ type: 'text', prefix: '<div class="x1b">', suffix: '</div>' },
 
 			{ type: 'select', prefix: '<div class="x2a">', suffix: '</div>', options: a },
 			{ type: 'select', prefix: '<div class="x2b">', suffix: '</div>',
-				options: [['a','Any Port'],['d','Dst Port'],['s','Src Port'],['x','Src or Dst']] },
+				options: [['a','Dowolny port'],['d','Port docel.'],['s','Port źródł.'],['x','Źródł. lub Docel.']] },
 			{ type: 'text', prefix: '<div class="x2c">', suffix: '</div>' },
 
 			{ type: 'select', prefix: '<div class="x3a">', suffix: '</div>', options: ipp2p },
@@ -354,13 +354,13 @@ qosg.setup = function() {
 			{ type: 'text', prefix: '<div class="x4b">', suffix: '</div>' },
 
 			{ type: 'text', prefix: '<div class="x5a">', suffix: '</div>' },
-			{ type: 'text', prefix: '<div class="x5b"> - </div><div class="x5c">', suffix: '</div><div class="x5d">KB Transferred</div>' }
+			{ type: 'text', prefix: '<div class="x5b"> - </div><div class="x5c">', suffix: '</div><div class="x5d">KB przesłano</div>' }
 		] },
 		{ type: 'select', options: class1, vtop: 1 },
 		{ type: 'text', maxlen: 32, vtop: 1 }
 	]);
 
-	this.headerSet(['Match Rule', 'Class', 'Description', '#']);
+	this.headerSet(['Reguła', 'Klasa', 'Opis', '#']);
 
 // addr_type < addr < proto < port_type < port < ipp2p < L7 < bcount < dscp < class < desc
 
@@ -430,7 +430,7 @@ function init()
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='version'>Wersja <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -442,7 +442,7 @@ function init()
 <input type='hidden' name='_service' value='qos-restart'>
 <input type='hidden' name='qos_orules'>
 
-<div class='section-title'>Outbound Direction</div>
+<div class='section-title'>Połączenia wychodzące</div>
 <div class='section'>
 	<table class='tomato-grid' cellspacing=1 id='qg'></table>
 </div>
@@ -450,7 +450,7 @@ function init()
 <br>
 <script type='text/javascript'>
 if (nvram.qos_enable != '1') {
-	W('<div class="note-disabled"><b>QoS disabled.</b> &nbsp; <a href="qos-settings.asp">Enable &raquo;</a></div>');
+	W('<div class="note-disabled"><b>QoS wyłączony.</b> &nbsp; <a href="qos-settings.asp">Włącz &raquo;</a></div>');
 }
 else {
 	show_notice1('<% notice("iptables"); %>');
@@ -462,8 +462,8 @@ else {
 </td></tr>
 <tr><td id='footer' colspan=2>
 	<span id='footer-msg'></span>
-	<input type='button' value='Save' id='save-button' onclick='save()'>
-	<input type='button' value='Cancel' id='cancel-button' onclick='reloadPage();'>
+	<input type='button' value='Zapisz' id='save-button' onclick='save()'>
+	<input type='button' value='Anuluj' id='cancel-button' onclick='reloadPage();'>
 </td></tr>
 </table>
 </form>
