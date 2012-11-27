@@ -71,7 +71,7 @@ function init()
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
 <div id='ident'><% ident(); %></div>
-<div class='section-title'>Ustawienia SNMP</div>
+<div class='section-title'>Administracja: Ustawienia SNMP</div>
 <div class='section' id='config-section'>
 <form id='_fom' method='post' action='tomato.cgi'>
 <input type='hidden' name='_nextpage' value='admin-snmp.asp'>
