@@ -150,6 +150,7 @@ Copyright (C) 2010 Keith Moyer,<br>
 <!-- TOR-BEGIN -->
 - Projekt TOR i integracja z GUI<br>
 <!-- TOR-END -->
+- TomatoAnon project integration and GUI<br>
 Copyright (C) 2011 Michał Rupental<br>
 <a href='http://openlinksys.info' target='_new'>http://openlinksys.info</a><br>
 <br>

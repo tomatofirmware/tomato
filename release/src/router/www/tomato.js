@@ -2456,6 +2456,7 @@ REMOVE-END */
 		null,
 		['Administracja',		'admin', 0, [
 			['Dostęp administratora',	'access.asp'],
+			['TomatoAnon',			'tomatoanon.asp'],
 			['Monitor przepustowości',	'bwm.asp'],
 			['Monitor IP Traffic',		'iptraffic.asp'],
 			['Przyciski / LED',		'buttons.asp'],
