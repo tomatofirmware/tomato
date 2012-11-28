@@ -58,7 +58,7 @@ function init()
 <input type='hidden' name='_nextpage' value='admin-tomatoanon.asp'>
 <input type='hidden' name='_service' value='tomatoanon-restart'>
 <div class='section-title'>Informacje o projekcie TomatoAnon</div>
-<div class="fields"><font color="#FFFFFF">
+<div class="fields"><div class="about">
 <b>Witaj,</b><br>
 <br>
 Chciałbym przedstawić nowy projekt nazwany TomatoAnon.<br>
@@ -87,7 +87,7 @@ To wszystko !!<br>
 Dziękuję za zapoznanie się z tematem projektu i proszę o dokonanie włąściwego wyboru.<br>
 <br>
 <b>Pozdrawiam!</b></font>
-</div>
+</div></div>
 <br>
 <br>
 <div class='section-title'>Ustawienia TomatoAnon <script>W(anon_link);</script></div>
