@@ -131,9 +131,7 @@ createFieldTable('', [
 	{ title: 'ICMP', indent: 2, name: 'f_icmp_limit_icmp', type: 'text', maxlen: 3, size: 3, suffix: ' <small> żądań na sekundę</small>', value: fixInt(nvram.block_wan_limit_icmp || 1, 1, 300, 5) },
 	{ title: 'Traceroute', indent: 2, name: 'f_icmp_limit_traceroute', type: 'text', maxlen: 3, size: 3, suffix: ' <small> żądań na sekundę</small>', value: fixInt(nvram.block_wan_limit_tr || 5, 1, 300, 5) },
 	null,
-	{ title: 'Włącz SYN cookies', name: 'f_syncookies', type: 'checkbox', value: nvram.ne_syncookies != '0' },
-	null,
-	{ title: 'Pętla zwrotna NAT', name: 'nf_loopback', type: 'select', options: [[0,'Wszystkie'],[1,'Tylko przekierowane'],[2,'Wyłączona']], value: fixInt(nvram.nf_loopback, 0, 2, 1) }
+	{ title: 'Włącz SYN cookies', name: 'f_syncookies', type: 'checkbox', value: nvram.ne_syncookies != '0' }
 ]);
 </script>
 </div>
