@@ -80,6 +80,7 @@ function init()
 <input type='hidden' name='snmp_remote'>
 
 <script type='text/javascript'>
+createFieldTable('', [
 	{ title: 'Włącz SNMP', name: 'f_snmp_enable', type: 'checkbox', value: nvram.snmp_enable == '1' },
 	null,
 	{ title: 'Port', name: 'snmp_port', type: 'text', maxlen: 5, size: 7, value: fixPort(nvram.snmp_port, 161) },
