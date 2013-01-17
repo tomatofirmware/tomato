@@ -12,7 +12,7 @@
 <meta name='robots' content='noindex,nofollow'>
 <title>[<% ident(); %>] Administracja: Projekt TomatoAnon</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
-<link rel='stylesheet' type='text/css' href='<% nv('web_css'); %>.css'>
+<link rel='stylesheet' type='text/css' href='color.css'>
 <script type='text/javascript' src='tomato.js'></script>
 <script type='text/javascript'>
 //	<% nvram("tomatoanon_enable,tomatoanon_answer,tomatoanon_cru,tomatoanon_id"); %>
@@ -59,7 +59,7 @@ function init()
 <input type='hidden' name='_service' value='tomatoanon-restart'>
 <div class='section-title'>Informacje o projekcie TomatoAnon</div>
 <div class="fields"><div class="about">
-<b>Witaj,</b><br>
+<b>Witajcie,</b><br>
 <br>
 Chciałbym przedstawić nowy projekt nazwany TomatoAnon.<br>
 TomatoAnon będzie wysyłał anonimowe lub niekompletne informacje odnośnie modelu routera oraz zainstalowanej wersji tomato.<br>

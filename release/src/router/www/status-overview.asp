@@ -112,6 +112,7 @@ function show()
 	c('uptime', stats.uptime);
 	c('time', stats.time);
 	c('wanip', stats.wanip);
+	c('wanprebuf',stats.wanprebuf); //Victek
 	c('wannetmask', stats.wannetmask);
 	c('wangateway', stats.wangateway);
 	c('dns', stats.dns);
@@ -251,6 +252,7 @@ createFieldTable('', [
 	{ title: 'Adres MAC', text: nvram.wan_hwaddr },
 	{ title: 'Typ połączenia', text: { 'dhcp':'DHCP', 'static':'Statyczny IP', 'pppoe':'PPPoE', 'pptp':'PPTP', 'l2tp':'L2TP', 'ppp3g':'Modem 3G' }[nvram.wan_proto] || '-' },
 	{ title: 'Adres IP', rid: 'wanip', text: stats.wanip },
+	{ title: 'Poprzedni adres IP', rid: 'wanprebuf', text: stats.wanprebuf, hidden: ((nvram.wan_proto != 'pppoe') && (nvram.wan_proto != 'pptp') && (nvram.wan_proto != 'l2tp') && (nvram.wan_proto != 'ppp3g')) }, //Victek
 	{ title: 'Maska podsieci', rid: 'wannetmask', text: stats.wannetmask },
 	{ title: 'Brama', rid: 'wangateway', text: stats.wangateway },
 /* IPV6-BEGIN */

@@ -423,9 +423,14 @@ const aspapi_t aspapi[] = {
 static void asp_css(int argc, char **argv)
 {
 	const char *css = nvram_safe_get("web_css");
-	
-	if (strcmp(css, "tomato") != 0) {
-		web_printf("<link rel='stylesheet' type='text/css' href='%s.css'>", css);
+	const char *ttb = nvram_safe_get("ttb_css");
+
+	if( nvram_match( "web_css", "online" ) ) {
+		web_printf("<link rel='stylesheet' type='text/css' href='ext/%s.css'>", ttb);
+	} else {
+		if (strcmp(css, "tomato") != 0) {
+			web_printf("<link rel='stylesheet' type='text/css' href='%s.css'>", css);
+		}
 	}
 }
 
@@ -883,6 +888,7 @@ static const nvset_t nvset_list[] = {
 	{ "dmz_ipaddr",			V_LENGTH(0, 15)		},
 	{ "dmz_sip",			V_LENGTH(0, 512)	},
 	{ "dmz_ifname",			V_LENGTH(0, 5)			},
+	{ "dmz_ra",			V_01			},
 
 // forward-upnp
 	{ "upnp_enable",		V_NUM				},
@@ -930,6 +936,7 @@ static const nvset_t nvset_list[] = {
 	{ "https_lanport",		V_PORT				},
 	{ "web_wl_filter",		V_01				},
 	{ "web_css",			V_LENGTH(1, 32)		},
+	{ "ttb_css",			V_LENGTH(1, 32)		},
 	{ "web_mx",				V_LENGTH(0, 128)	},
 	{ "http_wanport",		V_PORT				},
 	{ "telnetd_eas",		V_01				},
@@ -1150,6 +1157,7 @@ static const nvset_t nvset_list[] = {
 	{ "qos_fin",			V_01				},
 	{ "qos_rst",			V_01				},
 	{ "qos_icmp",			V_01				},
+	{ "qos_udp",			V_01				},
 	{ "qos_reset",			V_01				},
 	{ "qos_pfifo",			V_01				}, // !!TB
 	{ "qos_obw",			V_RANGE(10, 999999)	},
@@ -1159,7 +1167,7 @@ static const nvset_t nvset_list[] = {
 	{ "qos_irates",			V_LENGTH(0, 128)	},
 	{ "qos_orates",			V_LENGTH(0, 128)	},
 	{ "qos_classnames",		V_LENGTH(10, 128)		}, // !!TOASTMAN
-
+	{ "atm_overhead",		V_RANGE(-127, 128)	},
 	{ "ne_vegas",			V_01				},
 	{ "ne_valpha",			V_NUM				},
 	{ "ne_vbeta",			V_NUM				},
