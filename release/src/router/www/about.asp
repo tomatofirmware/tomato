@@ -123,7 +123,7 @@ Copyright (C) 2010 Keith Moyer,<br>
 
 <b>"Shibby":</b><br>
 <!-- BBT-BEGIN -->
-- Transmission 2.71<br>
+- Transmission 2.76<br>
 <!-- BBT-END -->
 <!-- BT-BEGIN -->
 - Integracja Transmission z GUI<br>
@@ -151,7 +151,8 @@ Copyright (C) 2010 Keith Moyer,<br>
 - Projekt TOR i integracja z GUI<br>
 <!-- TOR-END -->
 - TomatoAnon projekt i integracja z GUI<br>
-Copyright (C) 2011 Michał Rupental<br>
+- TomatoThemeBase projekt i implementacja z GUI<br>
+Copyright (C) 2011-2013 Michał Rupental<br>
 <a href='http://openlinksys.info' target='_new'>http://openlinksys.info</a><br>
 <br>
 
@@ -198,8 +199,16 @@ Copyright (C) 2011 Augusto Bott<br>
 <b>"Toastman" features:</b><br>
 - Konfigurowalne nazwy klas QoS<br>
 - Definicje klas QoS<br>
+- TC-ATM overhead calculation - patch autorstwa tvlz<br>
+- Wsparcie GPT dla dysków HDD - autorstwa Yaniv Hamo<br>
 Copyright (C) 2011 Toastman<br>
 <a href='http://www.linksysinfo.org/index.php?threads/using-qos-tutorial-and-discussion.28349/' target='_new'>QoS - Tutorial i dyskusja</a><br>
+<br>
+
+<b>"Tiomo" Features:</b><br>
+- IMQ based QOS Ingress<br>
+- Incoming Class Bandwidth pie chart<br>
+Copyright (C) 2012 Tiomo<br>
 <br>
 
 <!-- SDHC-BEGIN -->

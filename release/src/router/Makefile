@@ -699,7 +699,7 @@ openssl/stamp-h1:
 	no-sha0 no-smime no-camellia no-krb5 no-rmd160 no-ripemd \
 	no-seed no-capieng no-cms no-gms no-gmp no-rfc3779 \
 	no-ec no-ecdh no-ecdsa no-err no-hw no-jpake no-threads \
-	no-zlib no-engines no-sse2 no-perlasm \
+	no-zlib no-engines no-sse2 \
 	no-dtls1 no-store no-psk no-md2 no-mdc2 no-ts
 
 	@$(MAKE) -C openssl clean
@@ -1569,12 +1569,14 @@ openvpn: openvpn/.conf openssl lzo
 openvpn/.conf:
 	cd openvpn && CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
 	LDFLAGS="-L$(TOP)/openssl -L$(TOP)/lzo/src/.libs -ffunction-sections -fdata-sections -Wl,--gc-sections" \
+	CPPFLAGS="-I$(TOP)/lzo/include -I$(TOP)/openssl/include" \
 	$(CONFIGURE) --prefix= \
-	--with-lzo-headers="$(TOP)/lzo/include" \
-	--with-ssl-headers="$(TOP)/openssl/include/" \
+	--with-crypto-library=openssl \
 	--with-iproute-path="/usr/sbin/ip" \
 	--disable-debug --disable-plugins --enable-management --enable-small \
-	--disable-selinux --disable-socks --enable-password-save
+	--disable-selinux --disable-socks --enable-password-save \
+	OPENSSL_SSL_CFLAGS="-I$(TOP)/openssl/include" \
+	OPENSSL_SSL_LIBS="-L$(TOP)/openssl -lssl"
 	touch openvpn/.conf
 
 openvpn-clean:
@@ -1582,7 +1584,7 @@ openvpn-clean:
 	@rm -f openvpn/.conf
 
 openvpn-install: openvpn
-	install -D openvpn/openvpn $(INSTALLDIR)/openvpn/usr/sbin/openvpn
+	install -D openvpn/src/openvpn/.libs/openvpn $(INSTALLDIR)/openvpn/usr/sbin/openvpn
 	$(STRIP) -s $(INSTALLDIR)/openvpn/usr/sbin/openvpn
 	chmod 0500 $(INSTALLDIR)/openvpn/usr/sbin/openvpn
 
