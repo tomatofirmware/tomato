@@ -194,9 +194,9 @@ ifeq ($(LINKSYS_E2500),y)
 		| tee -a fpkg.log
 endif
 ifeq ($(LINKSYS_E3200),y)
-	# Linksys E2500(60k Nvram) image
+	# Linksys E3200(60k Nvram) image
 	@btools/fpkg -i lzma-loader/loader.gz -i $(LINUXDIR)/arch/mips/brcm-boards/bcm947xx/compressed/vmlinuz -a 1024 -i router/mipsel-uclibc/target.image \
-		-l E3200,image/tomato-E3200$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).bin \
+		-l 3200,image/tomato-E3200$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).bin \
 		| tee -a fpkg.log
 endif
 ifeq ($(LINKSYS_E_64k),y)
@@ -327,7 +327,7 @@ what:
 # JFFSv1 | NO_JFFS
 # NO_CIFS, NO_SSH, NO_ZEBRA, NO_SAMBA, NO_HTTPS, NO_XXTP, NO_LIBOPT
 # SAMBA3, OPENVPN, IPV6SUPP, EBTABLES, NTFS, MEDIASRV, BBEXTRAS, USBEXTRAS, BCM57, SLIM, NOCAT
-# NFS BTCLIENT BTGUI TR_EXTRAS SNMP SDHC HFS UPS DNSCRYPT PPTPD TOR IPSEC RAID USBAP NO_USBAPP
+# NFS BTCLIENT BTGUI TR_EXTRAS SNMP SDHC HFS UPS DNSCRYPT PPTPD TOR IPSEC RAID MICROSD USBAP NO_USBAPP
 
 define RouterOptions
 	@( \
@@ -1017,17 +1017,11 @@ n64m:
 
 #Linksys E-Series with 4MB Flash
 
-e1000v2i:
-	@$(MAKE) r2i NVRAM_SIZE=32 LINKSYS_E1000v2=y
-
 e1000v2f:
-	@$(MAKE) r2f NVRAM_SIZE=32 LINKSYS_E1000v2=y
-
-e1200v1i:
-	@$(MAKE) r2i NVRAM_SIZE=64 LINKSYS_E1200v1=y
+	@$(MAKE) r2f NVRAM_SIZE=32 LINKSYS_E1000v2=y NO_THEMES=y NO_JFFS=y
 
 e1200v1f:
-	@$(MAKE) r2f NVRAM_SIZE=64 LINKSYS_E1200v1=y
+	@$(MAKE) r2f NVRAM_SIZE=64 LINKSYS_E1200v1=y NO_THEMES=y NO_JFFS=y
 
 
 #Builds for WNR3500L v2
@@ -1151,9 +1145,7 @@ ifeq ($(CONFIG_LINUX26),y)
 	@echo "r2i          MIPS Release 2 MiniIPv6 (for 4MB flash)"
 	@echo "r2f          MIPS Release 2 Mini (for netgear)"
 	@echo "       Linksys E-Series with 4MB Flash(E1000v2/v2.1/E1200v1)"
-	@echo "e1000v2i     Linksys E1000v2-v2.1/Cisco M10v2 MiniIPv6"
 	@echo "e1000v2f     Linksys E1000v2-v2.1/Cisco M10v2 Mini"
-	@echo "e1200v1i     Linksys E1200v1 MiniIPv6"
 	@echo "e1200v1f     Linksys E1200v1 Mini"
 	@echo "       Linksys E-Series with 60k Nvram"
 	@echo "n60e         Linksys E-series build VPN"
@@ -1179,6 +1171,10 @@ ifeq ($(CONFIG_LINUX26),y)
 	@echo "n64o         Linksys E-series(64k Nvram) build Mega-VPN"
 	@echo "n64v         Linksys E-series(64k Nvram) build IPv6-VPN"
 	@echo "n64m         Linksys E-series(64k Nvram) build Max"
+	@echo "       Router with wl_high module"
+	@echo "rtn53        Asus RT-N53 with wl_high module (dualband support)"
+	@echo "e2500        Linksys E2500 with wl_high module (dualband support)"
+	@echo "e3200        Linksys E3200 with wl_high module (dualband support)"
 	@echo "       Netgear WNR3500L v2 builds (128MB Flash)"
 	@echo "v2e          Netgear WNR3500Lv2 build VPN"
 	@echo "v2g          Netgear WNR3500Lv2 build Tor-VPN"

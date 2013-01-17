@@ -77,6 +77,11 @@ ifneq ($(TCONFIG_EMF),y)
 	sed -i $(INSTALLDIR)/www/advanced-routing.asp -e "/EMF-BEGIN/,/EMF-END/d"
 endif
 
+# Only include sd/mmc card support if MICROSD is configured in.
+ifneq ($(TCONFIG_MICROSD),y)
+	sed -i $(INSTALLDIR)/www/nas-usb.asp -e "/MICROSD-BEGIN/,/MICROSD-END/d"
+endif
+
 # Only include NTFS settings if NTFS support is configured in.
 ifneq ($(TCONFIG_NTFS),y)
 	sed -i $(INSTALLDIR)/www/nas-usb.asp -e "/NTFS-BEGIN/,/NTFS-END/d"

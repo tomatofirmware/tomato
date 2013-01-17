@@ -845,7 +845,6 @@ function verifyFields(focused, quiet)
 		break;
 	case 'ppp3g':
 		vis._ppp_service = 0;
-		vis._ppp_custom = 0;
 		vis._l2tp_server_ip = 0;
 		vis._pptp_server_ip = 0;
 		vis._f_pptp_dhcp = 0;
@@ -853,6 +852,8 @@ function verifyFields(focused, quiet)
 		vis._wan_ipaddr = 0;
 		vis._wan_netmask = 0;
 		vis._lan_gateway = 0;
+		vis._modem_ipaddr = 0;
+		vis._f_ppp_mlppp = 0;
 		break;
 	case 'static':
 		vis._l2tp_server_ip = 0;
