@@ -1621,6 +1621,8 @@ route_add(const struct in_addr inetaddr, struct rtentry *rt)
 	u_int32_t dest, mask;
 
 	FILE *f = fopen("/proc/net/route", "r");
+	rt->rt_dev = NULL;
+	rt->rt_gateway.sa_family = AF_UNSPEC;
 	if (f == NULL) {
 	        l2tp_log (LOG_ERR, "/proc/net/route: %s", strerror(errno));
 		return -1;
