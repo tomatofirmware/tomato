@@ -687,7 +687,7 @@ struct call *get_call (int tunnel, int call,  struct in_addr addr, int port,
         tunnels.head = st;
         tunnels.count++;
         /* Add route to the peer */
-        memset(&st->rt, 0, sizeof(&st->rt));
+        memset(&st->rt, 0, sizeof(st->rt));
         route_add(st->peer.sin_addr, &st->rt);
         return st->self;
     }
