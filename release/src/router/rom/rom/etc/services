@@ -209,6 +209,8 @@ datametrics	1645/tcp	old-radius	# datametrics / old radius entry
 datametrics	1645/udp	old-radius	# datametrics / old radius entry
 sa-msg-port	1646/tcp	old-radacct	# sa-msg-port / old radacct entry
 sa-msg-port	1646/udp	old-radacct	# sa-msg-port / old radacct entry
+l2tp		1701/tcp			# Layer 2 Tunnelling Protocol
+l2tp		1701/udp			# Layer 2 Tunnelling Protocol
 radius		1812/tcp			# Radius
 radius		1812/udp			# Radius
 radacct		1813/tcp			# Radius Accounting
