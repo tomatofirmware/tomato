@@ -38,7 +38,7 @@
 #include <sys/socket.h>
 #include <sys/queue.h>
 
-#include <utmpx.h>
+#include <utmp.h>
 #if defined(__APPLE__) && defined(__MACH__)
 #include <util.h>
 #endif
@@ -1661,7 +1661,7 @@ isakmp_cfg_accounting_system(port, raddr, usr, inout)
 	int inout;
 {
 	int error = 0;
-	struct utmpx ut;
+	struct utmp ut;
 	char addr[NI_MAXHOST];
 	
 	if (usr == NULL || usr[0]=='\0') {
@@ -1686,7 +1686,7 @@ isakmp_cfg_accounting_system(port, raddr, usr, inout)
 			"Accounting : '%s' logging on '%s' from %s.\n",
 			ut.ut_user, ut.ut_id, addr);
 
-		pututxline(&ut);
+		pututline(&ut);
 
 		break;
 	case ISAKMP_CFG_LOGOUT:	
@@ -1696,7 +1696,7 @@ isakmp_cfg_accounting_system(port, raddr, usr, inout)
 			"Accounting : '%s' unlogging from '%s'.\n",
 			usr, ut.ut_id);
 
-		pututxline(&ut);
+		pututline(&ut);
 
 		break;
 	default:
