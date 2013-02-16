@@ -8,7 +8,7 @@
 #define FLEX_SCANNER
 #define YY_FLEX_MAJOR_VERSION 2
 #define YY_FLEX_MINOR_VERSION 5
-#define YY_FLEX_SUBMINOR_VERSION 37
+#define YY_FLEX_SUBMINOR_VERSION 35
 #if YY_FLEX_SUBMINOR_VERSION > 0
 #define FLEX_BETA
 #endif
@@ -53,6 +53,7 @@ typedef int flex_int32_t;
 typedef unsigned char flex_uint8_t; 
 typedef unsigned short int flex_uint16_t;
 typedef unsigned int flex_uint32_t;
+#endif /* ! C99 */
 
 /* Limits of integral types. */
 #ifndef INT8_MIN
@@ -82,8 +83,6 @@ typedef unsigned int flex_uint32_t;
 #ifndef UINT32_MAX
 #define UINT32_MAX             (4294967295U)
 #endif
-
-#endif /* ! C99 */
 
 #endif /* ! FLEXINT_H */
 
@@ -153,12 +152,7 @@ typedef unsigned int flex_uint32_t;
 typedef struct yy_buffer_state *YY_BUFFER_STATE;
 #endif
 
-#ifndef YY_TYPEDEF_YY_SIZE_T
-#define YY_TYPEDEF_YY_SIZE_T
-typedef size_t yy_size_t;
-#endif
-
-extern yy_size_t yyleng;
+extern int yyleng;
 
 extern FILE *yyin, *yyout;
 
@@ -184,6 +178,11 @@ extern FILE *yyin, *yyout;
 
 #define unput(c) yyunput( c, (yytext_ptr)  )
 
+#ifndef YY_TYPEDEF_YY_SIZE_T
+#define YY_TYPEDEF_YY_SIZE_T
+typedef size_t yy_size_t;
+#endif
+
 #ifndef YY_STRUCT_YY_BUFFER_STATE
 #define YY_STRUCT_YY_BUFFER_STATE
 struct yy_buffer_state
@@ -201,7 +200,7 @@ struct yy_buffer_state
 	/* Number of characters read into yy_ch_buf, not including EOB
 	 * characters.
 	 */
-	yy_size_t yy_n_chars;
+	int yy_n_chars;
 
 	/* Whether we "own" the buffer - i.e., we know we created it,
 	 * and can realloc() it to grow it, and should free() it to
@@ -271,8 +270,8 @@ static YY_BUFFER_STATE * yy_buffer_stack = 0; /**< Stack as an array. */
 
 /* yy_hold_char holds the character lost when yytext is formed. */
 static char yy_hold_char;
-static yy_size_t yy_n_chars;		/* number of characters read into yy_ch_buf */
-yy_size_t yyleng;
+static int yy_n_chars;		/* number of characters read into yy_ch_buf */
+int yyleng;
 
 /* Points to current character in buffer. */
 static char *yy_c_buf_p = (char *) 0;
@@ -300,7 +299,7 @@ static void yy_init_buffer (YY_BUFFER_STATE b,FILE *file  );
 
 YY_BUFFER_STATE yy_scan_buffer (char *base,yy_size_t size  );
 YY_BUFFER_STATE yy_scan_string (yyconst char *yy_str  );
-YY_BUFFER_STATE yy_scan_bytes (yyconst char *bytes,yy_size_t len  );
+YY_BUFFER_STATE yy_scan_bytes (yyconst char *bytes,int len  );
 
 void *yyalloc (yy_size_t  );
 void *yyrealloc (void *,yy_size_t  );
@@ -331,6 +330,9 @@ void yyfree (void *  );
 #define YY_AT_BOL() (YY_CURRENT_BUFFER_LVALUE->yy_at_bol)
 
 /* Begin user sect3 */
+
+#define yywrap(n) 1
+#define YY_SKIP_YYWRAP
 
 typedef unsigned char YY_CHAR;
 
@@ -1079,7 +1081,7 @@ char *yytext;
 /* common section */
 
 #define YY_NO_INPUT 1
-#line 1083 "token.c"
+#line 1085 "token.c"
 
 #define INITIAL 0
 #define S_PL 1
@@ -1121,7 +1123,7 @@ FILE *yyget_out (void );
 
 void yyset_out  (FILE * out_str  );
 
-yy_size_t yyget_leng (void );
+int yyget_leng (void );
 
 char *yyget_text (void );
 
@@ -1169,7 +1171,7 @@ static int input (void );
 /* This used to be an fputs(), but since the string might contain NUL's,
  * we now use fwrite().
  */
-#define ECHO do { if (fwrite( yytext, yyleng, 1, yyout )) {} } while (0)
+#define ECHO fwrite( yytext, yyleng, 1, yyout )
 #endif
 
 /* Gets input and stuffs it into "buf".  number of characters read, or YY_NULL,
@@ -1180,7 +1182,7 @@ static int input (void );
 	if ( YY_CURRENT_BUFFER_LVALUE->yy_is_interactive ) \
 		{ \
 		int c = '*'; \
-		size_t n; \
+		int n; \
 		for ( n = 0; n < max_size && \
 			     (c = getc( yyin )) != EOF && c != '\n'; ++n ) \
 			buf[n] = (char) c; \
@@ -1262,11 +1264,11 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 115 "token.l"
+#line 116 "token.l"
 
 
 
-#line 1270 "token.c"
+#line 1272 "token.c"
 
 	if ( !(yy_init) )
 		{
@@ -1357,89 +1359,89 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 118 "token.l"
+#line 119 "token.l"
 { return(ADD); }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 119 "token.l"
+#line 120 "token.l"
 { return(DELETE); }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 120 "token.l"
+#line 121 "token.l"
 { return(DELETEALL); }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 121 "token.l"
+#line 122 "token.l"
 { return(GET); }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 122 "token.l"
+#line 123 "token.l"
 { return(FLUSH); }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 123 "token.l"
+#line 124 "token.l"
 { return(DUMP); }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 124 "token.l"
+#line 125 "token.l"
 { return(EXIT); }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 125 "token.l"
+#line 126 "token.l"
 { return(EXIT); }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 126 "token.l"
+#line 127 "token.l"
 { return(EXIT); }
 	YY_BREAK
 /* for management SPD */
 case 10:
 YY_RULE_SETUP
-#line 129 "token.l"
+#line 130 "token.l"
 { return(SPDADD); }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 130 "token.l"
+#line 131 "token.l"
 { return(SPDUPDATE); }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 131 "token.l"
+#line 132 "token.l"
 { return(SPDDELETE); }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 132 "token.l"
+#line 133 "token.l"
 { return(SPDDUMP); }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 133 "token.l"
+#line 134 "token.l"
 { return(SPDFLUSH); }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 134 "token.l"
+#line 135 "token.l"
 { return(TAGGED); }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 135 "token.l"
+#line 136 "token.l"
 { BEGIN S_PL; return(F_POLICY); }
 	YY_BREAK
 case 17:
 /* rule 17 can match eol */
 YY_RULE_SETUP
-#line 136 "token.l"
+#line 137 "token.l"
 {
 			yymore();
 
@@ -1461,13 +1463,13 @@ YY_RULE_SETUP
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 154 "token.l"
+#line 155 "token.l"
 { BEGIN INITIAL; return(EOT); }
 	YY_BREAK
 /* address resolution flags */
 case 19:
 YY_RULE_SETUP
-#line 157 "token.l"
+#line 158 "token.l"
 {
 			yylval.val.len = strlen(yytext);
 			yylval.val.buf = strdup(yytext);
@@ -1479,37 +1481,37 @@ YY_RULE_SETUP
 /* security protocols */
 case 20:
 YY_RULE_SETUP
-#line 166 "token.l"
+#line 167 "token.l"
 { yylval.num = 0; return(PR_AH); }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 167 "token.l"
+#line 168 "token.l"
 { yylval.num = 0; return(PR_ESP); }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 168 "token.l"
+#line 169 "token.l"
 { yylval.num = 1; return(PR_AH); }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 169 "token.l"
+#line 170 "token.l"
 { yylval.num = 1; return(PR_ESP); }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 170 "token.l"
+#line 171 "token.l"
 { yylval.num = 0; return(PR_ESPUDP); }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 171 "token.l"
+#line 172 "token.l"
 { yylval.num = 0; return(PR_IPCOMP); }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 172 "token.l"
+#line 173 "token.l"
 { 
 			yylval.num = 0; return(PR_TCP); 
 		}
@@ -1517,72 +1519,72 @@ YY_RULE_SETUP
 /* authentication alogorithm */
 case 27:
 YY_RULE_SETUP
-#line 177 "token.l"
+#line 178 "token.l"
 { BEGIN S_AUTHALG; return(F_AUTH); }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 178 "token.l"
+#line 179 "token.l"
 { yylval.num = SADB_AALG_MD5HMAC; BEGIN INITIAL; return(ALG_AUTH); }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 179 "token.l"
+#line 180 "token.l"
 { yylval.num = SADB_AALG_SHA1HMAC; BEGIN INITIAL; return(ALG_AUTH); }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 180 "token.l"
+#line 181 "token.l"
 { yylval.num = SADB_X_AALG_MD5; BEGIN INITIAL; return(ALG_AUTH); }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 181 "token.l"
+#line 182 "token.l"
 { yylval.num = SADB_X_AALG_SHA; BEGIN INITIAL; return(ALG_AUTH); }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 182 "token.l"
+#line 183 "token.l"
 { yylval.num = SADB_X_AALG_SHA2_256; BEGIN INITIAL; return(ALG_AUTH); }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 183 "token.l"
+#line 184 "token.l"
 { yylval.num = SADB_X_AALG_SHA2_256; BEGIN INITIAL; return(ALG_AUTH); }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 184 "token.l"
+#line 185 "token.l"
 { yylval.num = SADB_X_AALG_SHA2_384; BEGIN INITIAL; return(ALG_AUTH); }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 185 "token.l"
+#line 186 "token.l"
 { yylval.num = SADB_X_AALG_SHA2_384; BEGIN INITIAL; return(ALG_AUTH); }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 186 "token.l"
+#line 187 "token.l"
 { yylval.num = SADB_X_AALG_SHA2_512; BEGIN INITIAL; return(ALG_AUTH); }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 187 "token.l"
+#line 188 "token.l"
 { yylval.num = SADB_X_AALG_SHA2_512; BEGIN INITIAL; return(ALG_AUTH); }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 188 "token.l"
+#line 189 "token.l"
 { yylval.num = SADB_X_AALG_RIPEMD160HMAC; BEGIN INITIAL; return(ALG_AUTH); }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 189 "token.l"
+#line 190 "token.l"
 { yylval.num = SADB_X_AALG_AES_XCBC_MAC; BEGIN INITIAL; return(ALG_AUTH); }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 190 "token.l"
+#line 191 "token.l"
 { 
 #ifdef SADB_X_AALG_TCP_MD5
 				yylval.num = SADB_X_AALG_TCP_MD5; 
@@ -1593,63 +1595,63 @@ YY_RULE_SETUP
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 197 "token.l"
+#line 198 "token.l"
 { yylval.num = SADB_X_AALG_NULL; BEGIN INITIAL; return(ALG_AUTH_NOKEY); }
 	YY_BREAK
 /* encryption alogorithm */
 case 42:
 YY_RULE_SETUP
-#line 200 "token.l"
+#line 201 "token.l"
 { BEGIN S_ENCALG; return(F_ENC); }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 201 "token.l"
+#line 202 "token.l"
 { yylval.num = SADB_EALG_DESCBC; BEGIN INITIAL; return(ALG_ENC); }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 202 "token.l"
+#line 203 "token.l"
 { yylval.num = SADB_EALG_3DESCBC; BEGIN INITIAL; return(ALG_ENC); }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 203 "token.l"
+#line 204 "token.l"
 { yylval.num = SADB_EALG_NULL; BEGIN INITIAL; return(ALG_ENC_NOKEY); }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 204 "token.l"
+#line 205 "token.l"
 { yylval.num = SADB_EALG_NULL; BEGIN INITIAL; return(ALG_ENC_OLD); }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 205 "token.l"
+#line 206 "token.l"
 { yylval.num = SADB_X_EALG_BLOWFISHCBC; BEGIN INITIAL; return(ALG_ENC); }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 206 "token.l"
+#line 207 "token.l"
 { yylval.num = SADB_X_EALG_CAST128CBC; BEGIN INITIAL; return(ALG_ENC); }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 207 "token.l"
+#line 208 "token.l"
 { yylval.num = SADB_EALG_DESCBC; BEGIN INITIAL; return(ALG_ENC_DESDERIV); }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 208 "token.l"
+#line 209 "token.l"
 { yylval.num = SADB_EALG_DESCBC; BEGIN INITIAL; return(ALG_ENC_DES32IV); }
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 209 "token.l"
+#line 210 "token.l"
 { yylval.num = SADB_X_EALG_TWOFISHCBC; BEGIN INITIAL; return(ALG_ENC); }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 210 "token.l"
+#line 211 "token.l"
 { 
 #ifdef SADB_X_EALG_AESCBC
 	yylval.num = SADB_X_EALG_AESCBC; BEGIN INITIAL; return(ALG_ENC); 
@@ -1658,7 +1660,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 215 "token.l"
+#line 216 "token.l"
 { 
 #ifdef SADB_X_EALG_AESCBC
 	yylval.num = SADB_X_EALG_AESCBC; BEGIN INITIAL; return(ALG_ENC); 
@@ -1667,12 +1669,12 @@ YY_RULE_SETUP
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 220 "token.l"
+#line 221 "token.l"
 { yylval.num = SADB_X_EALG_AESCTR; BEGIN INITIAL; return(ALG_ENC); }
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 221 "token.l"
+#line 222 "token.l"
 { 
 #ifdef SADB_X_EALG_CAMELLIACBC
 	yylval.num = SADB_X_EALG_CAMELLIACBC; BEGIN INITIAL; return(ALG_ENC); 
@@ -1682,152 +1684,152 @@ YY_RULE_SETUP
 /* compression algorithms */
 case 56:
 YY_RULE_SETUP
-#line 228 "token.l"
+#line 229 "token.l"
 { return(F_COMP); }
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 229 "token.l"
+#line 230 "token.l"
 { yylval.num = SADB_X_CALG_OUI; return(ALG_COMP); }
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 230 "token.l"
+#line 231 "token.l"
 { yylval.num = SADB_X_CALG_DEFLATE; return(ALG_COMP); }
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 231 "token.l"
+#line 232 "token.l"
 { yylval.num = SADB_X_CALG_LZS; return(ALG_COMP); }
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 232 "token.l"
+#line 233 "token.l"
 { return(F_RAWCPI); }
 	YY_BREAK
 /* extension */
 case 61:
 YY_RULE_SETUP
-#line 235 "token.l"
+#line 236 "token.l"
 { return(F_MODE); }
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 236 "token.l"
+#line 237 "token.l"
 { yylval.num = IPSEC_MODE_TRANSPORT; return(MODE); }
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 237 "token.l"
+#line 238 "token.l"
 { yylval.num = IPSEC_MODE_TUNNEL; return(MODE); }
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 238 "token.l"
+#line 239 "token.l"
 { return(F_REQID); }
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 239 "token.l"
+#line 240 "token.l"
 { return(F_EXT); }
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 240 "token.l"
+#line 241 "token.l"
 { yylval.num = SADB_X_EXT_PRAND; return(EXTENSION); }
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 241 "token.l"
+#line 242 "token.l"
 { yylval.num = SADB_X_EXT_PSEQ; return(EXTENSION); }
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 242 "token.l"
+#line 243 "token.l"
 { yylval.num = SADB_X_EXT_PZERO; return(EXTENSION); }
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 243 "token.l"
+#line 244 "token.l"
 { return(NOCYCLICSEQ); }
 	YY_BREAK
 case 70:
 YY_RULE_SETUP
-#line 244 "token.l"
+#line 245 "token.l"
 { return(F_REPLAY); }
 	YY_BREAK
 case 71:
 YY_RULE_SETUP
-#line 245 "token.l"
+#line 246 "token.l"
 { return(F_LIFETIME_HARD); }
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 246 "token.l"
+#line 247 "token.l"
 { return(F_LIFETIME_SOFT); }
 	YY_BREAK
 case 73:
 YY_RULE_SETUP
-#line 247 "token.l"
+#line 248 "token.l"
 { return(F_LIFEBYTE_HARD); }
 	YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 248 "token.l"
+#line 249 "token.l"
 { return(F_LIFEBYTE_SOFT); }
 	YY_BREAK
 case 75:
 YY_RULE_SETUP
-#line 249 "token.l"
+#line 250 "token.l"
 { return(SECURITY_CTX); }
 	YY_BREAK
 /* ... */
 case 76:
 YY_RULE_SETUP
-#line 252 "token.l"
+#line 253 "token.l"
 { return(ANY); }
 	YY_BREAK
 case 77:
 YY_RULE_SETUP
-#line 253 "token.l"
+#line 254 "token.l"
 { }
 	YY_BREAK
 case 78:
 /* rule 78 can match eol */
 YY_RULE_SETUP
-#line 254 "token.l"
+#line 255 "token.l"
 { lineno++; }
 	YY_BREAK
 case 79:
 YY_RULE_SETUP
-#line 255 "token.l"
+#line 256 "token.l"
 
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
-#line 256 "token.l"
+#line 257 "token.l"
 { return(EOT); }
 	YY_BREAK
 /* for address parameters: /prefix, [port] */
 case 81:
 YY_RULE_SETUP
-#line 259 "token.l"
+#line 260 "token.l"
 { return SLASH; }
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 260 "token.l"
+#line 261 "token.l"
 { return BLCL; }
 	YY_BREAK
 case 83:
 YY_RULE_SETUP
-#line 261 "token.l"
+#line 262 "token.l"
 { return ELCL; }
 	YY_BREAK
 /* parameter */
 case 84:
 YY_RULE_SETUP
-#line 264 "token.l"
+#line 265 "token.l"
 {
 			char *bp;
 
@@ -1837,7 +1839,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 85:
 YY_RULE_SETUP
-#line 271 "token.l"
+#line 272 "token.l"
 {
 			yylval.val.buf = strdup(yytext + 2);
 			if (!yylval.val.buf)
@@ -1850,7 +1852,7 @@ YY_RULE_SETUP
 case 86:
 /* rule 86 can match eol */
 YY_RULE_SETUP
-#line 280 "token.l"
+#line 281 "token.l"
 {
 			char *p = yytext;
 			while (*++p != '"') ;
@@ -1866,7 +1868,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 87:
 YY_RULE_SETUP
-#line 293 "token.l"
+#line 294 "token.l"
 {
 			yylval.val.len = yyleng;
 			yylval.val.buf = strdup(yytext);
@@ -1877,7 +1879,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 88:
 YY_RULE_SETUP
-#line 301 "token.l"
+#line 302 "token.l"
 {
 			yylval.val.len = yyleng;
 			yylval.val.buf = strdup(yytext);
@@ -1888,7 +1890,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 89:
 YY_RULE_SETUP
-#line 309 "token.l"
+#line 310 "token.l"
 {
 			yyfatal("Syntax error");
 			/*NOTREACHED*/
@@ -1896,10 +1898,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 90:
 YY_RULE_SETUP
-#line 314 "token.l"
+#line 315 "token.l"
 ECHO;
 	YY_BREAK
-#line 1903 "token.c"
+#line 1905 "token.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(S_PL):
 case YY_STATE_EOF(S_AUTHALG):
@@ -2088,21 +2090,21 @@ static int yy_get_next_buffer (void)
 
 	else
 		{
-			yy_size_t num_to_read =
+			int num_to_read =
 			YY_CURRENT_BUFFER_LVALUE->yy_buf_size - number_to_move - 1;
 
 		while ( num_to_read <= 0 )
 			{ /* Not enough room in the buffer - grow it. */
 
 			/* just a shorter name for the current buffer */
-			YY_BUFFER_STATE b = YY_CURRENT_BUFFER_LVALUE;
+			YY_BUFFER_STATE b = YY_CURRENT_BUFFER;
 
 			int yy_c_buf_p_offset =
 				(int) ((yy_c_buf_p) - b->yy_ch_buf);
 
 			if ( b->yy_is_our_buffer )
 				{
-				yy_size_t new_size = b->yy_buf_size * 2;
+				int new_size = b->yy_buf_size * 2;
 
 				if ( new_size <= 0 )
 					b->yy_buf_size += b->yy_buf_size / 8;
@@ -2133,7 +2135,7 @@ static int yy_get_next_buffer (void)
 
 		/* Read in more data. */
 		YY_INPUT( (&YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[number_to_move]),
-			(yy_n_chars), num_to_read );
+			(yy_n_chars), (size_t) num_to_read );
 
 		YY_CURRENT_BUFFER_LVALUE->yy_n_chars = (yy_n_chars);
 		}
@@ -2228,7 +2230,7 @@ static int yy_get_next_buffer (void)
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
 	yy_is_jam = (yy_current_state == 563);
 
-		return yy_is_jam ? 0 : yy_current_state;
+	return yy_is_jam ? 0 : yy_current_state;
 }
 
 #ifndef YY_NO_INPUT
@@ -2255,7 +2257,7 @@ static int yy_get_next_buffer (void)
 
 		else
 			{ /* need more input */
-			yy_size_t offset = (yy_c_buf_p) - (yytext_ptr);
+			int offset = (yy_c_buf_p) - (yytext_ptr);
 			++(yy_c_buf_p);
 
 			switch ( yy_get_next_buffer(  ) )
@@ -2415,6 +2417,10 @@ static void yy_load_buffer_state  (void)
 	yyfree((void *) b  );
 }
 
+#ifndef __cplusplus
+extern int isatty (int );
+#endif /* __cplusplus */
+    
 /* Initializes or reinitializes a buffer.
  * This function is sometimes called more than once on the same buffer,
  * such as during a yyrestart() or at EOF.
@@ -2527,7 +2533,7 @@ void yypop_buffer_state (void)
  */
 static void yyensure_buffer_stack (void)
 {
-	yy_size_t num_to_alloc;
+	int num_to_alloc;
     
 	if (!(yy_buffer_stack)) {
 
@@ -2619,12 +2625,12 @@ YY_BUFFER_STATE yy_scan_string (yyconst char * yystr )
 
 /** Setup the input buffer state to scan the given bytes. The next call to yylex() will
  * scan from a @e copy of @a bytes.
- * @param yybytes the byte buffer to scan
- * @param _yybytes_len the number of bytes in the buffer pointed to by @a bytes.
+ * @param bytes the byte buffer to scan
+ * @param len the number of bytes in the buffer pointed to by @a bytes.
  * 
  * @return the newly allocated buffer state object.
  */
-YY_BUFFER_STATE yy_scan_bytes  (yyconst char * yybytes, yy_size_t  _yybytes_len )
+YY_BUFFER_STATE yy_scan_bytes  (yyconst char * yybytes, int  _yybytes_len )
 {
 	YY_BUFFER_STATE b;
 	char *buf;
@@ -2711,7 +2717,7 @@ FILE *yyget_out  (void)
 /** Get the length of the current token.
  * 
  */
-yy_size_t yyget_leng  (void)
+int yyget_leng  (void)
 {
         return yyleng;
 }
@@ -2859,7 +2865,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 314 "token.l"
+#line 315 "token.l"
 
 
 

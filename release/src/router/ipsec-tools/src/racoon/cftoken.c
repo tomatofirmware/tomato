@@ -8,7 +8,7 @@
 #define FLEX_SCANNER
 #define YY_FLEX_MAJOR_VERSION 2
 #define YY_FLEX_MINOR_VERSION 5
-#define YY_FLEX_SUBMINOR_VERSION 37
+#define YY_FLEX_SUBMINOR_VERSION 35
 #if YY_FLEX_SUBMINOR_VERSION > 0
 #define FLEX_BETA
 #endif
@@ -53,6 +53,7 @@ typedef int flex_int32_t;
 typedef unsigned char flex_uint8_t; 
 typedef unsigned short int flex_uint16_t;
 typedef unsigned int flex_uint32_t;
+#endif /* ! C99 */
 
 /* Limits of integral types. */
 #ifndef INT8_MIN
@@ -82,8 +83,6 @@ typedef unsigned int flex_uint32_t;
 #ifndef UINT32_MAX
 #define UINT32_MAX             (4294967295U)
 #endif
-
-#endif /* ! C99 */
 
 #endif /* ! FLEXINT_H */
 
@@ -153,12 +152,7 @@ typedef unsigned int flex_uint32_t;
 typedef struct yy_buffer_state *YY_BUFFER_STATE;
 #endif
 
-#ifndef YY_TYPEDEF_YY_SIZE_T
-#define YY_TYPEDEF_YY_SIZE_T
-typedef size_t yy_size_t;
-#endif
-
-extern yy_size_t yyleng;
+extern int yyleng;
 
 extern FILE *yyin, *yyout;
 
@@ -184,6 +178,11 @@ extern FILE *yyin, *yyout;
 
 #define unput(c) yyunput( c, (yytext_ptr)  )
 
+#ifndef YY_TYPEDEF_YY_SIZE_T
+#define YY_TYPEDEF_YY_SIZE_T
+typedef size_t yy_size_t;
+#endif
+
 #ifndef YY_STRUCT_YY_BUFFER_STATE
 #define YY_STRUCT_YY_BUFFER_STATE
 struct yy_buffer_state
@@ -201,7 +200,7 @@ struct yy_buffer_state
 	/* Number of characters read into yy_ch_buf, not including EOB
 	 * characters.
 	 */
-	yy_size_t yy_n_chars;
+	int yy_n_chars;
 
 	/* Whether we "own" the buffer - i.e., we know we created it,
 	 * and can realloc() it to grow it, and should free() it to
@@ -271,8 +270,8 @@ static YY_BUFFER_STATE * yy_buffer_stack = 0; /**< Stack as an array. */
 
 /* yy_hold_char holds the character lost when yytext is formed. */
 static char yy_hold_char;
-static yy_size_t yy_n_chars;		/* number of characters read into yy_ch_buf */
-yy_size_t yyleng;
+static int yy_n_chars;		/* number of characters read into yy_ch_buf */
+int yyleng;
 
 /* Points to current character in buffer. */
 static char *yy_c_buf_p = (char *) 0;
@@ -300,7 +299,7 @@ static void yy_init_buffer (YY_BUFFER_STATE b,FILE *file  );
 
 YY_BUFFER_STATE yy_scan_buffer (char *base,yy_size_t size  );
 YY_BUFFER_STATE yy_scan_string (yyconst char *yy_str  );
-YY_BUFFER_STATE yy_scan_bytes (yyconst char *bytes,yy_size_t len  );
+YY_BUFFER_STATE yy_scan_bytes (yyconst char *bytes,int len  );
 
 void *yyalloc (yy_size_t  );
 void *yyrealloc (void *,yy_size_t  );
@@ -331,6 +330,9 @@ void yyfree (void *  );
 #define YY_AT_BOL() (YY_CURRENT_BUFFER_LVALUE->yy_at_bol)
 
 /* Begin user sect3 */
+
+#define yywrap(n) 1
+#define YY_SKIP_YYWRAP
 
 typedef unsigned char YY_CHAR;
 
@@ -1661,7 +1663,7 @@ static int yy_first_time = 1;
 
 
 
-#line 1665 "cftoken.c"
+#line 1667 "cftoken.c"
 
 #define INITIAL 0
 #define S_INI 1
@@ -1719,7 +1721,7 @@ FILE *yyget_out (void );
 
 void yyset_out  (FILE * out_str  );
 
-yy_size_t yyget_leng (void );
+int yyget_leng (void );
 
 char *yyget_text (void );
 
@@ -1769,7 +1771,7 @@ static int input (void );
 /* This used to be an fputs(), but since the string might contain NUL's,
  * we now use fwrite().
  */
-#define ECHO do { if (fwrite( yytext, yyleng, 1, yyout )) {} } while (0)
+#define ECHO fwrite( yytext, yyleng, 1, yyout )
 #endif
 
 /* Gets input and stuffs it into "buf".  number of characters read, or YY_NULL,
@@ -1780,7 +1782,7 @@ static int input (void );
 	if ( YY_CURRENT_BUFFER_LVALUE->yy_is_interactive ) \
 		{ \
 		int c = '*'; \
-		size_t n; \
+		int n; \
 		for ( n = 0; n < max_size && \
 			     (c = getc( yyin )) != EOF && c != '\n'; ++n ) \
 			buf[n] = (char) c; \
@@ -1862,7 +1864,7 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 142 "cftoken.l"
+#line 143 "cftoken.l"
 
 
 	if (yy_first_time) {
@@ -1872,7 +1874,7 @@ YY_DECL
 
 
 	/* privsep */
-#line 1876 "cftoken.c"
+#line 1878 "cftoken.c"
 
 	if ( !(yy_init) )
 		{
@@ -1963,1064 +1965,1064 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 151 "cftoken.l"
+#line 152 "cftoken.l"
 { BEGIN S_PRIV; YYDB; return(PRIVSEP); }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 152 "cftoken.l"
+#line 153 "cftoken.l"
 { return(BOC); }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 153 "cftoken.l"
+#line 154 "cftoken.l"
 { YYD; return(USER); }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 154 "cftoken.l"
+#line 155 "cftoken.l"
 { YYD; return(GROUP); }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 155 "cftoken.l"
+#line 156 "cftoken.l"
 { YYD; return(CHROOT); }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 156 "cftoken.l"
+#line 157 "cftoken.l"
 { BEGIN S_INI; return(EOC); }
 	YY_BREAK
 /* path */
 case 7:
 YY_RULE_SETUP
-#line 159 "cftoken.l"
+#line 160 "cftoken.l"
 { BEGIN S_PTH; YYDB; return(PATH); }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 160 "cftoken.l"
+#line 161 "cftoken.l"
 { YYD; yylval.num = LC_PATHTYPE_INCLUDE;
 				return(PATHTYPE); }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 162 "cftoken.l"
+#line 163 "cftoken.l"
 { YYD; yylval.num = LC_PATHTYPE_PSK;
 				return(PATHTYPE); }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 164 "cftoken.l"
+#line 165 "cftoken.l"
 { YYD; yylval.num = LC_PATHTYPE_CERT;
 				return(PATHTYPE); }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 166 "cftoken.l"
+#line 167 "cftoken.l"
 { YYD; yylval.num = LC_PATHTYPE_SCRIPT;
 				return(PATHTYPE); }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 168 "cftoken.l"
+#line 169 "cftoken.l"
 { YYD; yylval.num = LC_PATHTYPE_BACKUPSA;
 				return(PATHTYPE); }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 170 "cftoken.l"
+#line 171 "cftoken.l"
 { YYD; yylval.num = LC_PATHTYPE_PIDFILE;
 				return(PATHTYPE); }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 172 "cftoken.l"
+#line 173 "cftoken.l"
 { BEGIN S_INI; YYDB; return(EOS); }
 	YY_BREAK
 /* include */
 case 15:
 YY_RULE_SETUP
-#line 175 "cftoken.l"
+#line 176 "cftoken.l"
 { YYDB; return(INCLUDE); }
 	YY_BREAK
 /* pfkey_buffer */
 case 16:
 YY_RULE_SETUP
-#line 178 "cftoken.l"
+#line 179 "cftoken.l"
 { YYDB; return(PFKEY_BUFFER); }
 	YY_BREAK
 /* special */
 case 17:
 YY_RULE_SETUP
-#line 181 "cftoken.l"
+#line 182 "cftoken.l"
 { YYDB; return(COMPLEX_BUNDLE); }
 	YY_BREAK
 /* logging */
 case 18:
 YY_RULE_SETUP
-#line 184 "cftoken.l"
+#line 185 "cftoken.l"
 { BEGIN S_LOG; YYDB; return(LOGGING); }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 185 "cftoken.l"
+#line 186 "cftoken.l"
 { YYD; yylval.num = LLV_ERROR; return(LOGLEV); }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 186 "cftoken.l"
+#line 187 "cftoken.l"
 { YYD; yylval.num = LLV_WARNING; return(LOGLEV); }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 187 "cftoken.l"
+#line 188 "cftoken.l"
 { YYD; yylval.num = LLV_NOTIFY; return(LOGLEV); }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 188 "cftoken.l"
+#line 189 "cftoken.l"
 { YYD; yylval.num = LLV_INFO; return(LOGLEV); }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 189 "cftoken.l"
+#line 190 "cftoken.l"
 { YYD; yylval.num = LLV_DEBUG; return(LOGLEV); }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 190 "cftoken.l"
+#line 191 "cftoken.l"
 { YYD; yylval.num = LLV_DEBUG2; return(LOGLEV); }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 191 "cftoken.l"
+#line 192 "cftoken.l"
 { BEGIN S_INI; return(EOS); }
 	YY_BREAK
 /* padding */
 case 26:
 YY_RULE_SETUP
-#line 194 "cftoken.l"
+#line 195 "cftoken.l"
 { BEGIN S_PAD; YYDB; return(PADDING); }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 195 "cftoken.l"
+#line 196 "cftoken.l"
 { return(BOC); }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 196 "cftoken.l"
+#line 197 "cftoken.l"
 { YYD; return(PAD_RANDOMIZE); }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 197 "cftoken.l"
+#line 198 "cftoken.l"
 { YYD; return(PAD_RANDOMIZELEN); }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 198 "cftoken.l"
+#line 199 "cftoken.l"
 { YYD; return(PAD_MAXLEN); }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 199 "cftoken.l"
+#line 200 "cftoken.l"
 { YYD; return(PAD_STRICT); }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 200 "cftoken.l"
+#line 201 "cftoken.l"
 { YYD; return(PAD_EXCLTAIL); }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 201 "cftoken.l"
+#line 202 "cftoken.l"
 { BEGIN S_INI; return(EOC); }
 	YY_BREAK
 /* listen */
 case 34:
 YY_RULE_SETUP
-#line 204 "cftoken.l"
+#line 205 "cftoken.l"
 { BEGIN S_LST; YYDB; return(LISTEN); }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 205 "cftoken.l"
+#line 206 "cftoken.l"
 { return(BOC); }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 206 "cftoken.l"
+#line 207 "cftoken.l"
 { YYD; return(X_ISAKMP); }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 207 "cftoken.l"
+#line 208 "cftoken.l"
 { YYD; return(X_ISAKMP_NATT); }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 208 "cftoken.l"
+#line 209 "cftoken.l"
 { YYD; return(X_ADMIN); }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 209 "cftoken.l"
+#line 210 "cftoken.l"
 { YYD; return(ADMINSOCK); }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 210 "cftoken.l"
+#line 211 "cftoken.l"
 { YYD; return(DISABLED); }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 211 "cftoken.l"
+#line 212 "cftoken.l"
 { YYD; return(STRICT_ADDRESS); }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 212 "cftoken.l"
+#line 213 "cftoken.l"
 { BEGIN S_INI; return(EOC); }
 	YY_BREAK
 /* radius config */
 case 43:
 YY_RULE_SETUP
-#line 215 "cftoken.l"
+#line 216 "cftoken.l"
 { BEGIN S_RAD; YYDB; return(RADCFG); }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 216 "cftoken.l"
+#line 217 "cftoken.l"
 { return(BOC); }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 217 "cftoken.l"
+#line 218 "cftoken.l"
 { YYD; return(RAD_AUTH); }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 218 "cftoken.l"
+#line 219 "cftoken.l"
 { YYD; return(RAD_ACCT); }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 219 "cftoken.l"
+#line 220 "cftoken.l"
 { YYD; return(RAD_TIMEOUT); }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 220 "cftoken.l"
+#line 221 "cftoken.l"
 { YYD; return(RAD_RETRIES); }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 221 "cftoken.l"
+#line 222 "cftoken.l"
 { BEGIN S_INI; return(EOC); }
 	YY_BREAK
 /* ldap config */
 case 50:
 YY_RULE_SETUP
-#line 224 "cftoken.l"
+#line 225 "cftoken.l"
 { BEGIN S_LDAP; YYDB; return(LDAPCFG); }
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 225 "cftoken.l"
+#line 226 "cftoken.l"
 { return(BOC); }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 226 "cftoken.l"
+#line 227 "cftoken.l"
 { YYD; return(LDAP_PVER); }
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 227 "cftoken.l"
+#line 228 "cftoken.l"
 { YYD; return(LDAP_HOST); }
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 228 "cftoken.l"
+#line 229 "cftoken.l"
 { YYD; return(LDAP_PORT); }
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 229 "cftoken.l"
+#line 230 "cftoken.l"
 { YYD; return(LDAP_BASE); }
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 230 "cftoken.l"
+#line 231 "cftoken.l"
 { YYD; return(LDAP_SUBTREE); }
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 231 "cftoken.l"
+#line 232 "cftoken.l"
 { YYD; return(LDAP_BIND_DN); }
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 232 "cftoken.l"
+#line 233 "cftoken.l"
 { YYD; return(LDAP_BIND_PW); }
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 233 "cftoken.l"
+#line 234 "cftoken.l"
 { YYD; return(LDAP_ATTR_USER); }
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 234 "cftoken.l"
+#line 235 "cftoken.l"
 { YYD; return(LDAP_ATTR_ADDR); }
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 235 "cftoken.l"
+#line 236 "cftoken.l"
 { YYD; return(LDAP_ATTR_MASK); }
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 236 "cftoken.l"
+#line 237 "cftoken.l"
 { YYD; return(LDAP_ATTR_GROUP); }
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 237 "cftoken.l"
+#line 238 "cftoken.l"
 { YYD; return(LDAP_ATTR_MEMBER); }
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 238 "cftoken.l"
+#line 239 "cftoken.l"
 { BEGIN S_INI; return(EOC); }
 	YY_BREAK
 /* mode_cfg */
 case 65:
 YY_RULE_SETUP
-#line 241 "cftoken.l"
+#line 242 "cftoken.l"
 { BEGIN S_CFG; YYDB; return(MODECFG); }
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 242 "cftoken.l"
+#line 243 "cftoken.l"
 { return(BOC); }
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 243 "cftoken.l"
+#line 244 "cftoken.l"
 { YYD; return(CFG_NET4); }
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 244 "cftoken.l"
+#line 245 "cftoken.l"
 { YYD; return(CFG_MASK4); }
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 245 "cftoken.l"
+#line 246 "cftoken.l"
 { YYD; return(CFG_DNS4); }
 	YY_BREAK
 case 70:
 YY_RULE_SETUP
-#line 246 "cftoken.l"
+#line 247 "cftoken.l"
 { YYD; return(CFG_NBNS4); }
 	YY_BREAK
 case 71:
 YY_RULE_SETUP
-#line 247 "cftoken.l"
+#line 248 "cftoken.l"
 { YYD; return(CFG_NBNS4); }
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 248 "cftoken.l"
+#line 249 "cftoken.l"
 { YYD; return(CFG_DEFAULT_DOMAIN); }
 	YY_BREAK
 case 73:
 YY_RULE_SETUP
-#line 249 "cftoken.l"
+#line 250 "cftoken.l"
 { YYD; return(CFG_AUTH_SOURCE); }
 	YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 250 "cftoken.l"
+#line 251 "cftoken.l"
 { YYD; return(CFG_AUTH_GROUPS); }
 	YY_BREAK
 case 75:
 YY_RULE_SETUP
-#line 251 "cftoken.l"
+#line 252 "cftoken.l"
 { YYD; return(CFG_GROUP_SOURCE); }
 	YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 252 "cftoken.l"
+#line 253 "cftoken.l"
 { YYD; return(CFG_CONF_SOURCE); }
 	YY_BREAK
 case 77:
 YY_RULE_SETUP
-#line 253 "cftoken.l"
+#line 254 "cftoken.l"
 { YYD; return(CFG_ACCOUNTING); }
 	YY_BREAK
 case 78:
 YY_RULE_SETUP
-#line 254 "cftoken.l"
+#line 255 "cftoken.l"
 { YYD; return(CFG_SYSTEM); }
 	YY_BREAK
 case 79:
 YY_RULE_SETUP
-#line 255 "cftoken.l"
+#line 256 "cftoken.l"
 { YYD; return(CFG_LOCAL); }
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
-#line 256 "cftoken.l"
+#line 257 "cftoken.l"
 { YYD; return(CFG_NONE); }
 	YY_BREAK
 case 81:
 YY_RULE_SETUP
-#line 257 "cftoken.l"
+#line 258 "cftoken.l"
 { YYD; return(CFG_RADIUS); }
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 258 "cftoken.l"
+#line 259 "cftoken.l"
 { YYD; return(CFG_PAM); }
 	YY_BREAK
 case 83:
 YY_RULE_SETUP
-#line 259 "cftoken.l"
+#line 260 "cftoken.l"
 { YYD; return(CFG_LDAP); }
 	YY_BREAK
 case 84:
 YY_RULE_SETUP
-#line 260 "cftoken.l"
+#line 261 "cftoken.l"
 { YYD; return(CFG_POOL_SIZE); }
 	YY_BREAK
 case 85:
 YY_RULE_SETUP
-#line 261 "cftoken.l"
+#line 262 "cftoken.l"
 { YYD; return(CFG_MOTD); }
 	YY_BREAK
 case 86:
 YY_RULE_SETUP
-#line 262 "cftoken.l"
+#line 263 "cftoken.l"
 { YYD; return(CFG_AUTH_THROTTLE); }
 	YY_BREAK
 case 87:
 YY_RULE_SETUP
-#line 263 "cftoken.l"
+#line 264 "cftoken.l"
 { YYD; return(CFG_SPLIT_NETWORK); }
 	YY_BREAK
 case 88:
 YY_RULE_SETUP
-#line 264 "cftoken.l"
+#line 265 "cftoken.l"
 { YYD; return(CFG_SPLIT_LOCAL); }
 	YY_BREAK
 case 89:
 YY_RULE_SETUP
-#line 265 "cftoken.l"
+#line 266 "cftoken.l"
 { YYD; return(CFG_SPLIT_INCLUDE); }
 	YY_BREAK
 case 90:
 YY_RULE_SETUP
-#line 266 "cftoken.l"
+#line 267 "cftoken.l"
 { YYD; return(CFG_SPLIT_DNS); }
 	YY_BREAK
 case 91:
 YY_RULE_SETUP
-#line 267 "cftoken.l"
+#line 268 "cftoken.l"
 { YYD; return(CFG_PFS_GROUP); }
 	YY_BREAK
 case 92:
 YY_RULE_SETUP
-#line 268 "cftoken.l"
+#line 269 "cftoken.l"
 { YYD; return(CFG_SAVE_PASSWD); }
 	YY_BREAK
 case 93:
 YY_RULE_SETUP
-#line 269 "cftoken.l"
+#line 270 "cftoken.l"
 { YYD; return(COMMA); }
 	YY_BREAK
 case 94:
 YY_RULE_SETUP
-#line 270 "cftoken.l"
+#line 271 "cftoken.l"
 { BEGIN S_INI; return(EOC); }
 	YY_BREAK
 /* timer */
 case 95:
 YY_RULE_SETUP
-#line 273 "cftoken.l"
+#line 274 "cftoken.l"
 { BEGIN S_RTRY; YYDB; return(RETRY); }
 	YY_BREAK
 case 96:
 YY_RULE_SETUP
-#line 274 "cftoken.l"
+#line 275 "cftoken.l"
 { return(BOC); }
 	YY_BREAK
 case 97:
 YY_RULE_SETUP
-#line 275 "cftoken.l"
+#line 276 "cftoken.l"
 { YYD; return(RETRY_COUNTER); }
 	YY_BREAK
 case 98:
 YY_RULE_SETUP
-#line 276 "cftoken.l"
+#line 277 "cftoken.l"
 { YYD; return(RETRY_INTERVAL); }
 	YY_BREAK
 case 99:
 YY_RULE_SETUP
-#line 277 "cftoken.l"
+#line 278 "cftoken.l"
 { YYD; return(RETRY_PERSEND); }
 	YY_BREAK
 case 100:
 YY_RULE_SETUP
-#line 278 "cftoken.l"
+#line 279 "cftoken.l"
 { YYD; return(RETRY_PHASE1); }
 	YY_BREAK
 case 101:
 YY_RULE_SETUP
-#line 279 "cftoken.l"
+#line 280 "cftoken.l"
 { YYD; return(RETRY_PHASE2); }
 	YY_BREAK
 case 102:
 YY_RULE_SETUP
-#line 280 "cftoken.l"
+#line 281 "cftoken.l"
 { YYD; return(NATT_KA); }
 	YY_BREAK
 case 103:
 YY_RULE_SETUP
-#line 281 "cftoken.l"
+#line 282 "cftoken.l"
 { BEGIN S_INI; return(EOC); }
 	YY_BREAK
 /* sainfo */
 case 104:
 YY_RULE_SETUP
-#line 284 "cftoken.l"
+#line 285 "cftoken.l"
 { BEGIN S_SAINF; YYDB; return(SAINFO); }
 	YY_BREAK
 case 105:
 YY_RULE_SETUP
-#line 285 "cftoken.l"
+#line 286 "cftoken.l"
 { YYD; return(ANONYMOUS); }
 	YY_BREAK
 case 106:
 YY_RULE_SETUP
-#line 286 "cftoken.l"
+#line 287 "cftoken.l"
 { YYD; return(CLIENTADDR); }
 	YY_BREAK
 case 107:
 YY_RULE_SETUP
-#line 287 "cftoken.l"
+#line 288 "cftoken.l"
 { YYD; return(PORTANY); }
 	YY_BREAK
 case 108:
 YY_RULE_SETUP
-#line 288 "cftoken.l"
+#line 289 "cftoken.l"
 { YYD; return(ANY); }
 	YY_BREAK
 case 109:
 YY_RULE_SETUP
-#line 289 "cftoken.l"
+#line 290 "cftoken.l"
 { YYD; return(FROM); }
 	YY_BREAK
 case 110:
 YY_RULE_SETUP
-#line 290 "cftoken.l"
+#line 291 "cftoken.l"
 { YYD; return(GROUP); }
 	YY_BREAK
 /* sainfo spec */
 case 111:
 YY_RULE_SETUP
-#line 292 "cftoken.l"
+#line 293 "cftoken.l"
 { BEGIN S_SAINFS; return(BOC); }
 	YY_BREAK
 case 112:
 YY_RULE_SETUP
-#line 293 "cftoken.l"
+#line 294 "cftoken.l"
 { BEGIN S_INI; return(EOS); }
 	YY_BREAK
 case 113:
 YY_RULE_SETUP
-#line 294 "cftoken.l"
+#line 295 "cftoken.l"
 { BEGIN S_INI; return(EOC); }
 	YY_BREAK
 case 114:
 YY_RULE_SETUP
-#line 295 "cftoken.l"
+#line 296 "cftoken.l"
 { YYD; return(PFS_GROUP); }
 	YY_BREAK
 case 115:
 YY_RULE_SETUP
-#line 296 "cftoken.l"
+#line 297 "cftoken.l"
 { YYD; return(REMOTEID); }
 	YY_BREAK
 case 116:
 YY_RULE_SETUP
-#line 297 "cftoken.l"
+#line 298 "cftoken.l"
 { YYD; return(MY_IDENTIFIER); }
 	YY_BREAK
 case 117:
 YY_RULE_SETUP
-#line 298 "cftoken.l"
+#line 299 "cftoken.l"
 { YYD; return(LIFETIME); }
 	YY_BREAK
 case 118:
 YY_RULE_SETUP
-#line 299 "cftoken.l"
+#line 300 "cftoken.l"
 { YYD; return(LIFETYPE_TIME); }
 	YY_BREAK
 case 119:
 YY_RULE_SETUP
-#line 300 "cftoken.l"
+#line 301 "cftoken.l"
 { YYD; return(LIFETYPE_BYTE); }
 	YY_BREAK
 case 120:
 YY_RULE_SETUP
-#line 301 "cftoken.l"
+#line 302 "cftoken.l"
 { YYD; yylval.num = algclass_ipsec_enc; return(ALGORITHM_CLASS); }
 	YY_BREAK
 case 121:
 YY_RULE_SETUP
-#line 302 "cftoken.l"
+#line 303 "cftoken.l"
 { YYD; yylval.num = algclass_ipsec_auth; return(ALGORITHM_CLASS); }
 	YY_BREAK
 case 122:
 YY_RULE_SETUP
-#line 303 "cftoken.l"
+#line 304 "cftoken.l"
 { YYD; yylval.num = algclass_ipsec_comp; return(ALGORITHM_CLASS); }
 	YY_BREAK
 case 123:
 YY_RULE_SETUP
-#line 304 "cftoken.l"
+#line 305 "cftoken.l"
 { YYD; return(COMMA); }
 	YY_BREAK
 /* remote */
 case 124:
 YY_RULE_SETUP
-#line 307 "cftoken.l"
+#line 308 "cftoken.l"
 { BEGIN S_RMT; YYDB; return(REMOTE); }
 	YY_BREAK
 case 125:
 YY_RULE_SETUP
-#line 308 "cftoken.l"
+#line 309 "cftoken.l"
 { YYD; return(ANONYMOUS); }
 	YY_BREAK
 case 126:
 YY_RULE_SETUP
-#line 309 "cftoken.l"
+#line 310 "cftoken.l"
 { YYD; return(INHERIT); }
 	YY_BREAK
 case 127:
 YY_RULE_SETUP
-#line 310 "cftoken.l"
+#line 311 "cftoken.l"
 { BEGIN S_INI; YYDB; return(EOS); }
 	YY_BREAK
 /* remote spec */
 case 128:
 YY_RULE_SETUP
-#line 312 "cftoken.l"
+#line 313 "cftoken.l"
 { BEGIN S_RMTS; return(BOC); }
 	YY_BREAK
 case 129:
 YY_RULE_SETUP
-#line 313 "cftoken.l"
+#line 314 "cftoken.l"
 { BEGIN S_INI; return(EOC); }
 	YY_BREAK
 case 130:
 YY_RULE_SETUP
-#line 314 "cftoken.l"
+#line 315 "cftoken.l"
 { YYD; return(REMOTE_ADDRESS); }
 	YY_BREAK
 case 131:
 YY_RULE_SETUP
-#line 315 "cftoken.l"
+#line 316 "cftoken.l"
 { YYD; return(EXCHANGE_MODE); }
 	YY_BREAK
 case 132:
 YY_RULE_SETUP
-#line 316 "cftoken.l"
+#line 317 "cftoken.l"
 { YYD; /* XXX ignored, but to be handled. */ ; }
 	YY_BREAK
 case 133:
 YY_RULE_SETUP
-#line 317 "cftoken.l"
+#line 318 "cftoken.l"
 { YYD; yylval.num = ISAKMP_ETYPE_BASE; return(EXCHANGETYPE); }
 	YY_BREAK
 case 134:
 YY_RULE_SETUP
-#line 318 "cftoken.l"
+#line 319 "cftoken.l"
 { YYD; yylval.num = ISAKMP_ETYPE_IDENT; return(EXCHANGETYPE); }
 	YY_BREAK
 case 135:
 YY_RULE_SETUP
-#line 319 "cftoken.l"
+#line 320 "cftoken.l"
 { YYD; yylval.num = ISAKMP_ETYPE_AGG; return(EXCHANGETYPE); }
 	YY_BREAK
 case 136:
 YY_RULE_SETUP
-#line 320 "cftoken.l"
+#line 321 "cftoken.l"
 { YYD; return(DOI); }
 	YY_BREAK
 case 137:
 YY_RULE_SETUP
-#line 321 "cftoken.l"
+#line 322 "cftoken.l"
 { YYD; yylval.num = IPSEC_DOI; return(DOITYPE); }
 	YY_BREAK
 case 138:
 YY_RULE_SETUP
-#line 322 "cftoken.l"
+#line 323 "cftoken.l"
 { YYD; return(SITUATION); }
 	YY_BREAK
 case 139:
 YY_RULE_SETUP
-#line 323 "cftoken.l"
+#line 324 "cftoken.l"
 { YYD; yylval.num = IPSECDOI_SIT_IDENTITY_ONLY; return(SITUATIONTYPE); }
 	YY_BREAK
 case 140:
 YY_RULE_SETUP
-#line 324 "cftoken.l"
+#line 325 "cftoken.l"
 { YYD; yylval.num = IPSECDOI_SIT_SECRECY; return(SITUATIONTYPE); }
 	YY_BREAK
 case 141:
 YY_RULE_SETUP
-#line 325 "cftoken.l"
+#line 326 "cftoken.l"
 { YYD; yylval.num = IPSECDOI_SIT_INTEGRITY; return(SITUATIONTYPE); }
 	YY_BREAK
 case 142:
 YY_RULE_SETUP
-#line 326 "cftoken.l"
+#line 327 "cftoken.l"
 { YYD; return(MY_IDENTIFIER); }
 	YY_BREAK
 case 143:
 YY_RULE_SETUP
-#line 327 "cftoken.l"
+#line 328 "cftoken.l"
 { YYD; return(XAUTH_LOGIN); /* formerly identifier type login */ }
 	YY_BREAK
 case 144:
 YY_RULE_SETUP
-#line 328 "cftoken.l"
+#line 329 "cftoken.l"
 { YYD; return(PEERS_IDENTIFIER); }
 	YY_BREAK
 case 145:
 YY_RULE_SETUP
-#line 329 "cftoken.l"
+#line 330 "cftoken.l"
 { YYD; return(VERIFY_IDENTIFIER); }
 	YY_BREAK
 case 146:
 YY_RULE_SETUP
-#line 330 "cftoken.l"
+#line 331 "cftoken.l"
 { YYD; return(CERTIFICATE_TYPE); }
 	YY_BREAK
 case 147:
 YY_RULE_SETUP
-#line 331 "cftoken.l"
+#line 332 "cftoken.l"
 { YYD; return(CA_TYPE); }
 	YY_BREAK
 case 148:
 YY_RULE_SETUP
-#line 332 "cftoken.l"
+#line 333 "cftoken.l"
 { YYD; yylval.num = ISAKMP_CERT_X509SIGN; return(CERT_X509); }
 	YY_BREAK
 case 149:
 YY_RULE_SETUP
-#line 333 "cftoken.l"
+#line 334 "cftoken.l"
 { YYD; yylval.num = ISAKMP_CERT_PLAINRSA; return(CERT_PLAINRSA); }
 	YY_BREAK
 case 150:
 YY_RULE_SETUP
-#line 334 "cftoken.l"
+#line 335 "cftoken.l"
 { YYD; return(PEERS_CERTFILE); }
 	YY_BREAK
 case 151:
 YY_RULE_SETUP
-#line 335 "cftoken.l"
+#line 336 "cftoken.l"
 { YYD; return(DNSSEC); }
 	YY_BREAK
 case 152:
 YY_RULE_SETUP
-#line 336 "cftoken.l"
+#line 337 "cftoken.l"
 { YYD; return(VERIFY_CERT); }
 	YY_BREAK
 case 153:
 YY_RULE_SETUP
-#line 337 "cftoken.l"
+#line 338 "cftoken.l"
 { YYD; return(SEND_CERT); }
 	YY_BREAK
 case 154:
 YY_RULE_SETUP
-#line 338 "cftoken.l"
+#line 339 "cftoken.l"
 { YYD; return(SEND_CR); }
 	YY_BREAK
 case 155:
 YY_RULE_SETUP
-#line 339 "cftoken.l"
+#line 340 "cftoken.l"
 { YYD; return(MATCH_EMPTY_CR); }
 	YY_BREAK
 case 156:
 YY_RULE_SETUP
-#line 340 "cftoken.l"
+#line 341 "cftoken.l"
 { YYD; return(DH_GROUP); }
 	YY_BREAK
 case 157:
 YY_RULE_SETUP
-#line 341 "cftoken.l"
+#line 342 "cftoken.l"
 { YYD; return(NONCE_SIZE); }
 	YY_BREAK
 case 158:
 YY_RULE_SETUP
-#line 342 "cftoken.l"
+#line 343 "cftoken.l"
 { YYD; return(GENERATE_POLICY); }
 	YY_BREAK
 case 159:
 YY_RULE_SETUP
-#line 343 "cftoken.l"
+#line 344 "cftoken.l"
 { YYD; yylval.num = GENERATE_POLICY_UNIQUE; return(GENERATE_LEVEL); }
 	YY_BREAK
 case 160:
 YY_RULE_SETUP
-#line 344 "cftoken.l"
+#line 345 "cftoken.l"
 { YYD; yylval.num = GENERATE_POLICY_REQUIRE; return(GENERATE_LEVEL); }
 	YY_BREAK
 case 161:
 YY_RULE_SETUP
-#line 345 "cftoken.l"
+#line 346 "cftoken.l"
 { YYD; return(SUPPORT_PROXY); }
 	YY_BREAK
 case 162:
 YY_RULE_SETUP
-#line 346 "cftoken.l"
+#line 347 "cftoken.l"
 { YYD; return(INITIAL_CONTACT); }
 	YY_BREAK
 case 163:
 YY_RULE_SETUP
-#line 347 "cftoken.l"
+#line 348 "cftoken.l"
 { YYD; return(NAT_TRAVERSAL); }
 	YY_BREAK
 case 164:
 YY_RULE_SETUP
-#line 348 "cftoken.l"
+#line 349 "cftoken.l"
 { YYD; return(REMOTE_FORCE_LEVEL); }
 	YY_BREAK
 case 165:
 YY_RULE_SETUP
-#line 349 "cftoken.l"
+#line 350 "cftoken.l"
 { YYD; return(PROPOSAL_CHECK); }
 	YY_BREAK
 case 166:
 YY_RULE_SETUP
-#line 350 "cftoken.l"
+#line 351 "cftoken.l"
 { YYD; yylval.num = PROP_CHECK_OBEY; return(PROPOSAL_CHECK_LEVEL); }
 	YY_BREAK
 case 167:
 YY_RULE_SETUP
-#line 351 "cftoken.l"
+#line 352 "cftoken.l"
 { YYD; yylval.num = PROP_CHECK_STRICT; return(PROPOSAL_CHECK_LEVEL); }
 	YY_BREAK
 case 168:
 YY_RULE_SETUP
-#line 352 "cftoken.l"
+#line 353 "cftoken.l"
 { YYD; yylval.num = PROP_CHECK_EXACT; return(PROPOSAL_CHECK_LEVEL); }
 	YY_BREAK
 case 169:
 YY_RULE_SETUP
-#line 353 "cftoken.l"
+#line 354 "cftoken.l"
 { YYD; yylval.num = PROP_CHECK_CLAIM; return(PROPOSAL_CHECK_LEVEL); }
 	YY_BREAK
 case 170:
 YY_RULE_SETUP
-#line 354 "cftoken.l"
+#line 355 "cftoken.l"
 { YYD; return(KEEPALIVE); }
 	YY_BREAK
 case 171:
 YY_RULE_SETUP
-#line 355 "cftoken.l"
+#line 356 "cftoken.l"
 { YYD; return(PASSIVE); }
 	YY_BREAK
 case 172:
 YY_RULE_SETUP
-#line 356 "cftoken.l"
+#line 357 "cftoken.l"
 { YYD; return(LIFETIME); }
 	YY_BREAK
 case 173:
 YY_RULE_SETUP
-#line 357 "cftoken.l"
+#line 358 "cftoken.l"
 { YYD; return(LIFETYPE_TIME); }
 	YY_BREAK
 case 174:
 YY_RULE_SETUP
-#line 358 "cftoken.l"
+#line 359 "cftoken.l"
 { YYD; return(LIFETYPE_BYTE); }
 	YY_BREAK
 case 175:
 YY_RULE_SETUP
-#line 359 "cftoken.l"
+#line 360 "cftoken.l"
 { YYD; return(DPD); }
 	YY_BREAK
 case 176:
 YY_RULE_SETUP
-#line 360 "cftoken.l"
+#line 361 "cftoken.l"
 { YYD; return(DPD_DELAY); }
 	YY_BREAK
 case 177:
 YY_RULE_SETUP
-#line 361 "cftoken.l"
+#line 362 "cftoken.l"
 { YYD; return(DPD_RETRY); }
 	YY_BREAK
 case 178:
 YY_RULE_SETUP
-#line 362 "cftoken.l"
+#line 363 "cftoken.l"
 { YYD; return(DPD_MAXFAIL); }
 	YY_BREAK
 case 179:
 YY_RULE_SETUP
-#line 363 "cftoken.l"
+#line 364 "cftoken.l"
 { YYD; return(PH1ID); }
 	YY_BREAK
 case 180:
 YY_RULE_SETUP
-#line 364 "cftoken.l"
+#line 365 "cftoken.l"
 { YYD; return(IKE_FRAG); }
 	YY_BREAK
 case 181:
 YY_RULE_SETUP
-#line 365 "cftoken.l"
+#line 366 "cftoken.l"
 { YYD; return(ESP_FRAG); }
 	YY_BREAK
 case 182:
 YY_RULE_SETUP
-#line 366 "cftoken.l"
+#line 367 "cftoken.l"
 { YYD; return(SCRIPT); }
 	YY_BREAK
 case 183:
 YY_RULE_SETUP
-#line 367 "cftoken.l"
+#line 368 "cftoken.l"
 { YYD; return(PHASE1_UP); }
 	YY_BREAK
 case 184:
 YY_RULE_SETUP
-#line 368 "cftoken.l"
+#line 369 "cftoken.l"
 { YYD; return(PHASE1_DOWN); }
 	YY_BREAK
 case 185:
 YY_RULE_SETUP
-#line 369 "cftoken.l"
+#line 370 "cftoken.l"
 { YYD; return(PHASE1_DEAD); }
 	YY_BREAK
 case 186:
 YY_RULE_SETUP
-#line 370 "cftoken.l"
+#line 371 "cftoken.l"
 { YYD; return(MODE_CFG); }
 	YY_BREAK
 case 187:
 YY_RULE_SETUP
-#line 371 "cftoken.l"
+#line 372 "cftoken.l"
 { YYD; return(WEAK_PHASE1_CHECK); }
 	YY_BREAK
 case 188:
 YY_RULE_SETUP
-#line 372 "cftoken.l"
+#line 373 "cftoken.l"
 { YYD; return(REKEY); }
 	YY_BREAK
 /* remote proposal */
 case 189:
 YY_RULE_SETUP
-#line 374 "cftoken.l"
+#line 375 "cftoken.l"
 { BEGIN S_RMTP; YYDB; return(PROPOSAL); }
 	YY_BREAK
 case 190:
 YY_RULE_SETUP
-#line 375 "cftoken.l"
+#line 376 "cftoken.l"
 { return(BOC); }
 	YY_BREAK
 case 191:
 YY_RULE_SETUP
-#line 376 "cftoken.l"
+#line 377 "cftoken.l"
 { BEGIN S_RMTS; return(EOC); }
 	YY_BREAK
 case 192:
 YY_RULE_SETUP
-#line 377 "cftoken.l"
+#line 378 "cftoken.l"
 { YYD; return(LIFETIME); }
 	YY_BREAK
 case 193:
 YY_RULE_SETUP
-#line 378 "cftoken.l"
+#line 379 "cftoken.l"
 { YYD; return(LIFETYPE_TIME); }
 	YY_BREAK
 case 194:
 YY_RULE_SETUP
-#line 379 "cftoken.l"
+#line 380 "cftoken.l"
 { YYD; return(LIFETYPE_BYTE); }
 	YY_BREAK
 case 195:
 YY_RULE_SETUP
-#line 380 "cftoken.l"
+#line 381 "cftoken.l"
 { YYD; yylval.num = algclass_isakmp_enc; return(ALGORITHM_CLASS); }
 	YY_BREAK
 case 196:
 YY_RULE_SETUP
-#line 381 "cftoken.l"
+#line 382 "cftoken.l"
 { YYD; yylval.num = algclass_isakmp_ameth; return(ALGORITHM_CLASS); }
 	YY_BREAK
 case 197:
 YY_RULE_SETUP
-#line 382 "cftoken.l"
+#line 383 "cftoken.l"
 { YYD; yylval.num = algclass_isakmp_hash; return(ALGORITHM_CLASS); }
 	YY_BREAK
 case 198:
 YY_RULE_SETUP
-#line 383 "cftoken.l"
+#line 384 "cftoken.l"
 { YYD; return(DH_GROUP); }
 	YY_BREAK
 case 199:
 YY_RULE_SETUP
-#line 384 "cftoken.l"
+#line 385 "cftoken.l"
 { YYD; return(GSS_ID); }
 	YY_BREAK
 case 200:
 YY_RULE_SETUP
-#line 385 "cftoken.l"
+#line 386 "cftoken.l"
 { YYD; return(GSS_ID); } /* for back compatibility */
 	YY_BREAK
 /* GSS ID encoding type (global) */
 case 201:
 YY_RULE_SETUP
-#line 388 "cftoken.l"
+#line 389 "cftoken.l"
 { BEGIN S_GSSENC; YYDB; return(GSS_ID_ENC); }
 	YY_BREAK
 case 202:
 YY_RULE_SETUP
-#line 389 "cftoken.l"
+#line 390 "cftoken.l"
 { YYD; yylval.num = LC_GSSENC_LATIN1;
 				return(GSS_ID_ENCTYPE); }
 	YY_BREAK
 case 203:
 YY_RULE_SETUP
-#line 391 "cftoken.l"
+#line 392 "cftoken.l"
 { YYD; yylval.num = LC_GSSENC_UTF16LE;
 				return(GSS_ID_ENCTYPE); }
 	YY_BREAK
 case 204:
 YY_RULE_SETUP
-#line 393 "cftoken.l"
+#line 394 "cftoken.l"
 { BEGIN S_INI; YYDB; return(EOS); }
 	YY_BREAK
 /* parameter */
 case 205:
 YY_RULE_SETUP
-#line 396 "cftoken.l"
+#line 397 "cftoken.l"
 { YYD; yylval.num = TRUE; return(SWITCH); }
 	YY_BREAK
 case 206:
 YY_RULE_SETUP
-#line 397 "cftoken.l"
+#line 398 "cftoken.l"
 { YYD; yylval.num = FALSE; return(SWITCH); }
 	YY_BREAK
 /* prefix */
 case 207:
 YY_RULE_SETUP
-#line 400 "cftoken.l"
+#line 401 "cftoken.l"
 {
 			YYD;
 			yytext++;
@@ -3031,7 +3033,7 @@ YY_RULE_SETUP
 /* port number */
 case 208:
 YY_RULE_SETUP
-#line 408 "cftoken.l"
+#line 409 "cftoken.l"
 {
 			char *p = yytext;
 			YYD;
@@ -3045,7 +3047,7 @@ YY_RULE_SETUP
 /* address range */
 case 209:
 YY_RULE_SETUP
-#line 419 "cftoken.l"
+#line 420 "cftoken.l"
 {
                         YYD;
                         yytext++;
@@ -3061,323 +3063,323 @@ YY_RULE_SETUP
 /* upper protocol */
 case 210:
 YY_RULE_SETUP
-#line 432 "cftoken.l"
+#line 433 "cftoken.l"
 { YYD; yylval.num = IPPROTO_ESP; return(UL_PROTO); }
 	YY_BREAK
 case 211:
 YY_RULE_SETUP
-#line 433 "cftoken.l"
+#line 434 "cftoken.l"
 { YYD; yylval.num = IPPROTO_AH; return(UL_PROTO); }
 	YY_BREAK
 case 212:
 YY_RULE_SETUP
-#line 434 "cftoken.l"
+#line 435 "cftoken.l"
 { YYD; yylval.num = IPPROTO_IPCOMP; return(UL_PROTO); }
 	YY_BREAK
 case 213:
 YY_RULE_SETUP
-#line 435 "cftoken.l"
+#line 436 "cftoken.l"
 { YYD; yylval.num = IPPROTO_ICMP; return(UL_PROTO); }
 	YY_BREAK
 case 214:
 YY_RULE_SETUP
-#line 436 "cftoken.l"
+#line 437 "cftoken.l"
 { YYD; yylval.num = IPPROTO_ICMPV6; return(UL_PROTO); }
 	YY_BREAK
 case 215:
 YY_RULE_SETUP
-#line 437 "cftoken.l"
+#line 438 "cftoken.l"
 { YYD; yylval.num = IPPROTO_TCP; return(UL_PROTO); }
 	YY_BREAK
 case 216:
 YY_RULE_SETUP
-#line 438 "cftoken.l"
+#line 439 "cftoken.l"
 { YYD; yylval.num = IPPROTO_UDP; return(UL_PROTO); }
 	YY_BREAK
 case 217:
 YY_RULE_SETUP
-#line 439 "cftoken.l"
+#line 440 "cftoken.l"
 { YYD; yylval.num = IPPROTO_GRE; return(UL_PROTO); }
 	YY_BREAK
 /* algorithm type */
 case 218:
 YY_RULE_SETUP
-#line 442 "cftoken.l"
+#line 443 "cftoken.l"
 { YYD; yylval.num = algtype_des_iv64;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 219:
 YY_RULE_SETUP
-#line 443 "cftoken.l"
+#line 444 "cftoken.l"
 { YYD; yylval.num = algtype_des;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 220:
 YY_RULE_SETUP
-#line 444 "cftoken.l"
+#line 445 "cftoken.l"
 { YYD; yylval.num = algtype_3des;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 221:
 YY_RULE_SETUP
-#line 445 "cftoken.l"
+#line 446 "cftoken.l"
 { YYD; yylval.num = algtype_rc5;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 222:
 YY_RULE_SETUP
-#line 446 "cftoken.l"
+#line 447 "cftoken.l"
 { YYD; yylval.num = algtype_idea;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 223:
 YY_RULE_SETUP
-#line 447 "cftoken.l"
+#line 448 "cftoken.l"
 { YYD; yylval.num = algtype_cast128;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 224:
 YY_RULE_SETUP
-#line 448 "cftoken.l"
+#line 449 "cftoken.l"
 { YYD; yylval.num = algtype_blowfish;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 225:
 YY_RULE_SETUP
-#line 449 "cftoken.l"
+#line 450 "cftoken.l"
 { YYD; yylval.num = algtype_3idea;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 226:
 YY_RULE_SETUP
-#line 450 "cftoken.l"
+#line 451 "cftoken.l"
 { YYD; yylval.num = algtype_des_iv32;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 227:
 YY_RULE_SETUP
-#line 451 "cftoken.l"
+#line 452 "cftoken.l"
 { YYD; yylval.num = algtype_rc4;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 228:
 YY_RULE_SETUP
-#line 452 "cftoken.l"
+#line 453 "cftoken.l"
 { YYD; yylval.num = algtype_null_enc;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 229:
 YY_RULE_SETUP
-#line 453 "cftoken.l"
+#line 454 "cftoken.l"
 { YYD; yylval.num = algtype_null_enc;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 230:
 YY_RULE_SETUP
-#line 454 "cftoken.l"
+#line 455 "cftoken.l"
 { YYD; yylval.num = algtype_aes;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 231:
 YY_RULE_SETUP
-#line 455 "cftoken.l"
+#line 456 "cftoken.l"
 { YYD; yylval.num = algtype_aes;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 232:
 YY_RULE_SETUP
-#line 456 "cftoken.l"
+#line 457 "cftoken.l"
 { YYD; yylval.num = algtype_twofish;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 233:
 YY_RULE_SETUP
-#line 457 "cftoken.l"
+#line 458 "cftoken.l"
 { YYD; yylval.num = algtype_camellia;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 234:
 YY_RULE_SETUP
-#line 458 "cftoken.l"
+#line 459 "cftoken.l"
 { YYD; yylval.num = algtype_non_auth;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 235:
 YY_RULE_SETUP
-#line 459 "cftoken.l"
+#line 460 "cftoken.l"
 { YYD; yylval.num = algtype_hmac_md5;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 236:
 YY_RULE_SETUP
-#line 460 "cftoken.l"
+#line 461 "cftoken.l"
 { YYD; yylval.num = algtype_hmac_sha1;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 237:
 YY_RULE_SETUP
-#line 461 "cftoken.l"
+#line 462 "cftoken.l"
 { YYD; yylval.num = algtype_hmac_sha2_256;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 238:
 YY_RULE_SETUP
-#line 462 "cftoken.l"
+#line 463 "cftoken.l"
 { YYD; yylval.num = algtype_hmac_sha2_256;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 239:
 YY_RULE_SETUP
-#line 463 "cftoken.l"
+#line 464 "cftoken.l"
 { YYD; yylval.num = algtype_hmac_sha2_384;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 240:
 YY_RULE_SETUP
-#line 464 "cftoken.l"
+#line 465 "cftoken.l"
 { YYD; yylval.num = algtype_hmac_sha2_384;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 241:
 YY_RULE_SETUP
-#line 465 "cftoken.l"
+#line 466 "cftoken.l"
 { YYD; yylval.num = algtype_hmac_sha2_512;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 242:
 YY_RULE_SETUP
-#line 466 "cftoken.l"
+#line 467 "cftoken.l"
 { YYD; yylval.num = algtype_hmac_sha2_512;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 243:
 YY_RULE_SETUP
-#line 467 "cftoken.l"
+#line 468 "cftoken.l"
 { YYD; yylval.num = algtype_des_mac;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 244:
 YY_RULE_SETUP
-#line 468 "cftoken.l"
+#line 469 "cftoken.l"
 { YYD; yylval.num = algtype_kpdk;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 245:
 YY_RULE_SETUP
-#line 469 "cftoken.l"
+#line 470 "cftoken.l"
 { YYD; yylval.num = algtype_md5;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 246:
 YY_RULE_SETUP
-#line 470 "cftoken.l"
+#line 471 "cftoken.l"
 { YYD; yylval.num = algtype_sha1;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 247:
 YY_RULE_SETUP
-#line 471 "cftoken.l"
+#line 472 "cftoken.l"
 { YYD; yylval.num = algtype_tiger;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 248:
 YY_RULE_SETUP
-#line 472 "cftoken.l"
+#line 473 "cftoken.l"
 { YYD; yylval.num = algtype_sha2_256;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 249:
 YY_RULE_SETUP
-#line 473 "cftoken.l"
+#line 474 "cftoken.l"
 { YYD; yylval.num = algtype_sha2_256;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 250:
 YY_RULE_SETUP
-#line 474 "cftoken.l"
+#line 475 "cftoken.l"
 { YYD; yylval.num = algtype_sha2_384;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 251:
 YY_RULE_SETUP
-#line 475 "cftoken.l"
+#line 476 "cftoken.l"
 { YYD; yylval.num = algtype_sha2_384;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 252:
 YY_RULE_SETUP
-#line 476 "cftoken.l"
+#line 477 "cftoken.l"
 { YYD; yylval.num = algtype_sha2_512;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 253:
 YY_RULE_SETUP
-#line 477 "cftoken.l"
+#line 478 "cftoken.l"
 { YYD; yylval.num = algtype_sha2_512;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 254:
 YY_RULE_SETUP
-#line 478 "cftoken.l"
+#line 479 "cftoken.l"
 { YYD; yylval.num = algtype_oui;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 255:
 YY_RULE_SETUP
-#line 479 "cftoken.l"
+#line 480 "cftoken.l"
 { YYD; yylval.num = algtype_deflate;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 256:
 YY_RULE_SETUP
-#line 480 "cftoken.l"
+#line 481 "cftoken.l"
 { YYD; yylval.num = algtype_lzs;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 257:
 YY_RULE_SETUP
-#line 481 "cftoken.l"
+#line 482 "cftoken.l"
 { YYD; yylval.num = algtype_modp768;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 258:
 YY_RULE_SETUP
-#line 482 "cftoken.l"
+#line 483 "cftoken.l"
 { YYD; yylval.num = algtype_modp1024;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 259:
 YY_RULE_SETUP
-#line 483 "cftoken.l"
+#line 484 "cftoken.l"
 { YYD; yylval.num = algtype_modp1536;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 260:
 YY_RULE_SETUP
-#line 484 "cftoken.l"
+#line 485 "cftoken.l"
 { YYD; yylval.num = algtype_ec2n155;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 261:
 YY_RULE_SETUP
-#line 485 "cftoken.l"
+#line 486 "cftoken.l"
 { YYD; yylval.num = algtype_ec2n185;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 262:
 YY_RULE_SETUP
-#line 486 "cftoken.l"
+#line 487 "cftoken.l"
 { YYD; yylval.num = algtype_modp2048;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 263:
 YY_RULE_SETUP
-#line 487 "cftoken.l"
+#line 488 "cftoken.l"
 { YYD; yylval.num = algtype_modp3072;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 264:
 YY_RULE_SETUP
-#line 488 "cftoken.l"
+#line 489 "cftoken.l"
 { YYD; yylval.num = algtype_modp4096;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 265:
 YY_RULE_SETUP
-#line 489 "cftoken.l"
+#line 490 "cftoken.l"
 { YYD; yylval.num = algtype_modp6144;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 266:
 YY_RULE_SETUP
-#line 490 "cftoken.l"
+#line 491 "cftoken.l"
 { YYD; yylval.num = algtype_modp8192;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 267:
 YY_RULE_SETUP
-#line 491 "cftoken.l"
+#line 492 "cftoken.l"
 { YYD; yylval.num = algtype_psk;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 268:
 YY_RULE_SETUP
-#line 492 "cftoken.l"
+#line 493 "cftoken.l"
 { YYD; yylval.num = algtype_rsasig;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 269:
 YY_RULE_SETUP
-#line 493 "cftoken.l"
+#line 494 "cftoken.l"
 { YYD; yylval.num = algtype_dsssig;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 270:
 YY_RULE_SETUP
-#line 494 "cftoken.l"
+#line 495 "cftoken.l"
 { YYD; yylval.num = algtype_rsaenc;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 271:
 YY_RULE_SETUP
-#line 495 "cftoken.l"
+#line 496 "cftoken.l"
 { YYD; yylval.num = algtype_rsarev;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 272:
 YY_RULE_SETUP
-#line 496 "cftoken.l"
+#line 497 "cftoken.l"
 { YYD; yylval.num = algtype_gssapikrb;	return(ALGORITHMTYPE); }
 	YY_BREAK
 case 273:
 YY_RULE_SETUP
-#line 497 "cftoken.l"
+#line 498 "cftoken.l"
 {
 #ifdef ENABLE_HYBRID
 	YYD; yylval.num = algtype_hybrid_rsa_s; return(ALGORITHMTYPE);
@@ -3388,7 +3390,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 274:
 YY_RULE_SETUP
-#line 504 "cftoken.l"
+#line 505 "cftoken.l"
 {
 #ifdef ENABLE_HYBRID
 	YYD; yylval.num = algtype_hybrid_dss_s; return(ALGORITHMTYPE);
@@ -3399,7 +3401,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 275:
 YY_RULE_SETUP
-#line 511 "cftoken.l"
+#line 512 "cftoken.l"
 {
 #ifdef ENABLE_HYBRID
 	YYD; yylval.num = algtype_hybrid_rsa_c; return(ALGORITHMTYPE);
@@ -3410,7 +3412,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 276:
 YY_RULE_SETUP
-#line 518 "cftoken.l"
+#line 519 "cftoken.l"
 {
 #ifdef ENABLE_HYBRID
 	YYD; yylval.num = algtype_hybrid_dss_c; return(ALGORITHMTYPE);
@@ -3421,7 +3423,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 277:
 YY_RULE_SETUP
-#line 525 "cftoken.l"
+#line 526 "cftoken.l"
 {
 #ifdef ENABLE_HYBRID
 	YYD; yylval.num = algtype_xauth_psk_s; return(ALGORITHMTYPE);
@@ -3432,7 +3434,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 278:
 YY_RULE_SETUP
-#line 532 "cftoken.l"
+#line 533 "cftoken.l"
 {
 #ifdef ENABLE_HYBRID
 	YYD; yylval.num = algtype_xauth_psk_c; return(ALGORITHMTYPE);
@@ -3443,7 +3445,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 279:
 YY_RULE_SETUP
-#line 539 "cftoken.l"
+#line 540 "cftoken.l"
 {
 #ifdef ENABLE_HYBRID
 	YYD; yylval.num = algtype_xauth_rsa_s; return(ALGORITHMTYPE);
@@ -3454,7 +3456,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 280:
 YY_RULE_SETUP
-#line 546 "cftoken.l"
+#line 547 "cftoken.l"
 {
 #ifdef ENABLE_HYBRID
 	YYD; yylval.num = algtype_xauth_rsa_c; return(ALGORITHMTYPE);
@@ -3466,95 +3468,95 @@ YY_RULE_SETUP
 /* identifier type */
 case 281:
 YY_RULE_SETUP
-#line 556 "cftoken.l"
+#line 557 "cftoken.l"
 { YYD; yylval.num = IDTYPE_USERFQDN; return(IDENTIFIERTYPE); }
 	YY_BREAK
 case 282:
 YY_RULE_SETUP
-#line 557 "cftoken.l"
+#line 558 "cftoken.l"
 { YYD; yylval.num = IDTYPE_FQDN; return(IDENTIFIERTYPE); }
 	YY_BREAK
 case 283:
 YY_RULE_SETUP
-#line 558 "cftoken.l"
+#line 559 "cftoken.l"
 { YYD; yylval.num = IDTYPE_KEYID; return(IDENTIFIERTYPE); }
 	YY_BREAK
 case 284:
 YY_RULE_SETUP
-#line 559 "cftoken.l"
+#line 560 "cftoken.l"
 { YYD; yylval.num = IDTYPE_ADDRESS; return(IDENTIFIERTYPE); }
 	YY_BREAK
 case 285:
 YY_RULE_SETUP
-#line 560 "cftoken.l"
+#line 561 "cftoken.l"
 { YYD; yylval.num = IDTYPE_SUBNET; return(IDENTIFIERTYPE); }
 	YY_BREAK
 case 286:
 YY_RULE_SETUP
-#line 561 "cftoken.l"
+#line 562 "cftoken.l"
 { YYD; yylval.num = IDTYPE_ASN1DN; return(IDENTIFIERTYPE); }
 	YY_BREAK
 /* identifier qualifier */
 case 287:
 YY_RULE_SETUP
-#line 564 "cftoken.l"
+#line 565 "cftoken.l"
 { YYD; yylval.num = IDQUAL_TAG;  return(IDENTIFIERQUAL); }
 	YY_BREAK
 case 288:
 YY_RULE_SETUP
-#line 565 "cftoken.l"
+#line 566 "cftoken.l"
 { YYD; yylval.num = IDQUAL_FILE; return(IDENTIFIERQUAL); }
 	YY_BREAK
 /* units */
 case 289:
 YY_RULE_SETUP
-#line 568 "cftoken.l"
+#line 569 "cftoken.l"
 { YYD; return(UNITTYPE_BYTE); }
 	YY_BREAK
 case 290:
 YY_RULE_SETUP
-#line 569 "cftoken.l"
+#line 570 "cftoken.l"
 { YYD; return(UNITTYPE_KBYTES); }
 	YY_BREAK
 case 291:
 YY_RULE_SETUP
-#line 570 "cftoken.l"
+#line 571 "cftoken.l"
 { YYD; return(UNITTYPE_MBYTES); }
 	YY_BREAK
 case 292:
 YY_RULE_SETUP
-#line 571 "cftoken.l"
+#line 572 "cftoken.l"
 { YYD; return(UNITTYPE_TBYTES); }
 	YY_BREAK
 case 293:
 YY_RULE_SETUP
-#line 572 "cftoken.l"
+#line 573 "cftoken.l"
 { YYD; return(UNITTYPE_SEC); }
 	YY_BREAK
 case 294:
 YY_RULE_SETUP
-#line 573 "cftoken.l"
+#line 574 "cftoken.l"
 { YYD; return(UNITTYPE_MIN); }
 	YY_BREAK
 case 295:
 YY_RULE_SETUP
-#line 574 "cftoken.l"
+#line 575 "cftoken.l"
 { YYD; return(UNITTYPE_HOUR); }
 	YY_BREAK
 /* boolean */
 case 296:
 YY_RULE_SETUP
-#line 577 "cftoken.l"
+#line 578 "cftoken.l"
 { YYD; yylval.num = TRUE; return(BOOLEAN); }
 	YY_BREAK
 case 297:
 YY_RULE_SETUP
-#line 578 "cftoken.l"
+#line 579 "cftoken.l"
 { YYD; yylval.num = FALSE; return(BOOLEAN); }
 	YY_BREAK
 case 298:
 YY_RULE_SETUP
-#line 580 "cftoken.l"
+#line 581 "cftoken.l"
 {
 			char *bp;
 
@@ -3565,7 +3567,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 299:
 YY_RULE_SETUP
-#line 588 "cftoken.l"
+#line 589 "cftoken.l"
 {
 			char *p;
 
@@ -3591,7 +3593,7 @@ YY_RULE_SETUP
 case 300:
 /* rule 300 can match eol */
 YY_RULE_SETUP
-#line 610 "cftoken.l"
+#line 611 "cftoken.l"
 {
 			char *p = yytext;
 
@@ -3611,7 +3613,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 301:
 YY_RULE_SETUP
-#line 627 "cftoken.l"
+#line 628 "cftoken.l"
 {
 			YYD;
 
@@ -3645,7 +3647,7 @@ case YY_STATE_EOF(S_RMTS):
 case YY_STATE_EOF(S_RMTP):
 case YY_STATE_EOF(S_SA):
 case YY_STATE_EOF(S_GSSENC):
-#line 640 "cftoken.l"
+#line 641 "cftoken.l"
 {
 			yy_delete_buffer(YY_CURRENT_BUFFER);
 			fclose (incstack[incstackp].fp);
@@ -3677,36 +3679,36 @@ case YY_STATE_EOF(S_GSSENC):
 /* ... */
 case 302:
 YY_RULE_SETUP
-#line 669 "cftoken.l"
+#line 670 "cftoken.l"
 { ; }
 	YY_BREAK
 case 303:
 /* rule 303 can match eol */
 YY_RULE_SETUP
-#line 670 "cftoken.l"
+#line 671 "cftoken.l"
 { incstack[incstackp].lineno++; }
 	YY_BREAK
 case 304:
 YY_RULE_SETUP
-#line 671 "cftoken.l"
+#line 672 "cftoken.l"
 { YYD; }
 	YY_BREAK
 case 305:
 YY_RULE_SETUP
-#line 672 "cftoken.l"
+#line 673 "cftoken.l"
 { return(EOS); }
 	YY_BREAK
 case 306:
 YY_RULE_SETUP
-#line 673 "cftoken.l"
+#line 674 "cftoken.l"
 { yymore(); }
 	YY_BREAK
 case 307:
 YY_RULE_SETUP
-#line 675 "cftoken.l"
+#line 676 "cftoken.l"
 ECHO;
 	YY_BREAK
-#line 3710 "cftoken.c"
+#line 3712 "cftoken.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -3890,21 +3892,21 @@ static int yy_get_next_buffer (void)
 
 	else
 		{
-			yy_size_t num_to_read =
+			int num_to_read =
 			YY_CURRENT_BUFFER_LVALUE->yy_buf_size - number_to_move - 1;
 
 		while ( num_to_read <= 0 )
 			{ /* Not enough room in the buffer - grow it. */
 
 			/* just a shorter name for the current buffer */
-			YY_BUFFER_STATE b = YY_CURRENT_BUFFER_LVALUE;
+			YY_BUFFER_STATE b = YY_CURRENT_BUFFER;
 
 			int yy_c_buf_p_offset =
 				(int) ((yy_c_buf_p) - b->yy_ch_buf);
 
 			if ( b->yy_is_our_buffer )
 				{
-				yy_size_t new_size = b->yy_buf_size * 2;
+				int new_size = b->yy_buf_size * 2;
 
 				if ( new_size <= 0 )
 					b->yy_buf_size += b->yy_buf_size / 8;
@@ -3935,7 +3937,7 @@ static int yy_get_next_buffer (void)
 
 		/* Read in more data. */
 		YY_INPUT( (&YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[number_to_move]),
-			(yy_n_chars), num_to_read );
+			(yy_n_chars), (size_t) num_to_read );
 
 		YY_CURRENT_BUFFER_LVALUE->yy_n_chars = (yy_n_chars);
 		}
@@ -4030,7 +4032,7 @@ static int yy_get_next_buffer (void)
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
 	yy_is_jam = (yy_current_state == 1819);
 
-		return yy_is_jam ? 0 : yy_current_state;
+	return yy_is_jam ? 0 : yy_current_state;
 }
 
     static void yyunput (int c, register char * yy_bp )
@@ -4045,7 +4047,7 @@ static int yy_get_next_buffer (void)
 	if ( yy_cp < YY_CURRENT_BUFFER_LVALUE->yy_ch_buf + 2 )
 		{ /* need to shift things up to make room */
 		/* +2 for EOB chars. */
-		register yy_size_t number_to_move = (yy_n_chars) + 2;
+		register int number_to_move = (yy_n_chars) + 2;
 		register char *dest = &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[
 					YY_CURRENT_BUFFER_LVALUE->yy_buf_size + 2];
 		register char *source =
@@ -4094,7 +4096,7 @@ static int yy_get_next_buffer (void)
 
 		else
 			{ /* need more input */
-			yy_size_t offset = (yy_c_buf_p) - (yytext_ptr);
+			int offset = (yy_c_buf_p) - (yytext_ptr);
 			++(yy_c_buf_p);
 
 			switch ( yy_get_next_buffer(  ) )
@@ -4254,6 +4256,10 @@ static void yy_load_buffer_state  (void)
 	yyfree((void *) b  );
 }
 
+#ifndef __cplusplus
+extern int isatty (int );
+#endif /* __cplusplus */
+    
 /* Initializes or reinitializes a buffer.
  * This function is sometimes called more than once on the same buffer,
  * such as during a yyrestart() or at EOF.
@@ -4366,7 +4372,7 @@ void yypop_buffer_state (void)
  */
 static void yyensure_buffer_stack (void)
 {
-	yy_size_t num_to_alloc;
+	int num_to_alloc;
     
 	if (!(yy_buffer_stack)) {
 
@@ -4458,12 +4464,12 @@ YY_BUFFER_STATE yy_scan_string (yyconst char * yystr )
 
 /** Setup the input buffer state to scan the given bytes. The next call to yylex() will
  * scan from a @e copy of @a bytes.
- * @param yybytes the byte buffer to scan
- * @param _yybytes_len the number of bytes in the buffer pointed to by @a bytes.
+ * @param bytes the byte buffer to scan
+ * @param len the number of bytes in the buffer pointed to by @a bytes.
  * 
  * @return the newly allocated buffer state object.
  */
-YY_BUFFER_STATE yy_scan_bytes  (yyconst char * yybytes, yy_size_t  _yybytes_len )
+YY_BUFFER_STATE yy_scan_bytes  (yyconst char * yybytes, int  _yybytes_len )
 {
 	YY_BUFFER_STATE b;
 	char *buf;
@@ -4550,7 +4556,7 @@ FILE *yyget_out  (void)
 /** Get the length of the current token.
  * 
  */
-yy_size_t yyget_leng  (void)
+int yyget_leng  (void)
 {
         return yyleng;
 }
@@ -4698,7 +4704,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 675 "cftoken.l"
+#line 676 "cftoken.l"
 
 
 
