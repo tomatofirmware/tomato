@@ -112,6 +112,7 @@ hostname	{name}(({dot}{name})+{dot}?)?
 %s S_PL S_AUTHALG S_ENCALG
 
 %option noinput nounput
+%option noyywrap
 %%
 
 

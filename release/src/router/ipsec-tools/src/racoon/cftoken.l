@@ -139,6 +139,7 @@ hexstring	0x{hexdigit}+
 %s S_SA
 %s S_GSSENC
 
+%option noyywrap
 %%
 %{
 	if (yy_first_time) {
