@@ -36,6 +36,14 @@ endif
 ifeq ($(TCONFIG_PPTPD),y)
 OBJS += pptpd.o
 OBJS += pptp_client.o
+OBJS += xxtpd.o
+endif
+
+ifeq ($(TCONFIG_IPSEC_TOOLS),y)
+OBJS += l2tpd.o
+ifneq ($(TCONFIG_PPTPD),y)
+OBJS += xxtpd.o
+endif
 endif
 
 ifeq ($(TCONFIG_NOCAT),y)

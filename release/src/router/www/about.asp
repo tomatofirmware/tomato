@@ -112,6 +112,13 @@ Copyright (C) 2010 Keith Moyer,<br>
 <br>
 <!-- OPENVPN-END -->
 
+<!-- IPSEC_TOOLS-BEGIN -->
+<b>IPSec Tools integration and GUI,</b><br>
+Copyright (C) 2013 Daniel Borca,<br>
+<a href='mailto:dborca@yahoo.com'>dborca@yahoo.com</a><br>
+<br>
+<!-- IPSEC_TOOLS-END -->
+
 <b>"Shibby" features:</b><br>
 <!-- BBT-BEGIN -->
 - Transmission 2.77 integration<br>

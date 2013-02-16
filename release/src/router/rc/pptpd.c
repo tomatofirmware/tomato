@@ -30,55 +30,6 @@
 #include <errno.h>
 #include <sys/stat.h>
 
-void get_broadcast(char *ipaddr, char *netmask)
-{
-        int ip2[4], mask2[4];
-        unsigned char ip[4], mask[4];
-
-        if (!ipaddr || !netmask)
-                return;
-
-        sscanf(ipaddr, "%d.%d.%d.%d", &ip2[0], &ip2[1], &ip2[2], &ip2[3]);
-        sscanf(netmask, "%d.%d.%d.%d", &mask2[0], &mask2[1], &mask2[2],
-               &mask2[3]);
-        int i = 0;
-
-        for (i = 0; i < 4; i++) {
-                ip[i] = ip2[i];
-                mask[i] = mask2[i];
-                ip[i] = (ip[i] & mask[i]) | (0xff & ~mask[i]);
-        }
-
-        sprintf(ipaddr, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
-
-        //fprintf(stderr, "get_broadcast return %s\n", value);
-}
-
-void write_chap_secret(char *file)
-{
-        FILE *fp;
-        char *nv, *nvp, *b;
-        char *username, *passwd;
-//        char buf[64];
-
-        fp=fopen(file, "w");
-
-        if (fp==NULL) return;
-
-//        nv = nvp = strdup(nvram_safe_get("pptpd_clientlist"));
-        nv = nvp = strdup(nvram_safe_get("pptpd_users"));
-
-        if(nv) {
-            	while ((b = strsep(&nvp, ">")) != NULL) {
-                	if((vstrsep(b, "<", &username, &passwd)!=2)) continue;
-	                if(strlen(username)==0||strlen(passwd)==0) continue;
-        	        fprintf(fp, "%s * %s *\n", username, passwd);
-            	}
-            	free(nv);
-        }
-        fclose(fp);
-}
-
 void start_pptpd(void)
 {
 	int ret = 0, mss = 0, manual_dns = 0;
@@ -292,7 +243,7 @@ void start_pptpd(void)
 	chmod("/tmp/pptpd/ip-down", 0744);
 
 	// Exctract chap-secrets from nvram
-	write_chap_secret("/tmp/pptpd/chap-secrets");
+	write_chap_secret("pptpd_users", "*", "/tmp/pptpd/chap-secrets");
 
 	chmod("/tmp/pptpd/chap-secrets", 0600);
 
@@ -336,18 +287,4 @@ void stop_pptpd(void)
 	killall_tk("pptpd");
 	killall_tk("bcrelay");
 	return;
-}
-
-void write_pptpd_dnsmasq_config(FILE* f) {
-	int i;
-	if (nvram_match("pptpd_enable", "1")) {
-		fprintf(f, "interface=");
-		for (i = 4; i <= 9 ; i++) {
-			fprintf(f, "ppp%d%c", i, ((i < 9)? ',' : '\n'));
-		}
-		fprintf(f, "no-dhcp-interface=");
-		for (i = 4; i <= 9 ; i++) {
-			fprintf(f, "ppp%d%c", i, ((i < 9)? ',' : '\n'));
-		}
-	}
 }

@@ -954,6 +954,7 @@ int waitfor(int fd, int timeout)
 	FD_SET(fd, &rfds);
 	return select(fd + 1, &rfds, NULL, NULL, (timeout > 0) ? &tv : NULL);
 }
+#endif	// 0
 
 /*
  * Kills process whose PID is stored in plaintext in pidfile
@@ -975,4 +976,3 @@ int kill_pidfile(char *pidfile)
   	}
 	return errno;
 }
-#endif	// 0

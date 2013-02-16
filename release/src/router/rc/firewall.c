@@ -1253,6 +1253,18 @@ static void filter_forward(void)
 	}
 #endif
 
+#ifdef TCONFIG_IPSEC_TOOLS
+	//Add for l2tp server
+	if (nvram_match("l2tpd_enable", "1")) {
+		modprobe("xt_policy");
+		ipt_write("-A INPUT -p udp -m policy --dir in --pol ipsec -m udp --dport 1701 -j ACCEPT\n");
+		ipt_write("-A INPUT -p udp --dport 4500 -j ACCEPT\n");
+		ipt_write("-A INPUT -p udp --dport 500 -j ACCEPT\n");
+		ipt_write("-A INPUT -p esp -j ACCEPT\n");
+		ipt_write("-A INPUT -p ah -j ACCEPT\n");
+	}
+#endif
+
 #ifdef TCONFIG_IPV6
 	// Filter out invalid WAN->WAN connections
 	if (*wan6face)

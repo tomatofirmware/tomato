@@ -29,6 +29,10 @@ ifeq ($(TCONFIG_PPTPD),y)
 OBJS += pptpd.o
 endif
 
+ifeq ($(TCONFIG_IPSEC_TOOLS),y)
+OBJS += l2tpd.o
+endif
+
 all: httpd
 
 httpd: $(OBJS)

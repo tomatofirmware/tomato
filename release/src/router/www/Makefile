@@ -220,6 +220,18 @@ else
 	sed -i $(INSTALLDIR)/www/about.asp -e "/ PPTPD-BEGIN/,/ PPTPD-END/d"
 endif
 
+# Only include the L2TPD pages if IPSEC_TOOLS is compiled in
+ifeq ($(TCONFIG_IPSEC_TOOLS),y)
+	sed -i $(INSTALLDIR)/www/tomato.js -e "/ VPN-BEGIN/d" -e "/ VPN-END/d"
+	sed -i $(INSTALLDIR)/www/admin-access.asp -e "/ VPN-BEGIN/d" -e "/ VPN-END/d"
+	sed -i $(INSTALLDIR)/www/about.asp -e "/ VPN-BEGIN/d" -e "/ VPN-END/d"
+else
+	rm -f $(INSTALLDIR)/www/vpn-l2tp-server.asp
+	rm -f $(INSTALLDIR)/www/vpn-l2tp-online.asp
+	sed -i $(INSTALLDIR)/www/tomato.js -e "/ IPSEC_TOOLS-BEGIN/,/ IPSEC_TOOLS-END/d"
+	sed -i $(INSTALLDIR)/www/about.asp -e "/ IPSEC_TOOLS-BEGIN/,/ IPSEC_TOOLS-END/d"
+endif
+
 # Only include the nfs pages if NFS is compiled in
 ifneq ($(TCONFIG_NFS),y)
 	rm -f $(INSTALLDIR)/www/admin-nfs.asp

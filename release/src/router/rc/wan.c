@@ -304,7 +304,7 @@ static void stop_ppp(void)
 	killall_tk("ipv6-up");
 	killall_tk("ipv6-down");
 #endif
-	killall_tk("xl2tpd");
+	killall_tk("xl2tpd");	// XXX dBorca: this will also kill IPSec/L2TP
 	killall_tk("pppd");
 	killall_tk("listen");
 

@@ -338,6 +338,9 @@ const struct mime_handler mime_handlers[] = {
 #ifdef TCONFIG_PPTPD
 	{ "pptpd.cgi",		mime_javascript,			0,	wi_generic,			wo_pptpdcmd,		1 },	//!!AB - PPTPD
 #endif
+#ifdef TCONFIG_IPSEC_TOOLS
+	{ "l2tpd.cgi",		mime_javascript,			0,	wi_generic,			wo_l2tpdcmd,		1 },	//!!DB - L2TPD
+#endif
 #ifdef TCONFIG_USB
 	{ "usbcmd.cgi",			mime_javascript,			0,	wi_generic,		wo_usbcommand,		1 },	//!!TB - USB
 #endif
@@ -395,6 +398,9 @@ const aspapi_t aspapi[] = {
 	{ "wanup",				asp_wanup			},
 #ifdef TCONFIG_PPTPD
 	{ "pptpd_userol",		asp_pptpd_userol	},
+#endif
+#ifdef TCONFIG_IPSEC_TOOLS
+	{ "l2tpd_userol",		asp_l2tpd_userol	},
 #endif
 	{ "wlstats",			asp_wlstats		},
 	{ "wlclient",			asp_wlclient		},
@@ -1429,6 +1435,20 @@ static const nvset_t nvset_list[] = {
 	{ "pptpd_mtu",			V_RANGE(576, 1500)	},
 	{ "pptpd_mru",			V_RANGE(576, 1500)	},
 	{ "pptpd_custom",		V_TEXT(0, 2048)		},
+#endif
+
+#ifdef TCONFIG_IPSEC_TOOLS
+// l2tp server
+	{ "l2tpd_enable",		V_01			},
+	{ "l2tpd_ipsec_saref",		V_01			},
+	{ "l2tpd_remoteip",		V_TEXT(0,24)		},
+	{ "l2tpd_dns1",			V_TEXT(0, 15)		},
+	{ "l2tpd_dns2",			V_TEXT(0, 15)		},
+	{ "l2tpd_mtu",			V_RANGE(576, 1500)	},
+	{ "l2tpd_mru",			V_RANGE(576, 1500)	},
+	{ "l2tpd_users",		V_TEXT(0, 67*16)	},
+	{ "l2tpd_custom",		V_TEXT(0, 2048)		},
+	{ "ipsec_psk",			V_TEXT(0, 64)		},
 #endif
 
 #ifdef TCONFIG_TOR
