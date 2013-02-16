@@ -171,6 +171,11 @@ config TCONFIG_IPSEC
 	bool "IPSec Support"
 	default n
 
+config TCONFIG_IPSEC_TOOLS
+	bool "  IPSec tools"
+	depends on TCONFIG_IPSEC
+	default n
+
 config TCONFIG_RAID
 	bool "RAID Support: mdadm plus md modules"
 	default n

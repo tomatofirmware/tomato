@@ -55,6 +55,7 @@ obj-$(TCONFIG_TOR) += zlib
 obj-$(TCONFIG_DNSCRYPT) += dnscrypt
 obj-$(TCONFIG_SNMP) += snmp
 obj-$(TCONFIG_SDHC) += mmc
+obj-$(TCONFIG_IPSEC_TOOLS) += ipsec-tools
 
 # !!TB - updated Broadcom Wireless driver
 obj-y += et
@@ -1942,6 +1943,31 @@ tor-install: tor
 tor-clean:
 	-@$(MAKE) -C tor clean
 	@rm -rf tor/stamp-h1 tor/Makefile
+
+ipsec-tools/stamp-h1: openssl
+	cd $(TOP)/ipsec-tools && CC=$(CC) STRIP='mipsel-uclibc-strip' \
+	CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
+	LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections -L$(TOP)/openssl" \
+	$(CONFIGURE) --prefix=/usr --sysconfdir=/etc \
+		--with-openssl=$(TOP)/openssl --with-kernel-headers=$(LINUXDIR)/include \
+		--enable-natt=kernel --enable-hybrid --enable-frag --enable-dpd --enable-ipv6 \
+		--disable-security-context --without-libiconv --without-libradius --without-libpam --without-libldap \
+		--enable-shared
+	touch ipsec-tools/stamp-h1
+
+ipsec-tools: ipsec-tools/stamp-h1
+
+ipsec-tools-install: ipsec-tools
+	cd $(TOP)/ipsec-tools && make install-strip DESTDIR=$(INSTALLDIR)/ipsec-tools
+	rm -rf $(INSTALLDIR)/ipsec-tools/usr/include
+	rm -rf $(INSTALLDIR)/ipsec-tools/usr/lib/*.a
+	rm -rf $(INSTALLDIR)/ipsec-tools/usr/lib/*.la
+	rm -rf $(INSTALLDIR)/ipsec-tools/usr/sbin/plainrsa-gen
+	rm -rf $(INSTALLDIR)/ipsec-tools/usr/share
+
+ipsec-tools-clean:
+	-@$(MAKE) -c ipsec-tools clean
+	@rm -rf ipsec-tools/stamp-h1 ipsec-tools/Makefile
 
 mdadm:
 	$(MAKE) -C mdadm $(PARALLEL_BUILD)
