@@ -170,6 +170,15 @@ function verifyFields(focused, quiet) {
 	E('_f_l2tpd_startip').disabled = c;
 	E('_f_l2tpd_endip').disabled = c;
 	E('_l2tpd_custom').disabled = c;
+	E('_f_ipsec_psk_random').disabled = c;
+
+	var r = E('_ipsec_psk');
+	if (r.value.length < 8) {
+		ferror.set('_ipsec_psk', 'Invalid pre-shared key', quiet);
+		return 0;
+	} else {
+		ferror.clear(r);
+	}
 
 	var a = E('_f_l2tpd_startip');
 /* REMOVE-BEGIN */
@@ -285,6 +294,21 @@ function toggleVisibility(whichone) {
 	}
 }
 
+function random_x(max)
+{
+	var c = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+	var s = '';
+	while (max-- > 0) s += c.substr(Math.floor(c.length * Math.random()), 1);
+	return s;
+}
+
+function random_psk(id)
+{
+	var e = E(id);
+	e.value = random_x(64);
+	verifyFields(null, 1);
+}
+
 </script>
 </head>
 <body onload='init()'>
@@ -320,7 +344,8 @@ createFieldTable('', [
 	{ title: '', name: 'l2tpd_dns2', type: 'text', maxlen: 15, size: 17, value: nvram.l2tpd_dns2 },
 	{ title: 'MTU', name: 'l2tpd_mtu', type: 'text', maxlen: 4, size: 6, value: (nvram.l2tpd_mtu ? nvram.l2tpd_mtu : 1450)},
 	{ title: 'MRU', name: 'l2tpd_mru', type: 'text', maxlen: 4, size: 6, value: (nvram.l2tpd_mru ? nvram.l2tpd_mru : 1450)},
-	{ title: 'PSK', name: 'ipsec_psk', type: 'password', value: (nvram.ipsec_psk ? nvram.ipsec_psk : '**********') },
+	{ title: 'PSK', name: 'ipsec_psk', type: 'password', maxlen: 64, size: 60, peekaboo: 1, value: eval('nvram.ipsec_psk'),
+		suffix: ' <input type="button" id="_f_ipsec_psk_random" value="Random" onclick="random_psk(\'_ipsec_psk\')">' },
 
 	{ title: '<a href="http://poptop.sourceforge.net/" target="_new">Poptop</a><br>Custom configuration', name: 'l2tpd_custom', type: 'textarea', value: nvram.l2tpd_custom }
 
