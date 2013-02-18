@@ -1964,6 +1964,9 @@ ipsec-tools-install: ipsec-tools
 	rm -rf $(INSTALLDIR)/ipsec-tools/usr/lib/*.la
 	rm -rf $(INSTALLDIR)/ipsec-tools/usr/sbin/plainrsa-gen
 	rm -rf $(INSTALLDIR)/ipsec-tools/usr/share
+	rm -rf $(INSTALLDIR)/ipsec-tools/usr/sbin/setkey
+	rm -rf $(INSTALLDIR)/ipsec-tools/usr/sbin/racoonctl
+	rm -rf $(INSTALLDIR)/ipsec-tools/usr/lib/libracoon.so*
 
 ipsec-tools-clean:
 	-@$(MAKE) -c ipsec-tools clean
