@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
-	Tomato L2TP GUI
+	Tomato L2TPd GUI
 	Copyright (C) 2013 Daniel Borca
 	Copyright (C) 2012 Augusto Bott
 	http://code.google.com/p/tomato-sdhc-vlan/
@@ -30,9 +30,9 @@ textarea {
 </style>
 <script type='text/javascript' src='interfaces.js'></script>
 <script type='text/javascript'>
-//	<% nvram("lan_ipaddr,lan_netmask,l2tpd_enable,l2tpd_ipsec_saref,l2tpd_remoteip,l2tpd_users,l2tpd_dns1,l2tpd_dns2,l2tpd_mtu,l2tpd_mru,l2tpd_custom,ipsec_psk");%>
+//	<% nvram("lan_ipaddr,lan_netmask,l2tpd_enable,l2tpd_saref,l2tpd_remoteip,l2tpd_users,l2tpd_dns1,l2tpd_dns2,l2tpd_mtu,l2tpd_mru,l2tpd_custom,l2tpd_psk");%>
 
-if (nvram.l2tpd_remoteip == '') nvram.l2tpd_remoteip = '10.7.0.2-254';
+if (nvram.l2tpd_remoteip == '') nvram.l2tpd_remoteip = '10.7.0.2-7';
 
 var ul = new TomatoGrid();
 ul.setup = function() {
@@ -137,7 +137,7 @@ function save() {
 	fom.l2tpd_users.value = s;
 
 	fom.l2tpd_enable.value = E('_f_l2tpd_enable').checked ? 1 : 0;
-	fom.l2tpd_ipsec_saref.value = E('_f_l2tpd_ipsec_saref').checked ? 1 : 0;
+	fom.l2tpd_saref.value = E('_f_l2tpd_saref').checked ? 1 : 0;
 
 	var a = E('_f_l2tpd_startip').value;
 	var b = E('_f_l2tpd_endip').value;
@@ -161,20 +161,20 @@ function submit_complete() {
 
 function verifyFields(focused, quiet) {
 	var c = !E('_f_l2tpd_enable').checked;
-	E('_f_l2tpd_ipsec_saref').disabled = c;
+	E('_f_l2tpd_saref').disabled = c;
 	E('_l2tpd_dns1').disabled = c;
 	E('_l2tpd_dns2').disabled = c;
 	E('_l2tpd_mtu').disabled = c;
 	E('_l2tpd_mru').disabled = c;
-	E('_ipsec_psk').disabled = c;
+	E('_l2tpd_psk').disabled = c;
 	E('_f_l2tpd_startip').disabled = c;
 	E('_f_l2tpd_endip').disabled = c;
 	E('_l2tpd_custom').disabled = c;
-	E('_f_ipsec_psk_random').disabled = c;
+	E('_f_l2tpd_psk_random').disabled = c;
 
-	var r = E('_ipsec_psk');
+	var r = E('_l2tpd_psk');
 	if (r.value.length < 8) {
-		ferror.set('_ipsec_psk', 'Invalid pre-shared key', quiet);
+		ferror.set(r, 'Invalid pre-shared key', quiet);
 		return 0;
 	} else {
 		ferror.clear(r);
@@ -235,9 +235,9 @@ function verifyFields(focused, quiet) {
 	}
 */
 /* REMOVE-END */
-	if (Math.abs((aton(a.value) - (aton(b.value)))) > 252) {
-		ferror.set(a, 'Invalid range (max 252 IPs)', quiet);
-		ferror.set(b, 'Invalid range (max 252 IPs)', quiet);
+	if (Math.abs((aton(a.value) - (aton(b.value)))) > 5) {
+		ferror.set(a, 'Invalid range (max 6 IPs)', quiet);
+		ferror.set(b, 'Invalid range (max 6 IPs)', quiet);
 		elem.setInnerHTML('l2tpd_count', '(?)');
 		return 0;
 	} else {
@@ -326,7 +326,7 @@ function random_psk(id)
 <input type='hidden' name='_service' value='firewall-restart,l2tpd-restart,dnsmasq-restart'>
 <input type='hidden' name='l2tpd_users'>
 <input type='hidden' name='l2tpd_enable'>
-<input type='hidden' name='l2tpd_ipsec_saref'>
+<input type='hidden' name='l2tpd_saref'>
 <input type='hidden' name='l2tpd_remoteip'>
 
 <div class='section-title'>L2TP Server Configuration</div>
@@ -334,7 +334,7 @@ function random_psk(id)
 <script type='text/javascript'>
 createFieldTable('', [
 	{ title: 'Enable', name: 'f_l2tpd_enable', type: 'checkbox', value: nvram.l2tpd_enable == '1' },
-	{ title: 'IPSec SARef', name: 'f_l2tpd_ipsec_saref', type: 'checkbox', value: nvram.l2tpd_ipsec_saref == '1' },
+	{ title: 'IPSec SARef', name: 'f_l2tpd_saref', type: 'checkbox', value: nvram.l2tpd_saref == '1' },
 	{ title: 'Local IP Address/Netmask', text: (nvram.lan_ipaddr + ' / ' + nvram.lan_netmask) },
 	{ title: 'Remote IP Address Range', multi: [
 		{ name: 'f_l2tpd_startip', type: 'text', maxlen: 15, size: 17, value: nvram.dhcpd_startip, suffix: '&nbsp;-&nbsp;' },
@@ -344,10 +344,10 @@ createFieldTable('', [
 	{ title: '', name: 'l2tpd_dns2', type: 'text', maxlen: 15, size: 17, value: nvram.l2tpd_dns2 },
 	{ title: 'MTU', name: 'l2tpd_mtu', type: 'text', maxlen: 4, size: 6, value: (nvram.l2tpd_mtu ? nvram.l2tpd_mtu : 1450)},
 	{ title: 'MRU', name: 'l2tpd_mru', type: 'text', maxlen: 4, size: 6, value: (nvram.l2tpd_mru ? nvram.l2tpd_mru : 1450)},
-	{ title: 'PSK', name: 'ipsec_psk', type: 'password', maxlen: 64, size: 60, peekaboo: 1, value: eval('nvram.ipsec_psk'),
-		suffix: ' <input type="button" id="_f_ipsec_psk_random" value="Random" onclick="random_psk(\'_ipsec_psk\')">' },
+	{ title: 'PSK', name: 'l2tpd_psk', type: 'password', maxlen: 64, size: 60, peekaboo: 1, value: eval('nvram.l2tpd_psk'),
+		suffix: ' <input type="button" id="_f_l2tpd_psk_random" value="Random" onclick="random_psk(\'_l2tpd_psk\')">' },
 
-	{ title: '<a href="http://poptop.sourceforge.net/" target="_new">Poptop</a><br>Custom configuration', name: 'l2tpd_custom', type: 'textarea', value: nvram.l2tpd_custom }
+	{ title: 'PPP Custom configuration', name: 'l2tpd_custom', type: 'textarea', value: nvram.l2tpd_custom }
 
 ]);
 </script>
@@ -367,6 +367,7 @@ createFieldTable('', [
 <li><b>DNS Servers</b> - Allows defining DNS servers manually (if none are set, the router/local IP address should be used by VPN clients).</li>
 <li><b>MTU</b> - Maximum Transmission Unit. Max packet size the L2TP interface will be able to send without packet fragmentation.</li>
 <li><b>MRU</b> - Maximum Receive Unit. Max packet size the L2TP interface will be able to receive without packet fragmentation.</li>
+<li><b>PSK</b> - Pre-shared Key used by the IPSec daemon for all incoming connections.</li>
 </ul>
 
 <small>

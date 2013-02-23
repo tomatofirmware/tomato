@@ -115,7 +115,7 @@ void start_l2tpd(void)
 //		"debug state = yes\n"
 //		"force userspace = yes\n"
 		"access control = no\n");
-	if (nvram_match("l2tpd_ipsec_saref", "1"))
+	if (nvram_match("l2tpd_saref", "1"))
 		fprintf(fp, "ipsec saref = yes\n");	// will probably disable kernel mode
 	fprintf(fp,
 		"[lns default]\n"
@@ -186,7 +186,6 @@ void start_l2tpd(void)
 	modprobe("esp4");
 	modprobe("xfrm4_mode_transport");
 
-	// XXX use scripts?
 	modprobe("xfrm_user");
 #if !PHASE1_SCRIPT
 	const char *wan_ipaddr = nvram_safe_get("wan_ipaddr");
@@ -214,7 +213,7 @@ void start_l2tpd(void)
 	fprintf(fp, 
 		"path pre_shared_key \"/tmp/l2tpd/psk.txt\";\n"
 #if PHASE1_SCRIPT
-		"path script \"/tmp/l2tpd/\";\n"
+		"path script \"/tmp/l2tpd\";\n"
 #endif
 		"\n"
 		"remote anonymous {\n"
@@ -256,7 +255,7 @@ void start_l2tpd(void)
 	fclose(fp);
 
 	fp = fopen("/tmp/l2tpd/psk.txt", "w");
-	fprintf(fp, "* %s\n", nvram_safe_get("ipsec_psk"));
+	fprintf(fp, "* %s\n", nvram_safe_get("l2tpd_psk"));
 	fclose(fp);
 
 	chmod("/tmp/l2tpd/psk.txt", 0600);

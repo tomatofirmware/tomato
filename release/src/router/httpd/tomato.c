@@ -1440,7 +1440,7 @@ static const nvset_t nvset_list[] = {
 #ifdef TCONFIG_IPSEC_TOOLS
 // l2tp server
 	{ "l2tpd_enable",		V_01			},
-	{ "l2tpd_ipsec_saref",		V_01			},
+	{ "l2tpd_saref",		V_01			},
 	{ "l2tpd_remoteip",		V_TEXT(0,24)		},
 	{ "l2tpd_dns1",			V_TEXT(0, 15)		},
 	{ "l2tpd_dns2",			V_TEXT(0, 15)		},
@@ -1448,7 +1448,7 @@ static const nvset_t nvset_list[] = {
 	{ "l2tpd_mru",			V_RANGE(576, 1500)	},
 	{ "l2tpd_users",		V_TEXT(0, 67*16)	},
 	{ "l2tpd_custom",		V_TEXT(0, 2048)		},
-	{ "ipsec_psk",			V_TEXT(0, 64)		},
+	{ "l2tpd_psk",			V_TEXT(0, 64)		},
 #endif
 
 #ifdef TCONFIG_TOR

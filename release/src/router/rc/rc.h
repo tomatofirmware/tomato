@@ -479,6 +479,12 @@ extern void start_pptpd(void);
 extern void stop_pptpd(void);
 #endif
 
+// l2tp.c
+#ifdef TCONFIG_IPSEC_TOOLS
+extern void start_l2tpd(void);
+extern void stop_l2tpd(void);
+#endif
+
 // vpn.c
 #ifdef TCONFIG_OPENVPN
 extern void start_vpnclient(int clientNum);
