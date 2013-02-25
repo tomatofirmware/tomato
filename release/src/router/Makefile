@@ -194,7 +194,11 @@ else
       ifeq ($(TCONFIG_TOR),y)
         export FULL_OPENSSL := y
       else
-        FULL_OPENSSL :=
+        ifeq ($(TCONFIG_IPSEC_TOOLS),y)
+          export FULL_OPENSSL := y
+        else
+          FULL_OPENSSL :=
+        endif
       endif
     endif
   endif

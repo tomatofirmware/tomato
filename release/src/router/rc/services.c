@@ -2148,6 +2148,7 @@ void start_services(void)
 
 #ifdef TCONFIG_IPSEC_TOOLS
 	start_l2tpd();
+	start_ipsec();
 #endif
 
 #ifdef TCONFIG_IPV6
@@ -2215,6 +2216,7 @@ void stop_services(void)
 #endif
 #ifdef TCONFIG_IPSEC_TOOLS
 	stop_l2tpd();
+	stop_ipsec();
 #endif
 	stop_sched();
 	stop_rstats();
@@ -2815,6 +2817,15 @@ TOP:
 	if (strcmp(service, "l2tpd") == 0) {
 		if (action & A_STOP) stop_l2tpd();
 		if (action & A_START) start_l2tpd();
+		goto CLEAR;
+	}
+	if (strcmp(service, "ipsec") == 0) {
+		if (action & A_STOP) stop_ipsec();
+		if (action & A_START) {
+			ipsec_passwd();
+			create_passwd();
+			start_ipsec();
+		}
 		goto CLEAR;
 	}
 #endif

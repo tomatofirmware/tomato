@@ -48,6 +48,9 @@ void create_passwd(void)
 		fprintf(f, "%s:*:0:0:99999:7:0:0:\n", smbd_user);
 #endif
 
+#ifdef TCONFIG_IPSEC_TOOLS
+		fappend(f, "/etc/shadow.ipsec");
+#endif
 		fappend(f, "/etc/shadow.custom");
 		fclose(f);
 	}
@@ -71,6 +74,9 @@ void create_passwd(void)
 		"nobody:x:65534:65534:nobody:/dev/null:/dev/null\n",
 		0, 0644);
 #endif	//!!TB
+#ifdef TCONFIG_IPSEC_TOOLS
+	fappend_file("/etc/passwd", "/etc/passwd.ipsec");
+#endif
 	fappend_file("/etc/passwd", "/etc/passwd.custom");
 
 	f_write_string("/etc/gshadow",

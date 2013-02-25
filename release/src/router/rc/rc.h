@@ -483,6 +483,9 @@ extern void stop_pptpd(void);
 #ifdef TCONFIG_IPSEC_TOOLS
 extern void start_l2tpd(void);
 extern void stop_l2tpd(void);
+extern void start_ipsec(void);
+extern void stop_ipsec(void);
+extern int ipsec_passwd(void);
 #endif
 
 // vpn.c

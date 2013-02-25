@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
-	Tomato L2TPd GUI
+	Tomato IPSec GUI
 	Copyright (C) 2013 Daniel Borca
 	Copyright (C) 2012 Augusto Bott
 	http://code.google.com/p/tomato-sdhc-vlan/
@@ -15,7 +15,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] VPN: L2TP Online</title>
+<title>[<% ident(); %>] VPN: IPSec Online</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
@@ -45,7 +45,7 @@ text-align: left;
 </style>
 <script type='text/javascript'>
 //	<% nvram(''); %>	// http_id
-//	<% l2tpd_userol(); %>
+//	<% ipsec_userol(); %>
 
 list = [];
 
@@ -79,7 +79,7 @@ function get(pid) {
 
 var xob = null;
 function _disconnect(pid) {
-	form.submitHidden('/l2tpd.cgi', { disconnect: pid });
+	form.submitHidden('/ipsec.cgi', { disconnect: pid });
 }
 
 function disconnect(a, pid) {
@@ -113,10 +113,10 @@ function disconnect(a, pid) {
 		_disconnect(pid);
 	}
 
-	xob.post('/l2tpd.cgi', 'disconnect=' + pid);
+	xob.post('/ipsec.cgi', 'disconnect=' + pid);
 }
 
-var ref = new TomatoRefresh('/update.cgi', 'exec=l2tpd_userol', 0, 'l2tpd_userol_refresh');
+var ref = new TomatoRefresh('/update.cgi', 'exec=ipsec_userol', 0, 'ipsec_userol_refresh');
 
 ref.refresh = function(text) {
 	eval(text);
@@ -160,8 +160,8 @@ dg.populate = function() {
 		list[i].sourceip = '';
 	}
 
-	for (i = l2tpd_online.length - 1; i >= 0; --i) {
-		a = l2tpd_online[i];
+	for (i = ipsec_online.length - 1; i >= 0; --i) {
+		a = ipsec_online[i];
 		e = get(a[0]);
 		e.ifname   = a[1];
 		e.username = a[4];
@@ -235,12 +235,12 @@ function init() {
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
 <div id='ident'><% ident(); %></div>
-<div class='section-title'>L2TP Users Online</div>
+<div class='section-title'>IPSec Users Online</div>
 <div class='section'>
 <table id='dev-grid' class='tomato-grid' cellspacing=0></table>
 </div>
 <div style="float:right;text-align:right">
-&raquo; <a href="vpn-l2tp-server.asp">Configure</a>
+&raquo; <a href="vpn-ipsec-server.asp">Configure</a>
 </div>
 </td></tr>
 <tr><td id='footer' colspan=2><script type='text/javascript'>genStdRefresh(1,1,'ref.toggle()');</script></td></tr>

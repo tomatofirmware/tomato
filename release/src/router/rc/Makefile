@@ -40,7 +40,7 @@ OBJS += xxtpd.o
 endif
 
 ifeq ($(TCONFIG_IPSEC_TOOLS),y)
-OBJS += l2tpd.o
+OBJS += l2tpd.o ipsec.o
 ifneq ($(TCONFIG_PPTPD),y)
 OBJS += xxtpd.o
 endif

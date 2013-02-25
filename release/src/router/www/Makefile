@@ -228,6 +228,8 @@ ifeq ($(TCONFIG_IPSEC_TOOLS),y)
 else
 	rm -f $(INSTALLDIR)/www/vpn-l2tp-server.asp
 	rm -f $(INSTALLDIR)/www/vpn-l2tp-online.asp
+	rm -f $(INSTALLDIR)/www/vpn-ipsec-server.asp
+	rm -f $(INSTALLDIR)/www/vpn-ipsec-online.asp
 	sed -i $(INSTALLDIR)/www/tomato.js -e "/ IPSEC_TOOLS-BEGIN/,/ IPSEC_TOOLS-END/d"
 	sed -i $(INSTALLDIR)/www/about.asp -e "/ IPSEC_TOOLS-BEGIN/,/ IPSEC_TOOLS-END/d"
 endif

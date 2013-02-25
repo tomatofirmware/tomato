@@ -47,7 +47,7 @@ void start_l2tpd(void)
 //		return;
 //	}
 
-	if (!nvram_match("l2tpd_enable", "1")) {
+	if (!nvram_match("l2tpd_enable", "1") || nvram_match("ipsec_enable", "1")) {
 		return;
 	}
 	// cprintf("stop vpn modules\n");

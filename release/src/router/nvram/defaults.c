@@ -971,6 +971,16 @@ const defaults_t defaults[] = {
 	{ "l2tpd_users",          ""              },
 	{ "l2tpd_custom",         ""              },
 	{ "l2tpd_psk",            ""              },
+	{ "ipsec_enable",         "0"             },
+	{ "ipsec_usecert",        "0"             },
+	{ "ipsec_remoteip",       "10.6.0.2-7"    },
+	{ "ipsec_dns1",           ""              },
+	{ "ipsec_users",          ""              },
+	{ "ipsec_name",           ""              },
+	{ "ipsec_ca",             ""              },
+	{ "ipsec_crt",            ""              },
+	{ "ipsec_key",            ""              },
+	{ "ipsec_psk",            ""              },
 #endif
 
 #ifdef TCONFIG_BT

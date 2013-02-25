@@ -1799,6 +1799,9 @@ int init_main(int argc, char *argv[])
 				add_remove_usbhost("-1", 1);
 #endif
 
+#ifdef TCONFIG_IPSEC_TOOLS
+			ipsec_passwd();
+#endif
 			create_passwd();
 			start_vlan();
 			start_lan();

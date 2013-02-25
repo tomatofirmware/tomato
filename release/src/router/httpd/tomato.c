@@ -340,6 +340,7 @@ const struct mime_handler mime_handlers[] = {
 #endif
 #ifdef TCONFIG_IPSEC_TOOLS
 	{ "l2tpd.cgi",		mime_javascript,			0,	wi_generic,			wo_l2tpdcmd,		1 },	//!!DB - L2TPD
+	{ "ipsec.cgi",		mime_javascript,			0,	wi_generic,			wo_ipseccmd,		1 },	//!!DB - IPSec
 #endif
 #ifdef TCONFIG_USB
 	{ "usbcmd.cgi",			mime_javascript,			0,	wi_generic,		wo_usbcommand,		1 },	//!!TB - USB
@@ -401,6 +402,8 @@ const aspapi_t aspapi[] = {
 #endif
 #ifdef TCONFIG_IPSEC_TOOLS
 	{ "l2tpd_userol",		asp_l2tpd_userol	},
+	{ "ipsec_userol",		asp_ipsec_userol	},
+	{ "ipsec_altnames",		asp_ipsec_altnames	},
 #endif
 	{ "wlstats",			asp_wlstats		},
 	{ "wlclient",			asp_wlclient		},
@@ -1449,6 +1452,17 @@ static const nvset_t nvset_list[] = {
 	{ "l2tpd_users",		V_TEXT(0, 67*16)	},
 	{ "l2tpd_custom",		V_TEXT(0, 2048)		},
 	{ "l2tpd_psk",			V_TEXT(0, 64)		},
+// ipsec server
+	{ "ipsec_enable",		V_01			},
+	{ "ipsec_usecert",		V_01			},
+	{ "ipsec_remoteip",		V_TEXT(0,24)		},
+	{ "ipsec_dns1",			V_TEXT(0, 15)		},
+	{ "ipsec_users",		V_TEXT(0, 67*16)	},
+	{ "ipsec_name",			V_TEXT(0, 24)		},
+	{ "ipsec_ca",			V_NONE			},
+	{ "ipsec_crt",			V_NONE			},
+	{ "ipsec_key",			V_NONE			},
+	{ "ipsec_psk",			V_TEXT(0, 64)		},
 #endif
 
 #ifdef TCONFIG_TOR

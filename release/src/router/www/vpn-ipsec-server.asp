@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
-	Tomato L2TPd GUI
+	Tomato IPSec GUI
 	Copyright (C) 2013 Daniel Borca
 	Copyright (C) 2012 Augusto Bott
 	http://code.google.com/p/tomato-sdhc-vlan/
@@ -15,7 +15,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] VPN: L2TP Server</title>
+<title>[<% ident(); %>] VPN: IPSec Server</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
@@ -30,9 +30,10 @@ textarea {
 </style>
 <script type='text/javascript' src='interfaces.js'></script>
 <script type='text/javascript'>
-//	<% nvram("lan_ipaddr,lan_netmask,l2tpd_enable,l2tpd_saref,l2tpd_remoteip,l2tpd_users,l2tpd_dns1,l2tpd_dns2,l2tpd_mtu,l2tpd_mru,l2tpd_custom,l2tpd_psk,ipsec_enable");%>
+//	<% nvram("ipsec_enable,ipsec_usecert,ipsec_remoteip,ipsec_users,ipsec_dns1,ipsec_psk,ipsec_name,ipsec_ca,ipsec_crt,ipsec_key,l2tpd_enable");%>
+//	<% ipsec_altnames(); %>
 
-if (nvram.l2tpd_remoteip == '') nvram.l2tpd_remoteip = '10.7.0.2-7';
+if (nvram.ipsec_remoteip == '') nvram.ipsec_remoteip = '10.6.0.2-7';
 
 var ul = new TomatoGrid();
 ul.setup = function() {
@@ -42,7 +43,7 @@ ul.setup = function() {
 
 	this.headerSet(['Username', 'Password']);
 
-	var r = nvram.l2tpd_users.split('>');
+	var r = nvram.ipsec_users.split('>');
 	for (var i = 0; i < r.length; ++i) {
 		var l = r[i].split('<');
 		if (l.length == 2)
@@ -67,7 +68,7 @@ ul.existUser = function(user) {
 	return this.exist(0, user);
 }
 
-function v_l2tpd_secret(e, quiet) {
+function v_ipsec_secret(e, quiet) {
 	var s;
 	if ((e = E(e)) == null) return 0;
 	s = e.value.trim().replace(/\s+/g, '');
@@ -92,14 +93,14 @@ ul.verifyFields = function(row, quiet) {
 	var f, s;
 	f = fields.getAll(row);
 
-	if (!v_l2tpd_secret(f[0], quiet)) return 0;
+	if (!v_ipsec_secret(f[0], quiet)) return 0;
 
 	if (this.existUser(f[0].value)) {
 		ferror.set(f[0], 'Duplicate User', quiet);
 		return 0;
 	}
 
-	if (!v_l2tpd_secret(f[1], quiet)) return 0;
+	if (!v_ipsec_secret(f[1], quiet)) return 0;
 
 	return 1;
 }
@@ -111,13 +112,13 @@ ul.dataToView = function(data) {
 function save() {
 	if (ul.isEditing()) return;
 
-	if ((E('_f_l2tpd_enable').checked) && (!verifyFields(null, 0))) return;
+	if ((E('_f_ipsec_enable').checked) && (!verifyFields(null, 0))) return;
 
-	if (E('_f_l2tpd_enable').checked) {
+	if (E('_f_ipsec_enable').checked) {
 		var nouser = (ul.getDataCount() < 1);
-		if (nouser || nvram.ipsec_enable == '1') {
+		if (nouser || nvram.l2tpd_enable == '1') {
 			var e = E('footer-msg');
-			e.innerHTML = nouser ? 'Cannot proceed: at least one user must be defined.' : 'IPSec daemon enabled.';
+			e.innerHTML = nouser ? 'Cannot proceed: at least one user must be defined.' : 'L2TP daemon enabled.';
 			e.style.visibility = 'visible';
 			setTimeout(
 				function() {
@@ -137,20 +138,19 @@ function save() {
 	for (var i = 0; i < uldata.length; ++i) {
 		s += uldata[i].join('<') + '>';
 	}
-	fom.l2tpd_users.value = s;
+	fom.ipsec_users.value = s;
 
-	fom.l2tpd_enable.value = E('_f_l2tpd_enable').checked ? 1 : 0;
-	fom.l2tpd_saref.value = E('_f_l2tpd_saref').checked ? 1 : 0;
+	fom.ipsec_enable.value = E('_f_ipsec_enable').checked ? 1 : 0;
+	fom.ipsec_usecert.value = E('_f_ipsec_usecert').checked ? 1 : 0;
 
-	var a = E('_f_l2tpd_startip').value;
-	var b = E('_f_l2tpd_endip').value;
+	var a = E('_f_ipsec_startip').value;
+	var b = E('_f_ipsec_endip').value;
 	if ((fixIP(a) != null) && (fixIP(b) != null)) {
 		var c = b.split('.').splice(3, 1);
-		fom.l2tpd_remoteip.value = a + '-' + c;
+		fom.ipsec_remoteip.value = a + '-' + c;
 	}
 
-	if (fom.l2tpd_dns1.value == '0.0.0.0') fom.l2tpd_dns1.value = '';
-	if (fom.l2tpd_dns2.value == '0.0.0.0') fom.l2tpd_dns2.value = '';
+	if (fom.ipsec_dns1.value == '0.0.0.0') fom.ipsec_dns1.value = '';
 
 	form.submit(fom, 1);
 }
@@ -163,27 +163,54 @@ function submit_complete() {
 }
 
 function verifyFields(focused, quiet) {
-	var c = !E('_f_l2tpd_enable').checked;
-	E('_f_l2tpd_saref').disabled = c;
-	E('_l2tpd_dns1').disabled = c;
-	E('_l2tpd_dns2').disabled = c;
-	E('_l2tpd_mtu').disabled = c;
-	E('_l2tpd_mru').disabled = c;
-	E('_l2tpd_psk').disabled = c;
-	E('_f_l2tpd_startip').disabled = c;
-	E('_f_l2tpd_endip').disabled = c;
-	E('_l2tpd_custom').disabled = c;
-	E('_f_l2tpd_psk_random').disabled = c;
+	var c = !E('_f_ipsec_enable').checked;
+	var u = !E('_f_ipsec_usecert').checked;
+	E('_f_ipsec_usecert').disabled = c;
+	E('_f_ipsec_startip').disabled = c;
+	E('_f_ipsec_endip').disabled = c;
+	E('_ipsec_dns1').disabled = c;
+	E('_ipsec_psk').disabled = c || !u;
+	E('_f_ipsec_psk_random').disabled = c || !u;
+	E('_ipsec_name').disabled = c || u;
+	E('_ipsec_ca').disabled = c || u;
+	E('_ipsec_crt').disabled = c || u;
+	E('_ipsec_key').disabled = c || u;
 
-	var r = E('_l2tpd_psk');
-	if (r.value.length < 8) {
-		ferror.set(r, 'Invalid pre-shared key', quiet);
-		return 0;
+	elem.display(PR('_ipsec_psk'), u);
+	elem.display(PR('_ipsec_name'), PR('_ipsec_ca'), PR('_ipsec_crt'), PR('_ipsec_key'), !u);
+
+	if (u) {
+		var r = E('_ipsec_psk');
+		if (r.value.length < 8) {
+			ferror.set(r, 'Invalid pre-shared key', quiet);
+			return 0;
+		} else {
+			ferror.clear(r);
+		}
 	} else {
-		ferror.clear(r);
+		var r1 = E('_ipsec_ca');
+		var r2 = E('_ipsec_crt');
+		var r3 = E('_ipsec_key');
+		if (!r1.value.length || !r2.value.length || !r3.value.length) {
+			if (!r1.value.length) ferror.set(r1, 'Certificate Authority', quiet);
+			if (!r2.value.length) ferror.set(r2, 'Server Certificate', quiet);
+			if (!r3.value.length) ferror.set(r3, 'Server Key', quiet);
+			return 0;
+		} else {
+			ferror.clear(r1);
+			ferror.clear(r2);
+			ferror.clear(r3);
+		}
 	}
 
-	var a = E('_f_l2tpd_startip');
+/* REMOVE-BEGIN */
+// XXX TODO ipsec_name must be in ipsec_altnames
+// we need a way to refresh altnames
+// form.submitHidden('/ipsec.cgi', { refresh_altnames: nvram.ipsec_crt });
+// xob.post('/ipsec.cgi', 'refresh_altnames=' + nvram.ipsec_crt);
+/* REMOVE-END */
+
+	var a = E('_f_ipsec_startip');
 /* REMOVE-BEGIN */
 /*
 	if ((a.value == '') || (a.value == '0.0.0.0')) {
@@ -202,7 +229,7 @@ function verifyFields(focused, quiet) {
 	}
 */
 /* REMOVE-END */
-	var b = E('_f_l2tpd_endip');
+	var b = E('_f_ipsec_endip');
 /* REMOVE-BEGIN */
 /*
 	if ((b.value == '') || (b.value == '0.0.0.0')) {
@@ -241,7 +268,7 @@ function verifyFields(focused, quiet) {
 	if (Math.abs((aton(a.value) - (aton(b.value)))) > 5) {
 		ferror.set(a, 'Invalid range (max 6 IPs)', quiet);
 		ferror.set(b, 'Invalid range (max 6 IPs)', quiet);
-		elem.setInnerHTML('l2tpd_count', '(?)');
+		elem.setInnerHTML('ipsec_count', '(?)');
 		return 0;
 	} else {
 		ferror.clear(a);
@@ -254,30 +281,27 @@ function verifyFields(focused, quiet) {
 		b.value = d;
 	}
 
-	elem.setInnerHTML('l2tpd_count', '(' + ((aton(b.value) - aton(a.value)) + 1) + ')');
+	elem.setInnerHTML('ipsec_count', '(' + ((aton(b.value) - aton(a.value)) + 1) + ')');
 /* REMOVE-BEGIN */
 // AB TODO - move to ul.onOk, onAdd,onDelete?
 //	elem.setInnerHTML('user_count', '(total ' + (ul.getDataCount()) + ')');
 /* REMOVE-END */
-	if (!v_ipz('_l2tpd_dns1', quiet)) return 0;
-	if (!v_ipz('_l2tpd_dns2', quiet)) return 0;
-	if (!v_range('_l2tpd_mtu', quiet, 576, 1500)) return 0;
-	if (!v_range('_l2tpd_mru', quiet, 576, 1500)) return 0;
+	if (!v_ipz('_ipsec_dns1', quiet)) return 0;
 
-	if (!v_ip('_f_l2tpd_startip', quiet)) return 0;
-	if (!v_ip('_f_l2tpd_endip', quiet)) return 0;
+	if (!v_ip('_f_ipsec_startip', quiet)) return 0;
+	if (!v_ip('_f_ipsec_endip', quiet)) return 0;
 
 	return 1;
 }
 
 function init() {
 	var c;
-	if (((c = cookie.get('vpn_l2tpd_notes_vis')) != null) && (c == '1')) toggleVisibility("notes");
+	if (((c = cookie.get('vpn_ipsec_notes_vis')) != null) && (c == '1')) toggleVisibility("notes");
 
-	if (nvram.l2tpd_remoteip.indexOf('-') != -1) {
-		var tmp = nvram.l2tpd_remoteip.split('-');
-		E('_f_l2tpd_startip').value = tmp[0];
-		E('_f_l2tpd_endip').value = tmp[0].split('.').splice(0,3).join('.') + '.' + tmp[1];
+	if (nvram.ipsec_remoteip.indexOf('-') != -1) {
+		var tmp = nvram.ipsec_remoteip.split('-');
+		E('_f_ipsec_startip').value = tmp[0];
+		E('_f_ipsec_endip').value = tmp[0].split('.').splice(0,3).join('.') + '.' + tmp[1];
 	}
 
 	ul.setup();
@@ -289,11 +313,11 @@ function toggleVisibility(whichone) {
 	if (E('sesdiv_' + whichone).style.display == '') {
 		E('sesdiv_' + whichone).style.display = 'none';
 		E('sesdiv_' + whichone + '_showhide').innerHTML = '(Click here to show)';
-		cookie.set('vpn_l2tpd_' + whichone + '_vis', 0);
+		cookie.set('vpn_ipsec_' + whichone + '_vis', 0);
 	} else {
 		E('sesdiv_' + whichone).style.display='';
 		E('sesdiv_' + whichone + '_showhide').innerHTML = '(Click here to hide)';
-		cookie.set('vpn_l2tpd_' + whichone + '_vis', 1);
+		cookie.set('vpn_ipsec_' + whichone + '_vis', 1);
 	}
 }
 
@@ -324,39 +348,36 @@ function random_psk(id)
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
 <div id='ident'><% ident(); %></div>
-<input type='hidden' name='_nextpage' value='vpn-l2tpd.asp'>
+<input type='hidden' name='_nextpage' value='vpn-ipsec.asp'>
 <input type='hidden' name='_nextwait' value='5'>
-<input type='hidden' name='_service' value='firewall-restart,l2tpd-restart,dnsmasq-restart'>
-<input type='hidden' name='l2tpd_users'>
-<input type='hidden' name='l2tpd_enable'>
-<input type='hidden' name='l2tpd_saref'>
-<input type='hidden' name='l2tpd_remoteip'>
+<input type='hidden' name='_service' value='firewall-restart,ipsec-restart,dnsmasq-restart'>
+<input type='hidden' name='ipsec_users'>
+<input type='hidden' name='ipsec_enable'>
+<input type='hidden' name='ipsec_usecert'>
+<input type='hidden' name='ipsec_remoteip'>
 
-<div class='section-title'>L2TP Server Configuration</div>
+<div class='section-title'>IPSec Server Configuration</div>
 <div class='section'>
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: 'Enable', name: 'f_l2tpd_enable', type: 'checkbox', value: nvram.l2tpd_enable == '1' },
-	{ title: 'IPSec SARef', name: 'f_l2tpd_saref', type: 'checkbox', value: nvram.l2tpd_saref == '1' },
-	{ title: 'Local IP Address/Netmask', text: (nvram.lan_ipaddr + ' / ' + nvram.lan_netmask) },
+	{ title: 'Enable', name: 'f_ipsec_enable', type: 'checkbox', value: nvram.ipsec_enable == '1' },
+	{ title: 'Use certs', name: 'f_ipsec_usecert', type: 'checkbox', value: nvram.ipsec_usecert == '1' },
 	{ title: 'Remote IP Address Range', multi: [
-		{ name: 'f_l2tpd_startip', type: 'text', maxlen: 15, size: 17, value: nvram.dhcpd_startip, suffix: '&nbsp;-&nbsp;' },
-		{ name: 'f_l2tpd_endip', type: 'text', maxlen: 15, size: 17, value: nvram.dhcpd_endip, suffix: ' <i id="l2tpd_count"></i>' }
+		{ name: 'f_ipsec_startip', type: 'text', maxlen: 15, size: 17, value: nvram.dhcpd_startip, suffix: '&nbsp;-&nbsp;' },
+		{ name: 'f_ipsec_endip', type: 'text', maxlen: 15, size: 17, value: nvram.dhcpd_endip, suffix: ' <i id="ipsec_count"></i>' }
 	] },
-	{ title: 'DNS Servers', name: 'l2tpd_dns1', type: 'text', maxlen: 15, size: 17, value: nvram.l2tpd_dns1 },
-	{ title: '', name: 'l2tpd_dns2', type: 'text', maxlen: 15, size: 17, value: nvram.l2tpd_dns2 },
-	{ title: 'MTU', name: 'l2tpd_mtu', type: 'text', maxlen: 4, size: 6, value: (nvram.l2tpd_mtu ? nvram.l2tpd_mtu : 1450)},
-	{ title: 'MRU', name: 'l2tpd_mru', type: 'text', maxlen: 4, size: 6, value: (nvram.l2tpd_mru ? nvram.l2tpd_mru : 1450)},
-	{ title: 'PSK', name: 'l2tpd_psk', type: 'password', maxlen: 64, size: 60, peekaboo: 1, value: eval('nvram.l2tpd_psk'),
-		suffix: ' <input type="button" id="_f_l2tpd_psk_random" value="Random" onclick="random_psk(\'_l2tpd_psk\')">' },
-
-	{ title: 'PPP Custom configuration', name: 'l2tpd_custom', type: 'textarea', value: nvram.l2tpd_custom }
-
+	{ title: 'DNS Server', name: 'ipsec_dns1', type: 'text', maxlen: 15, size: 17, value: nvram.ipsec_dns1 },
+	{ title: 'Group PSK (nobody)', name: 'ipsec_psk', type: 'password', maxlen: 64, size: 60, peekaboo: 1, value: eval('nvram.ipsec_psk'),
+		suffix: ' <input type="button" id="_f_ipsec_psk_random" value="Random" onclick="random_psk(\'_ipsec_psk\')">' },
+	{ title: 'Server name', name: 'ipsec_name', type: 'select', options: ipsec_altnames.length ? ipsec_altnames : [['invalid']], value: eval('nvram.ipsec_name') },
+	{ title: 'Certificate Authority', name: 'ipsec_ca', type: 'textarea', value: nvram.ipsec_ca },
+	{ title: 'Server certificate', name: 'ipsec_crt', type: 'textarea', value: nvram.ipsec_crt },
+	{ title: 'Server key', name: 'ipsec_key', type: 'textarea', value: nvram.ipsec_key }
 ]);
 </script>
 </div>
 
-<div class='section-title'>L2TP User List</div>
+<div class='section-title'>IPSec User List</div>
 <div class='section'>
   <table class='tomato-grid' cellspacing=1 id='ul-grid'></table>
 </div>
@@ -364,13 +385,12 @@ createFieldTable('', [
 <div class='section-title'>Notes <small><i><a href='javascript:toggleVisibility("notes");'><span id='sesdiv_notes_showhide'>(Click here to show)</span></a></i></small></div>
 <div class='section' id='sesdiv_notes' style='display:none'>
 <ul>
-<li><b>IPSec SARef</b> - Allows tracking of multiple clients behind the same NAT router (needs kernel support).</li>
-<li><b>Local IP Address/Netmask</b> - Address to be used at the local end of the tunnelled PPP links between the server and the VPN clients.</li>
-<li><b>Remote IP Address Range</b> - Remote IP addresses to be used on the tunnelled PPP links (max 6).</li>
-<li><b>DNS Servers</b> - Allows defining DNS servers manually (if none are set, the router/local IP address should be used by VPN clients).</li>
-<li><b>MTU</b> - Maximum Transmission Unit. Max packet size the L2TP interface will be able to send without packet fragmentation.</li>
-<li><b>MRU</b> - Maximum Receive Unit. Max packet size the L2TP interface will be able to receive without packet fragmentation.</li>
-<li><b>PSK</b> - Pre-shared Key used by the IPSec daemon for all incoming connections.</li>
+<li><b>Remote IP Address Range</b> - Remote IP addresses to be used on the tunnelled IPSec links (max 6).</li>
+<li><b>DNS Server</b> - Allows defining DNS server manually (if none are set, the router/local IP address should be used by VPN clients).</li>
+<li><b>Group PSK (nobody)</b> - Pre-shared Key used by the IPSec daemon to authenticate group <b>nobody</b>.</li>
+<li><b>Server Name</b> - This server FQDN.  Must be included in certificate <b>subjectAltName</b>.</li>
+<li><b>Server certificate</b> - Certificate must contain this server name in <b>subjectAltName</b>.</li>
+<li><b>IPSec users</b> - Non-shell system users belonging to group <b>nobody</b>.</li>
 </ul>
 
 <small>
@@ -384,7 +404,7 @@ createFieldTable('', [
 
 <br>
 <div style="float:right;text-align:right">
-&raquo; <a href="vpn-l2tp-online.asp">L2TP Online</a>
+&raquo; <a href="vpn-ipsec-online.asp">IPSec Online</a>
 </div>
 
 </td></tr>

@@ -1255,13 +1255,19 @@ static void filter_forward(void)
 
 #ifdef TCONFIG_IPSEC_TOOLS
 	//Add for l2tp server
-	if (nvram_match("l2tpd_enable", "1")) {
+	if (nvram_match("l2tpd_enable", "1") || nvram_match("ipsec_enable", "1")) {
 		modprobe("xt_policy");
-		ipt_write("-A INPUT -p udp -m policy --dir in --pol ipsec -m udp --dport 1701 -j ACCEPT\n");
+		if (nvram_match("l2tpd_enable", "1")) {
+			ipt_write("-A INPUT -p udp -m policy --dir in --pol ipsec -m udp --dport 1701 -j ACCEPT\n");
+		} else {
+			ipt_write("-A INPUT -m policy --dir in --pol ipsec -j ACCEPT\n");
+		}
 		ipt_write("-A INPUT -p udp --dport 4500 -j ACCEPT\n");
 		ipt_write("-A INPUT -p udp --dport 500 -j ACCEPT\n");
 		ipt_write("-A INPUT -p esp -j ACCEPT\n");
-		ipt_write("-A INPUT -p ah -j ACCEPT\n");
+		if (nvram_match("l2tpd_enable", "1")) {
+			ipt_write("-A INPUT -p ah -j ACCEPT\n");
+		}
 	}
 #endif
 
