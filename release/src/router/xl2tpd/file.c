@@ -877,7 +877,7 @@ struct iprange *set_range (char *word, char *value, struct iprange *in)
 		}
 		if (count < 3) {
 			strcpy(ip_hi, value);
-			for (e = ip_hi + sizeof(ip_hi); e >= ip_hi; e--) {
+			for (e = ip_hi + strlen(ip_hi); e >= ip_hi; e--) {
 				if (*e == '.') count--;
 				if (count < 0) {
 					e++;
