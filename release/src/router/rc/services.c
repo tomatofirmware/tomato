@@ -388,6 +388,14 @@ void start_dnsmasq()
 #if defined(TCONFIG_PPTPD) || defined(TCONFIG_IPSEC_TOOLS)
 	write_xxtpd_dnsmasq_config(f);
 #endif
+#ifdef TCONFIG_IPSEC_TOOLS
+	if (nvram_match("ipsec_enable", "1")) {
+		// ok, this IS dangerous: make sure we drop all non-ipsec domain requests from wanface in firewall.c
+		const char *wanface = nvram_safe_get("wan_iface");
+		fprintf(f, "interface=%s\n", wanface);
+		fprintf(f, "no-dhcp-interface=%s\n", wanface);
+	}
+#endif
 
 #ifdef TCONFIG_IPV6
 	if (ipv6_enabled() && nvram_get_int("ipv6_radvd")) {
