@@ -86,7 +86,7 @@ void start_ipsec(void)
 		"    phase1_up)\n"
 		"        iptables -I FORWARD -i %s -s $INTERNAL_ADDR4 -j ACCEPT\n"
 		"        iptables -t nat -I PREROUTING -i %s -s $INTERNAL_ADDR4 -d %s/%s -j ACCEPT\n"
-		"        echo %s $INTERNAL_ADDR4 $REMOTE_ADDR `date +%%s` `getid \"$REMOTE_ID\"` >> /tmp/ipsec_connected\n"
+		"        echo %s $INTERNAL_ADDR4 $REMOTE_ADDR `getid \"$REMOTE_ID\"` `date +%%s` >> /tmp/ipsec_connected\n"
 		"        ;;\n"
 		"    phase1_down | phase1_dead)\n"
 		"        iptables -D FORWARD -i %s -s $INTERNAL_ADDR4 -j ACCEPT\n"
