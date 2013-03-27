@@ -626,9 +626,7 @@ cyassl-install:
 ifeq ($(FULL_OPENSSL),y)
 OPENSSL_CIPHERS:=enable-rc5
 else
-OPENSSL_CIPHERS:=no-dh no-idea no-rc2 no-rc5 no-aes no-aes192 no-cast no-des no-modes
-# no-tls1 no-tlsext
-# openssl 1.0.1 doesn't build when using "no-tlsext" or "no-tls1"
+OPENSSL_CIPHERS:=no-dh no-idea no-rc2 no-rc5 no-engine no-aes192 no-cast
 endif
 
 openssl/stamp-h1:
@@ -639,7 +637,7 @@ openssl/stamp-h1:
 	no-sha0 no-smime no-camellia no-krb5 no-rmd160 no-ripemd \
 	no-seed no-capieng no-cms no-gms no-gmp no-rfc3779 \
 	no-ec no-ecdh no-ecdsa no-err no-hw no-jpake no-threads \
-	no-zlib no-engine no-engines no-sse2 no-perlasm \
+	no-zlib no-engines no-sse2 \
 	no-dtls1 no-store no-psk no-md2 no-mdc2 no-ts
 
 	@$(MAKE) -C openssl clean
@@ -1476,7 +1474,7 @@ nocat-install:
 
 lzo/stamp-h1:
 	cd lzo && \
-	CFLAGS="-Os -Wall -fPIC $(EXTRACFLAGS)" $(CONFIGURE) --enable-shared --enable-static
+	CFLAGS="-O3 -Wall -fPIC $(EXTRACFLAGS)" $(CONFIGURE) --enable-shared --enable-static
 	touch lzo/stamp-h1
 
 lzo: lzo/stamp-h1
@@ -1494,7 +1492,7 @@ lzo-install: lzo
 openvpn: openvpn/.conf openssl lzo
 
 openvpn/.conf:
-	cd openvpn && CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
+	cd openvpn && CFLAGS="-O3 -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
 	LDFLAGS="-L$(TOP)/openssl -L$(TOP)/lzo/src/.libs -ffunction-sections -fdata-sections -Wl,--gc-sections" \
 	$(CONFIGURE) --prefix= \
 	--with-lzo-headers="$(TOP)/lzo/include" \
