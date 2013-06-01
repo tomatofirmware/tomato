@@ -579,9 +579,7 @@ static const nvset_t nvset_list[] = {
 #ifdef TCONFIG_DNSCRYPT
 	{ "dnscrypt_proxy",		V_01				},
 #endif
-	{ "lan_state",			V_01				},
-	{ "lan_desc",			V_01				},
-	{ "lan_invert",			V_01				},
+	{ "lan_state",			V_RANGE(0,7)			}, //Bit0=Enable, Bit1=Descript, Bit2=Invert Port order
 	{ "lan_proto",			V_WORD				},	// static, dhcp
 	{ "dhcp_start",			V_LENGTH(0, 15)		},	// remove !
 	{ "dhcp_num",			V_LENGTH(0, 4)		},	// remove !

@@ -421,7 +421,7 @@ void asp_etherstates(int argc, char **argv)
 	char s[32], *a, b[16];
 	unsigned n;
 
-	if (nvram_match("lan_state", "1")) {
+	if ((nvram_get_int("lan_state") & 1)) {
 
 		web_puts("\netherstates = {");
 
