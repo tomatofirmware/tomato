@@ -323,7 +323,7 @@ struct lns *get_lns (struct tunnel *t)
             {
 #ifdef DEBUG_AAA
                 l2tp_log (LOG_DEBUG,
-                     "$s: Rule %s to %s, sense %s matched %s\n", __FUNCTION__,
+                     "%s: Rule %s to %s, sense %s matched %s\n", __FUNCTION__,
                      IPADDY (ipr->start), IPADDY (ipr->end),
                      (ipr->sense ? "allow" : "deny"), IPADDY (t->peer.sin_addr.s_addr));
 #endif
