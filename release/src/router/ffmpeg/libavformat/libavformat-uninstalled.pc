@@ -1,0 +1,12 @@
+prefix=
+exec_prefix=
+libdir=${pcfiledir}
+includedir=/home/vicente/tomato/release/src/router/ffmpeg
+
+Name: libavformat
+Description: FFmpeg container format library
+Version: 52.64.2
+Requires: libavcodec = 52.72.2
+Conflicts:
+Libs: ${libdir}/libavformat.a  -L/home/vicente/tomato/release/src-rt/router/zlib -lz  -lz -pthread -lm
+Cflags: -I${includedir}

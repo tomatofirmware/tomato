@@ -284,6 +284,9 @@ const struct mime_handler mime_handlers[] = {
 	{ "bwm/*.gz",			NULL,					0,	wi_generic,			wo_bwmbackup,	1 },
 	{ "bwm/restore.cgi",	NULL,					0,	wi_bwmrestore,		wo_bwmrestore,	1 },
 
+	{ "ipt/*.gz",			NULL,					0,	wi_generic,			wo_iptbackup,	1 },
+	{ "ipt/restore.cgi",	NULL,					0,	wi_iptrestore,		wo_iptrestore,	1 },
+
 	{ "logs/view.cgi",	NULL,						0,	wi_generic,			wo_viewlog,		1 },
 	{ "logs/*.txt",		NULL,						0,	wi_generic,			wo_syslog,		1 },
 	{ "webmon_**",		NULL,						0,	wi_generic,			wo_syslog,		1 },
@@ -326,10 +329,14 @@ const struct mime_handler mime_handlers[] = {
 	{ "resolve.cgi",	mime_javascript,			0,	wi_generic,			wo_resolve,		1 },
 	{ "expct.cgi",		mime_html,					0,	wi_generic,			wo_expct,		1 },
 	{ "service.cgi",	NULL,						0,	wi_generic,			wo_service,		1 },
-//	{ "logout.cgi",		NULL,	   		 			0,	wi_generic,			wo_logout,		0 },	// see httpd.c
+//	{ "logout.cgi",		NULL,	   		 			0,	wi_generic,			wo_logout,		0 },
+// see httpd.c
 	{ "shutdown.cgi",	mime_html,					0,	wi_generic,			wo_shutdown,	1 },
 #ifdef TCONFIG_OPENVPN
 	{ "vpnstatus.cgi",	mime_javascript,			0,	wi_generic,			wo_vpn_status,		1 },
+#endif
+#ifdef TCONFIG_PPTPD
+	{ "pptpd.cgi",		mime_javascript,				0,	wi_generic,			wo_pptpdcmd,	1 },	//!!AB - PPTPD
 #endif
 #ifdef TCONFIG_USB
 	{ "usbcmd.cgi",			mime_javascript,			0,	wi_generic,		wo_usbcommand,		1 },	//!!TB - USB
@@ -337,8 +344,11 @@ const struct mime_handler mime_handlers[] = {
 #ifdef BLACKHOLE
 	{ "blackhole.cgi",	NULL,						0,	wi_blackhole,		NULL,			1 },
 #endif
-//	{ "test",			mime_html,					0,	wi_generic,			wo_test,		1 },
-	{ NULL,				NULL,						0,	NULL,				NULL,			1 }
+#ifdef TCONFIG_NOCAT
+	{ "uploadsplash.cgi",		NULL,					0,	wi_uploadsplash,	wo_uploadsplash,	1 },
+	{ "ext/uploadsplash.cgi",	NULL,					0,	wi_uploadsplash,	wo_uploadsplash,	1 },
+#endif
+	{ NULL,				NULL,					0,	NULL,		NULL,			1 }
 };
 
 const aspapi_t aspapi[] = {
@@ -353,15 +363,19 @@ const aspapi_t aspapi[] = {
 	{ "ctrate",				asp_ctrate			},
 	{ "ddnsx",				asp_ddnsx			},
 	{ "devlist",			asp_devlist			},
-	{ "webmon",			asp_webmon			},
+	{ "webmon",				asp_webmon			},
 	{ "dhcpc_time",			asp_dhcpc_time		},
 	{ "dns",				asp_dns				},
 	{ "ident",				asp_ident			},
 	{ "lanip",				asp_lanip			},
 	{ "layer7",				asp_layer7			},
 	{ "link_uptime",		asp_link_uptime		},
+	{ "link_starttime",		asp_link_starttime	},
 	{ "lipp",				asp_lipp			},
 	{ "netdev",				asp_netdev			},
+	{ "iptraffic",			asp_iptraffic		},
+	{ "iptmon",				asp_iptmon			},
+	{ "ipt_bandwidth",		asp_ipt_bandwidth	},
 	{ "notice",				asp_notice			},
 	{ "nv",					asp_nv				},
 	{ "nvram",				asp_nvram 			},
@@ -373,11 +387,15 @@ const aspapi_t aspapi[] = {
 	{ "rrule",				asp_rrule			},
 	{ "statfs",				asp_statfs			},
 	{ "sysinfo",			asp_sysinfo			},
+	{ "jiffies",			asp_jiffies			},
 	{ "time",				asp_time			},
 	{ "upnpinfo",			asp_upnpinfo		},
 	{ "version",			asp_version			},
 	{ "wanstatus",			asp_wanstatus		},
 	{ "wanup",				asp_wanup			},
+#ifdef TCONFIG_PPTPD
+	{ "pptpd_userol",		asp_pptpd_userol	},
+#endif
 	{ "wlstats",			asp_wlstats		},
 	{ "wlclient",			asp_wlclient		},
 	{ "wlnoise",			asp_wlnoise			},
@@ -389,6 +407,11 @@ const aspapi_t aspapi[] = {
 #ifdef TCONFIG_USB
 	{ "usbdevices",			asp_usbdevices	},	//!!TB - USB Support
 #endif
+	{ "etherstates",		asp_etherstates	},	//Ethernet States
+#ifdef TCONFIG_IPV6
+	{ "calc6rdlocalprefix",		asp_calc6rdlocalprefix	},
+#endif
+
 	{ "css",				asp_css				},
 	{ NULL,					NULL				}
 };
@@ -501,9 +524,15 @@ static const nvset_t nvset_list[] = {
 	{ "ntp_tdod",			V_01				},
 	{ "ntp_server",			V_LENGTH(1, 150)	},	// x y z
 	{ "ntp_kiss",			V_LENGTH(0, 255)	},
+	{ "ntpd_enable",		V_01				},	//!!Victek. Enable BusyBox NTPD Server.
+	{ "ntpd_server",		V_LENGTH(0, 128)	},	//!!Victek. NTPD Servers.
+	
 
 // basic-static
-	{ "dhcpd_static",		V_LENGTH(0, 106*101)},	// 106 (max chars per entry) x 100 entries
+	{ "dhcpd_static",		V_LENGTH(0, 108*251)	},	// 108 (max chars per entry) x 128 entries
+	{ "dhcpd_static_only",	V_01				},
+	{ "arpbind_static",		V_LENGTH(0, 34*128)	},	// 34 (max chars per entry) x 128 entries
+	{ "arpbind_listed",		V_01				}, // AB - Enable static ARP for all devices on list
 
 // basic-ddns
 	{ "ddnsx0",				V_LENGTH(0, 2048)	},
@@ -517,37 +546,92 @@ static const nvset_t nvset_list[] = {
 // basic-network
 	// WAN
 	{ "wan_proto",			V_LENGTH(1, 16)		},	// disabled, dhcp, static, pppoe, pptp, l2tp
-	{ "wan_ipaddr",			V_IP				},
-	{ "wan_netmask",		V_IP				},
-	{ "wan_gateway",		V_IP				},
-	{ "hb_server_ip",		V_LENGTH(0, 32)		},
-	{ "l2tp_server_ip",		V_LENGTH(0, 128)		},
-	{ "pptp_server_ip",		V_LENGTH(0, 128)		},
-	{ "pptp_dhcp",			V_01				},
-	{ "ppp_username",		V_LENGTH(0, 60)		},
-	{ "ppp_passwd",			V_LENGTH(0, 60)		},
-	{ "ppp_service",		V_LENGTH(0, 50)		},
-	{ "ppp_demand",			V_01				},
+	{ "wan_ipaddr",			V_IP			},
+	{ "wan_netmask",		V_IP			},
+	{ "wan_gateway",		V_IP			},
+	{ "hb_server_ip",		V_LENGTH(0, 32)	},
+	{ "l2tp_server_ip",		V_LENGTH(0, 128)	},
+	{ "pptp_server_ip",		V_LENGTH(0, 128)	},
+	{ "pptp_dhcp",			V_01			},
+	{ "ppp_username",		V_LENGTH(0, 60)	},
+	{ "ppp_passwd",			V_LENGTH(0, 60)	},
+	{ "ppp_service",		V_LENGTH(0, 50)	},
+	{ "ppp_demand",			V_01			},
 	{ "ppp_custom",			V_LENGTH(0, 256)		},
 	{ "ppp_idletime",		V_RANGE(0, 1440)	},
 	{ "ppp_redialperiod",	V_RANGE(1, 86400)	},
-	{ "ppp_mlppp",			V_01				},
-	{ "mtu_enable",			V_01				},
+	{ "ppp_mlppp",			V_01			},
+	{ "mtu_enable",			V_01			},
 	{ "wan_mtu",			V_RANGE(576, 1500)	},
-	{ "wan_islan",			V_01				},
+	{ "wan_islan",			V_01			},
+	{ "modem_ipaddr",		V_IP			},
+	{ "pppoe_lei",			V_RANGE(0, 60)	},
+	{ "pppoe_lef",			V_RANGE(0, 10)	},
+
+#ifdef TCONFIG_DNSCRYPT
+	{ "dnscrypt_proxy",		V_01			},
+#endif
 
 	// LAN
-	{ "lan_ipaddr",			V_IP				},
-	{ "lan_netmask",		V_IP				},
-	{ "lan_gateway",		V_IP				},
-	{ "wan_dns",			V_LENGTH(0, 50)		},	// ip ip ip
-	{ "lan_proto",			V_WORD				},	// static, dhcp
-	{ "dhcp_start",			V_RANGE(1, 254)		},	// remove !
-	{ "dhcp_num",			V_RANGE(1, 255)		},	// remove !
-	{ "dhcpd_startip",		V_IP				},
-	{ "dhcpd_endip",		V_IP				},
-	{ "dhcp_lease",			V_RANGE(1, 10080)	},
-	{ "wan_wins",			V_IP				},
+	{ "lan_ipaddr",			V_IP			},
+	{ "lan_netmask",		V_IP			},
+	{ "lan_gateway",		V_IP			},
+	{ "wan_dns",			V_LENGTH(0, 50)	},	// ip ip ip
+	{ "lan_proto",			V_WORD			},	// static, dhcp
+	{ "dhcp_start",			V_LENGTH(0, 15)		},	// remove !
+	{ "dhcp_num",			V_LENGTH(0, 4)		},	// remove !
+	{ "dhcpd_startip",		V_LENGTH(0, 15)		},
+	{ "dhcpd_endip",		V_LENGTH(0, 15)		},
+	{ "dhcp_lease",			V_LENGTH(0, 5)		},
+	{ "wan_wins",			V_IP			},
+
+	{ "lan_state",			V_RANGE(0, 7)		}, // 0=enable, 1=Descriptor, 2=Invert for Ethernet ports status
+	
+	// 3G MODEM
+	{ "modem_pin",			V_LENGTH(0,6)		},
+	{ "modem_dev",			V_LENGTH(0,8)		},
+	{ "modem_init",			V_LENGTH(0,25)		},
+	{ "modem_apn",			V_LENGTH(0,25)		},
+
+#ifdef TCONFIG_VLAN
+	// LAN networks
+	{ "lan_ifname",			V_LENGTH(0, 5)		},
+	{ "lan1_ifname",		V_LENGTH(0, 5)		},
+	{ "lan1_ifnames",		V_TEXT(0,64)		},
+	{ "lan1_ipaddr",		V_LENGTH(0, 15)		},
+	{ "lan1_netmask",		V_LENGTH(0, 15)		},
+	{ "lan1_proto",			V_LENGTH(0, 6)		},
+	{ "lan1_stp",			V_LENGTH(0, 1)		},
+	{ "dhcp1_start",		V_LENGTH(0, 15)		},
+	{ "dhcp1_num",			V_LENGTH(0, 4)		},
+	{ "dhcpd1_startip",		V_LENGTH(0, 15)		},
+	{ "dhcpd1_endip",		V_LENGTH(0, 15)		},
+	{ "dhcp1_lease",		V_LENGTH(0, 5)		},
+
+	{ "lan2_ifname",		V_LENGTH(0, 5)		},
+	{ "lan2_ifnames",		V_TEXT(0,64)		},
+	{ "lan2_ipaddr",		V_LENGTH(0, 15)		},
+	{ "lan2_netmask",		V_LENGTH(0, 15)		},
+	{ "lan2_proto",			V_LENGTH(0, 6)		},
+	{ "lan2_stp",			V_LENGTH(0, 1)		},
+	{ "dhcp2_start",		V_LENGTH(0, 15)		},
+	{ "dhcp2_num",			V_LENGTH(0, 4)		},
+	{ "dhcpd2_startip",		V_LENGTH(0, 15)		},
+	{ "dhcpd2_endip",		V_LENGTH(0, 15)		},
+	{ "dhcp2_lease",		V_LENGTH(0, 5)		},
+
+	{ "lan3_ifname",		V_LENGTH(0, 5)		},
+	{ "lan3_ifnames",		V_TEXT(0,64)		},
+	{ "lan3_ipaddr",		V_LENGTH(0, 15)		},
+	{ "lan3_netmask",		V_LENGTH(0, 15)		},
+	{ "lan3_proto",			V_LENGTH(0, 6)		},
+	{ "lan3_stp",			V_LENGTH(0, 1)		},
+	{ "dhcp3_start",		V_LENGTH(0, 15)		},
+	{ "dhcp3_num",			V_LENGTH(0, 4)		},
+	{ "dhcpd3_startip",		V_LENGTH(0, 15)		},
+	{ "dhcpd3_endip",		V_LENGTH(0, 15)		},
+	{ "dhcp3_lease",		V_LENGTH(0, 5)		},
+#endif
 
 	// wireless
 	{ "wl_radio",			V_01				},
@@ -556,6 +640,13 @@ static const nvset_t nvset_list[] = {
 	{ "wl_ssid",			V_LENGTH(1, 32)		},
 	{ "wl_closed",			V_01				},
 	{ "wl_channel",			V_RANGE(0, 216)		},
+
+#ifdef TCONFIG_VLAN
+	{ "wl_vifs",			V_LENGTH(0, 64)		},	// multiple/virtual BSSIDs
+#ifndef LINUX26
+	{ "nas_alternate",			V_01			},	// only meaningful for ND/K24 builds
+#endif
+#endif
 
 	{ "wl_security_mode",		V_LENGTH(1, 32)		},	// disabled, radius, wep, wpa_personal, wpa_enterprise, wpa2_personal, wpa2_enterprise
 	{ "wl_radius_ipaddr",	V_IP				},
@@ -581,46 +672,50 @@ static const nvset_t nvset_list[] = {
 	{ "wl_akm",				V_LENGTH(0, 32)		},	//  wpa, wpa2, psk, psk2, wpa wpa2, psk psk2, ""
 	{ "wl_auth_mode",	   	V_LENGTH(4, 6)		},	//  none, radius
 
-	{ "wl_nmode",			V_NONE				},
-	{ "wl_nband",			V_RANGE(0, 2)			},	// 2 - 2.4GHz, 1 - 5GHz, 0 - Auto
-	{ "wl_nreqd",			V_NONE				},
-	{ "wl_nbw_cap",			V_RANGE(0, 2)			},	// 0 - 20MHz, 1 - 40MHz, 2 - Auto
-	{ "wl_nbw",			V_NONE				},
-	{ "wl_mimo_preamble",		V_WORD				},	// 802.11n Preamble: mm/gf/auto/gfbcm
-	{ "wl_nctrlsb",			V_NONE				},	// none, lower, upper
+	{ "wl_nmode",			V_NONE			},
+	{ "wl_nband",			V_RANGE(0, 2)	},	// 2 - 2.4GHz, 1 - 5GHz, 0 - Auto
+	{ "wl_nreqd",			V_NONE			},
+	{ "wl_nbw_cap",			V_RANGE(0, 2)	},	// 0 - 20MHz, 1 - 40MHz, 2 - Auto
+	{ "wl_nbw",				V_NONE			},
+	{ "wl_mimo_preamble",	V_WORD			},	// 802.11n Preamble: mm/gf/auto/gfbcm
+	{ "wl_nctrlsb",			V_NONE			},	// none, lower, upper
 
 #ifdef TCONFIG_IPV6
 // basic-ipv6
-	{ "ipv6_service",		V_LENGTH(0, 16)			},	// '', native, native-pd, 6to4, sit, other
+	{ "ipv6_service",		V_LENGTH(0, 16)		},	// '', native, native-pd, 6to4, sit, other
 	{ "ipv6_prefix",		V_IPV6(0)			},
-	{ "ipv6_prefix_length",		V_RANGE(3, 127)			},
+	{ "ipv6_prefix_length",	V_RANGE(3, 127)		},
 	{ "ipv6_rtr_addr",		V_IPV6(0)			},
 	{ "ipv6_radvd",			V_01				},
 	{ "ipv6_accept_ra",		V_NUM				},
 	{ "ipv6_tun_addr",		V_IPV6(1)			},
-	{ "ipv6_tun_addrlen",		V_RANGE(3, 127)			},
-	{ "ipv6_ifname",		V_LENGTH(0, 8)			},
+	{ "ipv6_tun_addrlen",	V_RANGE(3, 127)		},
+	{ "ipv6_ifname",		V_LENGTH(0, 8)		},
 	{ "ipv6_tun_v4end",		V_IP				},
-	{ "ipv6_relay",			V_RANGE(1, 254)			},
+	{ "ipv6_relay",			V_RANGE(1, 254)		},
 	{ "ipv6_tun_mtu",		V_NUM				},	// Tunnel MTU
 	{ "ipv6_tun_ttl",		V_NUM				},	// Tunnel TTL
-	{ "ipv6_dns",			V_LENGTH(0, 40*3)		},	// ip6 ip6 ip6
+	{ "ipv6_dns",			V_LENGTH(0, 40*3)	},	// ip6 ip6 ip6
+	{ "ipv6_6rd_prefix",		V_IPV6(0)		},	// 6rd prefix
+	{ "ipv6_6rd_prefix_length",	V_RANGE(3, 127)	},	// 6rd prefix length
+	{ "ipv6_6rd_borderrelay",	V_IP			},	// 6rd ipv4 border relay addr
+	{ "ipv6_6rd_ipv4masklen",	V_RANGE(0, 255)	},	// 6rd ipv4 mask
 #endif
 
 // basic-wfilter
 	{ "wl_macmode",			V_NONE				},	// allow, deny, disabled
-	{ "wl_maclist",			V_LENGTH(0, 18*201)	},	// 18 x 200		(11:22:33:44:55:66 ...)
-	{ "macnames",			V_LENGTH(0, 62*201)	},	// 62 (12+1+48+1) x 50	(112233445566<..>)		todo: re-use -- zzz
+	{ "wl_maclist",			V_LENGTH(0, 18*251)	},	// 18 x 250		(11:22:33:44:55:66 ...)
+	{ "macnames",			V_LENGTH(0, 62*251)	},	// 62 (12+1+48+1) x 50	(112233445566<..>)		todo: re-use -- zzz
 
 // advanced-ctnf
-	{ "ct_max",			V_NUM			},
+	{ "ct_max",				V_NUM				},
 	{ "ct_tcp_timeout",		V_LENGTH(20, 70)	},
 	{ "ct_udp_timeout",		V_LENGTH(5, 15)		},
 	{ "ct_timeout",			V_LENGTH(5, 15)		},
-	{ "nf_ttl",			V_LENGTH(1, 6)		},
+	{ "nf_ttl",				V_LENGTH(1, 6)		},
 	{ "nf_l7in",			V_01				},
 #ifdef LINUX26
-	{ "nf_sip",			V_01				},
+	{ "nf_sip",				V_01				},
 	{ "ct_hashsize",		V_NUM				},
 #endif
 	{ "nf_rtsp",			V_01				},
@@ -636,37 +731,111 @@ static const nvset_t nvset_list[] = {
 	{ "dns_addget",			V_01				},
 	{ "dns_intcpt",			V_01				},
 	{ "dhcpc_minpkt",		V_01				},
-	{ "dhcpc_custom",		V_LENGTH(0, 80)			},
+	{ "dhcpc_custom",		V_LENGTH(0, 80)		},
 	{ "dns_norebind",		V_01				},
 	{ "dnsmasq_custom",		V_TEXT(0, 2048)		},
-//	{ "dnsmasq_norw",		V_01				},
+	{ "dnsmasq_q",			V_RANGE(0, 7)		}, // 0= quiet-dhcp, 1=dhcp6 2=ra
+	{ "dhcpd_static_only",		V_01			},
 
 // advanced-firewall
-	{ "block_wan",			V_01				},
-	{ "multicast_pass",		V_01				},
+	{ "block_wan",				V_01				},
+	{ "block_wan_limit",		V_01				},
+	{ "block_wan_limit_icmp",	V_RANGE(1, 300)		},
+	{ "block_wan_limit_tr",		V_RANGE(1, 300)		},
+	{ "multicast_pass",			V_01				},
+#ifdef TCONFIG_VLAN
+	{ "multicast_lan",		V_01				},
+	{ "multicast_lan1",		V_01				},
+	{ "multicast_lan2",		V_01				},
+	{ "multicast_lan3",		V_01				},
+#endif
+	{ "udpxy_enable",		V_01				},
+	{ "udpxy_stats",		V_01				},
+	{ "udpxy_clients",		V_RANGE(1, 5000)	},
+	{ "udpxy_port",			V_RANGE(0, 65535)	},
 	{ "block_loopback",		V_01				},
 	{ "nf_loopback",		V_NUM				},
 	{ "ne_syncookies",		V_01				},
+	{ "ne_snat",			V_01				},
 	{ "dhcp_pass",			V_01				},
 #ifdef TCONFIG_EMF
 	{ "emf_entry",			V_NONE				},
 	{ "emf_uffp_entry",		V_NONE				},
-	{ "emf_rtport_entry",		V_NONE				},
+	{ "emf_rtport_entry",	V_NONE				},
 	{ "emf_enable",			V_01				},
 #endif
 
 // advanced-misc
 	{ "wait_time",			V_RANGE(3, 20)		},
 	{ "wan_speed",			V_RANGE(0, 4)		},
+	{ "clkfreq",			V_NONE				},	// Victek
 	{ "jumbo_frame_enable",		V_01			},	// Jumbo Frames support (for RT-N16/WNR3500L)
 	{ "jumbo_frame_size",		V_RANGE(1, 9720)	},
 #ifdef CONFIG_BCMWL5
 	{ "ctf_disable",		V_01			},
 #endif
 
+#ifdef TCONFIG_VLAN
+// advanced-vlan
+	{ "vlan0ports",			V_TEXT(0,16)			},
+	{ "vlan1ports",			V_TEXT(0,16)			},
+	{ "vlan2ports",			V_TEXT(0,16)			},
+	{ "vlan3ports",			V_TEXT(0,16)			},
+	{ "vlan4ports",			V_TEXT(0,16)			},
+	{ "vlan5ports",			V_TEXT(0,16)			},
+	{ "vlan6ports",			V_TEXT(0,16)			},
+	{ "vlan7ports",			V_TEXT(0,16)			},
+	{ "vlan8ports",			V_TEXT(0,16)			},
+	{ "vlan9ports",			V_TEXT(0,16)			},
+	{ "vlan10ports",		V_TEXT(0,16)			},
+	{ "vlan11ports",		V_TEXT(0,16)			},
+	{ "vlan12ports",		V_TEXT(0,16)			},
+	{ "vlan13ports",		V_TEXT(0,16)			},
+	{ "vlan14ports",		V_TEXT(0,16)			},
+	{ "vlan15ports",		V_TEXT(0,16)			},
+	{ "vlan0hwname",		V_TEXT(0,8)			},
+	{ "vlan1hwname",		V_TEXT(0,8)			},
+	{ "vlan2hwname",		V_TEXT(0,8)			},
+	{ "vlan3hwname",		V_TEXT(0,8)			},
+	{ "vlan4hwname",		V_TEXT(0,8)			},
+	{ "vlan5hwname",		V_TEXT(0,8)			},
+	{ "vlan6hwname",		V_TEXT(0,8)			},
+	{ "vlan7hwname",		V_TEXT(0,8)			},
+	{ "vlan8hwname",		V_TEXT(0,8)			},
+	{ "vlan9hwname",		V_TEXT(0,8)			},
+	{ "vlan10hwname",		V_TEXT(0,8)			},
+	{ "vlan11hwname",		V_TEXT(0,8)			},
+	{ "vlan12hwname",		V_TEXT(0,8)			},
+	{ "vlan13hwname",		V_TEXT(0,8)			},
+	{ "vlan14hwname",		V_TEXT(0,8)			},
+	{ "vlan15hwname",		V_TEXT(0,8)			},
+	{ "wan_ifnameX",		V_TEXT(0,8)			},
+	{ "lan_ifnames",		V_TEXT(0,64)			},
+	{ "manual_boot_nv",		V_01				},
+	{ "trunk_vlan_so",		V_01				},
+	{ "vlan0tag",		V_TEXT(0,5)			},
+	{ "vlan0vid",		V_TEXT(0,5)			},
+	{ "vlan1vid",		V_TEXT(0,5)			},
+	{ "vlan2vid",		V_TEXT(0,5)			},
+	{ "vlan3vid",		V_TEXT(0,5)			},
+	{ "vlan4vid",		V_TEXT(0,5)			},
+	{ "vlan5vid",		V_TEXT(0,5)			},
+	{ "vlan6vid",		V_TEXT(0,5)			},
+	{ "vlan7vid",		V_TEXT(0,5)			},
+	{ "vlan8vid",		V_TEXT(0,5)			},
+	{ "vlan9vid",		V_TEXT(0,5)			},
+	{ "vlan10vid",		V_TEXT(0,5)			},
+	{ "vlan11vid",		V_TEXT(0,5)			},
+	{ "vlan12vid",		V_TEXT(0,5)			},
+	{ "vlan13vid",		V_TEXT(0,5)			},
+	{ "vlan14vid",		V_TEXT(0,5)			},
+	{ "vlan15vid",		V_TEXT(0,5)			},
+#endif
+
 // advanced-mac
 	{ "mac_wan",			V_LENGTH(0, 17)		},
 	{ "wl_macaddr",			V_LENGTH(0, 17)		},
+	{ "wl_hwaddr",			V_LENGTH(0, 17)		},
 
 // advanced-routing
 	{ "routes_static",		V_LENGTH(0, 2048)	},
@@ -677,8 +846,21 @@ static const nvset_t nvset_list[] = {
 	{ "dr_setting",			V_RANGE(0, 3)		},
 	{ "dr_lan_tx",			V_LENGTH(0, 32)		},
 	{ "dr_lan_rx",			V_LENGTH(0, 32)		},
+#ifdef TCONFIG_VLAN
+	{ "dr_lan1_tx",			V_LENGTH(0, 32)		},
+	{ "dr_lan1_rx",			V_LENGTH(0, 32)		},
+	{ "dr_lan2_tx",			V_LENGTH(0, 32)		},
+	{ "dr_lan2_rx",			V_LENGTH(0, 32)		},
+	{ "dr_lan3_tx",			V_LENGTH(0, 32)		},
+	{ "dr_lan3_rx",			V_LENGTH(0, 32)		},
+#endif
 	{ "dr_wan_tx",			V_LENGTH(0, 32)		},
 	{ "dr_wan_rx",			V_LENGTH(0, 32)		},
+#endif
+
+#ifdef TCONFIG_VLAN
+// advanced-access
+	{ "lan_access",			V_LENGTH(0, 4096)	},
 #endif
 
 // advanced-wireless
@@ -701,45 +883,55 @@ static const nvset_t nvset_list[] = {
 	{ "wl_antdiv",			V_RANGE(0, 3)		},
 	{ "wl_txant",			V_RANGE(0, 3)		},
 	{ "wl_txpwr",			V_RANGE(0, 400)		},
-	{ "wl_wme",			V_WORD				},	// auto, off, on
-	{ "wl_wme_no_ack",		V_ONOFF				},	// off, on
-	{ "wl_wme_apsd",		V_ONOFF				},	// off, on
-	{ "wl_maxassoc",		V_RANGE(0, 255)	},
+	{ "wl_wme",			V_WORD			},	// auto, off, on
+	{ "wl_wme_no_ack",		V_ONOFF			},	// off, on
+	{ "wl_wme_apsd",		V_ONOFF			},	// off, on
+	{ "wl_maxassoc",		V_RANGE(0, 255)		},
 	{ "wl_distance",		V_LENGTH(0, 5)		},	// "", 1-99999
-	{ "wlx_hpamp",			V_01				},
-	{ "wlx_hperx",			V_01				},
-	{ "wl_reg_mode",		V_LENGTH(1, 3)			},	// !!TB - Regulatory: off, h, d
-	{ "wl_mitigation",		V_RANGE(0, 3)			},	// Interference Mitigation Mode (0|1|2|3)
-
-	{ "wl_nmode_protection",	V_WORD,				},	// off, auto
+	{ "wlx_hpamp",			V_01			},
+	{ "wlx_hperx",			V_01			},
+	{ "wl_reg_mode",		V_LENGTH(1, 3)		},	// !!TB - Regulatory: off, h, d
+	{ "wl_mitigation",		V_RANGE(0, 4)		},	// Interference Mitigation Mode (0|1|2|3|4)
+	{ "wl_nmode_protection",	V_WORD			},	// off, auto
 	{ "wl_nmcsidx",			V_RANGE(-2, 32),	},	// -2 - 32
 	{ "wl_obss_coex",		V_01			},
+	{ "wl_wmf_bss_enable",		V_01			},	// Toastman
 
 // forward-dmz
 	{ "dmz_enable",			V_01				},
 	{ "dmz_ipaddr",			V_LENGTH(0, 15)		},
 	{ "dmz_sip",			V_LENGTH(0, 512)	},
-
+#ifdef TCONFIG_VLAN
+	{ "dmz_ifname",			V_LENGTH(0, 5)		},
+#endif
+	{ "dmz_ra",			V_01			},
 // forward-upnp
-	{ "upnp_enable",		V_NUM				},
-	{ "upnp_secure",		V_01				},
-	{ "upnp_port",			V_RANGE(0, 65535)		},
-	{ "upnp_ssdp_interval",		V_RANGE(10, 9999)		},
-	{ "upnp_mnp",			V_01				},
-	{ "upnp_clean",			V_01				},
-	{ "upnp_clean_interval",	V_RANGE(60, 65535)		},
-	{ "upnp_clean_threshold",	V_RANGE(0, 9999)		},
-	{ "upnp_min_port_int",		V_PORT				},
-	{ "upnp_max_port_int",		V_PORT				},
-	{ "upnp_min_port_ext",		V_PORT				},
-	{ "upnp_max_port_ext",		V_PORT				},
+	{ "upnp_enable",		V_NUM			},
+	{ "upnp_secure",		V_01			},
+	{ "upnp_port",			V_RANGE(0, 65535)	},
+	{ "upnp_ssdp_interval",		V_RANGE(10, 9999)	},
+	{ "upnp_mnp",			V_01			},
+	{ "upnp_clean",			V_01			},
+	{ "upnp_clean_interval",	V_RANGE(60, 65535)	},
+	{ "upnp_clean_threshold",	V_RANGE(0, 9999)	},
+	{ "upnp_min_port_int",		V_PORT			},
+	{ "upnp_max_port_int",		V_PORT			},
+	{ "upnp_min_port_ext",		V_PORT			},
+	{ "upnp_max_port_ext",		V_PORT			},
+#ifdef TCONFIG_VLAN
+	{ "upnp_lan",			V_01			},
+	{ "upnp_lan1",			V_01			},
+	{ "upnp_lan2",			V_01			},
+	{ "upnp_lan3",			V_01			},
+#endif
+	{ "upnp_custom",		V_TEXT(0, 2048)		},
 
 // forward-basic
 	{ "portforward",		V_LENGTH(0, 4096)	},
 
 #ifdef TCONFIG_IPV6
 // forward-basic-ipv6
-	{ "ipv6_portforward",	V_LENGTH(0, 4096)	},
+	{ "ipv6_portforward",		V_LENGTH(0, 4096)	},
 #endif
 
 // forward-triggered
@@ -747,43 +939,56 @@ static const nvset_t nvset_list[] = {
 
 
 // access restriction
-	{ "rruleN",				V_RANGE(0, 49)		},
-//	{ "rrule##",			V_LENGTH(0, 2048)	},	// in save_variables()
+	{ "rruleN",			V_RANGE(0, 99)		},
+//	{ "rrule##",			V_LENGTH(0, 16384)	},	// in save_variables()
 
 // admin-access
-	{ "http_enable",		V_01				},
-	{ "https_enable",		V_01				},
-	{ "https_crt_save",		V_01				},
+	{ "http_enable",		V_01			},
+	{ "https_enable",		V_01			},
+	{ "https_crt_save",		V_01			},
 	{ "https_crt_cn",		V_LENGTH(0, 64)		},
-	{ "https_crt_gen",		V_TEMP				},
-	{ "remote_management",	V_01				},
-	{ "remote_mgt_https",	V_01				},
-	{ "http_lanport",		V_PORT				},
-	{ "https_lanport",		V_PORT				},
-	{ "web_wl_filter",		V_01				},
+	{ "https_crt_gen",		V_TEMP			},
+	{ "remote_management",		V_01			},
+	{ "remote_mgt_https",		V_01			},
+	{ "remote_mgt_nodefault",	V_01			},
+	{ "http_lanport",		V_PORT			},
+	{ "https_lanport",		V_PORT			},
+	{ "web_wl_filter",		V_01			},
 	{ "web_css",			V_LENGTH(1, 32)		},
-	{ "web_mx",				V_LENGTH(0, 128)	},
-	{ "http_wanport",		V_PORT				},
-	{ "telnetd_eas",		V_01				},
-	{ "telnetd_port",		V_PORT				},
-	{ "sshd_eas",			V_01				},
-	{ "sshd_pass",			V_01				},
-	{ "sshd_port",			V_PORT				},
-	{ "sshd_remote",		V_01				},
-	{ "sshd_forwarding",		V_01				},
-	{ "sshd_rport", 		V_PORT				},
+	{ "web_mx",			V_LENGTH(0, 128)	},
+	{ "http_wanport",		V_PORT			},
+	{ "telnetd_eas",		V_01			},
+	{ "telnetd_port",		V_PORT			},
+	{ "sshd_eas",			V_01			},
+	{ "sshd_pass",			V_01			},
+	{ "sshd_port",			V_PORT			},
+	{ "sshd_remote",		V_01			},
+	{ "sshd_forwarding",		V_01			},
+	{ "sshd_rport", 		V_PORT			},
 	{ "sshd_authkeys",		V_TEXT(0, 4096)		},
 	{ "rmgt_sip",			V_LENGTH(0, 512)	},
 	{ "ne_shlimit",			V_TEXT(1, 50)		},
 
 // admin-bwm
-	{ "rstats_enable",		V_01				},
+	{ "rstats_enable",		V_01			},
 	{ "rstats_path",		V_LENGTH(0, 48)		},
 	{ "rstats_stime",		V_RANGE(1, 168)		},
 	{ "rstats_offset",		V_RANGE(1, 31)		},
 	{ "rstats_exclude",		V_LENGTH(0, 64)		},
-	{ "rstats_sshut",		V_01				},
-	{ "rstats_bak",			V_01				},
+	{ "rstats_sshut",		V_01			},
+	{ "rstats_bak",			V_01			},
+
+// admin-ipt
+	{ "cstats_enable",		V_01			},
+	{ "cstats_path",		V_LENGTH(0, 48)		},
+	{ "cstats_stime",		V_RANGE(1, 168)		},
+	{ "cstats_offset",		V_RANGE(1, 31)		},
+	{ "cstats_labels",		V_RANGE(0, 2)		},
+	{ "cstats_exclude",		V_LENGTH(0, 512)	},
+	{ "cstats_include",		V_LENGTH(0, 2048)	},
+	{ "cstats_all",			V_01			},
+	{ "cstats_sshut",		V_01			},
+	{ "cstats_bak",			V_01			},
 
 // admin-buttons
 	{ "sesx_led",			V_RANGE(0, 255)		},	// amber, white, aoss
@@ -795,24 +1000,24 @@ static const nvset_t nvset_list[] = {
 	{ "script_brau",		V_TEXT(0, 1024)		},	//
 
 // admin-debug
-	{ "debug_nocommit",		V_01				},
-	{ "debug_cprintf",		V_01				},
-	{ "debug_cprintf_file",	V_01				},
+	{ "debug_nocommit",		V_01			},
+	{ "debug_cprintf",		V_01			},
+	{ "debug_cprintf_file",		V_01			},
 //	{ "debug_keepfiles",	V_01				},
-	{ "debug_ddns",			V_01				},
-	{ "debug_norestart",	V_TEXT(0, 128)		},
-	{ "console_loglevel",	V_RANGE(1, 8)		},
-	{ "t_cafree",			V_01				},
-	{ "t_hidelr",			V_01				},
+	{ "debug_ddns",			V_01			},
+	{ "debug_norestart",		V_TEXT(0, 128)		},
+	{ "console_loglevel",		V_RANGE(1, 8)		},
+	{ "t_cafree",			V_01			},
+	{ "t_hidelr",			V_01			},
 
 // admin-sched
 	{ "sch_rboot", 			V_TEXT(0, 64)		},
 	{ "sch_rcon", 			V_TEXT(0, 64)		},
-	{ "sch_c1",				V_TEXT(0, 64)		},
+	{ "sch_c1",			V_TEXT(0, 64)		},
 	{ "sch_c1_cmd",			V_TEXT(0, 2048)		},
-	{ "sch_c2",				V_TEXT(0, 64)		},
+	{ "sch_c2",			V_TEXT(0, 64)		},
 	{ "sch_c2_cmd",			V_TEXT(0, 2048)		},
-	{ "sch_c3",				V_TEXT(0, 64)		},
+	{ "sch_c3",			V_TEXT(0, 64)		},
 	{ "sch_c3_cmd",			V_TEXT(0, 2048)		},
 
 // admin-scripts
@@ -822,125 +1027,187 @@ static const nvset_t nvset_list[] = {
 	{ "script_wanup", 		V_TEXT(0, 4096)		},
 
 // admin-log
-	{ "log_remote",			V_01				},
-	{ "log_remoteip",		V_LENGTH(0, 512)		},
-	{ "log_remoteport",		V_PORT				},
-	{ "log_file",			V_01				},
+	{ "log_remote",			V_01			},
+	{ "log_remoteip",		V_LENGTH(0, 512)	},
+	{ "log_remoteport",		V_PORT			},
+	{ "log_file",			V_01			},
+	{ "log_file_custom",		V_01			},
+	{ "log_file_path",		V_TEXT(0, 4096)		},
+	{ "log_file_size",		V_RANGE(0, 99999)	},
+	{ "log_file_keep",		V_RANGE(0, 99)		},
 	{ "log_limit",			V_RANGE(0, 2400)	},
-	{ "log_in",				V_RANGE(0, 3)		},
+	{ "log_in",			V_RANGE(0, 3)		},
 	{ "log_out",			V_RANGE(0, 3)		},
 	{ "log_mark",			V_RANGE(0, 99999)	},
 	{ "log_events",			V_TEXT(0, 32)		},	// "acre,crond,ntp"
 
 // admin-log-webmonitor
-	{ "log_wm",			V_01				},
-	{ "log_wmtype",			V_RANGE(0, 2)			},
-	{ "log_wmip",			V_LENGTH(0, 512)		},
-	{ "log_wmdmax",			V_RANGE(0, 9999)		},
-	{ "log_wmsmax",			V_RANGE(0, 9999)		},
+	{ "log_wm",			V_01			},
+	{ "log_wmtype",			V_RANGE(0, 2)		},
+	{ "log_wmip",			V_LENGTH(0, 512)	},
+	{ "log_wmdmax",			V_RANGE(0, 9999)	},
+	{ "log_wmsmax",			V_RANGE(0, 9999)	},
 
 // admin-cifs
-	{ "cifs1",				V_LENGTH(1, 1024)	},
-	{ "cifs2",				V_LENGTH(1, 1024)	},
+	{ "cifs1",			V_LENGTH(1, 1024)	},
+	{ "cifs2",			V_LENGTH(1, 1024)	},
 
 // admin-jffs2
-	{ "jffs2_on",			V_01				},
+	{ "jffs2_on",			V_01			},
 	{ "jffs2_exec",			V_LENGTH(0, 64)		},
-	{ "jffs2_format",		V_01				},
+	{ "jffs2_format",		V_01			},
 
 // nas-usb - !!TB
 #ifdef TCONFIG_USB
-	{ "usb_enable",			V_01				},
-	{ "usb_uhci",			V_RANGE(-1, 1)			},	// -1 - disabled, 0 - off, 1 - on
-	{ "usb_ohci",			V_RANGE(-1, 1)			},
-	{ "usb_usb2",			V_RANGE(-1, 1)			},
+	{ "usb_enable",			V_01			},
+	{ "usb_uhci",			V_RANGE(-1, 1)		},	// -1 - disabled, 0 - off, 1 - on
+	{ "usb_ohci",			V_RANGE(-1, 1)		},
+	{ "usb_usb2",			V_RANGE(-1, 1)		},
+
 #if defined(LINUX26) && defined(TCONFIG_USB_EXTRAS)
-	{ "usb_mmc",			V_RANGE(-1, 1)			},
+	{ "usb_mmc",			V_RANGE(-1, 1)		},
 #endif
-	{ "usb_irq_thresh",		V_RANGE(0, 6)			},
-	{ "usb_storage",		V_01				},
-	{ "usb_printer",		V_01				},
-	{ "usb_printer_bidirect",	V_01				},
-	{ "usb_fs_ext3",		V_01				},
-	{ "usb_fs_fat",			V_01				},
+	{ "usb_irq_thresh",		V_RANGE(0, 6)		},
+	{ "usb_storage",		V_01			},
+	{ "usb_printer",		V_01			},
+	{ "usb_printer_bidirect",	V_01			},
+	{ "usb_fs_ext3",		V_01			},
+	{ "usb_fs_fat",			V_01			},
 #ifdef TCONFIG_NTFS
-	{ "usb_fs_ntfs",		V_01				},
+	{ "usb_fs_ntfs",		V_01			},
 #endif
-	{ "usb_automount",		V_01				},
-	{ "script_usbhotplug", 		V_TEXT(0, 2048)			},
-	{ "script_usbmount", 		V_TEXT(0, 2048)			},
-	{ "script_usbumount", 		V_TEXT(0, 2048)			},
+	{ "usb_fs_hfs",			V_01			}, //!Victek
+	{ "usb_fs_hfsplus",		V_01			}, //!Victek
+	{ "usb_automount",		V_01			},
+	{ "script_usbhotplug", 		V_TEXT(0, 2048)		},
+	{ "script_usbmount", 		V_TEXT(0, 2048)		},
+	{ "script_usbumount", 		V_TEXT(0, 2048)		},
+	{ "idle_enable",		V_01			},
+	{ "usb_3g",			V_01			},
 #endif
 
 // nas-ftp - !!TB
 #ifdef TCONFIG_FTP
-	{ "ftp_enable",			V_RANGE(0, 2)			},
-	{ "ftp_super",			V_01				},
-	{ "ftp_anonymous",		V_RANGE(0, 3)			},
-	{ "ftp_dirlist",		V_RANGE(0, 2)			},
-	{ "ftp_port",			V_PORT				},
-	{ "ftp_max",			V_RANGE(0, 12)			},
-	{ "ftp_ipmax",			V_RANGE(0, 12)			},
-	{ "ftp_staytimeout",		V_RANGE(0, 65535)		},
-	{ "ftp_rate",			V_RANGE(0, 99999)		},
-	{ "ftp_anonrate",		V_RANGE(0, 99999)		},
-	{ "ftp_anonroot",		V_LENGTH(0, 256)		},
-	{ "ftp_pubroot",		V_LENGTH(0, 256)		},
-	{ "ftp_pvtroot",		V_LENGTH(0, 256)		},
-	{ "ftp_users",			V_LENGTH(0, 4096)		},
-	{ "ftp_custom",			V_TEXT(0, 2048)			},
-	{ "ftp_sip",			V_LENGTH(0, 512)		},
-	{ "ftp_limit",			V_TEXT(1, 50)			},
-	{ "log_ftp",			V_01				},
+	{ "ftp_enable",			V_RANGE(0, 2)		},
+	{ "ftp_super",			V_01			},
+	{ "ftp_anonymous",		V_RANGE(0, 3)		},
+	{ "ftp_dirlist",		V_RANGE(0, 2)		},
+	{ "ftp_port",			V_PORT			},
+	{ "ftp_max",			V_RANGE(0, 12)		},
+	{ "ftp_ipmax",			V_RANGE(0, 12)		},
+	{ "ftp_staytimeout",		V_RANGE(0, 65535)	},
+	{ "ftp_rate",			V_RANGE(0, 99999)	},
+	{ "ftp_anonrate",		V_RANGE(0, 99999)	},
+	{ "ftp_anonroot",		V_LENGTH(0, 256)	},
+	{ "ftp_pubroot",		V_LENGTH(0, 256)	},
+	{ "ftp_pvtroot",		V_LENGTH(0, 256)	},
+	{ "ftp_users",			V_LENGTH(0, 4096)	},
+	{ "ftp_custom",			V_TEXT(0, 2048)		},
+	{ "ftp_sip",			V_LENGTH(0, 512)	},
+	{ "ftp_limit",			V_TEXT(1, 50)		},
+	{ "log_ftp",			V_01			},
+#endif
+
+#ifdef TCONFIG_SNMP
+	{ "snmp_enable",		V_RANGE(0, 1)		},
+	{ "snmp_port",			V_RANGE(1, 65535)	},
+	{ "snmp_remote",		V_RANGE(0, 1)		},
+	{ "snmp_remote_sip",		V_LENGTH(0, 512)	},
+	{ "snmp_location",		V_LENGTH(0, 20)		},
+	{ "snmp_contact",		V_LENGTH(0, 20)		},
+	{ "snmp_ro",			V_LENGTH(0, 20)		},
 #endif
 
 #ifdef TCONFIG_SAMBASRV
 // nas-samba - !!TB
-	{ "smbd_enable",		V_RANGE(0, 2)			},
-	{ "smbd_wgroup",		V_LENGTH(0, 20)			},
-	{ "smbd_master",		V_01				},
-	{ "smbd_wins",			V_01				},
-	{ "smbd_cpage",			V_LENGTH(0, 4)			},
-	{ "smbd_cset",			V_LENGTH(0, 20)			},
-	{ "smbd_custom",		V_TEXT(0, 2048)			},
-	{ "smbd_autoshare",		V_RANGE(0, 3)			},
-	{ "smbd_shares",		V_LENGTH(0, 4096)		},
-	{ "smbd_user",			V_LENGTH(0, 50)			},
-	{ "smbd_passwd",		V_LENGTH(0, 50)			},
+	{ "smbd_enable",		V_RANGE(0, 2)		},
+	{ "smbd_wgroup",		V_LENGTH(0, 20)		},
+	{ "smbd_master",		V_01			},
+	{ "smbd_wins",			V_01			},
+	{ "smbd_cpage",			V_LENGTH(0, 4)		},
+	{ "smbd_cset",			V_LENGTH(0, 20)		},
+	{ "smbd_custom",		V_TEXT(0, 2048)		},
+	{ "smbd_autoshare",		V_RANGE(0, 3)		},
+	{ "smbd_shares",		V_LENGTH(0, 4096)	},
+	{ "smbd_user",			V_LENGTH(0, 50)		},
+	{ "smbd_passwd",		V_LENGTH(0, 50)		},
 #endif
 
 #ifdef TCONFIG_MEDIA_SERVER
 // nas-media
-	{ "ms_enable",			V_01				},
-	{ "ms_dirs",			V_LENGTH(0, 1024)		},
-	{ "ms_port",			V_RANGE(0, 65535)		},
-	{ "ms_dbdir",			V_LENGTH(0, 256)		},
-	{ "ms_tivo",			V_01				},
-	{ "ms_stdlna",			V_01				},
-	{ "ms_rescan",			V_01				},
-	{ "ms_sas",			V_01				},
+	{ "ms_enable",			V_01			},
+	{ "ms_dirs",			V_LENGTH(0, 1024)	},
+	{ "ms_port",			V_RANGE(1, 65535)	},
+	{ "ms_dbdir",			V_LENGTH(0, 256)	},
+	{ "ms_tivo",			V_01			},
+	{ "ms_stdlna",			V_01			},
+	{ "ms_rescan",			V_01			},
+	{ "ms_sas",			V_01			},
 #endif
 
-//	qos
-	{ "qos_enable",			V_01				},
-	{ "qos_ack",			V_01				},
-	{ "qos_syn",			V_01				},
-	{ "qos_fin",			V_01				},
-	{ "qos_rst",			V_01				},
-	{ "qos_icmp",			V_01				},
-	{ "qos_reset",			V_01				},
-	{ "qos_pfifo",			V_01				}, // !!TB
+// qos
+	{ "qos_enable",			V_01			},
+	{ "qos_pfifo",			V_01			},
+	{ "qos_ack",			V_01			},
+	{ "qos_syn",			V_01			},
+	{ "qos_fin",			V_01			},
+	{ "qos_rst",			V_01			},
+	{ "qos_icmp",			V_01			},
+	{ "qos_udp",			V_01			},
+	{ "qos_reset",			V_01			},
+	{ "qos_pfifo",			V_01			}, // !!TB
 	{ "qos_obw",			V_RANGE(10, 999999)	},
 	{ "qos_ibw",			V_RANGE(10, 999999)	},
-	{ "qos_orules",			V_LENGTH(0, 4096)	},
+	{ "qos_orules",			V_LENGTH(0, 8192)	},
 	{ "qos_default",		V_RANGE(0, 9)		},
 	{ "qos_irates",			V_LENGTH(0, 128)	},
 	{ "qos_orates",			V_LENGTH(0, 128)	},
+	{ "qos_classnames",		V_LENGTH(10, 128)	}, // !!TOASTMAN
+	{ "atm_overhead",		V_RANGE(-127, 128)	},
+	{ "ne_vegas",			V_01			},
+	{ "ne_valpha",			V_NUM			},
+	{ "ne_vbeta",			V_NUM			},
+	{ "ne_vgamma",			V_NUM			},
 
-	{ "ne_vegas",			V_01				},
-	{ "ne_valpha",			V_NUM				},
-	{ "ne_vbeta",			V_NUM				},
-	{ "ne_vgamma",			V_NUM				},
+// qos-bw-limiter
+	{ "qosl_enable",		V_01                   },
+	{ "qosl_rules",			V_LENGTH(0, 4096)      },
+	/*qosl_ibw unused - qos_ibw shared*/
+	/*qosl_obw unused - qos_obw shared*/
+
+//NoCatSplash. Victek.
+#ifdef TCONFIG_NOCAT
+	{ "NC_enable",			V_01					},
+	{ "NC_Verbosity",		V_RANGE(0, 10)			},
+	{ "NC_GatewayName",		V_LENGTH(0, 255)		},
+	{ "NC_GatewayPort",		V_PORT					},
+	{ "NC_ForcedRedirect",	V_01					},
+	{ "NC_HomePage",		V_LENGTH(0, 255)		},
+	{ "NC_DocumentRoot",	V_LENGTH(0, 255)		},
+	{ "NC_SplashURL",		V_LENGTH(0, 255)		},
+	{ "NC_LoginTimeout",	V_RANGE(0, 86400000)		},
+	{ "NC_IdleTimeout",		V_RANGE(0, 86400000)		},
+	{ "NC_MaxMissedARP",		V_RANGE(0, 10)			},
+	{ "NC_PeerChecktimeout",	V_RANGE(0, 60)			},
+	{ "NC_ExcludePorts",		V_LENGTH(0, 255)		},
+	{ "NC_IncludePorts",		V_LENGTH(0, 255)		},
+	{ "NC_AllowedWebHosts",		V_LENGTH(0, 255)		},
+	{ "NC_MACWhiteList",		V_LENGTH(0, 255)		},
+	{ "NC_SplashFile",			V_LENGTH(0, 8192)		},
+#ifdef TCONFIG_VLAN
+	{ "NC_BridgeLAN",			V_LENGTH(0, 50)			},
+#endif
+#endif
+
+// NGinX Roadkill
+#ifdef TCONFIG_NGINX
+	{"nginx_enable",		V_01			}, // NGinX enabled
+	{"nginx_docroot",		V_LENGTH(0, 255)	}, // root files path
+	{"nginx_port",			V_PORT			}, // listening port
+	{"nginx_fqdn",			V_LENGTH(0, 255)	}, // server name
+	{"nginx_priority",		V_LENGTH(0, 255)	}, // server priority
+	{"nginx_custom",		V_TEXT(0, 4096)		}, // user window to add parameters to nginx.conf
+#endif
 
 #ifdef TCONFIG_OPENVPN
 // vpn
@@ -1033,6 +1300,12 @@ static const nvset_t nvset_list[] = {
 	{ "vpn_client1_ca",       V_NONE              },
 	{ "vpn_client1_crt",      V_NONE              },
 	{ "vpn_client1_key",      V_NONE              },
+	{ "vpn_client1_userauth", V_01                },
+	{ "vpn_client1_username", V_TEXT(0,50)        },
+	{ "vpn_client1_password", V_TEXT(0,50)        },
+	{ "vpn_client1_useronly", V_01                },
+	{ "vpn_client1_tlsremote",V_01                },
+	{ "vpn_client1_cn",       V_NONE              },
 	{ "vpn_client2_poll",     V_RANGE(0, 1440)    },
 	{ "vpn_client2_if",       V_TEXT(3, 3)        },  // tap, tun
 	{ "vpn_client2_bridge",   V_01                },
@@ -1058,7 +1331,27 @@ static const nvset_t nvset_list[] = {
 	{ "vpn_client2_ca",       V_NONE              },
 	{ "vpn_client2_crt",      V_NONE              },
 	{ "vpn_client2_key",      V_NONE              },
+	{ "vpn_client2_userauth", V_01                },
+	{ "vpn_client2_username", V_TEXT(0,50)        },
+	{ "vpn_client2_password", V_TEXT(0,50)        },
+	{ "vpn_client2_useronly", V_01                },
+	{ "vpn_client2_tlsremote",V_01                },
+	{ "vpn_client2_cn",       V_NONE              },
 #endif // vpn
+
+// pptp server
+	{ "pptpd_enable",		V_01				},
+	{ "pptpd_remoteip",		V_TEXT(0,24)		},
+	{ "pptpd_forcemppe",	V_01				},
+	{ "pptpd_users",		V_TEXT(0, 67*16)	},
+	{ "pptpd_broadcast",	V_TEXT(0,8)			},
+	{ "pptpd_dns1",			V_TEXT(0, 15)		},
+	{ "pptpd_dns2",			V_TEXT(0, 15)		},
+	{ "pptpd_wins1",		V_TEXT(0, 15)		},
+	{ "pptpd_wins2",		V_TEXT(0, 15)		},
+	{ "pptpd_mtu",			V_RANGE(576, 1500)	},
+	{ "pptpd_mru",			V_RANGE(576, 1500)	},
+	{ "pptpd_custom",		V_TEXT(0, 2048)		},
 
 /*
 ppp_static			0/1
@@ -1093,7 +1386,24 @@ port_rate_limit_4	0-8
 wl_ap_ip
 wl_ap_ssid
 */
-
+#ifdef TCONFIG_USERPPTP
+	{ "pptp_client_enable",   V_01                  },
+	{ "pptp_client_peerdns",  V_RANGE(0,2)          },
+	{ "pptp_client_mtuenable",V_01                  },
+	{ "pptp_client_mtu",      V_RANGE(576, 1500)	},
+	{ "pptp_client_mruenable",V_01                  },
+	{ "pptp_client_mru",      V_RANGE(576, 1500)	},
+	{ "pptp_client_nat",      V_01                  },
+	{ "pptp_client_srvip",    V_NONE                },
+	{ "pptp_client_srvsub",   V_IP                  },
+	{ "pptp_client_srvsubmsk",V_IP                  },
+	{ "pptp_client_username", V_TEXT(0,50)          },
+	{ "pptp_client_passwd",   V_TEXT(0,50)          },
+	{ "pptp_client_crypt",    V_RANGE(0, 3)         },
+	{ "pptp_client_custom",   V_NONE                },
+	{ "pptp_client_dfltroute",V_01                  },
+	{ "pptp_client_stateless",V_01                  },
+#endif
 	{ NULL }
 };
 
@@ -1234,7 +1544,7 @@ static int save_variables(int write)
 	for (n = 0; n < 50; ++n) {
 		sprintf(s, "rrule%d", n);
 		if ((p = webcgi_get(s)) != NULL) {
-	        	if (strlen(p) > 2048) {
+	        	if (strlen(p) > 8192) {				//Toastman
 				sprintf(s, msgf, s);
 				resmsg_set(s);
 				return 0;
@@ -1258,6 +1568,7 @@ static void wo_tomato(char *url)
 	int nvset;
 	const char *red;
 	int commit;
+	int force_commit;
 
 //	_dprintf("tomato.cgi\n");
 
@@ -1265,6 +1576,7 @@ static void wo_tomato(char *url)
 	if (!*red) send_header(200, NULL, mime_html, 0);
 
 	commit = atoi(webcgi_safeget("_commit", "1"));
+	force_commit = atoi(webcgi_safeget("_force_commit", "0"));
 	ajax = atoi(webcgi_safeget("_ajax", "0"));
 
 	nvset = atoi(webcgi_safeget("_nvset", "1"));
@@ -1299,7 +1611,7 @@ static void wo_tomato(char *url)
 		}
 	}
 
-	if (commit) {
+	if (commit || force_commit) {
 		_dprintf("commit from tomato.cgi\n");
 		nvram_commit_x();
 	}

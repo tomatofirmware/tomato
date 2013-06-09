@@ -414,7 +414,13 @@ chap_verify_response(char *name, char *ourname, int id,
 	int ok;
 	unsigned char secret[MAXSECRETLEN];
 	int secret_len;
-
+#ifdef CHAPMS
+    char nametmp[MAXNAMELEN];
+    	if (ms_ignore_domain && strrchr(name, '\\')) {
+		strcpy(nametmp, strrchr(name, '\\') + 1);
+		strcpy(name, nametmp);
+	}
+#endif
 	/* Get the secret that the peer is supposed to know */
 	if (!get_secret(0, name, ourname, (char *)secret, &secret_len, 1)) {
 		error("No CHAP secret found for authenticating %q", name);
@@ -519,6 +525,7 @@ chap_handle_status(struct chap_client_state *cs, int code, int id,
 	else {
 		cs->flags |= AUTH_FAILED;
 		error("CHAP authentication failed");
+		system("ppp_event -t CHAP_AUTH_FAIL &");
 		auth_withpeer_fail(0, PPP_CHAP);
 	}
 }

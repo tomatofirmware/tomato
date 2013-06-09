@@ -1,0 +1,1760 @@
+Date:   2012-07-17
+
+    Reenable --enable-debug
+
+Date:   2012-07-17
+
+    Don't double quote CFLAGS.
+
+Date:   2012-07-17
+
+    Change the way we pass the autoconf args to the libevent autoconf script.
+
+Date:   2012-07-17
+
+    fpm -> 0.12
+
+Date:   2012-07-17
+
+    Update ChangeLog for 0.12
+
+Date:   2012-07-17
+
+    Bind UDP listeners first.
+
+Date:   2012-07-17
+
+    Update ChangeLog
+
+Date:   2012-07-17
+
+    Reset ac_configure_args before configuring libevent.
+    This fixes the issue with the OpenBSD port, that was reseting both CC and
+    CFLAGS.
+
+Date:   2012-07-17
+
+    Use both -fPIE (cc) and -pie (linker) or none.
+
+Date:   2012-07-17
+
+    Restore -pie.
+    It breaks the OpenBSD-current port, but unbreaks Linux, aaahhhhhh.
+
+Date:   2012-07-17
+
+    No more rlimit for now.
+
+Date:   2012-07-17
+
+    Don't strip symbols on Debian packages. Screw you, stupid Debian policies.
+
+Date:   2012-07-17
+
+    Start UDP listeners first. They provide an error message when they fail.
+
+Date:   2012-07-17
+
+    Linux doesn't like RLIMIT_NPROC = 0.
+
+Date:   2012-07-16
+
+    Use nonexistent.local instead of nonexistent.example.com
+    or else OpenDNS servers can return the "guide" IP instead of NXDOMAIN.
+
+Date:   2012-07-16
+
+    Invert the ifdef logic for retries.
+
+Date:   2012-07-16
+
+    Enable retries.
+
+Date:   2012-07-16
+
+    DNSCrypt 0.12
+
+Date:   2012-07-16
+
+    Fix UDP retries: ditch the retry timer after a successful sendto().
+
+Date:   2012-07-16
+
+    Update FreeBSD port.
+
+Date:   2012-07-16
+
+    Update NetBSD / Dragonfly BSD packages again.
+
+Date:   2012-07-16
+
+    Update OpenBSD package.
+
+Date:   2012-07-16
+
+    Update Homebrew formula.
+
+Date:   2012-07-16
+
+    Bring back _FORTIFY_SOURCE.
+
+Date:   2012-07-16
+
+    Prepare OpenBSD package update.
+
+Date:   2012-07-16
+
+    Add -fwrapv
+
+Date:   2012-07-16
+
+    Update ChangeLog
+
+Date:   2012-07-16
+
+    Nuke -pie for now. It breaks the OpenBSD-current port.
+
+Date:   2012-07-16
+
+    Update NetBSD / Dragonfly BSD package
+
+Date:   2012-07-16
+
+    Bump Homebrew package
+
+Date:   2012-07-16
+
+    Cleanup dist-files
+
+Date:   2012-07-16
+
+    Bump fpm packages to 0.11
+
+Date:   2012-07-16
+
+    Screw you, gcc
+
+Date:   2012-07-16
+
+    gcc nits
+
+Date:   2012-07-16
+
+    Disable UDP sendto() retries for now.
+
+Date:   2012-07-16
+
+    0.11
+
+Date:   2012-07-16
+
+    Check for -W combos, not for individual switches.
+
+Date:   2012-07-16
+
+    Add config.guess patch for bitrig to the tree.
+
+Date:   2012-07-16
+
+    Try harder to trigger the gcc warning bug.
+
+Date:   2012-07-16
+
+    Move clang detection
+
+Date:   2012-07-16
+
+    Update Changelog
+
+Date:   2012-07-16
+
+    Improve ax_check_compile_flag by adding an unused variable in order to
+    always trigger a non-fatal compiler warning.
+
+Date:   2012-07-16
+
+    Ignore unknown warnings only if we are using clang.
+
+Date:   2012-07-16
+
+    Remove -Wno-unknown-warning-option because of this stupid gcc.
+
+Date:   2012-07-16
+
+    libevent Win32: avoid crash when waiting forever on zero fds.
+
+Date:   2012-07-16
+
+    Explicitly mention libtool in the autoconf script.
+
+Date:   2012-07-16
+
+    Run sandbox_init() only if it's not a stub.
+
+Date:   2012-07-16
+
+    Update Changelog
+
+Date:   2012-07-16
+
+    Xcode 4.5DP3
+
+Date:   2012-07-16
+
+    Test --tcp-only
+
+Date:   2012-07-16
+
+    Update dist-files
+
+Date:   2012-07-16
+
+    opendnscache-proxy was the name of dnscrypt 1 year ago.
+    Rename it to dnscrypt-proxy.
+
+Date:   2012-07-16
+
+    Mention PowerDNS.
+
+Date:   2012-07-16
+
+    And Gemfile and more tests.
+
+Date:   2012-07-16
+
+    Exit with 1 when an invalid option is given in hostip, too.
+
+Date:   2012-07-16
+
+    Exit with 1 when an unknown option is given.
+
+Date:   2012-07-16
+
+    Revert to always using -fstack-protector-all on Windows.
+    If it fails outside the MingW environment, either do some magic to
+    statically link it, or use --disable-ssp if you're desperate.
+
+Date:   2012-07-15
+
+    Statically link libssp on Windows.
+
+Date:   2012-07-15
+
+    Windoz nitz
+
+Date:   2012-07-15
+
+    Add --disable-ssp option for platforms lacking libssp. (sad)
+
+Date:   2012-07-15
+
+    Ignore deprecated declarations warnings for sandbox*()
+
+Date:   2012-07-15
+
+    Reorder
+
+Date:   2012-07-15
+
+    Try to better detect Windows targets.
+
+Date:   2012-07-15
+
+    Copy with Winsock2 prototypes.
+
+Date:   2012-07-15
+
+    Use ev_socklen_t everywhere.
+
+Date:   2012-07-15
+
+    Update noops for systems without dtrace.
+
+Date:   2012-07-15
+
+    Update NEWS / ChangeLog
+
+Date:   2012-07-15
+
+    Deprecate --local-port and --resolver-port
+
+Date:   2012-07-15
+
+    Use some crazy heuristics to support ip:port addresses as well as the old
+    format --x-address and --x-port.
+
+Date:   2012-07-15
+
+    Export evutil_format_sockaddr_port()
+
+Date:   2012-07-15
+
+    Update NEWS/ChangeLog
+
+Date:   2012-07-15
+
+    Remove pwnam comments.
+
+Date:   2012-07-15
+
+    Rename SendtoWithRetryCbCtx to SendtoWithRetryCtx
+
+Date:   2012-07-15
+
+    Retries is zero, already, thanks to calloc().
+
+Date:   2012-07-15
+
+    Support retries on Windows.
+
+Date:   2012-07-15
+
+    Retry every second. On relevant errors only. At least on !_WIN32.
+    Windows roots are the DOS, anyway.
+
+Date:   2012-07-15
+
+    Retry on UDP sendto() error.
+    We should only do that on non-fatal errors only.
+    Which means testing for different error codes on Windows. Bleh.
+
+Date:   2012-07-15
+
+    Factorize sendto() calls and pave the way for retrying on non-fatal errors.
+
+Date:   2012-07-13
+
+    Port 443 is already the default.
+
+Date:   2012-07-12
+
+    Don't assert(! TAILQ_EMPTY()) unless the request has actually been inserted in
+    the list of queued requests.
+    Should fix issue #19.
+
+Date:   2012-07-12
+
+    hostip: add things Windows needs in order to get the in6_addr structure defined
+
+Date:   2012-07-11
+
+    Check for setrlimit() existence.
+
+Date:   2012-07-11
+
+    Restrict a bit more what processes can do.
+
+Date:   2012-07-09
+
+    Build hostip last.
+
+Date:   2012-07-06
+
+    Indentation nits...
+
+Date:   2012-07-06
+
+    Update ChangeLog, bump version to 0.11
+
+Date:   2012-07-06
+
+    Introduce hostip(8), a tool for resolving a name before dnscrypt-proxy starts.
+    It should help fighting the chicken-and-egg issue seen on routers, where
+    dnscrypt-proxy requires a working NTP server, but the NTP server requires
+    a working resolver.
+
+Date:   2012-07-06
+
+    Useless indentation nits.
+
+Date:   2012-07-02
+
+    Use ioctl() instead of fnctl(fnctl()) as much as possible. Saves 1 syscall.
+
+Date:   2012-07-02
+
+    Define getpwnam() and struct passwd if getpwnam(3) exists but the headers don't.
+
+Date:   2012-06-26
+
+    Xcode 4.5 DP2
+
+Date:   2012-06-24
+
+    Bump Linux packages to 10.0.1
+
+Date:   2012-06-24
+
+    Update ChangeLog
+
+Date:   2012-06-24
+
+    Current dev version is 0.10.1
+
+Date:   2012-06-24
+
+    chroot() as soon as we can again. Drop libevent2's evdns arc4random() to use
+    our chroot()-proof salsa20_random() function instead.
+
+Date:   2012-06-24
+
+    libevent: resurrect evdns_set_random_bytes_fn() and add evdns_set_random_init_fn().
+    Using the provided RC4 generator is nice, but we maybe want to use something
+    else, in particular if we need something that is guaranteed to work in a
+    chroot jail, without a /dev/*random device.
+
+Date:   2012-06-24
+
+    libevent: don't use memset(<something on the stack>) to securely wipe a buffer,
+    because it's prone to compiler optimization.
+
+Date:   2012-06-24
+
+    libevent: do not close /dev/*random and /proc/**/uuid descriptors, in order to
+    keep them accessible after chroot(), when reseeding is needed.
+
+Date:   2012-06-24
+
+    Revoke privileges after cert_updater_start() for systems without arc4random().
+    Pointed out by Ben Kibbey.
+
+Date:   2012-06-24
+
+    Change arc4random_uniform() to calculate ``2**32 % upper_bound'' as
+    ``-upper_bound % upper_bound''.
+    From OpenBSD.
+
+Date:   2012-06-21
+
+    Update pkgsrc packages.
+
+Date:   2012-06-21
+
+    Update FreeBSD package.
+
+Date:   2012-06-21
+
+    Update Homebrew formula.
+
+Date:   2012-06-21
+
+    Update OpenBSD port.
+
+Date:   2012-06-21
+
+    Update ChangeLog
+
+Date:   2012-06-21
+
+    Don't install libevent.
+
+Date:   2012-06-21
+
+    Compile with -fPIC if possible.
+
+Date:   2012-06-21
+
+    Make some type conversions explicit.
+
+Date:   2012-06-21
+
+    Typo
+
+Date:   2012-06-20
+
+    Fix IOC diagnostic with a left shift.
+
+Date:   2012-06-20
+
+    mingw defines cygwin32 as a host OS.
+
+Date:   2012-06-19
+
+    Update NetBSD / Dragonfly BSD package.
+
+Date:   2012-06-19
+
+    Update Homebrew formula
+
+Date:   2012-06-19
+
+    Update OpenBSD package
+
+Date:   2012-06-19
+
+    Update the FreeBSD port
+
+Date:   2012-06-19
+
+    We officially support Bitrig.
+
+Date:   2012-06-19
+
+    Update ChangeLog
+
+Date:   2012-06-19
+
+    More dtrace probes.
+
+Date:   2012-06-19
+
+    Update TCP dtrace probes
+
+Date:   2012-06-19
+
+    Bump Linux packages to 0.10
+
+Date:   2012-06-19
+
+    Update libevent to be7a95c62995a679ee24146b0d641b7392cbab51
+
+Date:   2012-06-19
+
+    Cast txtlen to size_t
+
+Date:   2012-06-19
+
+    Fix txt size check
+
+Date:   2012-06-19
+
+    Update date & changelog.
+
+Date:   2012-06-19
+
+    IPPROTO_TCP is defined in netinet/in.h on Dragonfly BSD
+
+Date:   2012-06-19
+
+    More gwurglz zindoz needz
+
+Date:   2012-06-19
+
+    Shit Windows needs.
+
+Date:   2012-06-19
+
+    Some fixes for Windows...
+
+Date:   2012-06-18
+
+    Allow 64K packets on TCP, use a different definition for UDP.
+
+Date:   2012-06-18
+
+    Spacing, blank lines, etc.
+
+Date:   2012-06-18
+
+    Test for big endianness in configure.ac
+    Change the first part of the client nonce to little endian on a big endian
+    system. Add 10 extra bits of randomness by the way.
+
+Date:   2012-06-18
+
+    Update ChangeLog
+
+Date:   2012-06-18
+
+    Disable the Nagle algorithm when sending a query to a resolver.
+
+Date:   2012-06-18
+
+    If we need a free slot and there's none for the current protocol, steal one from the other protocol.
+    Having distinct knobs for UDP and TCP makes sense now, but it will not make
+    sense once OpenDNS will properly support TCP persistent connections.
+
+Date:   2012-06-18
+
+    Factorize.
+
+Date:   2012-06-18
+
+    Update ChangeLog
+
+Date:   2012-06-18
+
+    Only resolve local_sockaddr once.
+
+Date:   2012-06-18
+
+    Unfuck libevent on Win32 when threading support has been disabled.
+
+Date:   2012-06-18
+
+    Run libevent's autogen.sh along with the top-level one.
+
+Date:   2012-06-18
+
+    Unfuck compilation on Linux.
+
+Date:   2012-06-18
+
+    Update ChangeLog
+
+Date:   2012-06-18
+
+    Remove free() leftover.
+
+Date:   2012-06-18
+
+    Use -Oz for the iOS build.
+
+Date:   2012-06-14
+
+    Rewrite using libevent instead of libuv.
+
+Date:   2012-06-13
+
+    libuv update
+
+Date:   2012-06-13
+
+    Update Xcode
+
+Date:   2012-05-20
+
+    Unbreak libuv compilation with mingw32.
+
+Date:   2012-05-20
+
+    This libuv code is scary and we don't use it, but check at least the strdup() output.
+
+Date:   2012-05-16
+
+    Change #if FIONBIO to #ifdef FIONBIO. Fixes compilation on Debian/ppc 6.0.4.
+    Reported by Sebastian Sjoholm.
+
+Date:   2012-02-09
+
+    Don't malloc(0). If we don't have any interfaces, return OK / null.
+
+Date:   2012-02-09
+
+    Rewrite uv_hrtime() for Darwin in a portable way.
+
+Date:   2012-02-09
+
+    rename() requires <stdio.h> on OSX. Don't ask why.
+
+Date:   2012-06-13
+
+    Resync libuv
+
+Date:   2012-06-13
+
+    Remove overzealous assertion.
+
+Date:   2012-06-13
+
+    Typo
+
+Date:   2012-06-13
+
+    OpenDNS finally sends zero-padded replies. Define TRIM_PADDING_FROM_REPLIES.
+
+Date:   2012-06-05
+
+    Update Homebrew formula.
+
+Date:   2012-06-05
+
+    Update the OpenBSD package to 0.9.5
+
+Date:   2012-06-05
+
+    Update ChangeLog
+
+Date:   2012-06-05
+
+    Implement dnscrypt_memzero() instead of using a volatile cast.
+
+Date:   2012-06-05
+
+    Update ChangeLog
+
+Date:   2012-06-05
+
+    Send the initial query through ares to whatever port has been specified
+    using --resolver-port even using UDP.
+
+Date:   2012-06-05
+
+    More libuv cherrypicks
+
+Date:   2012-06-04
+
+    libuv cherrypicks
+
+Date:   2012-06-04
+
+    Update ChangeLog
+
+Date:   2012-06-04
+
+    Revert libuv to 3f0833eec07b5fbea2057c47e1c9014d3b347d35
+    Something looks broken on Linux between this revision and 75565907073055dd717fb6a6074518cafdd9355d.
+
+Date:   2012-06-04
+
+    libuv update to 7d2ea316183ba29a8ab5883593d1f6ee6f8f8ae3
+    unix: fix event loop stall
+
+Date:   2012-06-04
+
+    ChangeLog update.
+
+Date:   2012-06-04
+
+    Update libuv to 0dff0e7d47453fafb72a287c0acdddd6e3f2d9de
+    A big and scary update.
+
+Date:   2012-05-29
+
+    Avoid compiler optimizations.
+
+Date:   2012-05-28
+
+    Update the plist file to use port 443 by default.
+
+Date:   2012-05-28
+
+    libuv update to 75565907073055dd717fb6a6074518cafdd9355d
+
+Date:   2012-05-28
+
+    Make sure that the event loop is always NULL before parsing options.
+
+Date:   2012-05-28
+
+    Don't call anything from libuv before fork()ing.
+    Since libuv will never be fork()-safe.
+
+Date:   2012-05-28
+
+    Initialize options one by one. Fixes dnscrypt on iOS.
+
+Date:   2012-05-28
+
+    Log when uv_loop_new() fails.
+
+Date:   2012-05-27
+
+    Remove libc6 dependency for RPMs because Fedora apparently doesn't like it.
+
+Date:   2012-05-27
+
+    We need to somehow call WSAStartup before trying to perform any lookups on Win32.
+
+Date:   2012-05-27
+
+    Unfuck Win32 build
+
+Date:   2012-05-26
+
+    Fix Cygwin test
+
+Date:   2012-05-26
+
+    Update NEWS
+
+Date:   2012-05-26
+
+    Bump version to 0.9.5, but don't tag yet.
+
+Date:   2012-05-26
+
+    Introduce ares_set_servers_any()
+
+Date:   2012-05-26
+
+    Remove useless prototype.
+
+Date:   2012-05-26
+
+    Remove STORAGE_PORT4 and STORAGE_PORT6. All we want is STORAGE_PORT_ANY.
+
+Date:   2012-05-26
+
+    Complete IPv6 support.
+
+Date:   2012-05-26
+
+    Support IPv6 for retrieving a certificate.
+
+Date:   2012-05-26
+
+    Wrap some libuv functions to work both with IPv4 and IPv6.
+
+Date:   2012-05-25
+
+    Don't use proxy_context->(ud|tc)p_listener_handle in a function where a handle
+    is explicitly given.
+
+Date:   2012-05-25
+
+    Trim padding from replies.
+    Not supported by OpenDNS yet, so #ifdef'd.
+
+Date:   2012-05-25
+
+    libuv update to 3f0833eec07b5fbea2057c47e1c9014d3b347d35
+
+Date:   2012-05-25
+
+    Ignore log_fd on Windows.
+
+Date:   2012-05-23
+
+    Gentoo ebuiild for dnscrypt-proxy 0.9.4.
+
+Date:   2012-05-22
+
+    libuv update to d1665792ca22d30b60319199662a0399be9f1352
+
+Date:   2012-05-22
+
+    Revert USE_NONBLOCKING_RANDOM since gathering enough entropy can be way too slow on Linux.
+    Turn this switch on if your OS doesn't correctly seed /dev/urandom at boot and
+    at install time, or use a better operating system.
+
+Date:   2012-05-20
+
+    Update the Linux fpm package
+
+Date:   2012-05-20
+
+    Update the FreeBSD package
+
+Date:   2012-05-20
+
+    Update the NetBSD/Dragonfly BSD package.
+
+Date:   2012-05-20
+
+    Update Homebrew formula.
+
+Date:   2012-05-20
+
+    Update OpenBSD port.
+
+Date:   2012-05-20
+
+    Unfuck libuv on Dragonfly... Again...
+
+Date:   2012-05-20
+
+    Unbreak libuv compilation with mingw32.
+
+Date:   2012-05-20
+
+    Update the OpenBSD port
+
+Date:   2012-05-20
+
+    Update dist-files, dist-dirs
+
+Date:   2012-05-20
+
+    Update ChangeLog
+
+Date:   2012-05-20
+
+    Mention the new Gentoo packages and credit David Lebel.
+
+Date:   2012-05-20
+
+    Doc update
+
+Date:   2012-05-20
+
+    This libuv code is scary and we don't use it, but check at least the strdup() output.
+
+Date:   2012-05-20
+
+    Use --enable-debug instead of --with-debug
+
+Date:   2012-05-20
+
+    Provide --use-nonblocking-random if you really need to use /dev/urandom
+    but use /dev/random by default.
+    /dev/arandom has been removed from OpenBSD a long time ago, but I'm attached to it.
+
+Date:   2012-05-20
+
+    Don't recommend DNS caches that are unable to perform DNSSec validation.
+
+Date:   2012-05-20
+
+    Rename section title.
+
+Date:   2012-05-20
+
+    Drop the --tcp-port= switch, and introduce --resolver-port= and --tcp-only switches instead.
+
+Date:   2012-05-20
+
+    Update libuv to e82d46452e3db141d3875286cf90be0de6d724e0
+
+Date:   2012-05-17
+
+    Use Xcode4.4-DP5
+
+Date:   2012-05-16
+
+    Provide a link to github for bug reports.
+
+Date:   2012-05-16
+
+    Credit Sebastian Sjoholm.
+
+Date:   2012-05-16
+
+    Change #if FIONBIO to #ifdef FIONBIO. Fixes compilation on Debian/ppc 6.0.4.
+    Reported by Sebastian Sjoholm.
+
+Date:   2012-05-16
+
+    libuv - test: prevent accidental division by zero
+
+Date:   2012-05-09
+
+    Mention the official GUI for Windows, now that it's officially out.
+
+Date:   2012-05-06
+
+    Update Xcode Path to 4.4DP4, and mention that iOS binaries have to be signed.
+
+Date:   2012-05-05
+
+    Sync ChangeLog
+
+Date:   2012-05-05
+
+    Move all checks for linker flags to the same place, and	always use -Wl.
+
+Date:   2012-05-05
+
+    Add pass -z,noexecstack to the linker if it accepts it.
+
+Merge: 00af2e8 7c77d94
+Date:   2012-05-05
+
+    Merge remote-tracking branch 'lebel/lebel'
+    
+    * lebel/lebel:
+      Add gentoo's portage files.
+
+Date:   2012-05-05
+
+    Sync libuv to 985b961d4eab778857101b17b62f9e521d43a157
+
+Date:   2012-05-01
+
+    Switch the iOS SDK to 5.1
+
+Date:   2012-05-01
+
+    Update libuv to 6367da25b38274c31b42097056b2995c2696caef.
+    Pretty sure it breaks non-Linux & OSX platforms as usual.
+
+Date:   2012-05-01
+
+    Pad with 0x80...0
+
+Date:   2012-04-20
+
+    Add gentoo's portage files.
+
+Date:   2012-03-21
+
+    Sync libuv up to c9c9d805dae321a7bdf0077547c2da2dbe70f2a2
+
+Date:   2012-03-19
+
+    Sync libuv up to 49d4e1884ba5ea135f68c8b17fdf2c5d5bf0f91e
+
+Date:   2012-03-13
+
+    Give fpm a list of directories to package.
+
+Date:   2012-03-12
+
+    libuv does support Openwall Linux by default, now.
+    The libuv guys are very reactive when it comes to merging patches.
+
+Date:   2012-03-12
+
+    Sync libuv up to db413f3806356a632774b8a589546fc6788debd6
+
+Date:   2012-03-07
+
+    Update ChangeLog
+
+Date:   2012-03-07
+
+    --daemonize has been fixed.
+
+Date:   2012-03-07
+
+    Update packages
+
+Date:   2012-03-07
+
+    Update ChangeLog
+
+Date:   2012-03-07
+
+    Initialize the event loop after having parse the options
+    so that the event loop works fine after a possible fork() when the proxy
+    is started with the --daemonize switch.
+
+Date:   2012-03-07
+
+    sync libuv to d07f2466d0a10ab02db588374dd97c2edd54c7fc
+
+Date:   2012-03-06
+
+    Update Dragonfly BSD & NetBSD package.
+
+Date:   2012-03-06
+
+    Fix FreeBSD distinfo.
+
+Date:   2012-03-06
+
+    Update FreeBSD package.
+
+Date:   2012-03-06
+
+    Update OpenBSD package to 0.9.3
+
+Date:   2012-03-06
+
+    Update Homebrew formula.
+
+Date:   2012-03-06
+
+    Bump Linux package version to 0.9.3
+
+Date:   2012-03-06
+
+    cygwin: we need to include uv-common.h for uv__set_sys_error()
+
+Date:   2012-03-06
+
+    Add windows quirks to the distribution.
+
+Date:   2012-03-06
+
+    Don't include sys/sysctl.h without sys/param.h first.
+
+Date:   2012-03-06
+
+    Update ChangeLog
+
+Date:   2012-03-06
+
+    Remove command-line switches that are unsupported on Win32.
+
+Date:   2012-03-05
+
+    Add missing break so that comments in fingerprints work.
+
+Date:   2012-03-05
+
+    Check for an actual library symbol in order to link Win32-specific libs.
+
+Date:   2012-03-05
+
+    Update libuv to 5505f2e9063aaf9b52d47315ae4324efbb5834be
+
+Date:   2012-03-03
+
+    Mention Noxwizard's dnscrypt-winclient
+
+Date:   2012-03-03
+
+    <stdlib.h> is required for NULL to be defined in safe_rw.c
+
+Date:   2012-03-02
+
+    Now, that's a super ugly way of linking ws2_32, psapi and iphlpapi.
+
+Date:   2012-03-02
+
+    Mark some unused variables on Win32.
+
+Date:   2012-03-02
+
+    Compile out more pid_file.c code on Win32.
+
+Date:   2012-03-02
+
+    Use _WIN32 instead of __MINGW32__ just in case we want to support Visual Studio.
+
+Date:   2012-03-02
+
+    Unfuck daemonization on Cygwin builds.
+
+Date:   2012-03-02
+
+    Bump version to 0.9.3, featuring native support for Windows.
+    Now, back to serious work.
+
+Date:   2012-03-02
+
+    Native Windows builds are now supported.
+    Sigh.
+
+Date:   2012-03-02
+
+    Provide some logging on Windows, and disable unsupported options.
+
+Date:   2012-03-02
+
+    Pass CRYPT_VERIFYCONTEXT to CryptAcquireContext().
+
+Date:   2012-03-02
+
+    Use the CryptoAPI on Win32.
+
+Date:   2012-03-01
+
+    Fascinating whitespace changes.
+
+Date:   2012-03-01
+
+    Sync libuv.
+    test: make pipe_connect_to_file succeed with ECONNREFUSED
+    windows: return UV_ENOTSOCK when doing uv_pipe_connect to a file
+
+Date:   2012-03-01
+
+    Windows: we need to zero the loop structure when we initialize it
+    or else the ares list of handles is uninitialized and bad things can happen
+    when we try to perform async lookups.
+
+Date:   2012-03-01
+
+    Oh course, there will be no /dev/*random on zindoz.
+
+Date:   2012-03-01
+
+    Force line buffering for stdout, for zindoz
+
+Date:   2012-03-01
+
+    Yes, it now natively compiles on Win32.
+    Fortunately, it crashes.
+
+Date:   2012-03-01
+
+    Shit Win32 needs.
+
+Date:   2012-03-01
+
+    Link with Winsock2 on Windows.
+
+Date:   2012-03-01
+
+    Unfuck MingW detection.
+
+Date:   2012-02-29
+
+    libuv - unix: fix fs_event refcount bug on darwin
+
+Date:   2012-02-29
+
+    libuv - unix: don't rely on libev to track timer state
+
+Date:   2012-02-28
+
+    Bump year & remove empty line.
+    (wow, awesome and useful commit)
+
+Date:   2012-02-24
+
+    The beginning of the end.
+
+Date:   2012-02-24
+
+    *sigh*
+
+Date:   2012-02-23
+
+    There are so many random() calls that having just one hack for Win32 will never fit the bill.
+
+Date:   2012-02-23
+
+    More disgusting changes Windows requires. Not having random()/srandom() is going to be a PITA.
+
+Date:   2012-02-23
+
+    setrlimit() on Win32? LOL.
+
+Date:   2012-02-23
+
+    <windows.h> is needed, even for Sleep().
+
+Date:   2012-02-23
+
+    Jeez, Win32 doesn't even provide sleep().
+
+Date:   2012-02-23
+
+    Fix memory leak in uv_exepath() on OSX.
+
+Date:   2012-02-23
+
+    Sync libuv
+    Share inotify fd across event loop.
+
+Date:   2012-02-23
+
+    chmod +x do
+
+Date:   2012-02-23
+
+    Update ChangeLog for version 0.9.2
+
+Date:   2012-02-23
+
+    Mention iOS support, bump version to 0.9.2
+
+Date:   2012-02-23
+
+    Some distributions don't provide a "hostname" command.
+    Always use the same name for a compilation directory.
+
+Date:   2012-02-23
+
+    Improve detection of -fPIE support.
+
+Date:   2012-02-23
+
+    Unbreak libuv on iPhone.
+
+Date:   2012-02-23
+
+    Don't benchmark functions at compile-time.
+    That should be done at run-time.
+
+Date:   2012-02-23
+
+    Test /dev/urandom with -r, not -f
+
+Date:   2012-02-23
+
+    Run less executables at compile-time in order to make cross-compilation for iPhone & Android possible.
+
+Date:   2012-02-23
+
+    Don't run test-c - It breaks cross-compilation.
+
+Date:   2012-02-22
+
+    Add some extra info to the Debian packages so that lintian stops whining.
+
+Date:   2012-02-21
+
+    libuv - linux: fix signedness issue in uv_exepath()
+
+Date:   2012-02-17
+
+    Yup
+
+Date:   2012-02-17
+
+    Add URL / maintainer / category to the Linux packages.
+
+Date:   2012-02-17
+
+    Update NetBSD and Dragonfly BSD packages.
+
+Date:   2012-02-17
+
+    Update FreeBSD & Homebrew packages
+
+Date:   2012-02-17
+
+    Update the dnscrypt package for OpenBSD to 0.9.1
+    It should now work on non-Intel architectures.
+
+Date:   2012-02-17
+
+    Bump version to 0.9.1
+
+Date:   2012-02-17
+
+    untab
+
+Date:   2012-02-17
+
+    Both the compiler and the linker have to accept -fstack-protector
+
+Date:   2012-02-17
+
+    Try to compile something that performs some stack allocation in order to
+    make the AX_CHECK_COMPILE_FLAG work with -fstack-protector
+
+Date:   2012-02-17
+
+    We actually need uclibc 0.9.32 to use ifaddrs.h
+
+Date:   2012-02-16
+
+    Thanks, Lance Fredrickson.
+
+Date:   2012-02-16
+
+    uClibc < 0.9.30 didn't have ifaddrs.h
+
+Date:   2012-02-16
+
+    Regen OpenBSD distinfo.
+
+Date:   2012-02-16
+
+    Update NEWS
+
+Date:   2012-02-16
+
+    Replace cpucycles with a no-op.
+    We're favoring portability for now, and we're not benchmarking functions.
+    And cpucycles seems to be causing a lot of trouble on some architectures.
+
+Date:   2012-02-16
+
+    Update Dragonfly BSD / NetBSD package.
+
+Date:   2012-02-16
+
+    Update Homebrew formula.
+
+Date:   2012-02-16
+
+    execinfo is *not* required on OpenBSD.
+
+Date:   2012-02-16
+
+    Update OpenBSD packages
+
+Date:   2012-02-16
+
+    Bump FreeBSD package to 0.9
+
+Date:   2012-02-16
+
+    Update the documentation to mention where the tarballs can be downloaded from.
+
+Date:   2012-02-16
+
+    Update Linux packages to 0.9
+
+Date:   2012-02-16
+
+    Regen ChangeLog
+
+Date:   2012-02-16
+
+    Set version to 0.9
+    Trying to keep the version number in sync with the Mac GUI doesn't make any
+    sense, especially with a Windows GUI on the way.
+
+Date:   2012-02-16
+
+    2012 & regen man page
+
+Date:   2012-02-16
+
+    Remove test-ipc-threads.c and regen uv/dist-files.
+
+Date:   2012-02-16
+
+    Resync libuv
+
+Date:   2012-02-09
+
+    Explicitly NULLify app_context.proxy_context
+
+Date:   2012-02-09
+
+    libuv: plug memleak on error path
+
+Date:   2012-02-09
+
+    Don't malloc(0). If we don't have any interfaces, return OK / null.
+
+Date:   2012-02-09
+
+    Rewrite uv_hrtime() for Darwin in a portable way.
+
+Date:   2012-02-09
+
+    rename() requires <stdio.h> on OSX. Don't ask why.
+
+Date:   2012-02-09
+
+    Resync libuv
+
+Date:   2012-01-25
+
+    Next version will be 0.11.
+    (yeah, people are having a hard time figuring out that the OSX GUI is a
+    different product, so let's try to keep version numbers more or less in sync)
+
+Date:   2012-01-25
+
+    libuv cherrypick: unix: set SO_REUSEADDR before binding
+
+Date:   2012-01-25
+
+    libuv cherrypick: unix: don't close kqueue fd in kqueue_fork()
+
+Date:   2012-01-25
+
+    libuv cherrypick: unix: clean up udp read/write watchers
+
+Date:   2012-01-25
+
+    libuv cherrypick: unix: clean up udp shutdown sequence
+
+Date:   2012-01-25
+
+    libuv cherrypick: unix: don't retry close() on EINTR
+
+Date:   2012-01-25
+
+    libuv cherrypick: unix: fix segfault in uv_guess_handle()
+
+Date:   2012-01-25
+
+    libuv cherrypick: unix: fix udp recv_start refcount
+
+Date:   2012-01-25
+
+    libuv cherrypick: remove unused #define
+
+Date:   2012-01-25
+
+    libuv cherrypick: docs: add c-ares license note
+
+Date:   2011-12-31
+
+    2012
+
+Date:   2011-12-21
+
+    Cherry-pick 6a9cb902ae25efa6f853dc10b20cd657b8a1f809
+
+Date:   2011-12-21
+
+    Cherrypick libuv 3cbe7c3f7952aa249450438b21cf4f346bb88e22
+
+Date:   2011-12-21
+
+    Revert "Update libuv" - libuv is still b0rk3d on OpenBSD, DragonflyBSD and NetBSD.
+    
+
+Date:   2011-12-21
+
+    Revert "Unbreak libuv on Dragonfly BSD."
+    
+
+Date:   2011-12-21
+
+    Unbreak libuv on Dragonfly BSD.
+
+Date:   2011-12-21
+
+    Update libuv
+
+Date:   2011-12-15
+
+    Set TZ even if strftime() fails.
+
+Date:   2011-12-14
+
+    Update libuv - Except the obviously untested patch provided by Microsoft that totally breaks libuv on BSD.
+
+Date:   2011-12-14
+
+    Revert - libuv is now totally b0rk3d on FreeBSD/DragonflyBSD.
+
+Date:   2011-12-14
+
+    Big and scary update to libuv
+
+Date:   2011-12-14
+
+    Add --disable-dependency-tracking to the Homebrew formula.
+
+Date:   2011-12-13
+
+    Update Dragonfly BSD / NetBSD package.
+
+Date:   2011-12-13
+
+    Update Homebrew package
+
+Date:   2011-12-13
+
+    Update FreeBSD package.
+
+Date:   2011-12-13
+
+    Update OpenBSD package.
+
+Date:   2011-12-13
+
+    Update ChangeLog.
+
+Date:   2011-12-13
+
+    We can detect accept4() while SOCK_CLOEXEC and SOCK_NONBLOCK are unavailable.
+    Fixes compilation on Openwall-current.
+
+Date:   2011-12-13
+
+    Redirect compile-time tests to an errors file.
+
+Date:   2011-12-13
+
+    Update for Dragonfly BSD.
+
+Date:   2011-12-13
+
+    -fstack-protector-all is causing trouble with Dragonfly BSD and NaCl.
+    Use -fstack-protector only on Dragonfly BSD for now.
+
+Date:   2011-12-13
+
+    Update packages to 0.8 - distinfo files have to be regenerated though.
+
+Date:   2011-12-13
+
+    Update NEWS / ChangeLog
+
+Date:   2011-12-12
+
+    Rename C_ASSERT, because Windows defines a macro with the same name.
+
+Date:   2011-12-12
+
+    Don't use substitution in a $(shell) statement.
+
+Date:   2011-12-12
+
+    Unfortunately, ULONG_LONG_MAX isn't always defined.
+
+Date:   2011-12-12
+
+    Sync dist files
+
+Date:   2011-12-12
+
+    Fix autoconf test.
+
+Date:   2011-12-12
+
+    Don't include crypto_int32.h
+
+Date:   2011-12-12
+
+    Missing quote
+
+Date:   2011-12-12
+
+    Sync libuv
+
+Date:   2011-12-11
+
+    assert() -> C_ASSERT()
+
+Date:   2011-12-11
+
+    Ignore .DS_Store
+
+Date:   2011-12-11
+
+    Typo
+
+Date:   2011-12-11
+
+    Make getword() a bit faster by using all the output bytes.
+
+Date:   2011-12-11
+
+    Rephrase.
+
+Date:   2011-12-11
+
+    Introduce a C_ASSERT() macro instead of repeating (void) sizeof(char[X?1:-1])
+
+Date:   2011-12-11
+
+    Switch to salsa20/20 as a stream cipher.
+
+Date:   2011-12-11
+
+    curvecp is fantastic but we don't use it for now. So don't ship a copy of it.
+
+Date:   2011-12-10
+
+    Move Linux packages to /usr
+
+Date:   2011-12-10
+
+    Provide better detection for Mingw when used on Windows.
+
+Date:   2011-12-10
+
+    Disable -fstack-protector-all on Windows but enable specific flags for ASLR & DEP.
+
+Date:   2011-12-10
+
+    Enable ASLR and DEP on Win32.
+
+Date:   2011-12-10
+
+    Works out of the box on Windows using Cygwin (for now, native port is coming).
+
+Date:   2011-12-10
+
+    Mention do-not-query-localhost: no for Unbound.
+
+Date:   2011-12-09
+
+    We do support Openwall Linux now.
+
+Date:   2011-12-09
+
+    Don't try compiling inotify-related functions on Linux distros without inotify.
+
+Date:   2011-12-09
+
+    Provide compatibility with glibc versions that don't provide pipe2()/O_CLOEXEC
+
+Date:   2011-12-09
+
+    resync dist-files.
+
+Date:   2011-12-09
+
+    Moving on.
+
+Date:   2011-12-09
+
+    Add the default public key for ed25519-signed certs.
+
+Date:   2011-12-08
+
+    Switch to 2.dnscrypt-cert.opendns.com
+
+Date:   2011-12-08
+
+    Switch to ed25519
+
+Date:   2011-12-08
+
+    Sync libuv
+
+Date:   2011-12-08
+
+    Import ed25519 - thanks to djb for his feedback.
+
+Date:   2011-12-07
+
+    Add a sample .plist file.
+
+Date:   2011-12-07
+
+    Add a formula for Homebrew
+
+Date:   2011-12-07
+
+    Nits
+
+Date:   2011-12-07
+
+    Nits
+
+Date:   2011-12-07
+
+    Nits
+
+Date:   2011-12-07
+
+    Downcase + remove some redundant stuff.
+
+Date:   2011-12-07
+
+    Spacing
+
+Date:   2011-12-07
+
+    Per popular request, add a description of the protocol + implementation details.
+
+Date:   2011-12-07
+
+    Add links & credits for NaCl and libuv.
+
+Date:   2011-12-07
+
+    Add THANKS file, credit sthen@ for his help on the OpenBSD port.
+
+Date:   2011-12-07
+
+    dnscrypt has been written by humans.
+
+Date:   2011-12-07
+
+    Test presence of 6Jack, that will be required for new tests.
+
+Merge: 2a196e1 cfbb34c
+Date:   2011-12-06
+
+    Merge pull request #1 from sthen/master
+    
+    OpenBSD port tweaks
+
+Date:   2011-12-06
+
+    add ONLY_FOR_ARCH, NaCl needs more work on !i386/amd64
+
+Date:   2011-12-06
+
+    picks up libexecinfo if installed; add dep
+
+Date:   2011-12-06
+
+    add OpenBSD cvs id
+
+Date:   2011-12-06
+
+    needs a homedir to chroot to; use /var/empty
+
+Date:   2011-12-06
+
+    daemonize in rc script, add cvs id for OpenBSD
+
+Date:   2011-12-06
+
+    Fix MASTER_SITE and HOMEPAGE
+
+Date:   2011-12-06
+
+    Switch back to using the .tar.gz file since the github CDN finally has it.
+
+Date:   2011-12-06
+
+    Update the OpenBSD package.
+
+Date:   2011-12-06
+
+    OpenBSD uid 685/686 were taken by other ports already. Switch to uid 688, reserved by sthen@
+
+Date:   2011-10-18
+
+    Initial public release.

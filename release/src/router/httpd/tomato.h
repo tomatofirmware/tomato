@@ -65,6 +65,7 @@ extern void asp_time(int argc, char **argv);
 extern void asp_wanup(int argc, char **argv);
 extern void asp_wanstatus(int argc, char **argv);
 extern void asp_link_uptime(int argc, char **argv);
+extern void asp_link_starttime(int argc, char **argv);
 extern void asp_rrule(int argc, char **argv);
 extern void asp_compmac(int argc, char **argv);
 extern void asp_ident(int argc, char **argv);
@@ -74,16 +75,28 @@ extern void asp_psup(int argc, char **argv);
 extern void wo_vpn_status(char *url);
 #endif
 extern void asp_sysinfo(int argc, char **argv);
+extern void asp_jiffies(int argc, char **argv);
 extern void asp_statfs(int argc, char **argv);
 extern void asp_notice(int argc, char **argv);
 extern void wo_wakeup(char *url);
 extern void asp_dns(int argc, char **argv);
 extern void wo_resolve(char *url);
+extern void asp_etherstates(int argc, char **argv);
+
+#ifdef TCONFIG_IPV6
+extern void asp_calc6rdlocalprefix(int argc, char **argv);
+#endif
 
 // usb.c
 #ifdef TCONFIG_USB
 extern void asp_usbdevices(int argc, char **argv);
 extern void wo_usbcommand(char *url);
+#endif
+
+//pptpd.c
+#ifdef TCONFIG_PPTPD
+extern void asp_pptpd_userol(int argc, char **argv);
+extern void wo_pptpdcmd(char *url);
 #endif
 
 // devlist.c
@@ -161,7 +174,21 @@ extern void wi_bwmrestore(char *url, int len, char *boundary);
 extern void wo_bwmrestore(char *url);
 extern void asp_netdev(int argc, char **argv);
 extern void asp_bandwidth(int argc, char **argv);
+extern void ctvbuf(FILE *f);
 
+extern void wo_iptbackup(char *url);
+extern void wi_iptrestore(char *url, int len, char *boundary);
+extern void wo_iptrestore(char *url);
+
+extern void asp_ipt_bandwidth(int argc, char **argv);
+extern void asp_iptmon(int argc, char **argv);
+extern void asp_iptraffic(int argc, char **argv);
+
+#ifdef TCONFIG_NOCAT
+// nocat.c
+extern void wi_uploadsplash(char *url, int len, char *boundary);
+extern void wo_uploadsplash(char *url);
+#endif
 
 #if TOMATO_SL
 // share.c

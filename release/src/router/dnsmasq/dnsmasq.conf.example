@@ -4,6 +4,11 @@
 # as the long options legal on the command line. See
 # "/usr/sbin/dnsmasq --help" or "man 8 dnsmasq" for details.
 
+# Listen on this specific port instead of the standard DNS port
+# (53). Setting this to zero completely disables DNS function,
+# leaving only DHCP and/or TFTP.
+#port=5353
+
 # The following two options make you a better netizen, since they
 # tell dnsmasq to filter out queries which the public DNS cannot
 # answer, and which load the servers (especially the root servers)
@@ -63,6 +68,10 @@
 
 # --address (and --server) work with IPv6 addresses too.
 #address=/www.thekelleys.org.uk/fe80::20d:60ff:fe36:f83
+
+# Add the IPs of all queries to yahoo.com, google.com, and their
+# subdomains to the vpn and search ipsets:
+#ipset=/yahoo.com/google.com/vpn,search
 
 # You can control how dnsmasq talks to a server: this forces
 # queries to 10.1.2.3 to be routed via eth1
@@ -157,6 +166,44 @@
 # an explicit netmask instead.
 #dhcp-range=192.168.0.0,static
 
+# Enable DHCPv6. Note that the prefix-length does not need to be specified
+# and defaults to 64 if missing/
+#dhcp-range=1234::2, 1234::500, 64, 12h
+
+# Do Router Advertisements, BUT NOT DHCP for this subnet.
+#dhcp-range=1234::, ra-only 
+
+# Do Router Advertisements, BUT NOT DHCP for this subnet, also try and
+# add names to the DNS for the IPv6 address of SLAAC-configured dual-stack 
+# hosts. Use the DHCPv4 lease to derive the name, network segment and 
+# MAC address and assume that the host will also have an
+# IPv6 address calculated using the SLAAC alogrithm.
+#dhcp-range=1234::, ra-names
+
+# Do Router Advertisements, BUT NOT DHCP for this subnet.
+# Set the lifetime to 46 hours. (Note: minimum lifetime is 2 hours.)
+#dhcp-range=1234::, ra-only, 48h
+
+# Do DHCP and Router Advertisements for this subnet. Set the A bit in the RA
+# so that clients can use SLAAC addresses as well as DHCP ones.
+#dhcp-range=1234::2, 1234::500, slaac
+
+# Do Router Advertisements and stateless DHCP for this subnet. Clients will
+# not get addresses from DHCP, but they will get other configuration information.
+# They will use SLAAC for addresses.
+#dhcp-range=1234::, ra-stateless
+
+# Do stateless DHCP, SLAAC, and generate DNS names for SLAAC addresses
+# from DHCPv4 leases.
+#dhcp-range=1234::, ra-stateless, ra-names
+
+# Do router advertisements for all subnets where we're doing DHCPv6
+# Unless overriden by ra-stateless, ra-names, et al, the router 
+# advertisements will have the M and O bits set, so that the clients
+# get addresses and configuration from DHCPv6, and the A bit reset, so the 
+# clients don't use SLAAC addresses.
+#enable-ra
+
 # Supply parameters for specified hosts using DHCP. There are lots
 # of valid alternatives, so we will give examples of each. Note that
 # IP addresses DO NOT have to be in the range given above, they just
@@ -219,7 +266,13 @@
 # any machine with Ethernet address starting 11:22:33:
 #dhcp-host=11:22:33:*:*:*,set:red
 
-# Ignore any clients which are specified in dhcp-host lines
+# Give a fixed IPv6 address and name to client with 
+# DUID 00:01:00:01:16:d2:83:fc:92:d4:19:e2:d8:b2
+# Note the MAC addresses CANNOT be used to identify DHCPv6 clients.
+# Note also the they [] around the IPv6 address are obilgatory.
+#dhcp-host=id:00:01:00:01:16:d2:83:fc:92:d4:19:e2:d8:b2, fred, [1234::5] 
+
+# Ignore any clients which are not specified in dhcp-host lines
 # or /etc/ethers. Equivalent to ISC "deny unknown-clients".
 # This relies on the special "known" tag which is set when
 # a host is matched.
@@ -270,6 +323,16 @@
 # Set the NTP time server addresses to 192.168.0.4 and 10.10.0.5
 #dhcp-option=option:ntp-server,192.168.0.4,10.10.0.5
 
+# Send DHCPv6 option. Note [] around IPv6 addresses.
+#dhcp-option=option6:dns-server,[1234::77],[1234::88]
+
+# Send DHCPv6 option for namservers as the machine running 
+# dnsmasq and another.
+#dhcp-option=option6:dns-server,[::],[1234::88]
+
+# Ask client to poll for option changes every six hours. (RFC4242)
+#dhcp-option=option6:information-refresh-time,6h
+
 # Set the NTP time server address to be the same machine as
 # is running dnsmasq
 #dhcp-option=42,0.0.0.0
@@ -303,6 +366,9 @@
 #dhcp-option=44,0.0.0.0     # set netbios-over-TCP/IP nameserver(s) aka WINS server(s)
 #dhcp-option=45,0.0.0.0     # netbios datagram distribution server
 #dhcp-option=46,8           # netbios node type
+
+# Send an empty WPAD option. This may be REQUIRED to get windows 7 to behave.
+#dhcp-option=252,"\n"
 
 # Send RFC-3397 DNS domain search DHCP option. WARNING: Your DHCP client
 # probably doesn't support this......
@@ -418,7 +484,7 @@
 #tftp-no-blocksize
 
 # Set the boot file name only when the "red" tag is set.
-#dhcp-boot=net:red,pxelinux.red-net
+#dhcp-boot=tag:red,pxelinux.red-net
 
 # An example of dhcp-boot with an external TFTP server: the name and IP
 # address of the server are given after the filename.
@@ -463,7 +529,7 @@
 # If you want to disable negative caching, uncomment this.
 #no-negcache
 
-# Normally responses which come form /etc/hosts and the DHCP lease
+# Normally responses which come from /etc/hosts and the DHCP lease
 # file have Time-To-Live set as zero, which conventionally means
 # do not cache further. If you are happy to trade lower load on the
 # server for potentially stale date, you can set a time-to-live (in
@@ -559,6 +625,6 @@
 # Log lots of extra information about DHCP transactions.
 #log-dhcp
 
-# Include a another lot of configuration options.
+# Include another lot of configuration options.
 #conf-file=/etc/dnsmasq.more.conf
 #conf-dir=/etc/dnsmasq.d

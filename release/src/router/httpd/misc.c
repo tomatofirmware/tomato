@@ -99,7 +99,11 @@ char *reltime(char *buf, time_t t)
 	if (t < 0) t = 0;
 	days = t / 86400;
 	m = t / 60;
-	sprintf(buf, "%d day%s, %02d:%02d:%02d", days, ((days==1) ? "" : "s"), ((m / 60) % 24), (m % 60), (int)(t % 60));
+	if (days == 0) {
+		sprintf(buf, "%02d:%02d:%02d", ((m / 60) % 24), (m % 60), (int)(t % 60));
+	} else {
+		sprintf(buf, "%d day%s, %02d:%02d:%02d", days, ((days==1) ? "" : "s"), ((m / 60) % 24), (m % 60), (int)(t % 60));
+	}
 	return buf;
 }
 
@@ -348,16 +352,148 @@ static void print_ipv6_addrs(void)
 				break;
 		}
 	}
-
 	freeifaddrs(ifap);
 }
+
+
+void asp_calc6rdlocalprefix(int argc, char **argv)
+{
+	struct in6_addr prefix_addr, local_prefix_addr;
+	int prefix_len = 0, relay_prefix_len = 0, local_prefix_len = 0;
+	struct in_addr wanip_addr;
+	char local_prefix[INET6_ADDRSTRLEN];
+	char s[128];
+
+	if (argc != 3) return;
+
+	inet_pton(AF_INET6, argv[0], &prefix_addr);
+	prefix_len = atoi(argv[1]);
+	relay_prefix_len = atoi(argv[2]);
+	inet_pton(AF_INET, get_wanip(), &wanip_addr);
+
+	if (calc_6rd_local_prefix(&prefix_addr, prefix_len, relay_prefix_len,
+	    &wanip_addr, &local_prefix_addr, &local_prefix_len) &&
+	    inet_ntop(AF_INET6, &local_prefix_addr, local_prefix, sizeof(local_prefix)) != NULL) {
+		sprintf(s, "\nlocal_prefix = '%s/%d';\n", local_prefix, local_prefix_len);
+		web_puts(s);
+	}
+}
 #endif
+
+
+int get_flashsize()
+{
+/*
+# cat /proc/mtd
+dev:    size   erasesize  name
+mtd0: 00020000 00010000 "pmon"
+mtd1: 007d0000 00010000 "linux"
+*/
+	FILE *f;
+	char s[512];
+	unsigned int size;
+	char partname[16];
+	int found = 0;
+
+	if ((f = fopen("/proc/mtd", "r")) != NULL) {
+	while (fgets(s, sizeof(s), f)) {
+		if (sscanf(s, "%*s %X %*s %16s", &size, partname) != 2) continue;
+			if (strcmp(partname, "\"linux\"") == 0) {
+				found = 1;
+				break;
+			}
+		}
+		fclose(f);
+	}
+	if (found) {
+		     if (nvram_match("boardtype", "0x052b") && nvram_match("boardrev", "02")) return 128; //Netgear 3500L v2 has 128MB NAND flash but linux partition has only 32MB
+		else if ((size > 0x2000000) && (size < 0x4000000)) return 64;
+		else if ((size > 0x1000000) && (size < 0x2000000)) return 32;
+		else if ((size > 0x800000) && (size < 0x1000000)) return 16;
+		else if ((size > 0x400000) && (size < 0x800000)) return 8;
+		else if ((size > 0x200000) && (size < 0x400000)) return 4;
+		else if ((size > 0x100000) && (size < 0x200000)) return 2;
+		else return 1;
+	}
+	else {
+		return 0;
+	}
+}
+
+void asp_jiffies(int argc, char **argv)
+{
+	char sa[64];
+	FILE *a;
+	char *e = NULL;
+	char *f= NULL;
+
+	const char procstat[] = "/proc/stat";
+	if ((a = fopen(procstat, "r")) != NULL) {
+		fgets(sa, sizeof(sa), a);
+
+		e = sa;
+
+		if ((e = strchr(sa, ' ')) != NULL) e = e + 2;
+
+		if ((f = strchr(sa, 10)) != NULL) *f = 0;
+
+		web_printf("\njiffies = [ '");
+		web_printf("%s", e);
+		web_puts("' ];\n");
+		fclose(a);
+    }
+}
+
+void asp_etherstates(int argc, char **argv)
+{
+	FILE *f;
+	char s[32], *a, b[16];
+	unsigned n;
+
+	if ((nvram_get_int("lan_state") & 1)) {
+
+		web_puts("\netherstates = {");
+
+		system("/usr/sbin/ethstate");
+		n = 0;
+		if ((f = fopen("/tmp/ethernet.state", "r")) != NULL) {
+			while (fgets(s, sizeof(s), f)) {
+				if (sscanf(s, "Port 0: %s", b) == 1) a="port0";
+				else if (sscanf(s, "Port 1: %s", b) == 1) a="port1";
+				else if (sscanf(s, "Port 2: %s", b) == 1) a="port2";
+				else if (sscanf(s, "Port 3: %s", b) == 1) a="port3";
+				else if (sscanf(s, "Port 4: %s", b) == 1) a="port4";
+				else continue;
+
+				web_printf("%s\t%s: '%s'", n ? ",\n" : "", a, b);
+				n++;
+			}
+			fclose(f);
+		}
+		web_puts("\n};\n");
+	} else {
+		web_puts("\netherstates = {\tport0: 'disabled'\n};\n");
+	}
+}
 
 void asp_sysinfo(int argc, char **argv)
 {
 	struct sysinfo si;
 	char s[64];
 	meminfo_t mem;
+
+	char sa[64];
+	FILE *a;
+	char *e = NULL;
+	char *f= NULL;
+	const char procstat[] = "/proc/stat";
+
+	char system_type[64];
+	char cpu_model[64];
+	char bogomips[8];
+	char cpuclk[8];
+
+	get_cpuinfo(system_type, cpu_model, bogomips, cpuclk);
 
 	web_puts("\nsysinfo = {\n");
 
@@ -378,7 +514,12 @@ void asp_sysinfo(int argc, char **argv)
 		"\ttotalswap: %ld,\n"
 		"\tfreeswap: %ld,\n"
 		"\ttotalfreeram: %ld,\n"
-		"\tprocs: %d\n",
+		"\tprocs: %d,\n"
+		"\tflashsize: %d,\n"
+		"\tsystemtype: '%s',\n"
+		"\tcpumodel: '%s',\n"
+		"\tbogomips: '%s',\n"
+		"\tcpuclk: '%s'",
 			si.uptime,
 			reltime(s, si.uptime),
 			si.loads[0], si.loads[1], si.loads[2],
@@ -386,7 +527,26 @@ void asp_sysinfo(int argc, char **argv)
 			mem.shared, mem.buffers, mem.cached,
 			mem.swaptotal, mem.swapfree,
 			mem.maxfreeram,
-			si.procs);
+			si.procs,
+			get_flashsize(),
+			system_type,
+			cpu_model,
+			bogomips,
+			cpuclk);
+
+	if ((a = fopen(procstat, "r")) != NULL) {
+		fgets(sa, sizeof(sa), a);
+		e = sa;
+		if ((e = strchr(sa, ' ')) != NULL) e = e + 2;
+		if ((f = strchr(sa, 10)) != NULL) *f = 0;
+		web_printf(",\n\tjiffies: '");
+		web_printf("%s", e);
+		web_puts("'\n");
+		fclose(a);
+	} else {
+		web_puts("\n");
+	}
+
 	web_puts("};\n");
 }
 
@@ -530,7 +690,27 @@ void asp_wanstatus(int argc, char **argv)
 		p = "Connected";
 	}
 	else if (f_exists("/var/lib/misc/wan.connecting")) {
+	        int proto = get_wan_proto();
+
 		p = "Connecting...";
+
+		if ((proto == WP_PPPOE || proto == WP_PPP3G) && f_exists("/tmp/ppp/log")) {
+			char s[256];
+
+			f_read_string("/tmp/ppp/log", s, sizeof(s));
+
+			if (strcmp(s, "PADO_TIMEOUT") == 0 || strcmp(s, "PADS_TIMEOUT") == 0) {
+				web_printf("Timed out%s", nvram_get_int("ppp_demand") == 0 ? ", Trying again...":"");
+			} else if (strcmp(s, "PAP_AUTH_FAIL") == 0 || strcmp(s, "CHAP_AUTH_FAIL") == 0) {
+				web_printf("Authentication failed%s", nvram_get_int("ppp_demand") == 0 ? ", Trying again...":"");
+			} else {
+				web_puts(p);
+			}
+			
+			return;
+			
+		}
+		
 	}
 	else {
 		p = "Disconnected";
@@ -549,6 +729,23 @@ void asp_link_uptime(int argc, char **argv)
 	if (check_wanup()) {
 		sysinfo(&si);
 		if (f_read("/var/lib/misc/wantime", &uptime, sizeof(uptime)) == sizeof(uptime)) {
+			reltime(buf, si.uptime - uptime);
+		}
+	}
+	web_puts(buf);
+}
+
+void asp_link_starttime(int argc, char **argv)
+{
+	struct sysinfo si;
+	char buf[64];
+	long uptime;
+
+	buf[0] = 0;
+
+	if (!check_wanup() && f_exists("/var/lib/misc/wan.connecting")) {
+		sysinfo(&si);
+		if (f_read("/var/lib/misc/wan.connecting", &uptime, sizeof(uptime)) == sizeof(uptime)) {
 			reltime(buf, si.uptime - uptime);
 		}
 	}
@@ -647,6 +844,14 @@ void wo_wakeup(char *url)
 			*p = 0;
 
 			eval("ether-wake", "-b", "-i", nvram_safe_get("lan_ifname"), mac);
+#ifdef TCONFIG_VLAN
+			if (strcmp(nvram_safe_get("lan1_ifname"), "") != 0)
+				eval("ether-wake", "-b", "-i", nvram_safe_get("lan1_ifname"), mac);
+			if (strcmp(nvram_safe_get("lan2_ifname"), "") != 0)
+				eval("ether-wake", "-b", "-i", nvram_safe_get("lan2_ifname"), mac);
+			if (strcmp(nvram_safe_get("lan3_ifname"), "") != 0)
+				eval("ether-wake", "-b", "-i", nvram_safe_get("lan3_ifname"), mac);
+#endif
 			mac = p + 1;
 		}
 	}

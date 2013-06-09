@@ -9,6 +9,7 @@
 
 #include <ctype.h>
 #include <wlutils.h>
+#include <sys/ioctl.h>
 
 #ifndef WL_BSS_INFO_VERSION
 #error WL_BSS_INFO_VERSION
@@ -436,8 +437,10 @@ static int print_wlstats(int idx, int unit, int subunit, void *param)
 
 void asp_wlstats(int argc, char **argv)
 {
+	int include_vifs = (argc > 0) ? atoi(argv[0]) : 0;
+
 	web_puts("\nwlstats = [");
-	foreach_wif(0, NULL, print_wlstats);
+	foreach_wif(include_vifs, NULL, print_wlstats); // AB multiSSID
 	web_puts("];\n");
 }
 
@@ -619,8 +622,10 @@ static int print_wlbands(int idx, int unit, int subunit, void *param)
 
 void asp_wlbands(int argc, char **argv)
 {
+	int include_vifs = (argc > 0) ? atoi(argv[0]) : 0;
+
 	web_puts("\nwl_bands = [");
-	foreach_wif(0, NULL, print_wlbands);
+	foreach_wif(include_vifs, NULL, print_wlbands); // AB multiSSID
 	web_puts(" ];\n");
 }
 
@@ -629,18 +634,60 @@ static int print_wif(int idx, int unit, int subunit, void *param)
 	char unit_str[] = "000000";
 	char *ssidj;
 
-	if (subunit > 0)
+	char *next;
+	char cap[WLC_IOCTL_SMLEN];
+	char caps[WLC_IOCTL_SMLEN];
+	int max_no_vifs = 0;
+
+	if (subunit > 0) {
 		snprintf(unit_str, sizeof(unit_str), "%d.%d", unit, subunit);
-	else
+	} else {
 		snprintf(unit_str, sizeof(unit_str), "%d", unit);
 
-	// [ifname, unitstr, unit, subunit, ssid, hwaddr]
+//		wl_iovar_get(wl_nvname("ifname", unit, 0), "cap", (void *)caps, WLC_IOCTL_SMLEN);
+//		wl_iovar_get("eth1", "cap", (void *)caps, WLC_IOCTL_SMLEN);
+		max_no_vifs = 1;
+		wl_iovar_get(nvram_safe_get(wl_nvname("ifname", unit, 0)), "cap", (void *)caps, WLC_IOCTL_SMLEN);
+		foreach(cap, caps, next) {
+			if (!strcmp(cap, "mbss16"))
+				max_no_vifs = 16;
+			if (!strcmp(cap, "mbss4"))
+				max_no_vifs = 4;
+		}
+
+	}
+
+	int up = 0;
+	int sfd;
+	struct ifreq ifr;
+
+	if ((sfd = socket(AF_INET, SOCK_RAW, IPPROTO_RAW)) < 0) {
+		_dprintf("[%s %d]: error opening socket %m\n", __FUNCTION__, __LINE__);
+	}
+
+	if (sfd >= 0) {
+		strcpy(ifr.ifr_name, nvram_safe_get(wl_nvname("ifname", unit, subunit)));
+		if (ioctl(sfd, SIOCGIFFLAGS, &ifr) == 0)
+			if (ifr.ifr_flags & (IFF_UP | IFF_RUNNING))
+				up = 1;
+		close(sfd);
+	}
+
+	char *ifname;
+	ifname = nvram_safe_get(wl_nvname("ifname", unit, subunit));
+	struct ether_addr bssid;
+
+	wl_ioctl(ifname, WLC_GET_BSSID, &bssid, ETHER_ADDR_LEN);
+
+	// [ifname, unitstr, unit, subunit, ssid, hwaddr, up, wmode, bssid]
 	ssidj = js_string(nvram_safe_get(wl_nvname("ssid", unit, subunit)));
-	web_printf("%c['%s','%s',%d,%d,'%s','%s']", (idx == 0) ? ' ' : ',',
+	web_printf("%c['%s','%s',%d,%d,'%s','%s',%d,%d,'%s','%02X:%02X:%02X:%02X:%02X:%02X']", (idx == 0) ? ' ' : ',',
 		nvram_safe_get(wl_nvname("ifname", unit, subunit)),
 		unit_str, unit, subunit, ssidj,
-		// assume the slave inteface MAC address is the same as the primary interface
-		nvram_safe_get(wl_nvname("hwaddr", unit, 0))
+//		// virtual inteface MAC address
+		nvram_safe_get(wl_nvname("hwaddr", unit, subunit)), up, max_no_vifs, // AB multiSSID
+		nvram_safe_get(wl_nvname("mode", unit, subunit)),
+		bssid.octet[0], bssid.octet[1], bssid.octet[2], bssid.octet[3], bssid.octet[4], bssid.octet[5]
 	);
 	free(ssidj);
 
