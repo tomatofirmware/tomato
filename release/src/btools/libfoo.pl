@@ -155,7 +155,9 @@ sub fixDyn
 	fixDynDep("pppd", "rp-pppoe.so");
 
 	fixDynDep("libcrypto.so.1.0.0", "libssl.so.1.0.0");
-	
+#shibby
+	fixDynDep("miniupnpd", "libnfnetlink.so.0.2.0");
+
 #	fixDynDep("libbcm.so", "libshared.so");
 #	fixDynDep("libbcm.so", "libc.so.0");
 
@@ -165,6 +167,11 @@ sub fixDyn
 	fixDynDep("wl", "libbcmcrypto.so");
 	fixDynDep("nas", "libc.so.0");
 	fixDynDep("wl", "libc.so.0");
+#Roadkill for NocatSplash
+	fixDynDep("splashd","libglib-1.2.so.0.0.10");
+#Roadkill for php
+	fixDynDep("php-cli","libz.so.1.2.5");
+	fixDynDep("php-cgi","libz.so.1.2.5");
 }
 
 sub usersOf
@@ -405,8 +412,8 @@ if ((!-d $root) || (!-d $uclibc) || (!-d $router)) {
 	exit(1);
 }
 
-#open(LOG, ">libfoo.debug");
-open(LOG, ">/dev/null");
+open(LOG, ">libfoo.debug");
+#open(LOG, ">/dev/null");
 
 print "Loading...\r";
 load($root);
@@ -422,17 +429,17 @@ if ($ARGV[0] eq "--noopt") {
 	$stripshared = "no";
 }
 
-genSO("${root}/lib/libc.so.0", "${uclibc}/lib/libc.a", "${stripshared}", "-Wl,-init=__uClibc_init ${uclibc}/lib/optinfo/interp.os");
+genSO("${root}/lib/libc.so.0", "${uclibc}/lib/libc.a", "", "-Wl,-init=__uClibc_init ${uclibc}/lib/optinfo/interp.os");
 genSO("${root}/lib/libresolv.so.0", "${uclibc}/lib/libresolv.a", "${stripshared}");
 genSO("${root}/lib/libcrypt.so.0", "${uclibc}/lib/libcrypt.a", "${stripshared}");
-genSO("${root}/lib/libm.so.0", "${uclibc}/lib/libm.a", "${stripshared}");
+genSO("${root}/lib/libm.so.0", "${uclibc}/lib/libm.a");
 genSO("${root}/lib/libpthread.so.0", "${uclibc}/lib/libpthread.a", "${stripshared}", "-u pthread_mutexattr_init -Wl,-init=__pthread_initialize_minimal_internal");
 genSO("${root}/lib/libutil.so.0", "${uclibc}/lib/libutil.a", "${stripshared}");
 #  genSO("${root}/lib/libdl.so.0", "${uclibc}/lib/libdl.a", "${stripshared}");
 #  genSO("${root}/lib/libnsl.so.0", "${uclibc}/lib/libnsl.a", "${stripshared}");
 
 genSO("${root}/usr/lib/libcrypto.so.1.0.0", "${router}/openssl/libcrypto.a");
-genSO("${root}/usr/lib/libssl.so.1.0.0", "${router}/openssl/libssl.a", "", "-L${router}/openssl");
+genSO("${root}/usr/lib/libssl.so.1.0.0", "${router}/openssl/libssl.a", "${stripshared}", "-L${router}/openssl");
 
 genSO("${root}/usr/lib/libzebra.so", "${router}/zebra/lib/libzebra.a");
 genSO("${root}/usr/lib/libz.so.1", "${router}/zlib/libz.a");
@@ -458,6 +465,7 @@ genSO("${root}/usr/lib/liblzo2.so.2", "${router}/lzo/src/.libs/liblzo2.a");
 #	genSO("${root}/usr/lib/libusb-0.1.so.4", "${router}/libusb/libusb/.libs/libusb.a", "", "-L${router}/libusb10/libusb/.libs");
 
 genSO("${root}/usr/lib/libbcmcrypto.so", "${router}/libbcmcrypto/libbcmcrypto.a");
+genSO("${root}/usr/lib/libnfnetlink.so.0.2.0", "${router}/libnfnetlink/src/.libs/libnfnetlink.a");
 
 print "\n";
 
