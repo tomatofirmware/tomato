@@ -145,16 +145,16 @@ ifeq ($(GTK_RESET),1)
 	WLFLAGS += -DGTK_RESET
 endif
 
-ifeq ($(USBAP),1)
+ifeq ($(WLUSBAP),1)
 	WLFLAGS += -DUSBAP
-	WLFLAGS += -DEHCI_FASTPATH_TX -DEHCI_FASTPATH_RX
+	#WLFLAGS += -DEHCI_FASTPATH_TX -DEHCI_FASTPATH_RX
 endif
 
 # split driver infrastructure files
 ifeq ($(WL_SPLIT),1)
 	WLFILES_SRC += src/shared/bcm_xdr.c
 	WLFILES_SRC += src/shared/bcm_rpc.c
-	ifneq ($(USBAP),1)
+	ifneq ($(WLUSBAP),1)
 		WLFILES_SRC_HI += src/shared/nvramstubs.c
 	endif
 	ifeq ($(OSLLX),1)
@@ -631,7 +631,7 @@ ifeq ($(AP),1)
 
 	# Channel Select
 	ifeq ($(APCS),1)
-		WLFILES_SRC_HI += wlc_apcs.c
+		WLFILES_SRC_HI += src/wl/sys/wlc_apcs.c
 		WLFLAGS += -DAPCS
 	endif
 
@@ -846,6 +846,20 @@ ifeq ($(WL11D),1)
 endif
 #endif
 
+#ifdef WL11U
+# 11U
+ifeq ($(WL11U),1)
+	WLFLAGS += -DWL11U
+endif
+#endif
+
+#ifdef WLPROBRESP_SW
+# WLPROBRESP_SW
+ifeq ($(WLPROBRESP_SW),1)
+	WLFLAGS += -DWLPROBRESP_SW
+endif
+#endif
+
 #ifdef DBAND
 # DBAND
 ifeq ($(DBAND),1)
@@ -878,6 +892,13 @@ endif
 # WLCHANIM
 ifeq ($(WLCHANIM),1)
 	WLFLAGS += -DWLCHANIM
+endif
+#endif
+
+# WL_AP_TPC
+#ifdef WL_AP_TPC
+ifeq ($(WL_AP_TPC),1)
+         WLFLAGS += -DWL_AP_TPC
 endif
 #endif
 

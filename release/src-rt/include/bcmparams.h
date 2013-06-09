@@ -20,7 +20,7 @@
 #ifndef	_bcmparams_h_
 #define	_bcmparams_h_
 
-#define VLAN_MAXVID	501	/* Max. VLAN ID supported/allowed */
+#define VLAN_MAXVID	15	/* Max. VLAN ID supported/allowed */
 
 #define VLAN_NUMPRIS	8	/* # of prio, start from 0 */
 

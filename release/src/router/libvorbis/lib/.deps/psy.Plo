@@ -28,9 +28,9 @@ psy.lo psy.o: psy.c \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/bits/mathcalls.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/string.h \
   ../include/vorbis/codec.h \
-  /home/vicente/tomato/release/src-rt/router/libogg/include/ogg/ogg.h \
-  /home/vicente/tomato/release/src-rt/router/libogg/include/ogg/os_types.h \
-  /home/vicente/tomato/release/src-rt/router/libogg/include/ogg/config_types.h \
+  /home/vicente/repos/tomato/release/src-rt/router/libogg/include/ogg/ogg.h \
+  /home/vicente/repos/tomato/release/src-rt/router/libogg/include/ogg/os_types.h \
+  /home/vicente/repos/tomato/release/src-rt/router/libogg/include/ogg/config_types.h \
   codec_internal.h envelope.h mdct.h codebook.h psy.h smallft.h \
   backends.h bitrate.h os.h ../config.h misc.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/memory.h \
@@ -108,11 +108,11 @@ psy.lo psy.o: psy.c \
 
 ../include/vorbis/codec.h:
 
-/home/vicente/tomato/release/src-rt/router/libogg/include/ogg/ogg.h:
+/home/vicente/repos/tomato/release/src-rt/router/libogg/include/ogg/ogg.h:
 
-/home/vicente/tomato/release/src-rt/router/libogg/include/ogg/os_types.h:
+/home/vicente/repos/tomato/release/src-rt/router/libogg/include/ogg/os_types.h:
 
-/home/vicente/tomato/release/src-rt/router/libogg/include/ogg/config_types.h:
+/home/vicente/repos/tomato/release/src-rt/router/libogg/include/ogg/config_types.h:
 
 codec_internal.h:
 

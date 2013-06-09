@@ -48,7 +48,7 @@ extensions/libip6t_ROUTE.d extensions/libip6t_ROUTE_sh.o: extensions/libip6t_ROU
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/limits.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/bits/posix1_lim.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/bits/local_lim.h \
-  /home/vicente/tomato/release/src-rt/linux/linux-2.6/include/linux/limits.h \
+  /home/vicente/repos/tomato/release/src-rt/linux/linux-2.6/include/linux/limits.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/bits/uClibc_local_lim.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/bits/posix2_lim.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/bits/sockaddr.h \
@@ -59,7 +59,7 @@ extensions/libip6t_ROUTE.d extensions/libip6t_ROUTE_sh.o: extensions/libip6t_ROU
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/netinet/in.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/stdint.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/bits/in.h \
-  /home/vicente/tomato/release/src-rt/linux/linux-2.6/include/linux/version.h \
+  /home/vicente/repos/tomato/release/src-rt/linux/linux-2.6/include/linux/version.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/bits/byteswap.h \
   include/ip6tables.h include/iptables_common.h \
   include/libiptc/libip6tc.h include/libiptc/ipt_kernel_headers.h \
@@ -67,15 +67,15 @@ extensions/libip6t_ROUTE.d extensions/libip6t_ROUTE_sh.o: extensions/libip6t_ROU
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/netinet/ip_icmp.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/netinet/tcp.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/netinet/udp.h \
-  /home/vicente/tomato/release/src-rt/linux/linux-2.6/include/linux/netfilter_ipv6/ip6_tables.h \
-  /home/vicente/tomato/release/src-rt/linux/linux-2.6/include/linux/compiler.h \
-  /home/vicente/tomato/release/src-rt/linux/linux-2.6/include/linux/netfilter_ipv6.h \
-  /home/vicente/tomato/release/src-rt/linux/linux-2.6/include/linux/netfilter.h \
-  /home/vicente/tomato/release/src-rt/linux/linux-2.6/include/linux/types.h \
-  /home/vicente/tomato/release/src-rt/linux/linux-2.6/include/linux/posix_types.h \
-  /home/vicente/tomato/release/src-rt/linux/linux-2.6/include/linux/stddef.h \
+  /home/vicente/repos/tomato/release/src-rt/linux/linux-2.6/include/linux/netfilter_ipv6/ip6_tables.h \
+  /home/vicente/repos/tomato/release/src-rt/linux/linux-2.6/include/linux/compiler.h \
+  /home/vicente/repos/tomato/release/src-rt/linux/linux-2.6/include/linux/netfilter_ipv6.h \
+  /home/vicente/repos/tomato/release/src-rt/linux/linux-2.6/include/linux/netfilter.h \
+  /home/vicente/repos/tomato/release/src-rt/linux/linux-2.6/include/linux/types.h \
+  /home/vicente/repos/tomato/release/src-rt/linux/linux-2.6/include/linux/posix_types.h \
+  /home/vicente/repos/tomato/release/src-rt/linux/linux-2.6/include/linux/stddef.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/asm/posix_types.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/asm/types.h \
-  /home/vicente/tomato/release/src-rt/linux/linux-2.6/include/linux/netfilter/x_tables.h \
-  /home/vicente/tomato/release/src-rt/linux/linux-2.6/include/linux/netfilter/xt_tcpudp.h \
-  /home/vicente/tomato/release/src-rt/linux/linux-2.6/include/linux/netfilter_ipv6/ip6t_ROUTE.h
+  /home/vicente/repos/tomato/release/src-rt/linux/linux-2.6/include/linux/netfilter/x_tables.h \
+  /home/vicente/repos/tomato/release/src-rt/linux/linux-2.6/include/linux/netfilter/xt_tcpudp.h \
+  /home/vicente/repos/tomato/release/src-rt/linux/linux-2.6/include/linux/netfilter_ipv6/ip6t_ROUTE.h

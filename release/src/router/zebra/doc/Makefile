@@ -38,10 +38,10 @@ pkglibdir = $(libdir)/zebra
 pkgincludedir = $(includedir)/zebra
 top_builddir = ..
 
-ACLOCAL = ${SHELL} /home/vicente/tomato/release/src/router/zebra/missing --run aclocal-1.6
-AUTOCONF = ${SHELL} /home/vicente/tomato/release/src/router/zebra/missing --run autoconf
-AUTOMAKE = ${SHELL} /home/vicente/tomato/release/src/router/zebra/missing --run automake-1.6
-AUTOHEADER = ${SHELL} /home/vicente/tomato/release/src/router/zebra/missing --run autoheader
+ACLOCAL = ${SHELL} /home/vicente/repos/tomato/release/src/router/zebra/missing --run aclocal-1.6
+AUTOCONF = ${SHELL} /home/vicente/repos/tomato/release/src/router/zebra/missing --run autoconf
+AUTOMAKE = ${SHELL} /home/vicente/repos/tomato/release/src/router/zebra/missing --run automake-1.6
+AUTOHEADER = ${SHELL} /home/vicente/repos/tomato/release/src/router/zebra/missing --run autoheader
 
 am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
 INSTALL = /usr/bin/install -c
@@ -65,7 +65,7 @@ host_triplet = mipsel-unknown-linux-gnu
 EXEEXT = 
 OBJEXT = o
 PATH_SEPARATOR = :
-AMTAR = ${SHELL} /home/vicente/tomato/release/src/router/zebra/missing --run tar
+AMTAR = ${SHELL} /home/vicente/repos/tomato/release/src/router/zebra/missing --run tar
 AR = mipsel-uclibc-ar
 AWK = gawk
 BGPD = 
@@ -98,7 +98,7 @@ VTYSH =
 ZEBRA = zebra
 am__include = include
 am__quote = 
-install_sh = /home/vicente/tomato/release/src/router/zebra/install-sh
+install_sh = /home/vicente/repos/tomato/release/src/router/zebra/install-sh
 
 info_TEXINFOS = zebra.texi
 
@@ -153,7 +153,7 @@ zebra.dvi: zebra.texi $(zebra_TEXINFOS)
 	  && $(MAKEINFO) $(AM_MAKEINFOFLAGS) $(MAKEINFOFLAGS) \
 	       `echo $< | sed 's,.*/,,'`
 
-MAKEINFO = ${SHELL} /home/vicente/tomato/release/src/router/zebra/missing --run makeinfo
+MAKEINFO = ${SHELL} /home/vicente/repos/tomato/release/src/router/zebra/missing --run makeinfo
 TEXI2DVI = texi2dvi
 DVIPS = dvips
 .dvi.ps:

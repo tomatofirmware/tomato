@@ -56,6 +56,7 @@ obj-$(CONFIG_IP_NF_MATCH_ADDRTYPE) += ipt_addrtype.o
 obj-$(CONFIG_IP_NF_MATCH_MACSAVE) += ipt_macsave.o
 obj-$(CONFIG_IP_NF_MATCH_EXP) += ipt_exp.o
 obj-$(CONFIG_IP_NF_MATCH_BCOUNT) += ipt_bcount.o
+obj-$(CONFIG_IP_NF_MATCH_ACCOUNT) += ipt_account.o
 
 # targets
 obj-$(CONFIG_IP_NF_TARGET_REJECT) += ipt_REJECT.o
@@ -88,3 +89,5 @@ obj-$(CONFIG_BCM_NAT) += bcm_nat.o
 
 obj-$(CONFIG_IP_NF_TOMATOCT) += tomato_ct.o
 
+# DNSMQ
+obj-$(CONFIG_IP_NF_DNSMQ) += dnsmq.o

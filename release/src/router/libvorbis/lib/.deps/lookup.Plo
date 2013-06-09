@@ -9,7 +9,7 @@ lookup.lo lookup.o: lookup.c \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/sgidefs.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/bits/mathcalls.h \
   lookup.h lookup_data.h os.h ../config.h \
-  /home/vicente/tomato/release/src-rt/router/libogg/include/ogg/os_types.h \
+  /home/vicente/repos/tomato/release/src-rt/router/libogg/include/ogg/os_types.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/sys/types.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/bits/types.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/bits/wordsize.h \
@@ -26,9 +26,9 @@ lookup.lo lookup.o: lookup.c \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/bits/sigset.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/bits/time.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/sys/sysmacros.h \
-  /home/vicente/tomato/release/src-rt/router/libogg/include/ogg/config_types.h \
+  /home/vicente/repos/tomato/release/src-rt/router/libogg/include/ogg/config_types.h \
   misc.h ../include/vorbis/codec.h \
-  /home/vicente/tomato/release/src-rt/router/libogg/include/ogg/ogg.h \
+  /home/vicente/repos/tomato/release/src-rt/router/libogg/include/ogg/ogg.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/alloca.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/memory.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/string.h
@@ -59,7 +59,7 @@ os.h:
 
 ../config.h:
 
-/home/vicente/tomato/release/src-rt/router/libogg/include/ogg/os_types.h:
+/home/vicente/repos/tomato/release/src-rt/router/libogg/include/ogg/os_types.h:
 
 /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/sys/types.h:
 
@@ -93,13 +93,13 @@ os.h:
 
 /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/sys/sysmacros.h:
 
-/home/vicente/tomato/release/src-rt/router/libogg/include/ogg/config_types.h:
+/home/vicente/repos/tomato/release/src-rt/router/libogg/include/ogg/config_types.h:
 
 misc.h:
 
 ../include/vorbis/codec.h:
 
-/home/vicente/tomato/release/src-rt/router/libogg/include/ogg/ogg.h:
+/home/vicente/repos/tomato/release/src-rt/router/libogg/include/ogg/ogg.h:
 
 /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/alloca.h:
 

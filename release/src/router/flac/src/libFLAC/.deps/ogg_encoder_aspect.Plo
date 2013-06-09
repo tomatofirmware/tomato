@@ -7,8 +7,8 @@ ogg_encoder_aspect.lo ogg_encoder_aspect.o: ogg_encoder_aspect.c \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/sys/cdefs.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/include/stddef.h \
   ../../include/FLAC/assert.h include/private/ogg_encoder_aspect.h \
-  /home/vicente/tomato/release/src-rt/router/libogg/include/ogg/ogg.h \
-  /home/vicente/tomato/release/src-rt/router/libogg/include/ogg/os_types.h \
+  /home/vicente/repos/tomato/release/src-rt/router/libogg/include/ogg/ogg.h \
+  /home/vicente/repos/tomato/release/src-rt/router/libogg/include/ogg/os_types.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/sys/types.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/bits/types.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/bits/wordsize.h \
@@ -24,7 +24,7 @@ ogg_encoder_aspect.lo ogg_encoder_aspect.o: ogg_encoder_aspect.c \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/bits/sigset.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/bits/time.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/sys/sysmacros.h \
-  /home/vicente/tomato/release/src-rt/router/libogg/include/ogg/config_types.h \
+  /home/vicente/repos/tomato/release/src-rt/router/libogg/include/ogg/config_types.h \
   ../../include/FLAC/ordinals.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/inttypes.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/stdint.h \
@@ -65,9 +65,9 @@ ogg_encoder_aspect.lo ogg_encoder_aspect.o: ogg_encoder_aspect.c \
 
 include/private/ogg_encoder_aspect.h:
 
-/home/vicente/tomato/release/src-rt/router/libogg/include/ogg/ogg.h:
+/home/vicente/repos/tomato/release/src-rt/router/libogg/include/ogg/ogg.h:
 
-/home/vicente/tomato/release/src-rt/router/libogg/include/ogg/os_types.h:
+/home/vicente/repos/tomato/release/src-rt/router/libogg/include/ogg/os_types.h:
 
 /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/sys/types.h:
 
@@ -99,7 +99,7 @@ include/private/ogg_encoder_aspect.h:
 
 /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/sys/sysmacros.h:
 
-/home/vicente/tomato/release/src-rt/router/libogg/include/ogg/config_types.h:
+/home/vicente/repos/tomato/release/src-rt/router/libogg/include/ogg/config_types.h:
 
 ../../include/FLAC/ordinals.h:
 

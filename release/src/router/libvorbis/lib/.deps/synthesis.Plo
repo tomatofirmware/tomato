@@ -27,15 +27,15 @@ synthesis.lo synthesis.o: synthesis.c \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/bits/uClibc_pthread.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/include/stdarg.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/bits/stdio_lim.h \
-  /home/vicente/tomato/release/src-rt/router/libogg/include/ogg/ogg.h \
-  /home/vicente/tomato/release/src-rt/router/libogg/include/ogg/os_types.h \
+  /home/vicente/repos/tomato/release/src-rt/router/libogg/include/ogg/ogg.h \
+  /home/vicente/repos/tomato/release/src-rt/router/libogg/include/ogg/os_types.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/sys/types.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/endian.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/bits/endian.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/sys/select.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/bits/select.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/sys/sysmacros.h \
-  /home/vicente/tomato/release/src-rt/router/libogg/include/ogg/config_types.h \
+  /home/vicente/repos/tomato/release/src-rt/router/libogg/include/ogg/config_types.h \
   ../include/vorbis/codec.h codec_internal.h envelope.h mdct.h codebook.h \
   psy.h smallft.h backends.h bitrate.h os.h ../config.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/math.h \
@@ -105,9 +105,9 @@ synthesis.lo synthesis.o: synthesis.c \
 
 /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/bits/stdio_lim.h:
 
-/home/vicente/tomato/release/src-rt/router/libogg/include/ogg/ogg.h:
+/home/vicente/repos/tomato/release/src-rt/router/libogg/include/ogg/ogg.h:
 
-/home/vicente/tomato/release/src-rt/router/libogg/include/ogg/os_types.h:
+/home/vicente/repos/tomato/release/src-rt/router/libogg/include/ogg/os_types.h:
 
 /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/sys/types.h:
 
@@ -121,7 +121,7 @@ synthesis.lo synthesis.o: synthesis.c \
 
 /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/sys/sysmacros.h:
 
-/home/vicente/tomato/release/src-rt/router/libogg/include/ogg/config_types.h:
+/home/vicente/repos/tomato/release/src-rt/router/libogg/include/ogg/config_types.h:
 
 ../include/vorbis/codec.h:
 

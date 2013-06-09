@@ -67,10 +67,10 @@ struct osl_info {
 	uint magic;
 	void *pdev;
 	atomic_t malloced;
+	atomic_t pktalloced; 	/* Number of allocated packet buffers */
 	uint failed;
 	uint bustype;
 	bcm_mem_link_t *dbgmem_list;
-	spinlock_t dbgmem_lock;
 #if defined(DSLCPE_DELAY)
 	shared_osl_t *oshsh; /* osh shared */
 #endif
@@ -78,6 +78,7 @@ struct osl_info {
 	spinlock_t pktlist_lock;
 	pktlist_info_t pktlist;
 #endif  /* BCMDBG_PKT */
+	spinlock_t dbgmem_lock;
 	spinlock_t pktalloc_lock;
 };
 
@@ -414,8 +415,8 @@ osl_pktfastget(osl_t *osh, uint len)
 
 	/* Init skb struct */
 	skb->next = skb->prev = NULL;
-	skb->data = skb->head + 16;
-	skb->tail = skb->head + 16;
+	skb->data = skb->head + NET_SKB_PAD_ALLOC;
+	skb->tail = skb->data;
 
 	skb->len = 0;
 	skb->cloned = 0;
@@ -554,7 +555,11 @@ osl_pktfastfree(osl_t *osh, struct sk_buff *skb)
 	skb->destructor = NULL;
 
 	ctfpool = (ctfpool_t *)CTFPOOLPTR(osh, skb);
+#if 0
 	ASSERT(ctfpool != NULL);
+#else
+	if (ctfpool == NULL) return;
+#endif
 
 	/* Add object to the ctfpool */
 	CTFPOOL_LOCK(ctfpool, flags);
@@ -594,8 +599,14 @@ osl_pktfree(osl_t *osh, void *p, bool send)
 		spin_unlock_irqrestore(&osh->pktlist_lock, flags);
 #endif
 
+#ifdef CTFMAP
+		/* Clear the map ptr before freeing */
+		PKTCLRCTF(osh, skb);
+		CTFMAPPTR(osh, skb) = NULL;
+#endif /* CTFMAP */
+
 #ifdef CTFPOOL
-		if (PKTISFAST(osh, skb))
+		if ((PKTISFAST(osh, skb)) && (atomic_read(&skb->users) == 1))
 			osl_pktfastfree(osh, skb);
 		else {
 #else /* CTFPOOL */
@@ -1099,6 +1110,13 @@ osl_pktdup(osl_t *osh, void *skb)
 {
 	void * p;
 	unsigned long flags;
+
+	/* clear the CTFBUF flag if set and map the reset of the buffer
+	 * before cloning
+	 */
+#ifdef CTFMAP
+  	PKTCTFMAP(osh, skb);
+#endif
 
 	if ((p = skb_clone((struct sk_buff*)skb, GFP_ATOMIC)) == NULL)
 		return NULL;

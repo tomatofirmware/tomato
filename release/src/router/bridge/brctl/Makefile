@@ -1,5 +1,5 @@
 
-KERNEL_HEADERS=-I/home/vicente/tomato/release/src-rt/linux/linux-2.6/include
+KERNEL_HEADERS=-I/home/vicente/repos/tomato/release/src-rt/linux/linux-2.6/include
 
 CC=mipsel-uclibc-gcc
 CFLAGS= -Wall -Os -g -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32 -mips32  

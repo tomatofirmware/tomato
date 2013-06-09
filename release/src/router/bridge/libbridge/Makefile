@@ -1,5 +1,5 @@
 
-KERNEL_HEADERS=-I/home/vicente/tomato/release/src-rt/linux/linux-2.6/include
+KERNEL_HEADERS=-I/home/vicente/repos/tomato/release/src-rt/linux/linux-2.6/include
 
 #AR=ar
 RANLIB=mipsel-uclibc-ranlib

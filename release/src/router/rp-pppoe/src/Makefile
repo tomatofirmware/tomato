@@ -29,7 +29,7 @@ sbindir=${exec_prefix}/sbin
 
 # Plugin for pppd on Linux
 LINUX_KERNELMODE_PLUGIN=rp-pppoe.so
-PPPD_INCDIR=/home/vicente/tomato/release/src-rt/router/pppd
+PPPD_INCDIR=/home/vicente/repos/tomato/release/src-rt/router/pppd
 
 # Licensed version
 LIC_INCDIR=

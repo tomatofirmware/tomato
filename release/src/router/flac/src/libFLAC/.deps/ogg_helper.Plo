@@ -28,15 +28,15 @@ ogg_helper.lo ogg_helper.o: ogg_helper.c ../../config.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/limits.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/bits/posix1_lim.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/bits/local_lim.h \
-  /home/vicente/tomato/release/src-rt/linux/linux-2.6/include/linux/limits.h \
+  /home/vicente/repos/tomato/release/src-rt/linux/linux-2.6/include/linux/limits.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/bits/uClibc_local_lim.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/bits/posix2_lim.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/stdint.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/bits/wchar.h \
   include/private/ogg_helper.h \
-  /home/vicente/tomato/release/src-rt/router/libogg/include/ogg/ogg.h \
-  /home/vicente/tomato/release/src-rt/router/libogg/include/ogg/os_types.h \
-  /home/vicente/tomato/release/src-rt/router/libogg/include/ogg/config_types.h \
+  /home/vicente/repos/tomato/release/src-rt/router/libogg/include/ogg/ogg.h \
+  /home/vicente/repos/tomato/release/src-rt/router/libogg/include/ogg/os_types.h \
+  /home/vicente/repos/tomato/release/src-rt/router/libogg/include/ogg/config_types.h \
   ../../include/FLAC/stream_encoder.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/stdio.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/bits/uClibc_stdio.h \
@@ -121,7 +121,7 @@ ogg_helper.lo ogg_helper.o: ogg_helper.c ../../config.h \
 
 /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/bits/local_lim.h:
 
-/home/vicente/tomato/release/src-rt/linux/linux-2.6/include/linux/limits.h:
+/home/vicente/repos/tomato/release/src-rt/linux/linux-2.6/include/linux/limits.h:
 
 /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/bits/uClibc_local_lim.h:
 
@@ -133,11 +133,11 @@ ogg_helper.lo ogg_helper.o: ogg_helper.c ../../config.h \
 
 include/private/ogg_helper.h:
 
-/home/vicente/tomato/release/src-rt/router/libogg/include/ogg/ogg.h:
+/home/vicente/repos/tomato/release/src-rt/router/libogg/include/ogg/ogg.h:
 
-/home/vicente/tomato/release/src-rt/router/libogg/include/ogg/os_types.h:
+/home/vicente/repos/tomato/release/src-rt/router/libogg/include/ogg/os_types.h:
 
-/home/vicente/tomato/release/src-rt/router/libogg/include/ogg/config_types.h:
+/home/vicente/repos/tomato/release/src-rt/router/libogg/include/ogg/config_types.h:
 
 ../../include/FLAC/stream_encoder.h:
 

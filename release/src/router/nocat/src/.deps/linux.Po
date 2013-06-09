@@ -1,6 +1,6 @@
 linux.o linux.o: linux.c \
-  /home/vicente/tomato/release/src-rt/router/mipsel-uclibc/install/glib/usr/include/glib-1.2/glib.h \
-  /home/vicente/tomato/release/src-rt/router/mipsel-uclibc/install/glib/usr/lib/glib/include/glibconfig.h \
+  /home/vicente/repos/tomato/release/src-rt/router/mipsel-uclibc/install/glib/usr/include/glib-1.2/glib.h \
+  /home/vicente/repos/tomato/release/src-rt/router/mipsel-uclibc/install/glib/usr/lib/glib/include/glibconfig.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/include/limits.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/include/syslimits.h \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/limits.h \
@@ -84,9 +84,9 @@ linux.o linux.o: linux.c \
   /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/../../../../mipsel-linux-uclibc/sys-include/alloca.h \
   config.h
 
-/home/vicente/tomato/release/src-rt/router/mipsel-uclibc/install/glib/usr/include/glib-1.2/glib.h:
+/home/vicente/repos/tomato/release/src-rt/router/mipsel-uclibc/install/glib/usr/include/glib-1.2/glib.h:
 
-/home/vicente/tomato/release/src-rt/router/mipsel-uclibc/install/glib/usr/lib/glib/include/glibconfig.h:
+/home/vicente/repos/tomato/release/src-rt/router/mipsel-uclibc/install/glib/usr/lib/glib/include/glibconfig.h:
 
 /home/vicente/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/bin/../lib/gcc/mipsel-linux-uclibc/4.2.4/include/limits.h:
 

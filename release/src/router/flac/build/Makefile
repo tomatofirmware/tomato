@@ -53,16 +53,16 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_triplet = mipsel-unknown-linux-gnu
-ACLOCAL = ${SHELL} /home/vicente/tomato/release/src/router/flac/missing --run aclocal-1.7
+ACLOCAL = ${SHELL} /home/vicente/repos/tomato/release/src/router/flac/missing --run aclocal-1.7
 ACLOCAL_AMFLAGS = -I m4
 AMDEP_FALSE = #
 AMDEP_TRUE = 
-AMTAR = ${SHELL} /home/vicente/tomato/release/src/router/flac/missing --run tar
+AMTAR = ${SHELL} /home/vicente/repos/tomato/release/src/router/flac/missing --run tar
 AR = mipsel-uclibc-ar
 AS = gas
-AUTOCONF = ${SHELL} /home/vicente/tomato/release/src/router/flac/missing --run autoconf
-AUTOHEADER = ${SHELL} /home/vicente/tomato/release/src/router/flac/missing --run autoheader
-AUTOMAKE = ${SHELL} /home/vicente/tomato/release/src/router/flac/missing --run automake-1.7
+AUTOCONF = ${SHELL} /home/vicente/repos/tomato/release/src/router/flac/missing --run autoconf
+AUTOHEADER = ${SHELL} /home/vicente/repos/tomato/release/src/router/flac/missing --run autoheader
+AUTOMAKE = ${SHELL} /home/vicente/repos/tomato/release/src/router/flac/missing --run automake-1.7
 AWK = gawk
 CC = mipsel-uclibc-gcc
 CCAS = $(CC)
@@ -70,7 +70,7 @@ CCASFLAGS = $(CFLAGS)
 CCDEPMODE = depmode=gcc3
 CFLAGS = -O3 -funroll-loops -finline-functions -Wall -W -Winline -Os -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32 -mips32   -fPIC -ffunction-sections -fdata-sections
 CPP = mipsel-uclibc-gcc -E
-CPPFLAGS = -DFLaC__INLINE=__inline__ -DNDEBUG -I$(top_builddir) -I$(srcdir)/include -I$(top_srcdir)/include -I/home/vicente/tomato/release/src-rt/router/libogg/include -I/home/vicente/tomato/release/src-rt/linux/linux-2.6/include
+CPPFLAGS = -DFLaC__INLINE=__inline__ -DNDEBUG -I$(top_builddir) -I$(srcdir)/include -I$(top_srcdir)/include -I/home/vicente/repos/tomato/release/src-rt/router/libogg/include -I/home/vicente/repos/tomato/release/src-rt/linux/linux-2.6/include
 CXX = mipsel-linux-g++
 CXXCPP = mipsel-linux-g++ -E
 CXXDEPMODE = depmode=gcc3
@@ -137,7 +137,7 @@ INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = ${SHELL} $(install_sh) -c -s
-LDFLAGS = -L/home/vicente/tomato/release/src-rt/router/libogg/src/.libs -fPIC -ffunction-sections -fdata-sections -Wl,--gc-sections
+LDFLAGS = -L/home/vicente/repos/tomato/release/src-rt/router/libogg/src/.libs -fPIC -ffunction-sections -fdata-sections -Wl,--gc-sections
 LIBICONV = 
 LIBOBJS = 
 LIBS = 
@@ -148,7 +148,7 @@ LTLIBOBJS =
 MAINT = #
 MAINTAINER_MODE_FALSE = 
 MAINTAINER_MODE_TRUE = #
-MAKEINFO = ${SHELL} /home/vicente/tomato/release/src/router/flac/missing --run makeinfo
+MAKEINFO = ${SHELL} /home/vicente/repos/tomato/release/src/router/flac/missing --run makeinfo
 MINGW_WINSOCK_LIBS = 
 NASM = 
 OBJEXT = o
@@ -206,7 +206,7 @@ host_os = linux-gnu
 host_vendor = unknown
 includedir = ${prefix}/include
 infodir = ${prefix}/info
-install_sh = /home/vicente/tomato/release/src/router/flac/install-sh
+install_sh = /home/vicente/repos/tomato/release/src/router/flac/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localstatedir = ${prefix}/var

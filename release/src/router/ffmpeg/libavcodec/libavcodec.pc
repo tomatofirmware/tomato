@@ -10,5 +10,5 @@ Requires:
 Requires.private: libavutil = 50.15.1
 Conflicts:
 Libs: -L${libdir} -lavcodec 
-Libs.private: -L/home/vicente/tomato/release/src-rt/router/zlib -lz -lz -pthread -lm
+Libs.private: -L/home/vicente/repos/tomato/release/src-rt/router/zlib -lz -lz -pthread -lm
 Cflags: -I${includedir}
