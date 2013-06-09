@@ -1,0 +1,1 @@
+pwdbased.lo pwdbased.o: ../ctaocrypt/src/pwdbased.c

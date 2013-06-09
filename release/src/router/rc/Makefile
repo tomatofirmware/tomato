@@ -14,6 +14,8 @@ OBJS := rc.o init.o interface.o network.o wan.o services.o dhcp.o
 OBJS += firewall.o ppp.o telssh.o wnas.o
 OBJS += listen.o redial.o led.o qos.o forward.o misc.o mtd.o
 OBJS += buttons.o restrict.o gpio.o sched.o
+OBJS += arpbind.o
+OBJS += qoslimit.o
 #	heartbeat.o
 
 ifeq ($(TCONFIG_USB),y)
@@ -31,12 +33,28 @@ endif
 ifeq ($(TCONFIG_OPENVPN),y)
 OBJS += vpn.o
 endif
+ifeq ($(TCONFIG_NOCAT),y)
+OBJS += nocat.o
+endif
+ifeq ($(TCONFIG_PPTPD),y)
+OBJS += pptpd.o
+endif
+ifeq ($(TCONFIG_NGINX),y)
+OBJS += nginx.o
+endif
 
 ifeq ($(TOMATO_SL),1)
 #OBJS += usb.o
 OBJS += samba.o
 endif
 
+ifeq ($(TCONFIG_SNMP),y)
+OBJS += snmp.o
+endif
+
+ifeq ($(TCONFIG_USERPPTP),y)
+OBJS += pptp_client.o
+endif
 
 all: rc
 
@@ -88,12 +106,6 @@ endif
 ifeq ($(TCONFIG_DDNS),y)
 	@cd $(INSTALLDIR)/sbin && ln -sf rc ddns-update
 endif
-
-#	ifeq ($(TCONFIG_HEARTBEAT),y)
-#		@cd $(INSTALLDIR)/sbin && ln -sf rc hb_connect
-#		@cd $(INSTALLDIR)/sbin && ln -sf rc hb_disconnect
-#		@cd $(INSTALLDIR)/sbin && ln -sf rc hb_idle
-#	endif
 
 ifeq ($(TCONFIG_CIFS),y)
 	@cd $(INSTALLDIR)/sbin && ln -sf rc mount-cifs

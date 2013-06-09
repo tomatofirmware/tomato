@@ -2223,11 +2223,11 @@ typedef struct {
 /* The below field is NOT present for the quota defaults entry. */
 	SID sid;		/* The SID of the user/object associated with
 				   this quota entry. If this field is missing
-				   then the INDEX_ENTRY is padded with zeros
-				   to multiply of 8 which are not counted in
+				   then the INDEX_ENTRY is padded to a multiple
+				   of 8 with zeros which are not counted in
 				   the data_length field. If the sid is present
 				   then this structure is padded with zeros to
-				   multiply of 8 and the padding is counted in
+				   a multiple of 8 and the padding is counted in
 				   the INDEX_ENTRY's data_length. */
 } __attribute__((__packed__)) QUOTA_CONTROL_ENTRY;
 
@@ -2398,18 +2398,19 @@ typedef enum {
 	IO_REPARSE_TAG_RESERVED_ONE	= const_cpu_to_le32(0x00000001),
 	IO_REPARSE_TAG_RESERVED_RANGE	= const_cpu_to_le32(0x00000001),
 
-	IO_REPARSE_TAG_NSS		= const_cpu_to_le32(0x68000005),
-	IO_REPARSE_TAG_NSS_RECOVER	= const_cpu_to_le32(0x68000006),
-	IO_REPARSE_TAG_SIS		= const_cpu_to_le32(0x68000007),
-	IO_REPARSE_TAG_DFS		= const_cpu_to_le32(0x68000008),
+	IO_REPARSE_TAG_CSV		= const_cpu_to_le32(0x80000009),
+	IO_REPARSE_TAG_DEDUP		= const_cpu_to_le32(0x80000013),
+	IO_REPARSE_TAG_DFS		= const_cpu_to_le32(0x8000000A),
+	IO_REPARSE_TAG_DFSR		= const_cpu_to_le32(0x80000012),
+	IO_REPARSE_TAG_HSM		= const_cpu_to_le32(0xC0000004),
+	IO_REPARSE_TAG_HSM2		= const_cpu_to_le32(0x80000006),
+	IO_REPARSE_TAG_MOUNT_POINT	= const_cpu_to_le32(0xA0000003),
+	IO_REPARSE_TAG_NFS		= const_cpu_to_le32(0x80000014),
+	IO_REPARSE_TAG_SIS		= const_cpu_to_le32(0x80000007),
+	IO_REPARSE_TAG_SYMLINK		= const_cpu_to_le32(0xA000000C),
+	IO_REPARSE_TAG_WIM		= const_cpu_to_le32(0x80000008),
 
-	IO_REPARSE_TAG_MOUNT_POINT	= const_cpu_to_le32(0x88000003),
-
-	IO_REPARSE_TAG_HSM		= const_cpu_to_le32(0xa8000004),
-
-	IO_REPARSE_TAG_SYMBOLIC_LINK	= const_cpu_to_le32(0xe8000000),
-
-	IO_REPARSE_TAG_VALID_VALUES	= const_cpu_to_le32(0xe000ffff),
+	IO_REPARSE_TAG_VALID_VALUES	= const_cpu_to_le32(0xf000ffff),
 } PREDEFINED_REPARSE_TAGS;
 
 /**

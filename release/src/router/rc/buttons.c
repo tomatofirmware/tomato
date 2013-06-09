@@ -122,6 +122,7 @@ int buttons_main(int argc, char *argv[])
 		break;		
 	case MODEL_WL500GPv2:
 	case MODEL_WL520GU:
+	case MODEL_WL330GE:
 		reset_mask = 1 << 2;
 		ses_mask = 1 << 3;
 		break;		
@@ -141,20 +142,34 @@ int buttons_main(int argc, char *argv[])
 		reset_mask = 1 << 3;
 		ses_mask = 1 << 2;
 		break;
+	case MODEL_RTN10U:
+		reset_mask = 1 << 21;
+		ses_mask = 1 << 20;
+		ses_led = LED_AOSS;
+		break;
 	case MODEL_RTN12:
 		reset_mask = 1 << 1;
 		ses_mask = 1 << 0;
 		brau_mask = (1 << 4) | (1 << 5) | (1 << 6);
 		break;
+	case MODEL_RTN15U:
+		reset_mask = 1 << 5;
+		ses_mask = 1 << 8;
+		break;
 	case MODEL_RTN16:
 		reset_mask = 1 << 6;
 		ses_mask = 1 << 8;
+		break;
+	case MODEL_RTN53:
+		reset_mask = 1 << 3;
+		ses_mask = 1 << 7;
 		break;
 	case MODEL_RTN66U:
 		reset_mask = 1 << 9;
 		ses_mask = 1 << 4;
 		break;
 	case MODEL_WNR3500L:
+	case MODEL_WNR3500LV2:
 		reset_mask = 1 << 4;
 		ses_mask = 1 << 6;
 		ses_led = LED_AOSS;
@@ -172,6 +187,18 @@ int buttons_main(int argc, char *argv[])
 		reset_mask = 1 << 6;
 		ses_mask = 1 << 8;
 		ses_led = LED_AOSS;
+		break;
+	case MODEL_E900:
+	case MODEL_E1000v2:
+	case MODEL_E1500:
+	case MODEL_E1550:
+	case MODEL_E2500:
+		reset_mask = 1 << 10;
+		ses_mask = 1 << 9;
+		break;
+	case MODEL_E3200:
+		reset_mask = 1 << 5;
+		ses_mask = 1 << 8;
 		break;
 	case MODEL_WRT160Nv3:
 		reset_mask = 1 << 6;
@@ -366,3 +393,5 @@ int buttons_main(int argc, char *argv[])
 
 	return 0;
 }
+
+

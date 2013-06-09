@@ -39,45 +39,64 @@
 //! = see restore_main()
 
 const defaults_t defaults[] = {
-	{ "restore_defaults",	"0"				},	// Set to 0 to not restore defaults on boot
+	{ "restore_defaults",	"0"			},	// Set to 0 to not restore defaults on boot
 
 	// LAN H/W parameters
-//!	{ "lan_ifname",			""				},	// LAN interface name
-//!	{ "lan_ifnames",		""				},	// Enslaved LAN interfaces
-	{ "lan_hwnames",		""				},	// LAN driver names (e.g. et0)
-	{ "lan_hwaddr",			""				},	// LAN interface MAC address
+//!	{ "lan_ifname",			""		},	// LAN interface name
+//!	{ "lan_ifnames",		""		},	// Enslaved LAN interfaces
+	{ "lan_hwnames",		""		},	// LAN driver names (e.g. et0)
+	{ "lan_hwaddr",			""		},	// LAN interface MAC address
 
 	// LAN TCP/IP parameters
-	{ "lan_dhcp",			"0"				},	// DHCP client [static|dhcp]
-	{ "lan_proto",			"dhcp"			},	// DHCP server [static|dhcp]  //Barry add 2004 09 16
+	{ "lan_dhcp",			"1"		},	// DHCP client [static|dhcp]
+	{ "lan_proto",			"dhcp"		},	// DHCP server [static|dhcp]  //start with no dhcp if nvram corrupted
 	{ "lan_ipaddr",			"192.168.1.1"	},	// LAN IP address
 	{ "lan_netmask",		"255.255.255.0"	},	// LAN netmask
-	{ "lan_wins",			""				},	// x.x.x.x x.x.x.x ...
-	{ "lan_domain",			""				},	// LAN domain name
-	{ "lan_lease",			"86400"			},	// LAN lease time in seconds
-	{ "lan_stp",			"0"				},	// LAN spanning tree protocol
-	{ "lan_route",			""				},	// Static routes (ipaddr:netmask:gateway:metric:ifname ...)
+	{ "lan_wins",			""		},	// x.x.x.x x.x.x.x ...
+	{ "lan_domain",			""		},	// LAN domain name
+	{ "lan_lease",			"86400"		},	// LAN lease time in seconds
+	{ "lan_stp",			"0"		},	// LAN spanning tree protocol
+	{ "lan_route",			""		},	// Static routes (ipaddr:netmask:gateway:metric:ifname ...)
 
-	{ "lan_gateway",		"0.0.0.0"		},	// LAN Gateway
-	{ "wl_wds_enable",		"0"				},	// WDS Enable (0|1)
+	{ "lan_gateway",		"0.0.0.0"	},	// LAN Gateway
+	{ "wl_wds_enable",		"0"		},	// WDS Enable (0|1)
+
+	{ "lan_state",			"3"		},	// 0=show, 1=description, 2=Invert
+	
+#ifdef TCONFIG_VLAN
+	{ "lan1_ipaddr",		""		},
+	{ "lan1_netmask",		""		},
+	{ "lan1_stp",			"0"		},
+	{ "lan2_ipaddr",		""		},
+	{ "lan2_netmask",		""		},
+	{ "lan2_stp",			"0"		},
+	{ "lan3_ipaddr",		""		},
+	{ "lan3_netmask",		""		},
+	{ "lan3_stp",			"0"		},
+#endif
 
 	// WAN H/W parameters
 //!	{ "wan_ifname",			""				},	// WAN interface name
 //!	{ "wan_ifnames",		""				},	// WAN interface names
 	{ "wan_hwname",			""				},	// WAN driver name (e.g. et1)
 	{ "wan_hwaddr",			""				},	// WAN interface MAC address
-	{ "wan_ifnameX",		NULL			},	// real wan if; see wan.c:start_wan
+	{ "wan_ifnameX",		NULL				},	// real wan if; see wan.c:start_wan
 
 	// WAN TCP/IP parameters
 	{ "wan_proto",			"dhcp"			},	// [static|dhcp|pppoe|disabled]
 	{ "wan_ipaddr",			"0.0.0.0"		},	// WAN IP address
 	{ "wan_netmask",		"0.0.0.0"		},	// WAN netmask
 	{ "wan_gateway",		"0.0.0.0"		},	// WAN gateway
-	{ "wan_gateway_get",		"0.0.0.0"		},	// default gateway for PPP
+	{ "wan_gateway_get",		"0.0.0.0"	},	// default gateway for PPP
 	{ "wan_dns",			""				},	// x.x.x.x x.x.x.x ...
 	{ "wan_wins",			""				},	// x.x.x.x x.x.x.x ...
 	{ "wan_lease",			"86400"			},	// WAN lease time in seconds
 	{ "wan_islan",			"0"				},
+	{ "modem_ipaddr",		"0.0.0.0"		},	// modem IP address (i.e. PPPoE bridged modem)
+
+#ifdef TCONFIG_DNSCRYPT
+	{ "dnscrypt_proxy",		""				},
+#endif
 
 	{ "wan_primary",		"1"				},	// Primary wan connection
 	{ "wan_unit",			"0"				},	// Last configured connection
@@ -87,14 +106,14 @@ const defaults_t defaults[] = {
 	{ "filter_macmode",		"deny"			},	// "allow" only, "deny" only, or "disabled" (allow all)
 	{ "filter_client0",		""				},	// [lan_ipaddr0-lan_ipaddr1|*]:lan_port0-lan_port1,proto,enable,day_start-day_end,sec_start-sec_end,desc
 
-	{ "filter",				"on"			},	// [on | off] Firewall Protection
+	{ "filter",			"on"				},	// [on | off] Firewall Protection
 
 	// Port forwards
 	{ "autofw_port0",		""				},	// out_proto:out_port,in_proto:in_port0-in_port1>to_port0-to_port1,enable,desc
 */
 	// DHCP server parameters
-	{ "dhcp_start",			"100"			},	//
-	{ "dhcp_num",			"50"			},	//
+	{ "dhcp_start",			"2"				},	//
+	{ "dhcp_num",			"52"			},	//
 	{ "dhcpd_startip",		"" 				},	// if empty, tomato will use dhcp_start/dchp_num for better compatibility
 	{ "dhcpd_endip",		"" 				},	// "
 	{ "dhcp_lease",			"0"				},	// LAN lease time in minutes
@@ -103,6 +122,29 @@ const defaults_t defaults[] = {
 	{ "wan_routes",			""				},
 	{ "wan_msroutes",		""				},
 
+#ifdef TCONFIG_VLAN
+	{ "dhcp1_start",		""				},
+	{ "dhcp1_num",			""				},
+	{ "dhcpd1_startip",		"" 				},
+	{ "dhcpd1_endip",		"" 				},
+	{ "dhcp1_lease",		"0"				},
+	{ "dhcp2_start",		""				},
+	{ "dhcp2_num",			""				},
+	{ "dhcpd2_startip",		"" 				},
+	{ "dhcpd2_endip",		"" 				},
+	{ "dhcp2_lease",		"0"				},
+	{ "dhcp3_start",		""				},
+	{ "dhcp3_num",			""				},
+	{ "dhcpd3_startip",		"" 				},
+	{ "dhcpd3_endip",		"" 				},
+	{ "dhcp3_lease",		"0"				},
+#endif
+
+	//3G parameters
+	{ "modem_pin",			""			},
+	{ "modem_dev",			"USB0"		},
+	{ "modem_init",			"*99#"		},
+	{ "modem_apn",			"internet"	},
 
 	// PPPoE parameters
 	{ "pppoe_ifname",		""				},	// PPPoE enslaved interface
@@ -111,38 +153,39 @@ const defaults_t defaults[] = {
 	{ "ppp_idletime",		"5"				},	// Dial on demand max idle time (mins)
 	{ "ppp_keepalive",		"0"				},	// Restore link automatically
 	{ "ppp_demand",			"0"				},	// Dial on demand
-	{ "ppp_redialperiod",	"30"			},	// Redial Period  (seconds)*/
+	{ "ppp_redialperiod",	"10"			},	// Redial Period  (seconds)*/
 	{ "ppp_mru",			"1500"			},	// Negotiate MRU to this value
 	{ "ppp_mtu",			"1500"			},	// Negotiate MTU to the smaller of this value or the peer MRU
 	{ "ppp_service",		""				},	// PPPoE service name
 	{ "ppp_ac",				""				},	// PPPoE access concentrator name
 	{ "ppp_static",			"0"				},	// Enable / Disable Static IP
 	{ "ppp_static_ip",		""				},	// PPPoE Static IP
-	{ "ppp_get_ac",			""				},	// PPPoE Server ac name
-	{ "ppp_get_srv",		""				},	// PPPoE Server service name
 	{ "ppp_custom",			""				},	// PPPD additional options
 	{ "ppp_mlppp",			"0"				},	// PPPoE single line MLPPP
-
-	{ "pppoe_lei",			""				},
-	{ "pppoe_lef",			""				},
+	{ "pppoe_lei",			"10"				},	// LCP Echo Interval
+	{ "pppoe_lef",			"5"				},	// LCP Echo Retries
 
 #ifdef TCONFIG_IPV6
 	// IPv6 parameters
-	{ "ipv6_service",		""				},	// [''|native|native-pd|6to4|sit|other]
-	{ "ipv6_prefix",		""				},	// The global-scope IPv6 prefix to route/advertise
-	{ "ipv6_prefix_length",		"64"				},	// The bit length of the prefix. Used by dhcp6c. For radvd, /64 is always assumed.
-	{ "ipv6_rtr_addr",		""				},	// defaults to $ipv6_prefix::1
-	{ "ipv6_radvd",			"1"				},	// Enable Router Advertisement (radvd)
-	{ "ipv6_accept_ra",		"0"				},	// Accept RA on WAN and/or LAN interfaces
-	{ "ipv6_ifname",		"six0"				},	// The interface facing the rest of the IPv6 world
-	{ "ipv6_tun_v4end",		"0.0.0.0"			},	// Foreign IPv4 endpoint of SIT tunnel
-	{ "ipv6_relay",			"1"				},	// Foreign IPv4 endpoint host of SIT tunnel 192.88.99.?
-	{ "ipv6_tun_addr",		""				},	// IPv6 address to assign to local tunnel endpoint
-	{ "ipv6_tun_addrlen",		"64"				},	// CIDR prefix length for tunnel's IPv6 address	
-	{ "ipv6_tun_mtu",		"0"				},	// Tunnel MTU, 0 for default
-	{ "ipv6_tun_ttl",		"255"				},	// Tunnel TTL
-	{ "ipv6_dns",			""				},	// DNS server(s) IPs
-	{ "ipv6_get_dns",		""				},	// DNS IP address which get by dhcp6c
+	{ "ipv6_service",		""		},	// [''|native|native-pd|6to4|sit|other]
+	{ "ipv6_prefix",		""		},	// The global-scope IPv6 prefix to route/advertise
+	{ "ipv6_prefix_length",	"64"	},	// The bit length of the prefix. Used by dhcp6c. For radvd, /64 is always assumed.
+	{ "ipv6_rtr_addr",		""		},	// defaults to $ipv6_prefix::1
+	{ "ipv6_radvd",			"1"		},	// Enable Router Advertisement (radvd)
+	{ "ipv6_accept_ra",		"1"		},	// Accept RA on bit 0WAN and/or bit1LAN interfaces
+	{ "ipv6_ifname",		"six0"	},	// The interface facing the rest of the IPv6 world
+	{ "ipv6_tun_v4end",		"0.0.0.0"	},	// Foreign IPv4 endpoint of SIT tunnel
+	{ "ipv6_relay",			"1"		},	// Foreign IPv4 endpoint host of SIT tunnel 192.88.99.?
+	{ "ipv6_tun_addr",		""		},	// IPv6 address to assign to local tunnel endpoint
+	{ "ipv6_tun_addrlen",	"64"	},	// CIDR prefix length for tunnel's IPv6 address	
+	{ "ipv6_tun_mtu",		"0"		},	// Tunnel MTU, 0 for default
+	{ "ipv6_tun_ttl",		"255"	},	// Tunnel TTL
+	{ "ipv6_dns",			""		},	// DNS server(s) IPs
+	{ "ipv6_get_dns",		"" 		},	// DNS IP address got
+	{ "ipv6_6rd_prefix",	"2602:100::"	},	// 6RD prefix (Charter)
+	{ "ipv6_6rd_prefix_length",	"32"		},	// 6RD prefix length (32-62) checkme
+	{ "ipv6_6rd_borderrelay",	"68.114.165.1"	},	// 6RD border relay address
+	{ "ipv6_6rd_ipv4masklen",	"0"				},	// 6RD IPv4 mask length 0-30) checkme
 #endif
 
 	// Wireless parameters
@@ -152,9 +195,9 @@ const defaults_t defaults[] = {
 	{ "wl_corerev",			""				},	// Current core revision
 	{ "wl_phytypes",		""				},	// List of supported wireless bands (e.g. "ga")
 	{ "wl_radioids",		""				},	// List of radio IDs
-	{ "wl_ssid",			"wireless"		},	// Service set ID (network name)
-	{ "wl1_ssid",			"wireless1"		},
-	{ "wl_country_code",		""		},		// Country (default obtained from driver)
+	{ "wl_ssid",			"Tomato_RAF24"	},	// Service set ID (network name)
+	{ "wl1_ssid",			"Tomato_RAF50"	},
+	{ "wl_country_code",	""				},		// Country (default obtained from driver)
 	{ "wl_radio",			"1"				},	// Enable (1) or disable (0) radio
 	{ "wl1_radio",			"1"				},	// Enable (1) or disable (0) radio
 	{ "wl_closed",			"0"				},	// Closed (hidden) network
@@ -170,7 +213,7 @@ const defaults_t defaults[] = {
 	{ "wl_key2",			""				},	// 5/13 char ASCII or 10/26 char hex
 	{ "wl_key3",			""				},	// 5/13 char ASCII or 10/26 char hex
 	{ "wl_key4",			""				},	// 5/13 char ASCII or 10/26 char hex
-	{ "wl_channel",			"6"				},	// Channel number
+	{ "wl_channel",			"7"				},	// Channel number
 	{ "wl1_channel",		"0"				},
 	{ "wl_rate",			"0"				},	// Rate (bps, 0 for auto)
 	{ "wl_mrate",			"0"				},	// Mcast Rate (bps, 0 for auto)
@@ -185,22 +228,25 @@ const defaults_t defaults[] = {
 	{ "wl_gmode_protection","off"			},	// 802.11g RTS/CTS protection (off|auto)
 	{ "wl_afterburner",		"off"			},	// AfterBurner
 	{ "wl_frameburst",		"off"			},	// BRCM Frambursting mode (off|on)
-	{ "wl_wme",			"auto"			},	// WME mode (auto|off|on)
+	{ "wl_wme",				"auto"			},	// WME mode (auto|off|on)
 	{ "wl1_wme",			"auto"			},	// WME mode (auto|off|on)
 	{ "wl_antdiv",			"-1"			},	// Antenna Diversity (-1|0|1|3)
 	{ "wl_infra",			"1"				},	// Network Type (BSS/IBSS)
 	{ "wl_btc_mode",		"0"				},	// !!TB - BT Coexistence Mode
-	{ "wl_sta_retry_time",		"5"				},	// !!TB - Seconds between association attempts (0 to disable retries)
-	{ "wl_mitigation",		"0"				},	// Interference Mitigation Mode (0|1|2|3)
-
+	{ "wl_sta_retry_time",	"5"				},	// !!TB - Seconds between association attempts (0 to disable retries)
+	{ "wl_mitigation",		"0"				},	// Interference Mitigation Mode (0|1|2|3|4)    		   //Toastman  0=off
 	{ "wl_passphrase",		""				},	// Passphrase	// Add
 	{ "wl_wep_bit",			"128"			},	// WEP encryption [64 | 128] // Add
 	{ "wl_wep_buf",			""				},	// save all settings for web // Add
 	{ "wl_wep_gen",			""				},	// save all settings for generate button	// Add
 	{ "wl_wep_last",		""				},	// Save last wl_wep mode	// Add
 
+#ifdef TCONFIG_VLAN
+	{ "wl_vifs",			""				},	// multiple/virtual BSSIDs
+#endif
+
 	// WPA parameters
-	{ "wl_security_mode",		"disabled"		},	// WPA mode (disabled|radius|wpa_personal|wpa_enterprise|wep|wpa2_personal|wpa2_enterprise) for WEB	// Add
+	{ "wl_security_mode",	"disabled"		},	// WPA mode (disabled|radius|wpa_personal|wpa_enterprise|wep|wpa2_personal|wpa2_enterprise) for WEB	// Add
 	{ "wl_auth_mode",		"none"			},	// Network authentication mode (radius|none)
 	{ "wl_wpa_psk",			""				},	// WPA pre-shared key
 	{ "wl_wpa_gtk_rekey",	"3600"			},	// WPA GTK rekey interval	// Modify
@@ -225,7 +271,7 @@ const defaults_t defaults[] = {
 	{ "wl_wme_ap_vo",		"3 7 1 3264 1504 off off"	},	// WME AP AC_VO paramters
 
 	{ "wl_wme_no_ack",		"off"			},	// WME No-Acknowledgmen mode
-	{ "wl_wme_apsd",		"on"			},	// WME APSD mode
+	{ "wl_wme_apsd",		"off"			},	// WME APSD mode
 	{ "wl_wme_bss_disable",		"0"			},	// WME BSS disable advertising (off|on)
 
 	/* Per AC Tx parameters */
@@ -247,58 +293,58 @@ const defaults_t defaults[] = {
 	{ "wl1_nband",			"1"			},
 	{ "wl_nmcsidx",			"-1"			},	// MCS Index for N - rate
 	{ "wl_nreqd",			"0"			},	// Require 802.11n support
-	{ "wl_nbw",			"40"			},	// BW: 20 / 40 MHz
+	{ "wl_nbw",				"40"		},	// BW: 20 / 40 MHz
 	{ "wl_nbw_cap",			"1"			},	// BW: def 20inB and 40inA
-	{ "wl_mimo_preamble",		"mm"			},	// 802.11n Preamble: mm/gf/auto/gfbcm
+	{ "wl_mimo_preamble",	"mm"				},	// 802.11n Preamble: mm/gf/auto/gfbcm
 	{ "wl_nctrlsb",			"upper"			},	// N-CTRL SB (none/lower/upper)
-	{ "wl_nmode_protection",	"off"			},	// 802.11n RTS/CTS protection (off|auto)
+	{ "wl_nmode_protection","off"				},	// 802.11n RTS/CTS protection (off|auto)
 	{ "wl_rxstreams",		"0"			},	// 802.11n Rx Streams, 0 is invalid, WLCONF will change it to a radio appropriate default
 	{ "wl_txstreams",		"0"			},	// 802.11n Tx Streams 0, 0 is invalid, WLCONF will change it to a radio appropriate default
 	{ "wl_dfs_preism",		"60"			},	// 802.11H pre network CAC time
 	{ "wl_dfs_postism",		"60"			},	// 802.11H In Service Monitoring CAC time
 	{ "wl_radarthrs",		"1 0x6c0 0x6e0 0x6bc 0x6e0 0x6ac 0x6cc 0x6bc 0x6e0" },	// Radar thrs params format: version thresh0_20 thresh1_20 thresh0_40 thresh1_40
 	{ "wl_bcn_rotate",		"1"			},	// Beacon rotation
-	{ "wl_vlan_prio_mode",		"off"			},	// VLAN Priority support
+	{ "wl_vlan_prio_mode",	"off"				},	// VLAN Priority support
 	{ "wl_obss_coex",		"0"			},	// OBSS Coexistence (0|1): when enabled, channel width is forced to 20MHz
 
 #ifdef TCONFIG_EMF
 	{ "emf_entry",			""			},	// Static MFDB entry (mgrp:if)
 	{ "emf_uffp_entry",		""			},	// Unreg frames forwarding ports
-	{ "emf_rtport_entry",		""			},	// IGMP frames forwarding ports
+	{ "emf_rtport_entry",	""			},	// IGMP frames forwarding ports
 	{ "emf_enable",			"0"			},	// Disable EMF by default
 #endif
 #ifdef CONFIG_BCMWL5
 	// AMPDU
 	{ "wl_ampdu",			"auto"			},	// Default AMPDU setting
 	{ "wl_ampdu_rtylimit_tid",	"5 5 5 5 5 5 5 5"	},	// Default AMPDU retry limit per-tid setting
-	{ "wl_ampdu_rr_rtylimit_tid",	"2 2 2 2 2 2 2 2"	},	// Default AMPDU regular rate retry limit per-tid setting
+	{ "wl_ampdu_rr_rtylimit_tid","2 2 2 2 2 2 2 2"		},	// Default AMPDU regular rate retry limit per-tid setting
 	{ "wl_amsdu",			"auto"			},	// Default AMSDU setting
 	// power save
-	{ "wl_rxchain_pwrsave_enable",	"1"			},	// Rxchain powersave enable
+	{ "wl_rxchain_pwrsave_enable",		"1"		},	// Rxchain powersave enable
 	{ "wl_rxchain_pwrsave_quiet_time","1800"		},	// Quiet time for power save
-	{ "wl_rxchain_pwrsave_pps",	"10"			},	// Packets per second threshold for power save
-	{ "wl_radio_pwrsave_enable",	"0"			},	// Radio powersave enable
-	{ "wl_radio_pwrsave_quiet_time","1800"			},	// Quiet time for power save
-	{ "wl_radio_pwrsave_pps",	"10"			},	// Packets per second threshold for power save
-	{ "wl_radio_pwrsave_on_time",	"50"			},	// Radio on time for power save
+	{ "wl_rxchain_pwrsave_pps",			"10"	},	// Packets per second threshold for power save
+	{ "wl_radio_pwrsave_enable",		"0"		},	// Radio powersave enable
+	{ "wl_radio_pwrsave_quiet_time",	"1800"		},	// Quiet time for power save
+	{ "wl_radio_pwrsave_pps",			"10"	},	// Packets per second threshold for power save
+	{ "wl_radio_pwrsave_on_time",		"50"		},	// Radio on time for power save
 	// misc
-	{ "wl_wmf_bss_enable",		"0"			},	// WMF Enable/Disable
+	{ "wl_wmf_bss_enable",		"0"			},	// Wireless Multicast Forwarding Enable/Disable
 	{ "wl_rifs_advert",		"auto"			},	// RIFS mode advertisement
 	{ "wl_stbc_tx",			"auto"			},	// Default STBC TX setting
 	{ "wl_mcast_regen_bss_enable",	"1"			},	// MCAST REGEN Enable/Disable
 #endif
 
-	{ "pptp_server_ip",		""				},	// as same as WAN gateway
-	{ "ppp_get_ip",			""				},	// IP Address assigned by PPTP/L2TP server
-	{ "pptp_dhcp",			"1"				},
+	{ "pptp_server_ip",		""			},	// as same as WAN gateway
+	{ "ppp_get_ip",			""			},	// IP Address assigned by PPTP/L2TP server
+	{ "pptp_dhcp",			"1"			},
 
 	// for firewall
 	{ "mtu_enable",			"0"				},	// WAN MTU [1|0]
 	{ "wan_mtu",			"1500"			},	// Negotiate MTU to the smaller of this value or the peer MRU
 
 	{ "l2tp_server_ip",		""				},	// L2TP auth server (IP Address)
-//	hbobs	{ "hb_server_ip",		""				},	// heartbeat auth server (IP Address)
-//	hbobs	{ "hb_server_domain",	""				},	// heartbeat auth server (domain name)
+//	hbobs	{ "hb_server_ip",		""		},	// heartbeat auth server (IP Address)
+//	hbobs	{ "hb_server_domain",	""		},	// heartbeat auth server (domain name)
 
 // misc
 	{ "wl_tnoise",			"-99"			},
@@ -320,27 +366,33 @@ const defaults_t defaults[] = {
 	{ "ddnsx_refresh",		"28"			},
 
 // basic-ident
-	{ "router_name",		"tomato"		},
+	{ "router_name",		"TomatoRAF"		},
 	{ "wan_hostname",		"unknown"		},
 	{ "wan_domain",			""				},
 
 // basic-time
-	{ "tm_sel",				"PST8PDT,M3.2.0/2,M11.1.0/2"	},
-	{ "tm_tz",				"PST8PDT,M3.2.0/2,M11.1.0/2"	},
-	{ "tm_dst",				"1",							},
-	{ "ntp_updates",		"4"								},
-	{ "ntp_tdod",			"0"								},
-	{ "ntp_server",			"0.pool.ntp.org 1.pool.ntp.org 2.pool.ntp.org" },
-	{ "ntp_kiss",			""								},
-	{ "ntp_kiss_ignore",	""								},
+	{ "tm_sel",			"CET-1CEST,M3.5.0/2,M10.5.0/3"		},
+	{ "tm_tz",			"CET-1CEST,M3.5.0/2,M10.5.0/3"		},
+	{ "tm_dst",			"1",					},
+	{ "ntp_updates",		"4"					},
+	{ "ntp_tdod",			"0"					},
+	{ "ntp_server",			"0.europe.pool.ntp.org 1.europe.pool.ntp.org 2.europe.pool.ntp.org" },
+#ifdef TCONFIG_DNSCRYPT
+       { "ntp_server_ip",              "205.233.73.201 83.133.106.119 81.88.24.155 81.94.123.17 91.234.160.19 82.197.164.46 184.105.192.247 195.216.64.208" }, // shibby - when dnscrypt-proxy 1, have to use ip addresses
+#endif
+	{ "ntp_kiss",			""					},
+	{ "ntp_kiss_ignore",		""					},
+	{ "ntpd_enable",		"0"					},
+	{ "ntpd_server",		"-p 0.europe.pool.ntp.org -p 1.europe.pool.ntp.org -p 2.europe.pool.ntp.org"},
 
 // basic-static
 	{ "dhcpd_static",		""				},
+	{ "arpbind_listed",		"0"				},	// AB - Enable static ARP for all devices on list
 
 // basic-wfilter
-	{ "wl_maclist",			""			},	// xx:xx:xx:xx:xx:xx ...
+	{ "wl_maclist",			""			},	// xx:xx:xx:xx:xx:xx ... = 17
 	{ "wl_macmode",			"disabled"		},
-	{ "macnames",			""			},
+	{ "macnames",			""				},
 
 // advanced-ctnf
 	{ "ct_tcp_timeout",		""				},
@@ -350,8 +402,8 @@ const defaults_t defaults[] = {
 	{ "nf_ttl",				"0"				},
 	{ "nf_l7in",			"1"				},
 #ifdef LINUX26
-	{ "nf_sip",			"1"				},
-	{ "ct_hashsize",		""				},
+	{ "nf_sip",				"1"				},
+	{ "ct_hashsize",		"2048"			},
 #endif
 #ifdef LINUX26
 	{ "nf_rtsp",			"0"				},
@@ -360,7 +412,7 @@ const defaults_t defaults[] = {
 #endif
 	{ "nf_pptp",			"1"				},
 	{ "nf_h323",			"1"				},
-	{ "nf_ftp",			"1"				},
+	{ "nf_ftp",				"1"				},
 
 // advanced-mac
 	{ "mac_wan",			""				},
@@ -370,8 +422,8 @@ const defaults_t defaults[] = {
 	{ "boot_wait",			"on"			},
 	{ "wait_time",			"5"				},
 	{ "wan_speed",			"4"				},	// 0=10 Mb Full, 1=10 Mb Half, 2=100 Mb Full, 3=100 Mb Half, 4=Auto
-	{ "jumbo_frame_enable",		"0"				},	// Jumbo Frames support (for RT-N16/WNR3500L)
-	{ "jumbo_frame_size",		"2000"				},
+	{ "jumbo_frame_enable",		"0"			},	// Jumbo Frames support (for RT-N16/WNR3500L)
+	{ "jumbo_frame_size",		"2000"		},
 #ifdef CONFIG_BCMWL5
 	{ "ctf_disable",		"1"				},
 #endif
@@ -387,14 +439,29 @@ const defaults_t defaults[] = {
 	{ "dhcpc_custom",		""				},
 	{ "dns_norebind",		"1"				},
 	{ "dnsmasq_custom",		""				},
-//	{ "dnsmasq_norw",		"0"				},
+	{ "dnsmasq_static_only",	"0"				},
+	{ "dnsmasq_q",			"0"				},      // 0= quiet-dhcp 1=dhcp6 2=ra
 
 // advanced-firewall
-//		{ "block_loopback",		"0"				},	// nat loopback
-	{ "nf_loopback",		"1"				},
+//	{ "block_loopback",		"0"				},	// nat loopback
+	{ "nf_loopback",		"0"				},
 	{ "block_wan",			"1"				},	// block inbound icmp
+	{ "block_wan_limit",		"1"			},
+	{ "block_wan_limit_icmp",	"1"			},
+	{ "block_wan_limit_tr",		"5"			},
 	{ "multicast_pass",		"0"				},	// enable multicast proxy
+#ifdef TCONFIG_VLAN
+	{ "multicast_lan",		"0"				},	// on LAN (br0)
+	{ "multicast_lan1",		"0"				},	// on LAN1 (br1)
+	{ "multicast_lan2",		"0"				},	// on LAN2 (br2)
+	{ "multicast_lan3",		"0"				},	// on LAN3 (br3)
+#endif
+	{ "udpxy_enable",		"0"				},
+	{ "udpxy_stats",		"0"				},
+	{ "udpxy_clients",		"3"				},
+	{ "udpxy_port",			"4022"			},
 	{ "ne_syncookies",		"0"				},	// tcp_syncookies
+	{ "ne_snat",			"0"				},	// use SNAT instead of MASQUERADE
 	{ "dhcp_pass",			"1"				},	// allow DHCP responses
 	{ "ne_shlimit",			"0,3,60"		},
 
@@ -406,63 +473,88 @@ const defaults_t defaults[] = {
 	{ "dr_setting",			"0"				},	// [ Disable | WAN | LAN | Both ]
 	{ "dr_lan_tx",			"0"				},	// Dynamic-Routing LAN out
 	{ "dr_lan_rx",			"0"				},	// Dynamic-Routing LAN in
+#ifdef TCONFIG_VLAN
+	{ "dr_lan1_tx",			"0"				},	// Dynamic-Routing LAN out
+	{ "dr_lan1_rx",			"0"				},	// Dynamic-Routing LAN in
+	{ "dr_lan2_tx",			"0"				},	// Dynamic-Routing LAN out
+	{ "dr_lan2_rx",			"0"				},	// Dynamic-Routing LAN in
+	{ "dr_lan3_tx",			"0"				},	// Dynamic-Routing LAN out
+	{ "dr_lan3_rx",			"0"				},	// Dynamic-Routing LAN in
+#endif
 	{ "dr_wan_tx",			"0"				},	// Dynamic-Routing WAN out
 	{ "dr_wan_rx",			"0"				},	// Dynamic-Routing WAN in
 #endif
 
+// advanced-vlan
+	{ "trunk_vlan_so",		"0"				},	// VLAN trunk support override
+
 // advanced-wireless
 	{ "wl_txant",			"3"				},
-	{ "wl_txpwr",			"42"			},
+	{ "wl_txpwr",			"0"				},	// 0 = driver default power
 	{ "wl_maxassoc",		"128"			},	// Max associations driver could support
-	{ "wl_bss_maxassoc",		"128"			},
+	{ "wl_bss_maxassoc",	"128"			},
 	{ "wl_distance",		""				},
 
 // forward-*
 	{ "portforward",		"0<3<1.1.1.0/24<1000:2000<<192.168.1.2<ex: 1000 to 2000, restricted>0<2<<1000,2000<<192.168.1.2<ex: 1000 and 2000>0<1<<1000<2000<192.168.1.2<ex: different internal port>0<3<<1000:2000,3000<<192.168.1.2<ex: 1000 to 2000, and 3000>" },
 #ifdef TCONFIG_IPV6
-	{ "ipv6_portforward",	""},
+	{ "ipv6_portforward",	""				},
 #endif
 	{ "trigforward",		"0<1<3000:4000<5000:6000<ex: open 5000-6000 if 3000-4000>"	},
 	{ "dmz_enable",			"0"				},
 	{ "dmz_ipaddr",			"0"				},
 	{ "dmz_sip",			""				},
+	{ "dmz_ra",				"1"				},
+#ifdef TCONFIG_VLAN
+	{ "dmz_ifname",			"br0"			},
+#endif
 
 // forward-upnp
-	{ "upnp_enable",		"0"				},
+	{ "upnp_enable",		"3"				},
 	{ "upnp_secure",		"1"				},
 	{ "upnp_port",			"0"				},
-	{ "upnp_ssdp_interval",		"60"				},	// SSDP interval
+	{ "upnp_ssdp_interval",	"60"			},	// SSDP interval
+	{ "upnp_max_age",		"180"			},	// Max age
 	{ "upnp_mnp",			"0"				},
-
+	{ "upnp_custom",		""				},
 	{ "upnp_clean",			"1"				},	/* 0:Disable 1:Enable */
-	{ "upnp_clean_interval",	"600"				},	/* Cleaning interval in seconds */
-	{ "upnp_clean_threshold",	"20"				},	/* Threshold for cleaning unused rules */
+	{ "upnp_clean_interval",	"600"		},	/* Cleaning interval in seconds */
+	{ "upnp_clean_threshold",	"20"		},	/* Threshold for cleaning unused rules */
 #if 0	// disabled for miniupnpd
 	{ "upnp_max_age",		"180"			},	// Max age
 	{ "upnp_config",		"0"				},
 #endif
 
 // qos
+	{ "atm_overhead",		"0"				},	
 	{ "qos_enable",			"0"				},
 	{ "qos_ack",			"0"				},
 	{ "qos_syn",			"1"				},
 	{ "qos_fin",			"1"				},
 	{ "qos_rst",			"1"				},
-	{ "qos_icmp",			"0"				},
+	{ "qos_udp",			"0"				},
+	{ "qos_icmp",			"1"				},
 	{ "qos_reset",			"1"				},
-	{ "qos_obw",			"230"			},
-	{ "qos_ibw",			"1000"			},
-	{ "qos_orules",			"0<<6<d<80,443<0<<0:512<1<WWW>0<<6<d<80,443<0<<512:<3<WWW (512K+)>0<<-1<d<53<0<<0:2<0<DNS>0<<-1<d<53<0<<2:<4<DNS (2K+)" },
+	{ "qos_obw",			"10000"				},
+	{ "qos_ibw",			"100000"				},
+	{ "qos_orules",			"0<<-1<d<53<0<<0:10<<0<DNS>0<<-1<d<37<0<<0:10<<0<Time>0<<17<d<123<0<<0:10<<0<NTP>0<<-1<d<3455<0<<0:10<<0<RSVP>0<<-1<d<9<0<<0:50<<4<SCTP, Discard>0<<-1<x<135,2101,2103,2105<0<<<<4<RPC (Microsoft)>0<<6<d<23,992<0<<<<3<Telnet>0<<6<x<22,2222<0<<<<0<SSH>0<<17<d<3544<0<<<<-1<Teredo Tunnel>0<<6<s<80,8080,2222<0<<<<3<Remote Access>0<<-1<x<3389<0<<<<3<Remote Assistance>0<<-1<x<6970:7170,8554<0<<<<2<Quicktime/RealAudio>0<<-1<d<1220,7070<0<<<<2<Quicktime/RealAudio>0<<-1<x<554,5004,5005<0<<<<2<RTP, RTSP>0<<-1<x<1755<0<<<<2<MMS (Microsoft)>0<<-1<d<3478,3479,5060:5063<0<<<<1<SIP, Sipgate Stun Services>0<<-1<s<53,88,3074<0<<<<1<Xbox Live>0<<6<d<1718:1720<0<<<<1<H323>0<<6<d<80,443<0<<0:512<<4<HTTP, HTTPS>0<<6<d<8080<0<<0:512<<4<HTTP Proxy/Alternate>0<<-1<d<11999,2300:2400,6073,28800:29100,47624<0<<<<-1<Other games>0<<6<d<25,587,465,2525<0<<<<5<SMTP, Submission Mail>0<<6<d<110,995<0<<<<5<POP3 Mail>0<<6<d<143,220,585,993<0<<<<5<IMAP Mail>0<<6<d<6005,6006<0<<<<6<Camfrog>0<<-1<d<1493,1502,1503,1542,1863,1963,3389,5061,5190:5193,7001<0<<<<6<MSGR1 - Windows Live>0<<-1<d<1071:1074,1455,1638,1644,5000:5010,5050,5100,5101,5150,8000:8002<0<<<<6<MSGR2 - Yahoo>0<<-1<d<194,1720,1730:1732,5220:5223,5298,6660:6669,22555<0<<<<6<MSGR3 - Additional>0<<6<d<119,563<0<<<<7<NNTP News & Downloads>0<<6<d<20,21,989,990<0<<<<7<FTP>0<<-1<x<6571,6891:6901<0<<<<7<WLM File/Webcam>0<<6<d<80,443,8080<0<<512:<<7<HTTP,SSL File Transfers>0<<-1<a<<0<httpvideo<<<2<HTTP Video, (Youtube)>0<<-1<a<<0<flash<<<2<Flash Video, (Youtube)>0<<-1<a<<0<rtp<<<2<RTP>0<<-1<a<<0<rtmp<<<2<RTMP>0<<-2<a<<0<rtmp<<<2<RTMPT (RTMP over HTTP)>0<<-1<a<<0<shoutcast<<<2<Shoutcast>0<<-1<a<<0<irc<<<6<IRC>0<<-1<a<<0<skypetoskype<<<1<Skype to Skype>0<<-1<a<<0<skypeout<<<1<Skype Phone>0<<17<d<1:65535<0<<<<9<P2P (uTP, UDP)" },
 	{ "qos_burst0",			""				},
 	{ "qos_burst1",			""				},
-
-	{ "qos_default",		"4"				},
-	{ "qos_orates",			"80-100,10-100,5-100,3-100,2-95,1-50,1-40,1-30,1-20,1-10"	},
+	{ "qos_default",		"8"				},
+	{ "qos_orates",			"5-100,5-30,5-30,5-100,20-100,5-70,5-70,5-70,5-30,1-5"				},
+	{ "qos_irates",			"5-100,5-30,5-40,5-100,20-90,5-60,5-60,5-60,5-60,1-5"   			},
+	{ "qos_classnames",		"Service VOIP/Game Media Remote WWW Mail Messenger FileXfer P2P/Bulk Crawl"	},
 
 	{ "ne_vegas",			"0"				},	// TCP Vegas
 	{ "ne_valpha",			"2"				},	// "
 	{ "ne_vbeta",			"6"				},	// "
 	{ "ne_vgamma",			"2"				},	// "
+
+// qos-bw-limiter
+	{ "qosl_enable",		"0"			},
+//	{ "qosl_obw",			""			},	//unused - used qos_obw
+//	{ "qosl_ibw",			""			},	//unused - used qos_obw
+	{ "qosl_rules",			"" 			},
 
 // access restrictions
 	{ "rruleN",				"0"				},
@@ -481,55 +573,66 @@ const defaults_t defaults[] = {
 
 // admin-access
 	{ "http_username",		""			},	// Username
-	{ "http_passwd",		"admin"			},	// Password
-	{ "remote_management",	"0"				},	// Remote Management [1|0]
-	{ "remote_mgt_https",	"0"				},	// Remote Management use https [1|0]
-	{ "http_wanport",		"8080"			},	// WAN port to listen on
-	{ "http_lanport",		"80"			},	// LAN port to listen on
-	{ "https_lanport",		"443"			},	// LAN port to listen on
-	{ "http_enable",		"1"				},	// HTTP server enable/disable
-	{ "https_enable",		"0"				},	// HTTPS server enable/disable
-	{ "https_crt_save",		"0"				},
-	{ "https_crt_cn",		""				},
-	{ "https_crt_file",		""				},
-	{ "https_crt",			""				},
-	{ "web_wl_filter",		"0"				},	// Allow/Deny Wireless Access Web
-	{ "web_css",			"tomato"		},
-	{ "web_svg",			"1"				},
-	{ "telnetd_eas",		"1"				},
-	{ "telnetd_port",		"23"			},
-	{ "sshd_eas",			"0"				},
-	{ "sshd_pass",			"1"				},
-	{ "sshd_port",			"22"			},
-	{ "sshd_remote",		"0"				},
-	{ "sshd_rport",			"2222"			},
-	{ "sshd_authkeys",		""				},
-	{ "sshd_hostkey",		""				},
-	{ "sshd_dsskey",		""				},
-	{ "sshd_forwarding",		"1"				},
-	{ "rmgt_sip",			""				},	// remote management: source ip address
-
-	{ "http_id",			""				},
-	{ "web_mx",				"status,bwm"	},
-	{ "web_pb",				""				},
+	{ "http_passwd",		"admin"		},	// Password
+	{ "remote_management",	"0"			},	// Remote Management [1|0]
+	{ "remote_mgt_https",	"0"			},	// Remote Management use https [1|0]
+	{ "http_wanport",		"8080"		},	// WAN port to listen on
+	{ "http_lanport",		"80"		},	// LAN port to listen on
+	{ "https_lanport",		"443"		},	// LAN port to listen on
+	{ "http_enable",		"1"			},	// HTTP server enable/disable
+	{ "https_enable",		"0"			},	// HTTPS server enable/disable
+	{ "https_crt_save",		"0"			},
+	{ "https_crt_cn",		""			},
+	{ "https_crt_file",		""			},
+	{ "https_crt",			""			},
+	{ "web_wl_filter",		"0"			},	// Allow/Deny Wireless Access Web
+	{ "web_css",			"usbred"	},
+	{ "web_svg",			"1"			},
+	{ "telnetd_eas",		"1"			},
+	{ "telnetd_port",		"23"		},
+	{ "sshd_eas",			"0"			},
+	{ "sshd_pass",			"1"			},
+	{ "sshd_port",			"22"		},
+	{ "sshd_remote",		"0"			},
+	{ "sshd_rport",			"2222"		},
+	{ "sshd_authkeys",		""			},
+	{ "sshd_hostkey",		""			},
+	{ "sshd_dsskey",		""			},
+	{ "sshd_forwarding",	"1"			},
+	{ "rmgt_sip",			""			},	// remote management: source ip address
+	{ "http_id",			""			},
+	{ "web_mx",				""			},
+	{ "web_pb",				""			},
 
 // admin-bwm
-	{ "rstats_enable",		"1"				},
-	{ "rstats_path",		""				},
-	{ "rstats_stime",		"48"			},
-	{ "rstats_offset",		"1"				},
-	{ "rstats_data",		""				},
-	{ "rstats_colors",		""				},
-	{ "rstats_exclude",		""				},
-	{ "rstats_sshut",		"1"				},
-	{ "rstats_bak",			"0"				},
+	{ "rstats_enable",		"1"			},
+	{ "rstats_path",		""			},
+	{ "rstats_stime",		"48"		},
+	{ "rstats_offset",		"1"			},
+	{ "rstats_data",		""			},
+	{ "rstats_colors",		""			},
+	{ "rstats_exclude",		""			},
+	{ "rstats_sshut",		"1"			},
+	{ "rstats_bak",			"0"			},
+
+// admin-ipt
+	{ "cstats_enable",		"0"			},
+	{ "cstats_path",		""			},
+	{ "cstats_stime",		"48"		},
+	{ "cstats_offset",		"1"			},
+	{ "cstats_labels",		"0"			},
+	{ "cstats_exclude",		""			},
+	{ "cstats_include",		""			},
+	{ "cstats_all",			"1"			},
+	{ "cstats_sshut",		"1"			},
+	{ "cstats_bak",			"0"			},
 
 // advanced-buttons
-	{ "sesx_led",			"0"				},
-	{ "sesx_b0",			"1"				},
-	{ "sesx_b1",			"4"				},
-	{ "sesx_b2",			"4"				},
-	{ "sesx_b3",			"4"				},
+	{ "sesx_led",			"0"			},
+	{ "sesx_b0",			"1"			},
+	{ "sesx_b1",			"4"			},
+	{ "sesx_b2",			"4"			},
+	{ "sesx_b3",			"4"			},
 	{ "sesx_script",
 		"[ $1 -ge 20 ] && telnetd -p 233 -l /bin/sh\n"
 	},
@@ -549,33 +652,37 @@ const defaults_t defaults[] = {
 	},
 
 // admin-log
-	{ "log_remote",			"0"				},
-	{ "log_remoteip",		""				},
+	{ "log_remote",			"0"			},
+	{ "log_remoteip",		""			},
 	{ "log_remoteport",		"514"			},
-	{ "log_file",			"1"				},
+	{ "log_file",			"1"			},
+	{ "log_file_custom",		"0"			},
+	{ "log_file_path",		"/var/log/messages"	},
+	{ "log_file_size",		"50"			},
+	{ "log_file_keep",		"1"			},
 	{ "log_limit",			"60"			},
-	{ "log_in",				"0"				},
-	{ "log_out",			"0"				},
+	{ "log_in",			"0"			},
+	{ "log_out",			"0"			},
 	{ "log_mark",			"60"			},
-	{ "log_events",			""				},
+	{ "log_events",			""			},
 
 // admin-log-webmonitor
-	{ "log_wm",			"0"				},
-	{ "log_wmtype",			"0"				},
-	{ "log_wmip",			""				},
-	{ "log_wmdmax",			"300"				},
-	{ "log_wmsmax",			"300"				},
+	{ "log_wm",			"0"			},
+	{ "log_wmtype",			"0"			},
+	{ "log_wmip",			""			},
+	{ "log_wmdmax",			"300"			},
+	{ "log_wmsmax",			"300"			},
 
 // admin-debugging
-	{ "debug_nocommit",		"0"				},
-	{ "debug_cprintf",		"0"				},
-	{ "debug_cprintf_file",	"0"				},
-//	{ "debug_keepfiles",	"0"				},
-	{ "console_loglevel",	"1"				},
-	{ "t_cafree",			"1"				},
-	{ "t_hidelr",			"0"				},
-	{ "debug_clkfix",		"1"				},
-	{ "debug_ddns",			"0"				},
+	{ "debug_nocommit",		"0"			},
+	{ "debug_cprintf",		"0"			},
+	{ "debug_cprintf_file",		"0"			},
+//	{ "debug_keepfiles",		"0"			},
+	{ "console_loglevel",		"1"			},
+	{ "t_cafree",			"1"			},
+	{ "t_hidelr",			"0"			},
+	{ "debug_clkfix",		"1"			},
+	{ "debug_ddns",			"0"			},
 
 // admin-cifs
 	{ "cifs1",				""				},
@@ -587,17 +694,17 @@ const defaults_t defaults[] = {
 
 #ifdef TCONFIG_USB
 // nas-usb - !!TB
-	{ "usb_enable",			"0"				},
+	{ "usb_enable",			"1"				},
 	{ "usb_uhci",			"0"				},
 	{ "usb_ohci",			"0"				},
 	{ "usb_usb2",			"1"				},
 #if defined(LINUX26) && defined(TCONFIG_USB_EXTRAS)
-	{ "usb_mmc",			"-1"				},
+	{ "usb_mmc",			"-1"			},
 #endif
 	{ "usb_irq_thresh",		"0"				},
 	{ "usb_storage",		"1"				},
-	{ "usb_printer",		"1"				},
-	{ "usb_printer_bidirect",	"0"				},
+	{ "usb_printer",		"0"				},
+	{ "usb_printer_bidirect",	"0"			},
 	{ "usb_ext_opt",		""				},
 	{ "usb_fat_opt",		""				},
 	{ "usb_ntfs_opt",		""				},
@@ -606,13 +713,17 @@ const defaults_t defaults[] = {
 #ifdef TCONFIG_NTFS
 	{ "usb_fs_ntfs",		"1"				},
 #endif
+	{ "usb_fs_hfs",			"1"				}, //!Victek
+	{ "usb_fs_hfsplus",		"1"				}, //!Victek
 	{ "usb_automount",		"1"				},
 #if 0
 	{ "usb_bdflush",		"30 500 0 0 100 100 60 0 0"	},
 #endif
-	{ "script_usbhotplug",		""				},
-	{ "script_usbmount",		""				},
-	{ "script_usbumount",		""				},
+	{ "script_usbhotplug",	""			},
+	{ "script_usbmount",	""			},
+	{ "script_usbumount",	""			},
+	{ "idle_enable",		"0"			},
+	{ "usb_3g",				"1"			},
 #endif
 
 #ifdef TCONFIG_FTP
@@ -621,10 +732,10 @@ const defaults_t defaults[] = {
 	{ "ftp_super",			"0"				},
 	{ "ftp_anonymous",		"0"				},
 	{ "ftp_dirlist",		"0"				},
-	{ "ftp_port",			"21"				},
+	{ "ftp_port",			"21"			},
 	{ "ftp_max",			"0"				},
 	{ "ftp_ipmax",			"0"				},
-	{ "ftp_staytimeout",		"300"				},
+	{ "ftp_staytimeout",	"300"			},
 	{ "ftp_rate",			"0"				},
 	{ "ftp_anonrate",		"0"				},
 	{ "ftp_anonroot",		""				},
@@ -633,36 +744,46 @@ const defaults_t defaults[] = {
 	{ "ftp_users",			""				},
 	{ "ftp_custom",			""				},
 	{ "ftp_sip",			""				},	// wan ftp access: source ip address(es)
-	{ "ftp_limit",			"0,3,60"			},
+	{ "ftp_limit",			"0,3,60"		},
 	{ "log_ftp",			"0"				},
+#endif
+
+#ifdef TCONFIG_SNMP
+	{ "snmp_enable",		"0"				},
+	{ "snmp_port",			"161"			},
+	{ "snmp_remote",		"0"				},
+	{ "snmp_remote_sip",		""			},
+	{ "snmp_location",		"router"		},
+	{ "snmp_contact",		"admin@tomato"	},
+	{ "snmp_ro",			"rocommunity"	},
 #endif
 
 #ifdef TCONFIG_SAMBASRV
 // nas-samba - !!TB
 	{ "smbd_enable",		"0"				},
-	{ "smbd_wgroup",		"WORKGROUP"			},
+	{ "smbd_wgroup",		"WORKGROUP"		},
 	{ "smbd_master",		"1"				},
 	{ "smbd_wins",			"1"				},
 	{ "smbd_cpage",			""				},
-	{ "smbd_cset",			"utf8"				},
+	{ "smbd_cset",			"utf8"			},
 	{ "smbd_custom",		""				},
 	{ "smbd_autoshare",		"2"				},
 	{ "smbd_shares",
 		"jffs</jffs<JFFS<1<0>root$</<Hidden Root<0<1"
 	},
-	{ "smbd_user",			"nas"				},
+	{ "smbd_user",			"nas"			},
 	{ "smbd_passwd",		""				},
 #endif
 
 #ifdef TCONFIG_MEDIA_SERVER
 // nas-media
 	{ "ms_enable",			"0"				},	/* 0:Disable 1:Enable 2:Enable&Rescan */
-	{ "ms_dirs",			"/mnt<"				},
+	{ "ms_dirs",			"/mnt<"			},
 	{ "ms_port",			"0"				},
 	{ "ms_dbdir",			""				},
 	{ "ms_tivo",			"0"				},
 	{ "ms_stdlna",			"0"				},
-	{ "ms_sas",			"0"				},
+	{ "ms_sas",				"0"				},
 #endif
 
 // admin-sch
@@ -671,7 +792,7 @@ const defaults_t defaults[] = {
 	{ "sch_c1",				""				},
 	{ "sch_c2",				""				},
 	{ "sch_c3",				""				},
-	{ "sch_c1_cmd",			""				},
+	{ "sch_c1_cmd",			"" 				},
 	{ "sch_c2_cmd",			""				},
 	{ "sch_c3_cmd",			""				},
 
@@ -679,43 +800,43 @@ const defaults_t defaults[] = {
 	{ "script_init",		""				},
 	{ "script_shut",		""				},
 	{ "script_fire",		""				},
-	{ "script_wanup",		""				},
+    { "script_wanup",		""				},
 
 #ifdef TCONFIG_OPENVPN
 // vpn
-	{ "vpn_debug",            "0"             },
-	{ "vpn_server_eas",       ""              },
-	{ "vpn_server_dns",       ""              },
-	{ "vpn_server1_poll",     "0"             },
-	{ "vpn_server1_if",       "tun"           },
-	{ "vpn_server1_proto",    "udp"           },
-	{ "vpn_server1_port",     "1194"          },
-	{ "vpn_server1_firewall", "auto"          },
-	{ "vpn_server1_crypt",    "tls"           },
-	{ "vpn_server1_comp",     "adaptive"      },
-	{ "vpn_server1_cipher",   "default"       },
-	{ "vpn_server1_dhcp",     "1"             },
-	{ "vpn_server1_r1",       "192.168.1.50"  },
-	{ "vpn_server1_r2",       "192.168.1.55"  },
-	{ "vpn_server1_sn",       "10.8.0.0"      },
-	{ "vpn_server1_nm",       "255.255.255.0" },
-	{ "vpn_server1_local",    "10.8.0.1"      },
-	{ "vpn_server1_remote",   "10.8.0.2"      },
-	{ "vpn_server1_reneg",    "-1"            },
-	{ "vpn_server1_hmac",     "-1"            },
-	{ "vpn_server1_plan",     "1"             },
-	{ "vpn_server1_ccd",      "0"             },
-	{ "vpn_server1_c2c",      "0"             },
-	{ "vpn_server1_ccd_excl", "0"             },
-	{ "vpn_server1_ccd_val",  ""              },
-	{ "vpn_server1_pdns",     "0"             },
-	{ "vpn_server1_rgw",      "0"             },
-	{ "vpn_server1_custom",   ""              },
-	{ "vpn_server1_static",   ""              },
-	{ "vpn_server1_ca",       ""              },
-	{ "vpn_server1_crt",      ""              },
-	{ "vpn_server1_key",      ""              },
-	{ "vpn_server1_dh",       ""              },
+	{ "vpn_debug",				"0"			},
+	{ "vpn_server_eas",			""			},
+	{ "vpn_server_dns",			""			},
+	{ "vpn_server1_poll",		"0"			},
+	{ "vpn_server1_if",			"tun"		},
+	{ "vpn_server1_proto",		"udp"		},
+	{ "vpn_server1_port",		"1194"		},
+	{ "vpn_server1_firewall",	"auto"		},
+	{ "vpn_server1_crypt",		"tls"		},
+	{ "vpn_server1_comp",		"adaptive"	},
+	{ "vpn_server1_cipher",		"default"	},
+	{ "vpn_server1_dhcp",		"1"			},
+	{ "vpn_server1_r1",		"192.168.1.50"	},
+	{ "vpn_server1_r2",		"192.168.1.55"	},
+	{ "vpn_server1_sn",		"10.8.0.0"		},
+	{ "vpn_server1_nm",		"255.255.255.0"	},
+	{ "vpn_server1_local",	"10.8.0.1"		},
+	{ "vpn_server1_remote",	"10.8.0.2"		},
+	{ "vpn_server1_reneg",	"-1"			},
+	{ "vpn_server1_hmac",	"-1"			},
+	{ "vpn_server1_plan",	"1"				},
+	{ "vpn_server1_ccd",	"0"				},
+	{ "vpn_server1_c2c",	"0"				},
+	{ "vpn_server1_ccd_excl",	"0"			},
+	{ "vpn_server1_ccd_val",	""			},
+	{ "vpn_server1_pdns",		"0"			},
+	{ "vpn_server1_rgw",		"0"			},
+	{ "vpn_server1_custom",		""			},
+	{ "vpn_server1_static",		""			},
+	{ "vpn_server1_ca",			""			},
+	{ "vpn_server1_crt",		""			},
+	{ "vpn_server1_key",		""			},
+	{ "vpn_server1_dh",			""			},
 	{ "vpn_server2_poll",     "0"             },
 	{ "vpn_server2_if",       "tun"           },
 	{ "vpn_server2_proto",    "udp"           },
@@ -800,6 +921,23 @@ const defaults_t defaults[] = {
 	{ "vpn_client2_crt",      ""              },
 	{ "vpn_client2_key",      ""              },
 #endif	// vpn
+#ifdef TCONFIG_USERPPTP
+	{ "pptp_client_enable",   "0"             },
+	{ "pptp_client_peerdns",  "0"             },
+	{ "pptp_client_mtuenable","0"             },
+	{ "pptp_client_mtu",      "1450"          },
+	{ "pptp_client_mruenable","0"             },
+	{ "pptp_client_mru",      "1450"          },
+	{ "pptp_client_nat",      "0"             },
+	{ "pptp_client_srvip",    ""              },
+	{ "pptp_client_srvsub",   "10.0.0.0"      },
+	{ "pptp_client_srvsubmsk","255.0.0.0"     },
+	{ "pptp_client_username", ""              },
+	{ "pptp_client_passwd",   ""              },
+	{ "pptp_client_crypt",    "0"             },
+	{ "pptp_client_custom",   ""              },
+	{ "pptp_client_dfltroute","0"             },
+#endif
 
 #if 0
 // safe to remove?
@@ -900,7 +1038,43 @@ const defaults_t defaults[] = {
 
 #endif	// 0
 
-	{ NULL, NULL	}
+// arpbind
+	{ "arpbind_enable",			"0"			},
+	{ "arpbind_only",			"0"			},
+	{ "arpbind_list",			"" 			},
+
+// NoCatSplash. !!Victek
+#ifdef TCONFIG_NOCAT
+	{ "NC_enable",				"0"			}, // enable NoCatSplash
+	{ "NC_Verbosity",			"2"			},
+	{ "NC_GatewayName",			"Tomato Captive Portal"	},
+	{ "NC_GatewayPort",			"5280"			},
+	{ "NC_GatewayMode",			"Open"			},
+	{ "NC_DocumentRoot",			"/tmp/splashd"		},
+	{ "NC_ExcludePorts",			"1863"			},
+	{ "NC_HomePage",			"http://victek.is-a-geek.com"	},
+	{ "NC_ForcedRedirect",			"0"			},
+	{ "NC_IdleTimeout",			"0"			},
+	{ "NC_MaxMissedARP",			"5"			},
+	{ "NC_PeerChecktimeout",		"0"			},
+	{ "NC_LoginTimeout",			"3600"			},
+	{ "NC_RenewTimeout",			"0"			},
+	{ "NC_AllowedWebHosts",			"http://victek.is-a-geek.com"			},
+#ifdef TCONFIG_VLAN
+	{ "NC_BridgeLAN",			"br0"			},
+#endif
+#endif
+//NGinx X Roadkill
+#ifdef TCONFIG_NGINX
+	{"nginx_enable",		"0"				}, // NGinX enabled
+	{"nginx_docroot",		"/www"				}, // path for server files
+	{"nginx_port",			"85"				}, // port to listen
+	{"nginx_fqdn",			"Tomato.RAF"			}, // server name
+	{"nginx_priority",		"10"				}, // server priority = worker_priority
+	{"nginx_custom",		"# NGINX Custom Parameters."	}, // additional lines for nginx.conf
+#endif
+	{ NULL, NULL}
+
 };
 
 const defaults_t if_generic[] = {
@@ -914,6 +1088,14 @@ const defaults_t if_generic[] = {
 const defaults_t if_vlan[] = {
 	{ "lan_ifname",		"br0"					},
 	{ "lan_ifnames",	"vlan0 eth1 eth2 eth3"	},
+#ifdef TCONFIG_VLAN
+	{ "lan1_ifname",	""					},
+	{ "lan1_ifnames",	""					},
+	{ "lan2_ifname",	""					},
+	{ "lan2_ifnames",	""					},
+	{ "lan3_ifname",	""					},
+	{ "lan3_ifnames",	""					},
+#endif
 	{ "wan_ifname",		"vlan1"					},
 	{ "wan_ifnames",	"vlan1"					},
 	{ NULL, NULL }

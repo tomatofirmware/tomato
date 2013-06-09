@@ -44,11 +44,30 @@ enum {
  */
 
 	/* default option for compression */
-#define DEFAULT_COMPRESSION FALSE
+#define DEFAULT_COMPRESSION 1
 	/* (log2 of) number of clusters in a compression block for new files */
 #define STANDARD_COMPRESSION_UNIT 4
 	/* maximum cluster size for allowing compression for new files */
 #define MAX_COMPRESSION_CLUSTER_SIZE 4096
+
+/*
+ *		Parameters for default options
+ */
+
+#define DEFAULT_DMTIME 60 /* default 1mn for delay_mtime */
+
+/*
+ *		Use of big write buffers
+ *
+ *	With small volumes, the cluster allocator may fail to allocate
+ *	enough clusters when the volume is nearly full. At most a run
+ *	can be allocated per bitmap chunk. So, there is a danger when the
+ *	number of chunks (capacity/(32768*clsiz)) is less than the number
+ *	of clusters in the biggest write buffer (131072/clsiz). Hence
+ *	a safe minimal capacity is 4GB
+ */
+
+#define SAFE_CAPACITY_FOR_BIG_WRITES 0x100000000LL
 
 /*
  *		Parameters for runlists
@@ -63,6 +82,11 @@ enum {
 
 #define XATTRMAPPINGFILE ".NTFS-3G/XattrMapping" /* default mapping file */
 
+/*
+ *		Parameters for path canonicalization
+ */
+
+#define MAPPERNAMELTH 256
 
 /*
  *		Permission checking modes for high level and low level
@@ -91,7 +115,11 @@ enum {
  *	of 6 is added in the mount report.
  */
 
+#if defined(__sun) && defined(__SVR4)
+#define HPERMSCONFIG 4 /* access control by kernel is broken on OpenIndiana */
+#else
 #define HPERMSCONFIG 1
+#endif
 #if defined(FUSE_INTERNAL) || !defined(FUSE_VERSION) || (FUSE_VERSION < 28)
 #define LPERMSCONFIG 5
 #else

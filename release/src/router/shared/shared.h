@@ -47,6 +47,7 @@ extern const char *tomato_shortver;
 #define	WP_L2TP			3
 #define	WP_PPPOE		4
 #define	WP_PPTP			5
+#define	WP_PPP3G		6
 
 #ifdef TCONFIG_IPV6
 #define	IPV6_DISABLED		0
@@ -55,6 +56,8 @@ extern const char *tomato_shortver;
 #define	IPV6_ANYCAST_6TO4	3
 #define	IPV6_6IN4		4
 #define	IPV6_MANUAL		5
+#define	IPV6_6RD		6
+#define	IPV6_6RD_DHCP		7
 #endif
 
 enum {
@@ -92,6 +95,10 @@ extern int get_wan_proto(void);
 extern int get_ipv6_service(void);
 #define ipv6_enabled()	(get_ipv6_service() != IPV6_DISABLED)
 extern const char *ipv6_router_address(struct in6_addr *in6addr);
+extern int calc_6rd_local_prefix(const struct in6_addr *prefix,
+	int prefix_len, int relay_prefix_len,
+	const struct in_addr *local_ip,
+	struct in6_addr *local_prefix, int *local_prefix_len);
 #else
 #define ipv6_enabled()	(0)
 #endif
@@ -174,6 +181,9 @@ enum {
 	MODEL_WL520GU,
 	MODEL_DIR320,
 	MODEL_H618B,
+	MODEL_CW5358U,
+	MODEL_HG320,
+	MODEL_RG200E_CA,
 	MODEL_WL1600GL,
 	MODEL_WBRG54,
 	MODEL_WBR2G54,
@@ -186,10 +196,15 @@ enum {
 	MODEL_WHR3AG54,
 	MODEL_RT390W,
 	MODEL_RTN10,
+	MODEL_RTN10U,
 	MODEL_RTN12,
+	MODEL_RTN12B1,
+	MODEL_RTN15U,
 	MODEL_RTN16,
+	MODEL_RTN53,
 	MODEL_RTN66U,
 	MODEL_WNR3500L,
+	MODEL_WNR3500LV2,
 	MODEL_WNR2000v2,
 	MODEL_F7D3301,
 	MODEL_F7D3302,
@@ -201,6 +216,12 @@ enum {
 	MODEL_WRT320N,
 	MODEL_WRT610Nv2,
 	MODEL_WRT310Nv1,
+	MODEL_E900,
+	MODEL_E1000v2,
+	MODEL_E1500,
+	MODEL_E1550,
+	MODEL_E2500,
+	MODEL_E3200,
 	MODEL_E4200,
 	MODEL_MN700,
 	MODEL_WRH54G,
@@ -211,7 +232,9 @@ enum {
 	MODEL_WLA2G54L,
 	MODEL_TM2300,
 	MODEL_WZRG300N,
-	MODEL_WRT300N
+	MODEL_WRT300N,
+	MODEL_WL330GE,
+	MODEL_L600N
 };
 
 /* NOTE: Do not insert new entries in the middle of this enum,
@@ -231,8 +254,13 @@ enum {
 	HW_BCM4705L_BCM5325E_EWC,
 	HW_BCM5350,
 	HW_BCM5356,
+	HW_BCM5357,
+	HW_BCM53572,
+	HW_BCM5358,
+	HW_BCM5358U,
 	HW_BCM4716,
 	HW_BCM4718,
+	HW_BCM47186,
 	HW_BCM4717,
 	HW_BCM5365,
 	HW_BCM4785,
@@ -259,6 +287,7 @@ extern int supports(unsigned long attr);
 extern char *psname(int pid, char *buffer, int maxlen);
 extern int pidof(const char *name);
 extern int killall(const char *name, int sig);
+extern int ppid(int pid);
 
 
 // files.c
@@ -321,3 +350,5 @@ extern const char *find_word(const char *buffer, const char *word);
 extern int remove_word(char *buffer, const char *word);
 
 #endif
+
+

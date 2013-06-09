@@ -257,7 +257,7 @@ u64 ntfs_inode_lookup_by_name(ntfs_inode *dir_ni,
 	u8 *index_end;
 	ntfs_attr *ia_na;
 	int eo, rc;
-	u32 index_block_size, index_vcn_size;
+	u32 index_block_size;
 	u8 index_vcn_size_bits;
 
 	ntfs_log_trace("Entering\n");
@@ -378,11 +378,9 @@ u64 ntfs_inode_lookup_by_name(ntfs_inode *dir_ni,
 
 	/* Determine the size of a vcn in the directory index. */
 	if (vol->cluster_size <= index_block_size) {
-		index_vcn_size = vol->cluster_size;
 		index_vcn_size_bits = vol->cluster_size_bits;
 	} else {
-		index_vcn_size = vol->sector_size;
-		index_vcn_size_bits = vol->sector_size_bits;
+		index_vcn_size_bits = NTFS_BLOCK_SIZE_BITS;
 	}
 
 	/* Get the starting vcn of the index_block holding the child node. */
@@ -869,6 +867,87 @@ typedef enum {
 	INDEX_TYPE_ALLOCATION,	/* index allocation */
 } INDEX_TYPE;
 
+/*
+ *		Decode Interix file types
+ *
+ *	Non-Interix types are returned as plain files, because a
+ *	Windows user may force patterns very similar to Interix,
+ *	and most metadata files have such similar patters.
+ */
+
+static u32 ntfs_interix_types(ntfs_inode *ni)
+{
+	ntfs_attr *na;
+	u32 dt_type;
+	le64 magic;
+
+	dt_type = NTFS_DT_UNKNOWN;
+	na = ntfs_attr_open(ni, AT_DATA, NULL, 0);
+	if (na) {
+		/* Unrecognized patterns (eg HID + SYST) are plain files */
+		dt_type = NTFS_DT_REG;
+		if (na->data_size <= 1) {
+			if (!(ni->flags & FILE_ATTR_HIDDEN))
+				dt_type = (na->data_size ?
+						NTFS_DT_SOCK : NTFS_DT_FIFO);
+		} else {
+			if ((na->data_size >= (s64)sizeof(magic))
+			    && (ntfs_attr_pread(na, 0, sizeof(magic), &magic)
+				== sizeof(magic))) {
+				if (magic == INTX_SYMBOLIC_LINK)
+					dt_type = NTFS_DT_LNK;
+				else if (magic == INTX_BLOCK_DEVICE)
+					dt_type = NTFS_DT_BLK;
+				else if (magic == INTX_CHARACTER_DEVICE)
+					dt_type = NTFS_DT_CHR;
+			}
+		}
+		ntfs_attr_close(na);
+	}
+	return (dt_type);
+}
+
+/*
+ *		Decode file types
+ *
+ *	Better only use for Interix types and junctions,
+ *	unneeded complexity when used for plain files or directories
+ *
+ *	Error cases are logged and returned as unknown.
+ */
+
+static u32 ntfs_dir_entry_type(ntfs_inode *dir_ni, MFT_REF mref,
+					FILE_ATTR_FLAGS attributes)
+{
+	ntfs_inode *ni;
+	u32 dt_type;
+
+	dt_type = NTFS_DT_UNKNOWN;
+	ni = ntfs_inode_open(dir_ni->vol, mref);
+	if (ni) {
+		if ((attributes & FILE_ATTR_REPARSE_POINT)
+		    && ntfs_possible_symlink(ni))
+			dt_type = NTFS_DT_LNK;
+		else
+			if ((attributes & FILE_ATTR_SYSTEM)
+			   && !(attributes & FILE_ATTR_I30_INDEX_PRESENT))
+				dt_type = ntfs_interix_types(ni);
+			else
+				dt_type = (attributes
+						& FILE_ATTR_I30_INDEX_PRESENT
+					? NTFS_DT_DIR : NTFS_DT_REG);
+		if (ntfs_inode_close(ni)) {
+				 /* anything special worth doing ? */
+			ntfs_log_error("Failed to close inode %lld\n",
+				(long long)MREF(mref));
+		}
+	}
+	if (dt_type == NTFS_DT_UNKNOWN)
+		ntfs_log_error("Could not decode the type of inode %lld\n",
+				(long long)MREF(mref));
+	return (dt_type);
+}
+
 /**
  * ntfs_filldir - ntfs specific filldir method
  * @dir_ni:	ntfs inode of current directory
@@ -903,19 +982,23 @@ static int ntfs_filldir(ntfs_inode *dir_ni, s64 *pos, u8 ivcn_bits,
 				dir_ni->vol->mft_record_size;
 	else /* if (index_type == INDEX_TYPE_ROOT) */
 		*pos = (u8*)ie - (u8*)iu.ir;
+	mref = le64_to_cpu(ie->indexed_file);
+	metadata = (MREF(mref) != FILE_root) && (MREF(mref) < FILE_first_user);
 	/* Skip root directory self reference entry. */
 	if (MREF_LE(ie->indexed_file) == FILE_root)
 		return 0;
-	if (ie->key.file_name.file_attributes & FILE_ATTR_I30_INDEX_PRESENT)
+	if ((ie->key.file_name.file_attributes
+		     & (FILE_ATTR_REPARSE_POINT | FILE_ATTR_SYSTEM))
+	    && !metadata)
+		dt_type = ntfs_dir_entry_type(dir_ni, mref,
+					ie->key.file_name.file_attributes);
+	else if (ie->key.file_name.file_attributes
+		     & FILE_ATTR_I30_INDEX_PRESENT)
 		dt_type = NTFS_DT_DIR;
-	else if (fn->file_attributes & FILE_ATTR_SYSTEM)
-		dt_type = NTFS_DT_UNKNOWN;
 	else
 		dt_type = NTFS_DT_REG;
 
 		/* return metadata files and hidden files if requested */
-	mref = le64_to_cpu(ie->indexed_file);
-        metadata = (MREF(mref) != FILE_root) && (MREF(mref) < FILE_first_user);
         if ((!metadata && (NVolShowHidFiles(dir_ni->vol)
 				|| !(fn->file_attributes & FILE_ATTR_HIDDEN)))
             || (NVolShowSysFiles(dir_ni->vol) && (NVolShowHidFiles(dir_ni->vol)
@@ -1039,7 +1122,7 @@ int ntfs_readdir(ntfs_inode *dir_ni, s64 *pos,
 	INDEX_ENTRY *ie;
 	INDEX_ALLOCATION *ia = NULL;
 	int rc, ir_pos, bmp_buf_size, bmp_buf_pos, eo;
-	u32 index_block_size, index_vcn_size;
+	u32 index_block_size;
 	u8 index_block_size_bits, index_vcn_size_bits;
 
 	ntfs_log_trace("Entering.\n");
@@ -1131,11 +1214,9 @@ int ntfs_readdir(ntfs_inode *dir_ni, s64 *pos,
 	}
 	index_block_size_bits = ffs(index_block_size) - 1;
 	if (vol->cluster_size <= index_block_size) {
-		index_vcn_size = vol->cluster_size;
 		index_vcn_size_bits = vol->cluster_size_bits;
 	} else {
-		index_vcn_size = vol->sector_size;
-		index_vcn_size_bits = vol->sector_size_bits;
+		index_vcn_size_bits = NTFS_BLOCK_SIZE_BITS;
 	}
 
 	/* Are we jumping straight into the index allocation attribute? */
@@ -1401,8 +1482,8 @@ err_out:
  * on error with errno set to the error code.
  */
 static ntfs_inode *__ntfs_create(ntfs_inode *dir_ni, le32 securid,
-		ntfschar *name, u8 name_len, mode_t type, dev_t dev,
-		ntfschar *target, int target_len)
+		const ntfschar *name, u8 name_len, mode_t type, dev_t dev,
+		const ntfschar *target, int target_len)
 {
 	ntfs_inode *ni;
 	int rollback_data = 0, rollback_sd = 0;
@@ -1517,7 +1598,7 @@ static ntfs_inode *__ntfs_create(ntfs_inode *dir_ni, le32 securid,
 		else
 			ir->clusters_per_index_block = 
 					ni->vol->indx_record_size >>
-					ni->vol->sector_size_bits;
+					NTFS_BLOCK_SIZE_BITS;
 		ir->index.entries_offset = cpu_to_le32(sizeof(INDEX_HEADER));
 		ir->index.index_length = cpu_to_le32(index_len);
 		ir->index.allocated_size = cpu_to_le32(index_len);
@@ -1671,7 +1752,7 @@ err_out:
  * Some wrappers around __ntfs_create() ...
  */
 
-ntfs_inode *ntfs_create(ntfs_inode *dir_ni, le32 securid, ntfschar *name,
+ntfs_inode *ntfs_create(ntfs_inode *dir_ni, le32 securid, const ntfschar *name,
 		u8 name_len, mode_t type)
 {
 	if (type != S_IFREG && type != S_IFDIR && type != S_IFIFO &&
@@ -1683,7 +1764,7 @@ ntfs_inode *ntfs_create(ntfs_inode *dir_ni, le32 securid, ntfschar *name,
 }
 
 ntfs_inode *ntfs_create_device(ntfs_inode *dir_ni, le32 securid,
-		ntfschar *name, u8 name_len, mode_t type, dev_t dev)
+		const ntfschar *name, u8 name_len, mode_t type, dev_t dev)
 {
 	if (type != S_IFCHR && type != S_IFBLK) {
 		ntfs_log_error("Invalid arguments.\n");
@@ -1693,7 +1774,8 @@ ntfs_inode *ntfs_create_device(ntfs_inode *dir_ni, le32 securid,
 }
 
 ntfs_inode *ntfs_create_symlink(ntfs_inode *dir_ni, le32 securid,
-		ntfschar *name, u8 name_len, ntfschar *target, int target_len)
+		const ntfschar *name, u8 name_len, const ntfschar *target,
+		int target_len)
 {
 	if (!target || !target_len) {
 		ntfs_log_error("%s: Invalid argument (%p, %d)\n", __FUNCTION__,
@@ -1768,7 +1850,8 @@ no_hardlink:
  * Return 0 on success or -1 on error with errno set to the error code.
  */
 int ntfs_delete(ntfs_volume *vol, const char *pathname,
-		ntfs_inode *ni, ntfs_inode *dir_ni, ntfschar *name, u8 name_len)
+		ntfs_inode *ni, ntfs_inode *dir_ni, const ntfschar *name,
+		u8 name_len)
 {
 	ntfs_attr_search_ctx *actx = NULL;
 	FILE_NAME_ATTR *fn = NULL;
@@ -1882,8 +1965,18 @@ search:
 	if (ntfs_index_remove(dir_ni, ni, fn, le32_to_cpu(actx->attr->value_length)))
 		goto err_out;
 	
-	if (ntfs_attr_record_rm(actx))
-		goto err_out;
+	/*
+	 * Keep the last name in place, this is useful for undeletion
+	 * (Windows also does so), however delete the name if it were
+	 * in an extent, to avoid leaving an attribute list.
+	 */
+	if ((ni->mrec->link_count == cpu_to_le16(1)) && !actx->base_ntfs_ino) {
+			/* make sure to not loop to another search */
+		looking_for_dos_name = FALSE;
+	} else {
+		if (ntfs_attr_record_rm(actx))
+			goto err_out;
+	}
 	
 	ni->mrec->link_count = cpu_to_le16(le16_to_cpu(
 			ni->mrec->link_count) - 1);
@@ -2006,6 +2099,7 @@ search:
 					"Leaving inconsistent metadata.\n");
 		}
 #endif
+	debug_double_inode(ni->mft_no,0);
 	if (ntfs_mft_record_free(ni->vol, ni)) {
 		err = errno;
 		ntfs_log_error("Failed to free base MFT record.  "
@@ -2048,7 +2142,7 @@ err_out:
  *
  * Return 0 on success or -1 on error with errno set to the error code.
  */
-static int ntfs_link_i(ntfs_inode *ni, ntfs_inode *dir_ni, ntfschar *name,
+static int ntfs_link_i(ntfs_inode *ni, ntfs_inode *dir_ni, const ntfschar *name,
 			 u8 name_len, FILE_NAME_TYPE_FLAGS nametype)
 {
 	FILE_NAME_ATTR *fn = NULL;
@@ -2067,6 +2161,15 @@ static int ntfs_link_i(ntfs_inode *ni, ntfs_inode *dir_ni, ntfschar *name,
 	   && !ntfs_possible_symlink(ni)) {
 		err = EOPNOTSUPP;
 		goto err_out;
+	}
+	if (NVolHideDotFiles(dir_ni->vol)) {
+		/* Set hidden flag according to the latest name */
+		if ((name_len > 1)
+		    && (name[0] == const_cpu_to_le16('.'))
+		    && (name[1] != const_cpu_to_le16('.')))
+			ni->flags |= FILE_ATTR_HIDDEN;
+		else
+			ni->flags &= ~FILE_ATTR_HIDDEN;
 	}
 	
 	/* Create FILE_NAME attribute. */
@@ -2125,7 +2228,8 @@ err_out:
 	return -1;
 }
 
-int ntfs_link(ntfs_inode *ni, ntfs_inode *dir_ni, ntfschar *name, u8 name_len)
+int ntfs_link(ntfs_inode *ni, ntfs_inode *dir_ni, const ntfschar *name,
+		u8 name_len)
 {
 	return (ntfs_link_i(ni, dir_ni, name, name_len, FILE_NAME_POSIX));
 }
@@ -2176,6 +2280,8 @@ ntfs_inode *ntfs_dir_parent_inode(ntfs_inode *ni)
 /*
  *		Get a DOS name for a file in designated directory
  *
+ *	Not allowed if there are several non-dos names (EMLINK)
+ *
  *	Returns size if found
  *		0 if not found
  *		-1 if there was an error (described by errno)
@@ -2184,6 +2290,7 @@ ntfs_inode *ntfs_dir_parent_inode(ntfs_inode *ni)
 static int get_dos_name(ntfs_inode *ni, u64 dnum, ntfschar *dosname)
 {
 	size_t outsize = 0;
+	int namecount = 0;
 	FILE_NAME_ATTR *fn;
 	ntfs_attr_search_ctx *ctx;
 
@@ -2198,6 +2305,8 @@ static int get_dos_name(ntfs_inode *ni, u64 dnum, ntfschar *dosname)
 		fn = (FILE_NAME_ATTR*)((u8*)ctx->attr +
 				le16_to_cpu(ctx->attr->value_offset));
 
+		if (fn->file_name_type != FILE_NAME_DOS)
+			namecount++;
 		if ((fn->file_name_type & FILE_NAME_DOS)
 		    && (MREF_LE(fn->parent_directory) == dnum)) {
 				/*
@@ -2212,12 +2321,18 @@ static int get_dos_name(ntfs_inode *ni, u64 dnum, ntfschar *dosname)
 		}
 	}
 	ntfs_attr_put_search_ctx(ctx);
+	if ((outsize > 0) && (namecount > 1)) {
+		outsize = -1;
+		errno = EMLINK; /* this error implies there is a dos name */
+	}
 	return (outsize);
 }
 
 
 /*
  *		Get a long name for a file in designated directory
+ *
+ *	Not allowed if there are several non-dos names (EMLINK)
  *
  *	Returns size if found
  *		0 if not found
@@ -2227,6 +2342,7 @@ static int get_dos_name(ntfs_inode *ni, u64 dnum, ntfschar *dosname)
 static int get_long_name(ntfs_inode *ni, u64 dnum, ntfschar *longname)
 {
 	size_t outsize = 0;
+	int namecount = 0;
 	FILE_NAME_ATTR *fn;
 	ntfs_attr_search_ctx *ctx;
 
@@ -2242,6 +2358,8 @@ static int get_long_name(ntfs_inode *ni, u64 dnum, ntfschar *longname)
 		fn = (FILE_NAME_ATTR*)((u8*)ctx->attr +
 				le16_to_cpu(ctx->attr->value_offset));
 
+		if (fn->file_name_type != FILE_NAME_DOS)
+			namecount++;
 		if ((fn->file_name_type & FILE_NAME_WIN32)
 		    && (MREF_LE(fn->parent_directory) == dnum)) {
 				/*
@@ -2251,6 +2369,11 @@ static int get_long_name(ntfs_inode *ni, u64 dnum, ntfschar *longname)
 			outsize = fn->file_name_length;
 			memcpy(longname,fn->file_name,outsize*sizeof(ntfschar));
 		}
+	}
+	if (namecount > 1) {
+		ntfs_attr_put_search_ctx(ctx);
+		errno = EMLINK;
+		return -1;
 	}
 		/* if not found search for POSIX names */
 	if (!outsize) {
@@ -2328,7 +2451,7 @@ int ntfs_get_ntfs_dos_name(ntfs_inode *ni, ntfs_inode *dir_ni,
  */
 
 static int set_namespace(ntfs_inode *ni, ntfs_inode *dir_ni,
-			ntfschar *name, int len,
+			const ntfschar *name, int len,
 			FILE_NAME_TYPE_FLAGS nametype)
 {
 	ntfs_attr_search_ctx *actx;
@@ -2402,9 +2525,9 @@ static int set_namespace(ntfs_inode *ni, ntfs_inode *dir_ni,
  */
 
 static int set_dos_name(ntfs_inode *ni, ntfs_inode *dir_ni,
-			ntfschar *shortname, int shortlen,
-			ntfschar *longname, int longlen,
-			ntfschar *deletename, int deletelen, BOOL existed)
+			const ntfschar *shortname, int shortlen,
+			const ntfschar *longname, int longlen,
+			const ntfschar *deletename, int deletelen, BOOL existed)
 {
 	unsigned int linkcount;
 	ntfs_volume *vol;
@@ -2508,24 +2631,24 @@ int ntfs_set_ntfs_dos_name(ntfs_inode *ni, ntfs_inode *dir_ni,
 	int res = 0;
 	int longlen = 0;
 	int shortlen = 0;
-	char newname[MAX_DOS_NAME_LENGTH + 1];
+	char newname[3*MAX_DOS_NAME_LENGTH + 1];
 	ntfschar oldname[MAX_DOS_NAME_LENGTH];
 	int oldlen;
-	ntfs_volume *vol;
-	u64 fnum;
 	u64 dnum;
 	BOOL closed = FALSE;
 	ntfschar *shortname = NULL;
 	ntfschar longname[NTFS_MAX_NAME_LEN];
 
-	vol = ni->vol;
-	fnum = ni->mft_no;
-		/* convert the string to the NTFS wide chars */
-	if (size > MAX_DOS_NAME_LENGTH)
-		size = MAX_DOS_NAME_LENGTH;
+		/* copy the string to insert a null char, and truncate */
+	if (size > 3*MAX_DOS_NAME_LENGTH)
+		size = 3*MAX_DOS_NAME_LENGTH;
 	strncpy(newname, value, size);
+		/* a long name may be truncated badly and be untranslatable */
 	newname[size] = 0;
+		/* convert the string to the NTFS wide chars, and truncate */
 	shortlen = ntfs_mbstoucs(newname, &shortname);
+	if (shortlen > MAX_DOS_NAME_LENGTH)
+		shortlen = MAX_DOS_NAME_LENGTH;
 			/* make sure the short name has valid chars */
 	if ((shortlen < 0) || ntfs_forbidden_chars(shortname,shortlen)) {
 		ntfs_inode_close_in_dir(ni,dir_ni);
@@ -2572,7 +2695,8 @@ int ntfs_set_ntfs_dos_name(ntfs_inode *ni, ntfs_inode *dir_ni,
 			res = -1;
 	} else {
 		res = -1;
-		errno = ENOENT;
+		if (!longlen)
+			errno = ENOENT;
 	}
 	free(shortname);
 	if (!closed) {
@@ -2648,7 +2772,8 @@ int ntfs_remove_ntfs_dos_name(ntfs_inode *ni, ntfs_inode *dir_ni)
 			}
 		}
 	} else {
-		errno = ENOENT;
+		if (!longlen)
+			errno = ENOENT;
 		res = -1;
 	}
 	if (!deleted) {

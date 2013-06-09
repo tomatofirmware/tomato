@@ -4,7 +4,7 @@
  * Copyright (c) 2005-2007 Yura Pakhuchiy
  * Copyright (c) 2005 Yuval Fledel
  * Copyright (c) 2006-2009 Szabolcs Szakacsits
- * Copyright (c) 2007-2011 Jean-Pierre Andre
+ * Copyright (c) 2007-2012 Jean-Pierre Andre
  * Copyright (c) 2009 Erik Larsson
  *
  * This file is originated from the Linux-NTFS project.
@@ -179,8 +179,15 @@ struct open_file {
 enum {
 	CLOSE_GHOST = 1,
 	CLOSE_COMPRESSED = 2,
-	CLOSE_ENCRYPTED = 4
+	CLOSE_ENCRYPTED = 4,
+	CLOSE_DMTIME = 8
 };
+
+enum RM_TYPES {
+	RM_LINK,
+	RM_DIR,
+	RM_ANY,
+} ;
 
 static struct ntfs_options opts;
 
@@ -207,12 +214,12 @@ static const char *usage_msg =
 "\n"
 "Copyright (C) 2005-2007 Yura Pakhuchiy\n"
 "Copyright (C) 2006-2009 Szabolcs Szakacsits\n"
-"Copyright (C) 2007-2011 Jean-Pierre Andre\n"
+"Copyright (C) 2007-2012 Jean-Pierre Andre\n"
 "Copyright (C) 2009 Erik Larsson\n"
 "\n"
 "Usage:    %s [-o option[,...]] <device|image_file> <mount_point>\n"
 "\n"
-"Options:  ro (read-only mount), remove_hiberfile, uid=, gid=,\n" 
+"Options:  ro (read-only mount), windows_names, uid=, gid=,\n" 
 "          umask=, fmask=, dmask=, streams_interface=.\n"
 "          Please see the details in the manual (type: man ntfs-3g).\n"
 "\n"
@@ -557,7 +564,8 @@ int ntfs_macfuse_setchgtime(const char *path, const struct timespec *tv)
 }
 #endif /* defined(__APPLE__) || defined(__DARWIN__) */
 
-#if defined(FUSE_CAP_DONT_MASK) || (defined(__APPLE__) || defined(__DARWIN__))
+#if defined(FUSE_CAP_DONT_MASK) || defined(FUSE_CAP_BIG_WRITES) \
+		|| (defined(__APPLE__) || defined(__DARWIN__))
 static void ntfs_init(void *userdata __attribute__((unused)),
 			struct fuse_conn_info *conn)
 {
@@ -568,6 +576,12 @@ static void ntfs_init(void *userdata __attribute__((unused)),
 		/* request umask not to be enforced by fuse */
 	conn->want |= FUSE_CAP_DONT_MASK;
 #endif /* defined FUSE_CAP_DONT_MASK */
+#ifdef FUSE_CAP_BIG_WRITES
+	if (ctx->big_writes
+	    && ((ctx->vol->nr_clusters << ctx->vol->cluster_size_bits)
+			>= SAFE_CAPACITY_FOR_BIG_WRITES))
+		conn->want |= FUSE_CAP_BIG_WRITES;
+#endif
 }
 #endif /* defined(FUSE_CAP_DONT_MASK) || (defined(__APPLE__) || defined(__DARWIN__)) */
 
@@ -969,10 +983,30 @@ static int ntfs_fuse_filler(ntfs_fuse_fill_context_t *fill_ctx,
 	if (MREF(mref) > 1) {
 		struct stat st = { .st_ino = MREF(mref) };
 		 
-		if (dt_type == NTFS_DT_REG)
-			st.st_mode = S_IFREG | (0777 & ~ctx->fmask);
-		else if (dt_type == NTFS_DT_DIR)
+		switch (dt_type) {
+		case NTFS_DT_DIR :
 			st.st_mode = S_IFDIR | (0777 & ~ctx->dmask); 
+			break;
+		case NTFS_DT_LNK :
+			st.st_mode = S_IFLNK | 0777;
+			break;
+		case NTFS_DT_FIFO :
+			st.st_mode = S_IFIFO;
+			break;
+		case NTFS_DT_SOCK :
+			st.st_mode = S_IFSOCK;
+			break;
+		case NTFS_DT_BLK :
+			st.st_mode = S_IFBLK;
+			break;
+		case NTFS_DT_CHR :
+			st.st_mode = S_IFCHR;
+			break;
+		default : /* unexpected types shown as plain files */
+		case NTFS_DT_REG :
+			st.st_mode = S_IFREG | (0777 & ~ctx->fmask);
+			break;
+		}
 	        
 #if defined(__APPLE__) || defined(__DARWIN__)
 		/* 
@@ -1084,14 +1118,17 @@ static void ntfs_fuse_releasedir(fuse_req_t req,
 	ntfs_fuse_fill_item_t *current;
 
 	fill = (ntfs_fuse_fill_context_t*)(long)fi->fh;
-		/* make sure to clear results */
-	current = fill->first;
-	while (current) {
-		current = current->next;
-		free(fill->first);
-		fill->first = current;
+	if (fill && (fill->ino == ino)) {
+			/* make sure to clear results */
+		current = fill->first;
+		while (current) {
+			current = current->next;
+			free(fill->first);
+			fill->first = current;
+		}
+		fill->ino = 0;
+		free(fill);
 	}
-	free(fill);
 	fuse_reply_err(req, 0);
 }
 
@@ -1107,7 +1144,7 @@ static void ntfs_fuse_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
 	int err = 0;
 
 	fill = (ntfs_fuse_fill_context_t*)(long)fi->fh;
-	if (fill) {
+	if (fill && (fill->ino == ino)) {
 		if (!fill->filled) {
 				/* initial call : build the full list */
 			first = (ntfs_fuse_fill_item_t*)ntfs_malloc
@@ -1212,6 +1249,9 @@ static void ntfs_fuse_open(fuse_req_t req, fuse_ino_t ino,
 				    && (ni->flags & FILE_ATTR_ENCRYPTED))
 					state |= CLOSE_ENCRYPTED;
 #endif /* HAVE_SETXATTR */
+			/* mark a future need to update the mtime */
+				if (ctx->dmtime)
+					state |= CLOSE_DMTIME;
 			/* deny opening metadata files for writing */
 				if (ino < FILE_first_user)
 					res = -EPERM;
@@ -1255,8 +1295,10 @@ static void ntfs_fuse_read(fuse_req_t req, fuse_ino_t ino, size_t size,
 	s64 total = 0;
 	s64 max_read;
 
-	if (!size)
+	if (!size) {
+		res = 0;
 		goto exit;
+	}
 	buf = (char*)ntfs_malloc(size);
 	if (!buf) {
 		res = -errno;
@@ -1346,7 +1388,10 @@ static void ntfs_fuse_write(fuse_req_t req, fuse_ino_t ino, const char *buf,
 		total  += ret;
 	}
 	res = total;
-	if (res > 0)
+	if ((res > 0)
+	    && (!ctx->dmtime
+		|| (le64_to_cpu(ntfs_current_time())
+		     - le64_to_cpu(ni->last_data_change_time)) > ctx->dmtime))
 		ntfs_fuse_update_times(na->ni, NTFS_UPDATE_MCTIME);
 exit:
 	if (na)
@@ -1795,6 +1840,8 @@ static int ntfs_fuse_create(fuse_req_t req, fuse_ino_t parent, const char *name,
 	struct open_file *of;
 	int state = 0;
 	le32 securid;
+	gid_t gid;
+	mode_t dsetgid;
 	mode_t type = typemode & ~07777;
 	mode_t perm;
 	struct SECURITY_CONTEXT security;
@@ -1817,13 +1864,15 @@ static int ntfs_fuse_create(fuse_req_t req, fuse_ino_t parent, const char *name,
 #if !KERNELPERMS | (POSIXACLS & !KERNELACLS)
 		/* make sure parent directory is writeable and executable */
 	if (!ntfs_fuse_fill_security_context(req, &security)
-	       || ntfs_allowed_access(&security,
-				dir_ni,S_IWRITE + S_IEXEC)) {
+	       || ntfs_allowed_create(&security,
+				dir_ni, &gid, &dsetgid)) {
 #else
 		ntfs_fuse_fill_security_context(req, &security);
+		ntfs_allowed_create(&security, dir_ni, &gid, &dsetgid);
 #endif
 		if (S_ISDIR(type))
-			perm = typemode & ~ctx->dmask & 0777;
+			perm = (typemode & ~ctx->dmask & 0777)
+				| (dsetgid & S_ISGID);
 		else
 			perm = typemode & ~ctx->fmask & 0777;
 			/*
@@ -1841,11 +1890,11 @@ static int ntfs_fuse_create(fuse_req_t req, fuse_ino_t parent, const char *name,
 			else
 #if POSIXACLS
 				securid = ntfs_alloc_securid(&security,
-					security.uid, security.gid,
+					security.uid, gid,
 					dir_ni, perm, S_ISDIR(type));
 #else
 				securid = ntfs_alloc_securid(&security,
-					security.uid, security.gid,
+					security.uid, gid,
 					perm & ~security.umask, S_ISDIR(type));
 #endif
 		/* Create object specified in @type. */
@@ -1879,13 +1928,13 @@ static int ntfs_fuse_create(fuse_req_t req, fuse_ino_t parent, const char *name,
 #if POSIXACLS
 				if (!securid
 				   && ntfs_set_inherited_posix(&security, ni,
-					security.uid, security.gid,
+					security.uid, gid,
 					dir_ni, perm) < 0)
 					set_fuse_error(&res);
 #else
 				if (!securid
 				   && ntfs_set_owner_mode(&security, ni,
-					security.uid, security.gid, 
+					security.uid, gid, 
 					perm & ~security.umask) < 0)
 					set_fuse_error(&res);
 #endif
@@ -1902,6 +1951,8 @@ static int ntfs_fuse_create(fuse_req_t req, fuse_ino_t parent, const char *name,
 			    && (ni->flags & FILE_ATTR_ENCRYPTED))
 				state |= CLOSE_ENCRYPTED;
 #endif /* HAVE_SETXATTR */
+			if (fi && ctx->dmtime)
+				state |= CLOSE_DMTIME;
 			ntfs_inode_update_mbsname(dir_ni, name, ni->mft_no);
 			NInoSetDirty(ni);
 			e->ino = ni->mft_no;
@@ -2006,6 +2057,12 @@ static int ntfs_fuse_newlink(fuse_req_t req __attribute__((unused)),
 		goto exit;
 	}
         
+	/* Do not accept linking to a directory (except for renaming) */
+	if (e && (ni->mrec->flags & MFT_RECORD_IS_DIRECTORY)) {
+		errno = EPERM;
+		res = -errno;
+		goto exit;
+	}
 	/* Generate unicode filename. */
 	uname_len = ntfs_mbstoucs(newname, &uname);
 	if ((uname_len < 0)
@@ -2073,7 +2130,8 @@ static void ntfs_fuse_link(fuse_req_t req, fuse_ino_t ino,
 		fuse_reply_entry(req, &entry);
 }
 
-static int ntfs_fuse_rm(fuse_req_t req, fuse_ino_t parent, const char *name)
+static int ntfs_fuse_rm(fuse_req_t req, fuse_ino_t parent, const char *name,
+			enum RM_TYPES rm_type __attribute__((unused)))
 {
 	ntfschar *uname = NULL;
 	ntfs_inode *dir_ni = NULL, *ni = NULL;
@@ -2128,7 +2186,7 @@ static int ntfs_fuse_rm(fuse_req_t req, fuse_ino_t parent, const char *name)
 			goto out;
 		}
 			/* sweep existing ghost if any */
-		ntfs_fuse_rm(req, parent, ghostname);
+		ntfs_fuse_rm(req, parent, ghostname, RM_LINK);
 		res = ntfs_fuse_newlink(req, of->ino, parent, ghostname,
 				(struct fuse_entry_param*)NULL);
 		if (res)
@@ -2147,6 +2205,16 @@ static int ntfs_fuse_rm(fuse_req_t req, fuse_ino_t parent, const char *name)
 		goto exit;
 	}
         
+#if defined(__sun) && defined (__SVR4)
+	/* on Solaris : deny unlinking directories */
+	if (rm_type
+	    == (ni->mrec->flags & MFT_RECORD_IS_DIRECTORY ? RM_LINK : RM_DIR)) {
+		errno = EPERM;
+		res = -errno;
+		goto exit;
+	}
+#endif /* defined(__sun) && defined (__SVR4) */
+
 #if !KERNELPERMS | (POSIXACLS & !KERNELACLS)
 	/* JPA deny unlinking if directory is not writable and executable */
 	if (!ntfs_fuse_fill_security_context(req, &security)
@@ -2177,7 +2245,7 @@ static void ntfs_fuse_unlink(fuse_req_t req, fuse_ino_t parent,
 {
 	int res;
 
-	res = ntfs_fuse_rm(req, parent, name);
+	res = ntfs_fuse_rm(req, parent, name, RM_LINK);
 	if (res)
 		fuse_reply_err(req, -res);
 	else
@@ -2198,7 +2266,7 @@ static int ntfs_fuse_safe_rename(fuse_req_t req, fuse_ino_t ino,
 	if (ret)
 		return ret;
         
-	ret = ntfs_fuse_rm(req, newparent, newname);
+	ret = ntfs_fuse_rm(req, newparent, newname, RM_ANY);
 	if (!ret) {
 	        
 		ret = ntfs_fuse_newlink(req, ino, newparent, newname,
@@ -2206,9 +2274,9 @@ static int ntfs_fuse_safe_rename(fuse_req_t req, fuse_ino_t ino,
 		if (ret)
 			goto restore;
 	        
-		ret = ntfs_fuse_rm(req, parent, name);
+		ret = ntfs_fuse_rm(req, parent, name, RM_ANY);
 		if (ret) {
-			if (ntfs_fuse_rm(req, newparent, newname))
+			if (ntfs_fuse_rm(req, newparent, newname, RM_ANY))
 				goto err;
 			goto restore;
 		}
@@ -2229,7 +2297,7 @@ cleanup:
 		 * fail (unless concurrent access to directories when fuse
 		 * is multithreaded)
 		 */
-		if (ntfs_fuse_rm(req, newparent, tmp) < 0)
+		if (ntfs_fuse_rm(req, newparent, tmp, RM_ANY) < 0)
 			ntfs_log_perror("Rename failed. Existing file '%s' still present "
 				"as '%s'", newname, tmp);
 	}
@@ -2350,9 +2418,9 @@ static void ntfs_fuse_rename(fuse_req_t req, fuse_ino_t parent,
 		if (ret)
 			goto out;
         
-		ret = ntfs_fuse_rm(req, parent, name);
+		ret = ntfs_fuse_rm(req, parent, name, RM_ANY);
 		if (ret)
-			ntfs_fuse_rm(req, newparent, newname);
+			ntfs_fuse_rm(req, newparent, newname, RM_ANY);
 	}
 out:
 	if (ret)
@@ -2372,7 +2440,9 @@ static void ntfs_fuse_release(fuse_req_t req, fuse_ino_t ino,
 
 	of = (struct open_file*)(long)fi->fh;
 	/* Only for marked descriptors there is something to do */
-	if (!of || !(of->state & (CLOSE_COMPRESSED | CLOSE_ENCRYPTED))) {
+	if (!of
+	    || !(of->state & (CLOSE_COMPRESSED
+				| CLOSE_ENCRYPTED | CLOSE_DMTIME))) {
 		res = 0;
 		goto out;
 	}
@@ -2387,6 +2457,8 @@ static void ntfs_fuse_release(fuse_req_t req, fuse_ino_t ino,
 		goto exit;
 	}
 	res = 0;
+	if (of->state & CLOSE_DMTIME)
+		ntfs_inode_update_times(ni,NTFS_UPDATE_MCTIME);
 	if (of->state & CLOSE_COMPRESSED)
 		res = ntfs_attr_pclose(na);
 #ifdef HAVE_SETXATTR	/* extended attributes interface required */
@@ -2403,7 +2475,7 @@ out:
 	if (of) {
 		if (of->state & CLOSE_GHOST) {
 			sprintf(ghostname,ghostformat,of->ghost);
-			ntfs_fuse_rm(req, of->parent, ghostname);
+			ntfs_fuse_rm(req, of->parent, ghostname, RM_ANY);
 		}
 			/* remove from open files list */
 		if (of->next)
@@ -2438,7 +2510,7 @@ static void ntfs_fuse_rmdir(fuse_req_t req, fuse_ino_t parent, const char *name)
 {
 	int res;
 
-	res = ntfs_fuse_rm(req, parent, name);
+	res = ntfs_fuse_rm(req, parent, name, RM_DIR);
 	if (res)
 		fuse_reply_err(req, -res);
 	else
@@ -2691,8 +2763,11 @@ static void ntfs_fuse_listxattr(fuse_req_t req, fuse_ino_t ino, size_t size)
 		ret = -errno;
 		goto out;
 	}
+		/* Return with no result for symlinks, fifo, etc. */
+	if (ni->flags & (FILE_ATTR_SYSTEM | FILE_ATTR_REPARSE_POINT))
+		goto exit;
+		/* otherwise file must be readable */
 #if !KERNELPERMS | (POSIXACLS & !KERNELACLS)
-		   /* file must be readable */
 	if (!ntfs_allowed_access(&security,ni,S_IREAD)) {
 		ret = -EACCES;
 		goto exit;
@@ -2829,7 +2904,7 @@ static void ntfs_fuse_getxattr(fuse_req_t req, fuse_ino_t ino, const char *name,
 		/* trusted only readable by root */
 	if ((namespace == XATTRNS_TRUSTED)
 	    && security.uid) {
-		res = -EPERM;
+		res = -ENODATA;
 		goto out;
 	}
 #endif
@@ -2838,8 +2913,13 @@ static void ntfs_fuse_getxattr(fuse_req_t req, fuse_ino_t ino, const char *name,
 		res = -errno;
 		goto out;
 	}
+		/* Return with no result for symlinks, fifo, etc. */
+	if (ni->flags & (FILE_ATTR_SYSTEM | FILE_ATTR_REPARSE_POINT)) {
+		res = -ENODATA;
+		goto exit;
+	}
+		/* otherwise file must be readable */
 #if !KERNELPERMS | (POSIXACLS & !KERNELACLS)
-		   /* file must be readable */
 	if (!ntfs_allowed_access(&security, ni, S_IREAD)) {
 		res = -errno;
 		goto exit;
@@ -3022,11 +3102,23 @@ static void ntfs_fuse_setxattr(fuse_req_t req, fuse_ino_t ino, const char *name,
 		}
 		break;
 	default :
+		/* User xattr not allowed for symlinks, fifo, etc. */
+		if (ni->flags & (FILE_ATTR_SYSTEM | FILE_ATTR_REPARSE_POINT)) {
+			res = -EPERM;
+			goto exit;
+		}
 		if (!ntfs_allowed_access(&security,ni,S_IWRITE)) {
 			res = -EACCES;
 			goto exit;
 		}
 		break;
+	}
+#else
+		/* User xattr not allowed for symlinks, fifo, etc. */
+	if ((namespace == XATTRNS_USER)
+	    && (ni->flags & (FILE_ATTR_SYSTEM | FILE_ATTR_REPARSE_POINT))) {
+		res = -EPERM;
+		goto exit;
 	}
 #endif
 	lename_len = fix_xattr_prefix(name, namespace, &lename);
@@ -3244,11 +3336,23 @@ static void ntfs_fuse_removexattr(fuse_req_t req, fuse_ino_t ino, const char *na
 		}
 		break;
 	default :
+		/* User xattr not allowed for symlinks, fifo, etc. */
+		if (ni->flags & (FILE_ATTR_SYSTEM | FILE_ATTR_REPARSE_POINT)) {
+			res = -EPERM;
+			goto exit;
+		}
 		if (!ntfs_allowed_access(&security,ni,S_IWRITE)) {
 			res = -EACCES;
 			goto exit;
 		}
 		break;
+	}
+#else
+		/* User xattr not allowed for symlinks, fifo, etc. */
+	if ((namespace == XATTRNS_USER)
+	    && (ni->flags & (FILE_ATTR_SYSTEM | FILE_ATTR_REPARSE_POINT))) {
+		res = -EPERM;
+		goto exit;
 	}
 #endif
 	lename_len = fix_xattr_prefix(name, namespace, &lename);
@@ -3364,7 +3468,8 @@ static struct fuse_lowlevel_ops ntfs_3g_ops = {
 	.setbkuptime	= ntfs_macfuse_setbkuptime,
 	.setchgtime	= ntfs_macfuse_setchgtime,
 #endif /* defined(__APPLE__) || defined(__DARWIN__) */
-#if defined(FUSE_CAP_DONT_MASK) || (defined(__APPLE__) || defined(__DARWIN__))
+#if defined(FUSE_CAP_DONT_MASK) || defined(FUSE_CAP_BIG_WRITES) \
+		|| (defined(__APPLE__) || defined(__DARWIN__))
 	.init		= ntfs_init
 #endif
 };
@@ -3396,13 +3501,13 @@ static int ntfs_open(const char *device)
 	ntfs_volume *vol;
         
 	if (!ctx->blkdev)
-		flags |= MS_EXCLUSIVE;
+		flags |= NTFS_MNT_EXCLUSIVE;
 	if (ctx->ro)
-		flags |= MS_RDONLY;
+		flags |= NTFS_MNT_RDONLY;
 	if (ctx->recover)
-		flags |= MS_RECOVER;
+		flags |= NTFS_MNT_RECOVER;
 	if (ctx->hiberfile)
-		flags |= MS_IGNORE_HIBERFILE;
+		flags |= NTFS_MNT_IGNORE_HIBERFILE;
 
 	ctx->vol = vol = ntfs_mount(device, flags);
 	if (!vol) {
@@ -3413,6 +3518,8 @@ static int ntfs_open(const char *device)
 		NDevSetSync(ctx->vol->dev);
 	if (ctx->compression)
 		NVolSetCompression(ctx->vol);
+	else
+		NVolClearCompression(ctx->vol);
 #ifdef HAVE_SETXATTR
 			/* archivers must see hidden files */
 	if (ctx->efs_raw)
@@ -3440,7 +3547,8 @@ static int ntfs_open(const char *device)
 	if (ctx->hiberfile && ntfs_volume_check_hiberfile(vol, 0)) {
 		if (errno != EPERM)
 			goto err_out;
-		if (ntfs_fuse_rm((fuse_req_t)NULL,FILE_root,"hiberfil.sys"))
+		if (ntfs_fuse_rm((fuse_req_t)NULL,FILE_root,"hiberfil.sys",
+					RM_LINK))
 			goto err_out;
 	}
         
@@ -3456,16 +3564,6 @@ static void usage(void)
 			5 + POSIXACLS*6 - KERNELPERMS*3 + CACHEING,
 			EXEC_NAME, ntfs_home);
 }
-
-#ifndef HAVE_REALPATH
-/* If there is no realpath() on the system, provide a dummy one. */
-static char *realpath(const char *path, char *resolved_path)
-{
-	strncpy(resolved_path, path, PATH_MAX);
-	resolved_path[PATH_MAX] = '\0';
-	return resolved_path;
-}
-#endif
 
 #if defined(linux) || defined(__uClinux__)
 
@@ -3668,6 +3766,9 @@ static void setup_logging(char *parsed_options)
 	ctx->seccache = (struct PERMISSIONS_CACHE*)NULL;
 
 	ntfs_log_info("Version %s %s %d\n", VERSION, FUSE_TYPE, fuse_version());
+	if (strcmp(opts.arg_device,opts.device))
+		ntfs_log_info("Requested device %s canonicalized as %s\n",
+				opts.arg_device,opts.device);
 	ntfs_log_info("Mounted %s (%s, label \"%s\", NTFS %d.%d)\n",
 			opts.device, (ctx->ro) ? "Read-Only" : "Read-Write",
 			ctx->vol->vol_name, ctx->vol->major_ver,
@@ -3730,7 +3831,9 @@ int main(int argc, char *argv[])
 		goto err_out;
 	}
 	if (!ntfs_check_if_mounted(opts.device,&existing_mount)
-	    && (existing_mount & NTFS_MF_MOUNTED)) {
+	    && (existing_mount & NTFS_MF_MOUNTED)
+		/* accept multiple read-only mounts */
+	    && (!(existing_mount & NTFS_MF_READONLY) || !ctx->ro)) {
 		err = NTFS_VOLUME_LOCKED;
 		goto err_out;
 	}
@@ -3745,6 +3848,10 @@ int main(int argc, char *argv[])
 				     PATH_MAX - strlen(opts.mnt_point) - 1)) {
 				strcat(ctx->abs_mnt_point, "/");
 				strcat(ctx->abs_mnt_point, opts.mnt_point);
+#if defined(__sun) && defined (__SVR4)
+			/* Solaris also wants the absolute mount point */
+				opts.mnt_point = ctx->abs_mnt_point;
+#endif /* defined(__sun) && defined (__SVR4) */
 			}
 		}
 	}
@@ -3799,6 +3906,12 @@ int main(int argc, char *argv[])
 	if (err)
 		goto err_out;
         
+	/* Force read-only mount if the device was found read-only */
+	if (!ctx->ro && NVolReadOnly(ctx->vol)) {
+		ctx->ro = TRUE;
+		if (ntfs_strinsert(&parsed_options, ",ro")) 
+                	goto err_out;
+	}
 	/* We must do this after ntfs_open() to be able to set the blksize */
 	if (ctx->blkdev && set_fuseblk_options(&parsed_options))
 		goto err_out;
@@ -3823,7 +3936,7 @@ int main(int argc, char *argv[])
 		else {
 			permissions_mode = "User mapping built, Posix ACLs in use";
 #if KERNELACLS
-			if (ntfs_strappend(&parsed_options,
+			if (ntfs_strinsert(&parsed_options,
 					",default_permissions,acl")) {
 				err = NTFS_VOLUME_SYNTAX_ERROR;
 				goto err_out;
@@ -3839,7 +3952,7 @@ int main(int argc, char *argv[])
 			 */
 #if KERNELPERMS
 			ctx->vol->secure_flags |= (1 << SECURITY_DEFAULT);
-			if (ntfs_strappend(&parsed_options, ",default_permissions")) {
+			if (ntfs_strinsert(&parsed_options, ",default_permissions")) {
 				err = NTFS_VOLUME_SYNTAX_ERROR;
 				goto err_out;
 			}
@@ -3856,7 +3969,7 @@ int main(int argc, char *argv[])
 		if ((ctx->vol->secure_flags & (1 << SECURITY_WANTED))
 		   && !(ctx->vol->secure_flags & (1 << SECURITY_DEFAULT))) {
 			ctx->vol->secure_flags |= (1 << SECURITY_DEFAULT);
-			if (ntfs_strappend(&parsed_options, ",default_permissions")) {
+			if (ntfs_strinsert(&parsed_options, ",default_permissions")) {
 				err = NTFS_VOLUME_SYNTAX_ERROR;
 				goto err_out;
 			}

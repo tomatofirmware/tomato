@@ -114,6 +114,7 @@ INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LDCONFIG = @LDCONFIG@
 LDFLAGS = @LDFLAGS@
+LIBFUSE_LITE_CFLAGS = @LIBFUSE_LITE_CFLAGS@
 LIBFUSE_LITE_LIBS = @LIBFUSE_LITE_LIBS@
 LIBGCRYPT_CFLAGS = @LIBGCRYPT_CFLAGS@
 LIBGCRYPT_CONFIG = @LIBGCRYPT_CONFIG@
@@ -214,6 +215,7 @@ MAINTAINERCLEANFILES = $(srcdir)/Makefile.in
 @FUSE_INTERNAL_TRUE@noinst_LTLIBRARIES = libfuse-lite.la
 libfuse_lite_la_CFLAGS = \
 	$(AM_CFLAGS) 			  \
+	$(LIBFUSE_LITE_CFLAGS)		  \
 	-I$(top_srcdir)/include/fuse-lite
 
 libfuse_lite_la_LIBADD = $(LIBFUSE_LITE_LIBS)
@@ -576,6 +578,8 @@ uninstall-am:
 	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
 	pdf pdf-am ps ps-am tags uninstall uninstall-am
 
+
+libs:	libfuse-lite.la
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

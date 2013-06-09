@@ -1,0 +1,1 @@
+rabbit.lo rabbit.o: ../ctaocrypt/src/rabbit.c

@@ -57,12 +57,12 @@
 #define PPPOE0		0
 #define PPPOE1		1
 
-#define GOT_IP			0x01
-#define RELEASE_IP		0x02
+#define GOT_IP				0x01
+#define RELEASE_IP			0x02
 #define	GET_IP_ERROR		0x03
 #define RELEASE_WAN_CONTROL	0x04
 #define USB_DATA_ACCESS		0x05	//For WRTSL54GS
-#define USB_CONNECT		0x06	//For WRTSL54GS
+#define USB_CONNECT			0x06	//For WRTSL54GS
 #define USB_DISCONNECT		0x07	//For WRTSL54GS
 
 /*
@@ -120,6 +120,9 @@ extern int listen_main(int argc, char **argv);
 extern int ipup_main(int argc, char **argv);
 extern int ipdown_main(int argc, char **argv);
 extern int pppevent_main(int argc, char **argv);
+extern int set_pppoepid_main(int argc, char **argv);
+extern int pppoe_down_main(int argc, char **argv);	
+
 #ifdef TCONFIG_IPV6
 extern int ip6up_main(int argc, char **argv);
 extern int ip6down_main(int argc, char **argv);
@@ -142,6 +145,7 @@ extern void start_l2tp(void);
 extern void stop_l2tp(void);
 extern void start_wan(int mode);
 extern void start_wan_done(char *ifname);
+extern char *wan_gateway(void);
 #ifdef TCONFIG_IPV6
 extern void start_wan6_done(const char *wan_ifname);
 #endif
@@ -159,7 +163,11 @@ extern void hotplug_net(void);
 extern void do_static_routes(int add);
 extern int radio_main(int argc, char *argv[]);
 extern int wldist_main(int argc, char *argv[]);
+extern void stop_wireless(void);
+extern void start_wireless(void);
 extern void start_wl(void);
+extern void unload_wl(void);
+extern void load_wl(void);
 #ifdef TCONFIG_IPV6
 extern void enable_ipv6(int enable);
 extern void accept_ra(const char *ifname);
@@ -191,6 +199,8 @@ extern void start_syslog(void);
 extern void stop_syslog(void);
 extern void start_igmp_proxy(void);
 extern void stop_igmp_proxy(void);
+extern void start_udpxy(void);
+extern void stop_udpxy(void);
 extern void start_httpd(void);
 extern void stop_httpd(void);
 extern void clear_resolv(void);
@@ -221,6 +231,8 @@ extern void stop_hotplug2(void);
 #ifdef TCONFIG_IPV6
 extern void start_ipv6_tunnel(void);
 extern void stop_ipv6_tunnel(void);
+extern void start_6rd_tunnel(void);
+extern void stop_6rd_tunnel(void);
 extern void start_radvd(void);
 extern void stop_radvd(void);
 extern void start_ipv6(void);
@@ -245,6 +257,7 @@ extern void remove_storage_main(int shutdn);
 
 // wnas.c
 extern int wds_enable(void);
+extern int wl_security_on(void);
 extern void start_nas(void);
 extern void stop_nas(void);
 extern void notify_nas(const char *ifname);
@@ -263,6 +276,7 @@ extern const char *chain_out_reject;
 extern char **layer7_in;
 
 extern void enable_ip_forward(void);
+extern void enable_ip6_forward(void);
 extern void ipt_write(const char *format, ...);
 extern void ip6t_write(const char *format, ...);
 #if defined(TCONFIG_IPV6) && defined(LINUX26)
@@ -292,9 +306,14 @@ extern void allow_fastnat(const char *service, int allow);
 extern void try_enabling_fastnat(void);
 #endif
 
+// arpbind.c
+extern void start_arpbind(void);
+extern void stop_arpbind(void);
+
 // forward.c
 extern void ipt_forward(ipt_table_t table);
 extern void ipt_triggered(ipt_table_t table);
+
 #ifdef TCONFIG_IPV6
 extern void ip6t_forward(void);
 #endif
@@ -391,6 +410,20 @@ extern int sched_main(int argc, char *argv[]);
 extern void start_sched(void);
 extern void stop_sched(void);
 
+// snmpd.c
+extern void start_snmpd(void);
+extern void stop_snmpd(void);
+
+#ifdef TCONFIG_USERPPTP
+// pptp_client.c
+extern void start_pptp_client(void);
+extern void stop_pptp_client(void);
+extern int write_pptpvpn_resolv(FILE*);
+extern void clear_pptp_route(void);
+#else
+#define write_pptpvpn_resolv(f) (0)
+#endif
+
 //nvram
 extern int nvram_file2nvram(const char *name, const char *filename);
 extern int nvram_nvram2file(const char *name, const char *filename);
@@ -415,6 +448,19 @@ extern void start_smbd(void);
 extern void stop_smbd(void);
 #endif
 
+// snmp.c
+#ifdef TCONFIG_SNMP
+extern void start_snmp();
+extern void stop_snmp();
+#endif
+
+// pptp.c
+#ifdef TCONFIG_PPTPD
+extern void start_pptpd(void);
+extern void stop_pptpd(void);
+extern void write_pptpd_dnsmasq_config(FILE* f);
+#endif
+
 // vpn.c
 #ifdef TCONFIG_OPENVPN
 extern void start_vpnclient(int clientNum);
@@ -422,6 +468,7 @@ extern void stop_vpnclient(int clientNum);
 extern void start_vpnserver(int serverNum);
 extern void stop_vpnserver(int serverNum);
 extern void start_vpn_eas();
+extern void stop_vpn_eas();
 extern void run_vpn_firewall_scripts();
 extern void write_vpn_dnsmasq_config(FILE*);
 extern int write_vpn_resolv(FILE*);
@@ -435,7 +482,40 @@ static inline void run_vpn_firewall_scripts() {}
 static inline void write_vpn_dnsmasq_config(FILE*) {}
 */
 static inline void start_vpn_eas() { }
+static inline void stop_vpn_eas() { }
 #define write_vpn_resolv(f) (0)
 #endif
 
+// qoslimit.c
+extern void ipt_qoslimit(int chain);
+extern void start_qoslimit(void);
+extern void stop_qoslimit(void);
+
+// arpbind.c
+extern void start_arpbind(void);
+extern void stop_arpbind(void);
+
+#ifdef TCONFIG_NOCAT
+// nocat.c 
+extern void start_nocat(); 
+extern void stop_nocat(); 
+extern void reset_nocat(); 
 #endif
+
+// nginx.c
+#ifdef TCONFIG_NGINX
+extern void nginx_write(const char *format, ...);
+extern void start_nginx();
+extern void stop_nginx();
+extern void start_nginxfp();
+extern void stop_nginxfp();
+#endif
+
+//ntpd.c
+extern void ntpd_write(const char *format, ...);
+extern void start_ntpd(); 
+extern void stop_ntpd(); 
+
+#endif
+
+

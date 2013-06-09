@@ -46,6 +46,7 @@ extern int engine_main(int argc,char *argv[]);
 extern int ocsp_main(int argc,char *argv[]);
 extern int prime_main(int argc,char *argv[]);
 extern int ts_main(int argc,char *argv[]);
+extern int srp_main(int argc,char *argv[]);
 
 #define FUNC_TYPE_GENERAL	1
 #define FUNC_TYPE_MD		2
@@ -93,6 +94,11 @@ FUNCTION functions[] = {
 	{FUNC_TYPE_CIPHER,"aes-256-ecb",enc_main},
 #endif
 
+#ifndef OPENSSL_NO_SPEED
+	{FUNC_TYPE_GENERAL,"speed",speed_main},
+#endif
+	{FUNC_TYPE_GENERAL,"version",version_main},
+
 #if 0
 
 	{FUNC_TYPE_GENERAL,"verify",verify_main},
@@ -139,13 +145,9 @@ FUNCTION functions[] = {
 #if !defined(OPENSSL_NO_SOCK) && !(defined(OPENSSL_NO_SSL2) && defined(OPENSSL_NO_SSL3))
 	{FUNC_TYPE_GENERAL,"s_client",s_client_main},
 #endif
-#ifndef OPENSSL_NO_SPEED
-	{FUNC_TYPE_GENERAL,"speed",speed_main},
-#endif
 #if !defined(OPENSSL_NO_SOCK) && !(defined(OPENSSL_NO_SSL2) && defined(OPENSSL_NO_SSL3))
 	{FUNC_TYPE_GENERAL,"s_time",s_time_main},
 #endif
-	{FUNC_TYPE_GENERAL,"version",version_main},
 	{FUNC_TYPE_GENERAL,"pkcs7",pkcs7_main},
 #ifndef OPENSSL_NO_CMS
 	{FUNC_TYPE_GENERAL,"cms",cms_main},
@@ -174,6 +176,9 @@ FUNCTION functions[] = {
 #endif
 	{FUNC_TYPE_GENERAL,"prime",prime_main},
 	{FUNC_TYPE_GENERAL,"ts",ts_main},
+#ifndef OPENSSL_NO_SRP
+	{FUNC_TYPE_GENERAL,"srp",srp_main},
+#endif
 #ifndef OPENSSL_NO_MD2
 	{FUNC_TYPE_MD,"md2",dgst_main},
 #endif

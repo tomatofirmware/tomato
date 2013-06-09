@@ -1,2 +1,2 @@
 
-char *host_name = "";
+char *host_name = "mipsel-linux";

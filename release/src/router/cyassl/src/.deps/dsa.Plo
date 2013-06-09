@@ -1,0 +1,1 @@
+dsa.lo dsa.o: ../ctaocrypt/src/dsa.c

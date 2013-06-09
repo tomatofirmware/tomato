@@ -54,6 +54,11 @@
 #include <locale.h>
 #endif
 
+#if defined(__sun) && defined (__SVR4)
+#include <sys/mnttab.h>
+#endif
+
+#include "param.h"
 #include "compat.h"
 #include "volume.h"
 #include "attrib.h"
@@ -67,6 +72,7 @@
 #include "dir.h"
 #include "logging.h"
 #include "cache.h"
+#include "realpath.h"
 #include "misc.h"
 
 const char *ntfs_home = 
@@ -87,13 +93,9 @@ static const char *corrupt_volume_msg =
 "for more details.\n";
 
 static const char *hibernated_volume_msg =
-"The NTFS partition is hibernated. Please resume and shutdown Windows\n"
-"properly, or mount the volume read-only with the 'ro' mount option, or\n"
-"mount the volume read-write with the 'remove_hiberfile' mount option.\n"
-"For example type on the command line:\n"
-"\n"
-"            mount -t ntfs-3g -o remove_hiberfile %s %s\n"
-"\n";
+"The NTFS partition is in an unsafe state. Please resume and shutdown\n"
+"Windows fully (no hibernation or fast restarting), or mount the volume\n"
+"read-only with the 'ro' mount option.\n";
 
 static const char *unclean_journal_msg =
 "Write access is denied because the disk wasn't safely powered\n"
@@ -373,6 +375,12 @@ mft_has_no_attr_list:
 	/* Done with the $Mft mft record. */
 	ntfs_attr_put_search_ctx(ctx);
 	ctx = NULL;
+
+	/* Update the size fields in the inode. */
+	vol->mft_ni->data_size = vol->mft_na->data_size;
+	vol->mft_ni->allocated_size = vol->mft_na->allocated_size;
+	set_nino_flag(vol->mft_ni, KnownSize);
+
 	/*
 	 * The volume is now setup so we can use all read access functions.
 	 */
@@ -458,7 +466,8 @@ error_exit:
  * Return the allocated volume structure on success and NULL on error with
  * errno set to the error code.
  */
-ntfs_volume *ntfs_volume_startup(struct ntfs_device *dev, unsigned long flags)
+ntfs_volume *ntfs_volume_startup(struct ntfs_device *dev,
+		ntfs_mount_flags flags)
 {
 	LCN mft_zone_size, mft_lcn;
 	s64 br;
@@ -494,13 +503,31 @@ ntfs_volume *ntfs_volume_startup(struct ntfs_device *dev, unsigned long flags)
 	NVolSetShowSysFiles(vol);
 	NVolSetShowHidFiles(vol);
 	NVolClearHideDotFiles(vol);
-	if (flags & MS_RDONLY)
+		/* set default compression */
+#if DEFAULT_COMPRESSION
+	NVolSetCompression(vol);
+#else
+	NVolClearCompression(vol);
+#endif
+	if (flags & NTFS_MNT_RDONLY)
 		NVolSetReadOnly(vol);
 	
 	/* ...->open needs bracketing to compile with glibc 2.7 */
 	if ((dev->d_ops->open)(dev, NVolReadOnly(vol) ? O_RDONLY: O_RDWR)) {
-		ntfs_log_perror("Error opening '%s'", dev->d_name);
-		goto error_exit;
+		if (!NVolReadOnly(vol) && (errno == EROFS)) {
+			if ((dev->d_ops->open)(dev, O_RDONLY)) {
+				ntfs_log_perror("Error opening read-only '%s'",
+						dev->d_name);
+				goto error_exit;
+			} else {
+				ntfs_log_info("Can only open '%s' as read-only\n",
+						dev->d_name);
+				NVolSetReadOnly(vol);
+			}
+		} else {
+			ntfs_log_perror("Error opening '%s'", dev->d_name);
+			goto error_exit;
+		}
 	}
 	/* Attach the device to the volume. */
 	vol->dev = dev;
@@ -635,6 +662,24 @@ static int ntfs_volume_check_logfile(ntfs_volume *vol)
 	
 	if (!ntfs_check_logfile(na, &rp) || !ntfs_is_logfile_clean(na, rp))
 		err = EOPNOTSUPP;
+		/*
+		 * If the latest restart page was identified as version
+		 * 2.0, then Windows may have kept a cached copy of
+		 * metadata for fast restarting, and we should not mount.
+		 * Hibernation will be seen the same way on a non
+		 * Windows-system partition, so we have to use the same
+		 * error code (EPERM).
+		 * The restart page may also be identified as version 2.0
+		 * when access to the file system is terminated abruptly
+		 * by unplugging or power cut, so mounting is also rejected
+		 * after such an event.
+		 */
+	if (rp
+	    && (rp->major_ver == const_cpu_to_le16(2))
+	    && (rp->minor_ver == const_cpu_to_le16(0))) {
+		ntfs_log_error("Metadata kept in Windows cache, refused to mount.\n");
+		err = EPERM;
+	}
 	free(rp);
 	ntfs_attr_close(na);
 out:	
@@ -748,7 +793,8 @@ int ntfs_volume_check_hiberfile(ntfs_volume *vol, int verbose)
 		errno = EPERM;
 		goto out;
 	}
-	if (memcmp(buf, "hibr", 4) == 0) {
+	if ((memcmp(buf, "hibr", 4) == 0)
+	   ||  (memcmp(buf, "HIBR", 4) == 0)) {
 		if (verbose)
 			ntfs_log_error("Windows is hibernated, refused to mount.\n");
 		errno = EPERM;
@@ -842,7 +888,7 @@ static int fix_txf_data(ntfs_volume *vol)
  * @flags is an optional second parameter. The same flags are used as for
  * the mount system call (man 2 mount). Currently only the following flag
  * is implemented:
- *	MS_RDONLY	- mount volume read-only
+ *	NTFS_MNT_RDONLY	- mount volume read-only
  *
  * The function opens the device @dev and verifies that it contains a valid
  * bootsector. Then, it allocates an ntfs_volume structure and initializes
@@ -853,7 +899,7 @@ static int fix_txf_data(ntfs_volume *vol)
  * Return the allocated volume structure on success and NULL on error with
  * errno set to the error code.
  */
-ntfs_volume *ntfs_device_mount(struct ntfs_device *dev, unsigned long flags)
+ntfs_volume *ntfs_device_mount(struct ntfs_device *dev, ntfs_mount_flags flags)
 {
 	s64 l;
 	ntfs_volume *vol;
@@ -1181,12 +1227,13 @@ ntfs_volume *ntfs_device_mount(struct ntfs_device *dev, unsigned long flags)
 	 * Check for dirty logfile and hibernated Windows.
 	 * We care only about read-write mounts.
 	 */
-	if (!(flags & (MS_RDONLY | MS_FORENSIC))) {
-		if (!(flags & MS_IGNORE_HIBERFILE) && 
+	if (!(flags & (NTFS_MNT_RDONLY | NTFS_MNT_FORENSIC))) {
+		if (!(flags & NTFS_MNT_IGNORE_HIBERFILE) &&
 		    ntfs_volume_check_hiberfile(vol, 1) < 0)
 			goto error_exit;
 		if (ntfs_volume_check_logfile(vol) < 0) {
-			if (!(flags & MS_RECOVER))
+			/* Always reject cached metadata for now */
+			if (!(flags & NTFS_MNT_RECOVER) || (errno == EPERM))
 				goto error_exit;
 			ntfs_log_info("The file system wasn't safely "
 				      "closed on Windows. Fixing.\n");
@@ -1275,7 +1322,7 @@ int ntfs_set_ignore_case(ntfs_volume *vol)
  * @flags is an optional second parameter. The same flags are used as for
  * the mount system call (man 2 mount). Currently only the following flags
  * is implemented:
- *	MS_RDONLY	- mount volume read-only
+ *	NTFS_MNT_RDONLY	- mount volume read-only
  *
  * The function opens the device or file @name and verifies that it contains a
  * valid bootsector. Then, it allocates an ntfs_volume structure and initializes
@@ -1290,7 +1337,7 @@ int ntfs_set_ignore_case(ntfs_volume *vol)
  * soon as the function returns.
  */
 ntfs_volume *ntfs_mount(const char *name __attribute__((unused)),
-		unsigned long flags __attribute__((unused)))
+		ntfs_mount_flags flags __attribute__((unused)))
 {
 #ifndef NO_NTFS_DEVICE_DEFAULT_IO_OPS
 	struct ntfs_device *dev;
@@ -1359,18 +1406,6 @@ int ntfs_umount(ntfs_volume *vol, const BOOL force __attribute__((unused)))
 
 #ifdef HAVE_MNTENT_H
 
-#ifndef HAVE_REALPATH
-/**
- * realpath - If there is no realpath on the system
- */
-static char *realpath(const char *path, char *resolved_path)
-{
-	strncpy(resolved_path, path, PATH_MAX);
-	resolved_path[PATH_MAX] = '\0';
-	return resolved_path;
-}
-#endif
-
 /**
  * ntfs_mntent_check - desc
  *
@@ -1394,7 +1429,7 @@ static int ntfs_mntent_check(const char *file, unsigned long *mnt_flags)
 		err = errno;
 		goto exit;
 	}
-	if (!realpath(file, real_file)) {
+	if (!ntfs_realpath_canonicalize(file, real_file)) {
 		err = errno;
 		goto exit;
 	}
@@ -1403,7 +1438,7 @@ static int ntfs_mntent_check(const char *file, unsigned long *mnt_flags)
 		goto exit;
 	}
 	while ((mnt = getmntent(f))) {
-		if (!realpath(mnt->mnt_fsname, real_fsname))
+		if (!ntfs_realpath_canonicalize(mnt->mnt_fsname, real_fsname))
 			continue;
 		if (!strcmp(real_file, real_fsname))
 			break;
@@ -1427,6 +1462,60 @@ exit:
 	}
 	return 0;
 }
+
+#else /* HAVE_MNTENT_H */
+
+#if defined(__sun) && defined (__SVR4)
+
+static int ntfs_mntent_check(const char *file, unsigned long *mnt_flags)
+{
+	struct mnttab *mnt = NULL;
+	char *real_file = NULL, *real_fsname = NULL;
+	FILE *f;
+	int err = 0;
+
+	real_file = (char*)ntfs_malloc(PATH_MAX + 1);
+	if (!real_file)
+		return -1;
+	real_fsname = (char*)ntfs_malloc(PATH_MAX + 1);
+	mnt = (struct mnttab*)ntfs_malloc(MNT_LINE_MAX + 1);
+	if (!real_fsname || !mnt) {
+		err = errno;
+		goto exit;
+	}
+	if (!ntfs_realpath_canonicalize(file, real_file)) {
+		err = errno;
+		goto exit;
+	}
+	if (!(f = fopen(MNTTAB, "r"))) {
+		err = errno;
+		goto exit;
+	}
+	while (!getmntent(f, mnt)) {
+		if (!ntfs_realpath_canonicalize(mnt->mnt_special, real_fsname))
+			continue;
+		if (!strcmp(real_file, real_fsname)) {
+			*mnt_flags = NTFS_MF_MOUNTED;
+			if (!strcmp(mnt->mnt_mountp, "/"))
+				*mnt_flags |= NTFS_MF_ISROOT;
+			if (hasmntopt(mnt, "ro") && !hasmntopt(mnt, "rw"))
+				*mnt_flags |= NTFS_MF_READONLY;
+			break;
+		}
+	}
+	fclose(f);
+exit:
+	free(mnt);
+	free(real_file);
+	free(real_fsname);
+	if (err) {
+		errno = err;
+		return -1;
+	}
+	return 0;
+}
+
+#endif /* defined(__sun) && defined (__SVR4) */
 #endif /* HAVE_MNTENT_H */
 
 /**
@@ -1458,7 +1547,7 @@ int ntfs_check_if_mounted(const char *file __attribute__((unused)),
 		unsigned long *mnt_flags)
 {
 	*mnt_flags = 0;
-#ifdef HAVE_MNTENT_H
+#if defined(HAVE_MNTENT_H) || (defined(__sun) && defined (__SVR4))
 	return ntfs_mntent_check(file, mnt_flags);
 #else
 	return 0;
@@ -1640,6 +1729,10 @@ int ntfs_volume_error(int err)
 			ret = NTFS_VOLUME_CORRUPT;
 			break;
 		case EPERM:
+			/*
+			 * Hibernation and fast restarting are seen the
+			 * same way on a non Windows-system partition.
+			 */
 			ret = NTFS_VOLUME_HIBERNATED;
 			break;
 		case EOPNOTSUPP:
@@ -1729,4 +1822,114 @@ int ntfs_volume_get_free_space(ntfs_volume *vol)
 			ret = 0;
 	}
 	return (ret);
+}
+
+/**
+ * ntfs_volume_rename - change the current label on a volume
+ * @vol:	volume to change the label on
+ * @label:	the new label
+ * @label_len:	the length of @label in ntfschars including the terminating NULL
+ *		character, which is mandatory (the value can not exceed 128)
+ *
+ * Change the label on the volume @vol to @label.
+ */
+int ntfs_volume_rename(ntfs_volume *vol, const ntfschar *label, int label_len)
+{
+	ntfs_attr *na;
+	char *old_vol_name;
+	char *new_vol_name = NULL;
+	int new_vol_name_len;
+	int err;
+
+	if (NVolReadOnly(vol)) {
+		ntfs_log_error("Refusing to change label on read-only mounted "
+			"volume.\n");
+		errno = EROFS;
+		return -1;
+	}
+
+	label_len *= sizeof(ntfschar);
+	if (label_len > 0x100) {
+		ntfs_log_error("New label is too long. Maximum %u characters "
+				"allowed.\n",
+				(unsigned)(0x100 / sizeof(ntfschar)));
+		errno = ERANGE;
+		return -1;
+	}
+
+	na = ntfs_attr_open(vol->vol_ni, AT_VOLUME_NAME, AT_UNNAMED, 0);
+	if (!na) {
+		if (errno != ENOENT) {
+			err = errno;
+			ntfs_log_perror("Lookup of $VOLUME_NAME attribute "
+				"failed");
+			goto err_out;
+		}
+
+		/* The volume name attribute does not exist.  Need to add it. */
+		if (ntfs_attr_add(vol->vol_ni, AT_VOLUME_NAME, AT_UNNAMED, 0,
+			(const u8*) label, label_len))
+		{
+			err = errno;
+			ntfs_log_perror("Encountered error while adding "
+				"$VOLUME_NAME attribute");
+			goto err_out;
+		}
+	}
+	else {
+		s64 written;
+
+		if (NAttrNonResident(na)) {
+			err = errno;
+			ntfs_log_error("Error: Attribute $VOLUME_NAME must be "
+					"resident.\n");
+			goto err_out;
+		}
+
+		if (na->data_size != label_len) {
+			if (ntfs_attr_truncate(na, label_len)) {
+				err = errno;
+				ntfs_log_perror("Error resizing resident "
+					"attribute");
+				goto err_out;
+			}
+		}
+
+		if (label_len) {
+			written = ntfs_attr_pwrite(na, 0, label_len, label);
+			if (written == -1) {
+				err = errno;
+				ntfs_log_perror("Error when writing "
+					"$VOLUME_NAME data");
+				goto err_out;
+			}
+			else if (written != label_len) {
+				err = EIO;
+				ntfs_log_error("Partial write when writing "
+					"$VOLUME_NAME data.");
+				goto err_out;
+
+			}
+		}
+	}
+
+	new_vol_name_len =
+		ntfs_ucstombs(label, label_len, &new_vol_name, 0);
+	if (new_vol_name_len == -1) {
+		err = errno;
+		ntfs_log_perror("Error while decoding new volume name");
+		goto err_out;
+	}
+
+	old_vol_name = vol->vol_name;
+	vol->vol_name = new_vol_name;
+	free(old_vol_name);
+
+	err = 0;
+err_out:
+	if (na)
+		ntfs_attr_close(na);
+	if (err)
+		errno = err;
+	return err ? -1 : 0;
 }

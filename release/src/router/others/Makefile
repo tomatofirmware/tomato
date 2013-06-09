@@ -11,7 +11,15 @@ ifeq ($(TCONFIG_USB),y)
 # Optware perl symlink
 	install -d $(INSTALLDIR)/usr/bin
 	ln -sf /opt/bin/perl $(INSTALLDIR)/usr/bin/perl
+
+ifeq ($(CONFIG_LINUX26),y)
+#3G modem switch script
+	install -m 0700 switch3g $(INSTALLDIR)/usr/sbin
 endif
+endif
+
+# Ethernet state report
+	install -m 0700 ethstate $(INSTALLDIR)/usr/sbin
 
 # cron helper
 	install -m 0700 cru $(INSTALLDIR)/usr/sbin
@@ -21,6 +29,9 @@ endif
 
 # system info
 	install -m 0700 sysinfo $(INSTALLDIR)/usr/sbin
+
+# nas starter # AB multiSSID
+	install -m 0700 nas.sh $(INSTALLDIR)/usr/sbin
 
 # keep winscp happy
 #	install -m 0700 groups $(INSTALLDIR)/usr/bin

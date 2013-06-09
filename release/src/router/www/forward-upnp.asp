@@ -13,7 +13,7 @@
 <meta name='robots' content='noindex,nofollow'>
 <title>[<% ident(); %>] Forwarding: UPnP / NAT-PMP</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
-<link rel='stylesheet' type='text/css' href='color.css'>
+<% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
 
 <!-- / / / -->
@@ -40,7 +40,7 @@
 /* REMOVE-BEGIN
 	!!TB - additional miniupnp settings
 REMOVE-END */
-//	<% nvram("upnp_enable,upnp_mnp,upnp_clean,upnp_secure,upnp_clean_interval,upnp_clean_threshold"); %>
+//	<% nvram("upnp_enable,upnp_mnp,upnp_clean,upnp_secure,upnp_clean_interval,upnp_clean_threshold,upnp_custom,upnp_lan,upnp_lan1,upnp_lan2,upnp_lan3,lan_ifname,lan1_ifname,lan2_ifname,lan3_ifname,"); %>
 
 // <% upnpinfo(); %>
 
@@ -108,6 +108,13 @@ function deleteAll()
 	submitDelete('*', '0');
 }
 
+function toggleFiltersVisibility(){
+	if(E('upnpsettings').style.display=='')
+		E('upnpsettings').style.display='none';
+	else
+		E('upnpsettings').style.display='';
+}
+
 function verifyFields(focused, quiet)
 {
 /* REMOVE-BEGIN
@@ -118,6 +125,7 @@ REMOVE-END */
 
 	E('_f_upnp_clean').disabled = (enable == 0);
 	E('_f_upnp_secure').disabled = (enable == 0);
+	E('_upnp_custom').disabled = (enable == 0);
 	E('_f_upnp_mnp').disabled = (E('_f_enable_upnp').checked == 0);
 	E('_upnp_clean_interval').disabled = (enable == 0) || (bc == 0);
 	E('_upnp_clean_threshold').disabled = (enable == 0) || (bc == 0);
@@ -132,7 +140,39 @@ REMOVE-END */
 		ferror.clear(E('_upnp_clean_interval'));
 		ferror.clear(E('_upnp_clean_threshold'));
 	}
-
+/* VLAN-BEGIN */
+	E('_f_upnp_lan').disabled = ((nvram.lan_ifname.length < 1) || (enable == 0));
+	if (E('_f_upnp_lan').disabled)
+		E('_f_upnp_lan').checked = false;
+	E('_f_upnp_lan1').disabled = ((nvram.lan1_ifname.length < 1) || (enable == 0));
+	if (E('_f_upnp_lan1').disabled)
+		E('_f_upnp_lan1').checked = false;
+	E('_f_upnp_lan2').disabled = ((nvram.lan2_ifname.length < 1) || (enable == 0));
+	if (E('_f_upnp_lan2').disabled)
+		E('_f_upnp_lan2').checked = false;
+	E('_f_upnp_lan3').disabled = ((nvram.lan3_ifname.length < 1) || (enable == 0));
+	if (E('_f_upnp_lan3').disabled)
+		E('_f_upnp_lan3').checked = false;
+	if ((enable) && (!E('_f_upnp_lan').checked) && (!E('_f_upnp_lan1').checked) && (!E('_f_upnp_lan2').checked) && (!E('_f_upnp_lan3').checked)) {
+		if ((E('_f_enable_natpmp').checked) || (E('_f_enable_upnp').checked)) {
+			var m = 'NAT-PMP or UPnP must be enabled in least one LAN bridge';
+			ferror.set('_f_enable_natpmp', m, quiet);
+			ferror.set('_f_enable_upnp', m, 1);
+			ferror.set('_f_upnp_lan', m, 1);
+			ferror.set('_f_upnp_lan1', m, 1);
+			ferror.set('_f_upnp_lan2', m, 1);
+			ferror.set('_f_upnp_lan3', m, 1);
+		}
+		return 0;
+	} else {
+		ferror.clear('_f_enable_natpmp');
+		ferror.clear('_f_enable_upnp');
+		ferror.clear('_f_upnp_lan');
+		ferror.clear('_f_upnp_lan1');
+		ferror.clear('_f_upnp_lan2');
+		ferror.clear('_f_upnp_lan3');
+	}
+/* VLAN-END */
 	return 1;
 }
 
@@ -155,6 +195,12 @@ REMOVE-END */
 	fom.upnp_clean.value = E('_f_upnp_clean').checked ? 1 : 0;
 	fom.upnp_secure.value = E('_f_upnp_secure').checked ? 1 : 0;
 
+/* VLAN-BEGIN */
+	fom.upnp_lan.value = E('_f_upnp_lan').checked ? 1 : 0;
+	fom.upnp_lan1.value = E('_f_upnp_lan1').checked ? 1 : 0;
+	fom.upnp_lan2.value = E('_f_upnp_lan2').checked ? 1 : 0;
+	fom.upnp_lan3.value = E('_f_upnp_lan3').checked ? 1 : 0;
+/* VLAN-END */
 	form.submit(fom, 0);
 }
 
@@ -196,6 +242,12 @@ REMOVE-END */
 <input type='hidden' name='upnp_mnp'>
 <input type='hidden' name='upnp_clean'>
 <input type='hidden' name='upnp_secure'>
+<!-- VLAN-BEGIN -->
+<input type='hidden' name='upnp_lan'>
+<input type='hidden' name='upnp_lan1'>
+<input type='hidden' name='upnp_lan2'>
+<input type='hidden' name='upnp_lan3'>
+<!-- VLAN-END -->
 
 <div class='section-title'>Forwarded Ports</div>
 <div class='section'>
@@ -203,8 +255,8 @@ REMOVE-END */
 	<div style='width: 100%; text-align: right'><input type='button' value='Delete All' onclick='deleteAll()' id='upnp-delete-all'> <input type='button' value='Refresh' onclick='javascript:reloadPage();'></div>
 </div>
 
-<div class='section-title'>Settings</div>
-<div class='section'>
+<div class='section-title'>Settings <small><i><a href='javascript:toggleFiltersVisibility();'>(Toggle Visibility)</a></i></small></div>
+<div class='section' id='upnpsettings' style='display:none'>
 <script type='text/javascript'>
 createFieldTable('', [
 	{ title: 'Enable UPnP', name: 'f_enable_upnp', type: 'checkbox', value: (nvram.upnp_enable & 1) },
@@ -220,8 +272,16 @@ REMOVE-END */
 	{ title: 'Secure Mode', name: 'f_upnp_secure', type: 'checkbox',
 		suffix: ' <small>(when enabled, UPnP clients are allowed to add mappings only to their IP)</small>',
 		value: (nvram.upnp_secure == '1') },
+/* VLAN-BEGIN */
+	{ title: 'Listen on' },
+	{ title: 'LAN', indent: 2, name: 'f_upnp_lan', type: 'checkbox', value: (nvram.upnp_lan == '1') },
+	{ title: 'LAN1', indent: 2, name: 'f_upnp_lan1', type: 'checkbox', value: (nvram.upnp_lan1 == '1') },
+	{ title: 'LAN2', indent: 2, name: 'f_upnp_lan2', type: 'checkbox', value: (nvram.upnp_lan2 == '1') },
+	{ title: 'LAN3', indent: 2, name: 'f_upnp_lan3', type: 'checkbox', value: (nvram.upnp_lan3 == '1') },
+/* VLAN-END */
+	{ title: 'Show In My Network Places',  name: 'f_upnp_mnp',  type: 'checkbox',  value: (nvram.upnp_mnp == '1')},
 	null,
-	{ title: 'Show In My Network Places',  name: 'f_upnp_mnp',  type: 'checkbox',  value: (nvram.upnp_mnp == '1') }
+	{ title: 'Miniupnpd</a><br>Custom configuration', name: 'upnp_custom', type: 'textarea', value: nvram.upnp_custom }
 ]);
 </script>
 </div>

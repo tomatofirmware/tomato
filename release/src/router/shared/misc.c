@@ -38,6 +38,7 @@ int get_wan_proto(void)
 		"l2tp",
 		"pppoe",
 		"pptp",
+		"ppp3g",
 		NULL
 	};
 	int i;
@@ -59,6 +60,8 @@ int get_ipv6_service(void)
 		"6to4",		// IPV6_ANYCAST_6TO4
 		"sit",		// IPV6_6IN4
 		"other",	// IPV6_MANUAL
+		"6rd",		// IPV6_6RD
+		"6rd-pd",	// IPV6_6RD_DHCP
 		NULL
 	};
 	int i;
@@ -96,6 +99,39 @@ const char *ipv6_router_address(struct in6_addr *in6addr)
 
 	return addr6;
 }
+
+int calc_6rd_local_prefix(const struct in6_addr *prefix,
+	int prefix_len, int relay_prefix_len,
+	const struct in_addr *local_ip,
+	struct in6_addr *local_prefix, int *local_prefix_len)
+{
+	// the following code is based on ipv6calc's code
+	uint32_t local_ip_bits, j;
+	int i;
+
+	if (!prefix || !local_ip || !local_prefix || !local_prefix_len) {
+		return 0;
+	}
+
+	*local_prefix_len = prefix_len + 32 - relay_prefix_len;
+	if (*local_prefix_len > 64) {
+		return 0;
+	}
+
+	local_ip_bits = ntohl(local_ip->s_addr) << relay_prefix_len;
+
+	for (i=0; i<4; i++) {
+		local_prefix->s6_addr32[i] = prefix->s6_addr32[i];
+	}
+
+	for (j = 0x80000000, i = prefix_len; i < *local_prefix_len; i++, j>>=1)
+	{
+		if (local_ip_bits & j)
+			local_prefix->s6_addr[i>>3] |= (0x80 >> (i & 0x7));
+	}
+
+	return 1;
+}
 #endif
 
 int using_dhcpc(void)
@@ -126,9 +162,19 @@ int foreach_wif(int include_vifs, void *param,
 	int i;
 	int ret = 0;
 
-	snprintf(ifnames, sizeof(ifnames), "%s %s",
-		 nvram_safe_get("lan_ifnames"), nvram_safe_get("wan_ifnames"));
+	snprintf(ifnames, sizeof(ifnames), "%s %s %s %s %s %s %s %s %s %s",
+		nvram_safe_get("lan_ifnames"),
+		nvram_safe_get("lan1_ifnames"),
+		nvram_safe_get("lan2_ifnames"),
+		nvram_safe_get("lan3_ifnames"),
+		nvram_safe_get("wan_ifnames"),
+		nvram_safe_get("wl_ifname"),
+		nvram_safe_get("wl0_ifname"),
+		nvram_safe_get("wl0_vifs"),
+		nvram_safe_get("wl1_ifname"),
+		nvram_safe_get("wl1_vifs"));
 	remove_dups(ifnames, sizeof(ifnames));
+	sort_list(ifnames, sizeof(ifnames));
 
 	i = 0;
 	foreach(name, ifnames, next) {
@@ -185,9 +231,18 @@ int check_wanup(void)
 	struct ifreq ifr;
 
 	proto = get_wan_proto();
-	if (proto == WP_DISABLED) return 0;
+	if (proto == WP_DISABLED)
+	{
+		if (nvram_match("boardrev", "0x11")) { // Ovislink 1600GL - led "connected" off
+			led(LED_WHITE,LED_OFF);
+		}
+		if (nvram_match("boardtype", "0x052b") &&  nvram_match("boardrev", "0x1204")) { //rt-n15u wan led off
+			led(LED_WHITE,LED_OFF);
+		}
+		 return 0;
+	}
 
-	if ((proto == WP_PPTP) || (proto == WP_L2TP) || (proto == WP_PPPOE)) {
+	if ((proto == WP_PPTP) || (proto == WP_L2TP) || (proto == WP_PPPOE) || (proto == WP_PPP3G)) {
 		if (f_read_string("/tmp/ppp/link", buf1, sizeof(buf1)) > 0) {
 				// contains the base name of a file in /var/run/ containing pid of a daemon
 				snprintf(buf2, sizeof(buf2), "/var/run/%s.pid", buf1);
@@ -225,6 +280,12 @@ int check_wanup(void)
 			up = 0;
 			_x_dprintf("%s: !IFF_UP\n", __FUNCTION__);
 		}
+	}
+	if (nvram_match("boardrev", "0x11")) { // Ovislink 1600GL - led "connected" on
+		led(LED_WHITE,up);
+	}
+	if (nvram_match("boardtype", "0x052b") &&  nvram_match("boardrev", "0x1204")) { //rt-n15u wan led on
+		led(LED_WHITE,up);
 	}
 
 	return up;
@@ -341,7 +402,7 @@ const wanface_list_t *get_wanfaces(void)
 			break;
 		default:
 			ip = (proto == WP_DISABLED) ? "0.0.0.0" : nvram_safe_get("wan_ipaddr");
-			if (proto == WP_PPPOE) {
+			if ((proto == WP_PPPOE) || (proto == WP_PPP3G)) {
 				iface = nvram_safe_get("wan_iface");
 				if (!(*iface)) iface = "ppp+";
 			}

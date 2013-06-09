@@ -4,6 +4,10 @@
 	Copyright (C) 2006-2010 Jonathan Zarate
 	http://www.polarcloud.com/tomato/
 
+	Tomato VLAN GUI
+	Copyright (C) 2011 Augusto Bott
+	http://code.google.com/p/tomato-sdhc-vlan/
+
 	For use with Tomato Firmware only.
 	No part of this file may be used without permission.
 -->
@@ -13,7 +17,7 @@
 <meta name='robots' content='noindex,nofollow'>
 <title>[<% ident(); %>] Status: Device List</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
-<link rel='stylesheet' type='text/css' href='color.css'>
+<% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
 
 <!-- / / / -->
@@ -147,6 +151,12 @@ function addWF(n)
 	location.href = 'basic-wfilter.asp';
 }
 
+function addqoslimit(n)
+{
+	var e = list[n];
+	cookie.set('addqoslimit', [e.ip, e.name.split(',')[0]].join(','), 1);
+	location.href = 'qos-qoslimit.asp';
+}
 
 var ref = new TomatoRefresh('update.cgi', 'exec=devlist', 0, 'status_devices_refresh');
 
@@ -157,7 +167,8 @@ ref.refresh = function(text)
 	dg.populate();
 	dg.resort();
 	for (var uidx = 0; uidx < wl_ifaces.length; ++uidx) {
-		E("noise"+uidx).innerHTML = wlnoise[uidx];
+		if (wl_sunit(uidx)<0)
+			E("noise"+uidx).innerHTML = wlnoise[uidx];
 	}
 }
 
@@ -212,7 +223,12 @@ dg.populate = function()
 		e = get(a[2], a[1]);
 		e.lease = '<small><a href="javascript:deleteLease(\'L' + i + '\',\'' + a[1] + '\')" title="Delete Lease" id="L' + i + '">' + a[3] + '</a></small>';
 		e.name = a[0];
+/* NOVLAN-BEGIN */
 		e.ifname = nvram.lan_ifname;
+/* NOVLAN-END */
+/* VLAN-BEGIN */
+		e.ifname = '';
+/* VLAN-END */
 	}
 
 	for (i = wldev.length - 1; i >= 0; --i) {
@@ -251,6 +267,10 @@ dg.populate = function()
 		}
 		if (j < 0) continue;
 
+		if (e.ip == '') {
+			e.ip = a[1];
+		}
+
 		if (e.name == '') {
 			e.name = a[2];
 		}
@@ -271,7 +291,8 @@ dg.populate = function()
 		if (e.mac.match(/^(..):(..):(..)/)) {
 			b += '<br><small>' +
 				'<a href="http://standards.ieee.org/cgi-bin/ouisearch?' + RegExp.$1 + '-' + RegExp.$2 + '-' + RegExp.$3 + '" target="_new" title="OUI Search">[oui]</a> ' +
-				'<a href="javascript:addStatic(' + i + ')" title="Static Lease...">[static]</a>';
+				'<a href="javascript:addStatic(' + i + ')" title="Static Lease...">[static]</a>' +
+				'<a href="javascript:addqoslimit(' + i + ')" title="QoS BW Limiter">[qoslimit]</a>';
 
 			if (e.rssi != '') {
 				b += ' <a href="javascript:addWF(' + i + ')" title="Wireless Filter...">[wfilter]</a>';
@@ -339,13 +360,15 @@ f = [];
 for (var uidx = 0; uidx < wl_ifaces.length; ++uidx) {
 	var u = wl_unit(uidx);
 	if (nvram['wl'+u+'_radio'] == '1') {
-		var a = '';
-		if ((nvram['wl'+u+'_mode'] == 'ap') || (nvram['wl'+u+'_mode'] == 'wds'))
-			a = '&nbsp;&nbsp;&nbsp; <input type="button" value="Measure" onclick="javascript:window.location=\'wlmnoise.cgi?_http_id=' + nvram.http_id + '&_wl_unit=' + u +'\'">';
-		f.push( { title: '<b>Noise Floor (' + wl_ifaces[uidx][0] + ')&nbsp;:</b>',
-			prefix: '<span id="noise'+uidx+'">',
-			custom: wlnoise[uidx],
-			suffix: '</span>&nbsp;<small>dBm</small>' + a } );
+		if (wl_sunit(uidx)<0) {
+			var a = '';
+			if ((nvram['wl'+u+'_mode'] == 'ap') || (nvram['wl'+u+'_mode'] == 'wds'))
+				a = '&nbsp;&nbsp;&nbsp; <input type="button" value="Measure" onclick="javascript:window.location=\'wlmnoise.cgi?_http_id=' + nvram.http_id + '&_wl_unit=' + u +'\'">';
+			f.push( { title: '<b>Ground Noise (' + wl_ifaces[uidx][0] + ')&nbsp;:</b>',
+				prefix: '<span id="noise'+uidx+'">',
+				custom: wlnoise[uidx],
+				suffix: '</span>&nbsp;<small>dBm</small>' + a } );
+		}
 	}
 }
 createFieldTable('', f);
@@ -356,7 +379,7 @@ createFieldTable('', f);
 <!-- / / / -->
 
 </td></tr>
-<tr><td id='footer' colspan=2><script type='text/javascript'>genStdRefresh(1,0,'ref.toggle()');</script></td></tr>
+<tr><td id='footer' colspan=2><script type='text/javascript'>genStdRefresh(1,1,'ref.toggle()');</script></td></tr>
 </table>
 <script type='text/javascript'>earlyInit();</script>
 </body>

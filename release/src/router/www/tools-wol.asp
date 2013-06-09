@@ -53,6 +53,17 @@ wg.setup = function() {
 	this.headerSet(['MAC Address', 'IP Address', 'Status', 'Name']);
 	this.sort(3);
 }
+wg.sortCompare = function(a, b) {
+        var da = a.getRowData();
+        var db = b.getRowData();
+        var r = 0;
+        var c = this.sortColumn;
+        if (c == 1)
+                r = cmpIP(da[c], db[c]);
+        else
+                r = cmpText(da[c], db[c]);
+        return this.sortAscending ? r : -r;
+}
 wg.populate = function()
 {
 	var i, j, r, s;
@@ -63,7 +74,7 @@ wg.populate = function()
 	var q = nvram.dhcpd_static.split('>');
 	for (i = 0; i < q.length; ++i) {
 		var e = q[i].split('<');
-		if (e.length == 3) {
+		if ((e.length == 3) || (e.length == 4)) {
 			var m = e[0].split(',');
 			for (j = 0; j < m.length; ++j) {
 				s.push([m[j], e[1], e[2]]);

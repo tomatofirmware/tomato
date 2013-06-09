@@ -43,7 +43,12 @@
 #include <bcmdevs.h>
 
 static const char ppp_linkfile[] = "/tmp/ppp/link";
-static const char ppp_optfile[]  = "/tmp/ppp/options";
+static const char ppp_optfile[]  = "/tmp/ppp/wanoptions";
+#ifdef LINUX26
+#ifdef TCONFIG_USB
+static const char ppp3g_chatfile[]  = "/tmp/ppp/connect.chat";
+#endif
+#endif
 
 static void make_secrets(void)
 {
@@ -73,6 +78,7 @@ static int config_pppd(int wan_proto, int num)
 	TRACE_PT("begin\n");
 
 	FILE *fp;
+	FILE *cfp;
 	char *p;
 	int demand;
 
@@ -93,11 +99,41 @@ static int config_pppd(int wan_proto, int num)
 		return -1;
 	}
 
+#ifdef LINUX26
+#ifdef TCONFIG_USB
+	if (nvram_match("wan_proto", "ppp3g") ) {
+		fprintf(fp,
+			"/dev/%s\n"
+			"460800\n"
+			"connect \"/usr/sbin/chat -V -t 60 -f %s\"\n"
+			"noipdefault\n"
+			"lock\n"
+			"crtscts\n"
+			"modem\n"
+			"ipcp-accept-local\n",
+			nvram_safe_get("modem_dev"),
+			ppp3g_chatfile);
+
+		if (strlen(nvram_get("ppp_username")) >0 )
+			fprintf(fp, "user '%s'\n", nvram_get("ppp_username"));
+	} else {
+#endif
+#endif
+		fprintf(fp,
+			"unit %d\n"
+			"user '%s'\n"
+			"lcp-echo-adaptive\n",	// Suppress LCP echo-requests if traffic was received
+			num,
+			nvram_safe_get("ppp_username"));
+#ifdef LINUX26
+#ifdef TCONFIG_USB
+	}
+#endif
+#endif
+
 	fprintf(fp,
-		"unit %d\n"
 		"defaultroute\n"	// Add a default route to the system routing tables, using the peer as the gateway
 		"usepeerdns\n"		// Ask the peer for up to 2 DNS server addresses
-		"user '%s'\n"
 		"default-asyncmap\n"	// Disable  asyncmap  negotiation
 		"nopcomp\n"		// Disable protocol field compression
 		"noaccomp\n"		// Disable Address/Control compression
@@ -109,10 +145,7 @@ static int config_pppd(int wan_proto, int num)
 		"maxfail 0\n"		// Never give up
 		"lcp-echo-interval %d\n"// Interval between LCP echo-requests
 		"lcp-echo-failure %d\n"	// Tolerance to unanswered echo-requests
-		"lcp-echo-adaptive\n"	// Suppress LCP echo-requests if traffic was received
 		"%s",			// Debug
-		num,
-		nvram_safe_get("ppp_username"),
 		nvram_get_int("pppoe_lei") ? : 10,
 		nvram_get_int("pppoe_lef") ? : 5,
 		nvram_get_int("debug_ppp") ? "debug\n" : "");
@@ -154,6 +187,58 @@ static int config_pppd(int wan_proto, int num)
 			fprintf(fp, "mp\n");
 		}
 		break;
+#ifdef LINUX26
+#ifdef TCONFIG_USB
+	case WP_PPP3G:
+		if ((cfp = fopen(ppp3g_chatfile, "w")) == NULL) {
+			perror(ppp3g_chatfile);
+			return -1;
+		}
+		fprintf(cfp,
+			"ABORT \"NO CARRIER\"\n"
+			"ABORT \"NO DIALTONE\"\n"
+			"ABORT \"NO ERROR\"\n"
+			"ABORT \"NO ANSWER\"\n"
+			"ABORT \"BUSY\"\n"
+			"REPORT CONNECT\n"
+			"\"\" \"AT\"\n");
+/* moved to switch3g script
+		if (strlen(nvram_get("modem_pin")) >0 ) {
+			fprintf(cfp, 
+				"TIMEOUT 60\n"
+				"OK \"AT+CPIN=%s\"\n"
+				"TIMEOUT 10\n",
+				nvram_get("modem_pin"));
+		}
+*/
+		fprintf(cfp,
+			"OK \"AT&FE0V1X1&D2&C1S0=0\"\n"
+			"OK \"AT\"\n"
+			"OK \"ATS0=0\"\n"
+			"OK \"AT\"\n"
+			"OK \"AT&FE0V1X1&D2&C1S0=0\"\n"
+			"OK \"AT\"\n"
+			"OK 'AT+CGDCONT=1,\"IP\",\"%s\"'\n"
+			"OK \"ATDT%s\"\n"
+			"CONNECT \\c\n",
+			nvram_safe_get("modem_apn"),
+			nvram_safe_get("modem_init")
+			);
+		fclose(cfp);
+
+
+		if (nvram_match("usb_3g", "1")) {
+			// clear old gateway
+			if (strlen(nvram_get("wan_gateway")) >0 ) {
+				nvram_set("wan_gateway", "");
+			}
+
+			// detect 3G Modem
+			xstart("switch3g");
+		}
+		break;
+#endif
+#endif
 	case WP_L2TP:
 		fprintf(fp, "nomppe nomppc\n");
 		if (nvram_get_int("mtu_enable"))
@@ -212,7 +297,7 @@ static void stop_ppp(void)
 
 static void run_pppd(void)
 {
-	eval("pppd");
+	eval("pppd", "file", (char *)ppp_optfile);
 
 	if (nvram_get_int("ppp_demand")) {
 		// demand mode
@@ -347,9 +432,21 @@ void start_pppoe(int num)
 
 	snprintf(ifname, sizeof(ifname), "ppp%d", num);
 
-	if (config_pppd(WP_PPPOE, num) != 0)
+#ifdef LINUX26
+#ifdef TCONFIG_USB
+	if (nvram_match( "wan_proto", "ppp3g") ) {
+		if (config_pppd(WP_PPP3G, num) != 0)
 		return;
-
+	} else {
+#endif
+#endif
+		if (config_pppd(WP_PPPOE, num) != 0)
+		return;
+#ifdef LINUX26
+#ifdef TCONFIG_USB
+	}
+#endif
+#endif
 	run_pppd();
 
 	if (nvram_get_int("ppp_demand"))
@@ -363,6 +460,8 @@ void start_pppoe(int num)
 void stop_pppoe(void)
 {
 	stop_ppp();
+
+
 }
 
 #if 0
@@ -419,6 +518,7 @@ void start_l2tp(void)
 		"port = 1701\n"
 		"[lac l2tp]\n"
 		"lns = %s\n"
+		"tx bps = 100000000\n"
 		"pppoptfile = %s\n"
 		"redial = yes\n"
 		"max redials = 32767\n"
@@ -451,7 +551,7 @@ void start_l2tp(void)
 
 // -----------------------------------------------------------------------------
 
-static char *wan_gateway(void)
+char *wan_gateway(void)
 {
 	char *gw = nvram_safe_get("wan_gateway_get");
 	if ((*gw == 0) || (strcmp(gw, "0.0.0.0") == 0))
@@ -559,15 +659,29 @@ void start_wan(int mode)
 	int max;
 	int mtu;
 	char buf[128];
+	struct sysinfo si;
+	int vid;
+	int vid_map;
+	int vlan0tag;
 
 	TRACE_PT("begin\n");
 
-	f_write(wan_connecting, NULL, 0, 0, 0);
+	sysinfo(&si);
+	f_write(wan_connecting, &si.uptime, sizeof(si.uptime), 0, 0);
 
 	//
 
 	if (!foreach_wif(1, &p, is_sta)) {
 		p = nvram_safe_get("wan_ifnameX");
+		/* vlan ID mapping */
+		if (sscanf(p, "vlan%d", &vid) == 1) {
+			vlan0tag = nvram_get_int("vlan0tag");
+			snprintf(buf, sizeof(buf), "vlan%dvid", vid);
+			vid_map = nvram_get_int(buf);
+			if ((vid_map < 1) || (vid_map > 4094)) vid_map = vlan0tag | vid;
+			snprintf(buf, sizeof(buf), "vlan%d", vid_map);
+			p = buf;
+		}
 		set_mac(p, "mac_wan", 1);
 	}
 	nvram_set("wan_ifname", p);
@@ -607,6 +721,7 @@ void start_wan(int mode)
 
 	switch (wan_proto) {
 	case WP_PPPOE:
+	case WP_PPP3G:
 		max = 1492;
 		break;
 	case WP_PPTP:
@@ -651,6 +766,7 @@ void start_wan(int mode)
 
 	switch (wan_proto) {
 	case WP_PPPOE:
+	case WP_PPP3G:
 		start_pppoe(PPPOE0);
 		break;
 	case WP_DHCP:
@@ -729,7 +845,9 @@ void start_wan6_done(const char *wan_ifname)
 		eval("ip", "route", "add", "::/0", "dev", (char *)wan_ifname, "metric", "2048");
 		break;
 	case IPV6_NATIVE_DHCP:
-		eval("ip", "route", "add", "::/0", "dev", (char *)wan_ifname);
+//		eval("ip", "route", "add", "::/0", "dev", (char *)wan_ifname);  //removed by Toastman
+//      see discussion at http://www.linksysinfo.org/index.php?threads/ipv6-and-comcast.38006/
+//		post #24 refers. 
 		stop_dhcp6c();
 		start_dhcp6c();
 		break;
@@ -750,13 +868,20 @@ void start_wan6_done(const char *wan_ifname)
 		// FIXME: give it a few seconds for DAD completion
 		sleep(2);
 		break;
+	case IPV6_6RD:
+	case IPV6_6RD_DHCP:
+		stop_6rd_tunnel();
+		start_6rd_tunnel();
+		// FIXME2?: give it a few seconds for DAD completion
+		sleep(2);
+		break;
 	}
 }
 #endif
 
 //	ppp_demand: 0=keep alive, 1=connect on demand (run 'listen')
 //	wan_ifname: vlan1
-//	wan_iface:	ppp# (PPPOE, PPTP, L2TP), vlan1 (DHCP, HB, Static)
+//	wan_iface:	ppp# (PPPOE, PPP3G, PPTP, L2TP), vlan1 (DHCP, HB, Static)
 
 void start_wan_done(char *wan_ifname)
 {
@@ -830,9 +955,11 @@ void start_wan_done(char *wan_ifname)
 
 	dns_to_resolv();
 	start_dnsmasq();
-
 	start_firewall();
 	start_qos();
+	start_qoslimit();
+	start_arpbind();
+
 
 	do_static_routes(1);
 	// and routes supplied via DHCP
@@ -852,7 +979,9 @@ void start_wan_done(char *wan_ifname)
 		stop_ddns();
 		start_ddns();
 		stop_igmp_proxy();
+		stop_udpxy();
 		start_igmp_proxy();
+		start_udpxy();
 	}
 
 #ifdef TCONFIG_IPV6
@@ -867,19 +996,40 @@ void start_wan_done(char *wan_ifname)
 
 	if (wanup) {
 		SET_LED(GOT_IP);
-		notice_set("wan", "");
-
 		run_nvscript("script_wanup", NULL, 0);
 	}
 
 	// We don't need STP after wireless led is lighted		//	no idea why... toggling it if necessary	-- zzz
 	if (check_hw_type() == HW_BCM4702) {
 		eval("brctl", "stp", nvram_safe_get("lan_ifname"), "0");
-		if (nvram_match("lan_stp", "1")) eval("brctl", "stp", nvram_safe_get("lan_ifname"), "1");
+		if (nvram_match("lan_stp", "1")) 
+			eval("brctl", "stp", nvram_safe_get("lan_ifname"), "1");
+#ifdef TCONFIG_VLAN
+		if(strcmp(nvram_safe_get("lan1_ifname"),"")!=0) {
+			eval("brctl", "stp", nvram_safe_get("lan1_ifname"), "0");
+			if (nvram_match("lan1_stp", "1")) 
+				eval("brctl", "stp", nvram_safe_get("lan1_ifname"), "1");
+		}
+		if(strcmp(nvram_safe_get("lan2_ifname"),"")!=0) {
+			eval("brctl", "stp", nvram_safe_get("lan2_ifname"), "0");
+			if (nvram_match("lan2_stp", "1")) 
+				eval("brctl", "stp", nvram_safe_get("lan2_ifname"), "1");
+		}
+		if(strcmp(nvram_safe_get("lan3_ifname"),"")!=0) {
+			eval("brctl", "stp", nvram_safe_get("lan3_ifname"), "0");
+			if (nvram_match("lan3_stp", "1")) 
+				eval("brctl", "stp", nvram_safe_get("lan3_ifname"), "1");
+		}
+#endif
 	}
 
 	if (wanup)
 		start_vpn_eas();
+
+#ifdef TCONFIG_USERPPTP
+	if (wanup && nvram_get_int("pptp_client_enable"))
+		start_pptp_client();
+#endif
 
 	unlink(wan_connecting);
 
@@ -893,10 +1043,19 @@ void stop_wan(void)
 	
 	TRACE_PT("begin\n");
 
+#ifdef TCONFIG_USERPPTP
+	stop_pptp_client();
+	stop_dnsmasq();
+	dns_to_resolv();
+	start_dnsmasq();
+#endif
+	stop_arpbind();
+	stop_qoslimit();
 	stop_qos();
 	stop_upnp();	//!!TB - moved from stop_services()
 	stop_firewall();
 	stop_igmp_proxy();
+	stop_udpxy();
 	stop_ntpc();
 
 #ifdef TCONFIG_IPV6
@@ -910,6 +1069,7 @@ void stop_wan(void)
 	stop_pppoe();
 	stop_ppp();
 	stop_dhcpc();
+	stop_vpn_eas();
 	clear_resolv();
 	nvram_set("wan_get_dns", "");
 

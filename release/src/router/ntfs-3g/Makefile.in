@@ -122,6 +122,7 @@ INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LDCONFIG = @LDCONFIG@
 LDFLAGS = @LDFLAGS@
+LIBFUSE_LITE_CFLAGS = @LIBFUSE_LITE_CFLAGS@
 LIBFUSE_LITE_LIBS = @LIBFUSE_LITE_LIBS@
 LIBGCRYPT_CFLAGS = @LIBGCRYPT_CFLAGS@
 LIBGCRYPT_CONFIG = @LIBGCRYPT_CONFIG@
@@ -723,11 +724,21 @@ dist-hook:
 libtool: $(LIBTOOL_DEPS)
 	$(SHELL) ./config.status --recheck
 
+libs:
+@FUSE_INTERNAL_TRUE@	(cd libfuse-lite && $(MAKE) libs) || exit 1;
+	(cd libntfs-3g && $(MAKE) libs) || exit 1;
+
+libntfs:
+	(cd libntfs-3g && $(MAKE) libs) || exit 1;
+
+drivers: libs
+	(cd src && $(MAKE) drivers) || exit 1;
+
+ntfsprogs: libntfs
+	(cd ntfsprogs && $(MAKE)) || exit 1;
+
 @ENABLE_NTFSPROGS_TRUE@strip:
 @ENABLE_NTFSPROGS_TRUE@	(cd ntfsprogs && $(MAKE) strip) || exit 1;
-
-@ENABLE_NTFSPROGS_TRUE@libs:
-@ENABLE_NTFSPROGS_TRUE@	(cd libntfs-3g && $(MAKE) libs) || exit 1;
 
 @ENABLE_NTFSPROGS_TRUE@extra:	extras
 

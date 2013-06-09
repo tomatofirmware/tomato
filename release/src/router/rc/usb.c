@@ -84,6 +84,10 @@ void start_usb(void)
 	char param[32];
 	int i;
 
+	if (nvram_match("boardtype", "0x052b")) { // Netgear WNR3500L v2 - initialize USB port
+		xstart("gpio", "enable", "20");
+	}
+
 	_dprintf("%s\n", __FUNCTION__);
 	tune_bdflush();
 
@@ -102,6 +106,12 @@ void start_usb(void)
 			f_write_string("/proc/leds-usb/gpio_pin", param, 0, 0);
 		}
 #endif
+#ifdef TCONFIG_USBAP
+			char instance[20];
+			sprintf(instance, "instance_base=1");
+			modprobe("wl_high", instance );
+#endif
+
 		if (nvram_get_int("usb_storage")) {
 			/* insert scsi and storage modules before usb drivers */
 			modprobe(SCSI_MOD);
@@ -124,6 +134,14 @@ void start_usb(void)
 			if (nvram_get_int("usb_fs_fat")) {
 				modprobe("fat");
 				modprobe("vfat");
+			}
+
+			if (nvram_get_int("usb_fs_hfs")) {
+				modprobe("hfs");
+			}
+
+			if (nvram_get_int("usb_fs_hfsplus")) {
+				modprobe("hfsplus");
 			}
 
 #if defined(LINUX26) && defined(TCONFIG_USB_EXTRAS)
@@ -166,6 +184,17 @@ void start_usb(void)
 				);
 			}
 		}
+
+#ifdef LINUX26
+		if (nvram_get_int("idle_enable") == 1) {
+			xstart( "sd-idle" );
+		}
+#endif
+#ifdef TCONFIG_USBAP
+			//enable eth2 after detect new iface by wl_high module
+			sleep(5);
+			xstart("service", "wireless", "restart");
+#endif
 	}
 }
 
@@ -192,6 +221,10 @@ void stop_usb(void)
 		modprobe_r("vfat");
 		modprobe_r("fat");
 		modprobe_r("fuse");
+#ifdef TCONFIG_HFS
+		modprobe_r("hfs");
+		modprobe_r("hfsplus");
+#endif
 		sleep(1);
 #ifdef TCONFIG_SAMBASRV
 		modprobe_r("nls_cp437");
@@ -239,6 +272,37 @@ void stop_usb(void)
 		modprobe_r(USB20_MOD);
 		modprobe_r(USBCORE_MOD);
 	}
+
+#ifdef LINUX26
+	if (nvram_get_int("idle_enable") == 0) {
+		killall("sd-idle", SIGTERM);
+	}
+
+	if (nvram_match("3g_usb", "0") ) {
+		if (nvram_match("3g_module", "sierra") ) {
+			modprobe_r("sierra");
+			modprobe_r("usbserial");
+		}
+		if (nvram_match("3g_module", "option") ) {
+			modprobe_r("option");
+			modprobe_r("usbserial");
+		}
+/*
+		// shibby
+		// when modem use usbserial module and we will try remove module, module will crash
+		// the only solution at the moment is reboot router
+		// FIX THIS
+		if (nvram_match("3g_module", "usbserial") ) {
+			modprobe_r("usbserial");
+		}
+*/
+
+	if (nvram_match("boardtype", "0x052b")) { // Netgear WNR3500L v2 - disable USB port
+		xstart("gpio", "disable", "20");
+	}
+
+	}
+#endif
 }
 
 
@@ -324,6 +388,15 @@ int mount_r(char *mnt_dev, char *mnt_dir, char *type)
 #endif
 					ret = eval("ntfs-3g", "-o", options, mnt_dev, mnt_dir);
 			}
+
+			if (ret != 0 && strncmp(type, "hfs", "") == 0) {
+				ret = eval("mount", "-o", "noatime,nodev", mnt_dev, mnt_dir);
+			}
+
+			if (ret != 0 && strncmp(type, "hfsplus", "") == 0) {
+				ret = eval("mount", "-o", "noatime,nodev", mnt_dev, mnt_dir);
+			}
+
 			if (ret != 0) /* give it another try - guess fs */
 				ret = eval("mount", "-o", "noatime,nodev", mnt_dev, mnt_dir);
 

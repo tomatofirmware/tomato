@@ -407,9 +407,13 @@ function v_mins(e, quiet, min, max)
 	return 0;
 }
 
-function v_macip(e, quiet, bok, ipp)
+function v_macip(e, quiet, bok, lan_ipaddr, lan_netmask)
 {
 	var s, a, b, c, d, i;
+	var ipp, temp;
+
+	temp = lan_ipaddr.split('.');
+	ipp = temp[0]+'.'+temp[1]+'.'+temp[2]+'.';
 
 	if ((e = E(e)) == null) return 0;
 	s = e.value.replace(/\s+/g, '');
@@ -424,49 +428,63 @@ function v_macip(e, quiet, bok, ipp)
 				return false;
 			}
 		}
-        else e.value = a;
+		else e.value = a;
 		ferror.clear(e);
 		return true;
 	}
 
 	a = s.split('-');
+    
 	if (a.length > 2) {
 		ferror.set(e, 'Invalid IP address range', quiet);
 		return false;
 	}
-	c = 0;
+	
+	if (a[0].match(/^\d+$/)){
+		a[0]=ipp+a[0];
+		if ((a.length == 2) && (a[1].match(/^\d+$/)))
+			a[1]=ipp+a[1];
+	}
+	else{
+		if ((a.length == 2) && (a[1].match(/^\d+$/))){
+			temp=a[0].split('.');
+			a[1]=temp[0]+'.'+temp[1]+'.'+temp[2]+'.'+a[1];
+		}
+	}
 	for (i = 0; i < a.length; ++i) {
-		b = a[i];
-		if (b.match(/^\d+$/)) b = ipp + b;
-
+		b = a[i];    
 		b = fixIP(b);
 		if (!b) {
 			ferror.set(e, 'Invalid IP address', quiet);
 			return false;
 		}
 
-		if (b.indexOf(ipp) != 0) {
+		if ((aton(b) & aton(lan_netmask))!=(aton(lan_ipaddr) & aton(lan_netmask))) {
 			ferror.set(e, 'IP address outside of LAN', quiet);
 			return false;
 		}
 
 		d = (b.split('.'))[3];
-		if (d <= c) {
+		if (parseInt(d) <= parseInt(c)) {
 			ferror.set(e, 'Invalid IP address range', quiet);
 			return false;
 		}
 
 		a[i] = c = d;
 	}
-	e.value = ipp + a.join('-');
+	e.value = b.split('.')[0] + '.' + b.split('.')[1] + '.' + b.split('.')[2] + '.' + a.join('-');
 	return true;
 }
 
 function fixIP(ip, x)
 {
 	var a, n, i;
+        a = ip;
+        i = a.indexOf("<br>");
+        if (i > 0)
+                a = a.slice(0,i);
 
-	a = ip.split('.');
+        a = a.split('.');
 	if (a.length != 4) return null;
 	for (i = 0; i < 4; ++i) {
 		n = a[i] * 1;
@@ -1216,7 +1234,7 @@ TomatoGrid.prototype = {
 		this.editor = null;
 		this.canSort = options.indexOf('sort') != -1;
 		this.canMove = options.indexOf('move') != -1;
-		this.maxAdd = maxAdd || 140;
+		this.maxAdd = maxAdd || 500;
 		this.canEdit = (editorFields != null);
 		this.canDelete = this.canEdit || (options.indexOf('delete') != -1);
 		this.editorFields = editorFields;
@@ -1532,6 +1550,9 @@ TomatoGrid.prototype = {
 					s += '<input type="' + f.type + '" maxlength=' + f.maxlen + common + attrib;
 					if (which == 'edit') s += ' value="' + escapeHTML('' + values[vi]) + '">';
 						else s += '>';
+					break;
+				case 'clear':
+					s += '';
 					break;
 				case 'select':
 					s += '<select' + common + attrib + '>';
@@ -2090,7 +2111,7 @@ TomatoRefresh.prototype = {
 function genStdTimeList(id, zero, min)
 {
 	var b = [];
-	var t = [3,4,5,10,15,30,60,120,180,240,300,10*60,15*60,20*60,30*60];
+	var t = [0.5,1,2,3,4,5,10,15,30,60,120,180,240,300,10*60,15*60,20*60,30*60];
 	var i, v;
 
 	if (min >= 0) {
@@ -2101,6 +2122,7 @@ function genStdTimeList(id, zero, min)
 			b.push('<option value=' + v + '>');
 			if (v == 60) b.push('1 minute');
 				else if (v > 60) b.push((v / 60) + ' minutes');
+				else if (v == 1) b.push('1 second');
 				else b.push(v + ' seconds');
 		}
 		b.push('</select> ');
@@ -2228,12 +2250,12 @@ function ellipsis(s, max) {
 
 function MIN(a, b)
 {
-	return a < b ? a : b;
+	return (a < b) ? a : b;
 }
 
 function MAX(a, b)
 {
-	return a > b ? a : b;
+	return (a > b) ? a : b;
 }
 
 function fixInt(n, min, max, def)
@@ -2331,8 +2353,17 @@ function navi()
 		['Bandwidth', 			'bwm', 0, [
 			['Real-Time',		'realtime.asp'],
 			['Last 24 Hours',	'24.asp'],
+/* REMOVE-BEGIN
+			['Client Monitor',	'client.asp'],
+REMOVE-END */
 			['Daily',			'daily.asp'],
 			['Weekly',			'weekly.asp'],
+			['Monthly',			'monthly.asp'] ] ],
+		['IP Traffic', 			'ipt', 0, [
+			['Real-Time',		'realtime.asp'],
+			['Last 24 Hours',	'24.asp'],
+			['Transfer Rates',	'details.asp'],
+			['Daily',			'daily.asp'],
 			['Monthly',			'monthly.asp'] ] ],
 		['Tools', 				'tools', 0, [
 			['Ping',			'ping.asp'],
@@ -2349,40 +2380,47 @@ function navi()
 			['Identification',	'ident.asp'],
 			['Time',			'time.asp'],
 			['DDNS',			'ddns.asp'],
-			['Static DHCP',		'static.asp'],
+			['Static DHCP/ARP/IPT',		'static.asp'],
 			['Wireless Filter',	'wfilter.asp'] ] ],
 		['Advanced', 			'advanced', 0, [
-			['Conntrack / Netfilter',	'ctnf.asp'],
-			['DHCP / DNS',		'dhcpdns.asp'],
+			['Conntrack/Netfilter',	'ctnf.asp'],
+			['DHCP/DNS',		'dhcpdns.asp'],
 			['Firewall',		'firewall.asp'],
 			['MAC Address',		'mac.asp'],
 			['Miscellaneous',	'misc.asp'],
 			['Routing',			'routing.asp'],
-			['Wireless',		'wireless.asp'] ] ],
+			['Wireless',		'wireless.asp']
+/* VLAN-BEGIN */
+			,['VLAN',			'vlan.asp'],
+			['LAN Access',			'access.asp'],
+			['Virtual Wireless',		'wlanvifs.asp']
+/* VLAN-END */
+			 ] ],
 		['Port Forwarding', 	'forward', 0, [
 			['Basic',			'basic.asp'],
 /* IPV6-BEGIN */
 			['Basic IPv6',		'basic-ipv6.asp'],
 /* IPV6-END */
-			['DMZ',				'dmz.asp'],
+			['DMZ',			'dmz.asp'],
 			['Triggered',		'triggered.asp'],
-			['UPnP / NAT-PMP',	'upnp.asp'] ] ],
+			['UPnP/NAT-PMP',	'upnp.asp'] ] ],
 		['QoS',					'qos', 0, [
 			['Basic Settings',	'settings.asp'],
 			['Classification',	'classify.asp'],
 			['View Graphs',		'graphs.asp'],
 			['View Details',	'detailed.asp'],
-			['Transfer Rates',	'ctrate.asp']
-			] ],
-		['Access Restriction',	'restrict.asp'],
-/* REMOVE-BEGIN
-		['Scripts',				'sc', 0, [
-			['Startup',			'startup.asp'],
-			['Shutdown',		'shutdown.asp'],
-			['Firewall',		'firewall.asp'],
-			['WAN Up',			'wanup.asp']
-			] ],
-REMOVE-END */
+			['Transfer Rates',	'ctrate.asp'] ] ],
+			
+		
+		['Access Restriction',		'restrict.asp'],
+		null,
+		['Bandwidth Limiter',		'qoslimit.asp'], 
+		/* NOCAT-BEGIN */
+		['Captive Portal',		'splashd.asp'],
+/* NOCAT-END */
+/* NGINX-BEGIN */
+		['Web Server',			'nginx.asp'],
+/* NGINX-END */
 /* USB-BEGIN */
 // ---- !!TB - USB, FTP, Samba, Media Server
 		['USB and NAS',			'nas', 0, [
@@ -2400,14 +2438,25 @@ REMOVE-END */
 /* USB-END */
 /* VPN-BEGIN */
 		['VPN Tunneling', 		'vpn', 0, [
-			['Server',			'server.asp'],
-			['Client',			'client.asp'] ] ],
+/* OPENVPN-BEGIN */
+			['OpenVPN Server',	'server.asp'],
+			['OpenVPN Client',	'client.asp'],
+/* OPENVPN-END */
+/* PPTPD-BEGIN */
+			['PPTP Server',		'pptp-server.asp'],
+			['PPTP Online',		'pptp-online.asp'],
+/* PPTPD-END */
+/* USERPPTP-BEGIN */
+			['PPTP Client',		'pptp.asp']
+/* USERPPTP-END */
+		] ],
 /* VPN-END */
 		null,
 		['Administration',		'admin', 0, [
 			['Admin Access',	'access.asp'],
 			['Bandwidth Monitoring','bwm.asp'],
-			['Buttons / LED',	'buttons.asp'],
+			['IP Traffic Monitoring','iptraffic.asp'],
+			['Buttons/LED',	'buttons.asp'],
 /* CIFS-BEGIN */
 			['CIFS Client',		'cifs.asp'],
 /* CIFS-END */
@@ -2419,6 +2468,9 @@ REMOVE-END */
 			['Logging',			'log.asp'],
 			['Scheduler',		'sched.asp'],
 			['Scripts',			'scripts.asp'],
+/* SNMP-BEGIN */
+			['SNMP',		'snmp.asp'],
+/* SNMP-END */
 			['Upgrade',			'upgrade.asp'] ] ],
 		null,
 		['About',				'about.asp'],
@@ -2571,6 +2623,9 @@ function createFieldTable(flags, desc)
 				// drop
 			case 'text':
 				buf2.push('<input type="' + f.type + '"' + name + ' value="' + escapeHTML(UT(f.value)) + '" maxlength=' + f.maxlen + (f.size ? (' size=' + f.size) : '') + common + '>');
+				break;
+			case 'clear':
+				s += '';
 				break;
 			case 'select':
 				buf2.push('<select' + name + common + '>');

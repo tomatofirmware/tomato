@@ -29,6 +29,7 @@ struct ntfs_options {
         char    *mnt_point;     /* Mount point */    
         char    *options;       /* Mount options */  
         char    *device;        /* Device to mount */
+	char	*arg_device;	/* Device requested in argv */
 } ;
 
 typedef enum {
@@ -49,6 +50,7 @@ enum {
 	OPT_NOATIME,
 	OPT_ATIME,
 	OPT_RELATIME,
+	OPT_DMTIME,
 	OPT_FAKE_RW,
 	OPT_FSNAME,
 	OPT_NO_DEF_OPTS,
@@ -72,6 +74,7 @@ enum {
 	OPT_NORECOVER,
 	OPT_REMOVE_HIBERFILE,
 	OPT_SYNC,
+	OPT_BIG_WRITES,
 	OPT_LOCALE,
 	OPT_NFCONV,
 	OPT_NONFCONV,
@@ -97,7 +100,8 @@ enum {
 	FLGOPT_OCTAL = 4,
 	FLGOPT_DECIMAL = 8,
 	FLGOPT_APPEND = 16,
-	FLGOPT_NOSUPPORT = 32
+	FLGOPT_NOSUPPORT = 32,
+	FLGOPT_OPTIONAL = 64
 } ;
 
 typedef enum {
@@ -114,6 +118,7 @@ typedef struct {
 	unsigned int dmask;
 	ntfs_fuse_streams_interface streams;
 	ntfs_atime_t atime;
+	u64 dmtime;
 	BOOL ro;
 	BOOL show_sys_files;
 	BOOL hide_hid_files;
@@ -126,6 +131,7 @@ typedef struct {
 	BOOL recover;
 	BOOL hiberfile;
 	BOOL sync;
+	BOOL big_writes;
 	BOOL debug;
 	BOOL no_detach;
 	BOOL blkdev;
@@ -167,6 +173,7 @@ extern const char nf_ns_trusted_prefix[];
 extern const int nf_ns_trusted_prefix_len;
 
 int ntfs_strappend(char **dest, const char *append);
+int ntfs_strinsert(char **dest, const char *append);
 char *parse_mount_options(ntfs_fuse_context_t *ctx,
 			const struct ntfs_options *popts, BOOL low_fuse);
 int ntfs_parse_options(struct ntfs_options *popts, void (*usage)(void),

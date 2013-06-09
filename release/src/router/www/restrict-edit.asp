@@ -82,7 +82,11 @@ layer7.unshift(['', 'Layer 7 (disabled)']);
 
 var ipp2p = [
 	[0,'IPP2P (disabled)'],[0xFFFF,'All IPP2P Filters'],[1,'AppleJuice'],[2,'Ares'],[4,'BitTorrent'],[8,'Direct Connect'],
-	[16,'eDonkey'],[32,'Gnutella'],[64,'Kazaa'],[128,'Mute'],[256,'SoulSeek'],[512,'Waste'],[1024,'WinMX'],[2048,'XDCC']];
+	[16,'eDonkey'],[32,'Gnutella'],[64,'Kazaa'],[128,'Mute'],[4096,'PPLive/UUSee'],[256,'SoulSeek'],[512,'Waste'],[1024,'WinMX']
+/* LINUX26-BEGIN */
+	,[2048,'XDCC'],[8192,'Xunlei/QQCyclone']
+/* LINUX26-END */
+	];
 
 var dowNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -102,7 +106,7 @@ cg.verifyFields = function(row, quiet) {
 cg.setup = function() {
 	var a, i, count, ex;
 
-	this.init('res-comp-grid', 'sort', 140, [ { type: 'text', maxlen: 32 } ] );
+	this.init('res-comp-grid', 'sort', 500, [ { type: 'text', maxlen: 32 } ] );
 	this.headerSet(['MAC / IP Address']);
 	this.showNewEditor();
 	this.resetNewEditor();
@@ -240,7 +244,7 @@ bpg.setup = function() {
 		if ((i != 6) && (i != 17)) protos.push([i, protocols[i] || i]);
 	}
 
-	this.init('res-bp-grid', 'sort', 140, [ { multi: [
+	this.init('res-bp-grid', 'sort', 500, [ { multi: [
 		{ type: 'select', prefix: '<div class="box1">', suffix: '</div>', options: protos },
 		{ type: 'select', prefix: '<div class="box2">', suffix: '</div>',
 			options: [['a','Any Port'],['d','Dst Port'],['s','Src Port'],['x','Src or Dst']] },
@@ -399,8 +403,8 @@ function save()
 	data.push(E('_f_desc').value);
 	data = data.join('|');
 
-	if (data.length >= 2048) {
-		alert('This rule is too big. Please reduce by ' + (data.length - 2048) + ' characters.');
+	if (data.length >= 8192) {
+		alert('This rule is too big. Please reduce by ' + (data.length - 8192) + ' characters.');
 		return;
 	}
 
@@ -485,7 +489,14 @@ createFieldTable('', [
 ]);
 </script>
 </div>
-
+<div>
+		<ul>
+			<li><b>Notice: Always write one domain or string to block on each line.</b>
+			<li>If you type the word 'love' for example all sites containing word 'love' we'll be blocked.
+			<li>If you type www.facebook.com any site containing the word www.facebook.com we'll blocked.
+			<li>It's a killer filter, try to be precise in your keywords for access restrictions.
+		</ul>
+</div>
 <!-- / / / -->
 
 </td></tr>

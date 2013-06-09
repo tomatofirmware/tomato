@@ -192,6 +192,7 @@ static int send_reply(fuse_req_t req, int error, const void *arg,
     return send_reply_iov(req, error, iov, count);
 }
 
+#if 0 /* not used */
 int fuse_reply_iov(fuse_req_t req, const struct iovec *iov, int count)
 {
     int res;
@@ -209,6 +210,7 @@ int fuse_reply_iov(fuse_req_t req, const struct iovec *iov, int count)
 
     return res;
 }
+#endif
 
 size_t fuse_dirent_size(size_t namelen)
 {
@@ -544,7 +546,7 @@ static void do_mknod(fuse_req_t req, fuse_ino_t nodeid, const void *inarg)
 	name = (const char *) inarg + FUSE_COMPAT_MKNOD_IN_SIZE;
 
     if (req->f->op.mknod)
-		req->f->op.mknod(req, nodeid, name, arg->mode, arg->rdev);
+	req->f->op.mknod(req, nodeid, name, arg->mode, arg->rdev);
     else
         fuse_reply_err(req, ENOSYS);
 }
@@ -619,7 +621,7 @@ static void do_link(fuse_req_t req, fuse_ino_t nodeid, const void *inarg)
 
 static void do_create(fuse_req_t req, fuse_ino_t nodeid, const void *inarg)
 {
-	const struct fuse_create_in *arg = (const struct fuse_create_in *) inarg;
+    const struct fuse_create_in *arg = (const struct fuse_create_in *) inarg;
 
     if (req->f->op.create) {
         struct fuse_file_info fi;
@@ -1043,6 +1045,8 @@ static void do_init(fuse_req_t req, fuse_ino_t nodeid, const void *inarg)
 	if (arg->flags & FUSE_DONT_MASK)
 	    f->conn.capable |= FUSE_CAP_DONT_MASK;
 #endif
+	if (arg->flags & FUSE_BIG_WRITES)
+	    f->conn.capable |= FUSE_CAP_BIG_WRITES;
     } else {
         f->conn.async_read = 0;
         f->conn.max_readahead = 0;
@@ -1087,6 +1091,8 @@ static void do_init(fuse_req_t req, fuse_ino_t nodeid, const void *inarg)
     if (f->conn.want & FUSE_CAP_DONT_MASK)
 	outarg.flags |= FUSE_DONT_MASK;
 #endif
+    if (f->conn.want & FUSE_CAP_BIG_WRITES)
+	outarg.flags |= FUSE_BIG_WRITES;
     outarg.max_readahead = f->conn.max_readahead;
     outarg.max_write = f->conn.max_write;
 
@@ -1123,18 +1129,6 @@ const struct fuse_ctx *fuse_req_ctx(fuse_req_t req)
 {
     return &req->ctx;
 }
-
-/*
- * The size of fuse_ctx got extended, so need to be careful about
- * incompatibility (i.e. a new binary cannot work with an old
- * library).
- */
-const struct fuse_ctx *fuse_req_ctx_compat24(fuse_req_t req);
-const struct fuse_ctx *fuse_req_ctx_compat24(fuse_req_t req)
-{
-	return fuse_req_ctx(req);
-}
-//FUSE_SYMVER(".symver fuse_req_ctx_compat24,fuse_req_ctx@FUSE_2.4");
 
 void fuse_req_interrupt_func(fuse_req_t req, fuse_interrupt_func_t func,
                              void *data)
@@ -1321,6 +1315,15 @@ static int fuse_ll_opt_proc(void *data, const char *arg, int key,
     return -1;
 }
 
+#ifdef __SOLARIS__
+
+int fuse_lowlevel_is_lib_option(const char *opt)
+{
+    return fuse_opt_match(fuse_ll_opts, opt);
+}
+
+#endif /* __SOLARIS__ */
+
 static void fuse_ll_destroy(void *data)
 {
     struct fuse_ll *f = (struct fuse_ll *) data;
@@ -1381,4 +1384,3 @@ struct fuse_session *fuse_lowlevel_new(struct fuse_args *args,
  out:
     return NULL;
 }
-

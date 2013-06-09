@@ -377,7 +377,8 @@ static int init_vlan_ports(void)
 	case MODEL_WL500GE:
 	case MODEL_WL500GPv2:
 	case MODEL_WL520GU:
-		if (nvram_match("vlan1ports", "0 5u"))	// 520GU or WL500GE?
+	case MODEL_WL330GE:
+		if (nvram_match("vlan1ports", "0 5u"))  // 520GU or 330GE or WL500GE?
 			dirty |= check_nv("vlan1ports", "0 5");
 		else if (nvram_match("vlan1ports", "4 5u"))
 			dirty |= check_nv("vlan1ports", "4 5");
@@ -403,19 +404,40 @@ static int init_vlan_ports(void)
 #ifdef CONFIG_BCMWL5
 	case MODEL_WNR3500L:
 	case MODEL_WRT320N:
+	case MODEL_WNR3500LV2:
 	case MODEL_RTN16:
 	case MODEL_RTN66U:
 		dirty |= check_nv("vlan1ports", "4 3 2 1 8*");
 		dirty |= check_nv("vlan2ports", "0 8");
 		break;
+	case MODEL_RTN53:
+		dirty |= check_nv("vlan2ports", "0 1 2 3 5*");
+		dirty |= check_nv("vlan1ports", "4 5");
+		break;
 	case MODEL_WNR2000v2:
+		dirty |= check_nv("vlan1ports", "4 3 2 1 5*");
+		dirty |= check_nv("vlan2ports", "0 5");
+		break;
+	case MODEL_RG200E_CA:
 		dirty |= check_nv("vlan0ports", "4 3 2 1 5*");
 		dirty |= check_nv("vlan1ports", "0 5");
 		break;
 	case MODEL_RTN10:
 		dirty |= check_nv("vlan1ports", "4 5");
 		break;
+	case MODEL_E1000v2:
+	case MODEL_L600N:
+		dirty |= check_nv("vlan1ports", "1 2 3 4 5*");
+		dirty |= check_nv("vlan2ports", "0 5");
+		break;
+	case MODEL_RTN10U:
+	case MODEL_CW5358U:
+	case MODEL_HG320:
+		dirty |= check_nv("vlan0ports", "1 2 3 4 5*");
+		dirty |= check_nv("vlan1ports", "0 5");
+		break;
 	case MODEL_RTN12:
+	case MODEL_RTN12B1:
 		dirty |= check_nv("vlan0ports", "3 2 1 0 5*");
 		dirty |= check_nv("vlan1ports", "4 5");
 		break;
@@ -429,11 +451,17 @@ static int init_vlan_ports(void)
 		dirty |= check_nv("vlan1ports", "3 2 1 0 8*");
 		dirty |= check_nv("vlan2ports", "4 8");
 		break;
+	case MODEL_E900:
+	case MODEL_E1500:
+	case MODEL_E1550:
+	case MODEL_E2500:
 	case MODEL_F7D3302:
 	case MODEL_F7D4302:
 		dirty |= check_nv("vlan1ports", "0 1 2 3 5*");
 		dirty |= check_nv("vlan2ports", "4 5");
 		break;
+	case MODEL_RTN15U:
+	case MODEL_E3200:
 	case MODEL_E4200:
 		dirty |= check_nv("vlan1ports", "0 1 2 3 8*");
 		dirty |= check_nv("vlan2ports", "4 8");
@@ -471,6 +499,9 @@ static void check_bootnv(void)
 		break;
 	case MODEL_WBRG54:
 		dirty |= check_nv("wl0gpio0", "130");
+		break;
+	case MODEL_WL330GE:
+		dirty |= check_nv("wl0gpio1", "0x02");
 		break;
 	case MODEL_WR850GV1:
 	case MODEL_WR850GV2:
@@ -534,6 +565,9 @@ static void check_bootnv(void)
 		dirty |= check_nv("vlan2hwname", "et0");
 		dirty |= check_nv("ledbh0", "7");
 		break;
+	case MODEL_WNR3500LV2:
+		dirty |= check_nv("vlan2hwname", "et0");
+		break;
 	case MODEL_WNR2000v2:
 		dirty |= check_nv("ledbh5", "8");
 		break;
@@ -569,8 +603,8 @@ static void check_bootnv(void)
 		}
 	case MODEL_E4200:
 		dirty |= check_nv("vlan2hwname", "et0");
-		if (invalid_mac(nvram_get("pci/1/1/macaddr")) == 0 ||
-		    invalid_mac(nvram_get("sb/1/macaddr"))) {
+		if (strncasecmp(nvram_safe_get("pci/1/1/macaddr"), "00:90:4c", 8) == 0 ||
+		    strncasecmp(nvram_safe_get("sb/1/macaddr"), "00:90:4c", 8) == 0) {
 			strcpy(mac, nvram_safe_get("et0macaddr"));
 			inc_mac(mac, 2);
 			dirty |= check_nv("sb/1/macaddr", mac);
@@ -578,6 +612,12 @@ static void check_bootnv(void)
 			dirty |= check_nv("pci/1/1/macaddr", mac);
 		}
 		break;
+	case MODEL_E900:
+	case MODEL_E1000v2:
+	case MODEL_E1500:
+	case MODEL_E1550:
+	case MODEL_E2500:
+	case MODEL_E3200:
 	case MODEL_WRT160Nv3:
 		dirty |= check_nv("vlan2hwname", "et0");
 		break;
@@ -678,6 +718,7 @@ static int init_nvram(void)
 	int model;
 	const char *mfr;
 	const char *name;
+	const char *ver;
 	char s[256];
 	unsigned long bf;
 	unsigned long n;
@@ -688,6 +729,7 @@ static int init_nvram(void)
 
 	mfr = "Broadcom";
 	name = NULL;
+	ver = NULL;
 	features = 0;
 	switch (model) {
 	case MODEL_WRT54G:
@@ -932,10 +974,62 @@ static int init_nvram(void)
 		nvram_set("ag0", "0x0C");
 		break;
 #ifdef CONFIG_BCMWL5
+	case MODEL_CW5358U:
+		mfr = "Catchtech";
+		name = "CW-5358U";
+		features = SUP_SES | SUP_80211N;
+#ifdef TCONFIG_USB
+		nvram_set("usb_uhci", "-1");
+#endif
+		if (!nvram_match("t_fix1", (char *)name)) {
+			nvram_set("lan_ifnames", "vlan0 eth1");
+			nvram_set("wan_ifnameX", "vlan1");
+			nvram_set("wl_ifname", "eth1");
+		}
+		break;
+	case MODEL_HG320:
+		mfr = "FiberHome";
+		name = "HG320";
+		features = SUP_SES | SUP_80211N;
+#ifdef TCONFIG_USB
+		nvram_set("usb_uhci", "-1");
+#endif
+		if (!nvram_match("t_fix1", (char *)name)) {
+			nvram_set("lan_ifnames", "vlan0 eth1");
+			nvram_set("wan_ifnameX", "vlan1");
+			nvram_set("wl_ifname", "eth1");
+		}
+		break;
+	case MODEL_RG200E_CA:
+		mfr = "ChinaNet";
+		name = "RG200E-CA";
+		features = SUP_SES | SUP_80211N;
+#ifdef TCONFIG_USB
+		nvram_set("usb_uhci", "-1");
+#endif
+		if (!nvram_match("t_fix1", (char *)name)) {
+			nvram_set("lan_ifnames", "vlan0 eth1");
+			nvram_set("wan_ifnameX", "vlan1");
+			nvram_set("wl_ifname", "eth1");
+		}
+		break;
 	case MODEL_RTN10:
 		mfr = "Asus";
 		name = "RT-N10";
 		features = SUP_SES | SUP_80211N;
+		if (!nvram_match("t_fix1", (char *)name)) {
+			nvram_set("lan_ifnames", "vlan0 eth1");
+			nvram_set("wan_ifnameX", "vlan1");
+			nvram_set("wl_ifname", "eth1");
+		}
+		break;
+	case MODEL_RTN10U:
+		mfr = "Asus";
+		name = "RT-N10U";
+		features = SUP_SES | SUP_80211N;
+#ifdef TCONFIG_USB
+		nvram_set("usb_uhci", "-1");
+#endif
 		if (!nvram_match("t_fix1", (char *)name)) {
 			nvram_set("lan_ifnames", "vlan0 eth1");
 			nvram_set("wan_ifnameX", "vlan1");
@@ -952,6 +1046,32 @@ static int init_nvram(void)
 			nvram_set("wl_ifname", "eth1");
 		}
 		break;
+	case MODEL_RTN12B1:
+		mfr = "Asus";
+		name = "RT-N12 B1";
+		features = SUP_80211N;
+		if (!nvram_match("t_fix1", (char *)name)) {
+			nvram_set("lan_ifnames", "vlan0 eth1");
+			nvram_set("wan_ifnameX", "vlan1");
+			nvram_set("wl_ifname", "eth1");
+		}
+		break;
+	case MODEL_RTN15U:
+		mfr = "Asus";
+		name = "RT-N15U";
+		features = SUP_SES | SUP_80211N | SUP_1000ET;
+#ifdef TCONFIG_USB
+		nvram_set("usb_uhci", "-1");
+#endif
+		if (!nvram_match("t_fix1", (char *)name)) {
+			nvram_set("lan_ifnames", "vlan1 eth1");
+			nvram_set("wan_iface", "vlan2");
+			nvram_set("wan_ifname", "vlan2");
+			nvram_set("wan_ifnameX", "vlan2");
+			nvram_set("wan_ifnames", "vlan2");
+			nvram_set("wl_ifname", "eth1");
+		}
+		break;
 	case MODEL_RTN16:
 		mfr = "Asus";
 		name = "RT-N16";
@@ -964,6 +1084,67 @@ static int init_nvram(void)
 			nvram_set("wan_ifnameX", "vlan2");
 			nvram_set("wl_ifname", "eth1");
 			nvram_set("vlan_enable", "1");
+		}
+		break;
+	case MODEL_RTN53:
+		mfr = "Asus";
+		name = "RT-N53";
+		features = SUP_SES | SUP_80211N;
+#if defined(LINUX26) && defined(TCONFIG_USBAP)
+		if (nvram_get_int("usb_storage") == 1) nvram_set("usb_storage", "-1");
+#endif
+		if (!nvram_match("t_fix1", (char *)name)) {
+#ifdef TCONFIG_USBAP
+			nvram_set("lan_ifnames", "vlan2 eth1 eth2");
+			nvram_set("landevs", "vlan2 wl0 wl1");
+			nvram_set("wl1_ifname", "eth2");
+#else
+			nvram_set("lan_ifnames", "vlan2 eth1");
+			nvram_set("landevs", "vlan2 wl0");
+#endif
+			nvram_set("wl_ifname", "eth1");
+			nvram_set("wl0_ifname", "eth1");
+			nvram_set("wan_ifnameX", "vlan1");
+			nvram_set("wandevs", "vlan1");
+			nvram_unset("vlan0ports");
+		}
+		break;
+	case MODEL_L600N:
+		mfr = "Rosewill";
+		name = "L600N";
+		features = SUP_SES | SUP_80211N;
+#if defined(LINUX26) && defined(TCONFIG_USBAP)
+		if (nvram_get_int("usb_storage") == 1) nvram_set("usb_storage", "-1");
+#endif
+		if (!nvram_match("t_fix1", (char *)name)) {
+#ifdef TCONFIG_USBAP
+		nvram_set("lan_ifnames", "vlan1 eth1 eth2");
+		nvram_set("landevs", "vlan1 wl0 wl1");
+		nvram_set("wl0_ifname", "wl0");
+		nvram_set("wl1_ifname", "wl1");
+#else
+		nvram_set("lan_ifnames", "vlan1 eth1");
+		nvram_set("landevs", "vlan1 wl0");
+#endif
+		nvram_set("wl_ifname", "eth1");
+		nvram_set("wan_ifnameX", "vlan2");
+		nvram_set("wandevs", "vlan2");
+		nvram_set("vlan2hwname", "et0");
+		nvram_set("gpio7", "wps_led");
+		nvram_set("gpio8", "usb_led");
+		nvram_set("gpio10", "wlan_button");
+		nvram_set("gpio20", "wps_button");
+		nvram_set("gpio21", "reset_button");		
+		nvram_set("gpio22", "wombo_reset");		
+		nvram_set("clkfreq", "500,200,100");
+		nvram_set("sdram_init", "0x0000");
+		nvram_set("xtalfreq", "20000");
+		nvram_set("boot_wait", "on");
+		nvram_set("wait_time", "3");
+		nvram_set("boardflags2", "0x0");
+		nvram_set("boardpwrctl", "0xC00");
+		nvram_set("boardtype", "0x0550");
+		nvram_set("watchdog", "0");
 		}
 		break;
 	case MODEL_RTN66U:
@@ -993,6 +1174,16 @@ static int init_nvram(void)
 		features = SUP_SES | SUP_AOSS_LED | SUP_80211N | SUP_1000ET;
 		if (!nvram_match("t_fix1", (char *)name)) {
 			nvram_set("sromrev", "3");
+			nvram_set("lan_ifnames", "vlan1 eth1");
+			nvram_set("wan_ifnameX", "vlan2");
+			nvram_set("wl_ifname", "eth1");
+		}
+		break;
+	case MODEL_WNR3500LV2:
+		mfr = "Netgear";
+		name = "WNR3500L v2";
+		features = SUP_SES | SUP_AOSS_LED | SUP_80211N | SUP_1000ET;
+		if (!nvram_match("t_fix1", (char *)name)) {
 			nvram_set("lan_ifnames", "vlan1 eth1");
 			nvram_set("wan_ifnameX", "vlan2");
 			nvram_set("wl_ifname", "eth1");
@@ -1042,12 +1233,89 @@ static int init_nvram(void)
 			nvram_set("wandevs", "vlan2");
 		}
 		break;
+	case MODEL_E900:
+	case MODEL_E1500:
+		mfr = "Linksys";
+		name = nvram_safe_get("boot_hw_model");
+		ver = nvram_safe_get("boot_hw_ver");
+		features = SUP_SES | SUP_80211N;
+		if (!nvram_match("t_fix1", (char *)name)) {
+			nvram_set("lan_ifnames", "vlan1 eth1");
+			nvram_set("wan_ifnameX", "vlan2");
+			nvram_set("wl_ifname", "eth1");
+		}
+		break;
+	case MODEL_E1550:
+		mfr = "Linksys";
+		name = nvram_safe_get("boot_hw_model");
+		ver = nvram_safe_get("boot_hw_ver");
+		features = SUP_SES | SUP_80211N;
+#ifdef TCONFIG_USB
+		nvram_set("usb_uhci", "-1");
+#endif
+		if (!nvram_match("t_fix1", (char *)name)) {
+			nvram_set("lan_ifnames", "vlan1 eth1");
+			nvram_set("wan_ifnameX", "vlan2");
+			nvram_set("wl_ifname", "eth1");
+		}
+		break;
+	case MODEL_E2500:
+		mfr = "Linksys";
+		name = nvram_safe_get("boot_hw_model");
+		ver = nvram_safe_get("boot_hw_ver");
+		features = SUP_SES | SUP_80211N;
+#if defined(LINUX26) && defined(TCONFIG_USBAP)
+		if (nvram_get_int("usb_storage") == 1) nvram_set("usb_storage", "-1");
+#endif
+		if (!nvram_match("t_fix1", (char *)name)) {
+#ifdef TCONFIG_USBAP
+			nvram_set("lan_ifnames", "vlan1 eth1 eth2");
+			nvram_set("landevs", "vlan1 wl0 wl1");
+			nvram_set("wl0_ifname", "eth1");
+			nvram_set("wl1_ifname", "eth2");
+#else
+			nvram_set("lan_ifnames", "vlan1 eth1");
+			nvram_set("landevs", "vlan1 wl0");
+#endif
+			nvram_set("wan_ifnameX", "vlan2");
+			nvram_set("wl_ifname", "eth1");
+
+		}
+		break;
+	case MODEL_E3200:
+		mfr = "Linksys";
+		name = nvram_safe_get("boot_hw_model");
+		ver = nvram_safe_get("boot_hw_ver");
+		features = SUP_SES | SUP_80211N | SUP_1000ET;
+#ifdef TCONFIG_USB
+		nvram_set("usb_uhci", "-1");
+#endif
+		if (!nvram_match("t_fix1", (char *)name)) {
+#ifdef TCONFIG_USBAP
+			nvram_set("lan_ifnames", "vlan1 eth1 eth2");
+			nvram_set("landevs", "vlan1 wl0 wl1");
+			nvram_set("wl0_ifname", "eth1");
+			nvram_set("wl1_ifname", "eth2");
+#else
+			nvram_set("lan_ifnames", "vlan1 eth1");
+			nvram_set("landevs", "vlan1 wl0");
+#endif
+			nvram_set("wl_ifname", "eth1");
+			nvram_set("wan_ifnameX", "vlan2");
+		}
+		break;
+	case MODEL_E1000v2:
 	case MODEL_WRT160Nv3:
 		// same as M10, M20, WRT310Nv2, E1000v1
 		mfr = "Linksys";
 		name = nvram_safe_get("boot_hw_model");
-		if (strcmp(name, "E100") == 0)
-			name = "E1000 v1";
+		ver = nvram_safe_get("boot_hw_ver");
+		if (nvram_match("boot_hw_model", "E100")){
+			name = "E1000";
+		}
+		if (nvram_match("boot_hw_model", "M10") || nvram_match("boot_hw_model", "M20")){
+			mfr = "Cisco";
+		}
 		features = SUP_SES | SUP_80211N | SUP_WHAM_LED;
 		if (!nvram_match("t_fix1", (char *)name)) {
 			nvram_set("lan_ifnames", "vlan1 eth1");
@@ -1092,6 +1360,21 @@ static int init_nvram(void)
 		}
 		break;
 #endif	// CONFIG_BCMWL5
+
+	case MODEL_WL330GE:
+		mfr = "Asus";
+		name = "WL-330gE";
+		// The 330gE has only one wired port which can act either as WAN or LAN.
+		// Failsafe mode is to have it start as a LAN port so you can get an IP
+		// address via DHCP and access the router config page.
+		if (!nvram_match("t_fix1", (char *)name)) {
+			nvram_set("wl_ifname", "eth1");
+			nvram_set("lan_ifnames", "eth1");
+			nvram_set("wan_ifnameX", "eth0");
+			nvram_set("wan_islan", "1");
+			nvram_set("wan_proto", "disabled");
+		}
+		break;
 	case MODEL_WL500GPv2:
 		mfr = "Asus";
 		name = "WL-500gP v2";
@@ -1171,13 +1454,19 @@ static int init_nvram(void)
 
 	if (name) {
 		nvram_set("t_fix1", name);
-		sprintf(s, "%s %s", mfr, name);
+		/* Don't show the version information if it's empty (null or empty string) */
+		if (ver == NULL || strcmp(ver, "") == 0) {
+			sprintf(s, "%s %s", mfr, name);
+		} else {
+			sprintf(s, "%s %s v%s", mfr, name, ver);
+		}
 	}
 	else {
 		snprintf(s, sizeof(s), "%s %d/%s/%s/%s/%s", mfr, check_hw_type(),
 			nvram_safe_get("boardtype"), nvram_safe_get("boardnum"), nvram_safe_get("boardrev"), nvram_safe_get("boardflags"));
 		s[64] = 0;
 	}
+
 	nvram_set("t_model_name", s);
 
 	nvram_set("pa0maxpwr", "400");	// allow Tx power up tp 400 mW, needed for ND only
@@ -1202,8 +1491,6 @@ static int init_nvram(void)
 		nvram_set("wan_ifnameX", p);
 #endif
 	}
-
-	nvram_set("wl_hwaddr", "");	// zzz- when disabling wireless, we must get null wireless mac ??
 
 	//!!TB - do not force country code here to allow nvram override
 	//nvram_set("wl_country", "JP");
@@ -1299,6 +1586,7 @@ static void sysinit(void)
 	struct dirent *de;
 	char s[256];
 	char t[256];
+	int model;
 
 	mount("proc", "/proc", "proc", 0, NULL);
 	mount("tmpfs", "/tmp", "tmpfs", 0, NULL);
@@ -1322,8 +1610,9 @@ static void sysinit(void)
 
 	static const char *mkd[] = {
 		"/tmp/etc", "/tmp/var", "/tmp/home", "/tmp/mnt",
+		"/tmp/splashd", //!!Victek
 		"/tmp/share", "/var/webmon", // !!TB
-		"/var/log", "/var/run", "/var/tmp", "/var/lib", "/var/lib/misc",
+		"/var/log", "/var/log/nginx", "/var/run", "/var/tmp", "/var/lib", "/var/lib/misc",
 		"/var/spool", "/var/spool/cron", "/var/spool/cron/crontabs",
 		"/tmp/var/wwwext", "/tmp/var/wwwext/cgi-bin",	// !!TB - CGI support
 		NULL
@@ -1404,6 +1693,17 @@ static void sysinit(void)
 	}
 	signal(SIGCHLD, handle_reap);
 
+	switch (model = get_model()) {
+	case MODEL_WR850GV1:
+	case MODEL_WR850GV2:
+		// need to cleanup some variables...
+		if ((nvram_get("t_model") == NULL) && (nvram_get("MyFirmwareVersion") != NULL)) {
+			nvram_unset("MyFirmwareVersion");
+			nvram_set("restore_defaults", "1");
+		}
+		break;
+	}
+
 #ifdef CONFIG_BCMWL5
 	// ctf must be loaded prior to any other modules
 	if (nvram_invmatch("ctf_disable", "1"))
@@ -1424,7 +1724,7 @@ static void sysinit(void)
 		break;
 	}
 
-	modprobe("wl");
+	load_wl();
 
 	config_loopback();
 
@@ -1464,6 +1764,9 @@ int init_main(int argc, char *argv[])
 {
 	int state, i;
 	sigset_t sigset;
+
+// AB - failsafe?
+	nvram_unset("debug_rc_svc");
 
 	sysinit();
 
@@ -1548,6 +1851,7 @@ int init_main(int argc, char *argv[])
 			create_passwd();
 			start_vlan();
 			start_lan();
+			start_arpbind();
 			start_wan(BOOT);
 			start_services();
 			start_wl();
@@ -1604,4 +1908,5 @@ int reboothalt_main(int argc, char *argv[])
 
 	return 0;
 }
+
 

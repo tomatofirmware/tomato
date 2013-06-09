@@ -1,7 +1,7 @@
 /**
  * ntfs-3g_common.c - Common definitions for ntfs-3g and lowntfs-3g.
  *
- * Copyright (c) 2010-2011 Jean-Pierre Andre
+ * Copyright (c) 2010-2012 Jean-Pierre Andre
  * Copyright (c) 2010      Erik Larsson
  *
  * This program/include file is free software; you can redistribute it and/or
@@ -32,6 +32,10 @@
 #include <string.h>
 #endif
 
+#ifdef HAVE_LIMITS_H
+#include <limits.h>
+#endif
+
 #ifdef HAVE_ERRNO_H
 #include <errno.h>
 #endif
@@ -43,6 +47,7 @@
 #include "security.h"
 #include "xattrs.h"
 #include "ntfs-3g_common.h"
+#include "realpath.h"
 #include "misc.h"
 
 const char xattr_ntfs_3g[] = "ntfs-3g.";
@@ -58,8 +63,6 @@ const int nf_ns_trusted_prefix_len = sizeof(nf_ns_trusted_prefix) - 1;
 
 static const char nf_ns_alt_xattr_efsinfo[] = "user.ntfs.efsinfo";
 
-#ifdef HAVE_SETXATTR
-
 static const char def_opts[] = "allow_other,nonempty,";
 
 	/*
@@ -73,6 +76,7 @@ const struct DEFOPTION optionlist[] = {
 	{ "noatime", OPT_NOATIME, FLGOPT_BOGUS },
 	{ "atime", OPT_ATIME, FLGOPT_BOGUS },
 	{ "relatime", OPT_RELATIME, FLGOPT_BOGUS },
+	{ "delay_mtime", OPT_DMTIME, FLGOPT_DECIMAL | FLGOPT_OPTIONAL },
 	{ "fake_rw", OPT_FAKE_RW, FLGOPT_BOGUS },
 	{ "fsname", OPT_FSNAME, FLGOPT_NOSUPPORT },
 	{ "no_def_opts", OPT_NO_DEF_OPTS, FLGOPT_BOGUS },
@@ -96,6 +100,7 @@ const struct DEFOPTION optionlist[] = {
 	{ "norecover", OPT_NORECOVER, FLGOPT_BOGUS },
 	{ "remove_hiberfile", OPT_REMOVE_HIBERFILE, FLGOPT_BOGUS },
 	{ "sync", OPT_SYNC, FLGOPT_BOGUS | FLGOPT_APPEND },
+	{ "big_writes", OPT_BIG_WRITES, FLGOPT_BOGUS },
 	{ "locale", OPT_LOCALE, FLGOPT_STRING },
 	{ "nfconv", OPT_NFCONV, FLGOPT_BOGUS },
 	{ "nonfconv", OPT_NONFCONV, FLGOPT_BOGUS },
@@ -150,6 +155,54 @@ int ntfs_strappend(char **dest, const char *append)
 	return 0;
 }
 
+/*
+ *		Insert an option before ",fsname="
+ *	This is for keeping "fsname" as the last option, because on
+ *	Solaris device names may contain commas.
+ */
+
+int ntfs_strinsert(char **dest, const char *append)
+{
+	char *p, *q;
+	size_t size_append, size_dest = 0;
+	
+	if (!dest)
+		return -1;
+	if (!append)
+		return 0;
+
+	size_append = strlen(append);
+	if (*dest)
+		size_dest = strlen(*dest);
+	
+	if (strappend_is_large(size_dest) || strappend_is_large(size_append)) {
+		errno = EOVERFLOW;
+		ntfs_log_perror("%s: Too large input buffer", EXEC_NAME);
+		return -1;
+	}
+	
+	p = (char*)malloc(size_dest + size_append + 1);
+	if (!p) {
+		ntfs_log_perror("%s: Memory reallocation failed", EXEC_NAME);
+		return -1;
+	}
+	strcpy(p, *dest);
+	q = strstr(p, ",fsname=");
+	if (q) {
+		strcpy(q, append);
+		q = strstr(*dest, ",fsname=");
+		if (q)
+			strcat(p, q);
+		free(*dest);
+		*dest = p;
+	} else {
+		free(*dest);
+		*dest = p;
+		strcpy(*dest + size_dest, append);
+	}
+	return 0;
+}
+
 static int bogus_option_value(char *val, const char *s)
 {
 	if (val) {
@@ -186,7 +239,6 @@ char *parse_mount_options(ntfs_fuse_context_t *ctx,
 	ctx->efs_raw = FALSE;
 #endif /* HAVE_SETXATTR */
 	ctx->compression = DEFAULT_COMPRESSION;
-	ctx->atime = ATIME_ENABLED;
 	options = strdup(orig_opts ? orig_opts : "");
 	if (!options) {
 		ntfs_log_perror("%s: strdup failed", EXEC_NAME);
@@ -210,12 +262,17 @@ char *parse_mount_options(ntfs_fuse_context_t *ctx,
 					opt);
 				goto err_exit;
 			}
-			if ((poptl->flags & FLGOPT_DECIMAL)
-			    && (!val
-				|| !sscanf(val, "%i", &intarg))) {
-				ntfs_log_error("'%s' option needs a decimal value\n",
-					opt);
-				goto err_exit;
+			if (poptl->flags & FLGOPT_DECIMAL) {
+				if ((poptl->flags & FLGOPT_OPTIONAL) && !val)
+					intarg = 0;
+				else
+					if (!val
+					    || !sscanf(val, "%i", &intarg)) {
+						ntfs_log_error("'%s' option "
+						     "needs a decimal value\n",
+							opt);
+						goto err_exit;
+					}
 			}
 			if ((poptl->flags & FLGOPT_STRING)
 			    && missing_option_value(val, opt))
@@ -234,6 +291,11 @@ char *parse_mount_options(ntfs_fuse_context_t *ctx,
 				break;
 			case OPT_RELATIME :
 				ctx->atime = ATIME_RELATIVE;
+				break;
+			case OPT_DMTIME :
+				if (!intarg)
+					intarg = DEFAULT_DMTIME;
+				ctx->dmtime = intarg*10000000LL;
 				break;
 			case OPT_NO_DEF_OPTS :
 				no_def_opts = TRUE; /* Don't add default options. */
@@ -312,6 +374,11 @@ char *parse_mount_options(ntfs_fuse_context_t *ctx,
 			case OPT_SYNC :
 				ctx->sync = TRUE;
 				break;
+#ifdef FUSE_CAP_BIG_WRITES
+			case OPT_BIG_WRITES :
+				ctx->big_writes = TRUE;
+				break;
+#endif
 			case OPT_LOCALE :
 				ntfs_set_char_encoding(val);
 				break;
@@ -507,7 +574,9 @@ int ntfs_parse_options(struct ntfs_options *popts, void (*usage)(void),
 					return -1;
 				
 				/* Canonicalize device name (mtab, etc) */
-				if (!realpath(optarg, popts->device)) {
+				popts->arg_device = optarg;
+				if (!ntfs_realpath_canonicalize(optarg,
+						popts->device)) {
 					ntfs_log_perror("%s: Failed to access "
 					     "volume '%s'", EXEC_NAME, optarg);
 					free(popts->device);
@@ -566,6 +635,8 @@ int ntfs_parse_options(struct ntfs_options *popts, void (*usage)(void),
 
 	return 0;
 }
+
+#ifdef HAVE_SETXATTR
 
 int ntfs_fuse_listxattr_common(ntfs_inode *ni, ntfs_attr_search_ctx *actx,
 			char *list, size_t size, BOOL prefixing)

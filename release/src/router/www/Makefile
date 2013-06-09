@@ -9,7 +9,7 @@ install:
 	rm -rf $(INSTALLDIR)/www
 	mkdir -p $(INSTALLDIR)/www
 
-	cp *.gif *.png *.ico robots.txt $(INSTALLDIR)/www
+	cp *.gif *.png *.ico *.html robots.txt $(INSTALLDIR)/www
 
 # squish some of the files by trimming whitespace...
 
@@ -41,6 +41,12 @@ ifneq ($(CONFIG_LINUX26),y)
 	cd $(INSTALLDIR)/www && \
 	for F in $(wildcard *.asp *.js); do \
 		sed -i $$F -e "/LINUX26-BEGIN/,/LINUX26-END/d"; \
+	done
+# But remove some K24 options if building for Linux 2.6.
+else
+	cd $(INSTALLDIR)/www && \
+	for F in $(wildcard *.asp *.js); do \
+		sed -i $$F -e "/LINUX24-BEGIN/,/LINUX24-END/d"; \
 	done
 endif
 
@@ -101,6 +107,25 @@ ifneq ($(TCONFIG_MEDIA_SERVER),y)
 	sed -i $(INSTALLDIR)/www/tomato.js -e "/MEDIA-SRV-BEGIN/,/MEDIA-SRV-END/d"
 endif
 
+# Victek for RAF verion
+# Only include Captive Portal menu option and pages when configured.
+ifneq ($(TCONFIG_NOCAT),y)
+	rm -f $(INSTALLDIR)/www/splashd.asp
+	rm -f $(INSTALLDIR)/www/splash.html
+	rm -f $(INSTALLDIR)/www/style.css
+	sed -i $(INSTALLDIR)/www/tomato.js -e "/NOCAT-BEGIN/,/NOCAT-END/d"
+	sed -i $(INSTALLDIR)/www/about.asp -e "/NOCAT-BEGIN/,/NOCAT-END/d"
+endif
+# Tomato RAF feature
+# Only include NGinX menu option and pages when configured
+ifneq ($(TCONFIG_NGINX),y)	
+	rm -f $(INSTALLDIR)/www/nginx.asp
+	rm -f $(INSTALLDIR)/www/index.html
+	rm -f $(INSTALLDIR)/www/index.php
+	sed -i $(INSTALLDIR)/www/tomato.js -e "/NGINX-BEGIN/,/NGINX-END/d"
+	sed -i $(INSTALLDIR)/www/about.asp -e "/NGINX-BEGIN/,/NGINX-END/d"
+endif
+
 # Only include IPv6 options if IPv6 is configured in.
 ifneq ($(TCONFIG_IPV6),y)
 	cd $(INSTALLDIR)/www && \
@@ -110,6 +135,10 @@ ifneq ($(TCONFIG_IPV6),y)
 		|| true; \
 	done
 	rm -f $(INSTALLDIR)/www/basic-ipv6.asp
+	sed -i $(INSTALLDIR)/www/tomato.js -e "/IPV6-BEGIN/,/IPV6-END/d"
+	sed -i $(INSTALLDIR)/www/about.asp -e "/IPV6-BEGIN/,/IPV6-END/d"
+	sed -i $(INSTALLDIR)/www/admin-debug.asp -e "/IPV6-BEGIN/,/IPV6-END/d"
+	sed -i $(INSTALLDIR)/www/advanced-dhcpdns.asp -e "/IPV6-BEGIN/,/IPV6-END/d"
 endif
 
 # Only include the USB and NAS pages if USB Support is configured in.
@@ -121,38 +150,107 @@ ifneq ($(TCONFIG_USB),y)
 	sed -i $(INSTALLDIR)/www/about.asp -e "/USB-BEGIN/,/USB-END/d"
 endif
 
+# Only include the USB and NAS pages if REMOVE_USBAPP is NOT configured in.
+ifeq ($(TCONFIG_REMOVE_USBAPP),y)
+	rm -f $(INSTALLDIR)/www/nas-*.*
+	sed -i $(INSTALLDIR)/www/tomato.js -e "/USB-BEGIN/,/USB-END/d"
+	sed -i $(INSTALLDIR)/www/admin-buttons.asp -e "/USB-BEGIN/,/USB-END/d"
+	sed -i $(INSTALLDIR)/www/admin-access.asp -e "/USB-BEGIN/,/USB-END/d"
+endif
+
 # Only include CTF option if CTF module exists
 ##	test -d $(SRCBASE)/ctf/linux || 
 	sed -i $(INSTALLDIR)/www/advanced-misc.asp -e "/CTF-BEGIN/,/CTF-END/d"
 
+# Only include VLAN-GUI pages if VLAN-GUI is configured in.
+ifneq ($(TCONFIG_VLAN),y)
+	rm -f $(INSTALLDIR)/www/advanced-vlan.asp
+	rm -f $(INSTALLDIR)/www/advanced-access.asp
+	rm -f $(INSTALLDIR)/www/advanced-wlanvifs.asp
+	sed -i $(INSTALLDIR)/www/about.asp -e "/ VLAN-BEGIN/,/ VLAN-END/d"
+	sed -i $(INSTALLDIR)/www/advanced-firewall.asp -e "/ VLAN-BEGIN/,/ VLAN-END/d"
+	sed -i $(INSTALLDIR)/www/advanced-routing.asp -e "/ VLAN-BEGIN/,/ VLAN-END/d"
+	sed -i $(INSTALLDIR)/www/basic-network.asp -e "/ VLAN-BEGIN/,/ VLAN-END/d"
+	sed -i $(INSTALLDIR)/www/forward-upnp.asp -e "/ VLAN-BEGIN/,/ VLAN-END/d"
+	sed -i $(INSTALLDIR)/www/status-devices.asp -e "/ VLAN-BEGIN/,/ VLAN-END/d"
+	sed -i $(INSTALLDIR)/www/status-overview.asp -e "/ VLAN-BEGIN/,/ VLAN-END/d"
+	sed -i $(INSTALLDIR)/www/tomato.js -e "/ VLAN-BEGIN/,/ VLAN-END/d"
+ifeq ($(TCONFIG_NOCAT),y)
+	sed -i $(INSTALLDIR)/www/splashd.asp -e "/ VLAN-BEGIN/,/ VLAN-END/d"
+endif
+else
+	sed -i $(INSTALLDIR)/www/advanced-routing.asp -e "/ NOVLAN-BEGIN/,/ NOVLAN-END/d"
+	sed -i $(INSTALLDIR)/www/basic-network.asp -e "/ NOVLAN-BEGIN/,/ NOVLAN-END/d"
+	sed -i $(INSTALLDIR)/www/status-devices.asp -e "/ NOVLAN-BEGIN/,/ NOVLAN-END/d"
+	sed -i $(INSTALLDIR)/www/status-overview.asp -e "/ NOVLAN-BEGIN/,/ NOVLAN-END/d"
+endif
 
-ifeq ($(TOMATO_EXPERIMENTAL),1)
+ifeq ($(TOMATO_EXPERIMENTAL),0)
 	cd $(INSTALLDIR)/www && \
 	for F in $(wildcard *.asp); do \
-		sed -e "s,<div class='title'>Tomato</div>,<div class='title'>Tomato <small><i>(beta)</i></small></div>," $$F > $$F.tmp; \
+		sed -e "s,<div class='title'>Tomato</div>,<div class='title'>Tomato RAF</div>," $$F > $$F.tmp; \
 		mv $$F.tmp $$F; \
 	done
 endif
 
-
+	cd $(INSTALLDIR)/www && \
+	for F in $(wildcard *.asp); do \
+		sed -e "s,<div class='version'>Version <% version(); %></div>,<div class='version'>Version <% version(); %>.9013 series (Beta)</div>," $$F > $$F.tmp; \
+		mv $$F.tmp $$F; \
+	done
 
 # Only include the vpn pages if OpenVPN is compiled in
 # Remove AES ciphers from the GUI if openssl doesn't have an AES directory
 ifeq ($(TCONFIG_OPENVPN),y)
 	test -d ../openssl/crypto/aes || sed -i $(INSTALLDIR)/www/vpn.js -e "/AES-BEGIN/,/AES-END/d"
+	sed -i $(INSTALLDIR)/www/tomato.js -e "/ VPN-BEGIN/d" -e "/ VPN-END/d"
+	sed -i $(INSTALLDIR)/www/admin-access.asp -e "/ VPN-BEGIN/d" -e "/ VPN-END/d"
 else
-	rm -f $(INSTALLDIR)/www/vpn*
-	sed -i $(INSTALLDIR)/www/tomato.js -e "/VPN-BEGIN/,/VPN-END/d"
-	sed -i $(INSTALLDIR)/www/about.asp -e "/VPN-BEGIN/,/VPN-END/d"
-	sed -i $(INSTALLDIR)/www/admin-access.asp -e "/VPN-BEGIN/,/VPN-END/d"
+	rm -f $(INSTALLDIR)/www/vpn-{client,server}.asp $(INSTALLDIR)/www/vpn.js
+	sed -i $(INSTALLDIR)/www/tomato.js -e "/ OPENVPN-BEGIN/,/ OPENVPN-END/d"
+	sed -i $(INSTALLDIR)/www/about.asp -e "/ OPENVPN-BEGIN/,/ OPENVPN-END/d"
 endif
 
+ifeq ($(TCONFIG_USERPPTP),y)
+	sed -i $(INSTALLDIR)/www/tomato.js -e "/ VPN-BEGIN/d" -e "/ VPN-END/d"
+	sed -i $(INSTALLDIR)/www/admin-access.asp -e "/ VPN-BEGIN/d" -e "/ VPN-END/d"
+else
+	rm -f $(INSTALLDIR)/www/vpn-pptp.asp
+	sed -i $(INSTALLDIR)/www/tomato.js -e "/USERPPTP-BEGIN/,/USERPPTP-END/d"
+	sed -i $(INSTALLDIR)/www/about.asp -e "/USERPPTP-BEGIN/,/USERPPTP-END/d"
+	sed -i $(INSTALLDIR)/www/about.asp -e "/JYAVENARD-BEGIN/,/JYAVENARD-END/d"
+endif
+
+# Only include the PPTPD pages if PPTPD is compiled in
+ifeq ($(TCONFIG_PPTPD),y)
+	sed -i $(INSTALLDIR)/www/tomato.js -e "/ VPN-BEGIN/d" -e "/ VPN-END/d"
+	sed -i $(INSTALLDIR)/www/admin-access.asp -e "/ VPN-BEGIN/d" -e "/ VPN-END/d"
+else
+	rm -f $(INSTALLDIR)/www/vpn-pptp-server.asp
+	rm -f $(INSTALLDIR)/www/vpn-pptp-online.asp
+	sed -i $(INSTALLDIR)/www/tomato.js -e "/ PPTPD-BEGIN/,/ PPTPD-END/d"
+	sed -i $(INSTALLDIR)/www/about.asp -e "/ PPTPD-BEGIN/,/ PPTPD-END/d"
+endif
+
+# Only include the snmp pages if SNMP is compiled in
+ifneq ($(TCONFIG_SNMP),y)
+	rm -f $(INSTALLDIR)/www/admin-snmp.asp
+	sed -i $(INSTALLDIR)/www/tomato.js -e "/SNMP-BEGIN/,/SNMP-END/d"
+	sed -i $(INSTALLDIR)/www/about.asp -e "/SNMP-BEGIN/,/SNMP-END/d"
+endif
+
+# Only include the dnscrypt option if is compiled in
+ifneq ($(TCONFIG_DNSCRYPT),y)
+	sed -i $(INSTALLDIR)/www/basic-network.asp -e "/DNSCRYPT-BEGIN/,/DNSCRYPT-END/d"
+	sed -i $(INSTALLDIR)/www/about.asp -e "/DNSCRYPT-BEGIN/,/DNSCRYPT-END/d"
+endif
 
 # clean up
 	cd $(INSTALLDIR)/www && \
-	for F in $(wildcard *.asp *.js *.jsx); do \
+	for F in $(wildcard *.asp *.js *.jsx *.html); do \
 		[ -f $(INSTALLDIR)/www/$$F ] && sed -i $$F \
 		-e "/LINUX26-BEGIN/d"	-e "/LINUX26-END/d" \
+		-e "/LINUX24-BEGIN/d"	-e "/LINUX24-END/d" \
 		-e "/USB-BEGIN/d"	-e "/USB-END/d" \
 		-e "/EXTRAS-BEGIN/d"	-e "/EXTRAS-END/d" \
 		-e "/NTFS-BEGIN/d"	-e "/NTFS-END/d" \
@@ -164,10 +262,17 @@ endif
 		-e "/CIFS-BEGIN/d"	-e "/CIFS-END/d" \
 		-e "/ZEBRA-BEGIN/d"	-e "/ZEBRA-END/d" \
 		-e "/EMF-BEGIN/d"	-e "/EMF-END/d" \
-		-e "/VPN-BEGIN/d"	-e "/VPN-END/d" \
+		-e "/ OPENVPN-BEGIN/d"	-e "/ OPENVPN-END/d" \
 		-e "/AES-BEGIN/d"	-e "/AES-END/d" \
+		-e "/ PPTPD-BEGIN/d"	-e "/ PPTPD-END/d" \
+		-e "/ VPN-BEGIN/,/ VPN-END/d" \
 		-e "/IPV6-BEGIN/d"	-e "/IPV6-END/d" \
 		-e "/CTF-BEGIN/d"	-e "/CTF-END/d" \
+		-e "/NOCAT-BEGIN/d"	-e "/NOCAT_END/d"\
+		-e "/SNMP-BEGIN/d"	-e "/SNMP_END/d"\
+		-e "/ VLAN-BEGIN/d"	-e "/ VLAN-END/d" \
+		-e "/ NOVLAN-BEGIN/d"	-e "/ NOVLAN-END/d" \
+		-e "/DNSCRYPT-BEGIN/d"	-e "/DNSCRYPT-END/d"\
 		|| true; \
 	done
 

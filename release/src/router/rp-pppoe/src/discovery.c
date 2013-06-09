@@ -4,7 +4,7 @@
 *
 * Perform PPPoE discovery
 *
-* Copyright (C) 1999 by Roaring Penguin Software Inc.
+* Copyright (C) 1999-2012 by Roaring Penguin Software Inc.
 *
 * LIC: GPL
 *
@@ -12,6 +12,7 @@
 
 static char const RCSID[] =
 "$Id$";
+#define _GNU_SOURCE 1
 
 #include "pppoe.h"
 
@@ -174,7 +175,10 @@ parsePADOTags(UINT16_t type, UINT16_t len, unsigned char *data,
 	    printf("Got a Service-Name-Error tag: %.*s\n", (int) len, data);
 	} else {
 	    pktLogErrs("PADO", type, len, data, extra);
-	    exit(1);
+	    pc->gotError = 1;
+	    if (!persist) {
+		exit(1);
+	    }
 	}
 	break;
     case TAG_AC_SYSTEM_ERROR:
@@ -182,7 +186,10 @@ parsePADOTags(UINT16_t type, UINT16_t len, unsigned char *data,
 	    printf("Got a System-Error tag: %.*s\n", (int) len, data);
 	} else {
 	    pktLogErrs("PADO", type, len, data, extra);
-	    exit(1);
+	    pc->gotError = 1;
+	    if (!persist) {
+		exit(1);
+	    }
 	}
 	break;
     case TAG_GENERIC_ERROR:
@@ -190,7 +197,10 @@ parsePADOTags(UINT16_t type, UINT16_t len, unsigned char *data,
 	    printf("Got a Generic-Error tag: %.*s\n", (int) len, data);
 	} else {
 	    pktLogErrs("PADO", type, len, data, extra);
-	    exit(1);
+	    pc->gotError = 1;
+	    if (!persist) {
+		exit(1);
+	    }
 	}
 	break;
     }
@@ -331,7 +341,7 @@ waitForPADO(PPPoEConnection *conn, int timeout)
 
     struct PacketCriteria pc;
     pc.conn          = conn;
-    pc.acNameOK      = (conn->acName)      ? 0 : 1;
+	pc.acNameOK      = (conn->acName)      ? 0 : 1;
     pc.serviceNameOK = (conn->serviceName) ? 0 : 1;
     pc.seenACName    = 0;
     pc.seenServiceName = 0;
@@ -404,11 +414,20 @@ waitForPADO(PPPoEConnection *conn, int timeout)
 	if (!packetIsForMe(conn, &packet)) continue;
 
 	if (packet.code == CODE_PADO) {
-	    if (BROADCAST(packet.ethHdr.h_source)) {
-		printErr("Ignoring PADO packet from broadcast MAC address");
+	    if (NOT_UNICAST(packet.ethHdr.h_source)) {
+		printErr("Ignoring PADO packet from non-unicast MAC address");
 		continue;
 	    }
+	    pc.gotError = 0;
+	    pc.seenACName    = 0;
+	    pc.seenServiceName = 0;
+	    pc.acNameOK      = (conn->acName)      ? 0 : 1;
+	    pc.serviceNameOK = (conn->serviceName) ? 0 : 1;
 	    parsePacket(&packet, parsePADOTags, &pc);
+	    if (pc.gotError) {
+		printErr("Error in PADO packet");
+		continue;
+	    }
 	    if (!pc.seenACName) {
 		printErr("Ignoring PADO packet with no AC-Name tag");
 		continue;
@@ -671,6 +690,7 @@ discovery(PPPoEConnection *conn)
 	    } else {
 		rp_fatal("Timeout waiting for PADO packets");
 	    }
+	    system("ppp_event -t PADO_TIMEOUT &");
 	}
 	sendPADI(conn);
 	conn->discoveryState = STATE_SENT_PADI;
@@ -703,6 +723,7 @@ discovery(PPPoEConnection *conn)
 	    } else {
 		rp_fatal("Timeout waiting for PADS packets");
 	    }
+	    system("ppp_event -t PADS_TIMEOUT &");
 	}
 	sendPADR(conn);
 	conn->discoveryState = STATE_SENT_PADR;

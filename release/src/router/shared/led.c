@@ -199,9 +199,15 @@ int do_led(int which, int mode)
 	static int wnr2000v2[]	= { 255, 255,   255,  255,  255,   -7,  255,  255	};
 	static int f7d[]	= { 255, 255,   255,  255,   12,   13,  255,   14	};
 	static int wrt160nv3[]	= { 255,   1,     4,    2,  255,  255,  255,  255	};
+	static int e900[]	= { 255,  -6,     8,  255,  255,  255,  255,  255	};
+	static int e1000v2[]	= { 255,  -6,     8,    7,  255,  255,  255,  255	};
+	static int e3200[]	= { 255,  -3,   255,  255,  255,  255,  255,  255	};
 	static int wrt320n[]	= { 255,   2,     3,    4,  255,  255,  255,  255	};
 	static int wrt610nv2[]	= { 255,   5,     3,    0,  255,  255,  255,   -7	};
 	static int e4200[]	= { 255,   5,    -3,  255,  255,  255,  255,  255	};
+	static int rtn10u[]	= { 255, 255,   255,  255,  255,   -7,  255,   -8	};
+	static int rtn12b1[]	= {  -5, 255,   255,  255,  255,  255,  255,  225	};
+	static int rtn15u[]	= {   1, 255,     3,  255,  255,  255,  255,   -9	};
 	static int rtn66u[]	= { 255, -12,   255,  255,  255,  255,  255,   15	};
 #endif
 
@@ -296,6 +302,7 @@ int do_led(int which, int mode)
 	case MODEL_WL500GPv2:
 	case MODEL_WL500GD:
 	case MODEL_WL520GU:
+	case MODEL_WL330GE:
 		if (which != LED_DIAG) return ret;
 		b = -99;	// Invert power light as diag indicator
 		break;
@@ -309,10 +316,14 @@ int do_led(int which, int mode)
 		if (which != LED_DIAG) return ret;
 		b = -1;	// power light
 		break;
+	case MODEL_RTN15U:
+		b = rtn15u[which];
+		break;
 	case MODEL_RTN66U:
 		b = rtn66u[which];
 		break;
 	case MODEL_WNR3500L:
+	case MODEL_WNR3500LV2:
 		if (which == LED_DIAG) {
 			// power led gpio: 0x03 - green, 0x07 - amber
 			b = (mode) ? 7 : 3;
@@ -340,6 +351,18 @@ int do_led(int which, int mode)
 		} else
 			b = f7d[which];
 		break;
+	case MODEL_E1000v2:
+		b = e1000v2[which];
+		break;
+	case MODEL_E900:
+	case MODEL_E1500:
+	case MODEL_E1550:
+	case MODEL_E2500:
+		b = e900[which];
+		break;
+	case MODEL_E3200:
+		b = e3200[which];
+		break;
 	case MODEL_WRT160Nv3:
 		b = wrt160nv3[which];
 		break;
@@ -351,6 +374,12 @@ int do_led(int which, int mode)
 		break;
 	case MODEL_E4200:
 		b = e4200[which];
+		break;
+	case MODEL_RTN10U:
+		b = rtn10u[which];
+		break;
+	case MODEL_RTN12B1:
+		b = rtn12b1[which];
 		break;
 #endif
 /*
@@ -410,3 +439,5 @@ SET:
 
 	return ret;
 }
+
+

@@ -419,7 +419,6 @@ void setup_conntrack(void)
 		ct_modprobe_r("sip");
 	}
 #endif
-
 	// !!TB - FTP Server
 #ifdef TCONFIG_FTP
 	i = nvram_get_int("ftp_port");

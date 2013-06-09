@@ -4,7 +4,7 @@
  * Copyright (c) 2000-2006 Anton Altaparmakov
  * Copyright (c) 2002-2006 Szabolcs Szakacsits
  * Copyright (c) 2007      Yura Pakhuchiy
- * Copyright (c) 2011      Jean-Pierre Andre
+ * Copyright (c) 2011-2012 Jean-Pierre Andre
  *
  * This utility fixes some common NTFS problems, resets the NTFS journal file
  * and schedules an NTFS consistency check for the first boot into Windows.
@@ -73,6 +73,8 @@
 #include "mft.h"
 #include "device.h"
 #include "logfile.h"
+#include "runlist.h"
+#include "mst.h"
 #include "utils.h"
 /* #include "version.h" */
 #include "logging.h"
@@ -87,13 +89,35 @@ switch if you want to be able to build the NTFS utilities."
 static const char *EXEC_NAME = "ntfsfix";
 static const char OK[]       = "OK\n";
 static const char FAILED[]   = "FAILED\n";
+static const char FOUND[]    = "FOUND\n";
 
 #define DEFAULT_SECTOR_SIZE 512
 
 static struct {
 	char *volume;
 	BOOL no_action;
+	BOOL clear_bad_sectors;
+	BOOL clear_dirty;
 } opt;
+
+/*
+ *		Definitions for fixing the self-located MFT bug
+ */
+
+#define SELFLOC_LIMIT 16
+
+struct MFT_SELF_LOCATED {
+	ntfs_volume *vol;
+	MFT_RECORD *mft0;
+	MFT_RECORD *mft1;
+	MFT_RECORD *mft2;
+	ATTR_LIST_ENTRY *attrlist;
+	ATTR_LIST_ENTRY *attrlist_to_ref1;
+	MFT_REF mft_ref0;
+	MFT_REF mft_ref1;
+	LCN attrlist_lcn;
+	BOOL attrlist_resident;
+} ;
 
 /**
  * usage
@@ -106,9 +130,11 @@ static void usage(void)
 		   "Usage: %s [options] device\n"
 		   "    Attempt to fix an NTFS partition.\n"
 		   "\n"
-		   "    -h, --help             Display this help\n"
-		   "    -n, --no-action        Do not write anything\n"
-		   "    -V, --version          Display version information\n"
+		   "    -b, --clear-bad-sectors Clear the bad sector list\n"
+		   "    -d, --clear-dirty       Clear the volume dirty flag\n"
+		   "    -h, --help              Display this help\n"
+		   "    -n, --no-action         Do not write anything\n"
+		   "    -V, --version           Display version information\n"
 		   "\n"
 		   "For example: %s /dev/hda6\n\n",
 		   EXEC_NAME, VERSION, EXEC_NAME,
@@ -127,7 +153,8 @@ static void version(void)
 		   "Attempt to fix an NTFS partition.\n\n"
 		   "Copyright (c) 2000-2006 Anton Altaparmakov\n"
 		   "Copyright (c) 2002-2006 Szabolcs Szakacsits\n"
-		   "Copyright (c) 2007      Yura Pakhuchiy\n\n",
+		   "Copyright (c) 2007      Yura Pakhuchiy\n\n"
+		   "Copyright (c) 2011      Jean-Pierre Andre\n\n",
 		   EXEC_NAME, VERSION);
 	ntfs_log_info("%s\n%s%s", ntfs_gpl, ntfs_bugs, ntfs_home);
 	exit(1);
@@ -139,12 +166,14 @@ static void version(void)
 static void parse_options(int argc, char **argv)
 {
 	int c;
-	static const char *sopt = "-hnV";
+	static const char *sopt = "-bdhnV";
 	static const struct option lopt[] = {
-		{ "help",	no_argument,	NULL, 'h' },
-		{ "no-action",	no_argument,	NULL, 'n' },
-		{ "version",	no_argument,	NULL, 'V' },
-		{ NULL, 0, NULL, 0 }
+		{ "help",		no_argument,	NULL, 'h' },
+		{ "no-action",		no_argument,	NULL, 'n' },
+		{ "clear-bad-sectors",	no_argument,	NULL, 'b' },
+		{ "clear-dirty",	no_argument,	NULL, 'd' },
+		{ "version",		no_argument,	NULL, 'V' },
+		{ NULL, 		0, NULL, 0 }
 	};
 
 	memset(&opt, 0, sizeof(opt));
@@ -158,6 +187,12 @@ static void parse_options(int argc, char **argv)
 				ntfs_log_info("ERROR: Too many arguments.\n");
 				usage();
 			}
+			break;
+		case 'b':
+			opt.clear_bad_sectors = TRUE;
+			break;
+		case 'd':
+			opt.clear_dirty = TRUE;
 			break;
 		case 'n':
 			opt.no_action = TRUE;
@@ -262,7 +297,7 @@ static int set_dirty_flag(ntfs_volume *vol)
 
 	/* Porting note: We test for the current state of VOLUME_IS_DIRTY. This
 	 * should actually be more appropriate than testing for NVolWasDirty. */
-	if (vol->flags | VOLUME_IS_DIRTY)
+	if (vol->flags & VOLUME_IS_DIRTY)
 		return 0;
 	ntfs_log_info("Setting required flags on partition... ");
 	/*
@@ -270,7 +305,7 @@ static int set_dirty_flag(ntfs_volume *vol)
 	 * and fix it for us.
 	 */
 	flags = vol->flags | VOLUME_IS_DIRTY;
-	if (OLD_ntfs_volume_set_flags(vol, flags)) {
+	if (!opt.no_action && OLD_ntfs_volume_set_flags(vol, flags)) {
 		ntfs_log_info(FAILED);
 		ntfs_log_error("Error setting volume flags.\n");
 		return -1;
@@ -303,6 +338,68 @@ static int empty_journal(ntfs_volume *vol)
 	}
 	ntfs_log_info(OK);
 	return 0;
+}
+
+/**
+ *		Clear the bad cluster marks (option)
+ */
+static int clear_badclus(ntfs_volume *vol)
+{
+	static ntfschar badstream[] = {
+				const_cpu_to_le16('$'), const_cpu_to_le16('B'),
+				const_cpu_to_le16('a'), const_cpu_to_le16('d')
+	} ;
+	ntfs_inode *ni;
+	ntfs_attr *na;
+	BOOL ok;
+
+	ok = FALSE;
+	ntfs_log_info("Going to un-mark the bad clusters ($BadClus)... ");
+	ni = ntfs_inode_open(vol, FILE_BadClus);
+	if (ni) {
+		na = ntfs_attr_open(ni, AT_DATA, badstream, 4);
+			/*
+			 * chkdsk does not adjust the data size when
+			 * moving clusters to $BadClus, so we have to
+			 * check the runlist.
+			 */
+		if (na && !ntfs_attr_map_whole_runlist(na)) {
+			if (na->rl
+			    && na->rl[0].length && na->rl[1].length) {
+			/*
+			 * Truncate the stream to free all its clusters,
+			 * (which requires setting the data size according
+			 * to allocation), then reallocate a sparse stream
+			 * to full size of volume and reset the data size.
+			 */
+				na->data_size = na->allocated_size;
+				na->initialized_size = na->allocated_size;
+				if (!ntfs_attr_truncate(na,0)
+				    && !ntfs_attr_truncate(na,vol->nr_clusters
+						<< vol->cluster_size_bits)) {
+					na->data_size = 0;
+					na->initialized_size = 0;
+					ni->flags |= FILE_ATTR_SPARSE_FILE;
+					NInoFileNameSetDirty(ni);
+					ok = TRUE;
+				} else {
+					ntfs_log_perror("Failed to un-mark the bad clusters");
+				}
+			} else {
+				ntfs_log_info("No bad clusters...");
+				ok = TRUE;
+			}
+			ntfs_attr_close(na);
+		} else {
+			ntfs_log_perror("Failed to open $BadClus::$Bad");
+		}
+		ntfs_inode_close(ni);
+	} else {
+		ntfs_log_perror("Failed to open inode FILE_BadClus");
+	}
+	if (ok)
+		ntfs_log_info(OK);
+	return (ok ? 0 : -1);
 }
 
 /**
@@ -628,6 +725,437 @@ static int rewrite_boot(struct ntfs_device *dev, char *full_bs,
 }
 
 /*
+ *		Locate an unnamed attribute in an MFT record
+ *
+ *	Returns NULL if not found (with no error message)
+ */
+
+static ATTR_RECORD *find_unnamed_attr(MFT_RECORD *mrec, ATTR_TYPES type)
+{
+	ATTR_RECORD *a;
+	u32 offset;
+
+			/* fetch the requested attribute */
+	offset = le16_to_cpu(mrec->attrs_offset);
+	a = (ATTR_RECORD*)((char*)mrec + offset);
+	while ((a->type != AT_END)
+	    && ((a->type != type) || a->name_length)
+	    && (offset < le32_to_cpu(mrec->bytes_in_use))) {
+		offset += le32_to_cpu(a->length);
+		a = (ATTR_RECORD*)((char*)mrec + offset);
+	}
+	if ((a->type != type)
+	    || a->name_length)
+		a = (ATTR_RECORD*)NULL;
+	return (a);
+}
+
+/*
+ *		First condition for having a self-located MFT :
+ *		only 16 MFT records are defined in MFT record 0
+ *
+ *	Only low-level library functions can be used.
+ *
+ *	Returns TRUE if the condition is met.
+ */
+
+static BOOL short_mft_selfloc_condition(struct MFT_SELF_LOCATED *selfloc)
+{
+	BOOL ok;
+	ntfs_volume *vol;
+	MFT_RECORD *mft0;
+	ATTR_RECORD *a;
+	runlist_element *rl;
+	u16 seqn;
+
+	ok = FALSE;
+	vol = selfloc->vol;
+	mft0 = selfloc->mft0;
+	if ((ntfs_pread(vol->dev,
+			vol->mft_lcn << vol->cluster_size_bits,
+			vol->mft_record_size, mft0)
+				== vol->mft_record_size)
+	    && !ntfs_mst_post_read_fixup((NTFS_RECORD*)mft0,
+			vol->mft_record_size)) {
+		a = find_unnamed_attr(mft0,AT_DATA);
+		if (a
+		    && a->non_resident
+		    && (((le64_to_cpu(a->highest_vcn) + 1)
+					<< vol->cluster_size_bits)
+				== (SELFLOC_LIMIT*vol->mft_record_size))) {
+			rl = ntfs_mapping_pairs_decompress(vol, a, NULL);
+			if (rl) {
+				/*
+				 * The first error condition is having only
+				 * 16 entries mapped in the first MFT record.
+				 */
+				if ((rl[0].lcn >= 0)
+				  && ((rl[0].length << vol->cluster_size_bits)
+					== SELFLOC_LIMIT*vol->mft_record_size)
+				  && (rl[1].vcn == rl[0].length)
+				  && (rl[1].lcn == LCN_RL_NOT_MAPPED)) {
+					ok = TRUE;
+					seqn = le16_to_cpu(
+						mft0->sequence_number);
+					selfloc->mft_ref0
+						= ((MFT_REF)seqn) << 48;
+				}
+				free(rl);
+			}
+		}
+	}
+	return (ok);
+}
+
+/*
+ *		Second condition for having a self-located MFT :
+ *		The 16th MFT record is defined in MFT record >= 16
+ *
+ *	Only low-level library functions can be used.
+ *
+ *	Returns TRUE if the condition is met.
+ */
+
+static BOOL attrlist_selfloc_condition(struct MFT_SELF_LOCATED *selfloc)
+{
+	ntfs_volume *vol;
+	ATTR_RECORD *a;
+	ATTR_LIST_ENTRY *attrlist;
+	ATTR_LIST_ENTRY *al;
+	runlist_element *rl;
+	VCN vcn;
+	leVCN levcn;
+	u32 length;
+	int ok;
+
+	ok = FALSE;
+	length = 0;
+	vol = selfloc->vol;
+	a = find_unnamed_attr(selfloc->mft0,AT_ATTRIBUTE_LIST);
+	if (a) {
+		selfloc->attrlist_resident = !a->non_resident;
+		selfloc->attrlist_lcn = 0;
+		if (a->non_resident) {
+			attrlist = selfloc->attrlist;
+			rl = ntfs_mapping_pairs_decompress(vol, a, NULL);
+			if (rl
+			    && (rl->lcn >= 0)
+			    && (le64_to_cpu(a->data_size) < vol->cluster_size)
+			    && (ntfs_pread(vol->dev,
+					rl->lcn << vol->cluster_size_bits,
+					vol->cluster_size, attrlist) == vol->cluster_size)) {
+				selfloc->attrlist_lcn = rl->lcn;
+				al = attrlist;
+				length = le64_to_cpu(a->data_size);
+			}
+		} else {
+			al = (ATTR_LIST_ENTRY*)
+				((char*)a + le16_to_cpu(a->value_offset));
+			length = le32_to_cpu(a->value_length);
+		}
+		if (length) {
+			/* search for a data attribute defining entry 16 */
+			vcn = (SELFLOC_LIMIT*vol->mft_record_size)
+					>> vol->cluster_size_bits;
+			levcn = cpu_to_le64(vcn);
+			while ((length > 0)
+			    && al->length
+			    && ((al->type != AT_DATA)
+				|| ((leVCN)al->lowest_vcn != levcn))) {
+				length -= le16_to_cpu(al->length);
+				al = (ATTR_LIST_ENTRY*)
+					((char*)al + le16_to_cpu(al->length));
+			}
+			if ((length > 0)
+			    && al->length
+			    && (al->type == AT_DATA)
+			    && !al->name_length
+			    && ((leVCN)al->lowest_vcn == levcn)
+			    && (MREF_LE(al->mft_reference) >= SELFLOC_LIMIT)) {
+				selfloc->mft_ref1
+					= le64_to_cpu(al->mft_reference);
+				selfloc->attrlist_to_ref1 = al;
+				ok = TRUE;
+			}
+		}
+	}
+	return (ok);
+}
+
+/*
+ *		Third condition for having a self-located MFT :
+ *		The location of the second part of the MFT is defined in itself
+ *
+ *	To locate the second part, we have to assume the first and the
+ *	second part of the MFT data are contiguous.
+ *
+ *	Only low-level library functions can be used.
+ *
+ *	Returns TRUE if the condition is met.
+ */
+
+static BOOL self_mapped_selfloc_condition(struct MFT_SELF_LOCATED *selfloc)
+{
+	BOOL ok;
+	s64 inum;
+	u64 offs;
+	VCN lowest_vcn;
+	MFT_RECORD *mft1;
+	ATTR_RECORD *a;
+	ntfs_volume *vol;
+	runlist_element *rl;
+
+	ok = FALSE;
+	vol = selfloc->vol;
+	mft1 = selfloc->mft1;
+	inum = MREF(selfloc->mft_ref1);
+	offs = 	(vol->mft_lcn << vol->cluster_size_bits)
+			+ (inum << vol->mft_record_size_bits);
+	if ((ntfs_pread(vol->dev, offs, vol->mft_record_size,
+			mft1) == vol->mft_record_size)
+	    && !ntfs_mst_post_read_fixup((NTFS_RECORD*)mft1,
+			vol->mft_record_size)) {
+		lowest_vcn = (SELFLOC_LIMIT*vol->mft_record_size)
+				>> vol->cluster_size_bits;
+		a = find_unnamed_attr(mft1,AT_DATA);
+		if (a
+		    && (mft1->flags & MFT_RECORD_IN_USE)
+		    && ((VCN)le64_to_cpu(a->lowest_vcn) == lowest_vcn)
+		    && (le64_to_cpu(mft1->base_mft_record)
+				== selfloc->mft_ref0)
+		    && ((u16)MSEQNO(selfloc->mft_ref1)
+				== le16_to_cpu(mft1->sequence_number))) {
+			rl = ntfs_mapping_pairs_decompress(vol, a, NULL);
+			if ((rl[0].lcn == LCN_RL_NOT_MAPPED)
+			   && !rl[0].vcn
+			   && (rl[0].length == lowest_vcn)
+			   && (rl[1].vcn == lowest_vcn)
+			   && ((u64)(rl[1].lcn << vol->cluster_size_bits)
+					<= offs)
+			   && ((u64)((rl[1].lcn + rl[1].length)
+					<< vol->cluster_size_bits) > offs)) {
+				ok = TRUE;
+			}
+		}
+	}
+	return (ok);
+}
+
+/*
+ *		Fourth condition, to be able to fix a self-located MFT :
+ *		The MFT record 15 must be available.
+ *
+ *	The MFT record 15 is expected to be marked in use, we assume
+ *	it is available if it has no parent, no name and no attr list.
+ *
+ *	Only low-level library functions can be used.
+ *
+ *	Returns TRUE if the condition is met.
+ */
+
+static BOOL spare_record_selfloc_condition(struct MFT_SELF_LOCATED *selfloc)
+{
+	BOOL ok;
+	s64 inum;
+	u64 offs;
+	MFT_RECORD *mft2;
+	ntfs_volume *vol;
+
+	ok = FALSE;
+	vol = selfloc->vol;
+	mft2 = selfloc->mft2;
+	inum = SELFLOC_LIMIT - 1;
+	offs = 	(vol->mft_lcn << vol->cluster_size_bits)
+			+ (inum << vol->mft_record_size_bits);
+	if ((ntfs_pread(vol->dev, offs, vol->mft_record_size,
+			mft2) == vol->mft_record_size)
+	    && !ntfs_mst_post_read_fixup((NTFS_RECORD*)mft2,
+			vol->mft_record_size)) {
+		if (!mft2->base_mft_record
+		    && (mft2->flags & MFT_RECORD_IN_USE)
+		    && !find_unnamed_attr(mft2,AT_ATTRIBUTE_LIST)
+		    && !find_unnamed_attr(mft2,AT_FILE_NAME)) {
+			ok = TRUE;
+		}
+	}
+	return (ok);
+}
+
+/*
+ *		Fix a self-located MFT by swapping two MFT records
+ *
+ *	Only low-level library functions can be used.
+ *
+ *	Returns 0 if the MFT corruption could be fixed.
+ */
+static int fix_selfloc_conditions(struct MFT_SELF_LOCATED *selfloc)
+{
+	MFT_RECORD *mft1;
+	MFT_RECORD *mft2;
+	ATTR_RECORD *a;
+	ATTR_LIST_ENTRY *al;
+	ntfs_volume *vol;
+	s64 offs;
+	s64 offsm;
+	s64 offs1;
+	s64 offs2;
+	s64 inum;
+	u16 usa_ofs;
+	int res;
+
+	res = 0;
+			/*
+			 * In MFT1, we must fix :
+			 * - the self-reference, if present,
+			 * - its own sequence number, must be 15
+			 * - the sizes of the data attribute.
+			 */
+	vol = selfloc->vol;
+	mft1 = selfloc->mft1;
+	mft2 = selfloc->mft2;
+	usa_ofs = le16_to_cpu(mft1->usa_ofs);
+	if (usa_ofs >= 48)
+		mft1->mft_record_number = const_cpu_to_le32(SELFLOC_LIMIT - 1);
+	mft1->sequence_number = const_cpu_to_le16(SELFLOC_LIMIT - 1);
+	a = find_unnamed_attr(mft1,AT_DATA);
+	if (a) {
+		a->allocated_size = const_cpu_to_le64(0);
+		a->data_size = const_cpu_to_le64(0);
+		a->initialized_size = const_cpu_to_le64(0);
+	} else
+		res = -1; /* bug : it has been found earlier */
+
+			/*
+			 * In MFT2, we must fix :
+			 * - the self-reference, if present
+			 */
+	usa_ofs = le16_to_cpu(mft2->usa_ofs);
+	if (usa_ofs >= 48)
+		mft2->mft_record_number = cpu_to_le32(MREF(selfloc->mft_ref1));
+
+			/*
+			 * In the attribute list, we must fix :
+			 * - the reference to MFT1
+			 */
+	al = selfloc->attrlist_to_ref1;
+	al->mft_reference = MK_LE_MREF(SELFLOC_LIMIT - 1, SELFLOC_LIMIT - 1);
+
+			/*
+			 * All fixes done, we can write all if allowed
+			 */
+	if (!res && !opt.no_action) {
+		inum = SELFLOC_LIMIT - 1;
+		offs2 = (vol->mft_lcn << vol->cluster_size_bits)
+			+ (inum << vol->mft_record_size_bits);
+		inum = MREF(selfloc->mft_ref1);
+		offs1 = (vol->mft_lcn << vol->cluster_size_bits)
+			+ (inum << vol->mft_record_size_bits);
+
+			/* rewrite the attribute list */
+		if (selfloc->attrlist_resident) {
+				/* write mft0 and mftmirr if it is resident */
+			offs = vol->mft_lcn << vol->cluster_size_bits;
+			offsm = vol->mftmirr_lcn << vol->cluster_size_bits;
+			if (ntfs_mst_pre_write_fixup(
+					(NTFS_RECORD*)selfloc->mft0,
+					vol->mft_record_size)
+			    || (ntfs_pwrite(vol->dev, offs, vol->mft_record_size,
+					selfloc->mft0) != vol->mft_record_size)
+			    || (ntfs_pwrite(vol->dev, offsm, vol->mft_record_size,
+					selfloc->mft0) != vol->mft_record_size))
+				res = -1;
+		} else {
+				/* write a full cluster if non resident */
+			offs = selfloc->attrlist_lcn << vol->cluster_size_bits;
+			if (ntfs_pwrite(vol->dev, offs, vol->cluster_size,
+					selfloc->attrlist) != vol->cluster_size)
+				res = -1;
+		}
+			/* replace MFT2 by MFT1 and replace MFT1 by MFT2 */
+		if (!res 
+		    && (ntfs_mst_pre_write_fixup((NTFS_RECORD*)selfloc->mft1,
+					vol->mft_record_size)
+			|| ntfs_mst_pre_write_fixup((NTFS_RECORD*)selfloc->mft2,
+					vol->mft_record_size)
+			|| (ntfs_pwrite(vol->dev, offs2, vol->mft_record_size,
+					mft1) != vol->mft_record_size)
+			|| (ntfs_pwrite(vol->dev, offs1, vol->mft_record_size,
+					mft2) != vol->mft_record_size)))
+				res = -1;
+	}
+	return (res);
+}
+
+/*
+ *		Detect and fix a Windows XP bug, leading to a corrupt MFT
+ *
+ *	Windows cannot boot anymore, so chkdsk cannot be started, which
+ *	is a good point, because chkdsk would have deleted all the files.
+ *	Older ntfs-3g fell into an endless recursion (recent versions
+ *	refuse to mount).
+ *
+ *	This situation is very rare, but it was fun to fix it.
+ *
+ *	The corrupted condition is :
+ *		- MFT entry 0 has only the runlist for MFT entries 0-15
+ *		- The attribute list for MFT shows the second part
+ *			in an MFT record beyond 15
+ *	Of course, this record has to be read in order to know where it is.
+ *
+ *	Sample case, met in 2011 (Windows XP) :
+ *		MFT record 0 has : stdinfo, nonres attrlist, the first
+ *				part of MFT data (entries 0-15), and bitmap
+ *		MFT record 16 has the name
+ *		MFT record 17 has the third part of MFT data (16-117731)
+ *		MFT record 18 has the second part of MFT data (117732-170908)
+ *
+ *	Assuming the second part of the MFT is contiguous to the first
+ *	part, we can find it, and fix the condition by relocating it
+ *	and swapping it with MFT record 15.
+ *	This record number 15 appears to be hardcoded into Windows NTFS.
+ *
+ *	Only low-level library functions can be used.
+ *
+ *	Returns 0 if the conditions for the error were not met or
+ *			the error could be fixed,
+ *		-1 if some error was encountered
+ */
+
+static int fix_self_located_mft(ntfs_volume *vol)
+{
+	struct MFT_SELF_LOCATED selfloc;
+	BOOL res;
+
+	ntfs_log_info("Checking for self-located MFT segment... ");
+	res = -1;
+	selfloc.vol = vol;
+	selfloc.mft0 = (MFT_RECORD*)malloc(vol->mft_record_size);
+	selfloc.mft1 = (MFT_RECORD*)malloc(vol->mft_record_size);
+	selfloc.mft2 = (MFT_RECORD*)malloc(vol->mft_record_size);
+	selfloc.attrlist = (ATTR_LIST_ENTRY*)malloc(vol->cluster_size);
+	if (selfloc.mft0 && selfloc.mft1 && selfloc.mft2
+	    && selfloc.attrlist) {
+		if (short_mft_selfloc_condition(&selfloc)
+		    && attrlist_selfloc_condition(&selfloc)
+		    && self_mapped_selfloc_condition(&selfloc)
+		    && spare_record_selfloc_condition(&selfloc)) {
+			ntfs_log_info(FOUND);
+			ntfs_log_info("Fixing the self-located MFT segment... ");
+			res = fix_selfloc_conditions(&selfloc);
+			ntfs_log_info(res ? FAILED : OK);
+		} else {
+			ntfs_log_info(OK);
+			res = 0;
+		}
+		free(selfloc.mft0);
+		free(selfloc.mft1);
+		free(selfloc.mft2);
+		free(selfloc.attrlist);
+	}
+	return (res);
+}
+
+/*
  *		Try an alternate boot sector and fix the real one
  *
  *	Only after successful checks is the boot sector rewritten.
@@ -746,6 +1274,104 @@ static int try_alternate_boot(ntfs_volume *vol, char *full_bs,
 }
 
 /*
+ *		Check and fix the alternate boot sector
+ *
+ *	The alternate boot sector is usually in the last sector of a
+ *	partition, which should not be used by the file system
+ *	(the sector count in the boot sector should be less than
+ *	the total sector count in the partition).
+ *
+ *	chkdsk never changes the count in the boot sector.
+ *	- If this is less than the total count, chkdsk place the
+ *	  alternate boot sector into the sector,
+ *	- if the count is the same as the total count, chkdsk place
+ *	  the alternate boot sector into the middle sector (half
+ *	  the total count rounded upwards)
+ *	- if the count is greater than the total count, chkdsk
+ *	  declares the file system as raw, and refuses to fix anything.
+ *
+ *	Here, we check and fix the alternate boot sector, only in the
+ *	first situation where the file system does not overflow on the
+ *	last sector.
+ *
+ *	Note : when shrinking a partition, ntfsresize cannot determine
+ *	the future size of the partition. As a consequence the number of
+ *	sectors in the boot sectors may be less than the possible size.
+ *
+ *	Returns 0 if successful
+ */
+
+static int check_alternate_boot(ntfs_volume *vol)
+{
+	s64 got_sectors;
+	s64 actual_sectors;
+	s64 last_sector_off;
+	char *full_bs;
+	char *alt_bs;
+	NTFS_BOOT_SECTOR *bs;
+	s64 br;
+	s64 bw;
+	int res;
+
+	res = -1;
+	full_bs = (char*)malloc(vol->sector_size);
+	alt_bs = (char*)malloc(vol->sector_size);
+	if (!full_bs || !alt_bs) {
+		ntfs_log_info("Error : failed to allocate memory\n");
+		goto error_exit;
+	}
+	/* Now read both bootsectors. */
+	br = ntfs_pread(vol->dev, 0, vol->sector_size, full_bs);
+	if (br == vol->sector_size) {
+		bs = (NTFS_BOOT_SECTOR*)full_bs;
+		got_sectors = le64_to_cpu(bs->number_of_sectors);
+		actual_sectors = ntfs_device_size_get(vol->dev,
+						vol->sector_size);
+		if (actual_sectors > got_sectors) {
+			last_sector_off = (actual_sectors - 1)
+						<< vol->sector_size_bits;
+			ntfs_log_info("Checking the alternate boot sector... ");
+			br = ntfs_pread(vol->dev, last_sector_off,
+						vol->sector_size, alt_bs);
+		} else {
+			ntfs_log_info("Checking file system overflow... ");
+			br = -1;
+		}
+		/* accept getting no byte, needed for short image files */
+		if (br >= 0) {
+			if ((br != vol->sector_size)
+			    || memcmp(full_bs, alt_bs, vol->sector_size)) {
+				if (opt.no_action) {
+					ntfs_log_info("BAD\n");
+				} else {
+					bw = ntfs_pwrite(vol->dev,
+						last_sector_off,
+						vol->sector_size, full_bs);
+					if (bw == vol->sector_size) {
+						ntfs_log_info("FIXED\n");
+						res = 0;
+					} else {
+						ntfs_log_info(FAILED);
+					}
+				}
+			} else {
+				ntfs_log_info(OK);
+				res = 0;
+			}
+		} else {
+			ntfs_log_info(FAILED);
+		}
+	} else {
+		ntfs_log_info("Error : could not read the boot sector again\n");
+	}
+	free(full_bs);
+	free(alt_bs);
+
+error_exit :
+	return (res);
+}
+
+/*
  *		Try to fix problems which may arise in the start up sequence
  *
  *	This is a replay of the normal start up sequence with fixes when
@@ -767,9 +1393,11 @@ static int fix_startup(struct ntfs_device *dev, unsigned long flags)
 	errno = 0;
 	res = -1;
 	dev_open = FALSE;
+	full_bs = (char*)NULL;
 	if (!dev || !dev->d_ops || !dev->d_name) {
 		errno = EINVAL;
 		ntfs_log_perror("%s: dev = %p", __FUNCTION__, dev);
+		vol = (ntfs_volume*)NULL;
 		goto error_exit;
 	}
 
@@ -791,7 +1419,7 @@ static int fix_startup(struct ntfs_device *dev, unsigned long flags)
 	NVolSetShowSysFiles(vol);
 	NVolSetShowHidFiles(vol);
 	NVolClearHideDotFiles(vol);
-	if (flags & MS_RDONLY)
+	if (flags & NTFS_MNT_RDONLY)
 		NVolSetReadOnly(vol);
 	
 	/* ...->open needs bracketing to compile with glibc 2.7 */
@@ -831,8 +1459,10 @@ static int fix_startup(struct ntfs_device *dev, unsigned long flags)
 			errno = EINVAL;
 			goto error_exit;
 		}
+		res = 0;
+	} else {
+		res = fix_self_located_mft(vol);
 	}
-	res = 0;
 error_exit:
 	if (res) {
 		switch (errno) {
@@ -847,7 +1477,7 @@ error_exit:
 		}
 	}
 	eo = errno;
-	free(bs);
+	free(full_bs);
 	if (vol) {
 		free(vol->upcase);
 		free(vol);
@@ -878,16 +1508,16 @@ static int fix_mount(void)
 		ntfs_log_perror("Failed to allocate device");
 		return -1;
 	}
-	flags = (opt.no_action ? MS_RDONLY : 0);
+	flags = (opt.no_action ? NTFS_MNT_RDONLY : 0);
 	vol = ntfs_volume_startup(dev, flags);
 	if (!vol) {
 		ntfs_log_info(FAILED);
 		ntfs_log_perror("Failed to startup volume");
 
-		/* Try fixing the bootsector and redo the startup */
+		/* Try fixing the bootsector and MFT, then redo the startup */
 		if (!fix_startup(dev, flags)) {
 			if (opt.no_action)
-				ntfs_log_info("The bootsector can be fixed, "
+				ntfs_log_info("The startup data can be fixed, "
 						"but no change was requested\n");
 			else
 				vol = ntfs_volume_startup(dev, flags);
@@ -943,7 +1573,7 @@ int main(int argc, char **argv)
 		ntfs_log_perror("Failed to determine whether %s is mounted",
 				opt.volume);
 	/* Attempt a full mount first. */
-	flags = (opt.no_action ? MS_RDONLY : 0);
+	flags = (opt.no_action ? NTFS_MNT_RDONLY : 0);
 	ntfs_log_info("Mounting volume... ");
 	vol = ntfs_mount(opt.volume, flags);
 	if (vol) {
@@ -963,6 +1593,10 @@ int main(int argc, char **argv)
 			exit(1);
 		}
 	}
+	if (check_alternate_boot(vol)) {
+		ntfs_log_error("Error: Failed to fix the alternate boot sector\n");
+		exit(1);
+	}
 	/* So the unmount does not clear it again. */
 
 	/* Porting note: The WasDirty flag was set here to prevent ntfs_unmount
@@ -971,9 +1605,16 @@ int main(int argc, char **argv)
 	 *
 	 * libntfs-3g does not automatically set or clear dirty flags on
 	 * mount/unmount, this means that the assumption that the dirty flag is
-	 * now set does not hold. So we need to set it if not already set. */
-	if(!(vol->flags & VOLUME_IS_DIRTY) && ntfs_volume_write_flags(vol,
-			vol->flags | VOLUME_IS_DIRTY)) {
+	 * now set does not hold. So we need to set it if not already set.
+	 *
+	 * However clear the flag if requested to do so, at this stage
+	 * mounting was successful.
+	 */
+	if (opt.clear_dirty)
+		vol->flags &= ~VOLUME_IS_DIRTY;
+	else
+		vol->flags |= VOLUME_IS_DIRTY;
+	if (!opt.no_action && ntfs_volume_write_flags(vol, vol->flags)) {
 		ntfs_log_error("Error: Failed to set volume dirty flag (%d "
 			"(%s))!\n", errno, strerror(errno));
 	}
@@ -984,6 +1625,12 @@ int main(int argc, char **argv)
 	if (ntfs_version_is_supported(vol)) {
 		ntfs_log_error("Error: Unknown NTFS version.\n");
 		goto error_exit;
+	}
+	if (opt.clear_bad_sectors && !opt.no_action) {
+		if (clear_badclus(vol)) {
+			ntfs_log_error("Error: Failed to un-mark bad sectors.\n");
+			goto error_exit;
+		}
 	}
 	if (vol->major_ver >= 3) {
 		/*

@@ -22,7 +22,7 @@
 
 <script type='text/javascript'>
 
-//	<% nvram("tm_sel,tm_dst,tm_tz,ntp_updates,ntp_server,ntp_tdod,ntp_kiss"); %>
+//	<% nvram("tm_sel,tm_dst,tm_tz,ntp_updates,ntp_server,ntp_tdod,ntp_kiss,ntpd_enable,ntpd_server"); %>
 
 
 var ntpList = [
@@ -44,12 +44,21 @@ function ntpString(name)
 	return '0.' + name + ' 1.' + name + ' 2.' + name;
 }
 
+function ntpdString(name)
+{
+	if (name == '') name = 'pool.ntp.org';
+		else name = name + '.pool.ntp.org';
+	return '-p 0.' + name + '-p 1.' + name + '-p 2.' + name;
+}
+
+
 function verifyFields(focused, quiet)
 {
 	var ok = 1;
 
 	var s = E('_tm_sel').value;
 	var f_dst = E('_f_tm_dst');
+	var f_ntpd = E('_f_ntpd_enable');
 	var f_tz = E('_f_tm_tz');
 	if (s == 'custom') {
 		f_dst.disabled = true;
@@ -110,11 +119,12 @@ function save(clearKiss)
 
 	fom = E('_fom');
 	fom.tm_dst.value = fom.f_tm_dst.checked ? 1 : 0;
+	fom.ntpd_enable.value = fom.f_ntpd_enable.checked ? 1 : 0;
 	fom.tm_tz.value = fom.f_tm_tz.value;
 
 	if (E('_f_ntp_server').value != 'custom') {
 		fom.ntp_server.value = ntpString(E('_f_ntp_server').value);
-	}
+		}
 	else {
 		a = [fom.f_ntp_1.value, fom.f_ntp_2.value, fom.f_ntp_3.value];
 		for (i = 0; i < a.length; ) {
@@ -156,10 +166,10 @@ function earlyInit()
 <input type='hidden' name='_nextwait' value='5'>
 <input type='hidden' name='_service' value='ntpc-restart'>
 <input type='hidden' name='_sleep' value='3'>
-
 <input type='hidden' name='tm_dst'>
 <input type='hidden' name='tm_tz'>
 <input type='hidden' name='ntp_server'>
+<input type='hidden' name='ntpd_enable'>
 <input type='hidden' name='ntp_tdod'>
 <input type='hidden' name='ntp_kiss' value='' disabled>
 
@@ -230,8 +240,8 @@ createFieldTable('', [
 		['STD1DST,M3.5.0/2,M10.5.0/2','UTC-01:00 Azores'],
 		['UTC0','UTC+00:00 Gambia, Liberia, Morocco'],
 		['GMT0BST,M3.5.0/2,M10.5.0/2','UTC+00:00 England'],
-		['UTC-1','UTC+01:00 Tunisia'],
-		['CET-1CEST,M3.5.0/2,M10.5.0/3','UTC+01:00 France, Germany, Italy, Poland, Sweden'],
+		['UTC-1','UTC+01:00 Canary Islands, Tunisia'],
+		['CET-1CEST,M3.5.0/2,M10.5.0/3','UTC+01:00 Andorra, France, Germany, Italy, Poland, Spain, Sweden'],
 		['EET-2EEST-3,M3.5.0/3,M10.5.0/4','UTC+02:00 Estonia, Finland, Latvia, Lithuania'],
 		['UTC-2','UTC+02:00 South Africa, Israel'],
 		['STD-2DST,M3.5.0/2,M10.5.0/2','UTC+02:00 Greece, Ukraine, Romania, Turkey, Latvia'],
@@ -261,12 +271,13 @@ createFieldTable('', [
 		['NZST-12NZDT,M9.5.0/2,M4.1.0/3','UTC+12:00 New Zealand']
 	], value: nvram.tm_sel },
 	{ title: 'Auto Daylight Savings Time', indent: 2, name: 'f_tm_dst', type: 'checkbox', value: nvram.tm_dst != '0' },
-	{ title: 'Custom TZ String', indent: 2, name: 'f_tm_tz', type: 'text', maxlen: 32, size: 34, value: nvram.tm_tz || '' },
+	{ title: 'Custom Time Zone String', indent: 2, name: 'f_tm_tz', type: 'text', maxlen: 32, size: 34, value: nvram.tm_tz || '' },
 	null,
+	{ title: 'Provide NTPD Service', ident:2, name: 'f_ntpd_enable', type:'checkbox', value: nvram.ntpd_enable != '0'},
 	{ title: 'Auto Update Time', name: 'ntp_updates', type: 'select', options: [[-1,'Never'],[0,'Only at startup'],[1,'Every hour'],[2,'Every 2 hours'],[4,'Every 4 hours'],[6,'Every 6 hours'],[8,'Every 8 hours'],[12,'Every 12 hours'],[24,'Every 24 hours']],
-		value: nvram.ntp_updates },
-	{ title: 'Trigger Connect On Demand', indent: 2, name: 'f_ntp_tdod', type: 'checkbox', value: nvram.ntp_tdod != '0' },
-	{ title: 'NTP Time Server', name: 'f_ntp_server', type: 'select', options: ntpList, value: ntpSel },
+	value: nvram.ntp_updates },
+	{ title: 'Push to Connect On Demand', indent: 2, name: 'f_ntp_tdod', type: 'checkbox', value: nvram.ntp_tdod != '0' },
+	{ title: 'NTP Server Candidates', name: 'f_ntp_server', type: 'select', options: ntpList, value: ntpSel },
 	{ title: '&nbsp;', text: '<small><span id="ntp-preset">xx</span></small>', hidden: 1 },
 	{ title: '', name: 'f_ntp_1', type: 'text', maxlen: 48, size: 50, value: ntp[0] || 'pool.ntp.org', hidden: 1 },
 	{ title: '', name: 'f_ntp_2', type: 'text', maxlen: 48, size: 50, value: ntp[1] || '', hidden: 1 },

@@ -710,9 +710,9 @@ static int utf8_to_unicode(u32 *wc, const char *s)
 			    | ((u32)(s[1] & 0x3F) << 12)
 			    | ((u32)(s[2] & 0x3F) << 6)
 			    | ((u32)(s[3] & 0x3F));
-		/* Check valid ranges */
-		if ((*wc <= 0x10ffff) && (*wc >= 0x10000))
-			return 4;
+			/* Check valid ranges */
+			if ((*wc <= 0x10ffff) && (*wc >= 0x10000))
+				return 4;
 		}
 		goto fail;
 	}
@@ -1262,7 +1262,7 @@ void ntfs_upcase_table_build(ntfschar *uc, u32 uc_len)
 
 u32 ntfs_upcase_build_default(ntfschar **upcase)
 {
-	u32 upcase_len;
+	u32 upcase_len = 0;
 
 	*upcase = (ntfschar*)ntfs_malloc(UPCASE_LEN*2);
 	if (*upcase) {
@@ -1406,16 +1406,18 @@ BOOL ntfs_collapsible_chars(ntfs_volume *vol,
 {
 	BOOL collapsible;
 	unsigned int ch;
+	unsigned int cs;
 	int i;
 
 	collapsible = shortlen == longlen;
-	if (collapsible)
-		for (i=0; i<shortlen; i++) {
-			ch = le16_to_cpu(longname[i]);
-			if ((ch >= vol->upcase_len)
-		   	 || ((shortname[i] != longname[i])
-				&& (shortname[i] != vol->upcase[ch])))
-					collapsible = FALSE;
+	for (i=0; collapsible && (i<shortlen); i++) {
+		ch = le16_to_cpu(longname[i]);
+		cs = le16_to_cpu(shortname[i]);
+		if ((cs != ch)
+		    && ((ch >= vol->upcase_len)
+			|| (cs >= vol->upcase_len)
+			|| (vol->upcase[cs] != vol->upcase[ch])))
+				collapsible = FALSE;
 	}
 	return (collapsible);
 }

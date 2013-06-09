@@ -32,6 +32,7 @@
 */
 
 #include "rc.h"
+#include <stdlib.h>
 
 #include <sys/ioctl.h>
 
@@ -69,6 +70,7 @@ int ipup_main(int argc, char **argv)
 
 		switch (get_wan_proto()) {
 		case WP_PPPOE:
+		case WP_PPP3G:
 			nvram_set("wan_ipaddr_buf", nvram_safe_get("wan_ipaddr"));		// store last ip address
 			nvram_set("wan_ipaddr", value);
 			nvram_set("wan_netmask", "255.255.255.255");
@@ -196,9 +198,12 @@ int pppevent_main(int argc, char **argv)
 			if (++i >= argc) return 1;
 			if ((strcmp(argv[i], "PAP_AUTH_FAIL") == 0) || (strcmp(argv[i], "CHAP_AUTH_FAIL") == 0)) {
 				f_write_string("/tmp/ppp/log", argv[i], 0, 0);
-				notice_set("wan", "Authentication failed");	// !!!
 				return 0;
-			}			
+			}
+			if ((strcmp(argv[i], "PADO_TIMEOUT") == 0) || (strcmp(argv[i], "PADS_TIMEOUT") == 0)) {
+				f_write_string("/tmp/ppp/log", argv[i], 0, 0);
+				return 0;
+			}
 		}
 	}
 

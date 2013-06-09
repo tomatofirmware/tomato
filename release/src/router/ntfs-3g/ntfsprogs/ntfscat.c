@@ -235,8 +235,8 @@ static int parse_options(int argc, char **argv)
 			break;
 
 		case 'n':
-			opts.attr_name_len = ntfs_mbstoucs_libntfscompat(optarg,
-							   &opts.attr_name, 0);
+			opts.attr_name_len = ntfs_mbstoucs(optarg,
+							   &opts.attr_name);
 			if (opts.attr_name_len < 0) {
 				ntfs_log_perror("Invalid attribute name '%s'",
 						optarg);
@@ -410,8 +410,8 @@ int main(int argc, char *argv[])
 
 	utils_set_locale();
 
-	vol = utils_mount_volume(opts.device, MS_RDONLY |
-			(opts.force ? MS_RECOVER : 0));
+	vol = utils_mount_volume(opts.device, NTFS_MNT_RDONLY |
+			(opts.force ? NTFS_MNT_RECOVER : 0));
 	if (!vol) {
 		ntfs_log_perror("ERROR: couldn't mount volume");
 		return 1;
