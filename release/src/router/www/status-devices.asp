@@ -155,7 +155,7 @@ function addqoslimit(n)
 {
 	var e = list[n];
 	cookie.set('addqoslimit', [e.ip, e.name.split(',')[0]].join(','), 1);
-	location.href = 'qos-qoslimit.asp';
+	location.href = 'qoslimit.asp';
 }
 
 var ref = new TomatoRefresh('update.cgi', 'exec=devlist', 0, 'status_devices_refresh');
