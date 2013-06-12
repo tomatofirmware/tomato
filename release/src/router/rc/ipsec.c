@@ -126,7 +126,7 @@ void start_ipsec(void)
 	fprintf(fp,
 		"listen {\n"
 		"	isakmp %s;\n"
-		"	isakmp_natt %s;\n"
+		"	isakmp_natt %s [4500];\n"
 		"}\n\n",
 		wanaddr, wanaddr);
 	fprintf(fp, 
@@ -136,7 +136,7 @@ void start_ipsec(void)
 		"        script \"ph1_script\" phase1_up;\n"
 		"        script \"ph1_script\" phase1_down;\n"
 		"        script \"ph1_script\" phase1_dead;\n"
-		"        exchange_mode main;\n");
+		"        exchange_mode aggressive,main;\n");
 	if (with_cert) {
 		fprintf(fp, 
 			"        certificate_type x509 \"server.crt\" \"server.key\";\n"
