@@ -37,6 +37,7 @@ void start_ipsec(void)
 	const char *dns4;
 	const char *xauth;
 	const char *wanface;
+	const char *wanaddr;
 	const char *lanaddr;
 	const char *lanmask;
 	FILE *fp;
@@ -47,6 +48,7 @@ void start_ipsec(void)
 	}
 
 	wanface = nvram_safe_get("wan_iface");
+	wanaddr = nvram_safe_get("wan_ipaddr");
 	lanaddr = nvram_safe_get("lan_ipaddr");
 	lanmask = nvram_safe_get("lan_netmask");
 
@@ -121,6 +123,12 @@ void start_ipsec(void)
 	fprintf(fp, "path pre_shared_key \"/tmp/ipsec/psk.txt\";\n");
 	if (with_cert)
 		fprintf(fp, "path certificate \"/tmp/ipsec\";\n");
+	fprintf(fp,
+		"listen {\n"
+		"	isakmp %s;\n"
+		"	isakmp_natt %s;\n"
+		"}\n\n",
+		wanaddr, wanaddr);
 	fprintf(fp, 
 		"path script \"/tmp/ipsec\";\n"
 		"\n"
@@ -128,7 +136,7 @@ void start_ipsec(void)
 		"        script \"ph1_script\" phase1_up;\n"
 		"        script \"ph1_script\" phase1_down;\n"
 		"        script \"ph1_script\" phase1_dead;\n"
-		"        exchange_mode aggressive,main;\n");
+		"        exchange_mode main;\n");
 	if (with_cert) {
 		fprintf(fp, 
 			"        certificate_type x509 \"server.crt\" \"server.key\";\n"
