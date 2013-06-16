@@ -751,8 +751,10 @@ void start_wan(int mode)
 		mtu = max;
 	}
 	else {
+// KDB If we've big fat frames enabled then we *CAN* break the 
+// max MTU on PPP link
 		mtu = nvram_get_int("wan_mtu");
-		if (mtu > max) mtu = max;
+		if (!(nvram_get_int("jumbo_frame_enable")) && (mtu > max)) mtu = max;
 			else if (mtu < 576) mtu = 576;
 	}
 	sprintf(buf, "%d", mtu);
