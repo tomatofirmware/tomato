@@ -824,6 +824,7 @@ ntfs-3g/Makefile:
 		LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC" \
 		$(CONFIGURE) --enable-shared=no --enable-static=no \
 		--disable-library --disable-ldconfig --disable-mount-helper --with-fuse=internal \
+		--disable-ntfsprogs --disable-crypto --without-uuid \
 		--disable-posix-acls --disable-nfconv --disable-dependency-tracking
 
 ntfs-3g: ntfs-3g/Makefile
@@ -1561,12 +1562,18 @@ libpcap-clean:
 libpcap-install:
 	@$(SEP)
 
-dnscrypt/stamp-h1:
+libsodium/stamp-h1:
+	cd $(TOP)/libsodium && CC=$(CC) STRIP='mipsel-uclibc-strip' \
+	$(CONFIGURE) --prefix=/usr --disable-ssp
+	touch libsodium/stamp-h1
+
+dnscrypt/stamp-h1: libsodium/stamp-h1
 	cd $(TOP)/dnscrypt && CC=$(CC) STRIP='mipsel-uclibc-strip' \
 	$(CONFIGURE) --prefix=/usr --disable-ssp
 	touch dnscrypt/stamp-h1
 
 dnscrypt: dnscrypt/stamp-h1
+	$(MAKE) -C dnscrypt $(PARALLEL_BUILD)
 
 dnscrypt-install: dnscrypt
 	install -D dnscrypt/src/proxy/dnscrypt-proxy $(INSTALLDIR)/dnscrypt/usr/sbin/dnscrypt-proxy
@@ -1576,7 +1583,8 @@ dnscrypt-install: dnscrypt
 
 dnscrypt-clean:
 	-@$(MAKE) -C dnscrypt clean
-	@rm -rf dnscrypt/stamp-h1 dnscrypt/src/dnscrypt-proxy/.deps dnscrypt/Makefile
+	-@$(MAKE) -C libsodium clean
+	@rm -rf dnscrypt/stamp-h1 dnscrypt/src/dnscrypt-proxy/.deps dnscrypt/Makefile libsodium/stamp-h1
 
 tcpdump/stamp-h1: openssl libpcap
 	cd tcpdump && \

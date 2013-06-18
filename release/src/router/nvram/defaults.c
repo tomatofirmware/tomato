@@ -89,14 +89,15 @@ const defaults_t defaults[] = {
 	{ "wan_gateway",		"0.0.0.0"		},	// WAN gateway
 	{ "wan_gateway_get",		"0.0.0.0"	},	// default gateway for PPP
 	{ "wan_dns",			""				},	// x.x.x.x x.x.x.x ...
+#ifdef TCONFIG_DNSCRYPT
+	{ "dnscrypt_proxy",		""				},
+	{ "dnscrypt_port",		"40"			}, // local port
+	{ "dnscrypt_cmd",		"-m 99"			}, // optional arguments
+#endif
 	{ "wan_wins",			""				},	// x.x.x.x x.x.x.x ...
 	{ "wan_lease",			"86400"			},	// WAN lease time in seconds
 	{ "wan_islan",			"0"				},
 	{ "modem_ipaddr",		"0.0.0.0"		},	// modem IP address (i.e. PPPoE bridged modem)
-
-#ifdef TCONFIG_DNSCRYPT
-	{ "dnscrypt_proxy",		""				},
-#endif
 
 	{ "wan_primary",		"1"				},	// Primary wan connection
 	{ "wan_unit",			"0"				},	// Last configured connection
@@ -142,7 +143,7 @@ const defaults_t defaults[] = {
 
 	//3G parameters
 	{ "modem_pin",			""			},
-	{ "modem_dev",			"USB0"		},
+	{ "modem_dev",			"ttyUSB0"	},
 	{ "modem_init",			"*99#"		},
 	{ "modem_apn",			"internet"	},
 
@@ -157,7 +158,6 @@ const defaults_t defaults[] = {
 	{ "ppp_mru",			"1500"			},	// Negotiate MRU to this value
 	{ "ppp_mtu",			"1500"			},	// Negotiate MTU to the smaller of this value or the peer MRU
 	{ "ppp_service",		""				},	// PPPoE service name
-	{ "ppp_ac",				""				},	// PPPoE access concentrator name
 	{ "ppp_static",			"0"				},	// Enable / Disable Static IP
 	{ "ppp_static_ip",		""				},	// PPPoE Static IP
 	{ "ppp_custom",			""				},	// PPPD additional options
@@ -324,14 +324,14 @@ const defaults_t defaults[] = {
 	{ "wl_rxchain_pwrsave_quiet_time","1800"		},	// Quiet time for power save
 	{ "wl_rxchain_pwrsave_pps",			"10"	},	// Packets per second threshold for power save
 	{ "wl_radio_pwrsave_enable",		"0"		},	// Radio powersave enable
-	{ "wl_radio_pwrsave_quiet_time",	"1800"		},	// Quiet time for power save
+	{ "wl_radio_pwrsave_quiet_time",	"1800"	},	// Quiet time for power save
 	{ "wl_radio_pwrsave_pps",			"10"	},	// Packets per second threshold for power save
-	{ "wl_radio_pwrsave_on_time",		"50"		},	// Radio on time for power save
+	{ "wl_radio_pwrsave_on_time",		"50"	},	// Radio on time for power save
 	// misc
 	{ "wl_wmf_bss_enable",		"0"			},	// Wireless Multicast Forwarding Enable/Disable
 	{ "wl_rifs_advert",		"auto"			},	// RIFS mode advertisement
 	{ "wl_stbc_tx",			"auto"			},	// Default STBC TX setting
-	{ "wl_mcast_regen_bss_enable",	"1"			},	// MCAST REGEN Enable/Disable
+	{ "wl_mcast_regen_bss_enable",	"1"		},	// MCAST REGEN Enable/Disable
 #endif
 
 	{ "pptp_server_ip",		""			},	// as same as WAN gateway
@@ -377,9 +377,6 @@ const defaults_t defaults[] = {
 	{ "ntp_updates",		"4"					},
 	{ "ntp_tdod",			"0"					},
 	{ "ntp_server",			"0.europe.pool.ntp.org 1.europe.pool.ntp.org 2.europe.pool.ntp.org" },
-#ifdef TCONFIG_DNSCRYPT
-       { "ntp_server_ip",              "205.233.73.201 83.133.106.119 81.88.24.155 81.94.123.17 91.234.160.19 82.197.164.46 184.105.192.247 195.216.64.208" }, // shibby - when dnscrypt-proxy 1, have to use ip addresses
-#endif
 	{ "ntp_kiss",			""					},
 	{ "ntp_kiss_ignore",		""					},
 	{ "ntpd_enable",		"0"					},
@@ -616,7 +613,7 @@ const defaults_t defaults[] = {
 	{ "rstats_bak",			"0"			},
 
 // admin-ipt
-	{ "cstats_enable",		"0"			},
+	{ "cstats_enable",		"1"			},
 	{ "cstats_path",		""			},
 	{ "cstats_stime",		"48"		},
 	{ "cstats_offset",		"1"			},
@@ -676,9 +673,9 @@ const defaults_t defaults[] = {
 // admin-debugging
 	{ "debug_nocommit",		"0"			},
 	{ "debug_cprintf",		"0"			},
-	{ "debug_cprintf_file",		"0"			},
-//	{ "debug_keepfiles",		"0"			},
-	{ "console_loglevel",		"1"			},
+	{ "debug_cprintf_file",	"0"			},
+//	{ "debug_keepfiles",	"0"			},
+	{ "console_loglevel",	"1"			},
 	{ "t_cafree",			"1"			},
 	{ "t_hidelr",			"0"			},
 	{ "debug_clkfix",		"1"			},
