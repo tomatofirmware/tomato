@@ -62,9 +62,11 @@ else
 
     # vendor:product
 
-    if [ "$SEARCH" == "1" ]; then
-        logger 3G MODEM FOUND - $SWITCH - Switching ...
-        /usr/sbin/usb_modeswitch -Q -c /etc/usb_modeswitch.d/$SWITCH
+        if [ "$SEARCH" == "1" ]; then
+            logger 3G MODEM FOUND - $SWITCH - Switching ...
+            DV=`echo $SWITCH | cut -d ":" -f1`
+            DP=`echo $SWITCH | cut -d ":" -f2`
+            /usr/sbin/usb_modeswitch -Q -c /etc/usb_modeswitch.d/$SWITCH -v $DV -p $DP
 
         TEST1=`cat /etc/usb_modeswitch.d/$SWITCH | grep "TargetVendor" | cut -d "=" -f2 | wc -l`
         if [ "$TEST1" == "1" ]; then

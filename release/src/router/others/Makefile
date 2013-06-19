@@ -18,6 +18,10 @@ ifeq ($(CONFIG_LINUX26),y)
 endif
 endif
 
+ifeq ($(TCONFIG_DNSCRYPT),y)
+	install -m 0700 ntp2ip $(INSTALLDIR)/usr/sbin
+endif
+
 # Ethernet state report
 	install -m 0700 ethstate $(INSTALLDIR)/usr/sbin
 
