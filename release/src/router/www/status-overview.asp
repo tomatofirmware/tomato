@@ -300,6 +300,9 @@ function earlyInit()
 
 function init() {
 	var c;
+	var isIE6 = navigator.userAgent.search("MSIE 6") > -1;
+	if(isIE6)
+		alert("<#ALERT_TO_CHANGE_BROWSER#>");
 	if (((c = cookie.get('status_overview_system_vis')) != null) && (c != '1')) toggleVisibility("system");
 	if (((c = cookie.get('status_overview_wan_vis')) != null) && (c != '1')) toggleVisibility("wan");
 	if (((c = cookie.get('status_overview_lan_vis')) != null) && (c != '1')) toggleVisibility("lan");

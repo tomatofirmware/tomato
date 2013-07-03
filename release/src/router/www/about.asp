@@ -100,7 +100,8 @@ function init()
 - IPv6 support<br>
 <!-- IPV6-END -->
 - Extended System and Hardware Info<br>
-- HFS/HFS+ MAC OS x read support<br>
+- HFS/HFS+ MAC OSX read support<br>
+- exFAT MAC OSX / WINDOWS suppport<br>
 <!-- NOCAT-BEGIN -->
 - Captive Portal. (NocatSplash). Copyright (C) 2011 Ofer Chen & Vicente Soriano<br>
 <!-- NOCAT-END -->
