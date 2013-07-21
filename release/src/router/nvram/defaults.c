@@ -507,19 +507,21 @@ const defaults_t defaults[] = {
 #endif
 
 // forward-upnp
-	{ "upnp_enable",		"3"				},
-	{ "upnp_secure",		"1"				},
-	{ "upnp_port",			"0"				},
+	{ "upnp_enable",		"3"		},
+	{ "upnp_secure",		"1"		},
+	{ "upnp_port",			"0"		},
 	{ "upnp_ssdp_interval",	"60"			},	// SSDP interval
-	{ "upnp_max_age",		"180"			},	// Max age
-	{ "upnp_mnp",			"0"				},
-	{ "upnp_custom",		""				},
-	{ "upnp_clean",			"1"				},	/* 0:Disable 1:Enable */
+	{ "upnp_max_age",		"180"		},	// Max age
+	{ "upnp_mnp",			"0"		},
+	{ "upnp_custom",		""		},
+	{ "upnp_clean",			"1"		},	/* 0:Disable 1:Enable */
 	{ "upnp_clean_interval",	"600"		},	/* Cleaning interval in seconds */
 	{ "upnp_clean_threshold",	"20"		},	/* Threshold for cleaning unused rules */
-#if 0	// disabled for miniupnpd
-	{ "upnp_max_age",		"180"			},	// Max age
-	{ "upnp_config",		"0"				},
+#ifdef TCONFIG_VLAN
+	{ "upnp_lan",			"1"		},
+	{ "upnp_lan1",			"0"		},
+	{ "upnp_lan2",			"0"		},
+	{ "upnp_lan3",			"0"		},
 #endif
 
 // qos
