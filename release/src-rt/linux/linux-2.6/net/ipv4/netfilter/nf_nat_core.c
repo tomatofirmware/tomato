@@ -233,8 +233,8 @@ ip_conntrack_ipct_add(struct sk_buff *skb, u_int32_t hooknum,
 	tcph = ((struct tcphdr *)(((__u8 *)iph) + (iph->ihl << 2)));
 
 	/* Add ctf ipc entry for this direction */
-	ipc_entry.tuple.sip = iph->saddr;
-	ipc_entry.tuple.dip = iph->daddr;
+	ipc_entry.tuple.sip[0] = iph->saddr;
+	ipc_entry.tuple.dip[0] = iph->daddr;
 	ipc_entry.tuple.proto = iph->protocol;
 	ipc_entry.tuple.sp = tcph->source;
 	ipc_entry.tuple.dp = tcph->dest;
@@ -285,8 +285,8 @@ ip_conntrack_ipct_add(struct sk_buff *skb, u_int32_t hooknum,
 #ifdef DEBUG
 	printk("%s: Adding ipc entry for [%d]%u.%u.%u.%u:%u - %u.%u.%u.%u:%u\n", __FUNCTION__,
 			ipc_entry.tuple.proto, 
-			NIPQUAD(ipc_entry.tuple.sip), ntohs(ipc_entry.tuple.sp), 
-			NIPQUAD(ipc_entry.tuple.dip), ntohs(ipc_entry.tuple.dp)); 
+			NIPQUAD(ipc_entry.tuple.sip[0]), ntohs(ipc_entry.tuple.sp), 
+			NIPQUAD(ipc_entry.tuple.dip[0]), ntohs(ipc_entry.tuple.dp)); 
 	printk("sa %02x:%02x:%02x:%02x:%02x:%02x\n",
 			ipc_entry.shost.octet[0], ipc_entry.shost.octet[1],
 			ipc_entry.shost.octet[2], ipc_entry.shost.octet[3],
@@ -302,7 +302,7 @@ ip_conntrack_ipct_add(struct sk_buff *skb, u_int32_t hooknum,
 	printk("txif: %s\n", ((struct net_device *)ipc_entry.txif)->name);
 #endif
 
-	ctf_ipc_add(kcih, &ipc_entry);
+	ctf_ipc_add(kcih, &ipc_entry,iph->version == 6);
 
 	/* Update the attributes flag to indicate a CTF conn */
 	ct->ctf_flags |= (CTF_FLAGS_CACHED | (1 << dir));
@@ -317,6 +317,9 @@ ip_conntrack_ipct_delete(struct nf_conn *ct, int ct_timeout)
 {
 	ctf_ipc_t *ipct;
 	struct nf_conntrack_tuple *orig, *repl;
+	ctf_ipc_t orig_ipct, repl_ipct;
+	int ipaddr_sz;
+	bool v6;
 
 	if (!CTF_ENAB(kcih))
 		return (0);
@@ -328,14 +331,29 @@ ip_conntrack_ipct_delete(struct nf_conn *ct, int ct_timeout)
 
 	repl = &ct->tuplehash[IP_CT_DIR_REPLY].tuple;
 
+	v6 = FALSE;
+	ipaddr_sz = sizeof(struct in_addr);
+
+	memset(&orig_ipct, 0, sizeof(orig_ipct));
+	memcpy(orig_ipct.tuple.sip, &orig->src.u3.ip, ipaddr_sz);
+	memcpy(orig_ipct.tuple.dip, &orig->dst.u3.ip, ipaddr_sz);
+	orig_ipct.tuple.proto = orig->dst.protonum;
+	orig_ipct.tuple.sp = orig->src.u.tcp.port;
+	orig_ipct.tuple.dp = orig->dst.u.tcp.port;
+
+	memset(&repl_ipct, 0, sizeof(repl_ipct));
+	memcpy(repl_ipct.tuple.sip, &repl->src.u3.ip, ipaddr_sz);
+	memcpy(repl_ipct.tuple.dip, &repl->dst.u3.ip, ipaddr_sz);
+	repl_ipct.tuple.proto = repl->dst.protonum;
+	repl_ipct.tuple.sp = repl->src.u.tcp.port;
+	repl_ipct.tuple.dp = repl->dst.u.tcp.port;
+
 	/* If the refresh counter of ipc entry is non zero, it indicates
 	 * that the packet transfer is active and we should not delete
 	 * the conntrack entry.
 	 */
 	if (ct_timeout) {
-		ipct = ctf_ipc_lkup(kcih, orig->src.u3.ip, orig->dst.u3.ip,
-		                    orig->dst.protonum, orig->src.u.tcp.port,
-		                    orig->dst.u.tcp.port);
+		ipct = ctf_ipc_lkup(kcih, &orig_ipct, v6);
 
 		/* Postpone the deletion of ct entry if there are frames
 		 * flowing in this direction.
@@ -347,9 +365,7 @@ ip_conntrack_ipct_delete(struct nf_conn *ct, int ct_timeout)
 			return (-1);
 		}
 
-		ipct = ctf_ipc_lkup(kcih, repl->src.u3.ip, repl->dst.u3.ip,
-		                    repl->dst.protonum, repl->src.u.tcp.port,
-		                    repl->dst.u.tcp.port);
+		ipct = ctf_ipc_lkup(kcih, &repl_ipct, v6);
 
 		if ((ipct != NULL) && (ipct->live > 0)) {
 			ipct->live = 0;
@@ -362,11 +378,9 @@ ip_conntrack_ipct_delete(struct nf_conn *ct, int ct_timeout)
 	/* If there are no packets over this connection for timeout period
 	 * delete the entries.
 	 */
-	ctf_ipc_delete(kcih, orig->src.u3.ip, orig->dst.u3.ip, orig->dst.protonum,
-	               orig->src.u.tcp.port, orig->dst.u.tcp.port);
+	ctf_ipc_delete(kcih, &orig_ipct, v6);
 
-	ctf_ipc_delete(kcih, repl->src.u3.ip, repl->dst.u3.ip, repl->dst.protonum,
-	               repl->src.u.tcp.port, repl->dst.u.tcp.port);
+	ctf_ipc_delete(kcih, &repl_ipct, v6);
 
 #ifdef DEBUG
 	printk("%s: Deleting the tuple %x %x %d %d %d\n",

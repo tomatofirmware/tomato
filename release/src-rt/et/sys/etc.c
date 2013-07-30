@@ -3,7 +3,7 @@
  * Broadcom Home Networking Division 10/100 Mbit/s Ethernet
  * Device Driver.
  *
- * Copyright (C) 2011, Broadcom Corporation. All Rights Reserved.
+ * Copyright (C) 2012, Broadcom Corporation. All Rights Reserved.
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -16,7 +16,7 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
  * OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- * $Id: etc.c 330107 2012-04-27 22:04:17Z $
+ * $Id: etc.c 346087 2012-07-20 01:04:13Z $
  */
 
 #include <et_cfg.h>
@@ -200,7 +200,7 @@ etc_up(etc_info_t *etc)
 {
 	etc->up = TRUE;
 
-	et_init(etc->et, ET_INIT_DEF_OPTIONS);
+	et_init(etc->et, ET_INIT_FULL | ET_INIT_INTRON );
 }
 
 /* mark interface down */
@@ -414,7 +414,7 @@ etc_ioctl(etc_info_t *etc, int cmd, void *arg)
 			etc->needautoneg = FALSE;
 		}
 
-		et_init(etc->et, ET_INIT_DEF_OPTIONS);
+		et_init(etc->et, ET_INIT_INTRON);
 		break;
 
 	case ETCPHYRD:
@@ -443,8 +443,10 @@ etc_ioctl(etc_info_t *etc, int cmd, void *arg)
 			(*etc->chops->phywr)(etc->ch, etc->phyaddr, vec[0], (uint16)vec[1]);
 #ifdef ETROBO
 			/* Invalidate current robo page */
-			if (etc->robo && etc->phyaddr == EPHY_NOREG && vec[0] == 0x10)
-				((robo_info_t *)etc->robo)->page = ((uint16)vec[1] >> 8);
+			if (etc->robo && etc->phyaddr == EPHY_NOREG && vec[0] == 0x10) {
+				uint16 page = (*etc->chops->phyrd)(etc->ch, EPHY_NOREG, 0x10);
+				((robo_info_t *)etc->robo)->page = (page == 0xffff) ? -1 : (page >> 8);
+			}
 #endif
 		}
 		break;
@@ -458,8 +460,10 @@ etc_ioctl(etc_info_t *etc, int cmd, void *arg)
 				(*etc->chops->phywr)(etc->ch, phyaddr, reg, (uint16)vec[1]);
 #ifdef ETROBO
 				/* Invalidate current robo page */
-				if (etc->robo && phyaddr == EPHY_NOREG && reg == 0x10)
-					((robo_info_t *)etc->robo)->page = ((uint16)vec[1] >> 8);
+				if (etc->robo && phyaddr == EPHY_NOREG && reg == 0x10) {
+					uint16 page = (*etc->chops->phyrd)(etc->ch, EPHY_NOREG, 0x10);
+					((robo_info_t *)etc->robo)->page = (page == 0xffff) ? -1 : (page >> 8);
+				}
 #endif
 				ET_TRACE(("etc_ioctl: ETCPHYWR2 to phy 0x%x, reg 0x%x <= 0x%x\n",
 				          phyaddr, reg, vec[1]));
@@ -651,7 +655,7 @@ etc_loopback(etc_info_t *etc, int on)
 	ET_TRACE(("et%d: etc_loopback: %d\n", etc->unit, on));
 
 	etc->loopbk = (bool) on;
-	et_init(etc->et, ET_INIT_DEF_OPTIONS);
+	et_init(etc->et, ET_INIT_INTRON);
 }
 
 void
@@ -660,7 +664,7 @@ etc_promisc(etc_info_t *etc, uint on)
 	ET_TRACE(("et%d: etc_promisc: %d\n", etc->unit, on));
 
 	etc->promisc = (bool) on;
-	et_init(etc->et, ET_INIT_DEF_OPTIONS);
+	et_init(etc->et, ET_INIT_INTRON);
 }
 
 void
@@ -669,7 +673,7 @@ etc_qos(etc_info_t *etc, uint on)
 	ET_TRACE(("et%d: etc_qos: %d\n", etc->unit, on));
 
 	etc->qos = (bool) on;
-	et_init(etc->et, ET_INIT_DEF_OPTIONS);
+	et_init(etc->et, ET_INIT_INTRON);
 }
 
 /* WAR: BCM53115 switch is not retaining the tag while forwarding
