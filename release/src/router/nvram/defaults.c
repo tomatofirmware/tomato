@@ -195,9 +195,9 @@ const defaults_t defaults[] = {
 	{ "wl_corerev",			""				},	// Current core revision
 	{ "wl_phytypes",		""				},	// List of supported wireless bands (e.g. "ga")
 	{ "wl_radioids",		""				},	// List of radio IDs
-	{ "wl_ssid",			"Tomato_RAF24"	},	// Service set ID (network name)
-	{ "wl1_ssid",			"Tomato_RAF50"	},
-	{ "wl_country_code",	""				},		// Country (default obtained from driver)
+	{ "wl_ssid",			"TomatoRAF24"			},	// Service set ID (network name for 2.4GHz)
+	{ "wl1_ssid",			"TomatoRAF50"			},	// Service set ID (network name for 5GHz)
+	{ "wl_country_code",		""				},	// Country (default obtained from driver)
 	{ "wl_radio",			"1"				},	// Enable (1) or disable (0) radio
 	{ "wl1_radio",			"1"				},	// Enable (1) or disable (0) radio
 	{ "wl_closed",			"0"				},	// Closed (hidden) network

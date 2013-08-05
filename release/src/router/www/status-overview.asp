@@ -356,10 +356,10 @@ createFieldTable('', [
 	null,
 	{ title: 'Date & Time', rid: 'time', text: stats.time },
 	{ title: 'Uptime', rid: 'uptime', text: stats.uptime },
-	{ title: 'RAM Flash Size', text: stats.flashsize },
-	{ title: 'Total / Free RAM', rid: 'memory', text: stats.memory },
-	{ title: 'Total / Free NVRAM', text: scaleSize(nvstat.size) + ' / ' + scaleSize(nvstat.free) + ' <small>(' + (a).toFixed(2) + '%)</small>' },
-	{ title: 'Total / Free Swap Memory', rid: 'swap', text: stats.swap, hidden: (stats.swap == '') }
+	{ title: 'Flash RAM Size', text: stats.flashsize },
+	{ title: 'RAM Size / Free', rid: 'memory', text: stats.memory },
+	{ title: 'NVRAM Size / Free', text: scaleSize(nvstat.size) + ' / ' + scaleSize(nvstat.free) + ' <small>(' + (a).toFixed(2) + '%)</small>' },
+	{ title: 'SWAP Memory Size / Free', rid: 'swap', text: stats.swap, hidden: (stats.swap == '') }
 ]);
 </script>
 </div>

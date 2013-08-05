@@ -253,7 +253,7 @@ function init()
 	<div class='section'>
 		<script type='text/javascript'>
 			createFieldTable('', [
-			{ title: 'Enable Limiter', name: 'f_qosl_enable', type: 'checkbox', value: nvram.qosl_enable != '0' },
+			{ title: 'Enable Limiter', name: 'f_qosl_enable', type: 'checkbox', suffix: ' <i>(BW Limiter and QoS cannot work at once!)</i>', value: nvram.qosl_enable != '0' },
 			{ title: 'Max Download Bandwidth <small>(same as used by QOS)', name: 'qos_ibw', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.qos_ibw },
 			{ title: 'Max Upload Bandwidth <small>(same as used by QOS)', name: 'qos_obw', type: 'text', maxlen: 6, size: 8, suffix: ' <small>kbit/s</small>', value: nvram.qos_obw }
 			]);
