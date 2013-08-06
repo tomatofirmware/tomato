@@ -16,7 +16,6 @@
  *	You should have received a copy of the GNU Lesser General Public
  *	License along with this library; if not, write to the Free Software
  *	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- *	From Busybox 1.21.1 to Tomato RAF
  */
 
 #include "volume_id_internal.h"
