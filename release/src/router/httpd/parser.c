@@ -39,6 +39,12 @@ int parse_asp(const char *path)
 
 	if (!header_sent) send_header(200, NULL, mime_html, 0);
 
+	char *replaced = NULL;
+	if(!translate(buffer, &replaced,128 * 1024)) {
+		free(buffer);
+		buffer = replaced;
+	}
+
 	// <% id(arg, arg); %>
 	cp = buffer;
 	while (*cp) {

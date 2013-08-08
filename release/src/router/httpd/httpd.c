@@ -997,6 +997,7 @@ int main(int argc, char **argv)
 	signal(SIGHUP, SIG_IGN);
 	signal(SIGCHLD, SIG_IGN);
 
+	load_dictionary();
 	for (;;) {
 
 		/* Do a select() on at least one and possibly many listen fds.

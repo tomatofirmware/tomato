@@ -204,3 +204,6 @@ extern char *utf8_to_js_string(const char *ins);
 extern char *utf8_to_html_string(const char *ins);
 
 #endif
+int load_dictionary();
+void release_dictionary();
+int translate(char *buffer, char **replaced,int max);
