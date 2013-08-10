@@ -1742,7 +1742,7 @@ nginx/stamp-h1: zlib pcre
 				--http-fastcgi-temp-path=/tmp/var/lib/nginx/fastcgi \
 				--http-uwsgi-temp-path=/tmp/var/lib/nginx/uwsgi \
 				--http-scgi-temp-path=/tmp/var/lib/nginx/scgi \
-				--without-http_proxy_module \
+				--http-proxy-temp-path=/tmp/var/lib/nginx/proxy \
 				--with-pcre=$(TOP)/pcre \
 				--with-zlib=$(TOP)/zlib \
 				--with-openssl=$(TOP)/openssl-nginx \
