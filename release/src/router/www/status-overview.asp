@@ -15,7 +15,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Status: Overview</title>
+<title>[<% ident(); %>] status_overiew</title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
@@ -114,7 +114,7 @@ function ethstates()
 	if (port == "disabled") { return 0; }
 
 	var state, state1, state2;
-	var code = '<div class="section-title">Ethernet Ports State</div>';
+	var code = '<div class="section-title"><#ethernet_ports_state#></div>';
 	code += '<table class="fields"><tr><td class="title indent2"><center><b>WAN</b></center></td><td class="title indent2"><!-- empty space --></td><td class="title indent2"><center><b>LAN 1</b></center></td><td class="title indent2"><center><b>LAN 2</b></center></td><td class="title indent2"><center><b>LAN 3</b></center></td><td class="title indent2"><center><b>LAN 4</b></center></td><tr>';
 
 	if (port == "DOWN") {
@@ -338,8 +338,8 @@ function toggleVisibility(whichone) {
 <form>
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
-	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='title'><#tomato#></div>
+	<div class='version'><#version#> <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -350,13 +350,13 @@ function toggleVisibility(whichone) {
 </div>
 
 <div style='display:none' id='att1'>
-<div class='section-title'><center>!! Attention !!</center></div>
-<div class='fields'><center>You did not configure <b>TomatoAnon project</b> setting.
-<br>Please go to <a href='admin-tomatoanon.asp'>TomatoAnon configuration page</a> and make a choice.</center></div>
+<div class='section-title'><center>!! <#attention#> !!</center></div>
+<div class='fields'><center><#did_not_configure_tomatoanon#>.
+<br><#tomatoanon_choice#></center></div>
 <br>
 </div>
 
-<div class='section-title'>System <small><i><a href='javascript:toggleVisibility("system");'><span id='sesdiv_system_showhide'>(hide)</span></a></i></small></div>
+<div class='section-title'><#system#> <small><i><a href='javascript:toggleVisibility("system");'><span id='sesdiv_system_showhide'>(<#hide#>)</span></a></i></small></div>
 <div class='section' id='sesdiv_system'>
 <script type='text/javascript'>
 var a = nvstat.free / nvstat.size * 100.0;
@@ -380,18 +380,18 @@ createFieldTable('', [
 <div class='section' id='ports'>
 </div>
 
-<div class='section-title' id='wan-title'>WAN <small><i><a href='javascript:toggleVisibility("wan");'><span id='sesdiv_wan_showhide'>(hide)</span></a></i></small></div>
+<div class='section-title' id='wan-title'>WAN <small><i><a href='javascript:toggleVisibility("wan");'><span id='sesdiv_wan_showhide'>(<#hide#>)</span></a></i></small></div>
 <div class='section' id='sesdiv_wan'>
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: 'MAC Address', text: nvram.wan_hwaddr },
+	{ title: 'MAC <#address#>', text: nvram.wan_hwaddr },
 	{ title: 'Connection Type', text: { 'dhcp':'DHCP', 'static':'Static IP', 'pppoe':'PPPoE', 'pptp':'PPTP', 'l2tp':'L2TP', 'ppp3g':'3G Modem' }[nvram.wan_proto] || '-' },
-	{ title: 'IP Address', rid: 'wanip', text: stats.wanip },
+	{ title: 'IP <#address#>', rid: 'wanip', text: stats.wanip },
 	{ title: 'Previous WAN IP', rid: 'wanprebuf', text: stats.wanprebuf, hidden: ((nvram.wan_proto != 'pppoe') && (nvram.wan_proto != 'pptp') && (nvram.wan_proto != 'l2tp') && (nvram.wan_proto != 'ppp3g')) }, //Victek
 	{ title: 'Subnet Mask', rid: 'wannetmask', text: stats.wannetmask },
 	{ title: 'Gateway', rid: 'wangateway', text: stats.wangateway },
 /* IPV6-BEGIN */
-	{ title: 'IPv6 Address', rid: 'ip6_wan', text: stats.ip6_wan, hidden: (stats.ip6_wan == '') },
+	{ title: 'IPv6 <#address#>', rid: 'ip6_wan', text: stats.ip6_wan, hidden: (stats.ip6_wan == '') },
 /* IPV6-END */
 	{ title: 'DNS', rid: 'dns', text: stats.dns },
 	{ title: 'MTU', text: nvram.wan_run_mtu },

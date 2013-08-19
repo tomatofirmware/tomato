@@ -1,0 +1,10 @@
+status_overiew=状态: 概述
+ethernet_ports_state=有线端口状态
+tomato=Tomato
+verstion=版本
+attention=注意
+did_not_configure_tomatoanon=您还没有对<b>TomatoAnon project</b>进行设置
+tomatoanon_choice=请到 <a href='admin-tomatoanon.asp'>TomatoAnon 配置页面</a> 进行选择
+system=系统
+hide=隐藏
+address=地址

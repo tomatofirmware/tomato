@@ -9,7 +9,7 @@ install:
 	rm -rf $(INSTALLDIR)/www
 	mkdir -p $(INSTALLDIR)/www
 
-	cp *.gif *.png *.ico *.html robots.txt $(INSTALLDIR)/www
+	cp *.gif *.png *.ico *.html robots.txt *.dict $(INSTALLDIR)/www
 
 # squish some of the files by trimming whitespace...
 
