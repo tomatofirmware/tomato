@@ -21,6 +21,7 @@
 #ifndef _netconf_h_
 #define _netconf_h_
 
+#ifdef CONFIG_BCMWL6
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -288,6 +289,6 @@ extern int netconf_del_filter(netconf_filter_t *filter_list);
 extern int netconf_get_filter(netconf_filter_t *filter_array, int *space);
 
 extern int netconf_clamp_mss_to_pmtu(void);
-
+#endif
 
 #endif /* _netconf_h_ */

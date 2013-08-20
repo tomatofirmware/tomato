@@ -1,7 +1,7 @@
 /*
  * BCM43XX PCIE core hardware definitions.
  *
- * Copyright (C) 2012, Broadcom Corporation. All Rights Reserved.
+ * Copyright (C) 2010, Broadcom Corporation. All Rights Reserved.
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -15,7 +15,7 @@
  * OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $Id: pcie_core.h 348160 2012-07-31 21:25:18Z $
+ * $Id: pcie_core.h,v 13.7.108.2 2010-05-24 06:41:20 Exp $
  */
 #ifndef	_PCIE_CORE_H
 #define	_PCIE_CORE_H
@@ -50,8 +50,7 @@
 /* SB side: PCIE core and host control registers */
 typedef struct sbpcieregs {
 	uint32 control;		/* host mode only */
-	uint32 iocstatus;	/* PCIE2: iostatus */
-	uint32 PAD[1];
+	uint32 PAD[2];
 	uint32 biststatus;	/* bist Status: 0x00C */
 	uint32 gpiosel;		/* PCIE gpio sel: 0x010 */
 	uint32 gpioouten;	/* PCIE gpio outen: 0x14 */
@@ -59,16 +58,7 @@ typedef struct sbpcieregs {
 	uint32 intstatus;	/* Interrupt status: 0x20 */
 	uint32 intmask;		/* Interrupt mask: 0x24 */
 	uint32 sbtopcimailbox;	/* sb to pcie mailbox: 0x028 */
-	uint32 obffcontrol;	/* PCIE2: 0x2C */
-	uint32 obffintstatus;	/* PCIE2: 0x30 */
-	uint32 obffdatastatus;	/* PCIE2: 0x34 */
-	uint32 PAD[2];
-	uint32 errlog;		/* PCIE2: 0x40 */
-	uint32 errlogaddr;	/* PCIE2: 0x44 */
-	uint32 mailboxint;	/* PCIE2: 0x48 */
-	uint32 mailboxintmsk; /* PCIE2: 0x4c */
-	uint32 PAD[44];
-
+	uint32 PAD[53];
 	uint32 sbtopcie0;	/* sb to pcie translation 0: 0x100 */
 	uint32 sbtopcie1;	/* sb to pcie translation 1: 0x104 */
 	uint32 sbtopcie2;	/* sb to pcie translation 2: 0x108 */
@@ -77,24 +67,16 @@ typedef struct sbpcieregs {
 	/* pcie core supports in direct access to config space */
 	uint32 configaddr;	/* pcie config space access: Address field: 0x120 */
 	uint32 configdata;	/* pcie config space access: Data field: 0x124 */
-	union {
-		struct {
-			/* mdio access to serdes */
-			uint32 mdiocontrol;	/* controls the mdio access: 0x128 */
-			uint32 mdiodata;	/* Data to the mdio access: 0x12c */
-			/* pcie protocol phy/dllp/tlp register indirect access mechanism */
-			uint32 pcieindaddr; /* indirect access to the internal register: 0x130 */
-			uint32 pcieinddata;	/* Data to/from the internal regsiter: 0x134 */
-			uint32 clkreqenctrl;	/* >= rev 6, Clkreq rdma control : 0x138 */
-		} pcie1;
-		struct {
-			/* mdio access to serdes */
-			uint32 mdiocontrol;	/* controls the mdio access: 0x128 */
-			uint32 mdiowrdata;	/* write data to mdio 0x12C */
-			uint32 mdiorddata;	/* read data to mdio 0x130 */
-			uint32	PAD[2];
-		} pcie2;
-	} u;
+
+	/* mdio access to serdes */
+	uint32 mdiocontrol;	/* controls the mdio access: 0x128 */
+	uint32 mdiodata;	/* Data to the mdio access: 0x12c */
+
+	/* pcie protocol phy/dllp/tlp register indirect access mechanism */
+	uint32 pcieindaddr;	/* indirect access to the internal register: 0x130 */
+	uint32 pcieinddata;	/* Data to/from the internal regsiter: 0x134 */
+
+	uint32 clkreqenctrl;	/* >= rev 6, Clkreq rdma control : 0x138 */
 	uint32 PAD[177];
 	uint32 pciecfg[4][64];	/* 0x400 - 0x7FF, PCIE Cfg Space */
 	uint16 sprom[64];	/* SPROM shadow Area */
@@ -114,33 +96,6 @@ typedef struct sbpcieregs {
 #define PCIE_INTNFATAL	0x08	/* PCIE INTNONFATAL message is received */
 #define PCIE_INTCORR	0x10	/* PCIE INTCORR message is received */
 #define PCIE_INTPME	0x20	/* PCIE INTPME message is received */
-
-#define PCIE_INT_MB_FN0_0 0x0100 /* PCIE to SB Mailbox int Fn0.0 is received */
-#define PCIE_INT_MB_FN0_1 0x0200 /* PCIE to SB Mailbox int Fn0.1 is received */
-#define PCIE_INT_MB_FN1_0 0x0400 /* PCIE to SB Mailbox int Fn1.0 is received */
-#define PCIE_INT_MB_FN1_1 0x0800 /* PCIE to SB Mailbox int Fn1.1 is received */
-#define PCIE_INT_MB_FN2_0 0x1000 /* PCIE to SB Mailbox int Fn2.0 is received */
-#define PCIE_INT_MB_FN2_1 0x2000 /* PCIE to SB Mailbox int Fn2.1 is received */
-#define PCIE_INT_MB_FN3_0 0x4000 /* PCIE to SB Mailbox int Fn3.0 is received */
-#define PCIE_INT_MB_FN3_1 0x8000 /* PCIE to SB Mailbox int Fn3.1 is received */
-
-/* PCIE MailboxInt/MailboxIntMask register */
-#define PCIE_MB_TOSB_FN0_0   0x0001 /* write to assert PCIEtoSB Mailbox interrupt */
-#define PCIE_MB_TOSB_FN0_1   0x0002
-#define PCIE_MB_TOSB_FN1_0   0x0004
-#define PCIE_MB_TOSB_FN1_1   0x0008
-#define PCIE_MB_TOSB_FN2_0   0x0010
-#define PCIE_MB_TOSB_FN2_1   0x0020
-#define PCIE_MB_TOSB_FN3_0   0x0040
-#define PCIE_MB_TOSB_FN3_1   0x0080
-#define PCIE_MB_TOPCIE_FN0_0 0x0100 /* int status/mask for SBtoPCIE Mailbox interrupts */
-#define PCIE_MB_TOPCIE_FN0_1 0x0200
-#define PCIE_MB_TOPCIE_FN1_0 0x0400
-#define PCIE_MB_TOPCIE_FN1_1 0x0800
-#define PCIE_MB_TOPCIE_FN2_0 0x1000
-#define PCIE_MB_TOPCIE_FN2_1 0x2000
-#define PCIE_MB_TOPCIE_FN3_0 0x4000
-#define PCIE_MB_TOPCIE_FN3_1 0x8000
 
 /* SB to PCIE translation masks */
 #define SBTOPCIE0_MASK	0xfc000000
@@ -276,22 +231,8 @@ typedef struct sbpcieregs {
 #define MDIODATA_DEV_ADDR		0x0		/* dev address for serdes */
 #define	MDIODATA_BLK_ADDR		0x1F		/* blk address for serdes */
 
-/* MDIO control/wrData/rdData register defines for PCIE Gen 2 */
-#define MDIOCTL2_DIVISOR_MASK		0x7f	/* clock to be used on MDIO */
-#define MDIOCTL2_DIVISOR_VAL		0x2
-#define MDIOCTL2_REGADDR_SHF		8		/* Regaddr shift */
-#define MDIOCTL2_REGADDR_MASK		0x00FFFF00	/* Regaddr Mask */
-#define MDIOCTL2_DEVADDR_SHF		24		/* Physmedia devaddr shift */
-#define MDIOCTL2_DEVADDR_MASK		0x0f000000	/* Physmedia devaddr Mask */
-#define MDIOCTL2_SLAVE_BYPASS		0x10000000	/* IP slave bypass */
-#define MDIOCTL2_READ			0x20000000	/* IP slave bypass */
 
-#define MDIODATA2_DONE			0x80000000	/* rd/wr transaction done */
-#define MDIODATA2_MASK			0x7FFFFFFF	/* rd/wr transaction data */
-#define MDIODATA2_DEVADDR_SHF		4		/* Physmedia devaddr shift */
-
-
-/* MDIO devices (SERDES modules)
+/* MDIO devices (SERDES modules) 
  *  unlike old pcie cores (rev < 10), rev10 pcie serde organizes registers into a few blocks.
  *  two layers mapping (blockidx, register offset) is required
  */
@@ -358,8 +299,6 @@ typedef struct sbpcieregs {
 #define PCIE_CAP_LCREG_ASPML0s		0x01	/* ASPM L0s in linkctrl */
 #define PCIE_CAP_LCREG_ASPML1		0x02	/* ASPM L1 in linkctrl */
 #define PCIE_CLKREQ_ENAB		0x100	/* CLKREQ Enab in linkctrl */
-#define PCIE_LINKSPEED_MASK       	0xF0000	/* bits 0 - 3 of high word */
-#define PCIE_LINKSPEED_SHIFT      	16	/* PCIE_LINKSPEED_SHIFT */
 
 /* Devcontrol reg offset in PCIE Cap */
 #define PCIE_CAP_DEVCTRL_OFFSET		8	/* devctrl offset in pcie cap */
@@ -368,52 +307,12 @@ typedef struct sbpcieregs {
 #define PCIE_CAP_DEVCTRL_MRRS_128B	0	/* 128 Byte */
 #define PCIE_CAP_DEVCTRL_MRRS_256B	1	/* 256 Byte */
 #define PCIE_CAP_DEVCTRL_MRRS_512B	2	/* 512 Byte */
-#define PCIE_CAP_DEVCTRL_MRRS_1024B	3	/* 1024 Byte */
-#define PCIE_CAP_DEVCTRL_MPS_MASK	0x00e0	/* Max payload size mask */
-#define PCIE_CAP_DEVCTRL_MPS_SHIFT	5	/* Max payload size shift */
-#define PCIE_CAP_DEVCTRL_MPS_128B	0	/* 128 Byte */
-#define PCIE_CAP_DEVCTRL_MPS_256B	1	/* 256 Byte */
-#define PCIE_CAP_DEVCTRL_MPS_512B	2	/* 512 Byte */
-#define PCIE_CAP_DEVCTRL_MPS_1024B	3	/* 1024 Byte */
 
 #define PCIE_ASPM_ENAB			3	/* ASPM L0s & L1 in linkctrl */
 #define PCIE_ASPM_L1_ENAB		2	/* ASPM L0s & L1 in linkctrl */
 #define PCIE_ASPM_L0s_ENAB		1	/* ASPM L0s & L1 in linkctrl */
 #define PCIE_ASPM_DISAB			0	/* ASPM L0s & L1 in linkctrl */
 
-/* Devcontrol2 reg offset in PCIE Cap */
-#define PCIE_CAP_DEVCTRL2_OFFSET	0x28	/* devctrl2 offset in pcie cap */
-#define PCIE_CAP_DEVCTRL2_LTR_ENAB_MASK	0x400	/* Latency Tolerance Reporting Enable */
-
 /* Status reg PCIE_PLP_STATUSREG */
 #define PCIE_PLP_POLARITYINV_STAT	0x10
-
-
-/* PCIE BRCM Vendor CAP REVID reg  bits */
-#define BRCMCAP_PCIEREV_CT_MASK			0xF00
-#define BRCMCAP_PCIEREV_CT_SHIFT		8
-#define BRCMCAP_PCIEREV_REVID_MASK		0xFF
-#define BRCMCAP_PCIEREV_REVID_SHIFT		0
-
-#define PCIE_REVREG_CT_PCIE1		0
-#define PCIE_REVREG_CT_PCIE2		1
-
-/* PCIE GEN2 specific defines */
-/* PCIE BRCM Vendor Cap offsets w.r.t to vendor cap ptr */
-#define PCIE2R0_BRCMCAP_REVID_OFFSET		4
-#define PCIE2R0_BRCMCAP_BAR0_WIN0_WRAP_OFFSET	8
-#define PCIE2R0_BRCMCAP_BAR0_WIN2_OFFSET	12
-#define PCIE2R0_BRCMCAP_BAR0_WIN2_WRAP_OFFSET	16
-#define PCIE2R0_BRCMCAP_BAR0_WIN_OFFSET		20
-#define PCIE2R0_BRCMCAP_BAR1_WIN_OFFSET		24
-#define PCIE2R0_BRCMCAP_SPROM_CTRL_OFFSET	28
-#define PCIE2R0_BRCMCAP_BAR2_WIN_OFFSET		32
-#define PCIE2R0_BRCMCAP_INTSTATUS_OFFSET	36
-#define PCIE2R0_BRCMCAP_INTMASK_OFFSET		40
-#define PCIE2R0_BRCMCAP_PCIE2SB_MB_OFFSET	44
-#define PCIE2R0_BRCMCAP_BPADDR_OFFSET		48
-#define PCIE2R0_BRCMCAP_BPDATA_OFFSET		52
-#define PCIE2R0_BRCMCAP_CLKCTLSTS_OFFSET	56
-
-
 #endif	/* _PCIE_CORE_H */

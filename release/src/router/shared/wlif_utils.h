@@ -28,8 +28,11 @@
 #ifndef ETHER_ADDR_LEN
 #define ETHER_ADDR_LEN 6
 #endif
-
+#ifdef CONFIG_BCMWL6
 #define WLIFU_MAX_NO_BRIDGE		2
+#else
+#define WLIFU_MAX_NO_BRIDGE	4
+#endif
 #define WLIFU_MAX_NO_WAN		2
 
 #define MAX_USER_KEY_LEN	80			/* same as NAS_WKSP_MAX_USER_KEY_LEN */
@@ -81,7 +84,11 @@ extern int get_lan_mac(unsigned char *mac);
 extern unsigned char *get_wlmacstr_by_unit(char *unit);
 extern int get_wlname_by_mac(unsigned char *mac, char *wlname);
 extern char *get_ifname_by_wlmac(unsigned char *mac, char *name);
+#ifdef CONFIG_BCMWL6
 extern int get_wsec(wsec_info_t *info, unsigned char *mac, char *osifname);
+#else
+extern int get_wsec(wsec_info_t *info, char *mac, char *osifname);
+#endif
 extern bool wl_wlif_is_psta(char *ifname);
 
 #endif /* _wlif_utils_h_ */

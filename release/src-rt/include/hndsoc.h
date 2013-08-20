@@ -1,7 +1,7 @@
 /*
  * Broadcom HND chip & on-chip-interconnect-related definitions.
  *
- * Copyright (C) 2012, Broadcom Corporation. All Rights Reserved.
+ * Copyright (C) 2010, Broadcom Corporation. All Rights Reserved.
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -15,7 +15,7 @@
  * OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $Id: hndsoc.h 345471 2012-07-18 06:08:52Z $
+ * $Id: hndsoc.h,v 13.11.12.1 2010-11-16 21:14:20 Exp $
  */
 
 #ifndef	_HNDSOC_H
@@ -44,8 +44,10 @@
 
 #define SI_WRAP_BASE    	0x18100000	/* Wrapper space base */
 #define SI_CORE_SIZE    	0x1000		/* each core gets 4Kbytes for registers */
-
-#define	SI_MAXCORES		32		/* NorthStar has more cores */
+#define	SI_MAXCORES		16		/* Max cores (this is arbitrary, for software
+						 * convenience and could be changed if we
+						 * make any larger chips
+						 */
 
 #define	SI_FASTRAM		0x19000000	/* On-chip RAM on chips that also have DDR */
 #define	SI_FASTRAM_SWAPPED	0x19800000
@@ -55,14 +57,7 @@
 #define	SI_ARMCM3_ROM		0x1e000000	/* ARM Cortex-M3 ROM */
 #define	SI_FLASH1		0x1fc00000	/* MIPS Flash Region 1 */
 #define	SI_FLASH1_SZ		0x00400000	/* MIPS Size of Flash Region 1 */
-#define	SI_FLASH_WINDOW		0x01000000	/* Flash XIP Window */
-
-#define SI_NS_NANDFLASH		0x1c000000	/* NorthStar NAND flash base */
-#define SI_NS_NORFLASH		0x1e000000	/* NorthStar NOR flash base */
-#define SI_NS_ROM		0xfffd0000	/* NorthStar ROM */
-
 #define	SI_ARM7S_ROM		0x20000000	/* ARM7TDMI-S ROM */
-#define	SI_ARMCR4_ROM		0x000f0000	/* ARM Cortex-R4 ROM */
 #define	SI_ARMCM3_SRAM2		0x60000000	/* ARM Cortex-M3 SRAM Region 2 */
 #define	SI_ARM7S_SRAM2		0x80000000	/* ARM7TDMI-S SRAM Region 2 */
 #define	SI_ARM_FLASH1		0xffff0000	/* ARM Flash Region 1 */
@@ -135,35 +130,13 @@
 #define	I2S_CORE_ID		0x834		/* I2S core */
 #define	DMEMS_CORE_ID		0x835		/* SDR/DDR1 memory controller core */
 #define	DEF_SHIM_COMP		0x837		/* SHIM component in ubus/6362 */
-
-#define ACPHY_CORE_ID		0x83b		/* Dot11 ACPHY */
-#define PCIE2_CORE_ID		0x83c		/* pci express Gen2 core */
-#define USB30D_CORE_ID		0x83d		/* usb 3.0 device core */
-#define ARMCR4_CORE_ID		0x83e		/* ARM CR4 CPU */
-#define APB_BRIDGE_CORE_ID	0x135		/* APB bridge core ID */
-#define AXI_CORE_ID		0x301		/* AXI/GPV core ID */
-#define EROM_CORE_ID		0x366		/* EROM core ID */
 #define OOB_ROUTER_CORE_ID	0x367		/* OOB router core ID */
-#define DEF_AI_COMP		0xfff		/* Default component, in ai chips it maps all
+#define	DEF_AI_COMP		0xfff		/* Default component, in ai chips it maps all
 						 * unused address ranges
 						 */
 
 #define CC_4706_CORE_ID		0x500		/* chipcommon core */
-#define NS_PCIEG2_CORE_ID	0x501		/* PCIE Gen 2 core */
-#define NS_DMA_CORE_ID		0x502		/* DMA core */
-#define NS_SDIO3_CORE_ID	0x503		/* SDIO3 core */
-#define NS_USB20_CORE_ID	0x504		/* USB2.0 core */
-#define NS_USB30_CORE_ID	0x505		/* USB3.0 core */
-#define NS_A9JTAG_CORE_ID	0x506		/* ARM Cortex A9 JTAG core */
-#define NS_DDR23_CORE_ID	0x507		/* Denali DDR2/DDR3 memory controller */
-#define NS_ROM_CORE_ID		0x508		/* ROM core */
-#define NS_NAND_CORE_ID		0x509		/* NAND flash controller core */
-#define NS_QSPI_CORE_ID		0x50a		/* SPI flash controller core */
-#define NS_CCB_CORE_ID		0x50b		/* ChipcommonB core */
 #define SOCRAM_4706_CORE_ID	0x50e		/* internal memory core */
-#define NS_SOCRAM_CORE_ID	SOCRAM_4706_CORE_ID
-#define	ARMCA9_CORE_ID		0x510		/* ARM Cortex A9 core (ihost) */
-#define	NS_IHOST_CORE_ID	ARMCA9_CORE_ID	/* ARM Cortex A9 core (ihost) */
 #define GMAC_COMMON_4706_CORE_ID	0x5dc		/* Gigabit MAC core */
 #define GMAC_4706_CORE_ID	0x52d		/* Gigabit MAC core */
 #define AMEMC_CORE_ID		0x52e		/* DDR1/2 memory controller core */
@@ -188,7 +161,6 @@
 #define	SOCI_SB			0
 #define	SOCI_AI			1
 #define	SOCI_UBUS		2
-#define	SOCI_NAI		3
 
 /* Common core control flags */
 #define	SICF_BIST_EN		0x8000
@@ -204,14 +176,6 @@
 #define	SISF_DMA64		0x1000
 #define	SISF_CORE_BITS		0x0fff
 
-/* Norstar core status flags */
-#define SISF_NS_BOOTDEV_MASK	0x0003	/* ROM core */
-#define SISF_NS_BOOTDEV_NOR	0x0000	/* ROM core */
-#define SISF_NS_BOOTDEV_NAND	0x0001	/* ROM core */
-#define SISF_NS_BOOTDEV_ROM	0x0002	/* ROM core */
-#define SISF_NS_BOOTDEV_OFFLOAD	0x0003	/* ROM core */
-#define SISF_NS_SKUVEC_MASK	0x000c	/* ROM core */
-
 /* A register that is common to all cores to
  * communicate w/PMU regarding clock control.
  */
@@ -224,8 +188,6 @@
 #define	CCS_ALPAREQ		0x00000008	/* ALP Avail Request */
 #define	CCS_HTAREQ		0x00000010	/* HT Avail Request */
 #define	CCS_FORCEHWREQOFF	0x00000020	/* Force HW Clock Request Off */
-#define CCS_HQCLKREQ		0x00000040	/* HQ Clock Required */
-#define CCS_USBCLKREQ		0x00000100	/* USB Clock Req */
 #define CCS_ERSRC_REQ_MASK	0x00000700	/* external resource requests */
 #define CCS_ERSRC_REQ_SHIFT	8
 #define	CCS_ALPAVAIL		0x00010000	/* ALP is available */
@@ -256,19 +218,5 @@
 #define	BISZ_BSSST_IDX		5		/*	5: bss start */
 #define	BISZ_BSSEND_IDX		6		/*	6: bss end */
 #define BISZ_SIZE		7		/* descriptor size in 32-bit integers */
-
-/* Boot/Kernel related defintion and functions */
-#define	SOC_BOOTDEV_ROM		0x00000001
-#define	SOC_BOOTDEV_PFLASH	0x00000002
-#define	SOC_BOOTDEV_SFLASH	0x00000004
-#define	SOC_BOOTDEV_NANDFLASH	0x00000008
-
-#define	SOC_KNLDEV_NORFLASH	0x00000002
-#define	SOC_KNLDEV_NANDFLASH	0x00000004
-
-#ifndef _LANGUAGE_ASSEMBLY
-int soc_boot_dev(void *sih);
-int soc_knl_dev(void *sih);
-#endif	/* _LANGUAGE_ASSEMBLY */
 
 #endif /* _HNDSOC_H */

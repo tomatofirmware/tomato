@@ -27,6 +27,7 @@
 #define MAX_NVPARSE 256
 #endif
 
+#ifdef CONFIG_BCMWL6
 /* Maximum  number of Traffic Management rules */
 #define MAX_NUM_TRF_MGMT_RULES 10
 
@@ -100,5 +101,5 @@ extern bool del_wds_wsec(int unit, int which);
 
 /* Conversion routine for deprecated variables */
 extern void convert_deprecated(void);
-
+#endif /* CONFIG_BCMWL6 */
 #endif /* _nvparse_h_ */

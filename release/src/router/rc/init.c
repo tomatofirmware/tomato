@@ -1141,21 +1141,40 @@ static int init_nvram(void)
 		break;
 	case MODEL_RTN66U:
 		mfr = "Asus";
+#ifdef CONFIG_BCMWL6
 		name = "RT-AC66U"; //id, board, rev same as N66
+#else
+		name = "RT-N66U";
+#endif
+#ifdef CONFIG_BCMWL6
 		features = SUP_SES | SUP_80211N | SUP_1000ET | SUP_80211AC;
+#else
+		features = SUP_SES | SUP_80211N | SUP_1000ET;
+#endif
 #ifdef TCONFIG_USB
 		nvram_set("usb_uhci", "-1");
+#ifndef CONFIG_BCMWL6
+#if defined(LINUX26) && defined(TCONFIG_MICROSD)
+		if (nvram_get_int("usb_mmc") == -1) nvram_set("usb_mmc", "1");
+#endif
+#endif
 #endif
 		if (!nvram_match("t_fix1", (char *)name)) {
 			nvram_set("lan_ifnames", "vlan1 eth1 eth2");
 			nvram_set("wan_ifnameX", "vlan2");
 			nvram_set("wl_ifnames", "eth1 eth2");
+#ifdef CONFIG_BCMWL6
 			nvram_set("wl_ifname", "eth1");
 			nvram_set("wl0_ifname", "eth1");
 			nvram_set("wl1_ifname", "eth2");
+#endif
 			nvram_set("landevs", "vlan1 wl0 wl1");
 			nvram_set("wandevs", "vlan2");
-
+#ifndef CONFIG_BCMWL6
+#if defined(LINUX26) && defined(TCONFIG_USB)
+			nvram_set("usb_noled", "1-1.4"); /* SD/MMC Card */
+#endif
+#else
 			// fix WL mac`s
 			strcpy(s, nvram_safe_get("et0macaddr"));
 			inc_mac(s, +2);
@@ -1380,6 +1399,7 @@ static int init_nvram(void)
 			nvram_set("pci/2/1/ledbh2", "4");
 			nvram_set("pci/2/1/ledbh3", "11");
 			nvram_set("pci/2/1/ledbh10", "7");*/
+#endif
 		}
 		break;
 	case MODEL_WNR3500L:

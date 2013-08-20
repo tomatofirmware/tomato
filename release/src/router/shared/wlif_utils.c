@@ -31,8 +31,10 @@
 #include <bcmparams.h>
 #include <bcmnvram.h>
 #include <bcmutils.h>
+#ifdef CONFIG_BCMWL6
 #include <netconf.h>
 #include <nvparse.h>
+#endif
 #include <shutils.h>
 #include <wlutils.h>
 #include <wlif_utils.h>
@@ -239,7 +241,11 @@ get_wlname_by_mac(unsigned char *mac, char *wlname)
 
 	ether_etoa(mac, eabuf);
 	/* find out the wl name from mac */
+#ifdef CONFIG_BCMWL6
 	for (i = 0; i < MAX_NVPARSE; i++) {
+#else
+	for (i = 0; i < WLIFU_MAX_NO_BRIDGE; i++) {
+#endif
 		sprintf(wlname, "wl%d", i);
 		sprintf(tmptr, "wl%d_hwaddr", i);
 		wl_hw = nvram_get(tmptr);
@@ -262,6 +268,7 @@ get_wlname_by_mac(unsigned char *mac, char *wlname)
 	return -1;
 }
 
+#ifdef CONFIG_BCMWL6
 bool
 wl_wlif_is_psta(char *ifname)
 {
@@ -274,6 +281,7 @@ wl_wlif_is_psta(char *ifname)
 
 	return psta ? TRUE : FALSE;
 }
+#endif
 
 /*
  * Get LAN or WAN ifname by wl mac
@@ -330,7 +338,11 @@ get_ifname_by_wlmac(unsigned char *mac, char *name)
 
 	/* find for wan  */
 	ifnames = nvram_get("wan_ifnames");
+#ifdef CONFIG_BCMWL6
 	ifname = nvram_get("wan0_ifname");
+#else
+	ifname = nvram_get("wan_ifname");
+#endif
 	/* the name in ifnames may nvifname or osifname */
 	if (find_in_list(ifnames, nv_name) ||
 	    find_in_list(ifnames, os_name))
@@ -338,18 +350,31 @@ get_ifname_by_wlmac(unsigned char *mac, char *name)
 
 	return 0;
 }
-
+#if defined(CONFIG_BCMWL6) || defined (BCMWPA2)
 #define CHECK_NAS(mode) ((mode) & (WPA_AUTH_UNSPECIFIED | WPA_AUTH_PSK | \
 				   WPA2_AUTH_UNSPECIFIED | WPA2_AUTH_PSK))
 #define CHECK_PSK(mode) ((mode) & (WPA_AUTH_PSK | WPA2_AUTH_PSK))
 #define CHECK_RADIUS(mode) ((mode) & (WPA_AUTH_UNSPECIFIED | WLIFU_AUTH_RADIUS | \
 				      WPA2_AUTH_UNSPECIFIED))
+#else
+#define CHECK_NAS(mode) ((mode) & (WPA_AUTH_UNSPECIFIED | WPA_AUTH_PSK))
+#define CHECK_PSK(mode) ((mode) & (WPA_AUTH_PSK))
+#define CHECK_RADIUS(mode) ((mode) & (WPA_AUTH_UNSPECIFIED | WLIFU_AUTH_RADIUS))
+#endif
 
 /* Get wireless security setting by interface name */
 int
+#ifdef CONFIG_BCMWL6
 get_wsec(wsec_info_t *info, unsigned char *mac, char *osifname)
+#else
+get_wsec(wsec_info_t *info, char *mac, char *osifname)
+#endif
 {
+#ifdef CONFIG_BCMWL6
 	int i, unit, wds = 0, wds_wsec = 0, dwds = 0;
+#else
+	int unit, wds = 0, wds_wsec = 0;
+#endif
 	char nv_name[16], os_name[16], wl_prefix[16], comb[32], key[8];
 	char wds_role[8], wds_ssid[48], wds_psk[80], wds_akms[16], wds_crypto[16],
 	        remote[ETHER_ADDR_LEN];
@@ -378,26 +403,28 @@ get_wsec(wsec_info_t *info, unsigned char *mac, char *osifname)
 		snprintf(wl_prefix, sizeof(wl_prefix), "wl%d", unit);
 		wds = 1;
 	}
+#ifdef CONFIG_BCMWL6
 	else if (wl_wlif_is_psta(os_name))
 		snprintf(wl_prefix, sizeof(wl_prefix), "wl%d", unit);
+#endif
 	else if (osifname_to_nvifname(os_name, wl_prefix, sizeof(wl_prefix)))
 		return WLIFU_ERR_INVALID_PARAMETER;
 
 	strcat(wl_prefix, "_");
 	memset(info, 0, sizeof(wsec_info_t));
-
+#ifdef CONFIG_BCMWL6
 	/* if dwds is enabled then dont configure the wds interface */
 	dwds = atoi(nvram_safe_get(strcat_r(wl_prefix, "dwds", comb)));
 	if (dwds)
 		wds = 0;
-
+#endif
 	/* get wds setting */
 	if (wds) {
 		/* remote address */
 		if (wl_ioctl(os_name, WLC_WDS_GET_REMOTE_HWADDR, remote, ETHER_ADDR_LEN))
 			return WLIFU_ERR_WL_REMOTE_HWADDR;
 		memcpy(info->remote, remote, ETHER_ADDR_LEN);
-
+#ifdef CONFIG_BCMWL6
 		/* get per wds settings */
 		for (i = 0; i < MAX_NVPARSE; i ++) {
 			char macaddr[18];
@@ -412,6 +439,7 @@ get_wsec(wsec_info_t *info, unsigned char *mac, char *osifname)
 			     break;
 			}
 		}
+#endif
 	}
 
 	/* interface unit */
@@ -442,10 +470,12 @@ get_wsec(wsec_info_t *info, unsigned char *mac, char *osifname)
 			info->akm |= WPA_AUTH_UNSPECIFIED;
 		if (!strcmp(akm, "psk"))
 			info->akm |= WPA_AUTH_PSK;
+#if defined(CONFIG_BCMWL6) || defined(BCMWPA2)
 		if (!strcmp(akm, "wpa2"))
 			info->akm |= WPA2_AUTH_UNSPECIFIED;
 		if (!strcmp(akm, "psk2"))
 			info->akm |= WPA2_AUTH_PSK;
+#endif
 	}
 	/* wsec encryption */
 	value = nvram_safe_get(strcat_r(wl_prefix, "wep", comb));
@@ -468,8 +498,12 @@ get_wsec(wsec_info_t *info, unsigned char *mac, char *osifname)
 	if (!strcmp(value, "ap")) {
 		info->flags |= WLIFU_WSEC_AUTH;
 	}
+#ifdef CONFIG_BCMWL6
 	else if (!strcmp(value, "sta") || !strcmp(value, "wet") ||
 	         !strcmp(value, "psr") || !strcmp(value, "psta")) {
+#else
+	else if (!strcmp(value, "sta") || !strcmp(value, "wet")) {
+#endif
 		if (!strcmp(infra, "0")) {
 			/* IBSS, so we must act as Authenticator and Supplicant */
 			info->flags |= WLIFU_WSEC_AUTH;
@@ -490,8 +524,12 @@ get_wsec(wsec_info_t *info, unsigned char *mac, char *osifname)
 	}
 	/* overwrite flags */
 	if (wds) {
+#ifdef CONFIG_BCMWL6
 		char buf[32];
 		unsigned char *ptr, lrole;
+#else
+		unsigned char buf[32], *ptr, lrole;
+#endif
 
 		/* did not find WDS link configuration, use wireless' */
 		if (!wds_wsec)
@@ -506,7 +544,11 @@ get_wsec(wsec_info_t *info, unsigned char *mac, char *osifname)
 			lrole = WL_WDS_WPA_ROLE_AUTO;
 
 		strcpy(buf, "wds_wpa_role");
+#ifdef CONFIG_BCMWL6
 		ptr = (unsigned char *)buf + strlen(buf) + 1;
+#else
+		ptr = buf + strlen(buf) + 1;
+#endif
 		bcopy(info->remote, ptr, ETHER_ADDR_LEN);
 		ptr[ETHER_ADDR_LEN] = lrole;
 		if (wl_ioctl(os_name, WLC_SET_VAR, buf, sizeof(buf)))

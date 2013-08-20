@@ -17,7 +17,7 @@
  *
  * $Id: nvparse.c 374496 2012-12-13 08:59:12Z $
  */
-
+#ifdef CONFIG_BCMWL6
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -1689,3 +1689,4 @@ convert_deprecated(void)
 	/* convert wl_wep and combine wl_auth_mode and wl_auth */
 	convert_wsec();
 }
+#endif

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012, Broadcom Corporation. All Rights Reserved.
+ * Copyright (C) 2010, Broadcom Corporation. All Rights Reserved.
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -13,16 +13,14 @@
  * OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
- * $Id: hndctf.h 342700 2012-07-03 21:26:12Z $
+ * $Id: hndctf.h,v 1.6.12.3 2010-10-26 00:19:09 Exp $
  */
 
 #ifndef _HNDCTF_H_
 #define _HNDCTF_H_
 
 #include <bcmutils.h>
-#include <proto/bcmip.h>
 #include <proto/ethernet.h>
-#include <proto/vlan.h>
 
 /*
  * Define to enable couting VLAN tx and rx packets and bytes. This could be
@@ -36,44 +34,28 @@
 #define CTF_ACTION_UNTAG	(1 << 1)
 #define CTF_ACTION_SNAT		(1 << 2)
 #define CTF_ACTION_DNAT		(1 << 3)
-#define CTF_ACTION_SUSPEND	(1 << 4)
-
-#define CTF_ACTION_PPPOE_ADD	(1 << 8)
-#define CTF_ACTION_PPPOE_DEL	(1 << 9)
-#define CTF_ACTION_PPTP_ADD	(1 << 10)
-#define CTF_ACTION_PPTP_DEL	(1 << 11)
-#define CTF_ACTION_L2TP_ADD	(1 << 12)
-#define CTF_ACTION_L2TP_DEL	(1 << 13)
 
 #define	ctf_attach(osh, n, m, c, a) \
 	(ctf_attach_fn ? ctf_attach_fn(osh, n, m, c, a) : NULL)
 #define ctf_forward(ci, p, d)	(ci)->fn.forward(ci, p, d)
 #define ctf_isenabled(ci, d)	(CTF_ENAB(ci) ? (ci)->fn.isenabled(ci, d) : FALSE)
 #define ctf_isbridge(ci, d)	(CTF_ENAB(ci) ? (ci)->fn.isbridge(ci, d) : FALSE)
-#define ctf_enable(ci, d, e, b)	(CTF_ENAB(ci) ? (ci)->fn.enable(ci, d, e, b) : BCME_OK)
+#define ctf_enable(ci, d, e)	(CTF_ENAB(ci) ? (ci)->fn.enable(ci, d, e) : BCME_OK)
 #define ctf_brc_add(ci, b)	(CTF_ENAB(ci) ? (ci)->fn.brc_add(ci, b) : BCME_OK)
 #define ctf_brc_delete(ci, e)	(CTF_ENAB(ci) ? (ci)->fn.brc_delete(ci, e) : BCME_OK)
 #define ctf_brc_update(ci, b)	(CTF_ENAB(ci) ? (ci)->fn.brc_update(ci, b) : BCME_OK)
 #define ctf_brc_lkup(ci, e)	(CTF_ENAB(ci) ? (ci)->fn.brc_lkup(ci, e) : NULL)
-#define ctf_ipc_add(ci, i, v6)	(CTF_ENAB(ci) ? (ci)->fn.ipc_add(ci, i, v6) : BCME_OK)
-#define ctf_ipc_delete(ci, i, v6)	\
-	(CTF_ENAB(ci) ? (ci)->fn.ipc_delete(ci, i, v6) : BCME_OK)
+#define ctf_ipc_add(ci, i)	(CTF_ENAB(ci) ? (ci)->fn.ipc_add(ci, i) : BCME_OK)
+#define ctf_ipc_delete(ci, sip, dip, p, sp, dp)	\
+	(CTF_ENAB(ci) ? (ci)->fn.ipc_delete(ci, sip, dip, p, sp, dp) : BCME_OK)
 #define ctf_ipc_count_get(ci, i) \
 	(CTF_ENAB(ci) ? (ci)->fn.ipc_count_get(ci, i) : BCME_OK)
-#define ctf_ipc_delete_multi(ci, i, im, v6)	\
-	(CTF_ENAB(ci) ? (ci)->fn.ipc_delete_multi(ci, i, im, v6) : BCME_OK)
-#define ctf_ipc_delete_range(ci, i, im, v6)	\
-	(CTF_ENAB(ci) ? (ci)->fn.ipc_delete_range(ci, i, im, v6) : BCME_OK)
-#define ctf_ipc_suspend(ci, i, im, s, v6) \
-	(CTF_ENAB(ci) ? (ci)->fn.ipc_suspend(ci, i, im, s, v6) : BCME_OK)
-#define ctf_ipc_lkup(ci, i, v6)	\
-	(CTF_ENAB(ci) ? (ci)->fn.ipc_lkup(ci, i, v6) : NULL)
-#ifdef CTF_IPV6
-#define ctf_ipc_lkup_l4proto(ci, iph, l4p)	(CTF_ENAB(ci) && (ci)->fn.ipc_lkup_l4proto? \
-	(ci)->fn.ipc_lkup_l4proto((uint8 *)iph, l4p) : NULL)
-#else
-#define ctf_ipc_lkup_l4proto(ci, iph, l4p)	(NULL)
-#endif /* CTF_IPV6 */
+#define ctf_ipc_delete_multi(ci, i, im)	\
+	(CTF_ENAB(ci) ? (ci)->fn.ipc_delete_multi(ci, i, im) : BCME_OK)
+#define ctf_ipc_delete_range(ci, i, im)	\
+	(CTF_ENAB(ci) ? (ci)->fn.ipc_delete_range(ci, i, im) : BCME_OK)
+#define ctf_ipc_lkup(ci, sip, dip, p, sp, dp)	\
+	(CTF_ENAB(ci) ? (ci)->fn.ipc_lkup(ci, sip, dip, p, sp, dp) : NULL)
 #define ctf_dev_register(ci, d, b)	\
 	(CTF_ENAB(ci) ? (ci)->fn.dev_register(ci, d, b) : BCME_OK)
 #define ctf_dev_vlan_add(ci, d, vid, vd)	\
@@ -83,10 +65,6 @@
 #define ctf_detach(ci)			if (CTF_ENAB(ci)) (ci)->fn.detach(ci)
 #define ctf_dump(ci, b)			if (CTF_ENAB(ci)) (ci)->fn.dump(ci, b)
 #define ctf_dev_unregister(ci, d)	if (CTF_ENAB(ci)) (ci)->fn.dev_unregister(ci, d)
-#ifdef CTF_L2TP
-#define ctf_l2tp_lookup(__ci__, __p__)	\
-	(CTF_ENAB((__ci__)) ? ((__ci__))->fn.l2tp_lookup((__ci__), (__p__)) : BCME_OK)
-#endif /* CTF_L2TP */
 
 #ifdef BCMDBG
 #define CTFCNTINCR(s) ((s)++)
@@ -94,7 +72,7 @@
 #define CTFCNTINCR(s)
 #endif /* BCMDBG */
 
-/* Copy an ethernet address in reverse order */
+/* copy an ethernet address in reverse order */
 #define	ether_rcopy(s, d) \
 do { \
 	((uint16 *)(d))[2] = ((uint16 *)(s))[2]; \
@@ -102,24 +80,10 @@ do { \
 	((uint16 *)(d))[0] = ((uint16 *)(s))[0]; \
 } while (0)
 
-
-#define PPPOE_ETYPE_OFFSET	12
-#define PPPOE_VER_OFFSET	14
-#define PPPOE_SESID_OFFSET	16
-#define PPPOE_LEN_OFFSET	18
-
-#define PPPOE_HLEN		20
-#define PPPOE_PPP_HLEN		8 //PPPOE + PPP HEADER LEN
-
-#define PPPOE_PROT_PPP_IP	0x0021
-#define PPPOE_PROT_PPP_IP6	0x0057
-
-
 typedef struct ctf_pub	ctf_t;
 typedef struct ctf_brc	ctf_brc_t;
 typedef struct ctf_ipc	ctf_ipc_t;
 typedef struct ctf_conn_tuple	ctf_conn_tuple_t;
-typedef struct ctf_brc_hot ctf_brc_hot_t;
 
 typedef void (*ctf_detach_cb_t)(ctf_t *ci, void *arg);
 typedef ctf_t * (*ctf_attach_t)(osl_t *osh, uint8 *name, uint32 *msg_level,
@@ -132,31 +96,22 @@ typedef int32 (*ctf_brc_add_t)(ctf_t *ci, ctf_brc_t *brc);
 typedef int32 (*ctf_brc_delete_t)(ctf_t *ci, uint8 *ea);
 typedef int32 (*ctf_brc_update_t)(ctf_t *ci, ctf_brc_t *brc);
 typedef ctf_brc_t * (*ctf_brc_lkup_t)(ctf_t *ci, uint8 *da);
-typedef int32 (*ctf_ipc_add_t)(ctf_t *ci, ctf_ipc_t *ipc, bool v6);
-typedef int32 (*ctf_ipc_delete_t)(ctf_t *ci, ctf_ipc_t *ipc, bool v6);
+typedef int32 (*ctf_ipc_add_t)(ctf_t *ci, ctf_ipc_t *ipc);
+typedef int32 (*ctf_ipc_delete_t)(ctf_t *ci, uint32 sip, uint32 dip, uint8 proto,
+                                  uint16 sp, uint16 dp);
 typedef int32 (*ctf_ipc_count_get_t)(ctf_t *ci);
-typedef int32 (*ctf_ipc_delete_multi_t)(ctf_t *ci, ctf_ipc_t *ipc,
-                                        ctf_ipc_t *ipcm, bool v6);
-typedef int32 (*ctf_ipc_delete_range_t)(ctf_t *ci, ctf_ipc_t *start,
-                                        ctf_ipc_t *end, bool v6);
-typedef int32 (*ctf_ipc_suspend_t)(ctf_t *ci, ctf_ipc_t *start,
-                                   ctf_ipc_t *end, bool suspend, bool v6);
-typedef ctf_ipc_t * (*ctf_ipc_lkup_t)(ctf_t *ci, ctf_ipc_t *ipc, bool v6);
-typedef	uint8 * (*ctf_ipc_lkup_l4proto_t)(uint8 *iph, uint8 *proto_num);
-typedef int32 (*ctf_enable_t)(ctf_t *ci, void *dev, bool enable, ctf_brc_hot_t **brc_hot);
+typedef int32 (*ctf_ipc_delete_multi_t)(ctf_t *ci, ctf_ipc_t *ipc, ctf_ipc_t *ipcm);
+typedef int32 (*ctf_ipc_delete_range_t)(ctf_t *ci, ctf_ipc_t *start, ctf_ipc_t *end);
+typedef ctf_ipc_t * (*ctf_ipc_lkup_t)(ctf_t *ci, uint32 sip, uint32 dip, uint8 proto,
+                                    uint16 sp, uint16 dp);
+typedef int32 (*ctf_enable_t)(ctf_t *ci, void *dev, bool enable);
 typedef int32 (*ctf_dev_register_t)(ctf_t *ci, void *dev, bool br);
 typedef void (*ctf_dev_unregister_t)(ctf_t *ci, void *dev);
 typedef int32 (*ctf_dev_vlan_add_t)(ctf_t *ci, void *dev, uint16 vid, void *vldev);
 typedef int32 (*ctf_dev_vlan_delete_t)(ctf_t *ci, void *dev, uint16 vid);
-#ifdef CTF_L2TP	
-typedef int32 (*ctf_l2tp_lookup_t)(ctf_t *ci, void *p);
-#endif /* CTF_L2TP */
+#if defined(BCMDBG) || defined(BCMDBG_DUMP)
 typedef void (*ctf_dump_t)(ctf_t *ci, struct bcmstrbuf *b);
-
-struct ctf_brc_hot {
-	struct ether_addr	ea;	/* Dest address */
-	ctf_brc_t		*brcp;	/* BRC entry corresp to dest mac */
-};
+#endif /* BCMDBG || BCMDBG_DUMP */
 
 typedef struct ctf_fn {
 	ctf_detach_t		detach;
@@ -172,9 +127,7 @@ typedef struct ctf_fn {
 	ctf_ipc_count_get_t	ipc_count_get;
 	ctf_ipc_delete_multi_t	ipc_delete_multi;
 	ctf_ipc_delete_range_t	ipc_delete_range;
-	ctf_ipc_suspend_t ipc_suspend;
 	ctf_ipc_lkup_t		ipc_lkup;
-	ctf_ipc_lkup_l4proto_t ipc_lkup_l4proto;
 	ctf_enable_t		enable;
 	ctf_dev_register_t	dev_register;
 	ctf_dev_unregister_t	dev_unregister;
@@ -182,10 +135,9 @@ typedef struct ctf_fn {
 	void			*detach_cb_arg;
 	ctf_dev_vlan_add_t	dev_vlan_add;
 	ctf_dev_vlan_delete_t	dev_vlan_delete;
-#ifdef CTF_L2TP		
-	ctf_l2tp_lookup_t l2tp_lookup;
-#endif /* CTF_L2TP */
+#if defined(BCMDBG) || defined(BCMDBG_DUMP)
 	ctf_dump_t		dump;
+#endif /* BCMDBG || BCMDBG_DUMP */
 } ctf_fn_t;
 
 struct ctf_pub {
@@ -200,17 +152,13 @@ struct ctf_brc {
 	void			*txifp;		/* Interface connected to host */
 	uint32			action;		/* Tag or untag the frames */
 	uint32			live;		/* Counter used to expire the entry */
+#ifdef BCMDBG
 	uint32			hits;		/* Num frames matching brc entry */
+#endif /* BCMDBG */
 };
 
-#ifdef CTF_IPV6
-#define IPADDR_U32_SZ		(IPV6_ADDR_LEN / sizeof(uint32))
-#else
-#define IPADDR_U32_SZ		1
-#endif
-
 struct ctf_conn_tuple {
-	uint32	sip[IPADDR_U32_SZ], dip[IPADDR_U32_SZ];
+	uint32	sip, dip;
 	uint16	sp, dp;
 	uint8	proto;
 };
@@ -219,13 +167,6 @@ typedef struct ctf_nat {
 	uint32	ip;
 	uint16	port;
 } ctf_nat_t;
-
-typedef struct ctf_pptp {
-	struct pptp_opt 	*pptpopt;		/*pointer to pppoe socket*/
-	uint8 	sk_pmtudisc;//iph->frag_off 
-	uint32	rt_dst_mtrc_lock_fgoff;//iph->frag_off 
-	uint32	rt_dst_mtrc_hoplmt;//iph->ttl 
-}ctf_pptp_t;
 
 struct ctf_ipc {
 	struct	ctf_ipc		*next;		/* Pointer to ipc entry */
@@ -239,60 +180,10 @@ struct ctf_ipc {
 	uint32			live;		/* Counter used to expire the entry */
 	struct	ctf_nat		nat;		/* Manip data for SNAT, DNAT */
 	struct	ether_addr	sa;		/* MAC address of sender */
-	uint16			pppoe_sid;	/*PPTP peer call id if wan type is pptp, PPPOE session ID if wan type is PPPOE*/
-#ifdef CTF_PPTP	
-	ctf_pptp_t		pptp;
-#endif
-#ifdef CTF_L2TP
-	void			*pppl2tp_tun;
-#endif
-	void			*ppp_ifp;	/* PPP interface handle */
+#ifdef BCMDBG
 	uint32			hits;		/* Num frames matching ipc entry */
+#endif /* BCMDBG */
 };
-
-struct ctf_ppp_sk {
-	struct pppox_sock 		*po;		/*pointer to pppoe socket*/
-	unsigned char			pppox_protocol;	/*0:pppoe/1:pptp*/
-	struct	ether_addr		dhost;		/*Remote MAC addr of host the pppox socket is bound to*/
-};
-
-typedef struct ctf_ppp {
-	struct ctf_ppp_sk		psk;
-	unsigned short			pppox_id;	/*PPTP peer call id if wan type is pptp, PPPOE session ID if wan type is PPPOE*/
-} ctf_ppp_t;
-
-
-#ifdef CTF_L2TP
-/* L2TP */
-struct ctf_pppol2tp_inet {
-	uint32 saddr;		/* src IP address of tunnel */
-	uint32 daddr;		/* src IP address of tunnel */
-	uint16 sport;		/* src port                 */
-	uint16 dport;		/* dst port                 */
-	uint8  protocol;    /* IP protocol              */
-	uint16 prio;		/* IP header priotity       */
-	uint8  tos;         /* IP tos                   */
-};
-
-struct ctf_pppol2tp_session
-{
-	uint16 optver;				/* option/ver field       */
-	uint16 tid;					/* Tunnel ID              */
-	uint16 sid;					/* Session ID             */
-	uint32 hdrlen;				/* l2tp pkt header length */
-	uint8  ppph[16];	        /* ppp header             */
-	uint32 ppph_len;			/* ppp header length      */
-};
-
-typedef struct ctf_pppol2tp_tunnel {
-
-	struct net_device *dev;
-	struct ctf_pppol2tp_inet inet;
-	struct ctf_pppol2tp_session session;
-} ctf_pppol2tp_tunnel_t;
-
-#endif /* CTF_L2TP */
-
 
 extern ctf_t *ctf_kattach(osl_t *osh, uint8 *name);
 extern void ctf_kdetach(ctf_t *kci);
@@ -300,36 +191,5 @@ extern ctf_attach_t ctf_attach_fn;
 extern ctf_t *_ctf_attach(osl_t *osh, uint8 *name, uint32 *msg_level,
                           ctf_detach_cb_t cb, void *arg);
 extern ctf_t *kcih;
-
-/* Hot bridge cache lkup */
-#define MAXBRCHOT		4
-#define MAXBRCHOTIF		4
-#define CTF_BRC_HOT_HASH(da) 	((((uint8 *)da)[4] ^ ((uint8 *)da)[5]) & (MAXBRCHOT - 1))
-#define CTF_HOTBRC_CMP(hbrc, da, rxifp) \
-({ \
-	ctf_brc_hot_t *bh = (hbrc) + CTF_BRC_HOT_HASH(da); \
-	((eacmp((bh)->ea.octet, (da)) == 0) && (bh->brcp->txifp != (rxifp))); \
-})
-
-/* Header prep for packets matching hot bridge cache entry */
-#define CTF_HOTBRC_L2HDR_PREP(osh, hbrc, prio, data, p) \
-do { \
-	uint8 *l2h; \
-	ctf_brc_hot_t *bh = (hbrc) + CTF_BRC_HOT_HASH(data); \
-	ASSERT(*(uint16 *)((data) + VLAN_TPID_OFFSET) == HTON16(ETHER_TYPE_8021Q)); \
-	if (bh->brcp->action & CTF_ACTION_UNTAG) { \
-		/* Remove vlan header */ \
-		l2h = PKTPULL((osh), (p), VLAN_TAG_LEN); \
-		ether_rcopy(l2h - VLAN_TAG_LEN + ETHER_ADDR_LEN, \
-		            l2h + ETHER_ADDR_LEN); \
-		ether_rcopy(l2h - VLAN_TAG_LEN, l2h); \
-	} else { \
-		/* Update vlan header */ \
-		l2h = (data); \
-		*(uint16 *)(l2h + VLAN_TCI_OFFSET) = \
-		            HTON16((prio) << VLAN_PRI_SHIFT | bh->brcp->vid); \
-	} \
-} while (0)
-
 
 #endif /* _HNDCTF_H_ */

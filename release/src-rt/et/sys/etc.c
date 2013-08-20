@@ -3,23 +3,16 @@
  * Broadcom Home Networking Division 10/100 Mbit/s Ethernet
  * Device Driver.
  *
- * Copyright (C) 2012, Broadcom Corporation. All Rights Reserved.
+ * Copyright (C) 2010, Broadcom Corporation
+ * All Rights Reserved.
  * 
- * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
- * SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
- * OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
- * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- * $Id: etc.c 346087 2012-07-20 01:04:13Z $
+ * This is UNPUBLISHED PROPRIETARY SOURCE CODE of Broadcom Corporation;
+ * the contents of this file may not be disclosed to third parties, copied
+ * or duplicated in any form, in whole or in part, without the prior
+ * written permission of Broadcom Corporation.
+ * $Id: etc.c,v 1.119.2.2 2010-07-01 23:25:01 Exp $
  */
 
-#include <et_cfg.h>
 #include <typedefs.h>
 #include <osl.h>
 #include <bcmendian.h>
@@ -51,7 +44,9 @@ uint32 et_msg_level =
 
 /* local prototypes */
 static void etc_loopback(etc_info_t *etc, int on);
+#ifdef BCMDBG
 static void etc_dumpetc(etc_info_t *etc, struct bcmstrbuf *b);
+#endif /* BCMDBG */
 
 /* 802.1d priority to traffic class mapping. queues correspond one-to-one
  * with traffic classes.
@@ -125,11 +120,6 @@ etc_attach(void *et, uint vendor, uint device, uint unit, void *osh, void *regsv
 	etc->forcespeed = ET_AUTO;
 	etc->linkstate = FALSE;
 
-#ifdef PKTC
-	/* initialize default pktc values */
-	etc->pktcbnd = MAX(PKTCBND, RXBND);
-#endif
-
 	/* set chip opsvec */
 	etc->chops = etc_chipmatch(vendor, device);
 	ASSERT(etc->chops);
@@ -200,7 +190,7 @@ etc_up(etc_info_t *etc)
 {
 	etc->up = TRUE;
 
-	et_init(etc->et, ET_INIT_FULL | ET_INIT_INTRON );
+	et_init(etc->et, ET_INIT_DEF_OPTIONS);
 }
 
 /* mark interface down */
@@ -231,19 +221,19 @@ int
 etc_iovar(etc_info_t *etc, uint cmd, uint set, void *arg)
 {
 	int error;
-	uint *vecarg;
 #if defined(ETROBO) && !defined(_CFE_)
 	int i;
+	uint *vecarg;
 	robo_info_t *robo = etc->robo;
 #endif /* ETROBO && _CFE_ */
 
 	error = 0;
-	vecarg = (uint *)arg;
 	ET_TRACE(("et%d: etc_iovar: cmd 0x%x\n", etc->unit, cmd));
 
 	switch (cmd) {
 #if defined(ETROBO) && !defined(_CFE_)
 		case IOV_ET_POWER_SAVE_MODE:
+			vecarg = (uint *)arg;
 			if (set)
 				error = robo_power_save_mode_set(robo, vecarg[1], vecarg[0]);
 			else {
@@ -262,15 +252,6 @@ etc_iovar(etc_info_t *etc, uint cmd, uint set, void *arg)
 				}
 			}
 			break;
-
-		case IOV_ET_ROBO_DEVID:
-			error = -1;
-
-			if (robo != NULL) {
-				*vecarg = robo->devid;
-				error = 0;
-			}
-			break;
 #endif /* ETROBO && !_CFE_ */
 #ifdef BCMDBG
 		case IOV_ET_CLEAR_DUMP:
@@ -283,37 +264,6 @@ etc_iovar(etc_info_t *etc, uint cmd, uint set, void *arg)
 			}
 			break;
 #endif /* BCMDBG */
-		case IOV_PKTC:
-			if (set)
-				etc->pktc = *vecarg;
-			else
-				*vecarg = (uint)etc->pktc;
-			break;
-
-		case IOV_PKTCBND:
-			if (set)
-				etc->pktcbnd = MAX(*vecarg, 32);
-			else
-				*vecarg = etc->pktcbnd;
-			break;
-
-		case IOV_COUNTERS:
-			{
-				struct bcmstrbuf b;
-				bcm_binit(&b, (char*)arg, IOCBUFSZ);
-				etc_dumpetc(etc, &b);
-			}
-			break;
-
-#ifdef HNDCTF
-		case IOV_DUMP_CTF:
-			{
-				struct bcmstrbuf b;
-				bcm_binit(&b, (char*)arg, IOCBUFSZ);
-				et_dump_ctf(etc->et, &b);
-			}
-			break;
-#endif /* HNDCTF */
 
 		default:
 			error = -1;
@@ -351,12 +301,12 @@ etc_ioctl(etc_info_t *etc, int cmd, void *arg)
 
 	case ETCDUMP:
 		if (et_msg_level & 0x10000)
-			bcmdumplog((char *)arg, IOCBUFSZ);
+			bcmdumplog((char *)arg, 4096);
 #ifdef BCMDBG
 		else
 		{
 			struct bcmstrbuf b;
-			bcm_binit(&b, (char*)arg, IOCBUFSZ);
+			bcm_binit(&b, (char*)arg, 4096);
 			et_dump(etc->et, &b);
 		}
 #endif /* BCMDBG */
@@ -414,7 +364,7 @@ etc_ioctl(etc_info_t *etc, int cmd, void *arg)
 			etc->needautoneg = FALSE;
 		}
 
-		et_init(etc->et, ET_INIT_INTRON);
+		et_init(etc->et, ET_INIT_DEF_OPTIONS);
 		break;
 
 	case ETCPHYRD:
@@ -443,10 +393,8 @@ etc_ioctl(etc_info_t *etc, int cmd, void *arg)
 			(*etc->chops->phywr)(etc->ch, etc->phyaddr, vec[0], (uint16)vec[1]);
 #ifdef ETROBO
 			/* Invalidate current robo page */
-			if (etc->robo && etc->phyaddr == EPHY_NOREG && vec[0] == 0x10) {
-				uint16 page = (*etc->chops->phyrd)(etc->ch, EPHY_NOREG, 0x10);
-				((robo_info_t *)etc->robo)->page = (page == 0xffff) ? -1 : (page >> 8);
-			}
+			if (etc->robo && etc->phyaddr == EPHY_NOREG && vec[0] == 0x10)
+				((robo_info_t *)etc->robo)->page = -1;
 #endif
 		}
 		break;
@@ -460,10 +408,8 @@ etc_ioctl(etc_info_t *etc, int cmd, void *arg)
 				(*etc->chops->phywr)(etc->ch, phyaddr, reg, (uint16)vec[1]);
 #ifdef ETROBO
 				/* Invalidate current robo page */
-				if (etc->robo && phyaddr == EPHY_NOREG && reg == 0x10) {
-					uint16 page = (*etc->chops->phyrd)(etc->ch, EPHY_NOREG, 0x10);
-					((robo_info_t *)etc->robo)->page = (page == 0xffff) ? -1 : (page >> 8);
-				}
+				if (etc->robo && phyaddr == EPHY_NOREG && reg == 0x10)
+					((robo_info_t *)etc->robo)->page = -1;
 #endif
 				ET_TRACE(("etc_ioctl: ETCPHYWR2 to phy 0x%x, reg 0x%x <= 0x%x\n",
 				          phyaddr, reg, vec[1]));
@@ -519,23 +465,15 @@ etc_watchdog(etc_info_t *etc)
 {
 	uint16 status;
 	uint16 lpa;
-#if defined(ETROBO)
-	robo_info_t *robo = (robo_info_t *)etc->robo;
-#endif
 #if defined(ETROBO) && !defined(_CFE_)
+	robo_info_t *robo = (robo_info_t *)etc->robo;
 	static uint32 sleep_timer = PWRSAVE_SLEEP_TIME, wake_timer;
 #endif /* ETROBO && !_CFE_ */
 
 	etc->now++;
 
-#if defined(ETROBO)
-	/* BCM53125 EEE IOP WAR for some other vendor's wrong EEE implementation. */
-	if (robo)
-		robo_watchdog(robo);
-#endif
-
 #if defined(ETROBO) && !defined(_CFE_)
-	/* Every PWRSAVE_WAKE_TIME sec the phys that are in manual mode
+	/* Every PWRSAVE_WAKE_TIME sec the phys that are in manual mode 
 	 * is taken out of that mode and link status is checked after
 	 * PWRSAVE_SLEEP_TIME sec to see if any of the links is up
 	 * to take that port is taken out of the manual power save mode
@@ -655,7 +593,7 @@ etc_loopback(etc_info_t *etc, int on)
 	ET_TRACE(("et%d: etc_loopback: %d\n", etc->unit, on));
 
 	etc->loopbk = (bool) on;
-	et_init(etc->et, ET_INIT_INTRON);
+	et_init(etc->et, ET_INIT_DEF_OPTIONS);
 }
 
 void
@@ -664,7 +602,7 @@ etc_promisc(etc_info_t *etc, uint on)
 	ET_TRACE(("et%d: etc_promisc: %d\n", etc->unit, on));
 
 	etc->promisc = (bool) on;
-	et_init(etc->et, ET_INIT_INTRON);
+	et_init(etc->et, ET_INIT_DEF_OPTIONS);
 }
 
 void
@@ -673,7 +611,7 @@ etc_qos(etc_info_t *etc, uint on)
 	ET_TRACE(("et%d: etc_qos: %d\n", etc->unit, on));
 
 	etc->qos = (bool) on;
-	et_init(etc->et, ET_INIT_INTRON);
+	et_init(etc->et, ET_INIT_DEF_OPTIONS);
 }
 
 /* WAR: BCM53115 switch is not retaining the tag while forwarding
@@ -763,7 +701,6 @@ etc_dump(etc_info_t *etc, struct bcmstrbuf *b)
 	etc_dumpetc(etc, b);
 	(*etc->chops->dump)(etc->ch, b);
 }
-#endif /* BCMDBG */
 
 static void
 etc_dumpetc(etc_info_t *etc, struct bcmstrbuf *b)
@@ -820,21 +757,9 @@ etc_dumpetc(etc_info_t *etc, struct bcmstrbuf *b)
 	               etc->rxnobuf, etc->rxdmauflo, etc->rxoflo, etc->rxbadlen,
 	               etc->rxgiants, etc->rxoflodiscards);
 
-	bcm_bprintf(b, "chained %d unchained %d maxchainsz %d currchainsz %d\n",
-	               etc->chained, etc->unchained, etc->maxchainsz, etc->currchainsz);
-
-#if defined(BCMDBG) && defined(PKTC)
-	bcm_bprintf(b, "chain sz histo:");
-	for (i = 0; i < PKTCBND && etc->chained; i++) {
-		bcm_bprintf(b, "  %d(%d%%)", etc->chainsz[i],
-		            (etc->chainsz[i] * 100) / etc->chained);
-		if (((i % 8) == 7) && (i != PKTCBND - 1))
-			bcm_bprintf(b, "\n              :");
-	}
-#endif
-
 	bcm_bprintf(b, "\n");
 }
+#endif /* BCMDBG */
 
 uint
 etc_totlen(etc_info_t *etc, void *p)
