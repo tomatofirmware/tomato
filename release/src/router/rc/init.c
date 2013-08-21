@@ -1302,10 +1302,8 @@ static int init_nvram(void)
 
 			// fix WL mac`s
 			strcpy(s, nvram_safe_get("et0macaddr"));
-			inc_mac(s, +2);
-			nvram_set("wl0_hwaddr", s);
-			inc_mac(s, +1);
-			nvram_set("wl1_hwaddr", s);
+			nvram_set("wl0_hwaddr", nvram_safe_get("0:macaddr"));
+			nvram_set("wl1_hwaddr", nvram_safe_get("1:macaddr"));
 
 //			nvram_set("wl0_phytype", "h");
 //			nvram_set("wl0_phytypes", "h");
