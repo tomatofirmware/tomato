@@ -22,13 +22,6 @@
 #define sin_addr(s) (((struct sockaddr_in *)(s))->sin_addr)
 
 extern int doSystem(char *fmt, ...);
-/*
- * Waits for a file descriptor to become available for reading or unblocked signal
- * @param       fd      file descriptor
- * @param       timeout seconds to wait before timing out or 0 for no timeout
- * @return      1 if descriptor changed status or 0 if timed out or -1 on error
- */
-extern int waitfor(int fd, int timeout);
 
 /*
  * Evaluate cmds using taskset while SMP.
@@ -65,6 +58,14 @@ extern char * fd2str(int fd);
  * @return	contents of file or NULL if an error occurred
  */
 extern char * file2str(const char *path);
+/*
+ * Waits for a file descriptor to become available for reading or unblocked signal
+ * @param       fd      file descriptor
+ * @param       timeout seconds to wait before timing out or 0 for no timeout
+ * @return      1 if descriptor changed status or 0 if timed out or -1 on error
+ */
+//extern int waitfor(int fd, int timeout);
+
 #endif
 
 /* 
@@ -165,19 +166,6 @@ static inline char * strcat_r(const char *s1, const char *s2, char *buf)
 	char *argv[] = { cmd, ## args, NULL }; \
 	_eval(argv, NULL, 0, NULL); \
 ))
-#endif
-#else
-#ifdef CONFIG_BCMWL6
-#define eval(cmd, args...) ({ \
-	char * const argv[] = { cmd, ## args, NULL }; \
-	_eval(argv, ">/dev/console", 0, NULL); \
-})
-#else
-#define eval(cmd, args...) ({ \
-	char *argv[] = { cmd, ## args, NULL }; \
-	_eval(argv, ">/dev/console", 0, NULL); \
-))
-#endif
 #endif
 
 #ifdef CONFIG_BCMWL6
