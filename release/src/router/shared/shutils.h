@@ -165,7 +165,7 @@ static inline char * strcat_r(const char *s1, const char *s2, char *buf)
 #define eval(cmd, args...) ({ \
 	char *argv[] = { cmd, ## args, NULL }; \
 	_eval(argv, NULL, 0, NULL); \
-))
+})
 #endif
 
 #ifdef CONFIG_BCMWL6
