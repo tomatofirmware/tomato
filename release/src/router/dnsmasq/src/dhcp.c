@@ -70,11 +70,11 @@ static int make_fd(int port)
      support it. This handles the introduction of REUSEPORT on Linux. */
   if (option_bool(OPT_NOWILD) || option_bool(OPT_CLEVERBIND))
     {
-	int rc = 0;
+      int rc = 0;
 
 #ifdef SO_REUSEPORT
       if ((rc = setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &oneopt, sizeof(oneopt))) == -1 && 
-	errno == ENOPROTOOPT)
+	  errno == ENOPROTOOPT)
 	rc = 0;
 #endif
       

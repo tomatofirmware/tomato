@@ -132,11 +132,12 @@ struct myoption {
 #ifdef OPTION6_PREFIX_CLASS 
 #define LOPT_PREF_CLSS 321
 #endif
+#define LOPT_FAST_RA   322
 
 #ifdef HAVE_QUIET_DHCP //Originally TOMATO option
-#define LOPT_QUIET_DHCP 322
-#define LOPT_QUIET_DHCP6 323
-#define LOPT_QUIET_RA 324
+#define LOPT_QUIET_DHCP 323
+#define LOPT_QUIET_DHCP6 324
+#define LOPT_QUIET_RA 325
 #endif
 
 #ifdef HAVE_GETOPT_LONG
@@ -213,7 +214,7 @@ static const struct myoption opts[] =
     { "dns-forward-max", 1, 0, '0' },
     { "clear-on-reload", 0, 0, LOPT_RELOAD },
     { "dhcp-ignore-names", 2, 0, LOPT_NO_NAMES },
-    { "enable-tftp", 0, 0, LOPT_TFTP },
+    { "enable-tftp", 2, 0, LOPT_TFTP },
     { "tftp-secure", 0, 0, LOPT_SECURE },
     { "tftp-unique-root", 0, 0, LOPT_APREF },
     { "tftp-root", 1, 0, LOPT_PREFIX },
@@ -275,6 +276,7 @@ static const struct myoption opts[] =
 #ifdef OPTION6_PREFIX_CLASS 
     { "dhcp-prefix-class", 1, 0, LOPT_PREF_CLSS },
 #endif
+    { "force-fast-ra", 0, 0, LOPT_FAST_RA },
 #ifdef HAVE_QUIET_DHCP //Originally TOMATO option
     { "quiet-dhcp", 0, 0, LOPT_QUIET_DHCP },
     { "quiet-dhcp6", 0, 0, LOPT_QUIET_DHCP6 },
@@ -377,7 +379,7 @@ static struct {
   { LOPT_RELOAD, OPT_RELOAD, NULL, gettext_noop("Clear DNS cache when reloading %s."), RESOLVFILE },
   { LOPT_NO_NAMES, ARG_DUP, "[=tag:<tag>]...", gettext_noop("Ignore hostnames provided by DHCP clients."), NULL },
   { LOPT_OVERRIDE, OPT_NO_OVERRIDE, NULL, gettext_noop("Do NOT reuse filename and server fields for extra DHCP options."), NULL },
-  { LOPT_TFTP, OPT_TFTP, NULL, gettext_noop("Enable integrated read-only TFTP server."), NULL },
+  { LOPT_TFTP, ARG_DUP, "[=<intr>[,<intr>]]", gettext_noop("Enable integrated read-only TFTP server."), NULL },
   { LOPT_PREFIX, ARG_DUP, "<dir>[,<iface>]", gettext_noop("Export files by TFTP only from the specified subtree."), NULL },
   { LOPT_APREF, OPT_TFTP_APREF, NULL, gettext_noop("Add client IP address to tftp-root."), NULL },
   { LOPT_SECURE, OPT_TFTP_SECURE, NULL, gettext_noop("Allow access only to files owned by the user running dnsmasq."), NULL },
@@ -408,6 +410,7 @@ static struct {
   { LOPT_CONNTRACK, OPT_CONNTRACK, NULL, gettext_noop("Copy connection-track mark from queries to upstream connections."), NULL },
   { LOPT_FQDN, OPT_FQDN_UPDATE, NULL, gettext_noop("Allow DHCP clients to do their own DDNS updates."), NULL },
   { LOPT_RA, OPT_RA, NULL, gettext_noop("Send router-advertisements for interfaces doing DHCPv6"), NULL },
+  { LOPT_FAST_RA, OPT_FAST_RA, NULL, gettext_noop("Always send frequent router-advertisements"), NULL },
   { LOPT_DUID, ARG_ONE, "<enterprise>,<duid>", gettext_noop("Specify DUID_EN-type DHCPv6 server DUID"), NULL },
   { LOPT_HOST_REC, ARG_DUP, "<name>,<address>", gettext_noop("Specify host (A/AAAA and PTR) records"), NULL },
   { LOPT_RR, ARG_DUP, "<name>,<RR-number>,[<data>]", gettext_noop("Specify arbitrary DNS resource record"), NULL },
@@ -1671,7 +1674,7 @@ static int one_opt(int option, char *arg, char *errstr, char *gen_err, int comma
 
     case  LOPT_AUTHSOA: /* --auth-soa */
       comma = split(arg);
-      atoi_check(arg, (int *)&daemon->soa_sn);
+      daemon->soa_sn = (u32)atoi(arg);
       if (comma)
 	{
 	  char *cp;
@@ -1686,17 +1689,17 @@ static int one_opt(int option, char *arg, char *errstr, char *gen_err, int comma
 	    {
 	      arg = comma;
 	      comma = split(arg); 
-	      atoi_check(arg, (int *)&daemon->soa_refresh);
+	      daemon->soa_refresh = (u32)atoi(arg);
 	      if (comma)
 		{
 		  arg = comma;
 		  comma = split(arg); 
-		  atoi_check(arg, (int *)&daemon->soa_retry);
+		  daemon->soa_retry = (u32)atoi(arg);
 		  if (comma)
 		    {
 		      arg = comma;
 		      comma = split(arg); 
-		      atoi_check(arg, (int *)&daemon->soa_expiry);
+		      daemon->soa_expiry = (u32)atoi(arg);
 		    }
 		}
 	    }
@@ -1917,6 +1920,12 @@ static int one_opt(int option, char *arg, char *errstr, char *gen_err, int comma
       } while (arg);
       break;
       
+    case LOPT_TFTP: /* --enable-tftp */
+      set_option_bool(OPT_TFTP);
+      if (!arg)
+	break;
+      /* fall through */
+
     case 'I':  /* --except-interface */
     case '2':  /* --no-dhcp-interface */
       do {
@@ -1927,6 +1936,11 @@ static int one_opt(int option, char *arg, char *errstr, char *gen_err, int comma
 	  {
 	    new->next = daemon->if_except;
 	    daemon->if_except = new;
+	  }
+	else if (option == LOPT_TFTP)
+	   {
+	    new->next = daemon->tftp_interfaces;
+	    daemon->tftp_interfaces = new;
 	  }
 	else
 	  {
@@ -2403,11 +2417,9 @@ static int one_opt(int option, char *arg, char *errstr, char *gen_err, int comma
 	  {
 	    new->prefix = 64; /* default */
 	    new->end6 = new->start6;
-	    
-	    /* dhcp-range=:: enables DHCP stateless on any interface */
-	    if (IN6_IS_ADDR_UNSPECIFIED(&new->start6))
-	      new->prefix = 0;
-	    
+	    new->next = daemon->dhcp6;
+	    daemon->dhcp6 = new;
+
 	    for (leasepos = 1; leasepos < k; leasepos++)
 	      {
 		if (strcmp(a[leasepos], "static") == 0)
@@ -2433,10 +2445,7 @@ static int one_opt(int option, char *arg, char *errstr, char *gen_err, int comma
 		else  
 		  break;
 	      }
-	    
-	    new->next = daemon->dhcp6;
-	    daemon->dhcp6 = new;
-	    	     
+	   	    	     
 	    /* bare integer < 128 is prefix value */
 	    if (leasepos < k)
 	      {
@@ -2448,20 +2457,35 @@ static int one_opt(int option, char *arg, char *errstr, char *gen_err, int comma
 		  {
 		    new->prefix = pref;
 		    leasepos++;
-		    if (new->prefix != 64)
-		      {
-			if ((new->flags & (CONTEXT_RA_ONLY | CONTEXT_RA_NAME | CONTEXT_RA_STATELESS)))
-			  ret_err(_("prefix must be exactly 64 for RA subnets"));
-			else if (new->template_interface)
-			  ret_err(_("prefix must be exactly 64 for subnet constructors"));
-		      }
-		    if (new->prefix < 64)
-		      ret_err(_("prefix must be at least 64"));
 		  }
 	      }
 	    
+	    if (new->prefix != 64)
+	      {
+		if ((new->flags & (CONTEXT_RA_ONLY | CONTEXT_RA_NAME | CONTEXT_RA_STATELESS)))
+		  ret_err(_("prefix length must be exactly 64 for RA subnets"));
+		else if (new->flags & CONTEXT_TEMPLATE)
+		  ret_err(_("prefix length must be exactly 64 for subnet constructors"));
+	      }
+
+	    if (new->prefix < 64)
+	      ret_err(_("prefix length must be at least 64"));
+	    
 	    if (!is_same_net6(&new->start6, &new->end6, new->prefix))
 	      ret_err(_("inconsistent DHCPv6 range"));
+
+	    /* dhcp-range=:: enables DHCP stateless on any interface */
+	    if (IN6_IS_ADDR_UNSPECIFIED(&new->start6) && !(new->flags & CONTEXT_TEMPLATE))
+	      new->prefix = 0;
+	    
+	    if (new->flags & CONTEXT_TEMPLATE)
+	      {
+		struct in6_addr zero;
+		memset(&zero, 0, sizeof(zero));
+		if (!is_same_net6(&zero, &new->start6, new->prefix))
+		  ret_err(_("prefix must be zero with \"constructor:\" argument"));
+	      }
+	    
 	    if (addr6part(&new->start6) > addr6part(&new->end6))
 	      {
 		struct in6_addr tmp = new->start6;

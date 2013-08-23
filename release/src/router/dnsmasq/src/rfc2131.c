@@ -615,7 +615,7 @@ size_t dhcp_reply(struct dhcp_context *context, char *iface_name, int int_index,
       return message ? 0 : dhcp_packet_size(mess, agent_id, real_end);
     }
       
-  if ((opt = option_find(mess, sz, OPTION_CLIENT_FQDN, 4)))
+  if ((opt = option_find(mess, sz, OPTION_CLIENT_FQDN, 3)))
     {
       /* http://tools.ietf.org/wg/dhc/draft-ietf-dhc-fqdn-option/draft-ietf-dhc-fqdn-option-10.txt */
       int len = option_len(opt);
@@ -645,7 +645,7 @@ size_t dhcp_reply(struct dhcp_context *context, char *iface_name, int int_index,
 	}
       
       if (fqdn_flags & 0x04)
-	while (*op != 0 && ((op + (*op) + 1) - pp) < len)
+	while (*op != 0 && ((op + (*op)) - pp) < len)
 	  {
 	    memcpy(pq, op+1, *op);
 	    pq += *op;
@@ -848,8 +848,16 @@ size_t dhcp_reply(struct dhcp_context *context, char *iface_name, int int_index,
 	      
 	      if (tmp)
 		{
-		  struct dhcp_boot *boot = find_boot(tagif_netid);
-		
+		  struct dhcp_boot *boot;
+		  
+		  if (tmp->netid.net)
+		    {
+		      tmp->netid.next = netid;
+		      tagif_netid = run_tag_if(&tmp->netid);
+		    }
+		  
+		  boot = find_boot(tagif_netid);
+		  
 		  mess->yiaddr.s_addr = 0;
 		  if  (mess_type == DHCPDISCOVER || mess->ciaddr.s_addr == 0)
 		    {
@@ -1409,8 +1417,8 @@ size_t dhcp_reply(struct dhcp_context *context, char *iface_name, int int_index,
 	  lease->hostname)
 	hostname = lease->hostname;
       
-      if (!hostname && (hostname = host_from_dns(mess->ciaddr)))
-	domain = get_domain(mess->ciaddr);
+      if (!hostname)
+	hostname = host_from_dns(mess->ciaddr);
       
       if (context && context->netid.net)
 	{
@@ -1560,7 +1568,6 @@ static void log_packet(char *type, void *addr, unsigned char *ext_mac,
 		       int mac_len, char *interface, char *string, u32 xid)
 {
   struct in_addr a;
-
  
   /* addr may be misaligned */
   if (addr)
@@ -1861,7 +1868,8 @@ static int do_opt(struct dhcp_opt *opt, unsigned char *p, struct dhcp_context *c
 	    }
 	}
       else
-	memcpy(p, opt->val, len);
+	/* empty string may be extended to "\0" by null_term */
+	memcpy(p, opt->val ? opt->val : (unsigned char *)"", len);
     }  
   return len;
 }
@@ -2317,7 +2325,9 @@ static void do_options(struct dhcp_context *context,
 
 	  if (domain)
 	    len += strlen(domain) + 1;
-	  
+	  else if (fqdn_flags & 0x04)
+	    len--;
+
 	  if ((p = free_space(mess, end, OPTION_CLIENT_FQDN, len)))
 	    {
 	      *(p++) = fqdn_flags & 0x0f; /* MBZ bits to zero */ 
@@ -2328,8 +2338,10 @@ static void do_options(struct dhcp_context *context,
 		{
 		  p = do_rfc1035_name(p, hostname);
 		  if (domain)
-		    p = do_rfc1035_name(p, domain);
-		  *p++ = 0;
+		    {
+		      p = do_rfc1035_name(p, domain);
+		      *p++ = 0;
+		    }
 		}
 	      else
 		{
