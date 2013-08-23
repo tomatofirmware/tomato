@@ -39,7 +39,11 @@ include ./target.mak
 V1 ?= "--def"
 VPN ?= "VPN"
 ifeq ($(CONFIG_LINUX26),y)
+ifeq ($(CONFIG_BCMWL6),y)
+ND = "K26AC"
+else
 ND = "K26"
+endif
 else
 ND = "ND"
 endif
