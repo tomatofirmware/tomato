@@ -1063,9 +1063,10 @@ const defaults_t defaults[] = {
 	{ "NC_BridgeLAN",			"br0"			},
 #endif
 #endif
-//NGinx X Roadkill
+//NGinx X Roadkill-Victek
 #ifdef TCONFIG_NGINX
 	{"nginx_enable",		"0"				}, // NGinX enabled
+	{"nginx_keepconf",		"0"				}, // Enable/disable keep configuration files unmodified in /etc/nginx
 	{"nginx_docroot",		"/www"				}, // path for server files
 	{"nginx_port",			"85"				}, // port to listen
 	{"nginx_fqdn",			"Tomato.RAF"			}, // server name

@@ -34,7 +34,7 @@
 <script type='text/javascript' src='debug.js'></script>
 <script type='text/javascript'>
 
-//	<% nvram("nginx_enable,nginx_port,nginx_fqdn,nginx_docroot,nginx_priority,nginx_custom"); %>
+//	<% nvram("nginx_enable,nginx_keepconf,nginx_port,nginx_fqdn,nginx_docroot,nginx_priority,nginx_custom"); %>
 
 changed = 0;
 nginxup = parseInt ('<% psup("nginx"); %>');
@@ -58,6 +58,7 @@ function verifyFields(focused, quiet)
 	var a, b, c;
 	var i;
 	var vis = {
+			_f_nginx_keepconf : 1,
 			_f_nginx_port : 1,
 			_f_nginx_fqdn : 1,
 			_f_nginx_docroot : 1,
@@ -70,14 +71,14 @@ function verifyFields(focused, quiet)
 			vis[i] = 2;
 		}
 	}
-
+	
 	for (a in vis) {
 		b = E(a);
 		c = vis[a];
 		b.disabled = (c != 1);
 		PR(b).style.display = c ? '' : 'none';
 	}
-
+	
 	if (!v_port('_f_nginx_port', quiet))
 	{
 		ok = 0;
@@ -101,8 +102,9 @@ function save()
 
 	var en = fom.f_nginx_enable.checked;
 	fom.nginx_enable.value = en ? 1 : 0;
-
+	
 	if (en) {
+	fom.nginx_keepconf.value = fom.f_nginx_keepconf.checked ? 1 : 0;
 	fom.nginx_port.value = fom.f_nginx_port.value;
 	fom.nginx_fqdn.value = fom.f_nginx_fqdn.value;
 	fom.nginx_docroot.value = fom.f_nginx_docroot.value;
@@ -142,7 +144,7 @@ function save()
 </div>
 </div>
 
-<div class='section-title'>WEB Server Management</div>
+<div class='section-title'>WEB Server Settings</div>
 <div class='section' id='config-section'>
 <form id='_fom' method='post' action='tomato.cgi'>
 <input type='hidden' name='_nextpage' value='nginx.asp'>
@@ -151,6 +153,7 @@ function save()
 <input type='hidden' name='_reboot' value='0'>
 
 <input type='hidden' name='nginx_enable'>
+<input type='hidden' name='nginx_keepconf'>
 <input type='hidden' name='nginx_port'>
 <input type='hidden' name='nginx_fqdn'>
 <input type='hidden' name='nginx_docroot'>
@@ -160,6 +163,7 @@ function save()
 <script type='text/javascript'>
 createFieldTable('', [
 	{ title: 'Enable Server on Start', name: 'f_nginx_enable', type: 'checkbox', value: (nvram.nginx_enable != '0') },
+	{ title: 'Keep Config Files', name: 'f_nginx_keepconf', type: 'checkbox', value: (nvram.nginx_keepconf != '0') },
 	{ title: 'Web Server Port', name: 'f_nginx_port', type: 'text', maxlen: 5, size: 7, value: fixPort(nvram.nginx_port, 85), suffix: '<small> default: 85</small>' },
 	{ title: 'Web Server Name', name: 'f_nginx_fqdn', type: 'text', maxlen: 255, size: 20, value: nvram.nginx_fqdn },
 	{ title: 'Server Root Path', name: 'f_nginx_docroot', type: 'text', maxlen: 255, size: 40, value: nvram.nginx_docroot, suffix: '<span>&nbsp;/index.html / index.htm / index.php</span>' },
@@ -178,9 +182,9 @@ createFieldTable('', [
 <li><b>Note: This Feature is in Beta test, please test and report any bug you may find.</b>
 <br> 
 <br>
-<li><b> Status Button:</b> Start-Stop service for test. Enable Web Server must be checked<br>
-to change the settings, then save and Toggle the upper button.<br>
+<li><b> Status Button:</b> Quick Start-Stop Service. Enable Web Server must be checked to modify settings.<br>
 <li><b> Enable Server on Start:</b> To activate the Web Server tick and save this screen.<br>
+<li><b> Keep Config Files:</b> Did you modifed manualy the configuration files? OK, Tick it and changes will be maintained.<br> 
 <li><b> Web Server Port:</b> The Port used by the Web Server to be accessed.<br>
 <li><b> Web Server Name:</b> Name that will appear on top of your Internet Browser.<br>
 <li><b> Document Root Path:</b> The path in your router where documents are stored.<br>
