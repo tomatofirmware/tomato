@@ -29,6 +29,7 @@
 #include <arpa/inet.h>
 #include <dirent.h>
 
+static int web_lanport;
 wanface_list_t wanfaces;
 char lanface[IFNAMSIZ + 1];
 #ifdef TCONFIG_VLAN
@@ -143,7 +144,11 @@ void enable_ip_forward(void)
 	*/
 	f_write_string("/proc/sys/net/ipv4/ip_forward", "1", 0, 0);
 
+}
+
 #ifdef TCONFIG_IPV6
+void enable_ip6_forward(void)
+{
 	if (ipv6_enabled()) {
 		f_write_string("/proc/sys/net/ipv6/conf/default/forwarding", "1", 0, 0);
 		f_write_string("/proc/sys/net/ipv6/conf/all/forwarding", "1", 0, 0);
@@ -154,7 +159,6 @@ void enable_ip_forward(void)
 	}
 }
 #endif
-
 
 
 // -----------------------------------------------------------------------------
@@ -443,7 +447,9 @@ static void ipt_account(void) {
 	// If the IP Address changes, the below rule will cause things to choke, and blocking rules don't get applied
 	// As a workaround, flush the entire FORWARD chain
 	system("iptables -F FORWARD");
-
+#ifdef TCONFIG_IPV6
+	system("ip6tables -F FORWARD");
+#endif
 	for(br=0 ; br<=3 ; br++) {
 		char bridge[2] = "0";
 		if (br!=0)
@@ -551,6 +557,7 @@ static void ipt_webmon()
 #else
 	modprobe("ipt_webmon");
 #endif
+
 }
 
 
@@ -719,24 +726,34 @@ static void nat_table(void)
 						lan3addr);
 #endif
 			}
-/*
-#ifdef TCONFIG_NGINX
-		if (wanup) {
-			if (nvram_match("nginx_enable", "1")) {
-				ipt_write("-A PREROUTING -p tcp -s %s/%s ! -d %s/%s --dport 80 -j DNAT --to-destination %s\n",
-					lanaddr, lanmask,
-					lanaddr, lanmask,
-					lanaddr);
-				ipt_write("-A PREROUTING -p tcp -s %s/%s ! -d %s/%s --dport 44380 -j DNAT --to-destination %s\n",
-					lanaddr, lanmask,
-					lanaddr, lanmask,
-					lanaddr);
-			}
-		}
-#endif
-*/
+
 			// ICMP packets are always redirected to INPUT chains
 			ipt_write("-A %s -p icmp -j DNAT --to-destination %s\n", chain_wan_prerouting, lanaddr);
+
+
+			//force remote access to router if DMZ is enabled - shibby
+			if( (nvram_match("dmz_enable", "1")) && (nvram_match("dmz_ra", "1")) ) {
+				strlcpy(t, nvram_safe_get("rmgt_sip"), sizeof(t));
+				p = t;
+				do {
+					if ((c = strchr(p, ',')) != NULL) *c = 0;
+					ipt_source(p, src, "ra", NULL);
+
+					if (remotemanage) {
+						ipt_write("-A %s -p tcp -m tcp %s --dport %s -j DNAT --to-destination %s:%d\n",
+							chain_wan_prerouting, src, nvram_safe_get("http_wanport"), lanaddr, web_lanport);
+					}
+
+					if (nvram_get_int("sshd_remote")) {
+						ipt_write("-A %s %s -p tcp -m tcp --dport %s -j DNAT --to-destination %s:%s\n",
+							chain_wan_prerouting, src, nvram_safe_get("sshd_rport"), lanaddr, nvram_safe_get("sshd_port"));
+					}
+
+					if (!c) break;
+					p = c + 1;
+				} while (*p);
+			}
+
 
 			ipt_forward(IPT_TABLE_NAT);
 			ipt_triggered(IPT_TABLE_NAT);
@@ -991,14 +1008,12 @@ static void filter_input(void)
 			}
 		}
 
-/*
-#ifdef TCONFIG_NGINX
-		if (nvram_get_int("nginx_enable")) {
-			ipt_write("-A INPUT -p tcp %s -m tcp -d %s --dport %s -j %s\n",
-			s, nvram_safe_get("lan_ipaddr"), nvram_safe_get("nginx_port"), chain_in_accept);
+#ifdef TCONFIG_NGINX //!!Victek - Web Server
+		if (nvram_match("nginx_enable", "1")) {
+			ipt_write("-A INPUT -p tcp --dport %s -j ACCEPT\n", nvram_safe_get( "nginx_port" ));
 		}
 #endif
-*/
+
 	if (!c) break;
 		p = c + 1;
 	} while (*p);
@@ -1029,7 +1044,7 @@ static void filter_input(void)
 
 			if (ipt_source(p, s, "snmp", "remote")) {
 				ipt_write("-A INPUT -p udp %s --dport %s -j %s\n",
-						s, nvram_safe_get("snmp_port"), chain_in_accept);
+					s, nvram_safe_get("snmp_port"), chain_in_accept);
 			}
 
 			if (!c) break;
@@ -1685,6 +1700,14 @@ int start_firewall(void)
 		/* Remote management */
 		if (nvram_match("remote_management", "1") && nvram_invmatch("http_wanport", "") &&
 			nvram_invmatch("http_wanport", "0")) remotemanage = 1;
+
+		if (nvram_match("remote_mgt_https", "1")) {
+			web_lanport = nvram_get_int("https_lanport");
+			if (web_lanport <= 0) web_lanport = 443;
+		} else {
+			web_lanport = nvram_get_int("http_lanport");
+			if (web_lanport <= 0) web_lanport = 80;
+		}
 	}
 
 	if ((ipt_file = fopen(ipt_fname, "w")) == NULL) {
@@ -1792,6 +1815,9 @@ int start_firewall(void)
 	simple_unlock("restrictions");
 	sched_restrictions();
 	enable_ip_forward();
+#ifdef TCONFIG_IPV6
+	if (ipv6_enabled()) enable_ip6_forward();
+#endif
 
 	led(LED_DMZ, dmz_dst(NULL));
 

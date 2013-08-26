@@ -75,7 +75,6 @@ static void async_event(int pipe, time_t now);
 static void fatal_event(struct event_desc *ev, char *msg);
 static int read_event(int fd, struct event_desc *evp, char **msg);
 
-
 int main (int argc, char **argv)
 {
   int bind_fallback = 0;
@@ -1163,7 +1162,6 @@ static void async_event(int pipe, time_t now)
 	/* Note: this may leave TCP-handling processes with the old file still open.
 	   Since any such process will die in CHILD_LIFETIME or probably much sooner,
 	   we leave them logging to the old file. */
-
 	if (daemon->log_file != NULL)
 	  log_reopen(daemon->log_file);
 
@@ -1262,11 +1260,6 @@ void poll_resolv(int force, int do_reload, time_t now)
 	      {
 		last_change = statbuf.st_mtime;
 		latest = res;
-/* This is now commented out
-#ifdef HAVE_TOMATO
-		break;
-#endif //TOMATO - Really don't understand what this break is trying to acheive/avoid
-*/
 	      }
 	  }
       }

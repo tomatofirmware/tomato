@@ -142,8 +142,8 @@ void lease_init(time_t now)
 	lease->length = ei;
 #endif
 #else
-	/* strictly time_t is opaque, but this hack should work on all sane
-           systems, even when sizeof(time_t) == 8 */
+	/* strictly time_t is opaque, but this hack should work on all sane systems,
+	   even when sizeof(time_t) == 8 */
 	lease->expires = (time_t)ei;
 #endif
 	
@@ -234,9 +234,9 @@ void lease_update_file(time_t now)
 #ifdef HAVE_LEASEFILE_EXPIRE
 	ourprintf(&err, "%u ",
 #ifdef HAVE_BROKEN_RTC
-		(lease->length == 0) ? 0 :
+	  (lease->length == 0) ? 0 :
 #else
-		(lease->expires == 0) ? 0 :
+	  (lease->expires == 0) ? 0 :
 #endif
 		(unsigned int)difftime(lease->expires, now));
 #elif defined(HAVE_BROKEN_RTC)
@@ -287,17 +287,16 @@ else
 #ifdef HAVE_LEASEFILE_EXPIRE
 		ourprintf(&err, "%u ",
 #ifdef HAVE_BROKEN_RTC
-			(lease->length == 0) ? 0 :
+	      (lease->length == 0) ? 0 :
 #else
-			(lease->expires == 0) ? 0 :
+	      (lease->expires == 0) ? 0 :
 #endif
 			(unsigned int)difftime(lease->expires, now));
 #elif defined(HAVE_BROKEN_RTC)
 		ourprintf(&err, "%u ", lease->length);
 else
 		ourprintf(&err, "%lu ", (unsigned long)lease->expires);
-#endif
-
+#endif    
 	      inet_ntop(AF_INET6, lease->hwaddr, daemon->addrbuff, ADDRSTRLEN);
 	 
 	      ourprintf(&err, "%s%u %s ", (lease->flags & LEASE_TA) ? "T" : "",

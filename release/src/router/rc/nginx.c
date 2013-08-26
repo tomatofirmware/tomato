@@ -17,38 +17,38 @@
 #include <sys/stat.h>
 #include <stdarg.h>
 
-#define nginxbin							"nginx"							// process name
-#define nginxname							"tomato.local"					// server name
-#define nginxdocrootdir						"/www"							// document root
-#define nginxconf							"/tmp/etc/nginx/nginx.conf"		// config file
-#define nginxcustom							"#"								// additional window for custom parameter.
-#define fastcgiconf							"/tmp/etc/nginx/fastcgi.conf"	// fastcgi config file
-#define mimetypes							"/tmp/etc/nginx/mime.types"		// mime.types config
-#define nginxdir							"/tmp/etc/nginx/"				// directory to write config files
-#define client_body_temp_path				"/tmp/var/lib/nginx/client"		// temp path needed to execute nginx
-#define fastcgi_temp_path					"/tmp/var/lib/nginx/fastcgi"	// temp path needed to execute nginx fastcgi
-#define uwsgi_temp_path						"/tmp/var/lib/nginx/uwsgi"		// temp path needed to execute nginx
-#define scgi_temp_path						"/tmp/var/lib/nginx/scgi"		// temp path needed to execute nginx
-#define proxy_temp_path						"/tmp/var/lib/nginx/proxy"		// temp path needed to execute reverse proxy
-#define nginxuser							"root"							// user. Beta test, root can't be exposed.
-#define nginx_worker_proc					"1"								// worker processes. CPU, cores.
-#define nginx_cpu_affinity					"0101"							// Can bind the worker process to a CPU, it calls sched_setaffinity().
-//define nginx_worker_priority				"5"								// priority ((-20)=High Priority (19)=Lowest Priority) Info: kernel have -5.
-#define nginx_multi_accept					"on"							// specifies multiple connections for one core CPU
-#define nginx_limitrate						"50k"							// specifies a limit rate of 50Kbps (multiply it by limit_conn_zone) per IP.
-#define nginx_limitzone						"one"							// specifies the server zone to apply the restriction (limit_rate+n).
-#define nginx_globrate						"5m"							// defines max global speed.
-#define nginx_master_process				"off"							// set to "on" in developpment mode only.
-#define nginx_limitsimconn					"10"							// defines max number of simulta. Connections in the server zone (limitzone).
-#define nginxerrorlog						"/tmp/var/log/nginx/error.log"	// error log
-#define nginxpid							"/tmp/var/run/nginx.pid"		// pid
-#define nginx_worker_rlimit_profile			"8192"							// worker rlimit profile
-#define nginx_keepalive_timeout				"60"							// the server will close connections after this time
-#define nginx_worker_connections			"512"							// worker_proc*512/keepalive_timeout*60 = 512 users per minute.
-#define nginxaccesslog						"/tmp/var/log/nginx/access.log"	// access log
-#define nginssendfile						"on"							// sendfile
-#define nginxtcp_nopush						"on"							// tcp_nopush
-#define nginxserver_names_hash_bucket_size	"128"							// server names hash bucket size
+#define nginxbin		"nginx"					// process name
+#define nginxname		"tomato.local"				// server name
+#define nginxdocrootdir		"/www"					// document root
+#define nginxconf		"/tmp/etc/nginx/nginx.conf"		// config file
+#define nginxcustom		"#"					// additional window for custom parameter.
+#define fastcgiconf		"/tmp/etc/nginx/fastcgi.conf"		// fastcgi config file
+#define mimetypes		"/tmp/etc/nginx/mime.types"		// mime.types config
+#define nginxdir		"/tmp/etc/nginx/"			// directory to write config files
+#define client_body_temp_path	"/tmp/var/lib/nginx/client"		// temp path needed to execute nginx
+#define fastcgi_temp_path	"/tmp/var/lib/nginx/fastcgi"		// temp path needed to execute nginx fastcgi
+#define uwsgi_temp_path		"/tmp/var/lib/nginx/uwsgi"		// temp path needed to execute nginx
+#define scgi_temp_path		"/tmp/var/lib/nginx/scgi"		// temp path needed to execute nginx
+#define proxy_temp_path		"/tmp/var/lib/nginx/proxy"		// temp path needed to execute reverse proxy
+#define nginxuser		"root"					// user. Beta test, root can't be exposed.
+#define nginx_worker_proc	"1"					// worker processes. CPU, cores.
+#define nginx_cpu_affinity	"0101"					// Can bind the worker process to a CPU, it calls sched_setaffinity().
+//define nginx_worker_priority	"5"					// priority ((-20)=High Priority (19)=Lowest Priority) Info: kernel have -5.
+#define nginx_multi_accept	"on"					// specifies multiple connections for one core CPU
+#define nginx_limitrate		"50k"					// specifies a limit rate of 50Kbps (multiply it by limit_conn_zone) per IP.
+#define nginx_limitzone		"one"					// specifies the server zone to apply the restriction (limit_rate+n).
+#define nginx_globrate		"5m"					// defines max global speed.
+#define nginx_master_process	"off"					// set to "on" in developpment mode only.
+#define nginx_limitsimconn	"10"					// defines max number of simulta. Connections in the server zone (limitzone).
+#define nginxerrorlog		"/tmp/var/log/nginx/error.log"		// error log
+#define nginxpid		"/tmp/var/run/nginx.pid"		// pid
+#define nginx_worker_rlimit_profile	"8192"				// worker rlimit profile
+#define nginx_keepalive_timeout		"60"				// the server will close connections after this time
+#define nginx_worker_connections	"512"				// worker_proc*512/keepalive_timeout*60 = 512 users per minute.
+#define nginxaccesslog			"/tmp/var/log/nginx/access.log"	// access log
+#define nginssendfile			"on"				// sendfile
+#define nginxtcp_nopush			"on"				// tcp_nopush
+#define nginxserver_names_hash_bucket_size	"128"			// server names hash bucket size
 
 FILE * nginx_conf_file;
 FILE * fastcgi_conf_file;
@@ -305,8 +305,7 @@ void start_nginx(void)
 
 	if (!f_exists(fastcgiconf)) build_fastcgi_conf();
 	if (!f_exists(mimetypes)) build_mime_types();
-	
-	if (fastpath != 1) {
+	if ((fastpath != 1) && (!nvram_match("nginx_keepconf", "1"))) {
 		build_nginx_conf();
 	}else{
 		if (!f_exists(nginxconf)) build_nginx_conf();
@@ -344,21 +343,21 @@ void stop_nginx(void)
 //			syslog(LOG_INFO,"NGinX - removed pid file %s\n", nginxpid);
 		}
 		if (f_exists(fastcgiconf)) {
-			if (fastpath != 1) {
+			if ((fastpath != 1) && (!nvram_match("nginx_keepconf", "1"))) {
 				unlink(fastcgiconf);
 //				syslog(LOG_INFO,"NGinX - removed fastcgi config file %s\n", fastcgiconf);
 			}
 //			syslog(LOG_INFO,"NGinX - skip removal of fastcgi config file %s due to fastpath method\n", fastcgiconf);
 		}
 		if (f_exists(mimetypes)) {
-			if (fastpath != 1) {
+			if ((fastpath != 1) && (!nvram_match("nginx_keepconf", "1"))) {
 				unlink(mimetypes);
 //				syslog(LOG_INFO,"NGinX - remove mime types file %s\n", mimetypes);
 			}
 //			syslog(LOG_INFO,"NGinX - skip removal of mime types config file %s due to fastpath method\n", mimetypes);
 		}
 		if (f_exists(nginxconf)) {
-			if (fastpath != 1) {
+			if ((fastpath != 1) && (!nvram_match("nginx_keepconf", "1"))) {
 			unlink(nginxconf);
 //			syslog(LOG_INFO,"NGinX - removed nginx config file %s\n", nginxconf);
 			}

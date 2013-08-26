@@ -80,14 +80,14 @@ const defaults_t defaults[] = {
 //!	{ "wan_ifnames",		""				},	// WAN interface names
 	{ "wan_hwname",			""				},	// WAN driver name (e.g. et1)
 	{ "wan_hwaddr",			""				},	// WAN interface MAC address
-	{ "wan_ifnameX",		NULL				},	// real wan if; see wan.c:start_wan
+	{ "wan_ifnameX",		NULL			},	// real wan if; see wan.c:start_wan
 
 	// WAN TCP/IP parameters
 	{ "wan_proto",			"dhcp"			},	// [static|dhcp|pppoe|disabled]
 	{ "wan_ipaddr",			"0.0.0.0"		},	// WAN IP address
 	{ "wan_netmask",		"0.0.0.0"		},	// WAN netmask
 	{ "wan_gateway",		"0.0.0.0"		},	// WAN gateway
-	{ "wan_gateway_get",		"0.0.0.0"	},	// default gateway for PPP
+	{ "wan_gateway_get",	"0.0.0.0"		},	// default gateway for PPP
 	{ "wan_dns",			""				},	// x.x.x.x x.x.x.x ...
 #ifdef TCONFIG_DNSCRYPT
 	{ "dnscrypt_proxy",		""				},
@@ -184,7 +184,7 @@ const defaults_t defaults[] = {
 	{ "ipv6_get_dns",		"" 		},	// DNS IP address got
 	{ "ipv6_6rd_prefix",	"2602:100::"	},	// 6RD prefix (Charter)
 	{ "ipv6_6rd_prefix_length",	"32"		},	// 6RD prefix length (32-62) checkme
-	{ "ipv6_6rd_borderrelay",	"68.114.165.1"	},	// 6RD border relay address
+	{ "ipv6_6rd_borderrelay",	"68.113.165.1"	},	// 6RD border relay address
 	{ "ipv6_6rd_ipv4masklen",	"0"				},	// 6RD IPv4 mask length 0-30) checkme
 #endif
 
@@ -288,23 +288,23 @@ const defaults_t defaults[] = {
 	{ "wl_reg_mode",		"off"			},	// !!TB - Regulatory: 802.11H(h)/802.11D(d)/off(off)
 
 // !!TB: n-mode
-	{ "wl_nmode",			"-1"			},	// N-mode
+	{ "wl_nmode",			"-1"		},	// N-mode
 	{ "wl_nband",			"2"			},	// 2 - 2.4GHz, 1 - 5GHz, 0 - Auto
 	{ "wl1_nband",			"1"			},
-	{ "wl_nmcsidx",			"-1"			},	// MCS Index for N - rate
+	{ "wl_nmcsidx",			"-1"		},	// MCS Index for N - rate
 	{ "wl_nreqd",			"0"			},	// Require 802.11n support
 	{ "wl_nbw",				"40"		},	// BW: 20 / 40 MHz
 	{ "wl_nbw_cap",			"1"			},	// BW: def 20inB and 40inA
-	{ "wl_mimo_preamble",	"mm"				},	// 802.11n Preamble: mm/gf/auto/gfbcm
-	{ "wl_nctrlsb",			"upper"			},	// N-CTRL SB (none/lower/upper)
-	{ "wl_nmode_protection","off"				},	// 802.11n RTS/CTS protection (off|auto)
+	{ "wl_mimo_preamble",	"mm"		},	// 802.11n Preamble: mm/gf/auto/gfbcm
+	{ "wl_nctrlsb",			"upper"		},	// N-CTRL SB (none/lower/upper)
+	{ "wl_nmode_protection","off"		},	// 802.11n RTS/CTS protection (off|auto)
 	{ "wl_rxstreams",		"0"			},	// 802.11n Rx Streams, 0 is invalid, WLCONF will change it to a radio appropriate default
 	{ "wl_txstreams",		"0"			},	// 802.11n Tx Streams 0, 0 is invalid, WLCONF will change it to a radio appropriate default
-	{ "wl_dfs_preism",		"60"			},	// 802.11H pre network CAC time
-	{ "wl_dfs_postism",		"60"			},	// 802.11H In Service Monitoring CAC time
+	{ "wl_dfs_preism",		"60"		},	// 802.11H pre network CAC time
+	{ "wl_dfs_postism",		"60"		},	// 802.11H In Service Monitoring CAC time
 	{ "wl_radarthrs",		"1 0x6c0 0x6e0 0x6bc 0x6e0 0x6ac 0x6cc 0x6bc 0x6e0" },	// Radar thrs params format: version thresh0_20 thresh1_20 thresh0_40 thresh1_40
 	{ "wl_bcn_rotate",		"1"			},	// Beacon rotation
-	{ "wl_vlan_prio_mode",	"off"				},	// VLAN Priority support
+	{ "wl_vlan_prio_mode",	"off"		},	// VLAN Priority support
 	{ "wl_obss_coex",		"0"			},	// OBSS Coexistence (0|1): when enabled, channel width is forced to 20MHz
 
 #ifdef TCONFIG_EMF
@@ -321,7 +321,7 @@ const defaults_t defaults[] = {
 	{ "wl_amsdu",			"auto"			},	// Default AMSDU setting
 	// power save
 	{ "wl_rxchain_pwrsave_enable",		"1"		},	// Rxchain powersave enable
-	{ "wl_rxchain_pwrsave_quiet_time","1800"		},	// Quiet time for power save
+	{ "wl_rxchain_pwrsave_quiet_time","1800"	},	// Quiet time for power save
 	{ "wl_rxchain_pwrsave_pps",			"10"	},	// Packets per second threshold for power save
 	{ "wl_radio_pwrsave_enable",		"0"		},	// Radio powersave enable
 	{ "wl_radio_pwrsave_quiet_time",	"1800"	},	// Quiet time for power save
@@ -436,7 +436,7 @@ const defaults_t defaults[] = {
 	{ "dhcpc_custom",		""				},
 	{ "dns_norebind",		"1"				},
 	{ "dnsmasq_custom",		""				},
-	{ "dnsmasq_static_only",	"0"				},
+	{ "dnsmasq_static_only",	"0"			},
 	{ "dnsmasq_q",			"0"				},      // 0= quiet-dhcp 1=dhcp6 2=ra
 
 // advanced-firewall
@@ -510,8 +510,8 @@ const defaults_t defaults[] = {
 	{ "upnp_enable",		"3"		},
 	{ "upnp_secure",		"1"		},
 	{ "upnp_port",			"0"		},
-	{ "upnp_ssdp_interval",	"60"			},	// SSDP interval
-	{ "upnp_max_age",		"180"		},	// Max age
+	{ "upnp_ssdp_interval",	"60"	},	// SSDP interval
+	{ "upnp_max_age",		"180"	},	// Max age
 	{ "upnp_mnp",			"0"		},
 	{ "upnp_custom",		""		},
 	{ "upnp_clean",			"1"		},	/* 0:Disable 1:Enable */
@@ -534,9 +534,9 @@ const defaults_t defaults[] = {
 	{ "qos_udp",			"0"				},
 	{ "qos_icmp",			"1"				},
 	{ "qos_reset",			"1"				},
-	{ "qos_obw",			"10000"				},
-	{ "qos_ibw",			"100000"				},
-	{ "qos_orules",			"0<<-1<d<53<0<<0:10<<0<DNS>0<<-1<d<37<0<<0:10<<0<Time>0<<17<d<123<0<<0:10<<0<NTP>0<<-1<d<3455<0<<0:10<<0<RSVP>0<<-1<d<9<0<<0:50<<4<SCTP, Discard>0<<-1<x<135,2101,2103,2105<0<<<<4<RPC (Microsoft)>0<<6<d<23,992<0<<<<3<Telnet>0<<6<x<22,2222<0<<<<0<SSH>0<<17<d<3544<0<<<<-1<Teredo Tunnel>0<<6<s<80,8080,2222<0<<<<3<Remote Access>0<<-1<x<3389<0<<<<3<Remote Assistance>0<<-1<x<6970:7170,8554<0<<<<2<Quicktime/RealAudio>0<<-1<d<1220,7070<0<<<<2<Quicktime/RealAudio>0<<-1<x<554,5004,5005<0<<<<2<RTP, RTSP>0<<-1<x<1755<0<<<<2<MMS (Microsoft)>0<<-1<d<3478,3479,5060:5063<0<<<<1<SIP, Sipgate Stun Services>0<<-1<s<53,88,3074<0<<<<1<Xbox Live>0<<6<d<1718:1720<0<<<<1<H323>0<<6<d<80,443<0<<0:512<<4<HTTP, HTTPS>0<<6<d<8080<0<<0:512<<4<HTTP Proxy/Alternate>0<<-1<d<11999,2300:2400,6073,28800:29100,47624<0<<<<-1<Other games>0<<6<d<25,587,465,2525<0<<<<5<SMTP, Submission Mail>0<<6<d<110,995<0<<<<5<POP3 Mail>0<<6<d<143,220,585,993<0<<<<5<IMAP Mail>0<<6<d<6005,6006<0<<<<6<Camfrog>0<<-1<d<1493,1502,1503,1542,1863,1963,3389,5061,5190:5193,7001<0<<<<6<MSGR1 - Windows Live>0<<-1<d<1071:1074,1455,1638,1644,5000:5010,5050,5100,5101,5150,8000:8002<0<<<<6<MSGR2 - Yahoo>0<<-1<d<194,1720,1730:1732,5220:5223,5298,6660:6669,22555<0<<<<6<MSGR3 - Additional>0<<6<d<119,563<0<<<<7<NNTP News & Downloads>0<<6<d<20,21,989,990<0<<<<7<FTP>0<<-1<x<6571,6891:6901<0<<<<7<WLM File/Webcam>0<<6<d<80,443,8080<0<<512:<<7<HTTP,SSL File Transfers>0<<-1<a<<0<httpvideo<<<2<HTTP Video, (Youtube)>0<<-1<a<<0<flash<<<2<Flash Video, (Youtube)>0<<-1<a<<0<rtp<<<2<RTP>0<<-1<a<<0<rtmp<<<2<RTMP>0<<-2<a<<0<rtmp<<<2<RTMPT (RTMP over HTTP)>0<<-1<a<<0<shoutcast<<<2<Shoutcast>0<<-1<a<<0<irc<<<6<IRC>0<<-1<a<<0<skypetoskype<<<1<Skype to Skype>0<<-1<a<<0<skypeout<<<1<Skype Phone>0<<17<d<1:65535<0<<<<9<P2P (uTP, UDP)" },
+	{ "qos_obw",			"10000"			},
+	{ "qos_ibw",			"100000"			},
+	{ "qos_orules",			"0<<-1<d<53<0<<0:10<<0<DNS>0<<-1<d<37<0<<0:10<<0<Time>0<<17<d<123<0<<0:10<<0<NTP>0<<-1<d<3455<0<<0:10<<0<RSVP>0<<-1<d<9<0<<0:50<<4<SCTP, Discard>0<<-1<x<135,2101,2103,2105<0<<<<4<RPC (Microsoft)>0<<17<d<3544<0<<<<-1<Teredo Tunnel>0<<6<x<22,2222<0<<<<3<SSH>0<<6<d<23,992<0<<<<3<Telnet>0<<6<s<80,5938,8080,2222<0<<<<3<Remote Access>0<<-1<x<3389<0<<<<3<Remote Assistance>0<<-1<x<6970:7170,8554<0<<<<2<Quicktime/RealAudio>0<<-1<d<1220,7070<0<<<<2<Quicktime/RealAudio>0<<-1<x<554,5004,5005<0<<<<2<RTP, RTSP>0<<-1<x<1755<0<<<<2<MMS (Microsoft)>0<<-1<d<3478,3479,5060:5063<0<<<<1<SIP, Sipgate Stun Services>0<<-1<s<53,88,3074<0<<<<1<Xbox Live>0<<6<d<1718:1720<0<<<<1<H323>0<<-1<d<11031,11235:11335,11999,2300:2400,6073,28800:29100,47624<0<<<<1<Various Games>0<<-1<d<1493,1502,1503,1542,1863,1963,3389,5061,5190:5193,7001<0<<<<6<MSGR1 - Windows Live>0<<-1<d<1071:1074,1455,1638,1644,5000:5010,5050,5100,5101,5150,8000:8002<0<<<<6<MSGR2 - Yahoo>0<<-1<d<194,1720,1730:1732,5220:5223,5298,6660:6669,22555<0<<<<6<MSGR3 - Additional>0<<-1<d<19294:19310<0<<<<6<Google+ & Voice>0<<6<d<6005,6006<0<<<<6<Camfrog>0<<-1<x<6571,6891:6901<0<<<<6<WLM File/Webcam>0<<-1<a<<0<skypetoskype<<<1<Skype to Skype>0<<-1<a<<0<skypeout<<<-1<Skype Phone (deprecated)>0<<-1<a<<0<youtube-2012<<<2<YouTube 2012 (Youtube)>0<<-1<a<<0<flash<<<2<Flash Video (Youtube)>0<<-1<a<<0<httpvideo<<<2<HTTP Video (Youtube)>0<<-1<a<<0<rtp<<<2<RTP>0<<-1<a<<0<rtmp<<<2<RTMP>0<<-1<a<<0<rtmpt<<<2<RTMPT (RTMP over HTTP)>0<<-1<a<<0<shoutcast<<<2<Shoutcast>0<<-1<a<<0<irc<<<6<IRC>0<<6<d<80,443,8080<0<<0:512<<4<HTTP, HTTPS, HTTP Proxy>0<<6<d<80,443,8080<0<<512:<<7<HTTP, SSL File Transfers>0<<6<d<20,21,989,990<0<<<<7<FTP>0<<6<d<119,563<0<<<<7<NNTP News & Downloads>0<<6<d<25,587,465,2525<0<<<<5<SMTP, Submission Mail>0<<6<d<110,995<0<<<<5<POP3 Mail>0<<6<d<143,220,585,993<0<<<<5<IMAP Mail>0<<17<d<1:65535<0<<<<9<P2P (uTP, UDP)" },
 	{ "qos_burst0",			""				},
 	{ "qos_burst1",			""				},
 	{ "qos_default",		"8"				},
@@ -653,24 +653,24 @@ const defaults_t defaults[] = {
 // admin-log
 	{ "log_remote",			"0"			},
 	{ "log_remoteip",		""			},
-	{ "log_remoteport",		"514"			},
+	{ "log_remoteport",		"514"		},
 	{ "log_file",			"1"			},
-	{ "log_file_custom",		"0"			},
+	{ "log_file_custom",	"0"			},
 	{ "log_file_path",		"/var/log/messages"	},
-	{ "log_file_size",		"50"			},
+	{ "log_file_size",		"50"		},
 	{ "log_file_keep",		"1"			},
-	{ "log_limit",			"60"			},
-	{ "log_in",			"0"			},
+	{ "log_limit",			"60"		},
+	{ "log_in",				"0"			},
 	{ "log_out",			"0"			},
-	{ "log_mark",			"60"			},
+	{ "log_mark",			"60"		},
 	{ "log_events",			""			},
 
 // admin-log-webmonitor
-	{ "log_wm",			"0"			},
+	{ "log_wm",				"0"			},
 	{ "log_wmtype",			"0"			},
 	{ "log_wmip",			""			},
-	{ "log_wmdmax",			"300"			},
-	{ "log_wmsmax",			"300"			},
+	{ "log_wmdmax",			"300"		},
+	{ "log_wmsmax",			"300"		},
 
 // admin-debugging
 	{ "debug_nocommit",		"0"			},
@@ -684,12 +684,12 @@ const defaults_t defaults[] = {
 	{ "debug_ddns",			"0"			},
 
 // admin-cifs
-	{ "cifs1",				""				},
-	{ "cifs2",				""				},
+	{ "cifs1",				""			},
+	{ "cifs2",				""			},
 
 // admin-jffs2
-	{ "jffs2_on",			"0"				},
-	{ "jffs2_exec",			""				},
+	{ "jffs2_on",			"0"			},
+	{ "jffs2_exec",			""			},
 
 #ifdef TCONFIG_USB
 // nas-usb - !!TB
@@ -1063,9 +1063,10 @@ const defaults_t defaults[] = {
 	{ "NC_BridgeLAN",			"br0"			},
 #endif
 #endif
-//NGinx X Roadkill
+//NGinx X Roadkill-Victek
 #ifdef TCONFIG_NGINX
 	{"nginx_enable",		"0"				}, // NGinX enabled
+	{"nginx_keepconf",		"0"				}, // Enable/disable keep configuration files unmodified in /etc/nginx
 	{"nginx_docroot",		"/www"				}, // path for server files
 	{"nginx_port",			"85"				}, // port to listen
 	{"nginx_fqdn",			"Tomato.RAF"			}, // server name

@@ -338,7 +338,8 @@ by '/', like the --server syntax, eg.
 Don't poll /etc/resolv.conf for changes.
 .TP
 .B --clear-on-reload
-Whenever /etc/resolv.conf is re-read, clear the DNS cache.
+Whenever /etc/resolv.conf is re-read or the upstream servers are set
+via DBus, clear the DNS cache.
 This is useful when new nameservers may have different
 data than that held in cache.
 .TP
@@ -661,6 +662,14 @@ that just any address on eth0 will not do: the non-prefix part must be
 equal either the start or end address given in the dhcp-range. This is
 to prevent prefixes becoming perpetual if the interface 
 gains a SLAAC address for the prefix when it is advertised by dnsmasq.
+
+If a dhcp-range is only being used for stateless DHCP and/or SLAAC,
+then the address can be simply ::
+
+.B --dhcp-range=::,constructor:eth0
+
+This removes the condition above, and will pick up the prefix from any address on eth0 which is NOT 
+autoconfigured, slaac, temporary or deprecated.
 
 There is a variant of the constructor: syntax using the keyword
 .B constructor-noauth.
@@ -1486,11 +1495,18 @@ the relevant link-local address of the machine running dnsmasq is sent
 as recursive DNS server. If provided, the DHCPv6 options dns-server and
 domain-search are used for RDNSS and DNSSL.
 .TP
-.B --enable-tftp
+.B --force-fast-ra
+Normally, dnsmasq advertises a new IPv6 prefix frequently (every 10 seconds or so) for the first minute, and then
+drops back to sending "maintenance" advertisements every 10 minutes or so. This option forces dnsmasq to be always in 
+frequent RA mode. It's a bug workaround for mobile devices which go deaf to RAs during sleep and therefore 
+lose conectivity; with frequent RAs they recover in a reasonable time after wakeup.
+.TP
+.B --enable-tftp[=<interface>[,<interface>]]
 Enable the TFTP server function. This is deliberately limited to that
 needed to net-boot a client. Only reading is allowed; the tsize and
 blksize extensions are supported (tsize is only supported in octet
-mode). 
+mode). Without an argument, the TFTP service is provided to the same set of interfaces as DHCP service. 
+If the list of interfaces is provided, that defines which interfaces recieve TFTP service.
 .TP
 .B --tftp-root=<directory>[,<interface>]
 Look for files to transfer using TFTP relative to the given
