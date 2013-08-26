@@ -45,8 +45,15 @@
 #include <linux/stddef.h>
 #include <linux/device.h>
 #include <linux/mutex.h>
+#include <linux/ppp_async.h>
 #include <net/slhc_vj.h>
 #include <asm/atomic.h>
+
+#ifdef HNDCTF
+#define TYPEDEF_INT32
+#include <ctf/hndctf.h>
+#include <linux/if_pppox.h>
+#endif
 
 #define PPP_VERSION	"2.4.2"
 
@@ -96,6 +103,10 @@ struct ppp_file {
  * and represents a multilink bundle.
  * It can have 0 or more ppp channels connected to it.
  */
+#ifdef HNDCTF
+ typedef struct channel channel_t;
+#endif 
+
 struct ppp {
 	struct ppp_file	file;		/* stuff for read/write/poll 0 */
 	struct file	*owner;		/* file that owns this unit 48 */
@@ -133,6 +144,9 @@ struct ppp {
 	struct sock_filter *active_filter;/* filter for pkts to reset idle */
 	unsigned pass_len, active_len;
 #endif /* CONFIG_PPP_FILTER */
+#ifdef HNDCTF
+	channel_t		*ctfpch;
+#endif
 };
 
 /*
@@ -920,7 +934,6 @@ ppp_start_xmit(struct sk_buff *skb, struct net_device *dev)
 	pp[0] = proto >> 8;
 	pp[1] = proto;
 
-	netif_stop_queue(dev);
 	skb_queue_tail(&ppp->file.xq, skb);
 	ppp_xmit_process(ppp);
 	return 0;
@@ -1013,8 +1026,10 @@ ppp_xmit_process(struct ppp *ppp)
 			ppp_send_frame(ppp, skb);
 		/* If there's no work left to do, tell the core net
 		   code that we can accept some more. */
-		if (ppp->xmit_pending == 0 && skb_peek(&ppp->file.xq) == 0)
+		if (!ppp->xmit_pending && !skb_peek(&ppp->file.xq))
 			netif_wake_queue(ppp->dev);
+		else
+			netif_stop_queue(ppp->dev);
 	}
 	ppp_xmit_unlock(ppp);
 }
@@ -2517,6 +2532,12 @@ ppp_create_interface(int unit, int *retp)
 		goto out2;
 	}
 
+#ifdef HNDCTF
+	if ((ctf_dev_register(kcih, dev, FALSE) != BCME_OK) ||
+	    (ctf_enable(kcih, dev, TRUE, NULL) != BCME_OK))
+		ctf_dev_unregister(kcih, dev);
+#endif
+
 	atomic_inc(&ppp_unit_count);
 	ret = cardmap_set(&all_ppp_units, unit, ppp);
 	if (ret != 0)
@@ -2566,6 +2587,9 @@ static void ppp_shutdown_interface(struct ppp *ppp)
 	ppp_unlock(ppp);
 	/* This will call dev_close() for us. */
 	if (dev) {
+#ifdef HNDCTF
+		ctf_dev_unregister(kcih, dev);
+#endif
 		unregister_netdev(dev);
 		free_netdev(dev);
 	}
@@ -2680,6 +2704,9 @@ ppp_connect_channel(struct channel *pch, int unit)
 	list_add_tail(&pch->clist, &ppp->channels);
 	++ppp->n_channels;
 	pch->ppp = ppp;
+#ifdef HNDCTF
+	ppp->ctfpch = pch;
+#endif	
 	atomic_inc(&ppp->file.refcnt);
 	ppp_unlock(ppp);
 	ret = 0;
@@ -2860,6 +2887,108 @@ static void cardmap_destroy(struct cardmap **pmap)
 	}
 	*pmap = NULL;
 }
+
+#ifdef HNDCTF
+#if defined(CTF_PPPOE) || defined(CTF_PPTP) || defined(CTF_L2TP)
+void
+ppp_rxstats_upd(void *pppif, struct sk_buff *skb)
+{
+	if(pppif == NULL || skb == NULL)
+		return;
+	struct ppp *ppp = ((struct net_device *)pppif)->priv;
+	if(ppp == NULL)
+		return;
+	++ppp->stats.rx_packets;
+	ppp->stats.rx_bytes += skb->len;
+	ppp->last_recv = jiffies;
+}
+
+void
+ppp_txstats_upd(void *pppif, struct sk_buff *skb)
+{
+	if(pppif == NULL || skb == NULL)
+		return;
+	struct ppp *ppp = ((struct net_device *)pppif)->priv;
+	if(ppp == NULL)
+		return;
+	++ppp->stats.tx_packets;
+	ppp->stats.tx_bytes += skb->len;
+	ppp->last_xmit = jiffies;
+}
+
+
+int
+ppp_get_conn_pkt_info(int unit, struct ctf_ppp *ctfppp){
+	struct pppox_sock *po = NULL;
+	struct asyncppp *ap = NULL;
+	struct sock *sk = NULL;
+	struct ppp *ppp = NULL;
+	struct channel *pch = NULL;
+	const char *vars = NULL;
+
+	ppp = ppp_find_unit(unit);
+	if(ppp) pch = ppp->ctfpch;
+
+	if (pch == NULL){
+		return (BCME_ERROR);
+	}
+
+	po = pppox_sk((struct sock *)pch->chan->private);
+	ap = (struct asyncppp *)pch->chan->private;
+
+	if(ap && ap->tty)
+		return (BCME_ERROR);
+
+	if (po == NULL){
+		return (BCME_ERROR);
+	}
+	ctfppp->psk.po = po;
+	
+	sk = po->chan.private;
+	if(sk /*&& sizeof(sk) > sizeof(struct sock_common)*/){
+		ctfppp->psk.pppox_protocol = sk->sk_protocol;
+		switch (sk->sk_protocol){
+		case PX_PROTO_OE:
+			ctfppp->pppox_id = po->pppoe_pa.sid;
+			memcpy(ctfppp->psk.dhost.octet , po->pppoe_pa.remote, ETH_ALEN);
+
+#ifdef DEBUG
+		printk("%s: Adding ppp connection:  session ID =%04x, Address=%02x:%02x:%02x:%02x:%02x:%02x\n",
+			__FUNCTION__,ntohs(ctfppp->pppox_id),
+				ctfppp->psk.dhost.octet[0], ctfppp->psk.dhost.octet[1],
+				ctfppp->psk.dhost.octet[2], ctfppp->psk.dhost.octet[3],
+				ctfppp->psk.dhost.octet[4], ctfppp->psk.dhost.octet[5]);
+#endif /*DEBUG*/
+			break;
+#if 0
+		case PX_PROTO_PPTP:
+			ctfppp->pppox_id = po->proto.pptp.dst_addr.call_id;
+#ifdef DEBUG
+
+		printk("%s: Adding pptp entry:  src call ID =%04x, src ip=%u.%u.%u.%u, dst call ID=%4x, dst ip=%u.%u.%u.%u\n ",
+			__FUNCTION__,po->proto.pptp.dst_addr.call_id,	NIPQUAD(po->proto.pptp.src_addr.sin_addr.s_addr),
+			po->proto.pptp.dst_addr.call_id,NIPQUAD(po->proto.pptp.dst_addr.sin_addr.s_addr));
+			//printk("%s\n ",sk->sk_send_head->dev->name);
+#endif
+			break;
+#endif
+		default:
+			return (BCME_ERROR);
+		}
+	}
+	else{
+		return (BCME_ERROR);
+	}
+	return (BCME_OK);
+
+}
+
+EXPORT_SYMBOL(ppp_rxstats_upd);
+EXPORT_SYMBOL(ppp_txstats_upd);
+EXPORT_SYMBOL(ppp_get_conn_pkt_info);
+
+#endif /* CTF_PPPOE | CTF_PPTP | CTF_L2TP */
+#endif /* HNDCTF */
 
 /* Module/initialization stuff */
 

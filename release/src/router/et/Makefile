@@ -10,8 +10,12 @@ CFLAGS	+= -s -O2 -DBCMWPA2
 LDFLAGS	+= -L$(TOP)/nvram -L$(INSTALLDIR)/nvram/usr/lib -lnvram -L$(TOP)/shared -L$(INSTALLDIR)/shared/usr/lib -lshared
 
 OBJS := et.o
-
+ifneq ($(wildcard $(SRCBASE)/et/prebuilt),)
+all:
+	-cp $(SRCBASE)/et/prebuilt/et et
+else
 all: et
+endif
 
 clean:
 	rm -f *.o et .*.depend

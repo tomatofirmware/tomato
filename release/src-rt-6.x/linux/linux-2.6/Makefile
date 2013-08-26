@@ -542,14 +542,17 @@ CFLAGS	+= $(call cc-option,-fno-strict-overflow)
 CFLAGS	+= $(call cc-option,-fno-dwarf2-cfi-asm)
 
 ifneq ($(CONFIG_BCM_CTF),)
-CFLAGS += -DHNDCTF -DCTFPOOL -DCTFMAP
+CFLAGS += -DHNDCTF -DCTFPOOL -DCTFMAP -DPKTC -DCTF_PPPOE -DCTF_PPTP
 ifneq ($(CONFIG_WL_USBAP),)
 CFLAGS += -DCTFPOOL_SPINLOCK
+endif
+ifneq ($(CONFIG_IPV6),)
+CFLAGS += -DCTF_IPV6
 endif
 endif
 
 ifdef CONFIG_PLC
-CFLAGS += -DPLC
+CFLAGS += -DPLC -DET_PLC_NO_VLAN_TAG_RX -DWL_PLC_NO_VLAN_TAG_TX -DWL_PLC_NO_VLAN_TAG_RX
 endif
 
 #netgear 3500v2
@@ -557,9 +560,15 @@ ifeq ($(CONFIG_MTD_NFLASH),y)
 CFLAGS += -DNFLASH_SUPPORT
 endif
 
-#ifeq ($(CONFIG_NVRAM_64K),y) //asus RT-N66U only
-#CFLAGS += -DRTN66U_NVRAM_64K_SUPPORT
-#endif
+ifeq ($(CONFIG_DUAL_TRX),y)
+CFLAGS += -DCONFIG_DUAL_TRX
+endif
+
+ifeq ($(CONFIG_NVRAM_64K),y)
+ifeq ($(BUILD_NAME),RT-N66U)
+CFLAGS += -DRTN66U_NVRAM_64K_SUPPORT
+endif
+endif
 
 # Default kernel image to build when no specific target is given.
 # KBUILD_IMAGE may be overruled on the command line or
@@ -1493,10 +1502,7 @@ endif
 	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
 
 # Modules
-/: prepare scripts FORCE
-	$(Q)$(MAKE) KBUILD_MODULES=$(if $(CONFIG_MODULES),1) \
-	$(build)=$(build-dir)
-%/: prepare scripts FORCE
+/ %/: prepare scripts FORCE
 	$(Q)$(MAKE) KBUILD_MODULES=$(if $(CONFIG_MODULES),1) \
 	$(build)=$(build-dir)
 %.ko: prepare scripts FORCE
