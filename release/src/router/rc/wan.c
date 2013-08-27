@@ -1051,7 +1051,7 @@ void start_wan_done(char *wan_ifname)
 #endif
 
 	unlink(wan_connecting);
-	qoslimit_start(); //!! RAF
+	start_qoslimit(); //!! RAF
 	TRACE_PT("end\n");
 }
 
