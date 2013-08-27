@@ -201,6 +201,7 @@ else
 endif
 
 obj-y += wanuptime
+obj-y += gettext
 
 obj-clean := $(foreach obj, $(obj-y) $(obj-n) $(obj-), $(obj)-clean)
 obj-install := $(foreach obj,$(obj-y),$(obj)-install)
@@ -1974,6 +1975,33 @@ ipset-install: ipset
 
 ipset-clean:
 	-@$(MAKE) -C ipset clean
+gettext/.stamp-h1:
+	cd gettext/gettext-runtime && \
+		CFLAGS="-Os -Wall $(EXTRACFLAGS)" \
+		./configure --host=mipsel-linux --target=mipsel-linux --disable-silent-rules --disable-java --disable-native-java --disable-csharp --disable-largefile --disable-threads --disable-nls\
+		--disable-static --disable-rpath --disable-c++ --disable-libasprintf --disable-openmp --disable-acl \
+		--without-emacs --without-git --without-cvs --without-bzip2 --without-xz
+	touch $@
+gettext: gettext/.stamp-h1
+	make -C gettext/gettext-runtime
+gettext-clean:
+	make -C gettext/gettext-runtime clean
+gettext-install: gettext
+	install -d $(INSTALLDIR)/gettext/usr/lib/
+	install gettext/gettext-runtime/intl/.libs/libgnuintl.so.8.1.2 $(INSTALLDIR)/gettext/usr/lib
+	cd $(INSTALLDIR)/gettext/usr/lib && \
+	ln -sf libgnuintl.so.8.1.2 libgnuintl.so.8 && \
+	ln -sf libgnuintl.so.8.1.2 libgnuintl.so
+	$(STRIP) $(INSTALLDIR)/gettext/usr/lib/libgnuintl.so 
+i18n:
+	make -C i18n mo
+i18n-clean:
+	make -C i18n clean
+i18n-install: i18n
+	install -d $(INSTALLDIR)/i18n/usr/share/locales/zh_CN/LC_MESSAGES
+	install -d $(INSTALLDIR)/i18n/usr/share/locales/en_US/LC_MESSAGES
+	install i18n/www/en_US.mo $(INSTALLDIR)/i18n/usr/share/locales/en_US/LC_MESSAGES/www.mo
+	install i18n/www/zh_CN.mo $(INSTALLDIR)/i18n/usr/share/locales/zh_CN/LC_MESSAGES/www.mo
 
 #
 # Generic rules
