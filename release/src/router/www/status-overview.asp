@@ -39,7 +39,7 @@
 //	<% etherstates(); %>
 //	<% anonupdate(); %>
 
-wmo = {'ap':'Access Point','sta':'Wireless Client','wet':'Wireless Ethernet Bridge','wds':'WDS'};
+wmo = {'ap':'<% _("Access Point"); %>','sta':'<% _("Wireless Client"); %>','wet':'<% _("Wireless Ethernet Bridge"); %>','wds':'<% _("WDS"); %>'};
 auth = {'disabled':'-','wep':'WEP','wpa_personal':'WPA Personal (PSK)','wpa_enterprise':'WPA Enterprise','wpa2_personal':'WPA2 Personal (PSK)','wpa2_enterprise':'WPA2 Enterprise','wpaX_personal':'WPA / WPA2 Personal','wpaX_enterprise':'WPA / WPA2 Enterprise','radius':'Radius'};
 enc = {'tkip':'TKIP','aes':'AES','tkip+aes':'TKIP / AES'};
 bgmo = {'disabled':'-','mixed':'Auto','b-only':'B Only','g-only':'G Only','bg-mixed':'B/G Mixed','lrs':'LRS','n-only':'N Only'};
@@ -114,7 +114,7 @@ function ethstates()
 	if (port == "disabled") { return 0; }
 
 	var state, state1, state2;
-	var code = '<div class="section-title"><#ethernet_ports_state#></div>';
+	var code = '<div class="section-title"><% _("Ethernet Ports State"); %></div>';
 	code += '<table class="fields"><tr><td class="title indent2"><center><b>WAN</b></center></td><td class="title indent2"><!-- empty space --></td><td class="title indent2"><center><b>LAN 1</b></center></td><td class="title indent2"><center><b>LAN 2</b></center></td><td class="title indent2"><center><b>LAN 3</b></center></td><td class="title indent2"><center><b>LAN 4</b></center></td><tr>';
 
 	if (port == "DOWN") {
@@ -338,8 +338,8 @@ function toggleVisibility(whichone) {
 <form>
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
-	<div class='title'><#tomato#></div>
-	<div class='version'><#version#> <% version(); %></div>
+	<div class='title'><% _("Tomato"); %></div>
+	<div class='version'><% _("Version"); %> <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -350,13 +350,13 @@ function toggleVisibility(whichone) {
 </div>
 
 <div style='display:none' id='att1'>
-<div class='section-title'><center>!! <#attention#> !!</center></div>
-<div class='fields'><center><#did_not_configure_tomatoanon#>.
-<br><#tomatoanon_choice#></center></div>
+<div class='section-title'><center>!! <% _("Attention"); %> !!</center></div>
+<div class='fields'><center><% _("You did not configure <b>TomatoAnon project</b> setting.");%>.
+<br><% _("Please go to"); %> <a href='admin-tomatoanon.asp'><% _("TomatoAnon configuration page"); %></a> <% _("and make a choice."); %></center></div>
 <br>
 </div>
 
-<div class='section-title'><#system#> <small><i><a href='javascript:toggleVisibility("system");'><span id='sesdiv_system_showhide'>(<#hide#>)</span></a></i></small></div>
+<div class='section-title'><% _("System"); %> <small><i><a href='javascript:toggleVisibility("system");'><span id='sesdiv_system_showhide'>(<% _("hide"); %>)</span></a></i></small></div>
 <div class='section' id='sesdiv_system'>
 <script type='text/javascript'>
 var a = nvstat.free / nvstat.size * 100.0;
@@ -380,18 +380,18 @@ createFieldTable('', [
 <div class='section' id='ports'>
 </div>
 
-<div class='section-title' id='wan-title'>WAN <small><i><a href='javascript:toggleVisibility("wan");'><span id='sesdiv_wan_showhide'>(<#hide#>)</span></a></i></small></div>
+<div class='section-title' id='wan-title'>WAN <small><i><a href='javascript:toggleVisibility("wan");'><span id='sesdiv_wan_showhide'>(<% _("hide"); %>)</span></a></i></small></div>
 <div class='section' id='sesdiv_wan'>
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: 'MAC <#address#>', text: nvram.wan_hwaddr },
+	{ title: 'MAC <% _("Address"); %>', text: nvram.wan_hwaddr },
 	{ title: 'Connection Type', text: { 'dhcp':'DHCP', 'static':'Static IP', 'pppoe':'PPPoE', 'pptp':'PPTP', 'l2tp':'L2TP', 'ppp3g':'3G Modem' }[nvram.wan_proto] || '-' },
-	{ title: 'IP <#address#>', rid: 'wanip', text: stats.wanip },
+	{ title: 'IP <% _("Address"); %>', rid: 'wanip', text: stats.wanip },
 	{ title: 'Previous WAN IP', rid: 'wanprebuf', text: stats.wanprebuf, hidden: ((nvram.wan_proto != 'pppoe') && (nvram.wan_proto != 'pptp') && (nvram.wan_proto != 'l2tp') && (nvram.wan_proto != 'ppp3g')) }, //Victek
 	{ title: 'Subnet Mask', rid: 'wannetmask', text: stats.wannetmask },
 	{ title: 'Gateway', rid: 'wangateway', text: stats.wangateway },
 /* IPV6-BEGIN */
-	{ title: 'IPv6 <#address#>', rid: 'ip6_wan', text: stats.ip6_wan, hidden: (stats.ip6_wan == '') },
+	{ title: 'IPv6 <% _("Address"); %>', rid: 'ip6_wan', text: stats.ip6_wan, hidden: (stats.ip6_wan == '') },
 /* IPV6-END */
 	{ title: 'DNS', rid: 'dns', text: stats.dns },
 	{ title: 'MTU', text: nvram.wan_run_mtu },
