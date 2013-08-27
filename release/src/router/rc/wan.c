@@ -135,8 +135,6 @@ static int config_pppd(int wan_proto, int num)
 		"defaultroute\n"	// Add a default route to the system routing tables, using the peer as the gateway
 		"usepeerdns\n"		// Ask the peer for up to 2 DNS server addresses
 		"default-asyncmap\n"	// Disable  asyncmap  negotiation
-		"nopcomp\n"		// Disable protocol field compression
-		"noaccomp\n"		// Disable Address/Control compression
 		"novj\n"		// Disable Van Jacobson style TCP/IP header compression
 		"nobsdcomp\n"		// Disable BSD-Compress  compression
 		"nodeflate\n"		// Disable Deflate compression
@@ -149,6 +147,24 @@ static int config_pppd(int wan_proto, int num)
 		nvram_get_int("pppoe_lei") ? : 10,
 		nvram_get_int("pppoe_lef") ? : 5,
 		nvram_get_int("debug_ppp") ? "debug\n" : "");
+
+#ifdef LINUX26
+#ifdef TCONFIG_USB
+	if (nvram_match("wan_proto", "ppp3g") && nvram_match("modem_dev", "ttyACM0") ) {
+		//don`t write nopcomp and noaccomp options
+	} else {
+#endif
+#endif
+		fprintf(fp,
+			"nopcomp\n"		// Disable protocol field compression
+			"noaccomp\n"		// Disable Address/Control compression
+			);
+#ifdef LINUX26
+#ifdef TCONFIG_USB
+	}
+#endif
+#endif
+
 
 	if (wan_proto != WP_L2TP) {
 		fprintf(fp,
@@ -297,6 +313,7 @@ static void stop_ppp(void)
 
 static void run_pppd(void)
 {
+
 	eval("pppd", "file", (char *)ppp_optfile);
 
 	if (nvram_get_int("ppp_demand")) {
@@ -996,6 +1013,8 @@ void start_wan_done(char *wan_ifname)
 
 	if (wanup) {
 		SET_LED(GOT_IP);
+		notice_set("wan", "");
+		
 		run_nvscript("script_wanup", NULL, 0);
 	}
 
@@ -1032,7 +1051,7 @@ void start_wan_done(char *wan_ifname)
 #endif
 
 	unlink(wan_connecting);
-
+	qoslimit_start(); //!! RAF
 	TRACE_PT("end\n");
 }
 
@@ -1050,7 +1069,7 @@ void stop_wan(void)
 	start_dnsmasq();
 #endif
 	stop_arpbind();
-	stop_qoslimit();
+	stop_qoslimit(); //!! RAF
 	stop_qos();
 	stop_upnp();	//!!TB - moved from stop_services()
 	stop_firewall();
