@@ -13,7 +13,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <time.h>
-
+#include <libgnuintl.h>
 
 //	#define DEBUG_NOEXECSERVICE
 #define DEBUG_NVRAMSET(k, v)	_dprintf("nvram set %s=%s\n", k, v);
@@ -240,7 +240,11 @@ static void wo_ip6tables(char *url)
 	web_pipecmd("ip6tables -nvL; echo; ip6tables -t mangle -nvL", WOF_NONE);
 }
 #endif
-
+/* _("msgid"[,defaultvalue])*/
+static void asp_gettext(int argc, char **argv) {
+	if(argc > 0)
+		web_puts(gettext(argv[0]));
+}
 /*
 static void wo_spin(char *url)
 {
@@ -417,6 +421,7 @@ const aspapi_t aspapi[] = {
 #endif
 
 	{ "css",				asp_css				},
+	{ "_",					asp_gettext			},
 	{ NULL,					NULL				}
 };
 
@@ -946,6 +951,7 @@ static const nvset_t nvset_list[] = {
 	{ "http_lanport",		V_PORT				},
 	{ "https_lanport",		V_PORT				},
 	{ "web_wl_filter",		V_01				},
+	{ "web_lang",			V_LENGTH(0, 6)		},
 	{ "web_css",			V_LENGTH(1, 32)		},
 	{ "ttb_css",			V_LENGTH(0, 128)		},
 	{ "web_mx",				V_LENGTH(0, 128)	},
@@ -1687,6 +1693,13 @@ static int save_variables(int write)
 			resmsg_set(s);
 			return 0;
   		}
+	}
+
+	char *lang;
+	if((lang = webcgi_get("web_lang")) != NULL) {
+		setenv("LANG",lang,1);
+		extern int  _nl_msg_cat_cntr;
+		++_nl_msg_cat_cntr;
 	}
 
 	for (n = 0; n < 50; ++n) {

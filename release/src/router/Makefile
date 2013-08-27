@@ -661,7 +661,7 @@ busybox-config:
 	$(MAKE) -C busybox menuconfig
 
 
-httpd: shared nvram mssl
+httpd: shared nvram mssl gettext
 	@$(SEP)
 	@$(MAKE) -C httpd
 

@@ -70,6 +70,8 @@
 
 #include <wlutils.h>
 
+#include <libgnuintl.h>
+#include <locale.h>
 
 #include "../mssl/mssl.h"
 int do_ssl;
@@ -918,6 +920,7 @@ int main(int argc, char **argv)
 	struct sockaddr_storage sai;
 	char bind[128];
 	char *port = NULL;
+	const char *lang = NULL;
 #ifdef TCONFIG_IPV6
 	int ip6 = 0;
 #else
@@ -997,7 +1000,13 @@ int main(int argc, char **argv)
 	signal(SIGHUP, SIG_IGN);
 	signal(SIGCHLD, SIG_IGN);
 
-	load_dictionary();
+        lang = nvram_get("web_lang");
+	if(lang == NULL || *lang ==0)
+		lang = "en_US";
+	setenv("LANG",lang,1);
+	setlocale (LC_ALL, "");
+	bindtextdomain ("www", "/usr/share/locales");
+	textdomain ("www");
 	for (;;) {
 
 		/* Do a select() on at least one and possibly many listen fds.

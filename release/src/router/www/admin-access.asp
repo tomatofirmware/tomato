@@ -29,7 +29,7 @@ textarea {
 
 <script type='text/javascript'>
 
-//	<% nvram("http_enable,https_enable,http_lanport,https_lanport,remote_management,remote_mgt_https,web_wl_filter,web_css,ttb_css,sshd_eas,sshd_pass,sshd_remote,telnetd_eas,http_wanport,sshd_authkeys,sshd_port,sshd_rport,sshd_forwarding,telnetd_port,rmgt_sip,https_crt_cn,https_crt_save,lan_ipaddr,ne_shlimit,sshd_motd"); %>
+//	<% nvram("http_enable,https_enable,http_lanport,https_lanport,remote_management,remote_mgt_https,web_lang,web_wl_filter,web_css,ttb_css,sshd_eas,sshd_pass,sshd_remote,telnetd_eas,http_wanport,sshd_authkeys,sshd_port,sshd_rport,sshd_forwarding,telnetd_port,rmgt_sip,https_crt_cn,https_crt_save,lan_ipaddr,ne_shlimit,sshd_motd"); %>
 
 changed = 0;
 tdup = parseInt('<% psup("telnetd"); %>');
@@ -234,6 +234,8 @@ function save()
 	}
 	fom.web_mx.value = a.join(',');
 
+	fom.web_lang.value = E('_f_web_lang').value;
+
 	form.submit(fom, 0);
 }
 
@@ -276,7 +278,7 @@ function init()
 <input type='hidden' name='rmgt_sip'>
 <input type='hidden' name='sshd_forwarding'>
 <input type='hidden' name='web_mx'>
-
+<input type='hidden' name='web_lang'>
 <div class='section-title'>Web Admin</div>
 <div class='section'>
 <script type='text/javascript'>

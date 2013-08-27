@@ -153,6 +153,9 @@ sub fixDyn
 	fixDynDep("pppd", "pppol2tp.so");
 	fixDynDep("pppd", "pptp.so");
 	fixDynDep("pppd", "rp-pppoe.so");
+#tomatoegg
+	fixDynDep("httpd", "libgnuintl.so.8.1.2");
+#
 
 	fixDynDep("libcrypto.so.1.0.0", "libssl.so.1.0.0");
 
