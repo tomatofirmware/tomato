@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TomatoEgg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-28 12:29-0400\n"
-"PO-Revision-Date: 2013-08-28 12:44-0500\n"
+"POT-Creation-Date: 2013-08-28 14:18-0400\n"
+"PO-Revision-Date: 2013-08-28 14:19-0500\n"
 "Last-Translator: Zhiqiang <Wang.9264@gmail.com>\n"
 "Language-Team: TomatoEgg Translators <translate@tomatoegg.net>\n"
 "MIME-Version: 1.0\n"
@@ -15,15 +15,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.5.7\n"
 
-#: ../www/admin-access.asp:300
+#: ../www/admin-access.asp:301
 msgid "Language"
 msgstr "Language"
 
-#: ../www/admin-access.asp:300
+#: ../www/admin-access.asp:301
 msgid "English"
 msgstr "English"
 
-#: ../www/admin-access.asp:300
+#: ../www/admin-access.asp:301
 msgid "Chinese"
 msgstr "Chinese"
 
@@ -115,7 +115,7 @@ msgstr "TomatoAnon configuration page"
 msgid "and make a choice."
 msgstr "and make a choice."
 
-#: ../www/status-overview.asp:359
+#: ../www/status-overview.asp:359 ../www/tomato.js:2372
 msgid "System"
 msgstr "System"
 
@@ -144,7 +144,7 @@ msgstr "CPU Freq"
 msgid "Flash Size"
 msgstr "Flash Size"
 
-#: ../www/status-overview.asp:370
+#: ../www/status-overview.asp:370 ../www/tomato.js:2382
 msgid "Time"
 msgstr "Time"
 
@@ -229,7 +229,7 @@ msgstr "DNS"
 msgid "MTU"
 msgstr "MTU"
 
-#: ../www/status-overview.asp:399
+#: ../www/status-overview.asp:399 ../www/tomato.js:2349
 msgid "Status"
 msgstr "Status"
 
@@ -277,7 +277,7 @@ msgstr "Router IPv6 Address"
 msgid "IPv6 Link-local Address"
 msgstr "IPv6 Link-local Address"
 
-#: ../www/status-overview.asp:499
+#: ../www/status-overview.asp:499 ../www/tomato.js:2390
 msgid "MAC Address"
 msgstr "MAC Address"
 
@@ -352,3 +352,331 @@ msgstr "Enable"
 #: ../www/status-overview.asp:520
 msgid "Disable"
 msgstr "Disable"
+
+#: ../www/tomato.js:2350
+msgid "Overview"
+msgstr "Overview"
+
+#: ../www/tomato.js:2351
+msgid "Device List"
+msgstr "Device List"
+
+#: ../www/tomato.js:2352
+msgid "Web Usage"
+msgstr "Web Usage"
+
+#: ../www/tomato.js:2353
+msgid "Logs"
+msgstr "Logs"
+
+#: ../www/tomato.js:2354
+msgid "Bandwidth"
+msgstr "Bandwidth"
+
+#: ../www/tomato.js:2355 ../www/tomato.js:2362
+msgid "Real-Time"
+msgstr "Real-Time"
+
+#: ../www/tomato.js:2356 ../www/tomato.js:2363
+msgid "Last 24 Hours"
+msgstr "Last 24 Hours"
+
+#: ../www/tomato.js:2357 ../www/tomato.js:2366
+msgid "Daily"
+msgstr "Daily"
+
+#: ../www/tomato.js:2358
+msgid "Weekly"
+msgstr "Weekly"
+
+#: ../www/tomato.js:2359 ../www/tomato.js:2367
+msgid "Monthly"
+msgstr "Monthly"
+
+#: ../www/tomato.js:2361
+msgid "IP Traffic"
+msgstr "IP Traffic"
+
+#: ../www/tomato.js:2364 ../www/tomato.js:2412
+msgid "View Graphs"
+msgstr "View Graphs"
+
+#: ../www/tomato.js:2365 ../www/tomato.js:2414
+msgid "Transfer Rates"
+msgstr "Transfer Rates"
+
+#: ../www/tomato.js:2369
+msgid "Tools"
+msgstr "Tools"
+
+#: ../www/tomato.js:2370
+msgid "Ping"
+msgstr "Ping"
+
+#: ../www/tomato.js:2371
+msgid "Trace"
+msgstr "Trace"
+
+#: ../www/tomato.js:2373
+msgid "Wireless Survey"
+msgstr "Wireless Survey"
+
+#: ../www/tomato.js:2374
+msgid "WOL"
+msgstr "WOL"
+
+#: ../www/tomato.js:2376 ../www/tomato.js:2401
+msgid "Basic"
+msgstr "Basic"
+
+#: ../www/tomato.js:2377
+msgid "Network"
+msgstr "Network"
+
+#: ../www/tomato.js:2379
+msgid "IPv6"
+msgstr "IPv6"
+
+#: ../www/tomato.js:2381
+msgid "Identification"
+msgstr "Identification"
+
+#: ../www/tomato.js:2383
+msgid "DDNS"
+msgstr "DDNS"
+
+#: ../www/tomato.js:2384
+msgid "Static DHCP/ARP/IPT"
+msgstr "Static DHCP/ARP/IPT"
+
+#: ../www/tomato.js:2385
+msgid "Wireless Filter"
+msgstr "Wireless Filter"
+
+#: ../www/tomato.js:2386
+msgid "Advanced"
+msgstr "Advanced"
+
+#: ../www/tomato.js:2387
+msgid "Conntrack/Netfilter"
+msgstr "Conntrack/Netfilter"
+
+#: ../www/tomato.js:2388
+msgid "DHCP/DNS"
+msgstr "DHCP/DNS"
+
+#: ../www/tomato.js:2389
+msgid "Firewall"
+msgstr "Firewall"
+
+#: ../www/tomato.js:2391
+msgid "Miscellaneous"
+msgstr "Miscellaneous"
+
+#: ../www/tomato.js:2392
+msgid "Routing"
+msgstr "Routing"
+
+#: ../www/tomato.js:2394
+msgid "TOR Project"
+msgstr "TOR Project"
+
+#: ../www/tomato.js:2396
+msgid "VLAN"
+msgstr "VLAN"
+
+#: ../www/tomato.js:2397
+msgid "LAN Access"
+msgstr "LAN Access"
+
+#: ../www/tomato.js:2398
+msgid "Virtual Wireless"
+msgstr "Virtual Wireless"
+
+#: ../www/tomato.js:2399
+msgid "Wireless"
+msgstr "Wireless"
+
+#: ../www/tomato.js:2400
+msgid "Port Forwarding"
+msgstr "Port Forwarding"
+
+#: ../www/tomato.js:2403
+msgid "Basic IPv6"
+msgstr "Basic IPv6"
+
+#: ../www/tomato.js:2405
+msgid "DMZ"
+msgstr "DMZ"
+
+#: ../www/tomato.js:2406
+msgid "Triggered"
+msgstr "Triggered"
+
+#: ../www/tomato.js:2407
+msgid "UPnP/NAT-PMP"
+msgstr "UPnP/NAT-PMP"
+
+#: ../www/tomato.js:2408
+msgid "Access Restriction"
+msgstr "Access Restriction"
+
+#: ../www/tomato.js:2409
+msgid "QoS"
+msgstr "QoS"
+
+#: ../www/tomato.js:2410
+msgid "Basic Settings"
+msgstr "Basic Settings"
+
+#: ../www/tomato.js:2411
+msgid "Classification"
+msgstr "Classification"
+
+#: ../www/tomato.js:2413
+msgid "View Details"
+msgstr "View Details"
+
+#: ../www/tomato.js:2416
+msgid "Bandwidth Limiter"
+msgstr "Bandwidth Limiter"
+
+#: ../www/tomato.js:2419
+msgid "Captive Portal"
+msgstr "Captive Portal"
+
+#: ../www/tomato.js:2431
+msgid "USB and NAS"
+msgstr "USB and NAS"
+
+#: ../www/tomato.js:2432
+msgid "USB Support"
+msgstr "USB Support"
+
+#: ../www/tomato.js:2434
+msgid "FTP Server"
+msgstr "FTP Server"
+
+#: ../www/tomato.js:2437
+msgid "File Sharing"
+msgstr "File Sharing"
+
+#: ../www/tomato.js:2440
+msgid "Media Server"
+msgstr "Media Server"
+
+#: ../www/tomato.js:2443
+msgid "UPS Monitor"
+msgstr "UPS Monitor"
+
+#: ../www/tomato.js:2446
+msgid "BitTorrent Client"
+msgstr "BitTorrent Client"
+
+#: ../www/tomato.js:2451
+msgid "VPN Tunneling"
+msgstr "VPN Tunneling"
+
+#: ../www/tomato.js:2453
+msgid "OpenVPN Server"
+msgstr "OpenVPN Server"
+
+#: ../www/tomato.js:2454
+msgid "OpenVPN Client"
+msgstr "OpenVPN Client"
+
+#: ../www/tomato.js:2457
+msgid "PPTP Server"
+msgstr "PPTP Server"
+
+#: ../www/tomato.js:2458
+msgid "PPTP Online"
+msgstr "PPTP Online"
+
+#: ../www/tomato.js:2459
+msgid "PPTP Client"
+msgstr "PPTP Client"
+
+#: ../www/tomato.js:2464
+msgid "Administration"
+msgstr "Administration"
+
+#: ../www/tomato.js:2465
+msgid "Admin Access"
+msgstr "Admin Access"
+
+#: ../www/tomato.js:2466
+msgid "TomatoAnon"
+msgstr "TomatoAnon"
+
+#: ../www/tomato.js:2467
+msgid "Bandwidth Monitoring"
+msgstr "Bandwidth Monitoring"
+
+#: ../www/tomato.js:2468
+msgid "IP Traffic Monitoring"
+msgstr "IP Traffic Monitoring"
+
+#: ../www/tomato.js:2469
+msgid "Buttons/LED"
+msgstr "Buttons/LED"
+
+#: ../www/tomato.js:2471
+msgid "CIFS Client"
+msgstr "CIFS Client"
+
+#: ../www/tomato.js:2474
+msgid "SDHC/MMC"
+msgstr "SDHC/MMC"
+
+#: ../www/tomato.js:2476
+msgid "Configuration"
+msgstr "Configuration"
+
+#: ../www/tomato.js:2477
+msgid "Debugging"
+msgstr "Debugging"
+
+#: ../www/tomato.js:2479
+msgid "JFFS"
+msgstr "JFFS"
+
+#: ../www/tomato.js:2482
+msgid "NFS Server"
+msgstr "NFS Server"
+
+#: ../www/tomato.js:2485
+msgid "SNMP"
+msgstr "SNMP"
+
+#: ../www/tomato.js:2487
+msgid "Logging"
+msgstr "Logging"
+
+#: ../www/tomato.js:2488
+msgid "Scheduler"
+msgstr "Scheduler"
+
+#: ../www/tomato.js:2489
+msgid "Scripts"
+msgstr "Scripts"
+
+#: ../www/tomato.js:2490
+msgid "Upgrade"
+msgstr "Upgrade"
+
+#: ../www/tomato.js:2492
+msgid "About"
+msgstr "About"
+
+#: ../www/tomato.js:2493
+msgid "Reboot"
+msgstr "Reboot"
+
+#: ../www/tomato.js:2494
+msgid "Shutdown"
+msgstr "Shutdown"
+
+#: ../www/tomato.js:2495
+msgid "Logout"
+msgstr "Logout"

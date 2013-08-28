@@ -6,25 +6,24 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TomatoEgg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-28 12:29-0400\n"
-"PO-Revision-Date: 2013-08-27 22:06-0500\n"
+"POT-Creation-Date: 2013-08-28 14:18-0400\n"
+"PO-Revision-Date: 2013-08-28 14:33-0500\n"
 "Last-Translator: Zhiqiang <Wang.9264@gmail.com>\n"
 "Language-Team: TomatoEgg Translators <translate@tomatoegg.net>\n"
-"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.5.7\n"
 
-#: ../www/admin-access.asp:300
+#: ../www/admin-access.asp:301
 msgid "Language"
 msgstr "语言"
 
-#: ../www/admin-access.asp:300
+#: ../www/admin-access.asp:301
 msgid "English"
 msgstr "英语"
 
-#: ../www/admin-access.asp:300
+#: ../www/admin-access.asp:301
 msgid "Chinese"
 msgstr "中文"
 
@@ -116,7 +115,7 @@ msgstr "TomatoAnon 配置页面"
 msgid "and make a choice."
 msgstr "进行配置。"
 
-#: ../www/status-overview.asp:359
+#: ../www/status-overview.asp:359 ../www/tomato.js:2372
 msgid "System"
 msgstr "系统"
 
@@ -145,7 +144,7 @@ msgstr "CPU频率"
 msgid "Flash Size"
 msgstr "闪存尺寸"
 
-#: ../www/status-overview.asp:370
+#: ../www/status-overview.asp:370 ../www/tomato.js:2382
 msgid "Time"
 msgstr "时间"
 
@@ -230,7 +229,7 @@ msgstr "DNS"
 msgid "MTU"
 msgstr "MTU"
 
-#: ../www/status-overview.asp:399
+#: ../www/status-overview.asp:399 ../www/tomato.js:2349
 msgid "Status"
 msgstr "状态"
 
@@ -278,7 +277,7 @@ msgstr "路由器IPv6地址"
 msgid "IPv6 Link-local Address"
 msgstr "IPv6本地链路地址"
 
-#: ../www/status-overview.asp:499
+#: ../www/status-overview.asp:499 ../www/tomato.js:2390
 msgid "MAC Address"
 msgstr "MAC地址"
 
@@ -353,3 +352,331 @@ msgstr "启用"
 #: ../www/status-overview.asp:520
 msgid "Disable"
 msgstr "禁用"
+
+#: ../www/tomato.js:2350
+msgid "Overview"
+msgstr "概览"
+
+#: ../www/tomato.js:2351
+msgid "Device List"
+msgstr "设备列表"
+
+#: ../www/tomato.js:2352
+msgid "Web Usage"
+msgstr "WEB使用状况"
+
+#: ../www/tomato.js:2353
+msgid "Logs"
+msgstr "日志"
+
+#: ../www/tomato.js:2354
+msgid "Bandwidth"
+msgstr "带宽统计"
+
+#: ../www/tomato.js:2355 ../www/tomato.js:2362
+msgid "Real-Time"
+msgstr "实时"
+
+#: ../www/tomato.js:2356 ../www/tomato.js:2363
+msgid "Last 24 Hours"
+msgstr "近24小时"
+
+#: ../www/tomato.js:2357 ../www/tomato.js:2366
+msgid "Daily"
+msgstr "按日"
+
+#: ../www/tomato.js:2358
+msgid "Weekly"
+msgstr "按周"
+
+#: ../www/tomato.js:2359 ../www/tomato.js:2367
+msgid "Monthly"
+msgstr "按月"
+
+#: ../www/tomato.js:2361
+msgid "IP Traffic"
+msgstr "IP流量"
+
+#: ../www/tomato.js:2364 ../www/tomato.js:2412
+msgid "View Graphs"
+msgstr "查看图表"
+
+#: ../www/tomato.js:2365 ../www/tomato.js:2414
+msgid "Transfer Rates"
+msgstr "传输速率"
+
+#: ../www/tomato.js:2369
+msgid "Tools"
+msgstr "工具"
+
+#: ../www/tomato.js:2370
+msgid "Ping"
+msgstr "Ping"
+
+#: ../www/tomato.js:2371
+msgid "Trace"
+msgstr "跟踪"
+
+#: ../www/tomato.js:2373
+msgid "Wireless Survey"
+msgstr "搜索无线"
+
+#: ../www/tomato.js:2374
+msgid "WOL"
+msgstr "网络唤醒"
+
+#: ../www/tomato.js:2376 ../www/tomato.js:2401
+msgid "Basic"
+msgstr "基本设置"
+
+#: ../www/tomato.js:2377
+msgid "Network"
+msgstr "网络"
+
+#: ../www/tomato.js:2379
+msgid "IPv6"
+msgstr "IPv6"
+
+#: ../www/tomato.js:2381
+msgid "Identification"
+msgstr "标识"
+
+#: ../www/tomato.js:2383
+msgid "DDNS"
+msgstr "动态域名"
+
+#: ../www/tomato.js:2384
+msgid "Static DHCP/ARP/IPT"
+msgstr "静态地址/ARP/IPT"
+
+#: ../www/tomato.js:2385
+msgid "Wireless Filter"
+msgstr "无线控制"
+
+#: ../www/tomato.js:2386
+msgid "Advanced"
+msgstr "高级设置"
+
+#: ../www/tomato.js:2387
+msgid "Conntrack/Netfilter"
+msgstr "连接限制/过滤"
+
+#: ../www/tomato.js:2388
+msgid "DHCP/DNS"
+msgstr "DHCP/DNS"
+
+#: ../www/tomato.js:2389
+msgid "Firewall"
+msgstr "防火墙"
+
+#: ../www/tomato.js:2391
+msgid "Miscellaneous"
+msgstr "其它设置"
+
+#: ../www/tomato.js:2392
+msgid "Routing"
+msgstr "路由"
+
+#: ../www/tomato.js:2394
+msgid "TOR Project"
+msgstr "TOR Project"
+
+#: ../www/tomato.js:2396
+msgid "VLAN"
+msgstr "VLAN"
+
+#: ../www/tomato.js:2397
+msgid "LAN Access"
+msgstr "LAN Access"
+
+#: ../www/tomato.js:2398
+msgid "Virtual Wireless"
+msgstr "虚拟接入点"
+
+#: ../www/tomato.js:2399
+msgid "Wireless"
+msgstr "无线"
+
+#: ../www/tomato.js:2400
+msgid "Port Forwarding"
+msgstr "端口转发"
+
+#: ../www/tomato.js:2403
+msgid "Basic IPv6"
+msgstr "IPv6基本设置"
+
+#: ../www/tomato.js:2405
+msgid "DMZ"
+msgstr "DMZ"
+
+#: ../www/tomato.js:2406
+msgid "Triggered"
+msgstr "端口触发"
+
+#: ../www/tomato.js:2407
+msgid "UPnP/NAT-PMP"
+msgstr "UPnP/NAT-PMP"
+
+#: ../www/tomato.js:2408
+msgid "Access Restriction"
+msgstr "访问限制"
+
+#: ../www/tomato.js:2409
+msgid "QoS"
+msgstr "QoS"
+
+#: ../www/tomato.js:2410
+msgid "Basic Settings"
+msgstr "基础设置"
+
+#: ../www/tomato.js:2411
+msgid "Classification"
+msgstr "协议识别"
+
+#: ../www/tomato.js:2413
+msgid "View Details"
+msgstr "查看详情"
+
+#: ../www/tomato.js:2416
+msgid "Bandwidth Limiter"
+msgstr "带宽限制"
+
+#: ../www/tomato.js:2419
+msgid "Captive Portal"
+msgstr "强制网络门户"
+
+#: ../www/tomato.js:2431
+msgid "USB and NAS"
+msgstr "USB和NAS"
+
+#: ../www/tomato.js:2432
+msgid "USB Support"
+msgstr "USB支持"
+
+#: ../www/tomato.js:2434
+msgid "FTP Server"
+msgstr "FTP服务器"
+
+#: ../www/tomato.js:2437
+msgid "File Sharing"
+msgstr "文件共享"
+
+#: ../www/tomato.js:2440
+msgid "Media Server"
+msgstr "媒体服务器"
+
+#: ../www/tomato.js:2443
+msgid "UPS Monitor"
+msgstr "UPS监视"
+
+#: ../www/tomato.js:2446
+msgid "BitTorrent Client"
+msgstr "BT客户端"
+
+#: ../www/tomato.js:2451
+msgid "VPN Tunneling"
+msgstr "虚拟专用网"
+
+#: ../www/tomato.js:2453
+msgid "OpenVPN Server"
+msgstr "OpenVPN服务器"
+
+#: ../www/tomato.js:2454
+msgid "OpenVPN Client"
+msgstr "OpenVPN客户端"
+
+#: ../www/tomato.js:2457
+msgid "PPTP Server"
+msgstr "PPTP服务器"
+
+#: ../www/tomato.js:2458
+msgid "PPTP Online"
+msgstr "PPTP在线列表"
+
+#: ../www/tomato.js:2459
+msgid "PPTP Client"
+msgstr "PPTP客户端"
+
+#: ../www/tomato.js:2464
+msgid "Administration"
+msgstr "管理设定"
+
+#: ../www/tomato.js:2465
+msgid "Admin Access"
+msgstr "访问控制"
+
+#: ../www/tomato.js:2466
+msgid "TomatoAnon"
+msgstr "TomatoAnon"
+
+#: ../www/tomato.js:2467
+msgid "Bandwidth Monitoring"
+msgstr "带宽监控"
+
+#: ../www/tomato.js:2468
+msgid "IP Traffic Monitoring"
+msgstr "IP流量监控"
+
+#: ../www/tomato.js:2469
+msgid "Buttons/LED"
+msgstr "按钮/LED"
+
+#: ../www/tomato.js:2471
+msgid "CIFS Client"
+msgstr "CIFS客户端"
+
+#: ../www/tomato.js:2474
+msgid "SDHC/MMC"
+msgstr "闪存卡"
+
+#: ../www/tomato.js:2476
+msgid "Configuration"
+msgstr "配置"
+
+#: ../www/tomato.js:2477
+msgid "Debugging"
+msgstr "调试"
+
+#: ../www/tomato.js:2479
+msgid "JFFS"
+msgstr "JFFS"
+
+#: ../www/tomato.js:2482
+msgid "NFS Server"
+msgstr "NFS服务器"
+
+#: ../www/tomato.js:2485
+msgid "SNMP"
+msgstr "SNMP"
+
+#: ../www/tomato.js:2487
+msgid "Logging"
+msgstr "日志"
+
+#: ../www/tomato.js:2488
+msgid "Scheduler"
+msgstr "计划调度"
+
+#: ../www/tomato.js:2489
+msgid "Scripts"
+msgstr "脚本管理"
+
+#: ../www/tomato.js:2490
+msgid "Upgrade"
+msgstr "升级"
+
+#: ../www/tomato.js:2492
+msgid "About"
+msgstr "关于"
+
+#: ../www/tomato.js:2493
+msgid "Reboot"
+msgstr "重启路由器"
+
+#: ../www/tomato.js:2494
+msgid "Shutdown"
+msgstr "关闭路由器"
+
+#: ../www/tomato.js:2495
+msgid "Logout"
+msgstr "退出"

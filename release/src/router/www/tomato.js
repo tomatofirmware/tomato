@@ -2346,77 +2346,77 @@ function myName()
 function navi()
 {
 	var menu = [
-		['Status', 			'status', 0, [
-			['Overview',			'overview.asp'],
-			['Device List',			'devices.asp'],
-			['Web Usage',			'webmon.asp'],
-			['Logs',			'log.asp'] ] ],
-		['Bandwidth', 			'bwm', 0, [
-			['Real-Time',			'realtime.asp'],
-			['Last 24 Hours',		'24.asp'],
-			['Daily',			'daily.asp'],
-			['Weekly',			'weekly.asp'],
-			['Monthly',			'monthly.asp']
+		['<% _("Status"); %>', 			'status', 0, [
+			['<% _("Overview"); %>',			'overview.asp'],
+			['<% _("Device List"); %>',			'devices.asp'],
+			['<% _("Web Usage"); %>',			'webmon.asp'],
+			['<% _("Logs"); %>',			'log.asp'] ] ],
+		['<% _("Bandwidth"); %>', 			'bwm', 0, [
+			['<% _("Real-Time"); %>',			'realtime.asp'],
+			['<% _("Last 24 Hours"); %>',		'24.asp'],
+			['<% _("Daily"); %>',			'daily.asp'],
+			['<% _("Weekly"); %>',			'weekly.asp'],
+			['<% _("Monthly"); %>',			'monthly.asp']
 			] ],
-		['IP Traffic',			'ipt', 0, [
-			['Real-Time',			'realtime.asp'],
-			['Last 24 Hours',		'24.asp'],
-			['View Graphs',			'graphs.asp'],
-			['Transfer Rates',		'details.asp'],
-			['Daily',			'daily.asp'],
-			['Monthly',			'monthly.asp']
+		['<% _("IP Traffic") %>',			'ipt', 0, [
+			['<% _("Real-Time"); %>',			'realtime.asp'],
+			['<% _("Last 24 Hours"); %>',		'24.asp'],
+			['<% _("View Graphs"); %>',			'graphs.asp'],
+			['<% _("Transfer Rates"); %>',		'details.asp'],
+			['<% _("Daily"); %>',			'daily.asp'],
+			['<% _("Monthly"); %>',			'monthly.asp']
 			] ],
-		['Tools', 			'tools', 0, [
-			['Ping',			'ping.asp'],
-			['Trace',			'trace.asp'],
-			['System',			'shell.asp'],
-			['Wireless Survey',		'survey.asp'],
-			['WOL',				'wol.asp'] ] ],
+		['<% _("Tools"); %>', 			'tools', 0, [
+			['<% _("Ping"); %>',			'ping.asp'],
+			['<% _("Trace"); %>',			'trace.asp'],
+			['<% _("System"); %>',			'shell.asp'],
+			['<% _("Wireless Survey"); %>',		'survey.asp'],
+			['<% _("WOL"); %>',				'wol.asp'] ] ],
 		null,
-		['Basic', 			'basic', 0, [
-			['Network',			'network.asp'],
+		['<% _("Basic"); %>', 			'basic', 0, [
+			['<% _("Network"); %>',			'network.asp'],
 /* IPV6-BEGIN */
-			['IPv6',			'ipv6.asp'],
+			['<% _("IPv6"); %>',			'ipv6.asp'],
 /* IPV6-END */
-			['Identification',		'ident.asp'],
-			['Time',			'time.asp'],
-			['DDNS',			'ddns.asp'],
-			['Static DHCP/ARP/IPT',		'static.asp'],
-			['Wireless Filter',		'wfilter.asp'] ] ],
-		['Advanced', 			'advanced', 0, [
-			['Conntrack/Netfilter',		'ctnf.asp'],
-			['DHCP/DNS',			'dhcpdns.asp'],
-			['Firewall',			'firewall.asp'],
-			['MAC Address',			'mac.asp'],
-			['Miscellaneous',		'misc.asp'],
-			['Routing',			'routing.asp'],
+			['<% _("Identification"); %>',		'ident.asp'],
+			['<% _("Time"); %>',			'time.asp'],
+			['<% _("DDNS"); %>',			'ddns.asp'],
+			['<% _("Static DHCP/ARP/IPT"); %>',		'static.asp'],
+			['<% _("Wireless Filter"); %>',		'wfilter.asp'] ] ],
+		['<% _("Advanced"); %>', 			'advanced', 0, [
+			['<% _("Conntrack/Netfilter"); %>',		'ctnf.asp'],
+			['<% _("DHCP/DNS"); %>',			'dhcpdns.asp'],
+			['<% _("Firewall"); %>',			'firewall.asp'],
+			['<% _("MAC Address"); %>',			'mac.asp'],
+			['<% _("Miscellaneous"); %>',		'misc.asp'],
+			['<% _("Routing"); %>',			'routing.asp'],
 /* TOR-BEGIN */
-			['TOR Project',			'tor.asp'],
+			['<% _("TOR Project"); %>',			'tor.asp'],
 /* TOR-END */
-			['VLAN',			'vlan.asp'],
-			['LAN Access',			'access.asp'],
-			['Virtual Wireless',		'wlanvifs.asp'],
-			['Wireless',			'wireless.asp'] ] ],
-		['Port Forwarding', 		'forward', 0, [
-			['Basic',			'basic.asp'],
+			['<% _("VLAN"); %>',			'vlan.asp'],
+			['<% _("LAN Access"); %>',			'access.asp'],
+			['<% _("Virtual Wireless"); %>',		'wlanvifs.asp'],
+			['<% _("Wireless"); %>',			'wireless.asp'] ] ],
+		['<% _("Port Forwarding"); %>', 		'forward', 0, [
+			['<% _("Basic"); %>',			'basic.asp'],
 /* IPV6-BEGIN */
-			['Basic IPv6',			'basic-ipv6.asp'],
+			['<% _("Basic IPv6"); %>',			'basic-ipv6.asp'],
 /* IPV6-END */
-			['DMZ',				'dmz.asp'],
-			['Triggered',			'triggered.asp'],
-			['UPnP/NAT-PMP',		'upnp.asp'] ] ],
-		['Access Restriction',		'restrict.asp'],
-		['QoS',				'qos', 0, [
-			['Basic Settings',		'settings.asp'],
-			['Classification',		'classify.asp'],
-			['View Graphs',			'graphs.asp'],
-			['View Details',		'detailed.asp'],
-			['Transfer Rates',		'ctrate.asp']
+			['<% _("DMZ"); %>',				'dmz.asp'],
+			['<% _("Triggered"); %>',			'triggered.asp'],
+			['<% _("UPnP/NAT-PMP"); %>',		'upnp.asp'] ] ],
+		['<% _("Access Restriction"); %>',		'restrict.asp'],
+		['<% _("QoS"); %>',				'qos', 0, [
+			['<% _("Basic Settings"); %>',		'settings.asp'],
+			['<% _("Classification"); %>',		'classify.asp'],
+			['<% _("View Graphs"); %>',			'graphs.asp'],
+			['<% _("View Details"); %>',		'detailed.asp'],
+			['<% _("Transfer Rates"); %>',		'ctrate.asp']
 			] ],
-		['Bandwidth Limiter',		'bwlimit.asp'],
+		['<% _("Bandwidth Limiter"); %>',		'bwlimit.asp'],
 		null,
 /* NOCAT-BEGIN */
-		['Captive Portal',		'splashd.asp'],
+		['<% _("Captive Portal"); %>',		'splashd.asp'],
 /* NOCAT-END */
 /* REMOVE-BEGIN
 		['Scripts',				'sc', 0, [
@@ -2428,71 +2428,71 @@ function navi()
 REMOVE-END */
 /* USB-BEGIN */
 // ---- !!TB - USB, FTP, Samba, Media Server
-		['USB and NAS',			'nas', 0, [
-			['USB Support',			'usb.asp']
+		['<% _("USB and NAS"); %>',			'nas', 0, [
+			['<% _("USB Support"); %>',			'usb.asp']
 /* FTP-BEGIN */
-			,['FTP Server',			'ftp.asp']
+			,['<% _("FTP Server"); %>',			'ftp.asp']
 /* FTP-END */
 /* SAMBA-BEGIN */
-			,['File Sharing',		'samba.asp']
+			,['<% _("File Sharing"); %>',		'samba.asp']
 /* SAMBA-END */
 /* MEDIA-SRV-BEGIN */
-			,['Media Server',		'media.asp']
+			,['<% _("Media Server"); %>',		'media.asp']
 /* MEDIA-SRV-END */
 /* UPS-BEGIN */
-			,['UPS Monitor',		'ups.asp']
+			,['<% _("UPS Monitor"); %>',		'ups.asp']
 /* UPS-END */
 /* BT-BEGIN */
-			,['BitTorrent Client',		'bittorrent.asp']
+			,['<% _("BitTorrent Client"); %>',		'bittorrent.asp']
 /* BT-END */
 			] ],
 /* USB-END */
 /* VPN-BEGIN */
-		['VPN Tunneling',			'vpn', 0, [
+		['<% _("VPN Tunneling"); %>',			'vpn', 0, [
 /* OPENVPN-BEGIN */
-			['OpenVPN Server',		'server.asp'],
-			['OpenVPN Client',		'client.asp'],
+			['<% _("OpenVPN Server"); %>',		'server.asp'],
+			['<% _("OpenVPN Client"); %>',		'client.asp'],
 /* OPENVPN-END */
 /* PPTPD-BEGIN */
-			['PPTP Server',			'pptp-server.asp'],
-			['PPTP Online',			'pptp-online.asp'],
-			['PPTP Client',			'pptp.asp']
+			['<% _("PPTP Server"); %>',			'pptp-server.asp'],
+			['<% _("PPTP Online"); %>',			'pptp-online.asp'],
+			['<% _("PPTP Client"); %>',			'pptp.asp']
 /* PPTPD-END */
 		] ],
 /* VPN-END */
 		null,
-		['Administration',		'admin', 0, [
-			['Admin Access',		'access.asp'],
-			['TomatoAnon',			'tomatoanon.asp'],
-			['Bandwidth Monitoring',	'bwm.asp'],
-			['IP Traffic Monitoring',	'iptraffic.asp'],
-			['Buttons/LED',			'buttons.asp'],
+		['<% _("Administration"); %>',		'admin', 0, [
+			['<% _("Admin Access"); %>',		'access.asp'],
+			['<% _("TomatoAnon"); %>',			'tomatoanon.asp'],
+			['<% _("Bandwidth Monitoring"); %>',	'bwm.asp'],
+			['<% _("IP Traffic Monitoring"); %>',	'iptraffic.asp'],
+			['<% _("Buttons/LED"); %>',			'buttons.asp'],
 /* CIFS-BEGIN */
-			['CIFS Client',			'cifs.asp'],
+			['<% _("CIFS Client"); %>',			'cifs.asp'],
 /* CIFS-END */
 /* SDHC-BEGIN */
-			['SDHC/MMC',			'sdhc.asp'],
+			['<% _("SDHC/MMC"); %>',			'sdhc.asp'],
 /* SDHC-END */
-			['Configuration',		'config.asp'],
-			['Debugging',			'debug.asp'],
+			['<% _("Configuration"); %>',		'config.asp'],
+			['<% _("Debugging"); %>',			'debug.asp'],
 /* JFFS2-BEGIN */
-			['JFFS',			'jffs2.asp'],
+			['<% _("JFFS"); %>',			'jffs2.asp'],
 /* JFFS2-END */
 /* NFS-BEGIN */
-			['NFS Server',			'nfs.asp'],
+			['<% _("NFS Server"); %>',			'nfs.asp'],
 /* NFS-END */
 /* SNMP-BEGIN */
-			['SNMP',			'snmp.asp'],
+			['<% _("SNMP"); %>',			'snmp.asp'],
 /* SNMP-END */
-			['Logging',			'log.asp'],
-			['Scheduler',			'sched.asp'],
-			['Scripts',			'scripts.asp'],
-			['Upgrade',			'upgrade.asp'] ] ],
+			['<% _("Logging"); %>',			'log.asp'],
+			['<% _("Scheduler"); %>',			'sched.asp'],
+			['<% _("Scripts"); %>',			'scripts.asp'],
+			['<% _("Upgrade"); %>',			'upgrade.asp'] ] ],
 		null,
-		['About',			'about.asp'],
-		['Reboot...',			'javascript:reboot()'],
-		['Shutdown...',			'javascript:shutdown()'],
-		['Logout',			'javascript:logout()']
+		['<% _("About"); %>',			'about.asp'],
+		['<% _("Reboot"); %>...',			'javascript:reboot()'],
+		['<% _("Shutdown"); %>...',			'javascript:shutdown()'],
+		['<% _("Logout"); %>',			'javascript:logout()']
 	];
 	var name, base;
 	var i, j;
