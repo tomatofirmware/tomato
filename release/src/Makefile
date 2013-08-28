@@ -445,6 +445,10 @@ define RouterOptions
 		sed -i "/TCONFIG_HTTPS/d" $(1); \
 		echo "# TCONFIG_HTTPS is not set" >>$(1); \
 	fi; \
+	if [ "$(NO_I18N)" = "y" ]; then \
+		sed -i "/TCONFIG_I18N/d" $(1); \
+		echo "# TCONFIG_I18N is not set" >>$(1); \
+	fi; \
 	if [ "$(NO_XXTP)" = "y" ]; then \
 		sed -i "/TCONFIG_L2TP/d" $(1); \
 		echo "# TCONFIG_L2TP is not set" >>$(1); \

@@ -247,6 +247,10 @@ ifneq ($(TCONFIG_DNSCRYPT),y)
 	sed -i $(INSTALLDIR)/www/about.asp -e "/DNSCRYPT-BEGIN/,/DNSCRYPT-END/d"
 endif
 
+ifneq ($(TCONFIG_I18N),y)
+	sed -i $(INSTALLDIR)/www/admin-access.asp -e "/I18N-BEGIN/,/I18N-END/d"
+endif
+
 # clean up
 	cd $(INSTALLDIR)/www && \
 	for F in $(wildcard *.asp *.js *.jsx *.html); do \

@@ -201,8 +201,8 @@ else
 endif
 
 obj-y += wanuptime
-obj-y += gettext
-obj-y += i18n
+obj-$(TCONFIG_I18N) += gettext
+obj-$(TCONFIG_I18N) += i18n
 
 obj-clean := $(foreach obj, $(obj-y) $(obj-n) $(obj-), $(obj)-clean)
 obj-install := $(foreach obj,$(obj-y),$(obj)-install)
@@ -660,8 +660,11 @@ busybox-clean:
 busybox-config:
 	$(MAKE) -C busybox menuconfig
 
-
-httpd: shared nvram mssl gettext
+ifeq ($(TCONFIG_I18N), y)
+httpd: shared nvram mssl gettext i18n
+else
+httpd: shared nvram mssl
+endif
 	@$(SEP)
 	@$(MAKE) -C httpd
 
@@ -1976,6 +1979,7 @@ ipset-install: ipset
 
 ipset-clean:
 	-@$(MAKE) -C ipset clean
+ifeq ($(TCONFIG_I18N) ,y)
 gettext/.stamp-h1:
 	cd gettext/gettext-runtime && \
 		CFLAGS="-Os -Wall $(EXTRACFLAGS)" \
@@ -2003,7 +2007,7 @@ i18n-install: i18n
 	install -d $(INSTALLDIR)/i18n/usr/share/locales/en_US/LC_MESSAGES
 	install i18n/www/en_US.mo $(INSTALLDIR)/i18n/usr/share/locales/en_US/LC_MESSAGES/www.mo
 	install i18n/www/zh_CN.mo $(INSTALLDIR)/i18n/usr/share/locales/zh_CN/LC_MESSAGES/www.mo
-
+endif
 #
 # Generic rules
 #

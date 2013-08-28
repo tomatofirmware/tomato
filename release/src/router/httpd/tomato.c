@@ -13,7 +13,11 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <time.h>
+#ifdef TCONFIG_I18N
 #include <libgnuintl.h>
+#else
+#define gettext(Str) (Str)
+#endif
 
 //	#define DEBUG_NOEXECSERVICE
 #define DEBUG_NVRAMSET(k, v)	_dprintf("nvram set %s=%s\n", k, v);
@@ -1694,13 +1698,14 @@ static int save_variables(int write)
 			return 0;
   		}
 	}
-
+#ifdef TCONFIG_I18N
 	char *lang;
 	if((lang = webcgi_get("web_lang")) != NULL) {
 		setenv("LANG",lang,1);
 		extern int  _nl_msg_cat_cntr;
 		++_nl_msg_cat_cntr;
 	}
+#endif
 
 	for (n = 0; n < 50; ++n) {
 		sprintf(s, "rrule%d", n);

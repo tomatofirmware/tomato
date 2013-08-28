@@ -69,9 +69,10 @@
 #include <sys/stat.h>
 
 #include <wlutils.h>
-
+#ifdef TCONFIG_I18N
 #include <libgnuintl.h>
 #include <locale.h>
+#endif
 
 #include "../mssl/mssl.h"
 int do_ssl;
@@ -999,7 +1000,7 @@ int main(int argc, char **argv)
 	signal(SIGALRM, SIG_IGN);
 	signal(SIGHUP, SIG_IGN);
 	signal(SIGCHLD, SIG_IGN);
-
+#ifdef TCONFIG_I18N
         lang = nvram_get("web_lang");
 	if(lang == NULL || *lang ==0)
 		lang = "en_US";
@@ -1007,6 +1008,7 @@ int main(int argc, char **argv)
 	setlocale (LC_ALL, "");
 	bindtextdomain ("www", "/usr/share/locales");
 	textdomain ("www");
+#endif
 	for (;;) {
 
 		/* Do a select() on at least one and possibly many listen fds.
