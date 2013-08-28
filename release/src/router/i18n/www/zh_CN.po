@@ -1,0 +1,61 @@
+# 18n support for tomato.
+# Copyright (C) 'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the tomato package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: TomatoEgg\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-08-27 21:51-0400\n"
+"PO-Revision-Date: 2013-08-27 22:06-0500\n"
+"Last-Translator: Zhiqiang <Wang.9264@gmail.com>\n"
+"Language-Team: TomatoEgg Translators <translate@tomatoegg.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.5.7\n"
+
+#: ../www/status-overview.asp:117
+msgid "Ethernet Ports State"
+msgstr "有线端口状态"
+
+#: ../www/status-overview.asp:341
+msgid "Tomato"
+msgstr "Tomato"
+
+#: ../www/status-overview.asp:342
+msgid "Version"
+msgstr "版本"
+
+#: ../www/status-overview.asp:353
+msgid "Attention"
+msgstr "注意"
+
+#: ../www/status-overview.asp:354
+msgid "You did not configure <b>TomatoAnon project</b> setting."
+msgstr "您还没有对<b>TomatoAnon 项目</b> 进行设置。"
+
+#: ../www/status-overview.asp:355
+msgid "Please go to"
+msgstr "请进入"
+
+#: ../www/status-overview.asp:355
+msgid "TomatoAnon configuration page"
+msgstr "TomatoAnon 配置页面"
+
+#: ../www/status-overview.asp:355
+msgid "and make a choice."
+msgstr "进行配置。"
+
+#: ../www/status-overview.asp:359
+msgid "System"
+msgstr "系统"
+
+#: ../www/status-overview.asp:359 ../www/status-overview.asp:383
+msgid "hide"
+msgstr "隐藏"
+
+#: ../www/status-overview.asp:387 ../www/status-overview.asp:389
+#: ../www/status-overview.asp:394
+msgid "Address"
+msgstr "地址"

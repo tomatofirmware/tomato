@@ -202,6 +202,7 @@ endif
 
 obj-y += wanuptime
 obj-y += gettext
+obj-y += i18n
 
 obj-clean := $(foreach obj, $(obj-y) $(obj-n) $(obj-), $(obj)-clean)
 obj-install := $(foreach obj,$(obj-y),$(obj)-install)
@@ -1978,7 +1979,7 @@ ipset-clean:
 gettext/.stamp-h1:
 	cd gettext/gettext-runtime && \
 		CFLAGS="-Os -Wall $(EXTRACFLAGS)" \
-		./configure --host=mipsel-linux --target=mipsel-linux --disable-silent-rules --disable-java --disable-native-java --disable-csharp --disable-largefile --disable-threads --disable-nls\
+		./configure --prefix=/ --host=mipsel-linux --target=mipsel-linux --disable-silent-rules --disable-java --disable-native-java --disable-csharp --disable-largefile --disable-threads --disable-nls\
 		--disable-static --disable-rpath --disable-c++ --disable-libasprintf --disable-openmp --disable-acl \
 		--without-emacs --without-git --without-cvs --without-bzip2 --without-xz
 	touch $@
