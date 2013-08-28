@@ -204,3 +204,4 @@ extern char *utf8_to_js_string(const char *ins);
 extern char *utf8_to_html_string(const char *ins);
 
 #endif
+int get_cpuinfo(char *system_type, char *cpu_model, char *bogomips, char *cpuclk);
