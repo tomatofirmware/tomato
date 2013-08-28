@@ -40,7 +40,7 @@
 //	<% anonupdate(); %>
 
 wmo = {'ap':'<% _("Access Point"); %>','sta':'<% _("Wireless Client"); %>','wet':'<% _("Wireless Ethernet Bridge"); %>','wds':'<% _("WDS"); %>'};
-auth = {'disabled':'-','wep':'WEP','wpa_personal':'WPA Personal (PSK)','wpa_enterprise':'WPA Enterprise','wpa2_personal':'WPA2 Personal (PSK)','wpa2_enterprise':'WPA2 Enterprise','wpaX_personal':'WPA / WPA2 Personal','wpaX_enterprise':'WPA / WPA2 Enterprise','radius':'Radius'};
+auth = {'disabled':'-','wep':'WEP','wpa_personal':'<% _("WPA Personal (PSK)"); %>','wpa_enterprise':'<% _("WPA Enterprise"); %>','wpa2_personal':'<% _("WPA2 Personal (PSK)"); %>','wpa2_enterprise':'<% _("WPA2 Enterprise"); %>','wpaX_personal':'<% _("WPA / WPA2 Personal"); %>','wpaX_enterprise':'<% _("WPA / WPA2 Enterprise"); %>','radius':'<% _("Radius"); %>'};
 enc = {'tkip':'TKIP','aes':'AES','tkip+aes':'TKIP / AES'};
 bgmo = {'disabled':'-','mixed':'Auto','b-only':'B Only','g-only':'G Only','bg-mixed':'B/G Mixed','lrs':'LRS','n-only':'N Only'};
 </script>
@@ -223,8 +223,8 @@ function anon_update()
 	update = anonupdate.update;
 	if (update == "no") { return 0; }
 
-	var code = '<div class="section-title"><center>!! Attention !!</center></div>';
-	code += '<div class="fields"><center>Tomato by Shibby ' + update + ' is now available. <a target="_blank" href="http://tomato.groov.pl/">Click here to read more</a>.</center></div>';
+	var code = '<div class="section-title"><center>!! <% _("Attention"); %> !!</center></div>';
+	code += '<div class="fields"><center><% _("Tomato by Shibby "); %>' + update + ' <% _("is now available"); %>. <a target="_blank" href="http://tomato.groov.pl/"><% _("Click here to read more"); %></a>.</center></div>';
 	code += '<br></div>';
 	E("nversion").innerHTML = code;
 }
@@ -361,18 +361,18 @@ function toggleVisibility(whichone) {
 <script type='text/javascript'>
 var a = nvstat.free / nvstat.size * 100.0;
 createFieldTable('', [
-	{ title: 'Name', text: nvram.router_name },
-	{ title: 'Model', text: nvram.t_model_name },
-	{ title: 'Chipset', text: stats.systemtype },
-	{ title: 'CPU Freq', text: stats.cpumhz },
-	{ title: 'Flash Size', text: stats.flashsize },
+	{ title: '<% _("Name"); %>', text: nvram.router_name },
+	{ title: '<% _("Model"); %>', text: nvram.t_model_name },
+	{ title: '<% _("Chipset"); %>', text: stats.systemtype },
+	{ title: '<% _("CPU Freq"); %>', text: stats.cpumhz },
+	{ title: '<% _("Flash Size"); %>', text: stats.flashsize },
 	null,
-	{ title: 'Time', rid: 'time', text: stats.time },
-	{ title: 'Uptime', rid: 'uptime', text: stats.uptime },
-	{ title: 'CPU Load <small>(1 / 5 / 15 mins)</small>', rid: 'cpu', text: stats.cpuload },
-	{ title: 'Total / Free Memory', rid: 'memory', text: stats.memory },
-	{ title: 'Total / Free Swap', rid: 'swap', text: stats.swap, hidden: (stats.swap == '') },
-	{ title: 'Total / Free NVRAM', text: scaleSize(nvstat.size) + ' / ' + scaleSize(nvstat.free) + ' <small>(' + (a).toFixed(2) + '%)</small>' }
+	{ title: '<% _("Time"); %>', rid: 'time', text: stats.time },
+	{ title: '<% _("Uptime"); %>', rid: 'uptime', text: stats.uptime },
+	{ title: '<% _("CPU Load"); %> <small>(1 / 5 / 15 <% _("mins"); %>)</small>', rid: 'cpu', text: stats.cpuload },
+	{ title: '<% _("Total / Free Memory"); %>', rid: 'memory', text: stats.memory },
+	{ title: '<% _("Total / Free Swap"); %>', rid: 'swap', text: stats.swap, hidden: (stats.swap == '') },
+	{ title: '<% _("Total / Free NVRAM"); %>', text: scaleSize(nvstat.size) + ' / ' + scaleSize(nvstat.free) + ' <small>(' + (a).toFixed(2) + '%)</small>' }
 ]);
 </script>
 </div>
@@ -380,37 +380,37 @@ createFieldTable('', [
 <div class='section' id='ports'>
 </div>
 
-<div class='section-title' id='wan-title'>WAN <small><i><a href='javascript:toggleVisibility("wan");'><span id='sesdiv_wan_showhide'>(<% _("hide"); %>)</span></a></i></small></div>
+<div class='section-title' id='wan-title'><% _("WAN"); %> <small><i><a href='javascript:toggleVisibility("wan");'><span id='sesdiv_wan_showhide'>(<% _("hide"); %>)</span></a></i></small></div>
 <div class='section' id='sesdiv_wan'>
 <script type='text/javascript'>
 createFieldTable('', [
 	{ title: 'MAC <% _("Address"); %>', text: nvram.wan_hwaddr },
-	{ title: 'Connection Type', text: { 'dhcp':'DHCP', 'static':'Static IP', 'pppoe':'PPPoE', 'pptp':'PPTP', 'l2tp':'L2TP', 'ppp3g':'3G Modem' }[nvram.wan_proto] || '-' },
+	{ title: '<% _("Connection Type"); %>', text: { 'dhcp':'<% _("DHCP"); %>', 'static':'<% _("Static IP"); %>', 'pppoe':'<% _("PPPoE"); %>', 'pptp':'<% _("PPTP"); %>', 'l2tp':'<% _("L2TP"); %>', 'ppp3g':'<% _("3G Modem"); %>' }[nvram.wan_proto] || '-' },
 	{ title: 'IP <% _("Address"); %>', rid: 'wanip', text: stats.wanip },
-	{ title: 'Previous WAN IP', rid: 'wanprebuf', text: stats.wanprebuf, hidden: ((nvram.wan_proto != 'pppoe') && (nvram.wan_proto != 'pptp') && (nvram.wan_proto != 'l2tp') && (nvram.wan_proto != 'ppp3g')) }, //Victek
-	{ title: 'Subnet Mask', rid: 'wannetmask', text: stats.wannetmask },
-	{ title: 'Gateway', rid: 'wangateway', text: stats.wangateway },
+	{ title: '<% _("Previous WAN IP"); %>', rid: 'wanprebuf', text: stats.wanprebuf, hidden: ((nvram.wan_proto != 'pppoe') && (nvram.wan_proto != 'pptp') && (nvram.wan_proto != 'l2tp') && (nvram.wan_proto != 'ppp3g')) }, //Victek
+	{ title: '<% _("Subnet Mask"); %>', rid: 'wannetmask', text: stats.wannetmask },
+	{ title: '<% _("Gateway"); %>', rid: 'wangateway', text: stats.wangateway },
 /* IPV6-BEGIN */
 	{ title: 'IPv6 <% _("Address"); %>', rid: 'ip6_wan', text: stats.ip6_wan, hidden: (stats.ip6_wan == '') },
 /* IPV6-END */
-	{ title: 'DNS', rid: 'dns', text: stats.dns },
-	{ title: 'MTU', text: nvram.wan_run_mtu },
+	{ title: '<% _("DNS"); %>', rid: 'dns', text: stats.dns },
+	{ title: '<% _("MTU"); %>', text: nvram.wan_run_mtu },
 	null,
-	{ title: 'Status', rid: 'wanstatus', text: stats.wanstatus },
-	{ title: 'Connection Uptime', rid: 'wanuptime', text: stats.wanuptime },
-	{ title: 'Remaining Lease Time', rid: 'wanlease', text: stats.wanlease, ignore: !show_dhcpc }
+	{ title: '<% _("Status"); %>', rid: 'wanstatus', text: stats.wanstatus },
+	{ title: '<% _("Connection Uptime"); %>', rid: 'wanuptime', text: stats.wanuptime },
+	{ title: '<% _("Remaining Lease Time"); %>', rid: 'wanlease', text: stats.wanlease, ignore: !show_dhcpc }
 ]);
 </script>
 <span id='b_dhcpc' style='display:none'>
-	<input type='button' class='controls' onclick='dhcpc("renew")' value='Renew'>
-	<input type='button' class='controls' onclick='dhcpc("release")' value='Release'> &nbsp;
+	<input type='button' class='controls' onclick='dhcpc("renew")' value='<% _("Renew"); %>'>
+	<input type='button' class='controls' onclick='dhcpc("release")' value='<% _("Release"); %>'> &nbsp;
 </span>
-<input type='button' class='controls' onclick='wan_connect()' value='Connect' id='b_connect' style='display:none'>
-<input type='button' class='controls' onclick='wan_disconnect()' value='Disconnect' id='b_disconnect' style='display:none'>
+<input type='button' class='controls' onclick='wan_connect()' value='<% _("Connect"); %>' id='b_connect' style='display:none'>
+<input type='button' class='controls' onclick='wan_disconnect()' value='<% _("Disconnect"); %>' id='b_disconnect' style='display:none'>
 </div>
 
 
-<div class='section-title'>LAN <small><i><a href='javascript:toggleVisibility("lan");'><span id='sesdiv_lan_showhide'>(hide)</span></a></i></small></div>
+<div class='section-title'><% _("LAN"); %> <small><i><a href='javascript:toggleVisibility("lan");'><span id='sesdiv_lan_showhide'>(<% _("hide"); %>)</span></a></i></small></div>
 <div class='section' id='sesdiv_lan'>
 <script type='text/javascript'>
 
@@ -463,15 +463,15 @@ for (var i = 0 ; i <= MAX_BRIDGE_ID ; i++) {
 }
 
 createFieldTable('', [
-	{ title: 'Router MAC Address', text: nvram.et0macaddr },
-	{ title: 'Router IP Addresses', text: t },
-	{ title: 'Gateway', text: nvram.lan_gateway, ignore: nvram.wan_proto != 'disabled' },
+	{ title: '<% _("Router MAC Address"); %>', text: nvram.et0macaddr },
+	{ title: '<% _("Router IP Addresses"); %>', text: t },
+	{ title: '<% _("Gateway"); %>', text: nvram.lan_gateway, ignore: nvram.wan_proto != 'disabled' },
 /* IPV6-BEGIN */
-	{ title: 'Router IPv6 Address', rid: 'ip6_lan', text: stats.ip6_lan, hidden: (stats.ip6_lan == '') },
-	{ title: 'IPv6 Link-local Address', rid: 'ip6_lan_ll', text: stats.ip6_lan_ll, hidden: (stats.ip6_lan_ll == '') },
+	{ title: '<% _("Router IPv6 Address"); %>', rid: 'ip6_lan', text: stats.ip6_lan, hidden: (stats.ip6_lan == '') },
+	{ title: '<% _("IPv6 Link-local Address"); %>', rid: 'ip6_lan_ll', text: stats.ip6_lan_ll, hidden: (stats.ip6_lan_ll == '') },
 /* IPV6-END */
-	{ title: 'DNS', rid: 'dns', text: stats.dns, ignore: nvram.wan_proto != 'disabled' },
-	{ title: 'DHCP', text: s }
+	{ title: '<% _("DNS"); %>', rid: 'dns', text: stats.dns, ignore: nvram.wan_proto != 'disabled' },
+	{ title: '<% _("DHCP"); %>', text: s }
 ]);
 
 </script>
@@ -496,28 +496,28 @@ REMOVE-END */
 	if ((nvram['wl'+u+'_mode'] == 'ap') && (nvram['wl'+u+'_wds_enable'] * 1)) wmode += ' + WDS';
 
 	createFieldTable('', [
-		{ title: 'MAC Address', text: nvram['wl'+u+'_hwaddr'] },
-		{ title: 'Wireless Mode', text: wmode },
-		{ title: 'Wireless Network Mode', text: bgmo[nvram['wl'+u+'_net_mode']], ignore: (wl_sunit(uidx)>=0) },
-		{ title: 'Interface Status', rid: 'ifstatus'+uidx, text: wlstats[uidx].ifstatus },
-		{ title: 'Radio', rid: 'radio'+uidx, text: (wlstats[uidx].radio == 0) ? '<b>Disabled</b>' : 'Enabled', ignore: (wl_sunit(uidx)>=0) },
+		{ title: '<% _("MAC Address"); %>', text: nvram['wl'+u+'_hwaddr'] },
+		{ title: '<% _("Wireless Mode"); %>', text: wmode },
+		{ title: '<% _("Wireless Network Mode"); %>', text: bgmo[nvram['wl'+u+'_net_mode']], ignore: (wl_sunit(uidx)>=0) },
+		{ title: '<% _("Interface Status"); %>', rid: 'ifstatus'+uidx, text: wlstats[uidx].ifstatus },
+		{ title: '<% _("Radio"); %>', rid: 'radio'+uidx, text: (wlstats[uidx].radio == 0) ? '<b><% _("Disabled"); %></b>' : '<% _("Enabled"); %>', ignore: (wl_sunit(uidx)>=0) },
 /* REMOVE-BEGIN */
 //	{ title: 'SSID', text: (nvram['wl'+u+'_ssid'] + ' <small><i>' + ((nvram['wl'+u+'_mode'] != 'ap') ? '' : ((nvram['wl'+u+'_closed'] == 0) ? '(Broadcast Enabled)' : '(Broadcast Disabled)')) + '</i></small>') },
 /* REMOVE-END */
-		{ title: 'SSID', text: nvram['wl'+u+'_ssid'] },
-		{ title: 'Broadcast', text: (nvram['wl'+u+'_closed'] == 0) ? 'Enabled' : '<b>Disabled</b>', ignore: (nvram['wl'+u+'_mode'] != 'ap') },
-		{ title: 'Security', text: sec },
-		{ title: 'Channel', rid: 'channel'+uidx, text: stats.channel[uidx], ignore: (wl_sunit(uidx)>=0) },
-		{ title: 'Channel Width', rid: 'nbw'+uidx, text: wlstats[uidx].nbw, ignore: ((!nphy) || (wl_sunit(uidx)>=0)) },
-		{ title: 'Interference Level', rid: 'interference'+uidx, text: stats.interference[uidx], hidden: ((stats.interference[uidx] == '') || (wl_sunit(uidx)>=0)) },
-		{ title: 'Rate', rid: 'rate'+uidx, text: wlstats[uidx].rate, ignore: (wl_sunit(uidx)>=0) },
-		{ title: 'RSSI', rid: 'rssi'+uidx, text: wlstats[uidx].rssi || '', ignore: ((!wlstats[uidx].client) || (wl_sunit(uidx)>=0)) },
-		{ title: 'Noise', rid: 'noise'+uidx, text: wlstats[uidx].noise || '', ignore: ((!wlstats[uidx].client) || (wl_sunit(uidx)>=0)) },
-		{ title: 'Signal Quality', rid: 'qual'+uidx, text: stats.qual[uidx] || '', ignore: ((!wlstats[uidx].client) || (wl_sunit(uidx)>=0)) }
+		{ title: '<% _("SSID"); %>', text: nvram['wl'+u+'_ssid'] },
+		{ title: '<% _("Broadcast"); %>', text: (nvram['wl'+u+'_closed'] == 0) ? 'Enabled' : '<b>Disabled</b>', ignore: (nvram['wl'+u+'_mode'] != 'ap') },
+		{ title: '<% _("Security"); %>', text: sec },
+		{ title: '<% _("Channel"); %>', rid: 'channel'+uidx, text: stats.channel[uidx], ignore: (wl_sunit(uidx)>=0) },
+		{ title: '<% _("Channel Width"); %>', rid: 'nbw'+uidx, text: wlstats[uidx].nbw, ignore: ((!nphy) || (wl_sunit(uidx)>=0)) },
+		{ title: '<% _("Interference Level"); %>', rid: 'interference'+uidx, text: stats.interference[uidx], hidden: ((stats.interference[uidx] == '') || (wl_sunit(uidx)>=0)) },
+		{ title: '<% _("Rate"); %>', rid: 'rate'+uidx, text: wlstats[uidx].rate, ignore: (wl_sunit(uidx)>=0) },
+		{ title: '<% _("RSSI"); %>', rid: 'rssi'+uidx, text: wlstats[uidx].rssi || '', ignore: ((!wlstats[uidx].client) || (wl_sunit(uidx)>=0)) },
+		{ title: '<% _("Noise"); %>', rid: 'noise'+uidx, text: wlstats[uidx].noise || '', ignore: ((!wlstats[uidx].client) || (wl_sunit(uidx)>=0)) },
+		{ title: '<% _("Signal Quality"); %>', rid: 'qual'+uidx, text: stats.qual[uidx] || '', ignore: ((!wlstats[uidx].client) || (wl_sunit(uidx)>=0)) }
 	]);
 
-	W('<input type=\'button\' class=\'controls\' onclick=\'wlenable('+uidx+', 1)\' id=\'b_wl'+uidx+'_enable\' value=\'Enable\' style=\'display:none\'>');
-	W('<input type=\'button\' class=\'controls\' onclick=\'wlenable('+uidx+', 0)\' id=\'b_wl'+uidx+'_disable\' value=\'Disable\' style=\'display:none\'>');
+	W('<input type=\'button\' class=\'controls\' onclick=\'wlenable('+uidx+', 1)\' id=\'b_wl'+uidx+'_enable\' value=\'<% _("Enable"); %>\' style=\'display:none\'>');
+	W('<input type=\'button\' class=\'controls\' onclick=\'wlenable('+uidx+', 0)\' id=\'b_wl'+uidx+'_disable\' value=\'<% _("Disable"); %>\' style=\'display:none\'>');
 	W('</div>');
 }
 </script>

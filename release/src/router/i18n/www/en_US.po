@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TomatoEgg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-27 21:51-0400\n"
-"PO-Revision-Date: 2013-08-27 22:02-0500\n"
+"POT-Creation-Date: 2013-08-28 12:29-0400\n"
+"PO-Revision-Date: 2013-08-28 12:44-0500\n"
 "Last-Translator: Zhiqiang <Wang.9264@gmail.com>\n"
 "Language-Team: TomatoEgg Translators <translate@tomatoegg.net>\n"
 "MIME-Version: 1.0\n"
@@ -15,9 +15,81 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.5.7\n"
 
+#: ../www/admin-access.asp:300
+msgid "Language"
+msgstr "Language"
+
+#: ../www/admin-access.asp:300
+msgid "English"
+msgstr "English"
+
+#: ../www/admin-access.asp:300
+msgid "Chinese"
+msgstr "Chinese"
+
+#: ../www/status-overview.asp:42
+msgid "Access Point"
+msgstr "Access Point"
+
+#: ../www/status-overview.asp:42
+msgid "Wireless Client"
+msgstr "Wireless Client"
+
+#: ../www/status-overview.asp:42
+msgid "Wireless Ethernet Bridge"
+msgstr "Wireless Ethernet Bridge"
+
+#: ../www/status-overview.asp:42
+msgid "WDS"
+msgstr "WDS"
+
+#: ../www/status-overview.asp:43
+msgid "WPA Personal (PSK)"
+msgstr "WPA Personal (PSK)"
+
+#: ../www/status-overview.asp:43
+msgid "WPA Enterprise"
+msgstr "WPA Enterprise"
+
+#: ../www/status-overview.asp:43
+msgid "WPA2 Personal (PSK)"
+msgstr "WPA2 Personal (PSK)"
+
+#: ../www/status-overview.asp:43
+msgid "WPA2 Enterprise"
+msgstr "WPA2 Enterprise"
+
+#: ../www/status-overview.asp:43
+msgid "WPA / WPA2 Personal"
+msgstr "WPA / WPA2 Personal"
+
+#: ../www/status-overview.asp:43
+msgid "WPA / WPA2 Enterprise"
+msgstr "WPA / WPA2 Enterprise"
+
+#: ../www/status-overview.asp:43
+msgid "Radius"
+msgstr "Radius"
+
 #: ../www/status-overview.asp:117
 msgid "Ethernet Ports State"
 msgstr "Ethernet Ports State"
+
+#: ../www/status-overview.asp:226 ../www/status-overview.asp:353
+msgid "Attention"
+msgstr "Attention"
+
+#: ../www/status-overview.asp:227
+msgid "Tomato by Shibby "
+msgstr "Tomato by Shibby "
+
+#: ../www/status-overview.asp:227
+msgid "is now available"
+msgstr "is now available"
+
+#: ../www/status-overview.asp:227
+msgid "Click here to read more"
+msgstr "Click here to read more"
 
 #: ../www/status-overview.asp:341
 msgid "Tomato"
@@ -26,10 +98,6 @@ msgstr "Tomato"
 #: ../www/status-overview.asp:342
 msgid "Version"
 msgstr "Version"
-
-#: ../www/status-overview.asp:353
-msgid "Attention"
-msgstr "Attention"
 
 #: ../www/status-overview.asp:354
 msgid "You did not configure <b>TomatoAnon project</b> setting."
@@ -52,10 +120,235 @@ msgid "System"
 msgstr "System"
 
 #: ../www/status-overview.asp:359 ../www/status-overview.asp:383
+#: ../www/status-overview.asp:413
 msgid "hide"
 msgstr "hide"
+
+#: ../www/status-overview.asp:364
+msgid "Name"
+msgstr "Name"
+
+#: ../www/status-overview.asp:365
+msgid "Model"
+msgstr "Model"
+
+#: ../www/status-overview.asp:366
+msgid "Chipset"
+msgstr "Chipset"
+
+#: ../www/status-overview.asp:367
+msgid "CPU Freq"
+msgstr "CPU Freq"
+
+#: ../www/status-overview.asp:368
+msgid "Flash Size"
+msgstr "Flash Size"
+
+#: ../www/status-overview.asp:370
+msgid "Time"
+msgstr "Time"
+
+#: ../www/status-overview.asp:371
+msgid "Uptime"
+msgstr "Uptime"
+
+#: ../www/status-overview.asp:372
+msgid "CPU Load"
+msgstr "CPU Load"
+
+#: ../www/status-overview.asp:372
+msgid "mins"
+msgstr "mins"
+
+#: ../www/status-overview.asp:373
+msgid "Total / Free Memory"
+msgstr "Total / Free Memory"
+
+#: ../www/status-overview.asp:374
+msgid "Total / Free Swap"
+msgstr "Total / Free Swap"
+
+#: ../www/status-overview.asp:375
+msgid "Total / Free NVRAM"
+msgstr "Total / Free NVRAM"
+
+#: ../www/status-overview.asp:383
+msgid "WAN"
+msgstr "WAN"
 
 #: ../www/status-overview.asp:387 ../www/status-overview.asp:389
 #: ../www/status-overview.asp:394
 msgid "Address"
 msgstr "Address"
+
+#: ../www/status-overview.asp:388
+msgid "Connection Type"
+msgstr "Connection Type"
+
+#: ../www/status-overview.asp:388 ../www/status-overview.asp:474
+msgid "DHCP"
+msgstr "DHCP"
+
+#: ../www/status-overview.asp:388
+msgid "Static IP"
+msgstr "Static IP"
+
+#: ../www/status-overview.asp:388
+msgid "PPPoE"
+msgstr "PPPoE"
+
+#: ../www/status-overview.asp:388
+msgid "PPTP"
+msgstr "PPTP"
+
+#: ../www/status-overview.asp:388
+msgid "L2TP"
+msgstr "L2TP"
+
+#: ../www/status-overview.asp:388
+msgid "3G Modem"
+msgstr "3G Modem"
+
+#: ../www/status-overview.asp:390
+msgid "Previous WAN IP"
+msgstr "Previous WAN IP"
+
+#: ../www/status-overview.asp:391
+msgid "Subnet Mask"
+msgstr "Subnet Mask"
+
+#: ../www/status-overview.asp:392 ../www/status-overview.asp:468
+msgid "Gateway"
+msgstr "Gateway"
+
+#: ../www/status-overview.asp:396 ../www/status-overview.asp:473
+msgid "DNS"
+msgstr "DNS"
+
+#: ../www/status-overview.asp:397
+msgid "MTU"
+msgstr "MTU"
+
+#: ../www/status-overview.asp:399
+msgid "Status"
+msgstr "Status"
+
+#: ../www/status-overview.asp:400
+msgid "Connection Uptime"
+msgstr "Connection Uptime"
+
+#: ../www/status-overview.asp:401
+msgid "Remaining Lease Time"
+msgstr "Remaining Lease Time"
+
+#: ../www/status-overview.asp:405
+msgid "Renew"
+msgstr "Renew"
+
+#: ../www/status-overview.asp:406
+msgid "Release"
+msgstr "Release"
+
+#: ../www/status-overview.asp:408
+msgid "Connect"
+msgstr "Connect"
+
+#: ../www/status-overview.asp:409
+msgid "Disconnect"
+msgstr "Disconnect"
+
+#: ../www/status-overview.asp:413
+msgid "LAN"
+msgstr "LAN"
+
+#: ../www/status-overview.asp:466
+msgid "Router MAC Address"
+msgstr "Router MAC Address"
+
+#: ../www/status-overview.asp:467
+msgid "Router IP Addresses"
+msgstr "Router IP Addresses"
+
+#: ../www/status-overview.asp:470
+msgid "Router IPv6 Address"
+msgstr "Router IPv6 Address"
+
+#: ../www/status-overview.asp:471
+msgid "IPv6 Link-local Address"
+msgstr "IPv6 Link-local Address"
+
+#: ../www/status-overview.asp:499
+msgid "MAC Address"
+msgstr "MAC Address"
+
+#: ../www/status-overview.asp:500
+msgid "Wireless Mode"
+msgstr "Wireless Mode"
+
+#: ../www/status-overview.asp:501
+msgid "Wireless Network Mode"
+msgstr "Wireless Network Mode"
+
+#: ../www/status-overview.asp:502
+msgid "Interface Status"
+msgstr "Interface Status"
+
+#: ../www/status-overview.asp:503
+msgid "Radio"
+msgstr "Radio"
+
+#: ../www/status-overview.asp:503
+msgid "Disabled"
+msgstr "Disabled"
+
+#: ../www/status-overview.asp:503
+msgid "Enabled"
+msgstr "Enabled"
+
+#: ../www/status-overview.asp:507
+msgid "SSID"
+msgstr "SSID"
+
+#: ../www/status-overview.asp:508
+msgid "Broadcast"
+msgstr "Broadcast"
+
+#: ../www/status-overview.asp:509
+msgid "Security"
+msgstr "Security"
+
+#: ../www/status-overview.asp:510
+msgid "Channel"
+msgstr "Channel"
+
+#: ../www/status-overview.asp:511
+msgid "Channel Width"
+msgstr "Channel Width"
+
+#: ../www/status-overview.asp:512
+msgid "Interference Level"
+msgstr "Interference Level"
+
+#: ../www/status-overview.asp:513
+msgid "Rate"
+msgstr "Rate"
+
+#: ../www/status-overview.asp:514
+msgid "RSSI"
+msgstr "RSSI"
+
+#: ../www/status-overview.asp:515
+msgid "Noise"
+msgstr "Noise"
+
+#: ../www/status-overview.asp:516
+msgid "Signal Quality"
+msgstr "Signal Quality"
+
+#: ../www/status-overview.asp:519
+msgid "Enable"
+msgstr "Enable"
+
+#: ../www/status-overview.asp:520
+msgid "Disable"
+msgstr "Disable"
