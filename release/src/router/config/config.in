@@ -189,3 +189,6 @@ config TCONFIG_REMOVE_USBAPP
 	bool "Remove USB Application (samba/ftp/usb support page)"
 	depends on TCONFIG_USBAP
 	default n
+config TCONFIG_I18N
+	bool "I18N"
+	default y
