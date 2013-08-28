@@ -2,7 +2,9 @@ include ../common.mak
 
 CFLAGS = -Os -Wall $(EXTRACFLAGS)
 CFLAGS += -I$(SRCBASE) -I$(SRCBASE)/include -I. -I$(TOP)/shared
+ifeq ($(TCONFIG_I18N),y)
 CFLAGS += -I$(TOP)/gettext/gettext-runtime/intl
+endif
 
 OBJS = httpd.o cgi.o tomato.o version.o 
 OBJS += misc.o dhcp.o upgrade.o traceping.o parser.o upnp.o ctnf.o
@@ -21,7 +23,9 @@ endif
 
 LIBS = -L$(TOP)/nvram -lnvram -L$(TOP)/shared -lshared
 LIBS += -L$(TOP)/mssl -lmssl
+ifeq ($(TCONFIG_I18N),y)
 LIBS += -L$(TOP)/gettext/gettext-runtime/intl/.libs -lgnuintl
+endif
 
 ifeq ($(FULL_OPENSSL),y)
 LIBS += -L$(TOP)/openssl -lssl -lcrypto
