@@ -302,7 +302,7 @@ const struct mime_handler mime_handlers[] = {
 	{ "logout.asp",			NULL,					0,	wi_generic,			wo_asp,			1 },
 	{ "clearcookies.asp",	NULL,					0,	wi_generic,			wo_asp,			1 },
 #ifdef TCONFIG_I18N
-	{ "tomato.js",                      mime_javascript,                        2,      wi_generic_noid,        do_file,                1 },
+	{ "tomato.js",                      mime_javascript,                        2,      wi_generic_noid,        wo_asp,                1 },
 #endif
 
 //	{ "spin.gif",		NULL,						0,	wi_generic_noid,	wo_spin,		1 },
