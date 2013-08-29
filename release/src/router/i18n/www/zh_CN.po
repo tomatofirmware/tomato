@@ -1474,7 +1474,7 @@ msgstr "带宽限制"
 
 #: ../www/tomato.js:2419
 msgid "Captive Portal"
-msgstr "强制网络门户"
+msgstr "认证门户"
 
 #: ../www/tomato.js:2431
 msgid "USB and NAS"
