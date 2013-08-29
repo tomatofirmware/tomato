@@ -8,6 +8,10 @@ LDFLAGS =
 OBJS = shutils.o wl.o wl_linux.o linux_timer.o defaults.o id.o
 OBJS += misc.o led.o version.o base64.o files.o strings.o process.o
 
+ifeq ($(CONFIG_BCMWL6),y)
+OBJS += nvparse.o
+endif
+
 ifeq ($(TCONFIG_USB),y)
 OBJS += usb.o
 OBJS += $(TOP)/busybox/util-linux/volume_id/ext.o

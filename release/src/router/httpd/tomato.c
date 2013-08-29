@@ -336,7 +336,7 @@ const struct mime_handler mime_handlers[] = {
 	{ "vpnstatus.cgi",	mime_javascript,			0,	wi_generic,			wo_vpn_status,		1 },
 #endif
 #ifdef TCONFIG_PPTPD
-	{ "pptpd.cgi",		mime_javascript,				0,	wi_generic,			wo_pptpdcmd,	1 },	//!!AB - PPTPD
+	{ "pptpd.cgi",		mime_javascript,			0,	wi_generic,			wo_pptpdcmd,		1 },	//!!AB - PPTPD
 #endif
 #ifdef TCONFIG_USB
 	{ "usbcmd.cgi",			mime_javascript,			0,	wi_generic,		wo_usbcommand,		1 },	//!!TB - USB
@@ -676,7 +676,7 @@ static const nvset_t nvset_list[] = {
 	{ "wl_nmode",			V_NONE			},
 	{ "wl_nband",			V_RANGE(0, 2)	},	// 2 - 2.4GHz, 1 - 5GHz, 0 - Auto
 	{ "wl_nreqd",			V_NONE			},
-	{ "wl_nbw_cap",			V_RANGE(0, 2)	},	// 0 - 20MHz, 1 - 40MHz, 2 - Auto
+	{ "wl_nbw_cap",			V_RANGE(0, 3)	},	// 0 - 20MHz, 1 - 40MHz, 2 - Auto, 3 - 80M
 	{ "wl_nbw",			V_NONE			},
 	{ "wl_mimo_preamble",		V_WORD			},	// 802.11n Preamble: mm/gf/auto/gfbcm
 	{ "wl_nctrlsb",			V_NONE			},	// none, lower, upper
@@ -1090,13 +1090,13 @@ static const nvset_t nvset_list[] = {
 // nas-ftp - !!TB
 #ifdef TCONFIG_FTP
 	{ "ftp_enable",			V_RANGE(0, 2)		},
-	{ "ftp_super",			V_01			},
+	{ "ftp_super",			V_01				},
 	{ "ftp_anonymous",		V_RANGE(0, 3)		},
 	{ "ftp_dirlist",		V_RANGE(0, 2)		},
-	{ "ftp_port",			V_PORT			},
+	{ "ftp_port",			V_PORT				},
 	{ "ftp_max",			V_RANGE(0, 12)		},
 	{ "ftp_ipmax",			V_RANGE(0, 12)		},
-	{ "ftp_staytimeout",		V_RANGE(0, 65535)	},
+	{ "ftp_staytimeout",	V_RANGE(0, 65535)	},
 	{ "ftp_rate",			V_RANGE(0, 99999)	},
 	{ "ftp_anonrate",		V_RANGE(0, 99999)	},
 	{ "ftp_anonroot",		V_LENGTH(0, 256)	},
@@ -1106,25 +1106,25 @@ static const nvset_t nvset_list[] = {
 	{ "ftp_custom",			V_TEXT(0, 2048)		},
 	{ "ftp_sip",			V_LENGTH(0, 512)	},
 	{ "ftp_limit",			V_TEXT(1, 50)		},
-	{ "log_ftp",			V_01			},
+	{ "log_ftp",			V_01				},
 #endif
 
 #ifdef TCONFIG_SNMP
 	{ "snmp_enable",		V_RANGE(0, 1)		},
 	{ "snmp_port",			V_RANGE(1, 65535)	},
 	{ "snmp_remote",		V_RANGE(0, 1)		},
-	{ "snmp_remote_sip",		V_LENGTH(0, 512)	},
-	{ "snmp_location",		V_LENGTH(0, 20)		},
-	{ "snmp_contact",		V_LENGTH(0, 20)		},
-	{ "snmp_ro",			V_LENGTH(0, 20)		},
+	{ "snmp_remote_sip",	V_LENGTH(0, 512)	},
+	{ "snmp_location",		V_LENGTH(0, 40)		},
+	{ "snmp_contact",		V_LENGTH(0, 40)		},
+	{ "snmp_ro",			V_LENGTH(0, 40)		},
 #endif
 
 #ifdef TCONFIG_SAMBASRV
 // nas-samba - !!TB
 	{ "smbd_enable",		V_RANGE(0, 2)		},
 	{ "smbd_wgroup",		V_LENGTH(0, 20)		},
-	{ "smbd_master",		V_01			},
-	{ "smbd_wins",			V_01			},
+	{ "smbd_master",		V_01				},
+	{ "smbd_wins",			V_01				},
 	{ "smbd_cpage",			V_LENGTH(0, 4)		},
 	{ "smbd_cset",			V_LENGTH(0, 20)		},
 	{ "smbd_custom",		V_TEXT(0, 2048)		},
@@ -1136,14 +1136,14 @@ static const nvset_t nvset_list[] = {
 
 #ifdef TCONFIG_MEDIA_SERVER
 // nas-media
-	{ "ms_enable",			V_01			},
+	{ "ms_enable",			V_01				},
 	{ "ms_dirs",			V_LENGTH(0, 1024)	},
 	{ "ms_port",			V_RANGE(1, 65535)	},
 	{ "ms_dbdir",			V_LENGTH(0, 256)	},
 	{ "ms_tivo",			V_01			},
 	{ "ms_stdlna",			V_01			},
 	{ "ms_rescan",			V_01			},
-	{ "ms_sas",			V_01			},
+	{ "ms_sas",				V_01			},
 #endif
 
 // qos
@@ -1173,30 +1173,28 @@ static const nvset_t nvset_list[] = {
 // qos-bw-limiter
 	{ "qosl_enable",		V_01                   },
 	{ "qosl_rules",			V_LENGTH(0, 4096)      },
-	/*qosl_ibw unused - qos_ibw shared*/
-	/*qosl_obw unused - qos_obw shared*/
-
+	
 //NoCatSplash. Victek.
 #ifdef TCONFIG_NOCAT
 	{ "NC_enable",			V_01				},
-	{ "NC_Verbosity",		V_RANGE(0, 10)			},
-	{ "NC_GatewayName",		V_LENGTH(0, 255)		},
+	{ "NC_Verbosity",		V_RANGE(0, 10)		},
+	{ "NC_GatewayName",		V_LENGTH(0, 255)	},
 	{ "NC_GatewayPort",		V_PORT				},
-	{ "NC_ForcedRedirect",		V_01				},
-	{ "NC_HomePage",		V_LENGTH(0, 255)		},
-	{ "NC_DocumentRoot",		V_LENGTH(0, 255)		},
-	{ "NC_SplashURL",		V_LENGTH(0, 255)		},
-	{ "NC_LoginTimeout",		V_RANGE(0, 31556926)		}, // Up to 1 Year
+	{ "NC_ForcedRedirect",	V_01				},
+	{ "NC_HomePage",		V_LENGTH(0, 255)	},
+	{ "NC_DocumentRoot",	V_LENGTH(0, 255)	},
+	{ "NC_SplashURL",		V_LENGTH(0, 255)	},
+	{ "NC_LoginTimeout",	V_RANGE(0, 31556926)		}, // Up to 1 Year
 	{ "NC_IdleTimeout",		V_RANGE(0, 31556926)		}, // Up to 1 Year
-	{ "NC_MaxMissedARP",		V_RANGE(0, 10)			},
-	{ "NC_PeerChecktimeout",	V_RANGE(0, 60)			},
-	{ "NC_ExcludePorts",		V_LENGTH(0, 255)		},
-	{ "NC_IncludePorts",		V_LENGTH(0, 255)		},
-	{ "NC_AllowedWebHosts",		V_LENGTH(0, 255)		},
-	{ "NC_MACWhiteList",		V_LENGTH(0, 255)		},
-	{ "NC_SplashFile",		V_LENGTH(0, 8192)		},
+	{ "NC_MaxMissedARP",	V_RANGE(0, 10)		},
+	{ "NC_PeerChecktimeout",V_RANGE(0, 60)		},
+	{ "NC_ExcludePorts",	V_LENGTH(0, 255)	},
+	{ "NC_IncludePorts",	V_LENGTH(0, 255)	},
+	{ "NC_AllowedWebHosts",	V_LENGTH(0, 255)	},
+	{ "NC_MACWhiteList",	V_LENGTH(0, 255)	},
+	{ "NC_SplashFile",		V_LENGTH(0, 8192)	},
 #ifdef TCONFIG_VLAN
-	{ "NC_BridgeLAN",		V_LENGTH(0, 50)			},
+	{ "NC_BridgeLAN",		V_LENGTH(0, 50)		},
 #endif
 #endif
 
@@ -1355,39 +1353,6 @@ static const nvset_t nvset_list[] = {
 	{ "pptpd_mru",			V_RANGE(576, 1500)	},
 	{ "pptpd_custom",		V_TEXT(0, 2048)		},
 
-/*
-ppp_static			0/1
-ppp_static_ip		IP
-wl_enable			0/1
-wl_wds_timeout
-wl_maxassoc			1-256
-wl_phytype			a,b,g
-wl_net_reauth
-wl_preauth
-wl_wme_ap_bk
-wl_wme_ap_be
-wl_wme_ap_vi
-wl_wme_ap_vo
-wl_wme_sta_bk
-wl_wme_sta_be
-wl_wme_sta_vi
-wl_wme_sta_vo
-QoS
-port_priority_1		0-2
-port_flow_control_1	0,1
-port_rate_limit_1	0-8
-port_priority_2		0-2
-port_flow_control_2	0,1
-port_rate_limit_2	0-8
-port_priority_3		0-2
-port_flow_control_3	0,1
-port_rate_limit_3	0-8
-port_priority_4		0-2
-port_flow_control_4	0,1
-port_rate_limit_4	0-8
-wl_ap_ip
-wl_ap_ssid
-*/
 #ifdef TCONFIG_USERPPTP
 	{ "pptp_client_enable",   V_01                  },
 	{ "pptp_client_peerdns",  V_RANGE(0,2)          },
@@ -1493,6 +1458,49 @@ static int nv_wl_find(int idx, int unit, int subunit, void *param)
 	}
 }
 
+#ifdef CONFIG_BCMWL6
+static int nv_wl_bwcap_chanspec(int idx, int unit, int subunit, void *param){
+	char		chan_spec[32];
+	char		*ch,*nbw_cap,*nctrlsb;
+	int 		write = *((int *)param);
+	ch	= webcgi_get(wl_nvname("channel",unit,0));
+	nbw_cap = webcgi_get(wl_nvname("nbw_cap",unit,0));
+	nctrlsb = webcgi_get(wl_nvname("nctrlsb",unit,0));
+	if(!ch && !nbw_cap && !nctrlsb)
+		return 0;
+	if(ch == NULL || !*ch)	ch = nvram_get(wl_nvname("channel",unit,0));
+	if(nbw_cap == NULL || !*nbw_cap)  nbw_cap = nvram_get(wl_nvname("nbw_cap",unit,0));
+	if(nctrlsb == NULL || !*nctrlsb)  nctrlsb = nvram_get(wl_nvname("nctrlsb",unit,0));
+
+	if(!ch || !nbw_cap || !nctrlsb || !*ch || !*nbw_cap || !*nctrlsb)
+		return 1;
+
+	memset(chan_spec,0,sizeof(chan_spec));
+	strncpy(chan_spec,ch,sizeof(chan_spec));
+	switch(atoi(nbw_cap)){
+		case 0:
+			if(write)
+				nvram_set(wl_nvname("bw_cap",unit,0), "1");
+			break;
+		case 1:
+			if(write)
+				nvram_set(wl_nvname("bw_cap",unit,0), "3");
+			if(*ch != '0')
+				*(chan_spec + strlen(chan_spec)) = *nctrlsb;
+			break;
+		case 3:
+			if(write)
+				nvram_set(wl_nvname("bw_cap",unit,0), "7");
+			if(*ch != '0')
+				strcpy(chan_spec + strlen(chan_spec),"/80");
+			break;
+	}
+	if(write)
+		nvram_set(wl_nvname("chanspec", unit, 0), chan_spec);
+	return 0;
+}
+#endif
+
 static int save_variables(int write)
 {
 	const nvset_t *v;
@@ -1527,6 +1535,9 @@ static int save_variables(int write)
 	}
 
 	// special cases
+#ifdef CONFIG_BCMWL6
+	foreach_wif(0, &write, nv_wl_bwcap_chanspec);
+#endif
 
 	char *p1, *p2;
 	if (((p1 = webcgi_get("set_password_1")) != NULL) && (strcmp(p1, "**********") != 0)) {

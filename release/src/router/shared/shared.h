@@ -184,6 +184,7 @@ enum {
 	MODEL_CW5358U,
 	MODEL_HG320,
 	MODEL_RG200E_CA,
+	MODEL_H218N,
 	MODEL_WL1600GL,
 	MODEL_WBRG54,
 	MODEL_WBR2G54,
@@ -234,6 +235,7 @@ enum {
 	MODEL_WZRG300N,
 	MODEL_WRT300N,
 	MODEL_WL330GE,
+	MODEL_W1800R,
 	MODEL_L600N
 };
 
@@ -276,6 +278,7 @@ enum {
 #define SUP_NONVE		(1 << 5)
 #define SUP_80211N		(1 << 6)
 #define SUP_1000ET		(1 << 7)
+#define SUP_80211AC		(1 << 8)
 
 extern int check_hw_type(void);
 //	extern int get_hardware(void) __attribute__ ((weak, alias ("check_hw_type")));
@@ -317,7 +320,8 @@ extern int f_wait_notexists(const char *name, int max);
 #define LED_BRIDGE			6
 #define LED_USB				7
 #define LED_MYSTERY			LED_USB	// (unmarked LED between wireless and bridge on WHR-G54S)
-#define LED_COUNT			8
+#define LED_5G				8
+#define LED_COUNT			9
 
 #define	LED_OFF				0
 #define	LED_ON				1
@@ -350,5 +354,3 @@ extern const char *find_word(const char *buffer, const char *word);
 extern int remove_word(char *buffer, const char *word);
 
 #endif
-
-

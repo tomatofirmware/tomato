@@ -92,7 +92,7 @@ function init()
 <div style='margin:30px 30px;font-size:14px;color:#555;'>
 <b>Tomato RAF Firmware v<% version(1); %></b><br>
 - Linux kernel <% version(2); %> and Broadcom Wireless Driver <% version(3); %> updates<br>
-- Support for additional router models, dual-band and Wireless-N mode.<br>
+- Support for additional router models, dual-band and Wireless AC or N mode.<br>
 <!-- USB-BEGIN -->
 - USB support integration and GUI<br>
 <!-- USB-END -->

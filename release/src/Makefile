@@ -42,7 +42,11 @@ VPN ?= "VPN"
 NC ?="NOCAT"
 NG ?="NGINX"
 ifeq ($(CONFIG_LINUX26),y)
+ifeq ($(CONFIG_BCMWL6),y)
+ND = "K26AC"
+else
 ND = "K26"
+endif
 else
 ND = "ND"
 endif
@@ -59,18 +63,12 @@ else
 EXTRA_PREDESC = ''
 endif
 
-ifeq ($(VLAN),y)
-EXTRA_PREDESC = 'VLAN-'
-else
-EXTRA_PREDESC = ''
+ifeq ($(AC66U),)
+AC66U = 0
 endif
 
-ifeq ($(NVRAM_64K),y)
-EXTRA_POSTDESC = ' -64K'
-EXTRA_64KCFLAG = '-DTCONFIG_NVRAM_64K'
-else
-EXTRA_POSTDESC = ''
-EXTRA_64KCFLAG = ''
+ifeq ($(W1800R),)
+W1800R = 0
 endif
 
 ifeq ($(WNR3500LV2),)
@@ -79,6 +77,14 @@ else
 WNRTOOL=$(SRCBASE)/wnrtool
 BOARD_FILE=$(WNRTOOL)/compatible_WNR3500Lv2.txt
 fw_cfg_file := $(WNRTOOL)/ambitCfg.h
+endif
+
+ifeq ($(NVRAM_64K),y)
+EXTRA_64KDESC = ' -64K'
+EXTRA_64KCFLAG = '-DTCONFIG_NVRAM_64K'
+else
+EXTRA_64KDESC = ''
+EXTRA_64KCFLAG = ''
 endif
 
 -include tomato_profile.mak
@@ -140,6 +146,29 @@ all: tomato_ver
 	@rm -f image/tomato-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(current_TOMATO_V1)$(mips_rev)$(beta)$(current_TOMATO_V2)-$(current_BUILD_DESC).trx
 	@rm -f image/tomato-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(current_TOMATO_V1)$(mips_rev)$(beta)$(current_TOMATO_V2)-$(current_BUILD_DESC).bin
 
+ifeq ($(AC66U),1)
+	$(MAKE) -C ctools
+	# Create generic TRX image
+	ctools/objcopy -O binary -R .reginfo -R .note -R .comment -R .mdebug -S $(LINUXDIR)/vmlinux ctools/piggy
+	ctools/lzma_4k e ctools/piggy  ctools/vmlinuz-lzma
+	ctools/mksquashfs router/mipsel-uclibc/target ctools/target.squashfs -noappend -all-root
+	ctools/trx -o image/linux-lzma.trx ctools/vmlinuz-lzma ctools/target.squashfs
+	ctools/trx_asus -i image/linux-lzma.trx -r $(BUILD_NAME),$(KERNEL_VER).$(FS_VER),image/tomato-RT-AC66U_$(V1)$(V2)-$(current_BUILD_DESC).trx
+	@rm -f image/linux-lzma.trx
+	@echo ""
+endif
+
+ifeq ($(W1800R),1)
+	$(MAKE) -C ctools
+	ctools/objcopy -O binary -R .reginfo -R .note -R .comment -R .mdebug -S $(LINUXDIR)/vmlinux ctools/piggy
+	ctools/lzma_4k e ctools/piggy  ctools/vmlinuz-lzma
+	ctools/mksquashfs router/mipsel-uclibc/target ctools/target.squashfs -noappend -all-root
+	ctools/trx -o image/linux-lzma.trx ctools/vmlinuz-lzma ctools/target.squashfs
+	ctools/trx_asus -i image/linux-lzma.trx -r $(BUILD_NAME),$(KERNEL_VER).$(FS_VER),image/tomato-W1800R_$(V1)$(V2)-$(current_BUILD_DESC).trx
+	@rm -f image/linux-lzma.trx
+	@echo ""
+endif
+
 ifeq ($(WNR3500LV2),y)
 	@echo "Creating Firmware for Netgear WNR3500L v2 .... "
 	mipsel-uclibc-objcopy -O binary -g $(LINUXDIR)/vmlinux image/vmlinux.bin
@@ -172,6 +201,12 @@ endif
 ifeq ($(LINKSYS_E1000v2),y)
 	@rm -f image/tomato-E1000v2-v21$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).bin
 	@rm -f image/tomato-Cisco-M10v2$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).bin
+endif
+ifeq ($(BELKIN),y)
+ifneq ($(NVRAM_SIZE),60)
+	@rm -f image/tomato-F7D????$(current_BUILD_USB)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).bin
+	@rm -f image/tomato-F5D8235v3$(current_BUILD_USB)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).bin
+endif
 endif
 ifeq ($(BELKIN),y)
 ifneq ($(NVRAM_SIZE),60)
@@ -213,7 +248,7 @@ endif
 ifeq ($(LINKSYS_E3200),y)
 	# Linksys E3200(60k Nvram) image
 	@btools/fpkg -i lzma-loader/loader.gz -i $(LINUXDIR)/arch/mips/brcm-boards/bcm947xx/compressed/vmlinuz -a 1024 -i router/mipsel-uclibc/target.image \
-		-l E3200,image/tomato-E3200$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).bin \
+		-l 3200,image/tomato-E3200$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).bin \
 		| tee -a fpkg.log
 endif
 ifeq ($(LINKSYS_E_64k),y)
@@ -517,6 +552,11 @@ define BusyboxOptions
 		echo "CONFIG_MKNOD=y" >>$(1); \
 		sed -i "/CONFIG_FEATURE_SYSLOGD_READ_BUFFER_SIZE/d" $(1); \
 		echo "CONFIG_FEATURE_SYSLOGD_READ_BUFFER_SIZE=512" >>$(1); \
+	else \
+		sed -i "/CONFIG_UDHCPC=y/d" $(1); \
+		sed -i "/CONFIG_UDHCPC_OLD/d" $(1); \
+		echo "CONFIG_UDHCPC_OLD=y" >>$(1); \
+		echo "# CONFIG_UDHCPC is not set" >>$(1); \
 	fi; \
 	if [ "$(NO_CIFS)" = "y" ]; then \
 		sed -i "/CONFIG_FEATURE_MOUNT_CIFS/d" $(1); \
@@ -648,6 +688,23 @@ define KernelConfig
 		echo "CONFIG_CPU_MIPS32_R2=y" >>$(1); \
 		sed -i "/CONFIG_CPU_MIPSR1/d" $(1); \
 		echo "CONFIG_CPU_MIPSR2=y" >>$(1); \
+if [ "$(NAND)" = "y" ]; then \
+			sed -i "/CONFIG_MTD_NFLASH/d" $(1); \
+			echo "CONFIG_MTD_NFLASH=y" >>$(1); \
+			sed -i "/CONFIG_MTD_NAND/d" $(1); \
+			echo "CONFIG_MTD_NAND=y" >>$(1); \
+			echo "CONFIG_MTD_NAND_IDS=y" >>$(1); \
+			echo "# CONFIG_MTD_NAND_VERIFY_WRITE is not set" >>$(1); \
+			echo "# CONFIG_MTD_NAND_ECC_SMC is not set" >>$(1); \
+			echo "# CONFIG_MTD_NAND_MUSEUM_IDS is not set" >>$(1); \
+			echo "# CONFIG_MTD_NAND_DISKONCHIP is not set" >>$(1); \
+			echo "# CONFIG_MTD_NAND_CAFE is not set" >>$(1); \
+			echo "# CONFIG_MTD_NAND_NANDSIM is not set" >>$(1); \
+			echo "# CONFIG_MTD_NAND_PLATFORM is not set" >>$(1); \
+			echo "# CONFIG_MTD_NAND_ONENAND is not set" >>$(1); \
+			sed -i "/CONFIG_MTD_BRCMNAND/d" $(1); \
+			echo "CONFIG_MTD_BRCMNAND=y" >>$(1); \
+		fi; \
 		if [ "$(WNR3500LV2)" = "y" ]; then \
 			sed -i "/CONFIG_MTD_NFLASH/d" $(1); \
 			echo "CONFIG_MTD_NFLASH=y" >>$(1); \
@@ -1038,7 +1095,13 @@ e2500:
 	
 e3200:
 	@$(MAKE) bin MIPS32=r2 OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y USB="USB" NOCAT=y BBEXTRAS=y SNMP=y DNSCRYPT=y USERPPTP=y PPTPD=y NGINX=y VLAN=y USBAP=y NO_USBAPP=y NVRAM_SIZE=60 LINKSYS_E3200=y
-	
+
+ac66e:
+	@$(MAKE) e MIPS32=r2 NVRAM_64K=y NAND=y AC66U=1 NO_JFFS=y
+
+w1800rz:
+	@$(MAKE) z MIPS32=r2 NVRAM_64K=y W1800R=1
+
 l600n:
 	@$(MAKE) bin MIPS32=r2 OPENVPN=y USERPPTP=y PPTPD=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=NC BUILD_DESC="$(VPN)" USB="USB" VLAN="$(VLAN)" SNMP=y NOCAT=y USBAP=y NO_USBAPP=y B=NC BUILD_DESC+="-$(NC)"  BUILD_DESC+="$(L600N)"
 	
@@ -1160,9 +1223,12 @@ ifeq ($(CONFIG_LINUX26),y)
 
 	@echo "       Netgear WNR3500L v2 builds (128MB Flash)"
 	@echo "v2e          Netgear WNR3500Lv2 build"
-	@echo "rtn53        Asus RT-N53"
-	@echo "e2500        Cisco E-2500"
-	@echo "e3200        Cisco E-3200"
+	@echo "rtn53		Asus RT-N53"
+	@echo "e2500		Cisco E-2500"
+	@echo "e3200		Cisco E-3200"
+	@echo "ac66e		ASUS RT-AC66"
+	@echo "w1800rz		Tenda 1800"
+
 endif
 	@echo "..etc..      other build configs"
 	@echo "clean        -C router clean"

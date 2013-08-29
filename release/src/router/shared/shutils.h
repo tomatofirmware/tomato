@@ -15,6 +15,36 @@
 #ifndef _shutils_h_
 #define _shutils_h_
 #include <string.h>
+
+#ifdef CONFIG_BCMWL6
+
+#define MAX_NVPARSE 255
+#define sin_addr(s) (((struct sockaddr_in *)(s))->sin_addr)
+
+extern int doSystem(char *fmt, ...);
+
+/*
+ * Evaluate cmds using taskset while SMP.
+ * @param       ppid    NULL to wait for child termination or pointer to pid
+ * @param       cmds    command argument list
+ * The normal command elements protype is as [cpu0/cpu1], [cmd_arg0, cmd_arg1, ..., NULL]
+ * If smp defined, it should specify cpu0/cpu1 at the fist element,
+ * if it is not specified, cpu0 will be the default choice.
+ * On UP case, no need to specify cpu0/1, otherwise will be ignored.
+ */
+#define CPU0    "0"
+#define CPU1    "1"
+
+extern int _cpu_eval(int *ppid, char *cmds[]);
+
+extern int kill_pidfile_s(char *pidfile, int sig);
+
+/* Check for a blank character; that is, a space or a tab */
+#ifndef isblank
+#define isblank(c) ((c) == ' ' || (c) == '\t')
+#endif
+
+#else
 /*
  * Reads file and returns contents
  * @param	fd	file descriptor
@@ -28,14 +58,15 @@ extern char * fd2str(int fd);
  * @return	contents of file or NULL if an error occurred
  */
 extern char * file2str(const char *path);
-
-/* 
+/*
  * Waits for a file descriptor to become available for reading or unblocked signal
- * @param	fd	file descriptor
- * @param	timeout	seconds to wait before timing out or 0 for no timeout
- * @return	1 if descriptor changed status or 0 if timed out or -1 on error
+ * @param       fd      file descriptor
+ * @param       timeout seconds to wait before timing out or 0 for no timeout
+ * @return      1 if descriptor changed status or 0 if timed out or -1 on error
  */
-//	extern int waitfor(int fd, int timeout);
+//extern int waitfor(int fd, int timeout);
+
+#endif
 
 /* 
  * Concatenates NULL-terminated list of arguments into a single
@@ -47,6 +78,7 @@ extern char * file2str(const char *path);
  * @return	return value of executed command or errno
  */
 extern int _eval(char *const argv[], const char *path, int timeout, pid_t *ppid);
+
 
 /* 
  * Concatenates NULL-terminated list of arguments into a single
@@ -113,6 +145,7 @@ static inline char * strcat_r(const char *s1, const char *s2, char *buf)
 	return buf;
 }	
 
+
 /* Strip trailing CR/NL from string <s> */
 #define chomp(s) ({ \
 	char *c = (s) + strlen((s)) - 1; \
@@ -123,15 +156,23 @@ static inline char * strcat_r(const char *s1, const char *s2, char *buf)
 
 
 /* Simple version of _eval() (no timeout and wait for child termination) */
-#if 1
+#ifdef CONFIG_BCMWL6
 #define eval(cmd, args...) ({ \
-	char *argv[] = { cmd, ## args, NULL }; \
+	char * const argv[] = { cmd, ## args, NULL }; \
 	_eval(argv, NULL, 0, NULL); \
 })
 #else
 #define eval(cmd, args...) ({ \
 	char *argv[] = { cmd, ## args, NULL }; \
-	_eval(argv, ">/dev/console", 0, NULL); \
+	_eval(argv, NULL, 0, NULL); \
+})
+#endif
+
+#ifdef CONFIG_BCMWL6
+/* another _cpu_eval form */
+#define cpu_eval(ppid, cmd, args...) ({ \
+	char * argv[] = { cmd, ## args, NULL }; \
+	_cpu_eval(ppid, argv); \
 })
 #endif
 
@@ -148,13 +189,47 @@ static inline char * strcat_r(const char *s1, const char *s2, char *buf)
 	     word[strcspn(word, " ")] = '\0', \
 	     word[sizeof(word) - 1] = '\0', \
 	     next = strchr(next, ' '))
+#ifdef CONFIG_BCMWL6
+/* Copy each token in wordlist delimited by ascii_60 into word */
+#define foreach_60(word, wordlist, next) \
+	for (next = &wordlist[strspn(wordlist, "<")], \
+	     strncpy(word, next, sizeof(word)), \
+	     word[strcspn(word, "<")] = '\0', \
+	     word[sizeof(word) - 1] = '\0', \
+	     next = strchr(next, '<'); \
+	     strlen(word); \
+	     next = next ? &next[strspn(next, "<")] : "", \
+	     strncpy(word, next, sizeof(word)), \
+	     word[strcspn(word, "<")] = '\0', \
+	     word[sizeof(word) - 1] = '\0', \
+	     next = strchr(next, '<'))
 
+/* Copy each token in wordlist delimited by ascii_62 into word */
+#define foreach_62(word, wordlist, next) \
+	for (next = &wordlist[strspn(wordlist, ">")], \
+	     strncpy(word, next, sizeof(word)), \
+	     word[strcspn(word, ">")] = '\0', \
+	     word[sizeof(word) - 1] = '\0', \
+	     next = strchr(next, '>'); \
+	     strlen(word); \
+	     next = next ? &next[strspn(next, ">")] : "", \
+	     strncpy(word, next, sizeof(word)), \
+	     word[strcspn(word, ">")] = '\0', \
+	     word[sizeof(word) - 1] = '\0', \
+	     next = strchr(next, '>'))
+
+#endif /* CONFIG_BCMWL6 */
 /* Return NUL instead of NULL if undefined */
 #define safe_getenv(s) (getenv(s) ? : "")
 
+#ifdef CONFIG_BCMWL6
+//#define dbg(fmt, args...) do { FILE *fp = fopen("/dev/console", "w"); if (fp) { fprintf(fp, fmt, ## args); fclose(fp); } } while (0)
+#define dbg(fmt, args...) do { FILE *fp = fopen("/dev/console", "w"); if (fp) { fprintf(fp, fmt, ## args); fclose(fp); } else fprintf(stderr, fmt, ## args); } while (0)
+#define dbG(fmt, args...) dbg("%s(0x%04x): " fmt , __FUNCTION__ , __LINE__, ## args)
+
+#endif /* CONFIG_BCMWL6 */
 
 extern void cprintf(const char *format, ...);
-
 
 /*
  * Parse the unit and subunit from an interface string such as wlXX or wlXX.YY
@@ -170,7 +245,7 @@ extern void cprintf(const char *format, ...);
  *		for unit and/or subuint to ignore the value.
  */
 extern int get_ifname_unit(const char* ifname, int *unit, int *subunit);
-
+#ifndef CONFIG_BCMWL6
 /*
  * Set the ip configuration index given the eth name
  * Updates both wlXX_ipconfig_index and lanYY_ifname.
@@ -188,7 +263,6 @@ extern int set_ipconfig_index(char *eth_ifname, int index);
  * @return	index or -1 if not found
  */
 extern int get_ipconfig_index(char *eth_ifname);
-
 /*
  * Get interfaces belonging to a specific bridge.
  *
@@ -197,7 +271,7 @@ extern int get_ipconfig_index(char *eth_ifname);
  */
 extern char *
 get_bridged_interfaces(char *bridge_name);
-
+#endif
 /*
 		remove_from_list
 		Remove the specified word from the list.
@@ -227,9 +301,10 @@ extern char *find_in_list(const char *haystack, const char *needle);
 
 extern char *remove_dups(char *inlist, int inlist_size);
 
+#ifndef CONFIG_BCMWL6
 extern char *find_smallest_in_list(char *haystack);
-
 extern char *sort_list(char *inlist, int inlist_size);
+#endif
 
 extern int nvifname_to_osifname(const char *nvifname, char *osifname_buf,
                                 int osifname_buf_len);
@@ -238,4 +313,10 @@ extern int osifname_to_nvifname(const char *osifname, char *nvifname_buf,
 
 int ure_any_enabled(void);
 
+#ifdef CONFIG_BCMWL6
+int is_hwnat_loaded(void);
+
+#define vstrsep(buf, sep, args...) _vstrsep(buf, sep, args, NULL)
+extern int _vstrsep(char *buf, const char *sep, ...);
+#endif
 #endif /* _shutils_h_ */

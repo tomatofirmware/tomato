@@ -15,6 +15,9 @@ include common.mak
 
 #TOMATO_EXPERIMENTAL=0
 
+#export PARALLEL_BUILD :=
+export PARALLEL_BUILD := -j`grep -c '^processor' /proc/cpuinfo`
+
 #
 #
 #
@@ -538,7 +541,7 @@ rmconf: config/mconf
 
 roldconf: config/conf
 	@config/conf -o $(CONFIG_IN)
-	@$(MAKE) shared-clean rc-clean nvram-clean httpd-clean prebuilt-clean libbcmcrypto-clean dhcpv6-clean
+	@$(MAKE) shared-clean rc-clean nvram-clean httpd-clean prebuilt-clean libbcmcrypto-clean dhcpv6-clean et-clean
 
 kconf:
 	@$(MAKE) -C $(LINUXDIR) config
@@ -773,8 +776,11 @@ libnfnetlink/stamp-h1:
 		CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
 		LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections" \
 		$(CONFIGURE) --prefix=/usr --enable-shared --enable-static
+	touch libnfnetlink/stamp-h1
 
 libnfnetlink: libnfnetlink/stamp-h1
+	@$(SEP)
+	$(MAKE) -C libnfnetlink
 
 libnfnetlink-install:
 	install -D libnfnetlink/src/.libs/libnfnetlink.so.0.2.0 $(INSTALLDIR)/libnfnetlink/usr/lib/libnfnetlink.so.0.2.0
@@ -794,7 +800,7 @@ miniupnpd: iptables miniupnpd-config libnfnetlink
 	@$(SEP)
 	$(MAKE) -C miniupnpd miniupnpd -f Makefile.linux CC=$(CC) \
 		CFLAGS="-Wall -Os -D_GNU_SOURCE $(EXTRACFLAGS) -I$(TOP)/iptables/include -I$(TOP)/libnfnetlink/include" \
-		LDFLAGS="-L$(TOP)/iptables -liptc -L$(TOP)/libnfnetlink/src/.libs -lnfnetlink" LIBS=""
+		LDFLAGS="-L$(TOP)/iptables -liptc -L$(TOP)/libnfnetlink/src/.libs -lnfnetlink" LIBS="" $(PARALLEL_BUILD)
 
 miniupnpd-clean:
 	-@$(MAKE) -C miniupnpd -f Makefile.linux clean
@@ -950,7 +956,8 @@ accel-pptp-install: accel-pptp
 	$(STRIP) $(INSTALLDIR)/accel-pptp/usr/lib/pppd/pptp.so
 
 pptpd/stamp-h1:
-	cd $(TOP)/pptpd && $(CONFIGURE) --prefix=$(INSTALLDIR)/pptpd --enable-bcrelay CC=mipsel-uclibc-gcc STRIP=mipsel-uclibc-strip AR=mipsel-uclibc-ar LD=mipsel-uclibc-ld NM=mipsel-uclibc-nm RANLIB=mipsel-uclibc-ranlib
+	cd pptpd && $(CONFIGURE) --prefix=$(INSTALLDIR)/pptpd --enable-bcrelay CC=mipsel-uclibc-gcc \
+		STRIP=mipsel-uclibc-strip AR=mipsel-uclibc-ar LD=mipsel-uclibc-ld NM=mipsel-uclibc-nm RANLIB=mipsel-uclibc-ranlib
 	touch pptpd/stamp-h1
 
 pptpd: pptpd/stamp-h1
@@ -966,8 +973,7 @@ pptpd-install: pptpd
 
 pptpd-clean:
 	-@$(MAKE) -C pptpd clean
-	rm -rf pptpd/.deps pptpd/stamp-h1
-
+	rm -rf pptpd/stamp-h1 pptpd/.deps
 
 pppd/Makefile: pppd/linux/Makefile.top
 	cd pppd && $(CONFIGURE) --prefix=/usr --sysconfdir=/tmp
