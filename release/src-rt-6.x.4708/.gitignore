@@ -1,0 +1,5 @@
+*.bin
+/.config
+fpkg.log
+image/*
+tags
