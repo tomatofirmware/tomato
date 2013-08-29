@@ -26,15 +26,15 @@
 
 
 var ntpList = [
-	['custom', 'Custom...'],
-	['', 'Default'],
-	['africa', 'Africa'],
-	['asia', 'Asia'],
-	['europe', 'Europe'],
-	['oceania', 'Oceania'],
-	['north-america', 'North America'],
-	['south-america', 'South America'],
-	['us', 'US']
+	['custom', '<% _("Custom"); %>...'],
+	['', '<% _("Default"); %>'],
+	['africa', '<% _("Africa"); %>'],
+	['asia', '<% _("Asia"); %>'],
+	['europe', '<% _("Europe"); %>'],
+	['oceania', '<% _("Oceania"); %>'],
+	['north-america', '<% _("North America"); %>'],
+	['south-america', '<% _("South America"); %>'],
+	['us', '<% _("US"); %>']
 ];
 
 function ntpString(name)
@@ -90,7 +90,7 @@ function verifyFields(focused, quiet)
 
 	if (a) {
 		if ((E('_f_ntp_1').value == '') && (E('_f_ntp_2').value == '') && ((E('_f_ntp_3').value == ''))) {
-			ferror.set('_f_ntp_1', 'At least one NTP server is required', quiet);
+			ferror.set('_f_ntp_1', '<% _("At least one NTP server is required"); %>', quiet);
 			return 0;
 		}
 	}
@@ -202,71 +202,71 @@ http://www.timeanddate.com/library/abbreviations/timezones/au/
 REMOVE-END */
 
 createFieldTable('', [
-	{ title: 'Router Time', text: '<span id="clock"><% time(); %></span>' },
+	{ title: '<% _("Router Time"); %>', text: '<span id="clock"><% time(); %></span>' },
 	null,
-	{ title: 'Time Zone', name: 'tm_sel', type: 'select', options: [
-		['custom','Custom...'],
-		['UTC12','UTC-12:00 Kwajalein'],
-		['UTC11','UTC-11:00 Midway Island, Samoa'],
-		['UTC10','UTC-10:00 Hawaii'],
-		['NAST9NADT,M3.2.0/2,M11.1.0/2','UTC-09:00 Alaska'],
-		['PST8PDT,M3.2.0/2,M11.1.0/2','UTC-08:00 Pacific Time'],
-		['UTC7','UTC-07:00 Arizona'],
-		['MST7MDT,M3.2.0/2,M11.1.0/2','UTC-07:00 Mountain Time'],
-		['UTC6','UTC-06:00 Mexico'],
-		['CST6CDT,M3.2.0/2,M11.1.0/2','UTC-06:00 Central Time'],
-		['UTC5','UTC-05:00 Colombia, Panama'],
-		['EST5EDT,M3.2.0/2,M11.1.0/2','UTC-05:00 Eastern Time'],
-		['VET4:30','UTC-04:30 Venezuela'],
-		['UTC4','UTC-04:00 Aruba, Bermuda, Guyana, Puerto Rico'],
-		['BOT4','UTC-04:00 Bolivia'],
-		['AST4ADT,M3.2.0/2,M11.1.0/2','UTC-04:00 Atlantic Time'],
-		['BRWST4BRWDT,M10.3.0/0,M2.5.0/0','UTC-04:00 Brazil West'],
-		['NST3:30NDT,M3.2.0/0:01,M11.1.0/0:01','UTC-03:30 Newfoundland'],
-		['WGST3WGDT,M3.5.6/22,M10.5.6/23','UTC-03:00 Greenland'],
-		['BRST3BRDT,M10.3.0/0,M2.5.0/0','UTC-03:00 Brazil East'],
-		['UTC3','UTC-03:00 Argentina, French Guiana, Surinam'],
-		['UTC2','UTC-02:00 Mid-Atlantic'],
-		['STD1DST,M3.5.0/2,M10.5.0/2','UTC-01:00 Azores'],
-		['UTC0','UTC+00:00 Gambia, Liberia, Morocco'],
-		['GMT0BST,M3.5.0/2,M10.5.0/2','UTC+00:00 England'],
-		['UTC-1','UTC+01:00 Tunisia'],
-		['CET-1CEST,M3.5.0/2,M10.5.0/3','UTC+01:00 France, Germany, Italy, Poland, Spain, Sweden'],
-		['EET-2EEST-3,M3.5.0/3,M10.5.0/4','UTC+02:00 Estonia, Finland, Latvia, Lithuania'],
-		['UTC-2','UTC+02:00 South Africa, Israel'],
-		['STD-2DST,M3.5.0/2,M10.5.0/2','UTC+02:00 Greece, Ukraine, Romania, Turkey, Latvia'],
-		['UTC-3','UTC+03:00 Iraq, Jordan, Kuwait'],
-		['MSK-3MSD,M3.5.0,M10.5.0/3','UTC+03:00 Moscow'],
-		['UTC-4','UTC+04:00 Oman, UAE'],
-		['AMT-4AMST,M3.5.0,M10.5.0/3','UTC+04:00 Armenia'],
-		['UTC-4:30','UTC+04:30 Kabul'],
-		['UTC-5','UTC+05:00 Pakistan'],
-		['YEKT-5YEKST,M3.5.0,M10.5.0/3','UTC+05:00 Russia, Yekaterinburg'],
-		['UTC-5:30','UTC+05:30 Bombay, Calcutta, Madras, New Delhi'],
-		['UTC-6','UTC+06:00 Bangladesh'],
-		['NOVT-6NOVST,M3.5.0,M10.5.0/3','UTC+06:00 Russia, Novosibirsk'],
-		['UTC-7','UTC+07:00 Thailand'],
-		['KRAT-7KRAST,M3.5.0,M10.5.0/3','UTC+07:00 Russia, Krasnoyarsk'],
-		['UTC-8','UTC+08:00 China, Hong Kong, Western Australia, Singapore, Taiwan'],
-		['IRKT-8IRKST,M3.5.0,M10.5.0/3','UTC+08:00 Russia, Irkutsk'],
-		['UTC-9','UTC+09:00 Japan, Korea'],
-		['YAKT-9YAKST,M3.5.0,M10.5.0/3','UTC+09:00 Russia, Yakutsk'],
-		['ACST-9:30ACDT,M10.1.0/2,M4.1.0/3', 'UTC+09:30 South Australia'],
-		['ACST-9:30', 'UTC+09:30 Darwin'],
-		['UTC-10','UTC+10:00 Guam, Russia'],
-		['AEST-10AEDT,M10.1.0,M4.1.0/3', 'UTC+10:00 Australia'],
-		['AEST-10', 'UTC+10:00 Brisbane'],
-		['UTC-11','UTC+11:00 Solomon Islands'],
-		['UTC-12','UTC+12:00 Fiji'],
-		['NZST-12NZDT,M9.5.0/2,M4.1.0/3','UTC+12:00 New Zealand']
+	{ title: '<% _("Time Zone"); %>', name: 'tm_sel', type: 'select', options: [
+		['custom','<% _("Custom"); %>...'],
+		['UTC12','UTC-12:00 <% _("Kwajalein"); %>'],
+		['UTC11','UTC-11:00 <% _("Midway Island"); %>, <% _("Samoa"); %>'],
+		['UTC10','UTC-10:00 <% _("Hawaii"); %>'],
+		['NAST9NADT,M3.2.0/2,M11.1.0/2','UTC-09:00 <% _("Alaska"); %>'],
+		['PST8PDT,M3.2.0/2,M11.1.0/2','UTC-08:00 <% _("Pacific Time"); %>'],
+		['UTC7','UTC-07:00 <% _("Arizona"); %>'],
+		['MST7MDT,M3.2.0/2,M11.1.0/2','UTC-07:00 <% _("Mountain Time"); %>'],
+		['UTC6','UTC-06:00 <% _("Mexico"); %>'],
+		['CST6CDT,M3.2.0/2,M11.1.0/2','UTC-06:00 <% _("Central Time"); %>'],
+		['UTC5','UTC-05:00 <% _("Colombia"); %>, <% _("Panama"); %>'],
+		['EST5EDT,M3.2.0/2,M11.1.0/2','UTC-05:00 <% _("Eastern Time"); %>'],
+		['VET4:30','UTC-04:30 <% _("Venezuela"); %>'],
+		['UTC4','UTC-04:00 <% _("Aruba"); %>, <% _("Bermuda"); %>, <% _("Guyana"); %>, <% _("Puerto Rico"); %>'],
+		['BOT4','UTC-04:00 <% _("Bolivia"); %>'],
+		['AST4ADT,M3.2.0/2,M11.1.0/2','UTC-04:00 <% _("Atlantic Time"); %>'],
+		['BRWST4BRWDT,M10.3.0/0,M2.5.0/0','UTC-04:00 <% _("Brazil West"); %>'],
+		['NST3:30NDT,M3.2.0/0:01,M11.1.0/0:01','UTC-03:30 <% _("Newfoundland"); %>'],
+		['WGST3WGDT,M3.5.6/22,M10.5.6/23','UTC-03:00 <% _("Greenland"); %>'],
+		['BRST3BRDT,M10.3.0/0,M2.5.0/0','UTC-03:00 <% _("Brazil East"); %>'],
+		['UTC3','UTC-03:00 <% _("Argentina"); %>, <% _("French Guiana"); %>, <% _("Surinam"); %>'],
+		['UTC2','UTC-02:00 <% _("Mid-Atlantic"); %>'],
+		['STD1DST,M3.5.0/2,M10.5.0/2','UTC-01:00 <% _("Azores"); %>'],
+		['UTC0','UTC+00:00 <% _("Gambia"); %>, <% _("Liberia"); %>, <% _("Morocco"); %>'],
+		['GMT0BST,M3.5.0/2,M10.5.0/2','UTC+00:00 <% _("England"); %>'],
+		['UTC-1','UTC+01:00 <% _("Tunisia"); %>'],
+		['CET-1CEST,M3.5.0/2,M10.5.0/3','UTC+01:00 <% _("France"); %>, <% _("Germany"); %>, <% _("Italy"); %>, <% _("Poland"); %>, <% _("Spain"); %>, <% _("Sweden"); %>'],
+		['EET-2EEST-3,M3.5.0/3,M10.5.0/4','UTC+02:00 <% _("Estonia"); %>, <% _("Finland"); %>, <% _("Latvia"); %>, <% _("Lithuania"); %>'],
+		['UTC-2','UTC+02:00 <% _("South Africa"); %>, <% _("Israel"); %>'],
+		['STD-2DST,M3.5.0/2,M10.5.0/2','UTC+02:00 <% _("Greece"); %>, <% _("Ukraine"); %>, <% _("Romania"); %>, <% _("Turkey"); %>, <% _("Latvia"); %>'],
+		['UTC-3','UTC+03:00 <% _("Iraq"); %>, <% _("Jordan"); %>, <% _("Kuwait"); %>'],
+		['MSK-3MSD,M3.5.0,M10.5.0/3','UTC+03:00 <% _("Moscow"); %>'],
+		['UTC-4','UTC+04:00 <% _("Oman"); %>, <% _("UAE"); %>'],
+		['AMT-4AMST,M3.5.0,M10.5.0/3','UTC+04:00 <% _("Armenia"); %>'],
+		['UTC-4:30','UTC+04:30 <% _("Kabul"); %>'],
+		['UTC-5','UTC+05:00 <% _("Pakistan"); %>'],
+		['YEKT-5YEKST,M3.5.0,M10.5.0/3','UTC+05:00 <% _("Russia"); %>, <% _("Yekaterinburg"); %>'],
+		['UTC-5:30','UTC+05:30 <% _("Bombay"); %>, <% _("Calcutta"); %>, <% _("Madras"); %>, <% _("New Delhi"); %>'],
+		['UTC-6','UTC+06:00 <% _("Bangladesh"); %>'],
+		['NOVT-6NOVST,M3.5.0,M10.5.0/3','UTC+06:00 <% _("Russia"); %>, <% _("Novosibirsk"); %>'],
+		['UTC-7','UTC+07:00 <% _("Thailand"); %>'],
+		['KRAT-7KRAST,M3.5.0,M10.5.0/3','UTC+07:00 <% _("Russia"); %>, <% _("Krasnoyarsk"0; %>'],
+		['UTC-8','UTC+08:00 <% _("China"); %>, <% _("Hong Kong"); %>, <% _("Western Australia"); %>, <% _("Singapore"); %>, <% _("Taiwan"); %>'],
+		['IRKT-8IRKST,M3.5.0,M10.5.0/3','UTC+08:00 <% _("Russia"); %>, <% _("Irkutsk"0; %>'],
+		['UTC-9','UTC+09:00 <% _("Japan"); %>, <% _("Korea"); %>'],
+		['YAKT-9YAKST,M3.5.0,M10.5.0/3','UTC+09:00 <% _("Russia"); %>, <% _("Yakutsk"); %>'],
+		['ACST-9:30ACDT,M10.1.0/2,M4.1.0/3', 'UTC+09:30 <% _("South Australia"0; %>'],
+		['ACST-9:30', 'UTC+09:30 <% _("Darwin"); %>'],
+		['UTC-10','UTC+10:00 <% _("Guam, Russia"); %>'],
+		['AEST-10AEDT,M10.1.0,M4.1.0/3', 'UTC+10:00 <% _("Australia"); %>'],
+		['AEST-10', 'UTC+10:00 <% _("Brisbane"); %>'],
+		['UTC-11','UTC+11:00 <% _("Solomon Islands"); %>'],
+		['UTC-12','UTC+12:00 <% _("Fiji"); %>'],
+		['NZST-12NZDT,M9.5.0/2,M4.1.0/3','UTC+12:00 <% _("New Zealand"); %>']
 	], value: nvram.tm_sel },
-	{ title: 'Auto Daylight Savings Time', indent: 2, name: 'f_tm_dst', type: 'checkbox', value: nvram.tm_dst != '0' },
-	{ title: 'Custom TZ String', indent: 2, name: 'f_tm_tz', type: 'text', maxlen: 32, size: 34, value: nvram.tm_tz || '' },
+	{ title: '<% _("Auto Daylight Savings Time"); %>', indent: 2, name: 'f_tm_dst', type: 'checkbox', value: nvram.tm_dst != '0' },
+	{ title: '<% _("Custom TZ String"); %>', indent: 2, name: 'f_tm_tz', type: 'text', maxlen: 32, size: 34, value: nvram.tm_tz || '' },
 	null,
-	{ title: 'Auto Update Time', name: 'ntp_updates', type: 'select', options: [[-1,'Never'],[0,'Only at startup'],[1,'Every hour'],[2,'Every 2 hours'],[4,'Every 4 hours'],[6,'Every 6 hours'],[8,'Every 8 hours'],[12,'Every 12 hours'],[24,'Every 24 hours']],
+	{ title: '<% _("Auto Update Time"); %>', name: 'ntp_updates', type: 'select', options: [[-1,'<% _("Never"); %>'],[0,'<% _("Only at startup"); %>'],[1,'<% _("Every hour"); %>'],[2,'<% _("Every 2 hours"); %>'],[4,'<% _("Every 4 hours"0; %>'],[6,'<% _("Every 6 hours"); %>'],[8,'<% _("Every 8 hours"); %>'],[12,'<% _("Every 12 hours"); %>'],[24,'<% _("Every 24 hours"); %>']],
 		value: nvram.ntp_updates },
-	{ title: 'Trigger Connect On Demand', indent: 2, name: 'f_ntp_tdod', type: 'checkbox', value: nvram.ntp_tdod != '0' },
-	{ title: 'NTP Time Server', name: 'f_ntp_server', type: 'select', options: ntpList, value: ntpSel },
+	{ title: '<% _("Trigger Connect On Demand"); %>', indent: 2, name: 'f_ntp_tdod', type: 'checkbox', value: nvram.ntp_tdod != '0' },
+	{ title: '<% _("NTP Time Server"); %>', name: 'f_ntp_server', type: 'select', options: ntpList, value: ntpSel },
 	{ title: '&nbsp;', text: '<small><span id="ntp-preset">xx</span></small>', hidden: 1 },
 	{ title: '', name: 'f_ntp_1', type: 'text', maxlen: 48, size: 50, value: ntp[0] || 'pool.ntp.org', hidden: 1 },
 	{ title: '', name: 'f_ntp_2', type: 'text', maxlen: 48, size: 50, value: ntp[1] || '', hidden: 1 },
@@ -277,10 +277,10 @@ createFieldTable('', [
 <br><br>
 
 <div id='ntpkiss' style='display:none'>
-The following NTP servers have been automatically blocked by request from the server:
+<% _("The following NTP servers have been automatically blocked by request from the server:"); %>
 <b id='ntpkiss-ip'></b>
 <div>
-	<input type='button' value='Clear' onclick='save(1)'>
+	<input type='button' value='<% _("Clear"); %>' onclick='save(1)'>
 </div>
 </div>
 
@@ -289,8 +289,8 @@ The following NTP servers have been automatically blocked by request from the se
 </td></tr>
 <tr><td id='footer' colspan=2>
 	<span id='footer-msg'></span>
-	<input type='button' value='Save' id='save-button' onclick='save(0)'>
-	<input type='button' value='Cancel' id='cancel-button' onclick='reloadPage();'>
+	<input type='button' value='<% _("Save"); %>' id='save-button' onclick='save(0)'>
+	<input type='button' value='<% _("Cancel"0; %>' id='cancel-button' onclick='reloadPage();'>
 </td></tr>
 </table>
 </form>

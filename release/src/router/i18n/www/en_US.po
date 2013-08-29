@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TomatoEgg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-29 01:17-0400\n"
-"PO-Revision-Date: 2013-08-29 01:19-0500\n"
+"POT-Creation-Date: 2013-08-29 09:10-0400\n"
+"PO-Revision-Date: 2013-08-29 09:11-0500\n"
 "Last-Translator: Zhiqiang <Wang.9264@gmail.com>\n"
 "Language-Team: TomatoEgg Translators <translate@tomatoegg.net>\n"
 "MIME-Version: 1.0\n"
@@ -26,6 +26,173 @@ msgstr "English"
 #: ../www/admin-access.asp:301
 msgid "Chinese"
 msgstr "Chinese"
+
+#: ../www/basic-ident.asp:14 ../www/tomato.js:2376 ../www/tomato.js:2401
+msgid "Basic"
+msgstr "Basic"
+
+#: ../www/basic-ident.asp:14 ../www/tomato.js:2381
+msgid "Identification"
+msgstr "Identification"
+
+#: ../www/basic-ident.asp:62
+msgid "Router Name"
+msgstr "Router Name"
+
+#: ../www/basic-ident.asp:63
+msgid "Hostname"
+msgstr "Hostname"
+
+#: ../www/basic-ident.asp:64
+msgid "Domain Name"
+msgstr "Domain Name"
+
+#: ../www/basic-ident.asp:74 ../www/basic-ipv6.asp:373
+#: ../www/basic-network.asp:1791 ../www/basic-time.asp:292
+msgid "Save"
+msgstr "Save"
+
+#: ../www/basic-ident.asp:75 ../www/basic-ipv6.asp:374
+#: ../www/basic-network.asp:1792 ../www/basic-time.asp:293
+msgid "Cancel"
+msgstr "Cancel"
+
+#: ../www/basic-ipv6.asp:305 ../www/status-overview.asp:341
+msgid "Tomato"
+msgstr "Tomato"
+
+#: ../www/basic-ipv6.asp:324
+msgid "IPv6 Configuration"
+msgstr "IPv6 Configuration"
+
+#: ../www/basic-ipv6.asp:330
+msgid "IPv6 Service Type"
+msgstr "IPv6 Service Type"
+
+#: ../www/basic-ipv6.asp:331 ../www/basic-network.asp:95
+#: ../www/basic-network.asp:98 ../www/basic-network.asp:1609
+#: ../www/basic-network.asp:1740 ../www/status-overview.asp:503
+msgid "Disabled"
+msgstr "Disabled"
+
+#: ../www/basic-ipv6.asp:331
+msgid "Native IPv6 from ISP"
+msgstr "Native IPv6 from ISP"
+
+#: ../www/basic-ipv6.asp:331
+msgid "DHCPv6 with Prefix Delegation"
+msgstr "DHCPv6 with Prefix Delegation"
+
+#: ../www/basic-ipv6.asp:331
+msgid "6to4 Anycast Relay"
+msgstr "6to4 Anycast Relay"
+
+#: ../www/basic-ipv6.asp:331
+msgid "6in4 Static Tunnel"
+msgstr "6in4 Static Tunnel"
+
+#: ../www/basic-ipv6.asp:331
+msgid "6rd Relay"
+msgstr "6rd Relay"
+
+#: ../www/basic-ipv6.asp:331
+msgid "6rd from DHCPv4 (Option 212)"
+msgstr "6rd from DHCPv4 (Option 212)"
+
+#: ../www/basic-ipv6.asp:331
+msgid "Other"
+msgstr "Other"
+
+#: ../www/basic-ipv6.asp:331
+msgid "Manual Configuration"
+msgstr "Manual Configuration"
+
+#: ../www/basic-ipv6.asp:333
+msgid "IPv6 WAN Interface"
+msgstr "IPv6 WAN Interface"
+
+#: ../www/basic-ipv6.asp:335
+msgid "Assigned / Routed Prefix"
+msgstr "Assigned / Routed Prefix"
+
+#: ../www/basic-ipv6.asp:336
+msgid "6rd Routed Prefix"
+msgstr "6rd Routed Prefix"
+
+#: ../www/basic-ipv6.asp:337
+msgid "6rd Prefix Length"
+msgstr "6rd Prefix Length"
+
+#: ../www/basic-ipv6.asp:337
+msgid "Usually 32"
+msgstr "Usually 32"
+
+#: ../www/basic-ipv6.asp:338
+msgid "Prefix Length"
+msgstr "Prefix Length"
+
+#: ../www/basic-ipv6.asp:339 ../www/status-overview.asp:470
+msgid "Router IPv6 Address"
+msgstr "Router IPv6 Address"
+
+#: ../www/basic-ipv6.asp:340 ../www/basic-network.asp:1636
+#: ../www/basic-time.asp:30
+msgid "Default"
+msgstr "Default"
+
+#: ../www/basic-ipv6.asp:340 ../www/basic-network.asp:1636
+msgid "Manual"
+msgstr "Manual"
+
+#: ../www/basic-ipv6.asp:343 ../www/basic-network.asp:1661
+msgid "Static DNS"
+msgstr "Static DNS"
+
+#: ../www/basic-ipv6.asp:346
+msgid "Accept RA from"
+msgstr "Accept RA from"
+
+#: ../www/basic-ipv6.asp:351
+msgid "Tunnel Remote Endpoint"
+msgstr "Tunnel Remote Endpoint"
+
+#: ../www/basic-ipv6.asp:351 ../www/basic-ipv6.asp:352
+#: ../www/status-overview.asp:387 ../www/status-overview.asp:389
+#: ../www/status-overview.asp:394
+msgid "Address"
+msgstr "Address"
+
+#: ../www/basic-ipv6.asp:352
+msgid "6RD Tunnel Border Relay"
+msgstr "6RD Tunnel Border Relay"
+
+#: ../www/basic-ipv6.asp:353
+msgid "6RD IPv4 Mask Length"
+msgstr "6RD IPv4 Mask Length"
+
+#: ../www/basic-ipv6.asp:353
+msgid "usually 0"
+msgstr "usually 0"
+
+#: ../www/basic-ipv6.asp:354
+msgid "Relay Anycast Address"
+msgstr "Relay Anycast Address"
+
+#: ../www/basic-ipv6.asp:355
+msgid "Tunnel Client IPv6 Address"
+msgstr "Tunnel Client IPv6 Address"
+
+#: ../www/basic-ipv6.asp:359
+msgid "Tunnel MTU"
+msgstr "Tunnel MTU"
+
+#: ../www/basic-ipv6.asp:359
+msgid "0 for default"
+msgstr "0 for default"
+
+#: ../www/basic-ipv6.asp:360
+msgid "Tunnel TTL"
+msgstr "Tunnel TTL"
 
 #: ../www/basic-network.asp:60
 msgid "Bridge"
@@ -59,12 +226,6 @@ msgstr "mins"
 #: ../www/status-overview.asp:503
 msgid "Enabled"
 msgstr "Enabled"
-
-#: ../www/basic-network.asp:95 ../www/basic-network.asp:98
-#: ../www/basic-network.asp:1609 ../www/basic-network.asp:1740
-#: ../www/status-overview.asp:503
-msgid "Disabled"
-msgstr "Disabled"
 
 #: ../www/basic-network.asp:241
 msgid "Cannot add another entry for bridge"
@@ -284,14 +445,6 @@ msgstr "LCP Echo Link fail limit"
 msgid "MTU"
 msgstr "MTU"
 
-#: ../www/basic-network.asp:1636
-msgid "Default"
-msgstr "Default"
-
-#: ../www/basic-network.asp:1636
-msgid "Manual"
-msgstr "Manual"
-
 #: ../www/basic-network.asp:1638
 msgid "Single Line MLPPP"
 msgstr "Single Line MLPPP"
@@ -311,10 +464,6 @@ msgstr "Bridge WAN port to primary LAN"
 #: ../www/basic-network.asp:1660
 msgid "Default Gateway"
 msgstr "Default Gateway"
-
-#: ../www/basic-network.asp:1661
-msgid "Static DNS"
-msgstr "Static DNS"
 
 #: ../www/basic-network.asp:1665
 msgid "Use dnscrypt-proxy"
@@ -494,13 +643,463 @@ msgstr "Generate"
 msgid "Key"
 msgstr "Key"
 
-#: ../www/basic-network.asp:1791
-msgid "Save"
-msgstr "Save"
+#: ../www/basic-time.asp:29 ../www/basic-time.asp:208
+msgid "Custom"
+msgstr "Custom"
 
-#: ../www/basic-network.asp:1792
-msgid "Cancel"
-msgstr "Cancel"
+#: ../www/basic-time.asp:31
+msgid "Africa"
+msgstr "Africa"
+
+#: ../www/basic-time.asp:32
+msgid "Asia"
+msgstr "Asia"
+
+#: ../www/basic-time.asp:33
+msgid "Europe"
+msgstr "Europe"
+
+#: ../www/basic-time.asp:34
+msgid "Oceania"
+msgstr "Oceania"
+
+#: ../www/basic-time.asp:35
+msgid "North America"
+msgstr "North America"
+
+#: ../www/basic-time.asp:36
+msgid "South America"
+msgstr "South America"
+
+#: ../www/basic-time.asp:37
+msgid "US"
+msgstr "US"
+
+#: ../www/basic-time.asp:93
+msgid "At least one NTP server is required"
+msgstr "At least one NTP server is required"
+
+#: ../www/basic-time.asp:205
+msgid "Router Time"
+msgstr "Router Time"
+
+#: ../www/basic-time.asp:207
+msgid "Time Zone"
+msgstr "Time Zone"
+
+#: ../www/basic-time.asp:209
+msgid "Kwajalein"
+msgstr "Kwajalein"
+
+#: ../www/basic-time.asp:210
+msgid "Midway Island"
+msgstr "Midway Island"
+
+#: ../www/basic-time.asp:210
+msgid "Samoa"
+msgstr "Samoa"
+
+#: ../www/basic-time.asp:211
+msgid "Hawaii"
+msgstr "Hawaii"
+
+#: ../www/basic-time.asp:212
+msgid "Alaska"
+msgstr "Alaska"
+
+#: ../www/basic-time.asp:213
+msgid "Pacific Time"
+msgstr "Pacific Time"
+
+#: ../www/basic-time.asp:214
+msgid "Arizona"
+msgstr "Arizona"
+
+#: ../www/basic-time.asp:215
+msgid "Mountain Time"
+msgstr "Mountain Time"
+
+#: ../www/basic-time.asp:216
+msgid "Mexico"
+msgstr "Mexico"
+
+#: ../www/basic-time.asp:217
+msgid "Central Time"
+msgstr "Central Time"
+
+#: ../www/basic-time.asp:218
+msgid "Colombia"
+msgstr "Colombia"
+
+#: ../www/basic-time.asp:218
+msgid "Panama"
+msgstr "Panama"
+
+#: ../www/basic-time.asp:219
+msgid "Eastern Time"
+msgstr "Eastern Time"
+
+#: ../www/basic-time.asp:220
+msgid "Venezuela"
+msgstr "Venezuela"
+
+#: ../www/basic-time.asp:221
+msgid "Aruba"
+msgstr "Aruba"
+
+#: ../www/basic-time.asp:221
+msgid "Bermuda"
+msgstr "Bermuda"
+
+#: ../www/basic-time.asp:221
+msgid "Guyana"
+msgstr "Guyana"
+
+#: ../www/basic-time.asp:221
+msgid "Puerto Rico"
+msgstr "Puerto Rico"
+
+#: ../www/basic-time.asp:222
+msgid "Bolivia"
+msgstr "Bolivia"
+
+#: ../www/basic-time.asp:223
+msgid "Atlantic Time"
+msgstr "Atlantic Time"
+
+#: ../www/basic-time.asp:224
+msgid "Brazil West"
+msgstr "Brazil West"
+
+#: ../www/basic-time.asp:225
+msgid "Newfoundland"
+msgstr "Newfoundland"
+
+#: ../www/basic-time.asp:226
+msgid "Greenland"
+msgstr "Greenland"
+
+#: ../www/basic-time.asp:227
+msgid "Brazil East"
+msgstr "Brazil East"
+
+#: ../www/basic-time.asp:228
+msgid "Argentina"
+msgstr "Argentina"
+
+#: ../www/basic-time.asp:228
+msgid "French Guiana"
+msgstr "French Guiana"
+
+#: ../www/basic-time.asp:228
+msgid "Surinam"
+msgstr "Surinam"
+
+#: ../www/basic-time.asp:229
+msgid "Mid-Atlantic"
+msgstr "Mid-Atlantic"
+
+#: ../www/basic-time.asp:230
+msgid "Azores"
+msgstr "Azores"
+
+#: ../www/basic-time.asp:231
+msgid "Gambia"
+msgstr "Gambia"
+
+#: ../www/basic-time.asp:231
+msgid "Liberia"
+msgstr "Liberia"
+
+#: ../www/basic-time.asp:231
+msgid "Morocco"
+msgstr "Morocco"
+
+#: ../www/basic-time.asp:232
+msgid "England"
+msgstr "England"
+
+#: ../www/basic-time.asp:233
+msgid "Tunisia"
+msgstr "Tunisia"
+
+#: ../www/basic-time.asp:234
+msgid "France"
+msgstr "France"
+
+#: ../www/basic-time.asp:234
+msgid "Germany"
+msgstr "Germany"
+
+#: ../www/basic-time.asp:234
+msgid "Italy"
+msgstr "Italy"
+
+#: ../www/basic-time.asp:234
+msgid "Poland"
+msgstr "Poland"
+
+#: ../www/basic-time.asp:234
+msgid "Spain"
+msgstr "Spain"
+
+#: ../www/basic-time.asp:234
+msgid "Sweden"
+msgstr "Sweden"
+
+#: ../www/basic-time.asp:235
+msgid "Estonia"
+msgstr "Estonia"
+
+#: ../www/basic-time.asp:235
+msgid "Finland"
+msgstr "Finland"
+
+#: ../www/basic-time.asp:235 ../www/basic-time.asp:237
+msgid "Latvia"
+msgstr "Latvia"
+
+#: ../www/basic-time.asp:235
+msgid "Lithuania"
+msgstr "Lithuania"
+
+#: ../www/basic-time.asp:236
+msgid "South Africa"
+msgstr "South Africa"
+
+#: ../www/basic-time.asp:236
+msgid "Israel"
+msgstr "Israel"
+
+#: ../www/basic-time.asp:237
+msgid "Greece"
+msgstr "Greece"
+
+#: ../www/basic-time.asp:237
+msgid "Ukraine"
+msgstr "Ukraine"
+
+#: ../www/basic-time.asp:237
+msgid "Romania"
+msgstr "Romania"
+
+#: ../www/basic-time.asp:237
+msgid "Turkey"
+msgstr "Turkey"
+
+#: ../www/basic-time.asp:238
+msgid "Iraq"
+msgstr "Iraq"
+
+#: ../www/basic-time.asp:238
+msgid "Jordan"
+msgstr "Jordan"
+
+#: ../www/basic-time.asp:238
+msgid "Kuwait"
+msgstr "Kuwait"
+
+#: ../www/basic-time.asp:239
+msgid "Moscow"
+msgstr "Moscow"
+
+#: ../www/basic-time.asp:240
+msgid "Oman"
+msgstr "Oman"
+
+#: ../www/basic-time.asp:240
+msgid "UAE"
+msgstr "UAE"
+
+#: ../www/basic-time.asp:241
+msgid "Armenia"
+msgstr "Armenia"
+
+#: ../www/basic-time.asp:242
+msgid "Kabul"
+msgstr "Kabul"
+
+#: ../www/basic-time.asp:243
+msgid "Pakistan"
+msgstr "Pakistan"
+
+#: ../www/basic-time.asp:244 ../www/basic-time.asp:247
+#: ../www/basic-time.asp:249 ../www/basic-time.asp:251
+#: ../www/basic-time.asp:253
+msgid "Russia"
+msgstr "Russia"
+
+#: ../www/basic-time.asp:244
+msgid "Yekaterinburg"
+msgstr "Yekaterinburg"
+
+#: ../www/basic-time.asp:245
+msgid "Bombay"
+msgstr "Bombay"
+
+#: ../www/basic-time.asp:245
+msgid "Calcutta"
+msgstr "Calcutta"
+
+#: ../www/basic-time.asp:245
+msgid "Madras"
+msgstr "Madras"
+
+#: ../www/basic-time.asp:245
+msgid "New Delhi"
+msgstr "New Delhi"
+
+#: ../www/basic-time.asp:246
+msgid "Bangladesh"
+msgstr "Bangladesh"
+
+#: ../www/basic-time.asp:247
+msgid "Novosibirsk"
+msgstr "Novosibirsk"
+
+#: ../www/basic-time.asp:248
+msgid "Thailand"
+msgstr "Thailand"
+
+#: ../www/basic-time.asp:250
+msgid "China"
+msgstr "China"
+
+#: ../www/basic-time.asp:250
+msgid "Hong Kong"
+msgstr "Hong Kong"
+
+#: ../www/basic-time.asp:250
+msgid "Western Australia"
+msgstr "Western Australia"
+
+#: ../www/basic-time.asp:250
+msgid "Singapore"
+msgstr "Singapore"
+
+#: ../www/basic-time.asp:250
+msgid "Taiwan"
+msgstr "Taiwan"
+
+#: ../www/basic-time.asp:252
+msgid "Japan"
+msgstr "Japan"
+
+#: ../www/basic-time.asp:252
+msgid "Korea"
+msgstr "Korea"
+
+#: ../www/basic-time.asp:253
+msgid "Yakutsk"
+msgstr "Yakutsk"
+
+#: ../www/basic-time.asp:255
+msgid "Darwin"
+msgstr "Darwin"
+
+#: ../www/basic-time.asp:256
+msgid "Guam, Russia"
+msgstr "Guam, Russia"
+
+#: ../www/basic-time.asp:257
+msgid "Australia"
+msgstr "Australia"
+
+#: ../www/basic-time.asp:258
+msgid "Brisbane"
+msgstr "Brisbane"
+
+#: ../www/basic-time.asp:259
+msgid "Solomon Islands"
+msgstr "Solomon Islands"
+
+#: ../www/basic-time.asp:260
+msgid "Fiji"
+msgstr "Fiji"
+
+#: ../www/basic-time.asp:261
+msgid "New Zealand"
+msgstr "New Zealand"
+
+#: ../www/basic-time.asp:263
+msgid "Auto Daylight Savings Time"
+msgstr "Auto Daylight Savings Time"
+
+#: ../www/basic-time.asp:264
+msgid "Custom TZ String"
+msgstr "Custom TZ String"
+
+#: ../www/basic-time.asp:266
+msgid "Auto Update Time"
+msgstr "Auto Update Time"
+
+#: ../www/basic-time.asp:266
+msgid "Never"
+msgstr "Never"
+
+#: ../www/basic-time.asp:266
+msgid "Only at startup"
+msgstr "Only at startup"
+
+#: ../www/basic-time.asp:266
+msgid "Every hour"
+msgstr "Every hour"
+
+#: ../www/basic-time.asp:266
+msgid "Every 2 hours"
+msgstr "Every 2 hours"
+
+#: ../www/basic-time.asp:266
+msgid "Every 6 hours"
+msgstr "Every 6 hours"
+
+#: ../www/basic-time.asp:266
+msgid "Every 8 hours"
+msgstr "Every 8 hours"
+
+#: ../www/basic-time.asp:266
+msgid "Every 12 hours"
+msgstr "Every 12 hours"
+
+#: ../www/basic-time.asp:266
+msgid "Every 24 hours"
+msgstr "Every 24 hours"
+
+#: ../www/basic-time.asp:268
+msgid "Trigger Connect On Demand"
+msgstr "Trigger Connect On Demand"
+
+#: ../www/basic-time.asp:269
+msgid "NTP Time Server"
+msgstr "NTP Time Server"
+
+#: ../www/basic-time.asp:280
+msgid ""
+"The following NTP servers have been automatically blocked by request from "
+"the server:"
+msgstr ""
+"The following NTP servers have been automatically blocked by request from "
+"the server:"
+
+#: ../www/basic-time.asp:283
+msgid "Clear"
+msgstr "Clear"
+
+#: ../www/basic-time.asp:266
+msgid "Every 4 hours"
+msgstr "Every 4 hours"
+
+#: ../www/basic-time.asp:254
+msgid "South Australia"
+msgstr "South Australia"
+
+#: ../www/basic-time.asp:251
+msgid "Irkutsk"
+msgstr "Irkutsk"
+
+#: ../www/basic-time.asp:249
+msgid "Krasnoyarsk"
+msgstr "Krasnoyarsk"
 
 #: ../www/status-overview.asp:43
 msgid "WPA Personal (PSK)"
@@ -529,10 +1128,6 @@ msgstr "is now available"
 #: ../www/status-overview.asp:227
 msgid "Click here to read more"
 msgstr "Click here to read more"
-
-#: ../www/status-overview.asp:341
-msgid "Tomato"
-msgstr "Tomato"
 
 #: ../www/status-overview.asp:342
 msgid "Version"
@@ -611,11 +1206,6 @@ msgstr "Total / Free NVRAM"
 msgid "WAN"
 msgstr "WAN"
 
-#: ../www/status-overview.asp:387 ../www/status-overview.asp:389
-#: ../www/status-overview.asp:394
-msgid "Address"
-msgstr "Address"
-
 #: ../www/status-overview.asp:388
 msgid "Connection Type"
 msgstr "Connection Type"
@@ -671,10 +1261,6 @@ msgstr "Router MAC Address"
 #: ../www/status-overview.asp:467
 msgid "Router IP Addresses"
 msgstr "Router IP Addresses"
-
-#: ../www/status-overview.asp:470
-msgid "Router IPv6 Address"
-msgstr "Router IPv6 Address"
 
 #: ../www/status-overview.asp:471
 msgid "IPv6 Link-local Address"
@@ -788,10 +1374,6 @@ msgstr "Wireless Survey"
 msgid "WOL"
 msgstr "WOL"
 
-#: ../www/tomato.js:2376 ../www/tomato.js:2401
-msgid "Basic"
-msgstr "Basic"
-
 #: ../www/tomato.js:2377
 msgid "Network"
 msgstr "Network"
@@ -799,10 +1381,6 @@ msgstr "Network"
 #: ../www/tomato.js:2379
 msgid "IPv6"
 msgstr "IPv6"
-
-#: ../www/tomato.js:2381
-msgid "Identification"
-msgstr "Identification"
 
 #: ../www/tomato.js:2383
 msgid "DDNS"

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TomatoEgg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-29 01:17-0400\n"
-"PO-Revision-Date: 2013-08-29 01:34-0500\n"
+"POT-Creation-Date: 2013-08-29 09:10-0400\n"
+"PO-Revision-Date: 2013-08-29 09:39-0500\n"
 "Last-Translator: Zhiqiang <Wang.9264@gmail.com>\n"
 "Language-Team: TomatoEgg Translators <translate@tomatoegg.net>\n"
 "MIME-Version: 1.0\n"
@@ -26,6 +26,173 @@ msgstr "英语"
 #: ../www/admin-access.asp:301
 msgid "Chinese"
 msgstr "中文"
+
+#: ../www/basic-ident.asp:14 ../www/tomato.js:2376 ../www/tomato.js:2401
+msgid "Basic"
+msgstr "基本设置"
+
+#: ../www/basic-ident.asp:14 ../www/tomato.js:2381
+msgid "Identification"
+msgstr "标识"
+
+#: ../www/basic-ident.asp:62
+msgid "Router Name"
+msgstr "路由器名称"
+
+#: ../www/basic-ident.asp:63
+msgid "Hostname"
+msgstr "主机名"
+
+#: ../www/basic-ident.asp:64
+msgid "Domain Name"
+msgstr "域名"
+
+#: ../www/basic-ident.asp:74 ../www/basic-ipv6.asp:373
+#: ../www/basic-network.asp:1791 ../www/basic-time.asp:292
+msgid "Save"
+msgstr "保存"
+
+#: ../www/basic-ident.asp:75 ../www/basic-ipv6.asp:374
+#: ../www/basic-network.asp:1792 ../www/basic-time.asp:293
+msgid "Cancel"
+msgstr "取消"
+
+#: ../www/basic-ipv6.asp:305 ../www/status-overview.asp:341
+msgid "Tomato"
+msgstr "Tomato"
+
+#: ../www/basic-ipv6.asp:324
+msgid "IPv6 Configuration"
+msgstr "IPv6配置"
+
+#: ../www/basic-ipv6.asp:330
+msgid "IPv6 Service Type"
+msgstr "IPv6服务类型"
+
+#: ../www/basic-ipv6.asp:331 ../www/basic-network.asp:95
+#: ../www/basic-network.asp:98 ../www/basic-network.asp:1609
+#: ../www/basic-network.asp:1740 ../www/status-overview.asp:503
+msgid "Disabled"
+msgstr "已禁用"
+
+#: ../www/basic-ipv6.asp:331
+msgid "Native IPv6 from ISP"
+msgstr "ISP分配"
+
+#: ../www/basic-ipv6.asp:331
+msgid "DHCPv6 with Prefix Delegation"
+msgstr "前缀授权DHCPv6"
+
+#: ../www/basic-ipv6.asp:331
+msgid "6to4 Anycast Relay"
+msgstr "6to4任播中继"
+
+#: ../www/basic-ipv6.asp:331
+msgid "6in4 Static Tunnel"
+msgstr "6in4静态隧道"
+
+#: ../www/basic-ipv6.asp:331
+msgid "6rd Relay"
+msgstr "6rd中继"
+
+#: ../www/basic-ipv6.asp:331
+msgid "6rd from DHCPv4 (Option 212)"
+msgstr "DHCPv4 6rd(选项212)"
+
+#: ../www/basic-ipv6.asp:331
+msgid "Other"
+msgstr "其它"
+
+#: ../www/basic-ipv6.asp:331
+msgid "Manual Configuration"
+msgstr "手动配置"
+
+#: ../www/basic-ipv6.asp:333
+msgid "IPv6 WAN Interface"
+msgstr "IPV6 WAN接口"
+
+#: ../www/basic-ipv6.asp:335
+msgid "Assigned / Routed Prefix"
+msgstr "已分配/路由前缀"
+
+#: ../www/basic-ipv6.asp:336
+msgid "6rd Routed Prefix"
+msgstr "6rd路由前缀"
+
+#: ../www/basic-ipv6.asp:337
+msgid "6rd Prefix Length"
+msgstr "6rd前缀长度"
+
+#: ../www/basic-ipv6.asp:337
+msgid "Usually 32"
+msgstr "一般为32"
+
+#: ../www/basic-ipv6.asp:338
+msgid "Prefix Length"
+msgstr "前缀长度"
+
+#: ../www/basic-ipv6.asp:339 ../www/status-overview.asp:470
+msgid "Router IPv6 Address"
+msgstr "路由器IPv6地址"
+
+#: ../www/basic-ipv6.asp:340 ../www/basic-network.asp:1636
+#: ../www/basic-time.asp:30
+msgid "Default"
+msgstr "默认"
+
+#: ../www/basic-ipv6.asp:340 ../www/basic-network.asp:1636
+msgid "Manual"
+msgstr "手动"
+
+#: ../www/basic-ipv6.asp:343 ../www/basic-network.asp:1661
+msgid "Static DNS"
+msgstr "静态DNS"
+
+#: ../www/basic-ipv6.asp:346
+msgid "Accept RA from"
+msgstr "接收RA接口"
+
+#: ../www/basic-ipv6.asp:351
+msgid "Tunnel Remote Endpoint"
+msgstr "隧道远程端口"
+
+#: ../www/basic-ipv6.asp:351 ../www/basic-ipv6.asp:352
+#: ../www/status-overview.asp:387 ../www/status-overview.asp:389
+#: ../www/status-overview.asp:394
+msgid "Address"
+msgstr "地址"
+
+#: ../www/basic-ipv6.asp:352
+msgid "6RD Tunnel Border Relay"
+msgstr "6RD隧道边界中继"
+
+#: ../www/basic-ipv6.asp:353
+msgid "6RD IPv4 Mask Length"
+msgstr "6RD IPv4掩码长度"
+
+#: ../www/basic-ipv6.asp:353
+msgid "usually 0"
+msgstr "一般为0"
+
+#: ../www/basic-ipv6.asp:354
+msgid "Relay Anycast Address"
+msgstr "中继任播地址"
+
+#: ../www/basic-ipv6.asp:355
+msgid "Tunnel Client IPv6 Address"
+msgstr "隧道客户端IPv6地址"
+
+#: ../www/basic-ipv6.asp:359
+msgid "Tunnel MTU"
+msgstr "隧道MTU"
+
+#: ../www/basic-ipv6.asp:359
+msgid "0 for default"
+msgstr "填0使用默认值"
+
+#: ../www/basic-ipv6.asp:360
+msgid "Tunnel TTL"
+msgstr "隧道TTL"
 
 #: ../www/basic-network.asp:60
 msgid "Bridge"
@@ -59,12 +226,6 @@ msgstr "分钟"
 #: ../www/status-overview.asp:503
 msgid "Enabled"
 msgstr "已启用"
-
-#: ../www/basic-network.asp:95 ../www/basic-network.asp:98
-#: ../www/basic-network.asp:1609 ../www/basic-network.asp:1740
-#: ../www/status-overview.asp:503
-msgid "Disabled"
-msgstr "已禁用"
 
 #: ../www/basic-network.asp:241
 msgid "Cannot add another entry for bridge"
@@ -276,14 +437,6 @@ msgstr "LCP Echo 连接失败限制"
 msgid "MTU"
 msgstr "MTU"
 
-#: ../www/basic-network.asp:1636
-msgid "Default"
-msgstr "默认"
-
-#: ../www/basic-network.asp:1636
-msgid "Manual"
-msgstr "手动"
-
 #: ../www/basic-network.asp:1638
 msgid "Single Line MLPPP"
 msgstr "单链路MLPPP"
@@ -303,10 +456,6 @@ msgstr "将WAN口桥接到LAN"
 #: ../www/basic-network.asp:1660
 msgid "Default Gateway"
 msgstr "默认网关"
-
-#: ../www/basic-network.asp:1661
-msgid "Static DNS"
-msgstr "静态DNS"
 
 #: ../www/basic-network.asp:1665
 msgid "Use dnscrypt-proxy"
@@ -486,13 +635,461 @@ msgstr "生成"
 msgid "Key"
 msgstr "密钥"
 
-#: ../www/basic-network.asp:1791
-msgid "Save"
-msgstr "保存"
+#: ../www/basic-time.asp:29 ../www/basic-time.asp:208
+msgid "Custom"
+msgstr "自定义"
 
-#: ../www/basic-network.asp:1792
-msgid "Cancel"
-msgstr "取消"
+#: ../www/basic-time.asp:31
+msgid "Africa"
+msgstr "非洲"
+
+#: ../www/basic-time.asp:32
+msgid "Asia"
+msgstr "亚洲"
+
+#: ../www/basic-time.asp:33
+msgid "Europe"
+msgstr "欧洲"
+
+#: ../www/basic-time.asp:34
+msgid "Oceania"
+msgstr "大洋洲"
+
+#: ../www/basic-time.asp:35
+msgid "North America"
+msgstr "北美洲"
+
+#: ../www/basic-time.asp:36
+msgid "South America"
+msgstr "南美洲"
+
+#: ../www/basic-time.asp:37
+msgid "US"
+msgstr "美国"
+
+#: ../www/basic-time.asp:93
+msgid "At least one NTP server is required"
+msgstr "至少需要一个时间服务器"
+
+#: ../www/basic-time.asp:205
+msgid "Router Time"
+msgstr "路由器时间"
+
+#: ../www/basic-time.asp:207
+msgid "Time Zone"
+msgstr "时区"
+
+#: ../www/basic-time.asp:209
+msgid "Kwajalein"
+msgstr "夸贾林"
+
+#: ../www/basic-time.asp:210
+msgid "Midway Island"
+msgstr "中途岛"
+
+#: ../www/basic-time.asp:210
+msgid "Samoa"
+msgstr "萨摩亚群岛"
+
+#: ../www/basic-time.asp:211
+msgid "Hawaii"
+msgstr "夏威夷"
+
+#: ../www/basic-time.asp:212
+msgid "Alaska"
+msgstr "阿拉斯加"
+
+#: ../www/basic-time.asp:213
+msgid "Pacific Time"
+msgstr "太平洋时间"
+
+#: ../www/basic-time.asp:214
+msgid "Arizona"
+msgstr "亚利桑那"
+
+#: ../www/basic-time.asp:215
+msgid "Mountain Time"
+msgstr "山地时间"
+
+#: ../www/basic-time.asp:216
+msgid "Mexico"
+msgstr "墨西哥"
+
+#: ../www/basic-time.asp:217
+msgid "Central Time"
+msgstr "中部时间"
+
+#: ../www/basic-time.asp:218
+msgid "Colombia"
+msgstr "哥伦比亚"
+
+#: ../www/basic-time.asp:218
+msgid "Panama"
+msgstr "巴拿马"
+
+#: ../www/basic-time.asp:219
+msgid "Eastern Time"
+msgstr "东部时间(美)"
+
+#: ../www/basic-time.asp:220
+msgid "Venezuela"
+msgstr "委内瑞拉"
+
+#: ../www/basic-time.asp:221
+msgid "Aruba"
+msgstr "阿鲁巴岛"
+
+#: ../www/basic-time.asp:221
+msgid "Bermuda"
+msgstr "百慕大群岛"
+
+#: ../www/basic-time.asp:221
+msgid "Guyana"
+msgstr "英属圭亚那"
+
+#: ../www/basic-time.asp:221
+msgid "Puerto Rico"
+msgstr "波多黎各"
+
+#: ../www/basic-time.asp:222
+msgid "Bolivia"
+msgstr "玻利维亚"
+
+#: ../www/basic-time.asp:223
+msgid "Atlantic Time"
+msgstr "大西洋时间"
+
+#: ../www/basic-time.asp:224
+msgid "Brazil West"
+msgstr "巴西西部"
+
+#: ../www/basic-time.asp:225
+msgid "Newfoundland"
+msgstr "纽芬兰"
+
+#: ../www/basic-time.asp:226
+msgid "Greenland"
+msgstr "格陵兰"
+
+#: ../www/basic-time.asp:227
+msgid "Brazil East"
+msgstr "巴西东部"
+
+#: ../www/basic-time.asp:228
+msgid "Argentina"
+msgstr "阿根廷"
+
+#: ../www/basic-time.asp:228
+msgid "French Guiana"
+msgstr "法属吉亚纳"
+
+#: ../www/basic-time.asp:228
+msgid "Surinam"
+msgstr "苏里南"
+
+#: ../www/basic-time.asp:229
+msgid "Mid-Atlantic"
+msgstr "中大西洋"
+
+#: ../www/basic-time.asp:230
+msgid "Azores"
+msgstr "亚述尔群岛"
+
+#: ../www/basic-time.asp:231
+msgid "Gambia"
+msgstr "冈比亚"
+
+#: ../www/basic-time.asp:231
+msgid "Liberia"
+msgstr "利比里亚"
+
+#: ../www/basic-time.asp:231
+msgid "Morocco"
+msgstr "摩洛哥"
+
+#: ../www/basic-time.asp:232
+msgid "England"
+msgstr "英格兰"
+
+#: ../www/basic-time.asp:233
+msgid "Tunisia"
+msgstr "突尼斯"
+
+#: ../www/basic-time.asp:234
+msgid "France"
+msgstr "法国"
+
+#: ../www/basic-time.asp:234
+msgid "Germany"
+msgstr "德国"
+
+#: ../www/basic-time.asp:234
+msgid "Italy"
+msgstr "意大利"
+
+#: ../www/basic-time.asp:234
+msgid "Poland"
+msgstr "波兰"
+
+#: ../www/basic-time.asp:234
+msgid "Spain"
+msgstr "西班牙"
+
+#: ../www/basic-time.asp:234
+msgid "Sweden"
+msgstr "瑞典"
+
+#: ../www/basic-time.asp:235
+msgid "Estonia"
+msgstr "爱沙尼亚"
+
+#: ../www/basic-time.asp:235
+msgid "Finland"
+msgstr "芬兰"
+
+#: ../www/basic-time.asp:235 ../www/basic-time.asp:237
+msgid "Latvia"
+msgstr "拉脱维亚"
+
+#: ../www/basic-time.asp:235
+msgid "Lithuania"
+msgstr "立陶宛"
+
+#: ../www/basic-time.asp:236
+msgid "South Africa"
+msgstr "南非"
+
+#: ../www/basic-time.asp:236
+msgid "Israel"
+msgstr "以色列"
+
+#: ../www/basic-time.asp:237
+msgid "Greece"
+msgstr "希腊"
+
+#: ../www/basic-time.asp:237
+msgid "Ukraine"
+msgstr "乌克兰"
+
+#: ../www/basic-time.asp:237
+msgid "Romania"
+msgstr "罗马尼亚"
+
+#: ../www/basic-time.asp:237
+msgid "Turkey"
+msgstr "土耳其"
+
+#: ../www/basic-time.asp:238
+msgid "Iraq"
+msgstr "伊拉克"
+
+#: ../www/basic-time.asp:238
+msgid "Jordan"
+msgstr "约旦"
+
+#: ../www/basic-time.asp:238
+msgid "Kuwait"
+msgstr "科威特"
+
+#: ../www/basic-time.asp:239
+msgid "Moscow"
+msgstr "莫斯科"
+
+#: ../www/basic-time.asp:240
+msgid "Oman"
+msgstr "阿曼"
+
+#: ../www/basic-time.asp:240
+msgid "UAE"
+msgstr "阿拉伯联合酋长国"
+
+#: ../www/basic-time.asp:241
+msgid "Armenia"
+msgstr "亚美尼亚"
+
+#: ../www/basic-time.asp:242
+msgid "Kabul"
+msgstr "喀布尔"
+
+#: ../www/basic-time.asp:243
+msgid "Pakistan"
+msgstr "巴基斯坦"
+
+#: ../www/basic-time.asp:244 ../www/basic-time.asp:247
+#: ../www/basic-time.asp:249 ../www/basic-time.asp:251
+#: ../www/basic-time.asp:253
+msgid "Russia"
+msgstr "俄罗斯"
+
+#: ../www/basic-time.asp:244
+msgid "Yekaterinburg"
+msgstr "叶卡捷琳堡"
+
+#: ../www/basic-time.asp:245
+msgid "Bombay"
+msgstr "孟买"
+
+#: ../www/basic-time.asp:245
+msgid "Calcutta"
+msgstr "加尔各答"
+
+#: ../www/basic-time.asp:245
+msgid "Madras"
+msgstr "马德拉斯"
+
+#: ../www/basic-time.asp:245
+msgid "New Delhi"
+msgstr "新德里"
+
+#: ../www/basic-time.asp:246
+msgid "Bangladesh"
+msgstr "孟加拉共和国"
+
+#: ../www/basic-time.asp:247
+msgid "Novosibirsk"
+msgstr "新西伯利亚"
+
+#: ../www/basic-time.asp:248
+msgid "Thailand"
+msgstr "泰国"
+
+#: ../www/basic-time.asp:250
+msgid "China"
+msgstr "中国"
+
+#: ../www/basic-time.asp:250
+msgid "Hong Kong"
+msgstr "香港"
+
+#: ../www/basic-time.asp:250
+msgid "Western Australia"
+msgstr "西澳大利亚"
+
+#: ../www/basic-time.asp:250
+msgid "Singapore"
+msgstr "新加坡"
+
+#: ../www/basic-time.asp:250
+msgid "Taiwan"
+msgstr "台湾"
+
+#: ../www/basic-time.asp:252
+msgid "Japan"
+msgstr "日本"
+
+#: ../www/basic-time.asp:252
+msgid "Korea"
+msgstr "韩国"
+
+#: ../www/basic-time.asp:253
+msgid "Yakutsk"
+msgstr "雅库茨克"
+
+#: ../www/basic-time.asp:255
+msgid "Darwin"
+msgstr "津巴布韦"
+
+#: ../www/basic-time.asp:256
+msgid "Guam, Russia"
+msgstr "关岛,俄罗斯"
+
+#: ../www/basic-time.asp:257
+msgid "Australia"
+msgstr "澳大利亚"
+
+#: ../www/basic-time.asp:258
+msgid "Brisbane"
+msgstr "布里斯班"
+
+#: ../www/basic-time.asp:259
+msgid "Solomon Islands"
+msgstr "所罗门群岛"
+
+#: ../www/basic-time.asp:260
+msgid "Fiji"
+msgstr "斐济群岛"
+
+#: ../www/basic-time.asp:261
+msgid "New Zealand"
+msgstr "新西兰"
+
+#: ../www/basic-time.asp:263
+msgid "Auto Daylight Savings Time"
+msgstr "自动夏令时"
+
+#: ../www/basic-time.asp:264
+msgid "Custom TZ String"
+msgstr "自定义时区"
+
+#: ../www/basic-time.asp:266
+msgid "Auto Update Time"
+msgstr "自动更新时间"
+
+#: ../www/basic-time.asp:266
+msgid "Never"
+msgstr "从不"
+
+#: ../www/basic-time.asp:266
+msgid "Only at startup"
+msgstr "只在系统启动时"
+
+#: ../www/basic-time.asp:266
+msgid "Every hour"
+msgstr "每小时"
+
+#: ../www/basic-time.asp:266
+msgid "Every 2 hours"
+msgstr "每2小时"
+
+#: ../www/basic-time.asp:266
+msgid "Every 6 hours"
+msgstr "每6小时"
+
+#: ../www/basic-time.asp:266
+msgid "Every 8 hours"
+msgstr "每8小时"
+
+#: ../www/basic-time.asp:266
+msgid "Every 12 hours"
+msgstr "每12小时"
+
+#: ../www/basic-time.asp:266
+msgid "Every 24 hours"
+msgstr "每24小时"
+
+#: ../www/basic-time.asp:268
+msgid "Trigger Connect On Demand"
+msgstr "触发自动拨号"
+
+#: ../www/basic-time.asp:269
+msgid "NTP Time Server"
+msgstr "时钟服务器"
+
+#: ../www/basic-time.asp:280
+msgid ""
+"The following NTP servers have been automatically blocked by request from "
+"the server:"
+msgstr "下面的时钟服务器已经自动阻止从服务器发出的请求"
+
+#: ../www/basic-time.asp:283
+msgid "Clear"
+msgstr "清除"
+
+#: ../www/basic-time.asp:266
+msgid "Every 4 hours"
+msgstr "每4小时"
+
+#: ../www/basic-time.asp:254
+msgid "South Australia"
+msgstr "南澳大利亚"
+
+#: ../www/basic-time.asp:251
+msgid "Irkutsk"
+msgstr "伊尔库茨克"
+
+#: ../www/basic-time.asp:249
+msgid "Krasnoyarsk"
+msgstr "克拉斯诺亚尔斯克"
 
 #: ../www/status-overview.asp:43
 msgid "WPA Personal (PSK)"
@@ -521,10 +1118,6 @@ msgstr "已经发布了"
 #: ../www/status-overview.asp:227
 msgid "Click here to read more"
 msgstr "点击这里获取更多信息"
-
-#: ../www/status-overview.asp:341
-msgid "Tomato"
-msgstr "Tomato"
 
 #: ../www/status-overview.asp:342
 msgid "Version"
@@ -603,11 +1196,6 @@ msgstr "总/空闲闪存"
 msgid "WAN"
 msgstr "WAN"
 
-#: ../www/status-overview.asp:387 ../www/status-overview.asp:389
-#: ../www/status-overview.asp:394
-msgid "Address"
-msgstr "地址"
-
 #: ../www/status-overview.asp:388
 msgid "Connection Type"
 msgstr "连接类型"
@@ -663,10 +1251,6 @@ msgstr "路由器MAC地址"
 #: ../www/status-overview.asp:467
 msgid "Router IP Addresses"
 msgstr "路由器IP地址"
-
-#: ../www/status-overview.asp:470
-msgid "Router IPv6 Address"
-msgstr "路由器IPv6地址"
 
 #: ../www/status-overview.asp:471
 msgid "IPv6 Link-local Address"
@@ -780,10 +1364,6 @@ msgstr "搜索无线"
 msgid "WOL"
 msgstr "网络唤醒"
 
-#: ../www/tomato.js:2376 ../www/tomato.js:2401
-msgid "Basic"
-msgstr "基本设置"
-
 #: ../www/tomato.js:2377
 msgid "Network"
 msgstr "网络"
@@ -791,10 +1371,6 @@ msgstr "网络"
 #: ../www/tomato.js:2379
 msgid "IPv6"
 msgstr "IPv6"
-
-#: ../www/tomato.js:2381
-msgid "Identification"
-msgstr "标识"
 
 #: ../www/tomato.js:2383
 msgid "DDNS"
