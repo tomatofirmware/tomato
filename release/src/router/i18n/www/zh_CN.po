@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TomatoEgg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-28 14:18-0400\n"
-"PO-Revision-Date: 2013-08-28 14:33-0500\n"
+"POT-Creation-Date: 2013-08-29 01:17-0400\n"
+"PO-Revision-Date: 2013-08-29 01:34-0500\n"
 "Last-Translator: Zhiqiang <Wang.9264@gmail.com>\n"
 "Language-Team: TomatoEgg Translators <translate@tomatoegg.net>\n"
 "MIME-Version: 1.0\n"
@@ -27,49 +27,480 @@ msgstr "英语"
 msgid "Chinese"
 msgstr "中文"
 
-#: ../www/status-overview.asp:42
+#: ../www/basic-network.asp:60
+msgid "Bridge"
+msgstr "网桥"
+
+#: ../www/basic-network.asp:60 ../www/basic-network.asp:1620
+msgid "IP Address"
+msgstr "IP地址"
+
+#: ../www/basic-network.asp:60
+msgid "Netmask"
+msgstr "子网掩码"
+
+#: ../www/basic-network.asp:60
+msgid "IP&nbsp;Range&nbsp;"
+msgstr "IP地址范围"
+
+#: ../www/basic-network.asp:60
+msgid "(first/last)"
+msgstr "(起/止)"
+
+#: ../www/basic-network.asp:60
+msgid "Lease&nbsp;Time&nbsp;"
+msgstr "租约期限"
+
+#: ../www/basic-network.asp:60 ../www/status-overview.asp:372
+msgid "mins"
+msgstr "分钟"
+
+#: ../www/basic-network.asp:95 ../www/basic-network.asp:98
+#: ../www/status-overview.asp:503
+msgid "Enabled"
+msgstr "已启用"
+
+#: ../www/basic-network.asp:95 ../www/basic-network.asp:98
+#: ../www/basic-network.asp:1609 ../www/basic-network.asp:1740
+#: ../www/status-overview.asp:503
+msgid "Disabled"
+msgstr "已禁用"
+
+#: ../www/basic-network.asp:241
+msgid "Cannot add another entry for bridge"
+msgstr "不能加入更多网桥"
+
+#: ../www/basic-network.asp:259
+msgid "Netmask should have at least 22 bits"
+msgstr "子网掩码至少应为22位"
+
+#: ../www/basic-network.asp:259
+msgid "You may continue anyway but remember - you was warned"
+msgstr "你仍可以忽略此警告继续"
+
+#: ../www/basic-network.asp:265
+msgid ""
+"Invalid IP address or subnet mask (the address of the network cannot be used)"
+msgstr "无效的地址或子网掩码(此网络地址不可用)"
+
+#: ../www/basic-network.asp:271
+msgid ""
+"Invalid IP address or subnet mask (the broadcast address cannot be used)"
+msgstr "无效的地址或子网掩码(此广播地址不可用)"
+
+#: ../www/basic-network.asp:277
+msgid ""
+"Invalid IP address or subnet mask (conflicts/overlaps with another LAN "
+"bridge)"
+msgstr "无效的地址或子网掩码(与另一网桥冲突)"
+
+#: ../www/basic-network.asp:328
+msgid "Invalid first IP address or subnet mask"
+msgstr "起始地址或子网掩码无限"
+
+#: ../www/basic-network.asp:338
+msgid "Invalid last IP address or subnet mask"
+msgstr "结束地址或子网掩码无限"
+
+#: ../www/basic-network.asp:423 ../www/basic-network.asp:497
+msgid "Auto"
+msgstr "自动"
+
+#: ../www/basic-network.asp:425
+msgid "A Only"
+msgstr "仅A"
+
+#: ../www/basic-network.asp:427 ../www/basic-network.asp:435
+msgid "N Only"
+msgstr "仅N"
+
+#: ../www/basic-network.asp:431
+msgid "B Only"
+msgstr "仅B"
+
+#: ../www/basic-network.asp:432
+msgid "G Only"
+msgstr "仅G"
+
+#: ../www/basic-network.asp:434
+msgid "B/G Mixed"
+msgstr "B/G混合"
+
+#: ../www/basic-network.asp:597
+msgid "strongest"
+msgstr "最强"
+
+#: ../www/basic-network.asp:1170
+msgid "TKIP encryption is not supported with WPA / WPA2 in N and AC mode."
+msgstr "TKIP加密不能在N或AC模式中用于WPA/WPA2"
+
+#: ../www/basic-network.asp:1184
+msgid "Only one wireless interface can be configured in client mode."
+msgstr "仅有一个无线接口可以配置成客户端模式"
+
+#: ../www/basic-network.asp:1188
+msgid "N-only is not supported in wireless client modes, use Auto."
+msgstr "客户端模式时不能配置为仅N,使用自动"
+
+#: ../www/basic-network.asp:1197
+msgid ""
+"Invalid pre-shared key. Please enter at least 8 characters or 64 hexadecimal "
+"digits."
+msgstr "预共享密钥错误,请输入8个字符或64个十六进制数字."
+
+#: ../www/basic-network.asp:1204
+msgid "Fixed wireless channel required in WDS mode."
+msgstr "WDS模式需要使用指定频道."
+
+#: ../www/basic-network.asp:1211
+msgid "Wireless Client mode requires a valid WAN setting (usually DHCP)."
+msgstr "无线客户端模式需要设置有效的WAN(常常是DHCP)"
+
+#: ../www/basic-network.asp:1295
+msgid "WDS MAC address required."
+msgstr "必需填写WDS MAC地址"
+
+#: ../www/basic-network.asp:1470
+msgid ""
+"Cannot proceed: two or more LAN bridges have conflicting IP addresses or "
+"overlapping subnets"
+msgstr "不能继续,两个或更多的网桥的IP地址或子网存在冲突"
+
+#: ../www/basic-network.asp:1512
+msgid "Bridge br0 must be always defined and have a valid IP address set."
+msgstr "br0必须定义并且有一个有效的IP地址."
+
+#: ../www/basic-network.asp:1603
+msgid "Type"
+msgstr "类型"
+
+#: ../www/basic-network.asp:1603 ../www/status-overview.asp:388
+#: ../www/status-overview.asp:474
+msgid "DHCP"
+msgstr "自动获取"
+
+#: ../www/basic-network.asp:1603 ../www/status-overview.asp:388
+msgid "PPPoE"
+msgstr "PPPoE"
+
+#: ../www/basic-network.asp:1603
+msgid "Static"
+msgstr "静态"
+
+#: ../www/basic-network.asp:1603 ../www/status-overview.asp:388
+msgid "PPTP"
+msgstr "PPTP"
+
+#: ../www/basic-network.asp:1603 ../www/status-overview.asp:388
+msgid "L2TP"
+msgstr "L2TP"
+
+#: ../www/basic-network.asp:1606 ../www/status-overview.asp:388
+msgid "3G Modem"
+msgstr "3G上网卡"
+
+#: ../www/basic-network.asp:1611
+msgid "Modem device"
+msgstr "Modem设备"
+
+#: ../www/basic-network.asp:1612
+msgid "PIN Code"
+msgstr "PIN码"
+
+#: ../www/basic-network.asp:1613
+msgid "Modem init string"
+msgstr "Modem初始化字符串"
+
+#: ../www/basic-network.asp:1614
+msgid "APN"
+msgstr "接入点"
+
+#: ../www/basic-network.asp:1615
+msgid "Username"
+msgstr "用户名"
+
+#: ../www/basic-network.asp:1616
+msgid "Password"
+msgstr "密码"
+
+#: ../www/basic-network.asp:1617
+msgid "Service Name"
+msgstr "服务名"
+
+#: ../www/basic-network.asp:1618
+msgid "L2TP Server"
+msgstr "L2TP服务器"
+
+#: ../www/basic-network.asp:1619
+msgid "Use DHCP"
+msgstr "使用DHCP"
+
+#: ../www/basic-network.asp:1621 ../www/status-overview.asp:391
+msgid "Subnet Mask"
+msgstr "子网掩码"
+
+#: ../www/basic-network.asp:1622 ../www/status-overview.asp:392
+#: ../www/status-overview.asp:468
+msgid "Gateway"
+msgstr "网关"
+
+#: ../www/basic-network.asp:1623
+msgid "PPTP Gateway"
+msgstr "PPTP网关"
+
+#: ../www/basic-network.asp:1624
+msgid "Options"
+msgstr "选项"
+
+#: ../www/basic-network.asp:1625
+msgid "Connect Mode"
+msgstr "连接类型"
+
+#: ../www/basic-network.asp:1627
+msgid "Max Idle Time"
+msgstr "最大空闲时间"
+
+#: ../www/basic-network.asp:1629
+msgid "Redial Interval"
+msgstr "重拨间隔"
+
+#: ../www/basic-network.asp:1631
+msgid "LCP Echo Interval"
+msgstr "LCP Echo间隔"
+
+#: ../www/basic-network.asp:1633
+msgid "LCP Echo Link fail limit"
+msgstr "LCP Echo 连接失败限制"
+
+#: ../www/basic-network.asp:1635 ../www/status-overview.asp:397
+msgid "MTU"
+msgstr "MTU"
+
+#: ../www/basic-network.asp:1636
+msgid "Default"
+msgstr "默认"
+
+#: ../www/basic-network.asp:1636
+msgid "Manual"
+msgstr "手动"
+
+#: ../www/basic-network.asp:1638
+msgid "Single Line MLPPP"
+msgstr "单链路MLPPP"
+
+#: ../www/basic-network.asp:1640
+msgid "Route Modem IP"
+msgstr "Modem路由地址"
+
+#: ../www/basic-network.asp:1640
+msgid "must be in different subnet to router, 0.0.0.0 to disable"
+msgstr "必须与路由器子网不同,0.0.0.0禁用"
+
+#: ../www/basic-network.asp:1642
+msgid "Bridge WAN port to primary LAN"
+msgstr "将WAN口桥接到LAN"
+
+#: ../www/basic-network.asp:1660
+msgid "Default Gateway"
+msgstr "默认网关"
+
+#: ../www/basic-network.asp:1661
+msgid "Static DNS"
+msgstr "静态DNS"
+
+#: ../www/basic-network.asp:1665
+msgid "Use dnscrypt-proxy"
+msgstr "使用DNS加密代理"
+
+#: ../www/basic-network.asp:1666
+msgid "Local Port"
+msgstr "本地端口"
+
+#: ../www/basic-network.asp:1667
+msgid "Startup Parameters"
+msgstr "启动参数"
+
+#: ../www/basic-network.asp:1667
+msgid "optional"
+msgstr "可选"
+
+#: ../www/basic-network.asp:1678
+msgid "Enable Ports State"
+msgstr "启用端口状态监视"
+
+#: ../www/basic-network.asp:1679
+msgid "Show Speed Info"
+msgstr "显示速度信息"
+
+#: ../www/basic-network.asp:1680
+msgid "Invert Ports Order"
+msgstr "反转端口顺序"
+
+#: ../www/basic-network.asp:1719
+msgid "Enable Wireless"
+msgstr "启用无线"
+
+#: ../www/basic-network.asp:1721 ../www/basic-network.asp:1774
+#: ../www/status-overview.asp:499 ../www/tomato.js:2390
+msgid "MAC Address"
+msgstr "MAC地址"
+
+#: ../www/basic-network.asp:1722 ../www/status-overview.asp:500
+msgid "Wireless Mode"
+msgstr "无线模式"
+
+#: ../www/basic-network.asp:1723 ../www/status-overview.asp:42
 msgid "Access Point"
 msgstr "无线接入点"
 
-#: ../www/status-overview.asp:42
-msgid "Wireless Client"
-msgstr "无线客户端"
-
-#: ../www/status-overview.asp:42
-msgid "Wireless Ethernet Bridge"
-msgstr "无线转接桥"
-
+#: ../www/basic-network.asp:1723 ../www/basic-network.asp:1770
 #: ../www/status-overview.asp:42
 msgid "WDS"
 msgstr "WDS"
+
+#: ../www/basic-network.asp:1723 ../www/status-overview.asp:42
+msgid "Wireless Client"
+msgstr "无线客户端"
+
+#: ../www/basic-network.asp:1723 ../www/status-overview.asp:42
+msgid "Wireless Ethernet Bridge"
+msgstr "无线转接桥"
+
+#: ../www/basic-network.asp:1725
+msgid "Radio Band"
+msgstr "无线频段"
+
+#: ../www/basic-network.asp:1727 ../www/status-overview.asp:501
+msgid "Wireless Network Mode"
+msgstr "无线网络模式"
+
+#: ../www/basic-network.asp:1730 ../www/status-overview.asp:507
+msgid "SSID"
+msgstr "SSID"
+
+#: ../www/basic-network.asp:1731 ../www/status-overview.asp:508
+msgid "Broadcast"
+msgstr "广播"
+
+#: ../www/basic-network.asp:1732 ../www/status-overview.asp:510
+msgid "Channel"
+msgstr "频道"
+
+#: ../www/basic-network.asp:1732
+msgid "Scan"
+msgstr "扫描"
+
+#: ../www/basic-network.asp:1734 ../www/status-overview.asp:511
+msgid "Channel Width"
+msgstr "频道带宽"
+
+#: ../www/basic-network.asp:1736
+msgid "Control Sideband"
+msgstr "控制频道"
+
+#: ../www/basic-network.asp:1736
+msgid "Lower"
+msgstr "低"
+
+#: ../www/basic-network.asp:1736
+msgid "Upper"
+msgstr "高"
+
+#: ../www/basic-network.asp:1739 ../www/status-overview.asp:509
+msgid "Security"
+msgstr "安全"
+
+#: ../www/basic-network.asp:1740
+msgid "WEP"
+msgstr "WEP"
+
+#: ../www/basic-network.asp:1740
+msgid "WPA Personal"
+msgstr "WPA个人"
+
+#: ../www/basic-network.asp:1740 ../www/status-overview.asp:43
+msgid "WPA Enterprise"
+msgstr "WPA 企业版"
+
+#: ../www/basic-network.asp:1740
+msgid "WPA2 Personal"
+msgstr "WPA2个人"
+
+#: ../www/basic-network.asp:1740 ../www/status-overview.asp:43
+msgid "WPA2 Enterprise"
+msgstr "WPA2 企业版"
+
+#: ../www/basic-network.asp:1740 ../www/status-overview.asp:43
+msgid "WPA / WPA2 Personal"
+msgstr "WPA / WPA2 个人版"
+
+#: ../www/basic-network.asp:1740 ../www/status-overview.asp:43
+msgid "WPA / WPA2 Enterprise"
+msgstr "WPA / WPA2 企业版"
+
+#: ../www/basic-network.asp:1740 ../www/status-overview.asp:43
+msgid "Radius"
+msgstr "Radius"
+
+#: ../www/basic-network.asp:1742 ../www/basic-network.asp:1755
+msgid "Encryption"
+msgstr "加密"
+
+#: ../www/basic-network.asp:1743
+msgid "TKIP"
+msgstr "TKIP"
+
+#: ../www/basic-network.asp:1743
+msgid "AES"
+msgstr "AES"
+
+#: ../www/basic-network.asp:1743
+msgid "TKIP / AES"
+msgstr "TKIP / AES"
+
+#: ../www/basic-network.asp:1744 ../www/basic-network.asp:1747
+msgid "Shared Key"
+msgstr "共享密钥"
+
+#: ../www/basic-network.asp:1745 ../www/basic-network.asp:1748
+msgid "Random"
+msgstr "随机"
+
+#: ../www/basic-network.asp:1750
+msgid "Group Key Renewal"
+msgstr "组密钥更新间隔"
+
+#: ../www/basic-network.asp:1752
+msgid "Radius Server"
+msgstr "Radius服务器"
+
+#: ../www/basic-network.asp:1757
+msgid "Passphrase"
+msgstr "密钥"
+
+#: ../www/basic-network.asp:1758
+msgid "Generate"
+msgstr "生成"
+
+#: ../www/basic-network.asp:1764
+msgid "Key"
+msgstr "密钥"
+
+#: ../www/basic-network.asp:1791
+msgid "Save"
+msgstr "保存"
+
+#: ../www/basic-network.asp:1792
+msgid "Cancel"
+msgstr "取消"
 
 #: ../www/status-overview.asp:43
 msgid "WPA Personal (PSK)"
 msgstr "WPA 个人版 (PSK)"
 
 #: ../www/status-overview.asp:43
-msgid "WPA Enterprise"
-msgstr "WPA 企业版"
-
-#: ../www/status-overview.asp:43
 msgid "WPA2 Personal (PSK)"
 msgstr "WPA2 个人版 (PSK)"
-
-#: ../www/status-overview.asp:43
-msgid "WPA2 Enterprise"
-msgstr "WPA2 企业版"
-
-#: ../www/status-overview.asp:43
-msgid "WPA / WPA2 Personal"
-msgstr "WPA / WPA2 个人版"
-
-#: ../www/status-overview.asp:43
-msgid "WPA / WPA2 Enterprise"
-msgstr "WPA / WPA2 企业版"
-
-#: ../www/status-overview.asp:43
-msgid "Radius"
-msgstr "Radius"
 
 #: ../www/status-overview.asp:117
 msgid "Ethernet Ports State"
@@ -156,10 +587,6 @@ msgstr "运行时长"
 msgid "CPU Load"
 msgstr "CPU负载"
 
-#: ../www/status-overview.asp:372
-msgid "mins"
-msgstr "分钟"
-
 #: ../www/status-overview.asp:373
 msgid "Total / Free Memory"
 msgstr "总/空闲内存"
@@ -185,49 +612,17 @@ msgstr "地址"
 msgid "Connection Type"
 msgstr "连接类型"
 
-#: ../www/status-overview.asp:388 ../www/status-overview.asp:474
-msgid "DHCP"
-msgstr "自动获取"
-
 #: ../www/status-overview.asp:388
 msgid "Static IP"
 msgstr "静态IP"
-
-#: ../www/status-overview.asp:388
-msgid "PPPoE"
-msgstr "PPPoE"
-
-#: ../www/status-overview.asp:388
-msgid "PPTP"
-msgstr "PPTP"
-
-#: ../www/status-overview.asp:388
-msgid "L2TP"
-msgstr "L2TP"
-
-#: ../www/status-overview.asp:388
-msgid "3G Modem"
-msgstr "3G上网卡"
 
 #: ../www/status-overview.asp:390
 msgid "Previous WAN IP"
 msgstr "上次WAN IP"
 
-#: ../www/status-overview.asp:391
-msgid "Subnet Mask"
-msgstr "子网掩码"
-
-#: ../www/status-overview.asp:392 ../www/status-overview.asp:468
-msgid "Gateway"
-msgstr "网关"
-
 #: ../www/status-overview.asp:396 ../www/status-overview.asp:473
 msgid "DNS"
 msgstr "DNS"
-
-#: ../www/status-overview.asp:397
-msgid "MTU"
-msgstr "MTU"
 
 #: ../www/status-overview.asp:399 ../www/tomato.js:2349
 msgid "Status"
@@ -277,18 +672,6 @@ msgstr "路由器IPv6地址"
 msgid "IPv6 Link-local Address"
 msgstr "IPv6本地链路地址"
 
-#: ../www/status-overview.asp:499 ../www/tomato.js:2390
-msgid "MAC Address"
-msgstr "MAC地址"
-
-#: ../www/status-overview.asp:500
-msgid "Wireless Mode"
-msgstr "无线模式"
-
-#: ../www/status-overview.asp:501
-msgid "Wireless Network Mode"
-msgstr "无线网络模式"
-
 #: ../www/status-overview.asp:502
 msgid "Interface Status"
 msgstr "接口状态"
@@ -296,34 +679,6 @@ msgstr "接口状态"
 #: ../www/status-overview.asp:503
 msgid "Radio"
 msgstr "无线信号"
-
-#: ../www/status-overview.asp:503
-msgid "Disabled"
-msgstr "已禁用"
-
-#: ../www/status-overview.asp:503
-msgid "Enabled"
-msgstr "已启用"
-
-#: ../www/status-overview.asp:507
-msgid "SSID"
-msgstr "SSID"
-
-#: ../www/status-overview.asp:508
-msgid "Broadcast"
-msgstr "广播"
-
-#: ../www/status-overview.asp:509
-msgid "Security"
-msgstr "安全"
-
-#: ../www/status-overview.asp:510
-msgid "Channel"
-msgstr "频道"
-
-#: ../www/status-overview.asp:511
-msgid "Channel Width"
-msgstr "频道带宽"
 
 #: ../www/status-overview.asp:512
 msgid "Interference Level"

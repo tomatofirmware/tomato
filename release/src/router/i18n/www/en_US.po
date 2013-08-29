@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TomatoEgg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-28 14:18-0400\n"
-"PO-Revision-Date: 2013-08-28 14:19-0500\n"
+"POT-Creation-Date: 2013-08-29 01:17-0400\n"
+"PO-Revision-Date: 2013-08-29 01:19-0500\n"
 "Last-Translator: Zhiqiang <Wang.9264@gmail.com>\n"
 "Language-Team: TomatoEgg Translators <translate@tomatoegg.net>\n"
 "MIME-Version: 1.0\n"
@@ -27,49 +27,488 @@ msgstr "English"
 msgid "Chinese"
 msgstr "Chinese"
 
-#: ../www/status-overview.asp:42
+#: ../www/basic-network.asp:60
+msgid "Bridge"
+msgstr "Bridge"
+
+#: ../www/basic-network.asp:60 ../www/basic-network.asp:1620
+msgid "IP Address"
+msgstr "IP Address"
+
+#: ../www/basic-network.asp:60
+msgid "Netmask"
+msgstr "Netmask"
+
+#: ../www/basic-network.asp:60
+msgid "IP&nbsp;Range&nbsp;"
+msgstr "IP&nbsp;Range&nbsp;"
+
+#: ../www/basic-network.asp:60
+msgid "(first/last)"
+msgstr "(first/last)"
+
+#: ../www/basic-network.asp:60
+msgid "Lease&nbsp;Time&nbsp;"
+msgstr "Lease&nbsp;Time&nbsp;"
+
+#: ../www/basic-network.asp:60 ../www/status-overview.asp:372
+msgid "mins"
+msgstr "mins"
+
+#: ../www/basic-network.asp:95 ../www/basic-network.asp:98
+#: ../www/status-overview.asp:503
+msgid "Enabled"
+msgstr "Enabled"
+
+#: ../www/basic-network.asp:95 ../www/basic-network.asp:98
+#: ../www/basic-network.asp:1609 ../www/basic-network.asp:1740
+#: ../www/status-overview.asp:503
+msgid "Disabled"
+msgstr "Disabled"
+
+#: ../www/basic-network.asp:241
+msgid "Cannot add another entry for bridge"
+msgstr "Cannot add another entry for bridge"
+
+#: ../www/basic-network.asp:259
+msgid "Netmask should have at least 22 bits"
+msgstr "Netmask should have at least 22 bits"
+
+#: ../www/basic-network.asp:259
+msgid "You may continue anyway but remember - you was warned"
+msgstr "You may continue anyway but remember - you was warned"
+
+#: ../www/basic-network.asp:265
+msgid ""
+"Invalid IP address or subnet mask (the address of the network cannot be used)"
+msgstr ""
+"Invalid IP address or subnet mask (the address of the network cannot be used)"
+
+#: ../www/basic-network.asp:271
+msgid ""
+"Invalid IP address or subnet mask (the broadcast address cannot be used)"
+msgstr ""
+"Invalid IP address or subnet mask (the broadcast address cannot be used)"
+
+#: ../www/basic-network.asp:277
+msgid ""
+"Invalid IP address or subnet mask (conflicts/overlaps with another LAN "
+"bridge)"
+msgstr ""
+"Invalid IP address or subnet mask (conflicts/overlaps with another LAN "
+"bridge)"
+
+#: ../www/basic-network.asp:328
+msgid "Invalid first IP address or subnet mask"
+msgstr "Invalid first IP address or subnet mask"
+
+#: ../www/basic-network.asp:338
+msgid "Invalid last IP address or subnet mask"
+msgstr "Invalid last IP address or subnet mask"
+
+#: ../www/basic-network.asp:423 ../www/basic-network.asp:497
+msgid "Auto"
+msgstr "Auto"
+
+#: ../www/basic-network.asp:425
+msgid "A Only"
+msgstr "A Only"
+
+#: ../www/basic-network.asp:427 ../www/basic-network.asp:435
+msgid "N Only"
+msgstr "N Only"
+
+#: ../www/basic-network.asp:431
+msgid "B Only"
+msgstr "B Only"
+
+#: ../www/basic-network.asp:432
+msgid "G Only"
+msgstr "G Only"
+
+#: ../www/basic-network.asp:434
+msgid "B/G Mixed"
+msgstr "B/G Mixed"
+
+#: ../www/basic-network.asp:597
+msgid "strongest"
+msgstr "strongest"
+
+#: ../www/basic-network.asp:1170
+msgid "TKIP encryption is not supported with WPA / WPA2 in N and AC mode."
+msgstr "TKIP encryption is not supported with WPA / WPA2 in N and AC mode."
+
+#: ../www/basic-network.asp:1184
+msgid "Only one wireless interface can be configured in client mode."
+msgstr "Only one wireless interface can be configured in client mode."
+
+#: ../www/basic-network.asp:1188
+msgid "N-only is not supported in wireless client modes, use Auto."
+msgstr "N-only is not supported in wireless client modes, use Auto."
+
+#: ../www/basic-network.asp:1197
+msgid ""
+"Invalid pre-shared key. Please enter at least 8 characters or 64 hexadecimal "
+"digits."
+msgstr ""
+"Invalid pre-shared key. Please enter at least 8 characters or 64 hexadecimal "
+"digits."
+
+#: ../www/basic-network.asp:1204
+msgid "Fixed wireless channel required in WDS mode."
+msgstr "Fixed wireless channel required in WDS mode."
+
+#: ../www/basic-network.asp:1211
+msgid "Wireless Client mode requires a valid WAN setting (usually DHCP)."
+msgstr "Wireless Client mode requires a valid WAN setting (usually DHCP)."
+
+#: ../www/basic-network.asp:1295
+msgid "WDS MAC address required."
+msgstr "WDS MAC address required."
+
+#: ../www/basic-network.asp:1470
+msgid ""
+"Cannot proceed: two or more LAN bridges have conflicting IP addresses or "
+"overlapping subnets"
+msgstr ""
+"Cannot proceed: two or more LAN bridges have conflicting IP addresses or "
+"overlapping subnets"
+
+#: ../www/basic-network.asp:1512
+msgid "Bridge br0 must be always defined and have a valid IP address set."
+msgstr "Bridge br0 must be always defined and have a valid IP address set."
+
+#: ../www/basic-network.asp:1603
+msgid "Type"
+msgstr "Type"
+
+#: ../www/basic-network.asp:1603 ../www/status-overview.asp:388
+#: ../www/status-overview.asp:474
+msgid "DHCP"
+msgstr "DHCP"
+
+#: ../www/basic-network.asp:1603 ../www/status-overview.asp:388
+msgid "PPPoE"
+msgstr "PPPoE"
+
+#: ../www/basic-network.asp:1603
+msgid "Static"
+msgstr "Static"
+
+#: ../www/basic-network.asp:1603 ../www/status-overview.asp:388
+msgid "PPTP"
+msgstr "PPTP"
+
+#: ../www/basic-network.asp:1603 ../www/status-overview.asp:388
+msgid "L2TP"
+msgstr "L2TP"
+
+#: ../www/basic-network.asp:1606 ../www/status-overview.asp:388
+msgid "3G Modem"
+msgstr "3G Modem"
+
+#: ../www/basic-network.asp:1611
+msgid "Modem device"
+msgstr "Modem device"
+
+#: ../www/basic-network.asp:1612
+msgid "PIN Code"
+msgstr "PIN Code"
+
+#: ../www/basic-network.asp:1613
+msgid "Modem init string"
+msgstr "Modem init string"
+
+#: ../www/basic-network.asp:1614
+msgid "APN"
+msgstr "APN"
+
+#: ../www/basic-network.asp:1615
+msgid "Username"
+msgstr "Username"
+
+#: ../www/basic-network.asp:1616
+msgid "Password"
+msgstr "Password"
+
+#: ../www/basic-network.asp:1617
+msgid "Service Name"
+msgstr "Service Name"
+
+#: ../www/basic-network.asp:1618
+msgid "L2TP Server"
+msgstr "L2TP Server"
+
+#: ../www/basic-network.asp:1619
+msgid "Use DHCP"
+msgstr "Use DHCP"
+
+#: ../www/basic-network.asp:1621 ../www/status-overview.asp:391
+msgid "Subnet Mask"
+msgstr "Subnet Mask"
+
+#: ../www/basic-network.asp:1622 ../www/status-overview.asp:392
+#: ../www/status-overview.asp:468
+msgid "Gateway"
+msgstr "Gateway"
+
+#: ../www/basic-network.asp:1623
+msgid "PPTP Gateway"
+msgstr "PPTP Gateway"
+
+#: ../www/basic-network.asp:1624
+msgid "Options"
+msgstr "Options"
+
+#: ../www/basic-network.asp:1625
+msgid "Connect Mode"
+msgstr "Connect Mode"
+
+#: ../www/basic-network.asp:1627
+msgid "Max Idle Time"
+msgstr "Max Idle Time"
+
+#: ../www/basic-network.asp:1629
+msgid "Redial Interval"
+msgstr "Redial Interval"
+
+#: ../www/basic-network.asp:1631
+msgid "LCP Echo Interval"
+msgstr "LCP Echo Interval"
+
+#: ../www/basic-network.asp:1633
+msgid "LCP Echo Link fail limit"
+msgstr "LCP Echo Link fail limit"
+
+#: ../www/basic-network.asp:1635 ../www/status-overview.asp:397
+msgid "MTU"
+msgstr "MTU"
+
+#: ../www/basic-network.asp:1636
+msgid "Default"
+msgstr "Default"
+
+#: ../www/basic-network.asp:1636
+msgid "Manual"
+msgstr "Manual"
+
+#: ../www/basic-network.asp:1638
+msgid "Single Line MLPPP"
+msgstr "Single Line MLPPP"
+
+#: ../www/basic-network.asp:1640
+msgid "Route Modem IP"
+msgstr "Route Modem IP"
+
+#: ../www/basic-network.asp:1640
+msgid "must be in different subnet to router, 0.0.0.0 to disable"
+msgstr "must be in different subnet to router, 0.0.0.0 to disable"
+
+#: ../www/basic-network.asp:1642
+msgid "Bridge WAN port to primary LAN"
+msgstr "Bridge WAN port to primary LAN"
+
+#: ../www/basic-network.asp:1660
+msgid "Default Gateway"
+msgstr "Default Gateway"
+
+#: ../www/basic-network.asp:1661
+msgid "Static DNS"
+msgstr "Static DNS"
+
+#: ../www/basic-network.asp:1665
+msgid "Use dnscrypt-proxy"
+msgstr "Use dnscrypt-proxy"
+
+#: ../www/basic-network.asp:1666
+msgid "Local Port"
+msgstr "Local Port"
+
+#: ../www/basic-network.asp:1667
+msgid "Startup Parameters"
+msgstr "Startup Parameters"
+
+#: ../www/basic-network.asp:1667
+msgid "optional"
+msgstr "optional"
+
+#: ../www/basic-network.asp:1678
+msgid "Enable Ports State"
+msgstr "Enable Ports State"
+
+#: ../www/basic-network.asp:1679
+msgid "Show Speed Info"
+msgstr "Show Speed Info"
+
+#: ../www/basic-network.asp:1680
+msgid "Invert Ports Order"
+msgstr "Invert Ports Order"
+
+#: ../www/basic-network.asp:1719
+msgid "Enable Wireless"
+msgstr "Enable Wireless"
+
+#: ../www/basic-network.asp:1721 ../www/basic-network.asp:1774
+#: ../www/status-overview.asp:499 ../www/tomato.js:2390
+msgid "MAC Address"
+msgstr "MAC Address"
+
+#: ../www/basic-network.asp:1722 ../www/status-overview.asp:500
+msgid "Wireless Mode"
+msgstr "Wireless Mode"
+
+#: ../www/basic-network.asp:1723 ../www/status-overview.asp:42
 msgid "Access Point"
 msgstr "Access Point"
 
-#: ../www/status-overview.asp:42
-msgid "Wireless Client"
-msgstr "Wireless Client"
-
-#: ../www/status-overview.asp:42
-msgid "Wireless Ethernet Bridge"
-msgstr "Wireless Ethernet Bridge"
-
+#: ../www/basic-network.asp:1723 ../www/basic-network.asp:1770
 #: ../www/status-overview.asp:42
 msgid "WDS"
 msgstr "WDS"
+
+#: ../www/basic-network.asp:1723 ../www/status-overview.asp:42
+msgid "Wireless Client"
+msgstr "Wireless Client"
+
+#: ../www/basic-network.asp:1723 ../www/status-overview.asp:42
+msgid "Wireless Ethernet Bridge"
+msgstr "Wireless Ethernet Bridge"
+
+#: ../www/basic-network.asp:1725
+msgid "Radio Band"
+msgstr "Radio Band"
+
+#: ../www/basic-network.asp:1727 ../www/status-overview.asp:501
+msgid "Wireless Network Mode"
+msgstr "Wireless Network Mode"
+
+#: ../www/basic-network.asp:1730 ../www/status-overview.asp:507
+msgid "SSID"
+msgstr "SSID"
+
+#: ../www/basic-network.asp:1731 ../www/status-overview.asp:508
+msgid "Broadcast"
+msgstr "Broadcast"
+
+#: ../www/basic-network.asp:1732 ../www/status-overview.asp:510
+msgid "Channel"
+msgstr "Channel"
+
+#: ../www/basic-network.asp:1732
+msgid "Scan"
+msgstr "Scan"
+
+#: ../www/basic-network.asp:1734 ../www/status-overview.asp:511
+msgid "Channel Width"
+msgstr "Channel Width"
+
+#: ../www/basic-network.asp:1736
+msgid "Control Sideband"
+msgstr "Control Sideband"
+
+#: ../www/basic-network.asp:1736
+msgid "Lower"
+msgstr "Lower"
+
+#: ../www/basic-network.asp:1736
+msgid "Upper"
+msgstr "Upper"
+
+#: ../www/basic-network.asp:1739 ../www/status-overview.asp:509
+msgid "Security"
+msgstr "Security"
+
+#: ../www/basic-network.asp:1740
+msgid "WEP"
+msgstr "WEP"
+
+#: ../www/basic-network.asp:1740
+msgid "WPA Personal"
+msgstr "WPA Personal"
+
+#: ../www/basic-network.asp:1740 ../www/status-overview.asp:43
+msgid "WPA Enterprise"
+msgstr "WPA Enterprise"
+
+#: ../www/basic-network.asp:1740
+msgid "WPA2 Personal"
+msgstr "WPA2 Personal"
+
+#: ../www/basic-network.asp:1740 ../www/status-overview.asp:43
+msgid "WPA2 Enterprise"
+msgstr "WPA2 Enterprise"
+
+#: ../www/basic-network.asp:1740 ../www/status-overview.asp:43
+msgid "WPA / WPA2 Personal"
+msgstr "WPA / WPA2 Personal"
+
+#: ../www/basic-network.asp:1740 ../www/status-overview.asp:43
+msgid "WPA / WPA2 Enterprise"
+msgstr "WPA / WPA2 Enterprise"
+
+#: ../www/basic-network.asp:1740 ../www/status-overview.asp:43
+msgid "Radius"
+msgstr "Radius"
+
+#: ../www/basic-network.asp:1742 ../www/basic-network.asp:1755
+msgid "Encryption"
+msgstr "Encryption"
+
+#: ../www/basic-network.asp:1743
+msgid "TKIP"
+msgstr "TKIP"
+
+#: ../www/basic-network.asp:1743
+msgid "AES"
+msgstr "AES"
+
+#: ../www/basic-network.asp:1743
+msgid "TKIP / AES"
+msgstr "TKIP / AES"
+
+#: ../www/basic-network.asp:1744 ../www/basic-network.asp:1747
+msgid "Shared Key"
+msgstr "Shared Key"
+
+#: ../www/basic-network.asp:1745 ../www/basic-network.asp:1748
+msgid "Random"
+msgstr "Random"
+
+#: ../www/basic-network.asp:1750
+msgid "Group Key Renewal"
+msgstr "Group Key Renewal"
+
+#: ../www/basic-network.asp:1752
+msgid "Radius Server"
+msgstr "Radius Server"
+
+#: ../www/basic-network.asp:1757
+msgid "Passphrase"
+msgstr "Passphrase"
+
+#: ../www/basic-network.asp:1758
+msgid "Generate"
+msgstr "Generate"
+
+#: ../www/basic-network.asp:1764
+msgid "Key"
+msgstr "Key"
+
+#: ../www/basic-network.asp:1791
+msgid "Save"
+msgstr "Save"
+
+#: ../www/basic-network.asp:1792
+msgid "Cancel"
+msgstr "Cancel"
 
 #: ../www/status-overview.asp:43
 msgid "WPA Personal (PSK)"
 msgstr "WPA Personal (PSK)"
 
 #: ../www/status-overview.asp:43
-msgid "WPA Enterprise"
-msgstr "WPA Enterprise"
-
-#: ../www/status-overview.asp:43
 msgid "WPA2 Personal (PSK)"
 msgstr "WPA2 Personal (PSK)"
-
-#: ../www/status-overview.asp:43
-msgid "WPA2 Enterprise"
-msgstr "WPA2 Enterprise"
-
-#: ../www/status-overview.asp:43
-msgid "WPA / WPA2 Personal"
-msgstr "WPA / WPA2 Personal"
-
-#: ../www/status-overview.asp:43
-msgid "WPA / WPA2 Enterprise"
-msgstr "WPA / WPA2 Enterprise"
-
-#: ../www/status-overview.asp:43
-msgid "Radius"
-msgstr "Radius"
 
 #: ../www/status-overview.asp:117
 msgid "Ethernet Ports State"
@@ -156,10 +595,6 @@ msgstr "Uptime"
 msgid "CPU Load"
 msgstr "CPU Load"
 
-#: ../www/status-overview.asp:372
-msgid "mins"
-msgstr "mins"
-
 #: ../www/status-overview.asp:373
 msgid "Total / Free Memory"
 msgstr "Total / Free Memory"
@@ -185,49 +620,17 @@ msgstr "Address"
 msgid "Connection Type"
 msgstr "Connection Type"
 
-#: ../www/status-overview.asp:388 ../www/status-overview.asp:474
-msgid "DHCP"
-msgstr "DHCP"
-
 #: ../www/status-overview.asp:388
 msgid "Static IP"
 msgstr "Static IP"
-
-#: ../www/status-overview.asp:388
-msgid "PPPoE"
-msgstr "PPPoE"
-
-#: ../www/status-overview.asp:388
-msgid "PPTP"
-msgstr "PPTP"
-
-#: ../www/status-overview.asp:388
-msgid "L2TP"
-msgstr "L2TP"
-
-#: ../www/status-overview.asp:388
-msgid "3G Modem"
-msgstr "3G Modem"
 
 #: ../www/status-overview.asp:390
 msgid "Previous WAN IP"
 msgstr "Previous WAN IP"
 
-#: ../www/status-overview.asp:391
-msgid "Subnet Mask"
-msgstr "Subnet Mask"
-
-#: ../www/status-overview.asp:392 ../www/status-overview.asp:468
-msgid "Gateway"
-msgstr "Gateway"
-
 #: ../www/status-overview.asp:396 ../www/status-overview.asp:473
 msgid "DNS"
 msgstr "DNS"
-
-#: ../www/status-overview.asp:397
-msgid "MTU"
-msgstr "MTU"
 
 #: ../www/status-overview.asp:399 ../www/tomato.js:2349
 msgid "Status"
@@ -277,18 +680,6 @@ msgstr "Router IPv6 Address"
 msgid "IPv6 Link-local Address"
 msgstr "IPv6 Link-local Address"
 
-#: ../www/status-overview.asp:499 ../www/tomato.js:2390
-msgid "MAC Address"
-msgstr "MAC Address"
-
-#: ../www/status-overview.asp:500
-msgid "Wireless Mode"
-msgstr "Wireless Mode"
-
-#: ../www/status-overview.asp:501
-msgid "Wireless Network Mode"
-msgstr "Wireless Network Mode"
-
 #: ../www/status-overview.asp:502
 msgid "Interface Status"
 msgstr "Interface Status"
@@ -296,34 +687,6 @@ msgstr "Interface Status"
 #: ../www/status-overview.asp:503
 msgid "Radio"
 msgstr "Radio"
-
-#: ../www/status-overview.asp:503
-msgid "Disabled"
-msgstr "Disabled"
-
-#: ../www/status-overview.asp:503
-msgid "Enabled"
-msgstr "Enabled"
-
-#: ../www/status-overview.asp:507
-msgid "SSID"
-msgstr "SSID"
-
-#: ../www/status-overview.asp:508
-msgid "Broadcast"
-msgstr "Broadcast"
-
-#: ../www/status-overview.asp:509
-msgid "Security"
-msgstr "Security"
-
-#: ../www/status-overview.asp:510
-msgid "Channel"
-msgstr "Channel"
-
-#: ../www/status-overview.asp:511
-msgid "Channel Width"
-msgstr "Channel Width"
 
 #: ../www/status-overview.asp:512
 msgid "Interference Level"
