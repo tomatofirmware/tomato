@@ -153,67 +153,13 @@ sub fixDyn
 	fixDynDep("pppd", "pppol2tp.so");
 	fixDynDep("pppd", "pptp.so");
 	fixDynDep("pppd", "rp-pppoe.so");
-	fixDynDep("libcrypto.so.1.0.0", "libssl.so.1.0.0");
-## charles add
-#	    fixDynDep("libsmbclient.so.0", "libpthread.so.0");
-	fixDynDep("mod_smbdav.so", "libshared.so");
-	fixDynDep("mod_smbdav.so", "libnvram.so");
-	fixDynDep("mod_smbdav.so", "libsqlite3.so.0");
-    fixDynDep("mod_smbdav.so", "libxml2.so.2");
-	fixDynDep("mod_smbdav.so", "libsmbclient.so.0");
-	fixDynDep("mod_smbdav.so", "libpthread.so.0");
-	   fixDynDep("lighttpd", "libpthread.so.0");
-	   fixDynDep("lighttpd-arpping", "libpthread.so.0");
-	   fixDynDep("lighttpd-arpping", "libsmbclient.so.0");
 
-	fixDynDep("lighttpd", "libcrypto.so.1.0.0");
-	fixDynDep("lighttpd", "libssl.so.1.0.0");
-        fixDynDep("lighttpd", "libpcre.so.0.0.1");
-        fixDynDep("lighttpd", "mod_accesslog.so");
-        fixDynDep("lighttpd", "mod_alias.so");
-        fixDynDep("lighttpd", "mod_auth.so");
-        fixDynDep("lighttpd", "mod_cml.so");
-        fixDynDep("lighttpd", "mod_cgi.so");
-        fixDynDep("lighttpd", "mod_compress.so");
-        fixDynDep("lighttpd", "mod_dirlisting.so");
-        fixDynDep("lighttpd", "mod_proxy.so");
-        fixDynDep("lighttpd", "mod_redirect.so");
-        fixDynDep("lighttpd", "mod_rewrite.so");
-        fixDynDep("lighttpd", "mod_ssi.so");
-        fixDynDep("lighttpd", "mod_staticfile.so");
-        fixDynDep("lighttpd", "mod_status.so");
-        fixDynDep("lighttpd", "mod_trigger_b4_dl.so");
-        fixDynDep("lighttpd", "mod_userdir.so");
-        fixDynDep("lighttpd", "mod_webdav.so");
-        fixDynDep("lighttpd", "mod_usertrack.so");
-        fixDynDep("lighttpd", "mod_ssi.so");
-        fixDynDep("lighttpd", "mod_scgi.so");
-        fixDynDep("lighttpd", "mod_access.so");
-        fixDynDep("lighttpd", "mod_evasive.so");
-        fixDynDep("lighttpd", "mod_evhost.so");
-        fixDynDep("lighttpd", "mod_expire.so");
-        fixDynDep("lighttpd", "mod_extforward.so");
-        fixDynDep("lighttpd", "mod_fastcgi.so");
-        fixDynDep("lighttpd", "mod_flv_streaming.so");
-        fixDynDep("lighttpd", "mod_indexfile.so");
-        fixDynDep("lighttpd", "mod_magnet.so");
-        fixDynDep("lighttpd", "mod_mysql_vhost.so");
-        fixDynDep("lighttpd", "mod_rrdtool.so");
-        fixDynDep("lighttpd", "mod_secdownload.so");
-        fixDynDep("lighttpd", "mod_setenv.so");
-        fixDynDep("lighttpd", "mod_simple_vhost.so");
-        fixDynDep("mod_webdav.so", "libsqlite3.so.0");
-        fixDynDep("mod_webdav.so", "libxml2.so.2");
-## charles add
-		fixDynDep("lighttpd", "mod_smbdav.so");
-        fixDynDep("lighttpd", "libshared.so");
-        fixDynDep("lighttpd", "libnvram.so");
-		fixDynDep("lighttpd", "libxml2.so.2");
-		fixDynDep("libbcm.so", "libshared.so");
-		fixDynDep("libbcm.so", "libc.so.0");
-#   fixDynDep("lighttpd", "libdisk.so");
-        fixDynDep("lighttpd", "mod_smbdav_access.so");
-        fixDynDep("mod_smbdav_access.so", "libdisk.so");
+	fixDynDep("libcrypto.so.1.0.0", "libssl.so.1.0.0");
+#shibby
+	fixDynDep("miniupnpd", "libnfnetlink.so.0.2.0");
+
+#	fixDynDep("libbcm.so", "libshared.so");
+#	fixDynDep("libbcm.so", "libc.so.0");
 
 #!!TB - Updated Broadcom WL driver
 	fixDynDep("libbcmcrypto.so", "libc.so.0");
@@ -221,6 +167,11 @@ sub fixDyn
 	fixDynDep("wl", "libbcmcrypto.so");
 	fixDynDep("nas", "libc.so.0");
 	fixDynDep("wl", "libc.so.0");
+#Roadkill for NocatSplash
+	fixDynDep("splashd","libglib-1.2.so.0.0.10");
+#Roadkill for php
+	fixDynDep("php-cli","libz.so.1.2.5");
+	fixDynDep("php-cgi","libz.so.1.2.5");
 }
 
 sub usersOf
@@ -297,11 +248,8 @@ sub fillGaps
 				}
 				
 				if ($found == 0) {
-#					if (!$name eq 'u2ec') {
-					if (!$name eq 'mt-daapd-svn-1696') {
-						print "Unable to resolve $sym used by $name\n", @users;
-						exit 1;
-					}
+					print "Unable to resolve $sym used by $name\n", @users;
+					exit 1;
 				}
 			}
 		}
@@ -463,8 +411,8 @@ if ((!-d $root) || (!-d $uclibc) || (!-d $router)) {
 	exit(1);
 }
 
-#open(LOG, ">libfoo.debug");
-open(LOG, ">/dev/null");
+open(LOG, ">libfoo.debug");
+#open(LOG, ">/dev/null");
 
 print "Loading...\r";
 load($root);
@@ -519,8 +467,9 @@ genSO("${root}/usr/lib/liblzo2.so.2", "${router}/lzo/src/.libs/liblzo2.a");
 #	genSO("${root}/usr/lib/libnvram.so", "${router}/nvram/libnvram.a");
 #	genSO("${root}/usr/lib/libusb-1.0.so.0", "${router}/libusb10/libusb/.libs/libusb-1.0.a");
 #	genSO("${root}/usr/lib/libusb-0.1.so.4", "${router}/libusb/libusb/.libs/libusb.a", "", "-L${router}/libusb10/libusb/.libs");
-genSO("${root}/usr/lib/libbcmcrypto.so", "${router}/libbcmcrypto/libbcmcrypto.a");
 
+genSO("${root}/usr/lib/libbcmcrypto.so", "${router}/libbcmcrypto/libbcmcrypto.a");
+genSO("${root}/usr/lib/libnfnetlink.so.0.2.0", "${router}/libnfnetlink/src/.libs/libnfnetlink.a");
 
 print "\n";
 
