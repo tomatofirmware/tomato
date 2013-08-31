@@ -107,7 +107,7 @@ switch(nvram['boardtype']) {
   case '0xd4cf':  // Belkin F7D4301
   case '0x048e':  // WL-520GU, WL-500G Premium v2
   case '0x0550':  // RT-N53 (boardrev = 0x1442), RT-N10U ( boardrev = 0x1102)
-    if (nvram['boardrev'] == '0x1102') { //RT-N10U
+	if (((nvram['boardrev'] == '0x1102') || (nvram['boardrev'] == '0x1100')) ||(nvram['boardrev'] == '0x1400')) { //RT-N10U, CW-5358U, L600N
       COL_P0N = '1';
       COL_P1N = '2';
       COL_P2N = '3';
@@ -115,12 +115,12 @@ switch(nvram['boardtype']) {
       COL_P4N = '0';
       break;
     }
-    if (nvram['boardrev'] == '0x1100') { //CW-5358U
-      COL_P0N = '1';
-      COL_P1N = '2';
-      COL_P2N = '3';
-      COL_P3N = '4';
-      COL_P4N = '0';
+	if(((nvram['boardrev'] == '0x1446') { //Dir-620 C1
+      COL_P0N = '0';
+      COL_P1N = '1';
+      COL_P2N = '2';
+      COL_P3N = '3';
+      COL_P4N = '4';
       break;
     }
     COL_P0N = '3';

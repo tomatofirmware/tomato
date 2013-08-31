@@ -210,6 +210,9 @@ int do_led(int which, int mode)
 	static int rtn15u[]	= {   1, 255,     3,  255,  255,  255,  255,   -9,    255};
 	static int rtn66u[]	= { 255, -12,   255,  255,  255,  255,  255,   15,    255};
 	static int w1800r[]     = { 255, -13,   255,  255,  255,  255,  255,  -12,     -5};
+	static int l600n[]      = { 255, 255,   255,  255,  255,  -7,   255,  -8,      -5};
+	static int dir620c1[]   = { -6,   -8,   255,  255,  255,  -7,   255,  255,     -5};
+	
 #endif
 
 	char s[16];
@@ -384,6 +387,12 @@ int do_led(int which, int mode)
 		break;
 	case MODEL_RTN12B1:
 		b = rtn12b1[which];
+		break;
+	case MODEL_L600N:
+		b = l600n[which];
+		break;
+	case MODEL_DIR620C1:
+		b = dir620c1[which];
 		break;
 #endif
 /*

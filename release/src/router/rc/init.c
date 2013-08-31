@@ -457,6 +457,7 @@ static int init_vlan_ports(void)
 	case MODEL_E2500:
 	case MODEL_F7D3302:
 	case MODEL_F7D4302:
+	case MODEL_DIR620C1:
 		dirty |= check_nv("vlan1ports", "0 1 2 3 5*");
 		dirty |= check_nv("vlan2ports", "4 5");
 		break;
@@ -631,6 +632,8 @@ static void check_bootnv(void)
 	case MODEL_E2500:
 	case MODEL_E3200:
 	case MODEL_WRT160Nv3:
+	case MODEL_DIR620C1:
+	case MODEL_L600N:
 		dirty |= check_nv("vlan2hwname", "et0");
 		break;
 #endif
@@ -986,6 +989,51 @@ static int init_nvram(void)
 		nvram_set("ag0", "0x0C");
 		break;
 #ifdef CONFIG_BCMWL5
+	case MODEL_L600N:
+		mfr = "Rosewill";
+		name = "L600N";
+		features = SUP_SES | SUP_80211N;
+		if (!nvram_match("t_fix1", (char *)name)) {
+#ifdef TCONFIG_USBAP
+		nvram_set("wl1_hwaddr", nvram_safe_get("0:macaddr"));
+		nvram_set("ehciirqt", "3");
+		nvram_set("qtdc_pid", "48407");
+		nvram_set("qtdc_vid", "2652");
+		nvram_set("qtdc0_ep", "4");
+		nvram_set("qtdc0_sz", "0");
+		nvram_set("qtdc1_ep", "18");
+		nvram_set("qtdc1_sz", "10");
+		nvram_set("lan_ifnames", "vlan1 eth1 eth2");
+		nvram_set("landevs", "vlan1 wl0 wl1");
+		nvram_set("wl0_ifname", "wl0");
+		nvram_set("wl1_ifname", "wl1");
+#else
+		nvram_set("lan_ifnames", "vlan1 eth1");
+		nvram_set("landevs", "vlan1 wl0");
+#endif
+		nvram_set("wl_ifname", "eth1");
+		nvram_set("wan_ifnameX", "vlan2");
+		nvram_set("wandevs", "vlan2");
+		}
+	break;
+	case MODEL_DIR620C1:
+		mfr = "D-Link";
+		name = "Dir-620 C1";
+		features = SUP_SES | SUP_80211N;
+		if (!nvram_match("t_fix1", (char *)name)) {
+#ifdef TCONFIG_USBAP
+		nvram_set("lan_ifnames", "vlan1 eth1 eth2");
+		nvram_set("landevs", "vlan1 wl0 wl1");
+		nvram_set("wl_ifname", "eth1");
+		nvram_set("wl_ifname", "eth2");
+#else
+		nvram_set("lan_ifnames", "vlan1 eth1");
+		nvram_set("landevs", "vlan1 wl0");
+#endif
+		nvram_set("wl_ifnameX", "vlan2");
+		nvram_set("wl_ifname", "eth1");
+		}
+		break;
 	case MODEL_CW5358U:
 		mfr = "Catchtech";
 		name = "CW-5358U";
@@ -1138,44 +1186,6 @@ static int init_nvram(void)
 			nvram_set("wan_ifnameX", "vlan1");
 			nvram_set("wandevs", "vlan1");
 			nvram_unset("vlan0ports");
-		}
-		break;
-	case MODEL_L600N:
-		mfr = "Rosewill";
-		name = "L600N";
-		features = SUP_SES | SUP_80211N;
-#if defined(LINUX26) && defined(TCONFIG_USBAP)
-		if (nvram_get_int("usb_storage") == 1) nvram_set("usb_storage", "-1");
-#endif
-		if (!nvram_match("t_fix1", (char *)name)) {
-#ifdef TCONFIG_USBAP
-		nvram_set("lan_ifnames", "vlan1 eth1 eth2");
-		nvram_set("landevs", "vlan1 wl0 wl1");
-		nvram_set("wl0_ifname", "wl0");
-		nvram_set("wl1_ifname", "wl1");
-#else
-		nvram_set("lan_ifnames", "vlan1 eth1");
-		nvram_set("landevs", "vlan1 wl0");
-#endif
-		nvram_set("wl_ifname", "eth1");
-		nvram_set("wan_ifnameX", "vlan2");
-		nvram_set("wandevs", "vlan2");
-		nvram_set("vlan2hwname", "et0");
-		nvram_set("gpio7", "wps_led");
-		nvram_set("gpio8", "usb_led");
-		nvram_set("gpio10", "wlan_button");
-		nvram_set("gpio20", "wps_button");
-		nvram_set("gpio21", "reset_button");		
-		nvram_set("gpio22", "wombo_reset");		
-		nvram_set("clkfreq", "500,200,100");
-		nvram_set("sdram_init", "0x0000");
-		nvram_set("xtalfreq", "20000");
-		nvram_set("boot_wait", "on");
-		nvram_set("wait_time", "3");
-		nvram_set("boardflags2", "0x0");
-		nvram_set("boardpwrctl", "0xC00");
-		nvram_set("boardtype", "0x0550");
-		nvram_set("watchdog", "0");
 		}
 		break;
 	case MODEL_RTN66U:

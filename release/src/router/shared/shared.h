@@ -217,6 +217,7 @@ enum {
 	MODEL_WRT320N,
 	MODEL_WRT610Nv2,
 	MODEL_WRT310Nv1,
+	MODEL_E800,	
 	MODEL_E900,
 	MODEL_E1000v2,
 	MODEL_E1500,
@@ -236,7 +237,8 @@ enum {
 	MODEL_WRT300N,
 	MODEL_WL330GE,
 	MODEL_W1800R,
-	MODEL_L600N
+	MODEL_L600N,
+	MODEL_DIR620C1
 };
 
 /* NOTE: Do not insert new entries in the middle of this enum,

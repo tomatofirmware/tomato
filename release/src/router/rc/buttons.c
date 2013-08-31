@@ -191,6 +191,7 @@ int buttons_main(int argc, char *argv[])
 		ses_mask = 1 << 8;
 		ses_led = LED_AOSS;
 		break;
+	case MODEL_E800:
 	case MODEL_E900:
 	case MODEL_E1000v2:
 	case MODEL_E1500:
@@ -221,6 +222,15 @@ int buttons_main(int argc, char *argv[])
 		reset_mask = 1 << 6;
 		ses_mask = 1 << 4;
 		ses_led = LED_WHITE;
+		break;
+	case MODEL_L600N:
+		reset_mask = 1 << 21;
+		ses_mask = 1 << 20;
+		//wlan button = 1 >> 10
+		break;
+	case MODEL_DIR620C1:
+		reset_mask = 1 << 21;
+		ses_mask = 1 << 20;
 		break;
 #endif
 	case MODEL_WRT160Nv1:

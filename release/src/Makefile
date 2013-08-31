@@ -254,6 +254,7 @@ endif
 ifeq ($(LINKSYS_E_64k),y)
 	# Linksys E-series(64k Nvram) images
 	@btools/fpkg -i lzma-loader/loader.gz -i $(LINUXDIR)/arch/mips/brcm-boards/bcm947xx/compressed/vmlinuz -a 1024 -i router/mipsel-uclibc/target.image \
+		-l E800,image/tomato-E800$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).bin \
 		-l E900,image/tomato-E900$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).bin \
 		-l E122,image/tomato-E1200v2$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).bin \
 		-l E150,image/tomato-E1500$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).bin \
@@ -1103,7 +1104,7 @@ w1800rz:
 	@$(MAKE) z MIPS32=r2 NVRAM_64K=y W1800R=1
 
 l600n:
-	@$(MAKE) bin MIPS32=r2 OPENVPN=y USERPPTP=y PPTPD=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=NC BUILD_DESC="$(VPN)" USB="USB" VLAN="$(VLAN)" SNMP=y NOCAT=y USBAP=y NO_USBAPP=y B=NC BUILD_DESC+="-$(NC)"  BUILD_DESC+="$(L600N)"
+	@$(MAKE) bin MIPS32=r2 OPENVPN=y USERPPTP=y PPTPD=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=NC BUILD_DESC="$(VPN)" USB="USB" VLAN="$(VLAN)" SNMP=y NOCAT=y USBAP=y B=NC BUILD_DESC+="-$(NC)"  BUILD_DESC+="$(L600N)"
 	
 setprofile:
 	echo '#ifndef TOMATO_PROFILE' > router/shared/tomato_profile.h
@@ -1134,7 +1135,7 @@ setprofile:
 	echo 'TOMATO_BUILD_V1 = "${V1}"' >> tomato_profile.mak
 	echo 'TOMATO_BUILD_V2 = "${V2}"' >> tomato_profile.mak
 
-	echo 'export EXTRACFLAGS := $(EXTRA_CFLAGS) -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32 -mips32 $(if $(filter $(NVRAM_SIZE),0),,-DCONFIG_NVRAM_SIZE=$(NVRAM_SIZE)) $(EXTRA_64KCFLAG)' >> tomato_profile.mak
+	echo 'export EXTRACFLAGS := $(EXTRA_CFLAGS) -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 $(if $(filter $(NVRAM_SIZE),0),,-DCONFIG_NVRAM_SIZE=$(NVRAM_SIZE)) $(EXTRA_64KCFLAG)' >> tomato_profile.mak
 
 # Note that changes to variables in tomato_profile.mak don't
 # get propogated to this invocation of make!
@@ -1208,7 +1209,7 @@ ifeq ($(CONFIG_LINUX26),y)
 	@echo "n60s         Linksys E-series build (60KB NVRAM, no USB support)"
 	@echo "n60v         Linksys E-series build (60KB NVRAM, VPN with no USB support)"
 
-	@echo "       Linksys E-Series with 64k Nvram/8MB Flash(E900/E1200v2/E1500)"
+	@echo "       Linksys E-Series with 64k Nvram/8MB Flash(E800/E900/E1200v2/E1500)"
 	@echo "n64m         Linksys E-series build (64KB NVRAM, standard plus extras)"
 	@echo "n64e         Linksys E-series build (64KB NVRAM, standard plus VPN and extras)"
 	@echo "n64nc        Linksys E-series build (64KB NVRAM, standard plus extras, plus VPN, plus NOCAT)"
@@ -1220,14 +1221,17 @@ ifeq ($(CONFIG_LINUX26),y)
 	@echo "e1000v2f     Linksys E1000v2-v2.1/Cisco M10v2 Mini"
 	@echo "e1200v1i     Linksys E1200v1 MiniIPv6"
 	@echo "e1200v1f     Linksys E1200v1 Mini"
-
 	@echo "       Netgear WNR3500L v2 builds (128MB Flash)"
 	@echo "v2e          Netgear WNR3500Lv2 build"
-	@echo "rtn53		Asus RT-N53"
-	@echo "e2500		Cisco E-2500"
-	@echo "e3200		Cisco E-3200"
-	@echo "ac66e		ASUS RT-AC66"
-	@echo "w1800rz		Tenda 1800"
+	@echo "       Routers with wl_high module"
+	@echo "rtn53	Asus RT-N53 with wl_high module (dualband support)"
+	@echo "e2500	Linksys E2500 with wl_high module (dualband support)"
+	@echo "e3200    Linksys E3200 with wl_high module (dualband support)"
+	@echo "l600n    Rosewill L600N Build with wl_high module (dualband support)"
+	@echo "       Routers with AC WIRELESS"	
+	@echo "ac66e	ASUS RT-AC66"
+	@ECHO "ac56	ASUS RT-AC56"
+	@echo "w1800rz	Tenda 1800"
 
 endif
 	@echo "..etc..      other build configs"
