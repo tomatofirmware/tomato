@@ -320,7 +320,7 @@ nflash_cfe_erase_range(cfe_devctx_t *ctx, flash_range_t *range)
 		return CFE_ERR_INV_PARAM;
 	}
 	if ((offset & (blocksize - 1)) != 0) {
-		printf("ersae offset must aligned to %llx = 0x%x\n", offset, blocksize);
+		printf("erase offset must aligned to %llx = 0x%x\n", offset, blocksize);
 		return CFE_ERR_INV_PARAM;
 	}
 

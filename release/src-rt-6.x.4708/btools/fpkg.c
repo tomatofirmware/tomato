@@ -49,6 +49,7 @@ char names[TRX_MAX_OFFSET][80];
 char trx_version = 1;
 int trx_max_offset = 3;
 
+uint32_t trx_magic = TRX_MAGIC;
 
 typedef struct {
 	uint32_t crc32;
@@ -134,11 +135,18 @@ void help(void)
 		"   610N WRT610N v2\n"
 		"   32XN E2000\n"
 		"   61XN E3000\n"
+		"   4200 E4200\n"
 		" Motorola:       -m <id>,<output file>\n"
 		"   0x10577000 WE800\n"
 		"   0x10577040 WA840\n"
 		"   0x10577050 WR850\n"
-		" ASUS: 	  -r <id>,<v1>,<v2>,<v3>,<v4>,<output file>\n"
+		" Belkin:         -b <id>,<output file>\n"
+		"   0x20100322 F7D3301 (Share Max)\n"
+		"   0x20090928 F7D3302 (Share)\n"
+		"   0x20091006 F7D4302 (Play)\n"
+		"   0x00017116 F5D8235 v3\n"
+		"   0x12345678 QA (QA firmware)\n"
+		" Asus:           -r <id>,<v1>,<v2>,<v3>,<v4>,<output file>\n"
 		"\n"
 	);
 	exit(1);
@@ -259,13 +267,16 @@ void finalize_trx(void)
 		exit(1);
 	}
 
-	if (trx_final) return;
+	if (trx_final) {
+		trx->magic = trx_magic;
+		return;
+	}
 	trx_final = 1;
 
 	len = trx->length;
 
 	trx->length = ROUNDUP(len, 4096);
-	trx->magic = TRX_MAGIC;
+	trx->magic = trx_magic;
 	trx->flag_version = trx_version << 16;
 	trx->crc32 = crc_calc(0xFFFFFFFF, (void *)&trx->flag_version,
 		trx->length - (sizeof(*trx) - (sizeof(trx->flag_version) + sizeof(trx->offsets))));
@@ -308,7 +319,10 @@ void create_cytan(const char *fname, const char *pattern)
 	memset(&h, 0, sizeof(h));
 	memcpy(h.magic, pattern, 4);
 	memcpy(h.u2nd, "U2ND", 4);
-	h.version[0] = 4;		// 4.0.0	should be >= *_VERSION_FROM defined in code_pattern.h
+	h.version[0] = 4; // stock fw has version check
+	h.version[1] = 20;
+	h.version[2] = 6;
+//	h.version[0] = 4;		// 4.0.0	should be >= *_VERSION_FROM defined in code_pattern.h
 	h.flags = 0xFF;
 	tm = localtime(&max_time);
 	h.date[0] = tm->tm_year - 100;
@@ -413,7 +427,7 @@ int create_asus(const char *optarg)
 
 	finalize_trx();
 
-	printf("Creating ASUS %s firmware to %s\n", asus_tail.productid, fname);
+	printf("Creating Asus %s firmware to %s\n", asus_tail.productid, fname);
 
 	if (((f = fopen(fname, "w")) == NULL) ||
 		(fwrite(trx, trx->length, 1, f) != 1)) {
@@ -428,7 +442,7 @@ int create_asus(const char *optarg)
 int main(int argc, char **argv)
 {
 	char s[256];
-	char *p;
+	char *p, *e;
 	int o;
 	unsigned l, j;
 
@@ -439,8 +453,9 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 	trx->length = trx_header_size();
+	trx_magic = TRX_MAGIC;
 
-	while ((o = getopt(argc, argv, "v:i:a:t:l:m:r:")) != -1) {
+	while ((o = getopt(argc, argv, "v:i:a:t:l:m:b:r:")) != -1) {
 		switch (o) {
 		case 'v':
 			set_trx_version(optarg);
@@ -450,6 +465,17 @@ int main(int argc, char **argv)
 			break;
 		case 'a':
 			align_trx(optarg);
+			break;
+		case 'b':
+			if (strlen(optarg) >= sizeof(s)) help();
+			strcpy(s, optarg);
+			if ((p = strchr(s, ',')) == NULL) help();
+			*p = 0;
+			++p;
+			trx_magic = strtoul(s, &e, 0);
+			if (*e != 0) help();
+			create_trx(p);
+			trx_magic = TRX_MAGIC;
 			break;
 		case 't':
 			create_trx(optarg);
@@ -473,6 +499,7 @@ int main(int argc, char **argv)
 		}
 	}
 
+	trx_magic = TRX_MAGIC;
 	if (trx_count == 0) {
 		help();
 	}
@@ -512,6 +539,8 @@ int main(int argc, char **argv)
 		else
 			j = 0;
 		printf("  32MB, 256K CFE : %d EBs + %d\n", j / (64*1024), j % (64*1024));
+
+		printf("            Note : Netgear routers have 6 EBs less available!\n");
 
 		printf(" CRC-32 ........ : %8X\n", trx->crc32);
 		l = (ROUNDUP(trx->length, (128 * 1024)) / (128 * 1024));
