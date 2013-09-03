@@ -79,10 +79,6 @@ endif
 
 # Only include extra themes if USB Extras are configured in.
 ifneq ($(TCONFIG_USB_EXTRAS),y)
-	rm -f $(INSTALLDIR)/www/usbred.css
-	rm -f $(INSTALLDIR)/www/usbblue.css
-	rm -f $(INSTALLDIR)/www/tomatousb.png
-	rm -f $(INSTALLDIR)/www/tomatousb_bg.png
 	sed -i $(INSTALLDIR)/www/admin-access.asp -e "/THEMES-BEGIN/,/THEMES-END/d"
 	sed -i $(INSTALLDIR)/www/nas-usb.asp -e "/EXTRAS-BEGIN/,/EXTRAS-END/d"
 endif
