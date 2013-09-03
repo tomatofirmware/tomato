@@ -1,1 +1,0 @@
-liblzma_la-crc32_x86.lo: check/crc32_x86.S
