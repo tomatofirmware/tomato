@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TomatoEgg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-29 09:10-0400\n"
-"PO-Revision-Date: 2013-08-29 09:39-0500\n"
+"POT-Creation-Date: 2013-09-03 23:34-0400\n"
+"PO-Revision-Date: 2013-09-03 23:54-0500\n"
 "Last-Translator: Zhiqiang <Wang.9264@gmail.com>\n"
 "Language-Team: TomatoEgg Translators <translate@tomatoegg.net>\n"
 "MIME-Version: 1.0\n"
@@ -26,6 +26,508 @@ msgstr "英语"
 #: ../www/admin-access.asp:301
 msgid "Chinese"
 msgstr "中文"
+
+#: ../www/advanced-ctnf.asp:14 ../www/advanced-dhcpdns.asp:14
+#: ../www/advanced-firewall.asp:18 ../www/advanced-mac.asp:14
+#: ../www/tomato.js:2386
+msgid "Advanced"
+msgstr "高级设置"
+
+#: ../www/advanced-ctnf.asp:14
+msgid "Conntrack"
+msgstr "连接跟踪"
+
+#: ../www/advanced-ctnf.asp:14
+msgid "Netfilter"
+msgstr "网络过滤"
+
+#: ../www/advanced-ctnf.asp:175 ../www/advanced-dhcpdns.asp:126
+#: ../www/advanced-firewall.asp:97 ../www/advanced-mac.asp:141
+#: ../www/basic-ipv6.asp:305 ../www/status-overview.asp:341
+msgid "Tomato"
+msgstr "Tomato"
+
+#: ../www/advanced-ctnf.asp:176 ../www/advanced-dhcpdns.asp:127
+#: ../www/advanced-firewall.asp:98 ../www/advanced-mac.asp:142
+#: ../www/status-overview.asp:342
+msgid "Version"
+msgstr "版本"
+
+#: ../www/advanced-ctnf.asp:200
+msgid "Connections"
+msgstr "连接数"
+
+#: ../www/advanced-ctnf.asp:204
+msgid "Maximum Connections"
+msgstr "最大连接数"
+
+#: ../www/advanced-ctnf.asp:205
+msgid "count current"
+msgstr "计算当前连接数"
+
+#: ../www/advanced-ctnf.asp:208
+msgid "Hash Table Size"
+msgstr "哈希表尺寸"
+
+#: ../www/advanced-ctnf.asp:213
+msgid "Drop Idle"
+msgstr "删除空闲连接"
+
+#: ../www/advanced-ctnf.asp:218
+msgid "TCP Timeout"
+msgstr "TCP超时时间"
+
+#: ../www/advanced-ctnf.asp:224
+msgid "None"
+msgstr "无"
+
+#: ../www/advanced-ctnf.asp:224
+msgid "Established"
+msgstr "已连接"
+
+#: ../www/advanced-ctnf.asp:224
+msgid "SYN Sent"
+msgstr "已发送SYN"
+
+#: ../www/advanced-ctnf.asp:224
+msgid "SYN Received"
+msgstr "已收到SYN"
+
+#: ../www/advanced-ctnf.asp:224
+msgid "FIN Wait"
+msgstr "FIN等待"
+
+#: ../www/advanced-ctnf.asp:224
+msgid "Time Wait"
+msgstr "Time Wait"
+
+#: ../www/advanced-ctnf.asp:224
+msgid "Close"
+msgstr "已关闭"
+
+#: ../www/advanced-ctnf.asp:224
+msgid "Close Wait"
+msgstr "等待关闭"
+
+#: ../www/advanced-ctnf.asp:224
+msgid "Last ACK"
+msgstr "最后ACK"
+
+#: ../www/advanced-ctnf.asp:224
+msgid "Listen"
+msgstr "侦听"
+
+#: ../www/advanced-ctnf.asp:225 ../www/advanced-ctnf.asp:243
+#: ../www/advanced-ctnf.asp:257
+msgid "seconds"
+msgstr "秒"
+
+#: ../www/advanced-ctnf.asp:236
+msgid "UDP Timeout"
+msgstr "UDP超时时间"
+
+#: ../www/advanced-ctnf.asp:244
+msgid "Unreplied"
+msgstr "无回复"
+
+#: ../www/advanced-ctnf.asp:245
+msgid "Assured"
+msgstr "确定"
+
+#: ../www/advanced-ctnf.asp:250
+msgid "Other Timeouts"
+msgstr "其它超时时间"
+
+#: ../www/advanced-ctnf.asp:258
+msgid "Generic"
+msgstr "通用"
+
+#: ../www/advanced-ctnf.asp:259 ../www/advanced-firewall.asp:130
+msgid "ICMP"
+msgstr "ICMP"
+
+#: ../www/advanced-ctnf.asp:264
+msgid "Tracking"
+msgstr "跟踪"
+
+#: ../www/advanced-ctnf.asp:264
+msgid "NAT Helpers"
+msgstr "NAT帮助"
+
+#: ../www/advanced-ctnf.asp:268
+msgid "FTP"
+msgstr "FTP"
+
+#: ../www/advanced-ctnf.asp:269
+msgid "GRE"
+msgstr "GRE"
+
+#: ../www/advanced-ctnf.asp:269 ../www/basic-network.asp:1603
+#: ../www/status-overview.asp:388
+msgid "PPTP"
+msgstr "PPTP"
+
+#: ../www/advanced-ctnf.asp:270
+msgid "H.323"
+msgstr "H.323"
+
+#: ../www/advanced-ctnf.asp:272
+msgid "SIP"
+msgstr "SIP"
+
+#: ../www/advanced-ctnf.asp:274
+msgid "RTSP"
+msgstr "RTSP"
+
+#: ../www/advanced-ctnf.asp:279 ../www/tomato.js:2391
+msgid "Miscellaneous"
+msgstr "其它设置"
+
+#: ../www/advanced-ctnf.asp:286 ../www/advanced-dhcpdns.asp:161
+#: ../www/basic-time.asp:29 ../www/basic-time.asp:208
+msgid "Custom"
+msgstr "自定义"
+
+#: ../www/advanced-ctnf.asp:289
+msgid "TTL Adjust"
+msgstr "超时调整"
+
+#: ../www/advanced-ctnf.asp:293
+msgid "Inbound Layer 7"
+msgstr "连入7层协议"
+
+#: ../www/advanced-ctnf.asp:303 ../www/advanced-dhcpdns.asp:221
+#: ../www/advanced-firewall.asp:172 ../www/advanced-mac.asp:199
+#: ../www/basic-ident.asp:74 ../www/basic-ipv6.asp:373
+#: ../www/basic-network.asp:1791 ../www/basic-time.asp:292
+msgid "Save"
+msgstr "保存"
+
+#: ../www/advanced-ctnf.asp:304 ../www/advanced-dhcpdns.asp:222
+#: ../www/advanced-firewall.asp:173 ../www/advanced-mac.asp:200
+#: ../www/basic-ident.asp:75 ../www/basic-ipv6.asp:374
+#: ../www/basic-network.asp:1792 ../www/basic-time.asp:293
+msgid "Cancel"
+msgstr "取消"
+
+#: ../www/advanced-dhcpdns.asp:14 ../www/advanced-dhcpdns.asp:149
+#: ../www/advanced-dhcpdns.asp:190 ../www/basic-network.asp:1603
+#: ../www/status-overview.asp:388 ../www/status-overview.asp:474
+msgid "DHCP"
+msgstr "自动获取"
+
+#: ../www/advanced-dhcpdns.asp:14 ../www/advanced-dhcpdns.asp:149
+#: ../www/advanced-dhcpdns.asp:190 ../www/status-overview.asp:396
+#: ../www/status-overview.asp:473
+msgid "DNS"
+msgstr "DNS"
+
+#: ../www/advanced-dhcpdns.asp:149 ../www/advanced-dhcpdns.asp:190
+msgid "Server"
+msgstr "服务器"
+
+#: ../www/advanced-dhcpdns.asp:153 ../www/advanced-dhcpdns.asp:192
+msgid "Use internal DNS"
+msgstr "使用内部DNS"
+
+#: ../www/advanced-dhcpdns.asp:154 ../www/advanced-dhcpdns.asp:193
+msgid "Use received DNS with user-entered DNS"
+msgstr "使用收到的DNS服务器"
+
+#: ../www/advanced-dhcpdns.asp:155 ../www/advanced-dhcpdns.asp:194
+msgid "Prevent DNS-rebind attacks"
+msgstr "阻止DNS重绑定攻击"
+
+#: ../www/advanced-dhcpdns.asp:156
+msgid "Intercept DNS port<br>(UDP 53)"
+msgstr "拦截DNS端口<br>(UDP 53)"
+
+#: ../www/advanced-dhcpdns.asp:157 ../www/advanced-dhcpdns.asp:196
+msgid "Use user-entered gateway if WAN is disabled"
+msgstr "WAN禁用时使用用户输入的网关"
+
+#: ../www/advanced-dhcpdns.asp:158
+msgid "Ignore DHCP requests from unknown devices"
+msgstr "忽略未知设备的DNS请求"
+
+#: ../www/advanced-dhcpdns.asp:159 ../www/advanced-dhcpdns.asp:198
+msgid "Maximum active DHCP leases"
+msgstr "最大活动DHCP租约"
+
+#: ../www/advanced-dhcpdns.asp:160 ../www/advanced-dhcpdns.asp:199
+msgid "Static lease time"
+msgstr "静态租约时间"
+
+#: ../www/advanced-dhcpdns.asp:161
+msgid "Same as normal lease time"
+msgstr "与普通租约相同"
+
+#: ../www/advanced-dhcpdns.asp:161
+msgid "Infinite"
+msgstr "永不过期"
+
+#: ../www/advanced-dhcpdns.asp:163
+msgid "minutes"
+msgstr "分钟"
+
+#: ../www/advanced-dhcpdns.asp:165
+msgid "Announce IPv6 on LAN"
+msgstr "在LAN上发布IPV6"
+
+#: ../www/advanced-dhcpdns.asp:166
+msgid "Mute dhcpv4 logging"
+msgstr "不记录DHCPv4日志"
+
+#: ../www/advanced-dhcpdns.asp:167
+msgid "Mute dhcpv6 logging"
+msgstr "不记录DHCPv6日志"
+
+#: ../www/advanced-dhcpdns.asp:168
+msgid "Mute RA logging"
+msgstr "不记录RA日志"
+
+#: ../www/advanced-dhcpdns.asp:169
+msgid "Dnsmasq"
+msgstr "Dnsmasq"
+
+#: ../www/advanced-dhcpdns.asp:169 ../www/advanced-dhcpdns.asp:200
+msgid "Custom configuration"
+msgstr "自定义配置"
+
+#: ../www/advanced-dhcpdns.asp:175 ../www/advanced-dhcpdns.asp:203
+msgid "DHCP Client"
+msgstr "DHCP客户端"
+
+#: ../www/advanced-dhcpdns.asp:179 ../www/advanced-dhcpdns.asp:205
+msgid "DHCPC Options"
+msgstr "DHCPC选项"
+
+#: ../www/advanced-dhcpdns.asp:180 ../www/advanced-dhcpdns.asp:206
+msgid "Reduce packet size"
+msgstr "减小包尺寸"
+
+#: ../www/advanced-dhcpdns.asp:187
+msgid "Notes"
+msgstr "提示"
+
+#: ../www/advanced-dhcpdns.asp:187
+msgid "Click here to show"
+msgstr "点击这里显示"
+
+#: ../www/advanced-dhcpdns.asp:192
+msgid "Allow dnsmasq to be your DNS server on LAN."
+msgstr "允许dnsmasq成为你局域网的DNS服务器"
+
+#: ../www/advanced-dhcpdns.asp:193
+msgid ""
+"Add DNS servers received from your WAN connection to the static DNS server "
+"list"
+msgstr "将从WAN连接收到的DNS服务器加入到静态DNS服务器列表中。"
+
+#: ../www/advanced-dhcpdns.asp:193
+msgid "see"
+msgstr "参见"
+
+#: ../www/advanced-dhcpdns.asp:193 ../www/tomato.js:2377
+msgid "Network"
+msgstr "网络"
+
+#: ../www/advanced-dhcpdns.asp:193
+msgid "configuration"
+msgstr "配置"
+
+#: ../www/advanced-dhcpdns.asp:194
+msgid "Enable DNS rebinding protection on Dnsmasq."
+msgstr "在Dnsmasq上启用DNS重绑定"
+
+#: ../www/advanced-dhcpdns.asp:195
+msgid "Intercept DNS port"
+msgstr "拦截DNS端口"
+
+#: ../www/advanced-dhcpdns.asp:195
+msgid ""
+"Any DNS requests/packets sent out to UDP port 53 are redirected to the "
+"internal DNS server."
+msgstr "任何发送到外部53号端口的DNS请求/包重定向到内部DNS服务器"
+
+#: ../www/advanced-dhcpdns.asp:196
+msgid ""
+"DHCP will use the IP address of the router as the default gateway on each "
+"LAN."
+msgstr "DHCP服务器将在所有LAN上把路由器的IP地址作为网关。"
+
+#: ../www/advanced-dhcpdns.asp:197
+msgid "Ignore DHCP requests"
+msgstr "忽略DHCP请求"
+
+#: ../www/advanced-dhcpdns.asp:197
+msgid ""
+"Dnsmasq will ignore DHCP requests  to Only MAC addresses listed on the <a "
+"href='basic-static.asp'>Static DHCP/ARP</a> page won't be able to obtain an "
+"IP address through DHCP."
+msgstr ""
+"Dnsmasq会忽略所有不在<a href='basic-static.asp'>静态DHCP/ARP</a>列表中设备的"
+"请求."
+
+#: ../www/advanced-dhcpdns.asp:198 ../www/advanced-dhcpdns.asp:206
+msgid "Self-explanatory."
+msgstr "自解释"
+
+#: ../www/advanced-dhcpdns.asp:199
+msgid "Absolute maximum amount of time allowed for any DHCP lease to be valid."
+msgstr "DHCP允许的最长租约时间"
+
+#: ../www/advanced-dhcpdns.asp:200
+msgid "Extra options to be added to the Dnsmasq configuration file."
+msgstr "其它附加到Dnsmasq配置文件中的选项"
+
+#: ../www/advanced-dhcpdns.asp:205
+msgid "Extra options for the DHCP client."
+msgstr "发送到DHCP客户端的其它选项"
+
+#: ../www/advanced-dhcpdns.asp:209
+msgid "Other relevant notes/hints"
+msgstr "其它相关提示"
+
+#: ../www/advanced-dhcpdns.asp:211
+msgid ""
+"The contents of file /etc/dnsmasq.custom are also added to the end of "
+"Dnsmasq's configuration file (if it exists)."
+msgstr "/etc/dnsmasq.custom如果存在的话，也会附加到Dnsmasq配置文件尾部"
+
+#: ../www/advanced-firewall.asp:18 ../www/advanced-firewall.asp:124
+#: ../www/tomato.js:2389
+msgid "Firewall"
+msgstr "防火墙"
+
+#: ../www/advanced-firewall.asp:53
+msgid "IGMPproxy must be enabled in least one LAN bridge"
+msgstr "IGMPproxy必须至少在一个局域网桥上激活"
+
+#: ../www/advanced-firewall.asp:128
+msgid "Respond to ICMP ping"
+msgstr "响应ICMP ping"
+
+#: ../www/advanced-firewall.asp:129
+msgid "Limits per second"
+msgstr "每秒限制"
+
+#: ../www/advanced-firewall.asp:131
+msgid "Traceroute"
+msgstr "Traceroute"
+
+#: ../www/advanced-firewall.asp:133
+msgid "Enable SYN cookies"
+msgstr "启用SYN cookies"
+
+#: ../www/advanced-firewall.asp:138
+msgid "NAT"
+msgstr "NAT"
+
+#: ../www/advanced-firewall.asp:142
+msgid "NAT loopback"
+msgstr "NAT loopback"
+
+#: ../www/advanced-firewall.asp:143
+msgid "NAT target"
+msgstr "NAT target"
+
+#: ../www/advanced-firewall.asp:143
+msgid "MASQUERADE"
+msgstr "MASQUERADE"
+
+#: ../www/advanced-firewall.asp:143
+msgid "SNAT"
+msgstr "SNAT"
+
+#: ../www/advanced-firewall.asp:148
+msgid "Multicast"
+msgstr "多播"
+
+#: ../www/advanced-firewall.asp:152
+msgid "Enable IGMPproxy"
+msgstr "启用IGMPproxy"
+
+#: ../www/advanced-firewall.asp:153 ../www/status-overview.asp:413
+msgid "LAN"
+msgstr "LAN"
+
+#: ../www/advanced-firewall.asp:154
+msgid "LAN1"
+msgstr "LAN1"
+
+#: ../www/advanced-firewall.asp:155
+msgid "LAN2"
+msgstr "LAN2"
+
+#: ../www/advanced-firewall.asp:156
+msgid "LAN3"
+msgstr "LAN3"
+
+#: ../www/advanced-firewall.asp:158
+msgid "Enable Udpxy"
+msgstr "启用Udpxy"
+
+#: ../www/advanced-firewall.asp:159
+msgid "Enable client statistics"
+msgstr "启用客户端统计"
+
+#: ../www/advanced-firewall.asp:160
+msgid "Max clients"
+msgstr "最大客户端"
+
+#: ../www/advanced-firewall.asp:161
+msgid "Udpxy port"
+msgstr "Udpxy端口"
+
+#: ../www/advanced-mac.asp:14 ../www/advanced-mac.asp:163
+#: ../www/basic-network.asp:1721 ../www/basic-network.asp:1774
+#: ../www/status-overview.asp:499 ../www/tomato.js:2390
+msgid "MAC Address"
+msgstr "MAC地址"
+
+#: ../www/advanced-mac.asp:108
+msgid "Addresses must be unique"
+msgstr "地址必须唯一"
+
+#: ../www/advanced-mac.asp:120
+msgid ""
+"Warning: Changing the MAC address may require that you reboot all devices, "
+"computers or modem connected to this router. Continue anyway?"
+msgstr ""
+"警告:修改设备MAC地址可能需要你重启所有连接到此路由器上的设备、计算机和猫，继"
+"续？"
+
+#: ../www/advanced-mac.asp:168
+msgid "WAN Port"
+msgstr "WAN端口"
+
+#: ../www/advanced-mac.asp:169 ../www/advanced-mac.asp:177
+#: ../www/basic-ipv6.asp:340 ../www/basic-network.asp:1636
+#: ../www/basic-time.asp:30
+msgid "Default"
+msgstr "默认"
+
+#: ../www/advanced-mac.asp:169 ../www/advanced-mac.asp:177
+#: ../www/basic-network.asp:1745 ../www/basic-network.asp:1748
+msgid "Random"
+msgstr "随机"
+
+#: ../www/advanced-mac.asp:169 ../www/advanced-mac.asp:177
+msgid "Clone PC"
+msgstr "复制计算机"
+
+#: ../www/advanced-mac.asp:176
+msgid "Wireless Interface"
+msgstr "无线接口"
+
+#: ../www/advanced-mac.asp:187
+msgid "Router's LAN MAC Address"
+msgstr "路由器局域网MAC地址"
+
+#: ../www/advanced-mac.asp:188
+msgid "Computer's MAC Address"
+msgstr "计算机MAC地址"
 
 #: ../www/basic-ident.asp:14 ../www/tomato.js:2376 ../www/tomato.js:2401
 msgid "Basic"
@@ -46,20 +548,6 @@ msgstr "主机名"
 #: ../www/basic-ident.asp:64
 msgid "Domain Name"
 msgstr "域名"
-
-#: ../www/basic-ident.asp:74 ../www/basic-ipv6.asp:373
-#: ../www/basic-network.asp:1791 ../www/basic-time.asp:292
-msgid "Save"
-msgstr "保存"
-
-#: ../www/basic-ident.asp:75 ../www/basic-ipv6.asp:374
-#: ../www/basic-network.asp:1792 ../www/basic-time.asp:293
-msgid "Cancel"
-msgstr "取消"
-
-#: ../www/basic-ipv6.asp:305 ../www/status-overview.asp:341
-msgid "Tomato"
-msgstr "Tomato"
 
 #: ../www/basic-ipv6.asp:324
 msgid "IPv6 Configuration"
@@ -134,11 +622,6 @@ msgstr "前缀长度"
 #: ../www/basic-ipv6.asp:339 ../www/status-overview.asp:470
 msgid "Router IPv6 Address"
 msgstr "路由器IPv6地址"
-
-#: ../www/basic-ipv6.asp:340 ../www/basic-network.asp:1636
-#: ../www/basic-time.asp:30
-msgid "Default"
-msgstr "默认"
 
 #: ../www/basic-ipv6.asp:340 ../www/basic-network.asp:1636
 msgid "Manual"
@@ -336,21 +819,12 @@ msgid "Type"
 msgstr "类型"
 
 #: ../www/basic-network.asp:1603 ../www/status-overview.asp:388
-#: ../www/status-overview.asp:474
-msgid "DHCP"
-msgstr "自动获取"
-
-#: ../www/basic-network.asp:1603 ../www/status-overview.asp:388
 msgid "PPPoE"
 msgstr "PPPoE"
 
 #: ../www/basic-network.asp:1603
 msgid "Static"
 msgstr "静态"
-
-#: ../www/basic-network.asp:1603 ../www/status-overview.asp:388
-msgid "PPTP"
-msgstr "PPTP"
 
 #: ../www/basic-network.asp:1603 ../www/status-overview.asp:388
 msgid "L2TP"
@@ -489,11 +963,6 @@ msgstr "反转端口顺序"
 msgid "Enable Wireless"
 msgstr "启用无线"
 
-#: ../www/basic-network.asp:1721 ../www/basic-network.asp:1774
-#: ../www/status-overview.asp:499 ../www/tomato.js:2390
-msgid "MAC Address"
-msgstr "MAC地址"
-
 #: ../www/basic-network.asp:1722 ../www/status-overview.asp:500
 msgid "Wireless Mode"
 msgstr "无线模式"
@@ -611,10 +1080,6 @@ msgstr "TKIP / AES"
 msgid "Shared Key"
 msgstr "共享密钥"
 
-#: ../www/basic-network.asp:1745 ../www/basic-network.asp:1748
-msgid "Random"
-msgstr "随机"
-
 #: ../www/basic-network.asp:1750
 msgid "Group Key Renewal"
 msgstr "组密钥更新间隔"
@@ -634,10 +1099,6 @@ msgstr "生成"
 #: ../www/basic-network.asp:1764
 msgid "Key"
 msgstr "密钥"
-
-#: ../www/basic-time.asp:29 ../www/basic-time.asp:208
-msgid "Custom"
-msgstr "自定义"
 
 #: ../www/basic-time.asp:31
 msgid "Africa"
@@ -1119,10 +1580,6 @@ msgstr "已经发布了"
 msgid "Click here to read more"
 msgstr "点击这里获取更多信息"
 
-#: ../www/status-overview.asp:342
-msgid "Version"
-msgstr "版本"
-
 #: ../www/status-overview.asp:354
 msgid "You did not configure <b>TomatoAnon project</b> setting."
 msgstr "您还没有对<b>TomatoAnon 项目</b> 进行设置。"
@@ -1208,10 +1665,6 @@ msgstr "静态IP"
 msgid "Previous WAN IP"
 msgstr "上次WAN IP"
 
-#: ../www/status-overview.asp:396 ../www/status-overview.asp:473
-msgid "DNS"
-msgstr "DNS"
-
 #: ../www/status-overview.asp:399 ../www/tomato.js:2349
 msgid "Status"
 msgstr "状态"
@@ -1239,10 +1692,6 @@ msgstr "连接"
 #: ../www/status-overview.asp:409
 msgid "Disconnect"
 msgstr "断开"
-
-#: ../www/status-overview.asp:413
-msgid "LAN"
-msgstr "LAN"
 
 #: ../www/status-overview.asp:466
 msgid "Router MAC Address"
@@ -1364,10 +1813,6 @@ msgstr "搜索无线"
 msgid "WOL"
 msgstr "网络唤醒"
 
-#: ../www/tomato.js:2377
-msgid "Network"
-msgstr "网络"
-
 #: ../www/tomato.js:2379
 msgid "IPv6"
 msgstr "IPv6"
@@ -1384,10 +1829,6 @@ msgstr "静态地址/ARP/IPT"
 msgid "Wireless Filter"
 msgstr "无线控制"
 
-#: ../www/tomato.js:2386
-msgid "Advanced"
-msgstr "高级设置"
-
 #: ../www/tomato.js:2387
 msgid "Conntrack/Netfilter"
 msgstr "连接限制/过滤"
@@ -1395,14 +1836,6 @@ msgstr "连接限制/过滤"
 #: ../www/tomato.js:2388
 msgid "DHCP/DNS"
 msgstr "DHCP/DNS"
-
-#: ../www/tomato.js:2389
-msgid "Firewall"
-msgstr "防火墙"
-
-#: ../www/tomato.js:2391
-msgid "Miscellaneous"
-msgstr "其它设置"
 
 #: ../www/tomato.js:2392
 msgid "Routing"

@@ -11,7 +11,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Advanced: DHCP / DNS</title>
+<title>[<% ident(); %>] <% _("Advanced"); %>: <% _("DHCP"); %> / <% _("DNS"); %></title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
@@ -123,8 +123,8 @@ function init() {
 <form id='_fom' method='post' action='tomato.cgi'>
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
-	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='title'><% _("Tomato"); %></div>
+	<div class='version'><% _("Version"); %> <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -146,69 +146,69 @@ function init() {
 <input type='hidden' name='ipv6_radvd'>
 <input type='hidden' name='dnsmasq_q'>
 
-<div class='section-title'>DHCP / DNS Server (LAN)</div>
+<div class='section-title'><% _("DHCP"); %> / <% _("DNS"); %> <% _("Server"); %> (LAN)</div>
 <div class='section'>
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: 'Use internal DNS', name: 'f_dhcpd_dmdns', type: 'checkbox', value: nvram.dhcpd_dmdns == '1' },
-	{ title: 'Use received DNS with user-entered DNS', name: 'f_dns_addget', type: 'checkbox', value: nvram.dns_addget == '1' },
-	{ title: 'Prevent DNS-rebind attacks', name: 'f_dns_norebind', type: 'checkbox', value: nvram.dns_norebind == '1' },
-	{ title: 'Intercept DNS port<br>(UDP 53)', name: 'f_dns_intcpt', type: 'checkbox', value: nvram.dns_intcpt == '1' },
-	{ title: 'Use user-entered gateway if WAN is disabled', name: 'f_dhcpd_gwmode', type: 'checkbox', value: nvram.dhcpd_gwmode == '1' },
-	{ title: 'Ignore DHCP requests from unknown devices', name: 'f_dhcpd_static_only', type: 'checkbox', value: nvram.dhcpd_static_only == '1' },
-	{ title: 'Maximum active DHCP leases', name: 'dhcpd_lmax', type: 'text', maxlen: 5, size: 8, value: nvram.dhcpd_lmax },
-	{ title: 'Static lease time', multi: [
-		{ name: 'f_dhcpd_sltsel', type: 'select', options: [[0,'Same as normal lease time'],[-1,'"Infinite"'],[1,'Custom']],
+	{ title: '<% _("Use internal DNS"); %>', name: 'f_dhcpd_dmdns', type: 'checkbox', value: nvram.dhcpd_dmdns == '1' },
+	{ title: '<% _("Use received DNS with user-entered DNS"); %>', name: 'f_dns_addget', type: 'checkbox', value: nvram.dns_addget == '1' },
+	{ title: '<% _("Prevent DNS-rebind attacks"); %>', name: 'f_dns_norebind', type: 'checkbox', value: nvram.dns_norebind == '1' },
+	{ title: '<% _("Intercept DNS port<br>(UDP 53)"); %>', name: 'f_dns_intcpt', type: 'checkbox', value: nvram.dns_intcpt == '1' },
+	{ title: '<% _("Use user-entered gateway if WAN is disabled"); %>', name: 'f_dhcpd_gwmode', type: 'checkbox', value: nvram.dhcpd_gwmode == '1' },
+	{ title: '<% _("Ignore DHCP requests from unknown devices"); %>', name: 'f_dhcpd_static_only', type: 'checkbox', value: nvram.dhcpd_static_only == '1' },
+	{ title: '<% _("Maximum active DHCP leases"); %>', name: 'dhcpd_lmax', type: 'text', maxlen: 5, size: 8, value: nvram.dhcpd_lmax },
+	{ title: '<% _("Static lease time"); %>', multi: [
+		{ name: 'f_dhcpd_sltsel', type: 'select', options: [[0,'<% _("Same as normal lease time"); %>'],[-1,'"<% _("Infinite"); %>"'],[1,'<% _("Custom"); %>']],
 			value: (nvram.dhcpd_slt < 1) ? nvram.dhcpd_slt : 1 },
-		{ name: 'f_dhcpd_slt', type: 'text', maxlen: 5, size: 8, prefix: '<span id="_dhcpd_sltman"> ', suffix: ' <i>(minutes)</i></span>',
+		{ name: 'f_dhcpd_slt', type: 'text', maxlen: 5, size: 8, prefix: '<span id="_dhcpd_sltman"> ', suffix: ' <i>(<% _("minutes"); %>)</i></span>',
 			value: (nvram.dhcpd_slt >= 1) ? nvram.dhcpd_slt : 3600 } ] },
-	{ title: 'Announce IPv6 on LAN', name: 'f_ipv6_radvd', type: 'checkbox', value: nvram.ipv6_radvd == '1' },
-	{ title: 'Mute dhcpv4 logging', name: 'f_dnsmasq_q4', type: 'checkbox', value: (nvram.dnsmasq_q & 1) },
-	{ title: 'Mute dhcpv6 logging', name: 'f_dnsmasq_q6', type: 'checkbox', value: (nvram.dnsmasq_q & 2) },
-	{ title: 'Mute RA logging', name: 'f_dnsmasq_qr', type: 'checkbox', value: (nvram.dnsmasq_q & 4) },
-	{ title: '<a href="http://www.thekelleys.org.uk/" target="_new">Dnsmasq</a><br>Custom configuration', name: 'dnsmasq_custom', type: 'textarea', value: nvram.dnsmasq_custom }
+	{ title: '<% _("Announce IPv6 on LAN"); %>', name: 'f_ipv6_radvd', type: 'checkbox', value: nvram.ipv6_radvd == '1' },
+	{ title: '<% _("Mute dhcpv4 logging"); %>', name: 'f_dnsmasq_q4', type: 'checkbox', value: (nvram.dnsmasq_q & 1) },
+	{ title: '<% _("Mute dhcpv6 logging"); %>', name: 'f_dnsmasq_q6', type: 'checkbox', value: (nvram.dnsmasq_q & 2) },
+	{ title: '<% _("Mute RA logging"); %>', name: 'f_dnsmasq_qr', type: 'checkbox', value: (nvram.dnsmasq_q & 4) },
+	{ title: '<a href="http://www.thekelleys.org.uk/" target="_new"><% _("Dnsmasq"); %></a><br><% _("Custom configuration"); %>', name: 'dnsmasq_custom', type: 'textarea', value: nvram.dnsmasq_custom }
 ]);
 </script>
 
 <!-- / / / -->
 
-<div class='section-title'>DHCP Client (WAN)</div>
+<div class='section-title'><% _("DHCP Client"); %> (WAN)</div>
 <div class='section'>
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: 'DHCPC Options', name: 'dhcpc_custom', type: 'text', maxlen: 80, size: 34, value: nvram.dhcpc_custom },
-	{ title: 'Reduce packet size', name: 'f_dhcpc_minpkt', type: 'checkbox', value: nvram.dhcpc_minpkt == '1' }
+	{ title: '<% _("DHCPC Options"); %>', name: 'dhcpc_custom', type: 'text', maxlen: 80, size: 34, value: nvram.dhcpc_custom },
+	{ title: '<% _("Reduce packet size"); %>', name: 'f_dhcpc_minpkt', type: 'checkbox', value: nvram.dhcpc_minpkt == '1' }
 ]);
 </script>
 </div>
 
 <!-- / / / -->
 
-<div class='section-title'>Notes <small><i><a href='javascript:toggleVisibility("notes");'><span id='sesdivnotesshowhide'>(Click here to show)</span></a></i></small></div>
+<div class='section-title'><% _("Notes"); %> <small><i><a href='javascript:toggleVisibility("notes");'><span id='sesdivnotesshowhide'>(<% _("Click here to show"); %>)</span></a></i></small></div>
 <div class='section' id='sesdivnotes' style='display:none'>
 
-<i>DHCP / DNS Server (LAN):</i><br>
+<i><% _("DHCP"); %> / <% _("DNS"); %> <% _("Server"); %> (LAN):</i><br>
 <ul>
-<li><b>Use internal DNS</b> - Allow dnsmasq to be your DNS server on LAN.</li>
-<li><b>Use received DNS with user-entered DNS</b> - Add DNS servers received from your WAN connection to the static DNS server list (see <a href='basic-network.asp'>Network</a> configuration).</li>
-<li><b>Prevent DNS-rebind attacks</b> - Enable DNS rebinding protection on Dnsmasq.</li>
-<li><b>Intercept DNS port</b> - Any DNS requests/packets sent out to UDP port 53 are redirected to the internal DNS server.</li>
-<li><b>Use user-entered gateway if WAN is disabled</b> - DHCP will use the IP address of the router as the default gateway on each LAN.</li>
-<li><b>Ignore DHCP requests (...)</b> - Dnsmasq will ignore DHCP requests  to Only MAC addresses listed on the <a href='basic-static.asp'>Static DHCP/ARP</a> page won't be able to obtain an IP address through DHCP.</li>
-<li><b>Maximum active DHCP leases</b> - Self-explanatory.</li>
-<li><b>Static lease time</b> - Absolute maximum amount of time allowed for any DHCP lease to be valid.</li>
-<li><b>Custom configuration</b> - Extra options to be added to the Dnsmasq configuration file.</li>
+<li><b><% _("Use internal DNS"); %></b> - <% _("Allow dnsmasq to be your DNS server on LAN."); %></li>
+<li><b><% _("Use received DNS with user-entered DNS"); %></b> - <% _("Add DNS servers received from your WAN connection to the static DNS server list"); %> (<% _("see"); %> <a href='basic-network.asp'><% _("Network"); %></a> <% _("configuration"); %>).</li>
+<li><b><% _("Prevent DNS-rebind attacks"); %></b> - <% _("Enable DNS rebinding protection on Dnsmasq."); %></li>
+<li><b><% _("Intercept DNS port"); %></b> - <% _("Any DNS requests/packets sent out to UDP port 53 are redirected to the internal DNS server."); %></li>
+<li><b><% _("Use user-entered gateway if WAN is disabled"); %></b> - <% _("DHCP will use the IP address of the router as the default gateway on each LAN."); %></li>
+<li><b><% _("Ignore DHCP requests"); %> (...)</b> - <% _("Dnsmasq will ignore DHCP requests  to Only MAC addresses listed on the <a href='basic-static.asp'>Static DHCP/ARP</a> page won't be able to obtain an IP address through DHCP."); %></li>
+<li><b><% _("Maximum active DHCP leases"); %></b> - <% _("Self-explanatory."); %></li>
+<li><b><% _("Static lease time"); %></b> - <% _("Absolute maximum amount of time allowed for any DHCP lease to be valid."); %></li>
+<li><b><% _("Custom configuration"); %></b> - <% _("Extra options to be added to the Dnsmasq configuration file."); %></li>
 </ul>
 
-<i>DHCP Client (WAN):</i><br>
+<i><% _("DHCP Client"); %> (WAN):</i><br>
 <ul>
-<li><b>DHCPC Options</b> - Extra options for the DHCP client.</li>
-<li><b>Reduce packet size</b> - Self-explanatory.</li>
+<li><b><% _("DHCPC Options"); %></b> - <% _("Extra options for the DHCP client."); %></li>
+<li><b><% _("Reduce packet size"); %></b> - <% _("Self-explanatory."0; %></li>
 </ul>
 
-<i>Other relevant notes/hints:</i><br>
+<i><% _("Other relevant notes/hints"); %>:</i><br>
 <ul>
-<li>The contents of file /etc/dnsmasq.custom are also added to the end of Dnsmasq's configuration file (if it exists).</li>
+<li><% _("The contents of file /etc/dnsmasq.custom are also added to the end of Dnsmasq's configuration file (if it exists)."); %></li>
 </ul>
 
 </div>
@@ -218,8 +218,8 @@ createFieldTable('', [
 </td></tr>
 <tr><td id='footer' colspan=2>
 	<span id='footer-msg'></span>
-	<input type='button' value='Save' id='save-button' onclick='save()'>
-	<input type='button' value='Cancel' id='cancel-button' onclick='javascript:reloadPage();'>
+	<input type='button' value='<% _("Save"); %>' id='save-button' onclick='save()'>
+	<input type='button' value='<% _("Cancel"); %>' id='cancel-button' onclick='javascript:reloadPage();'>
 </td></tr>
 </table>
 </form>

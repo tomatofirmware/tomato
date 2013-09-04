@@ -11,7 +11,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Advanced: Conntrack / Netfilter</title>
+<title>[<% ident(); %>] <% _("Advanced"); %>: <% _("Conntrack"); %> / <% _("Netfilter"); %></title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <link rel='stylesheet' type='text/css' href='color.css'>
 <script type='text/javascript' src='tomato.js'></script>
@@ -172,8 +172,8 @@ function save()
 <form id='_fom' method='post' action='tomato.cgi'>
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
-	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='title'><% _("Tomato"); %></div>
+	<div class='version'><% _("Version"); %> <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -197,32 +197,32 @@ function save()
 <input type='hidden' name='nf_sip'>
 /* LINUX26-END */
 
-<div class='section-title'>Connections</div>
+<div class='section-title'><% _("Connections"); %></div>
 <div class='section'>
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: 'Maximum Connections', name: 'ct_max', type: 'text', maxlen: 6, size: 8,
-		suffix: '&nbsp; <a href="javascript:clicked()" id="count0">[ count current... ]</a> <img src="spin.gif" style="vertical-align:bottom;padding-left:10px;visibility:hidden" id="spin" onclick="clicked()">',
+	{ title: '<% _("Maximum Connections"); %>', name: 'ct_max', type: 'text', maxlen: 6, size: 8,
+		suffix: '&nbsp; <a href="javascript:clicked()" id="count0">[ <% _("count current"); %>... ]</a> <img src="spin.gif" style="vertical-align:bottom;padding-left:10px;visibility:hidden" id="spin" onclick="clicked()">',
 		value: fixInt(nvram.ct_max || 4096, 128, 300000, 4096) }
 /* LINUX26-BEGIN */
-	,{ title: 'Hash Table Size', name: 'ct_hashsize', type: 'text', maxlen: 6, size: 8, value: nvram.ct_hashsize || 1023 }
+	,{ title: '<% _("Hash Table Size"); %>', name: 'ct_hashsize', type: 'text', maxlen: 6, size: 8, value: nvram.ct_hashsize || 1023 }
 /* LINUX26-END */
 ]);
 </script>
 <br>
-<input type='button' value='Drop Idle' onclick='expireClicked()' id='expire'>
+<input type='button' value='<% _("Drop Idle"); %>' onclick='expireClicked()' id='expire'>
 <br><br>
 </div>
 
 
-<div class='section-title'>TCP Timeout</div>
+<div class='section-title'><% _("TCP Timeout"); %></div>
 <div class='section'>
 <script type='text/javascript'>
 if ((v = nvram.ct_tcp_timeout.match(/^(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)$/)) == null) {
 	v = [0,0,1200,120,60,120,120,10,60,30,0];
 }
-titles = ['-', 'None', 'Established', 'SYN Sent', 'SYN Received', 'FIN Wait', 'Time Wait', 'Close', 'Close Wait', 'Last ACK', 'Listen'];
-f = [{ title: ' ', text: '<small>(seconds)</small>' }];
+titles = ['-', '<% _("None"); %>', '<% _("Established"); %>', '<% _("SYN Sent"); %>', '<% _("SYN Received"); %>', '<% _("FIN Wait"); %>', '<% _("Time Wait"); %>', '<% _("Close"); %>', '<% _("Close Wait"); %>', '<% _("Last ACK"); %>', '<% _("Listen"); %>'];
+f = [{ title: ' ', text: '<small>(<% _("seconds"); %>)</small>' }];
 for (i = 1; i < 11; ++i) {
 	f.push({ title: titles[i], name: ('f_tcp_' + (i - 1)),
 		type: 'text', maxlen: 6, size: 8, value: v[i],
@@ -233,64 +233,64 @@ createFieldTable('', f);
 </script>
 </div>
 
-<div class='section-title'>UDP Timeout</div>
+<div class='section-title'><% _("UDP Timeout"); %></div>
 <div class='section'>
 <script type='text/javascript'>
 if ((v = nvram.ct_udp_timeout.match(/^(\d+)\s+(\d+)$/)) == null) {
 	v = [0,30,180];
 }
 createFieldTable('', [
-	{ title: ' ', text: '<small>(seconds)</small>' },
-	{ title: 'Unreplied', name: 'f_udp_0', type: 'text', maxlen: 6, size: 8, value: v[1], suffix: '<span id="count11"></span>' },
-	{ title: 'Assured', name: 'f_udp_1', type: 'text', maxlen: 6, size: 8, value: v[2], suffix: '<span id="count12"></span>' }
+	{ title: ' ', text: '<small>(<% _("seconds"); %>)</small>' },
+	{ title: '<% _("Unreplied"); %>', name: 'f_udp_0', type: 'text', maxlen: 6, size: 8, value: v[1], suffix: '<span id="count11"></span>' },
+	{ title: '<% _("Assured"); %>', name: 'f_udp_1', type: 'text', maxlen: 6, size: 8, value: v[2], suffix: '<span id="count12"></span>' }
 ]);
 </script>
 </div>
 
-<div class='section-title'>Other Timeouts</div>
+<div class='section-title'><% _("Other Timeouts"); %></div>
 <div class='section'>
 <script type='text/javascript'>
 if ((v = nvram.ct_timeout.match(/^(\d+)\s+(\d+)$/)) == null) {
 	v = [0,600,30];
 }
 createFieldTable('', [
-	{ title: ' ', text: '<small>(seconds)</small>' },
-	{ title: 'Generic', name: 'f_ct_0', type: 'text', maxlen: 6, size: 8, value: v[1] },
-	{ title: 'ICMP', name: 'f_ct_1', type: 'text', maxlen: 6, size: 8, value: v[2] }
+	{ title: ' ', text: '<small>(<% _("seconds"); %>)</small>' },
+	{ title: '<% _("Generic"); %>', name: 'f_ct_0', type: 'text', maxlen: 6, size: 8, value: v[1] },
+	{ title: '<% _("ICMP"); %>', name: 'f_ct_1', type: 'text', maxlen: 6, size: 8, value: v[2] }
 ]);
 </script>
 </div>
 
-<div class='section-title'>Tracking / NAT Helpers</div>
+<div class='section-title'><% _("Tracking"); %> / <% _("NAT Helpers"); %></div>
 <div class='section'>
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: 'FTP', name: 'f_ftp', type: 'checkbox', value: nvram.nf_ftp != '0' },
-	{ title: 'GRE / PPTP', name: 'f_pptp', type: 'checkbox', value: nvram.nf_pptp != '0' },
-	{ title: 'H.323', name: 'f_h323', type: 'checkbox', value: nvram.nf_h323 != '0' },
+	{ title: '<% _("FTP"); %>', name: 'f_ftp', type: 'checkbox', value: nvram.nf_ftp != '0' },
+	{ title: '<% _("GRE"); %> / <% _("PPTP"); %>', name: 'f_pptp', type: 'checkbox', value: nvram.nf_pptp != '0' },
+	{ title: '<% _("H.323"); %>', name: 'f_h323', type: 'checkbox', value: nvram.nf_h323 != '0' },
 /* LINUX26-BEGIN */
-	{ title: 'SIP', name: 'f_sip', type: 'checkbox', value: nvram.nf_sip != '0' },
+	{ title: '<% _("SIP"); %>', name: 'f_sip', type: 'checkbox', value: nvram.nf_sip != '0' },
 /* LINUX26-END */
-	{ title: 'RTSP', name: 'f_rtsp', type: 'checkbox', value: nvram.nf_rtsp != '0' }
+	{ title: '<% _("RTSP"); %>', name: 'f_rtsp', type: 'checkbox', value: nvram.nf_rtsp != '0' }
 ]);
 </script>
 </div>
 
-<div class='section-title'>Miscellaneous</div>
+<div class='section-title'><% _("Miscellaneous"); %></div>
 <div class='section'>
 <script type='text/javascript'>
 v = [];
 for (i = -5; i <= 5; ++i) {
 	v.push([i + '', i ? ((i > 0) ? '+' : '') + i : 'None']);
 }
-v.push(['', 'Custom']);
+v.push(['', '<% _("Custom"); %>']);
 
 createFieldTable('', [
-	{ title: 'TTL Adjust', multi: [
+	{ title: '<% _("TTL Adjust"); %>', multi: [
 		{ name: 'f_nf_ttl', type: 'select', options: v, value: nvram.nf_ttl.substr(0, 2) == 'c:' ? '' : nvram.nf_ttl },
 		{ name: 'f_ttl_val', type: 'text', maxlen: 3, size: 6, value: nvram.nf_ttl.substr(0, 2) == 'c:' ?  nvram.nf_ttl.substr(2, 5) : '' }
 	] },
-	{ title: 'Inbound Layer 7', name: 'f_l7in', type: 'checkbox', value: nvram.nf_l7in != '0' }
+	{ title: '<% _("Inbound Layer 7"); %>', name: 'f_l7in', type: 'checkbox', value: nvram.nf_l7in != '0' }
 ]);
 </script>
 </div>
@@ -300,8 +300,8 @@ createFieldTable('', [
 </td></tr>
 <tr><td id='footer' colspan=2>
 	<span id='footer-msg'></span>
-	<input type='button' value='Save' id='save-button' onclick='save()'>
-	<input type='button' value='Cancel' id='cancel-button' onclick='reloadPage();'>
+	<input type='button' value='<% _("Save"); %>' id='save-button' onclick='save()'>
+	<input type='button' value='<% _("Cancel"); %>' id='cancel-button' onclick='reloadPage();'>
 </td></tr>
 </table>
 </form>

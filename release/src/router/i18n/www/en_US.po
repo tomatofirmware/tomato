@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TomatoEgg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-29 09:10-0400\n"
-"PO-Revision-Date: 2013-08-29 09:11-0500\n"
+"POT-Creation-Date: 2013-09-03 23:34-0400\n"
+"PO-Revision-Date: 2013-09-03 23:35-0500\n"
 "Last-Translator: Zhiqiang <Wang.9264@gmail.com>\n"
 "Language-Team: TomatoEgg Translators <translate@tomatoegg.net>\n"
 "MIME-Version: 1.0\n"
@@ -26,6 +26,518 @@ msgstr "English"
 #: ../www/admin-access.asp:301
 msgid "Chinese"
 msgstr "Chinese"
+
+#: ../www/advanced-ctnf.asp:14 ../www/advanced-dhcpdns.asp:14
+#: ../www/advanced-firewall.asp:18 ../www/advanced-mac.asp:14
+#: ../www/tomato.js:2386
+msgid "Advanced"
+msgstr "Advanced"
+
+#: ../www/advanced-ctnf.asp:14
+msgid "Conntrack"
+msgstr "Conntrack"
+
+#: ../www/advanced-ctnf.asp:14
+msgid "Netfilter"
+msgstr "Netfilter"
+
+#: ../www/advanced-ctnf.asp:175 ../www/advanced-dhcpdns.asp:126
+#: ../www/advanced-firewall.asp:97 ../www/advanced-mac.asp:141
+#: ../www/basic-ipv6.asp:305 ../www/status-overview.asp:341
+msgid "Tomato"
+msgstr "Tomato"
+
+#: ../www/advanced-ctnf.asp:176 ../www/advanced-dhcpdns.asp:127
+#: ../www/advanced-firewall.asp:98 ../www/advanced-mac.asp:142
+#: ../www/status-overview.asp:342
+msgid "Version"
+msgstr "Version"
+
+#: ../www/advanced-ctnf.asp:200
+msgid "Connections"
+msgstr "Connections"
+
+#: ../www/advanced-ctnf.asp:204
+msgid "Maximum Connections"
+msgstr "Maximum Connections"
+
+#: ../www/advanced-ctnf.asp:205
+msgid "count current"
+msgstr "count current"
+
+#: ../www/advanced-ctnf.asp:208
+msgid "Hash Table Size"
+msgstr "Hash Table Size"
+
+#: ../www/advanced-ctnf.asp:213
+msgid "Drop Idle"
+msgstr "Drop Idle"
+
+#: ../www/advanced-ctnf.asp:218
+msgid "TCP Timeout"
+msgstr "TCP Timeout"
+
+#: ../www/advanced-ctnf.asp:224
+msgid "None"
+msgstr "None"
+
+#: ../www/advanced-ctnf.asp:224
+msgid "Established"
+msgstr "Established"
+
+#: ../www/advanced-ctnf.asp:224
+msgid "SYN Sent"
+msgstr "SYN Sent"
+
+#: ../www/advanced-ctnf.asp:224
+msgid "SYN Received"
+msgstr "SYN Received"
+
+#: ../www/advanced-ctnf.asp:224
+msgid "FIN Wait"
+msgstr "FIN Wait"
+
+#: ../www/advanced-ctnf.asp:224
+msgid "Time Wait"
+msgstr "Time Wait"
+
+#: ../www/advanced-ctnf.asp:224
+msgid "Close"
+msgstr "Close"
+
+#: ../www/advanced-ctnf.asp:224
+msgid "Close Wait"
+msgstr "Close Wait"
+
+#: ../www/advanced-ctnf.asp:224
+msgid "Last ACK"
+msgstr "Last ACK"
+
+#: ../www/advanced-ctnf.asp:224
+msgid "Listen"
+msgstr "Listen"
+
+#: ../www/advanced-ctnf.asp:225 ../www/advanced-ctnf.asp:243
+#: ../www/advanced-ctnf.asp:257
+msgid "seconds"
+msgstr "seconds"
+
+#: ../www/advanced-ctnf.asp:236
+msgid "UDP Timeout"
+msgstr "UDP Timeout"
+
+#: ../www/advanced-ctnf.asp:244
+msgid "Unreplied"
+msgstr "Unreplied"
+
+#: ../www/advanced-ctnf.asp:245
+msgid "Assured"
+msgstr "Assured"
+
+#: ../www/advanced-ctnf.asp:250
+msgid "Other Timeouts"
+msgstr "Other Timeouts"
+
+#: ../www/advanced-ctnf.asp:258
+msgid "Generic"
+msgstr "Generic"
+
+#: ../www/advanced-ctnf.asp:259 ../www/advanced-firewall.asp:130
+msgid "ICMP"
+msgstr "ICMP"
+
+#: ../www/advanced-ctnf.asp:264
+msgid "Tracking"
+msgstr "Tracking"
+
+#: ../www/advanced-ctnf.asp:264
+msgid "NAT Helpers"
+msgstr "NAT Helpers"
+
+#: ../www/advanced-ctnf.asp:268
+msgid "FTP"
+msgstr "FTP"
+
+#: ../www/advanced-ctnf.asp:269
+msgid "GRE"
+msgstr "GRE"
+
+#: ../www/advanced-ctnf.asp:269 ../www/basic-network.asp:1603
+#: ../www/status-overview.asp:388
+msgid "PPTP"
+msgstr "PPTP"
+
+#: ../www/advanced-ctnf.asp:270
+msgid "H.323"
+msgstr "H.323"
+
+#: ../www/advanced-ctnf.asp:272
+msgid "SIP"
+msgstr "SIP"
+
+#: ../www/advanced-ctnf.asp:274
+msgid "RTSP"
+msgstr "RTSP"
+
+#: ../www/advanced-ctnf.asp:279 ../www/tomato.js:2391
+msgid "Miscellaneous"
+msgstr "Miscellaneous"
+
+#: ../www/advanced-ctnf.asp:286 ../www/advanced-dhcpdns.asp:161
+#: ../www/basic-time.asp:29 ../www/basic-time.asp:208
+msgid "Custom"
+msgstr "Custom"
+
+#: ../www/advanced-ctnf.asp:289
+msgid "TTL Adjust"
+msgstr "TTL Adjust"
+
+#: ../www/advanced-ctnf.asp:293
+msgid "Inbound Layer 7"
+msgstr "Inbound Layer 7"
+
+#: ../www/advanced-ctnf.asp:303 ../www/advanced-dhcpdns.asp:221
+#: ../www/advanced-firewall.asp:172 ../www/advanced-mac.asp:199
+#: ../www/basic-ident.asp:74 ../www/basic-ipv6.asp:373
+#: ../www/basic-network.asp:1791 ../www/basic-time.asp:292
+msgid "Save"
+msgstr "Save"
+
+#: ../www/advanced-ctnf.asp:304 ../www/advanced-dhcpdns.asp:222
+#: ../www/advanced-firewall.asp:173 ../www/advanced-mac.asp:200
+#: ../www/basic-ident.asp:75 ../www/basic-ipv6.asp:374
+#: ../www/basic-network.asp:1792 ../www/basic-time.asp:293
+msgid "Cancel"
+msgstr "Cancel"
+
+#: ../www/advanced-dhcpdns.asp:14 ../www/advanced-dhcpdns.asp:149
+#: ../www/advanced-dhcpdns.asp:190 ../www/basic-network.asp:1603
+#: ../www/status-overview.asp:388 ../www/status-overview.asp:474
+msgid "DHCP"
+msgstr "DHCP"
+
+#: ../www/advanced-dhcpdns.asp:14 ../www/advanced-dhcpdns.asp:149
+#: ../www/advanced-dhcpdns.asp:190 ../www/status-overview.asp:396
+#: ../www/status-overview.asp:473
+msgid "DNS"
+msgstr "DNS"
+
+#: ../www/advanced-dhcpdns.asp:149 ../www/advanced-dhcpdns.asp:190
+msgid "Server"
+msgstr "Server"
+
+#: ../www/advanced-dhcpdns.asp:153 ../www/advanced-dhcpdns.asp:192
+msgid "Use internal DNS"
+msgstr "Use internal DNS"
+
+#: ../www/advanced-dhcpdns.asp:154 ../www/advanced-dhcpdns.asp:193
+msgid "Use received DNS with user-entered DNS"
+msgstr "Use received DNS with user-entered DNS"
+
+#: ../www/advanced-dhcpdns.asp:155 ../www/advanced-dhcpdns.asp:194
+msgid "Prevent DNS-rebind attacks"
+msgstr "Prevent DNS-rebind attacks"
+
+#: ../www/advanced-dhcpdns.asp:156
+msgid "Intercept DNS port<br>(UDP 53)"
+msgstr "Intercept DNS port<br>(UDP 53)"
+
+#: ../www/advanced-dhcpdns.asp:157 ../www/advanced-dhcpdns.asp:196
+msgid "Use user-entered gateway if WAN is disabled"
+msgstr "Use user-entered gateway if WAN is disabled"
+
+#: ../www/advanced-dhcpdns.asp:158
+msgid "Ignore DHCP requests from unknown devices"
+msgstr "Ignore DHCP requests from unknown devices"
+
+#: ../www/advanced-dhcpdns.asp:159 ../www/advanced-dhcpdns.asp:198
+msgid "Maximum active DHCP leases"
+msgstr "Maximum active DHCP leases"
+
+#: ../www/advanced-dhcpdns.asp:160 ../www/advanced-dhcpdns.asp:199
+msgid "Static lease time"
+msgstr "Static lease time"
+
+#: ../www/advanced-dhcpdns.asp:161
+msgid "Same as normal lease time"
+msgstr "Same as normal lease time"
+
+#: ../www/advanced-dhcpdns.asp:161
+msgid "Infinite"
+msgstr "Infinite"
+
+#: ../www/advanced-dhcpdns.asp:163
+msgid "minutes"
+msgstr "minutes"
+
+#: ../www/advanced-dhcpdns.asp:165
+msgid "Announce IPv6 on LAN"
+msgstr "Announce IPv6 on LAN"
+
+#: ../www/advanced-dhcpdns.asp:166
+msgid "Mute dhcpv4 logging"
+msgstr "Mute dhcpv4 logging"
+
+#: ../www/advanced-dhcpdns.asp:167
+msgid "Mute dhcpv6 logging"
+msgstr "Mute dhcpv6 logging"
+
+#: ../www/advanced-dhcpdns.asp:168
+msgid "Mute RA logging"
+msgstr "Mute RA logging"
+
+#: ../www/advanced-dhcpdns.asp:169
+msgid "Dnsmasq"
+msgstr "Dnsmasq"
+
+#: ../www/advanced-dhcpdns.asp:169 ../www/advanced-dhcpdns.asp:200
+msgid "Custom configuration"
+msgstr "Custom configuration"
+
+#: ../www/advanced-dhcpdns.asp:175 ../www/advanced-dhcpdns.asp:203
+msgid "DHCP Client"
+msgstr "DHCP Client"
+
+#: ../www/advanced-dhcpdns.asp:179 ../www/advanced-dhcpdns.asp:205
+msgid "DHCPC Options"
+msgstr "DHCPC Options"
+
+#: ../www/advanced-dhcpdns.asp:180 ../www/advanced-dhcpdns.asp:206
+msgid "Reduce packet size"
+msgstr "Reduce packet size"
+
+#: ../www/advanced-dhcpdns.asp:187
+msgid "Notes"
+msgstr "Notes"
+
+#: ../www/advanced-dhcpdns.asp:187
+msgid "Click here to show"
+msgstr "Click here to show"
+
+#: ../www/advanced-dhcpdns.asp:192
+msgid "Allow dnsmasq to be your DNS server on LAN."
+msgstr "Allow dnsmasq to be your DNS server on LAN."
+
+#: ../www/advanced-dhcpdns.asp:193
+msgid ""
+"Add DNS servers received from your WAN connection to the static DNS server "
+"list"
+msgstr ""
+"Add DNS servers received from your WAN connection to the static DNS server "
+"list"
+
+#: ../www/advanced-dhcpdns.asp:193
+msgid "see"
+msgstr "see"
+
+#: ../www/advanced-dhcpdns.asp:193 ../www/tomato.js:2377
+msgid "Network"
+msgstr "Network"
+
+#: ../www/advanced-dhcpdns.asp:193
+msgid "configuration"
+msgstr "configuration"
+
+#: ../www/advanced-dhcpdns.asp:194
+msgid "Enable DNS rebinding protection on Dnsmasq."
+msgstr "Enable DNS rebinding protection on Dnsmasq."
+
+#: ../www/advanced-dhcpdns.asp:195
+msgid "Intercept DNS port"
+msgstr "Intercept DNS port"
+
+#: ../www/advanced-dhcpdns.asp:195
+msgid ""
+"Any DNS requests/packets sent out to UDP port 53 are redirected to the "
+"internal DNS server."
+msgstr ""
+"Any DNS requests/packets sent out to UDP port 53 are redirected to the "
+"internal DNS server."
+
+#: ../www/advanced-dhcpdns.asp:196
+msgid ""
+"DHCP will use the IP address of the router as the default gateway on each "
+"LAN."
+msgstr ""
+"DHCP will use the IP address of the router as the default gateway on each "
+"LAN."
+
+#: ../www/advanced-dhcpdns.asp:197
+msgid "Ignore DHCP requests"
+msgstr "Ignore DHCP requests"
+
+#: ../www/advanced-dhcpdns.asp:197
+msgid ""
+"Dnsmasq will ignore DHCP requests  to Only MAC addresses listed on the <a "
+"href='basic-static.asp'>Static DHCP/ARP</a> page won't be able to obtain an "
+"IP address through DHCP."
+msgstr ""
+"Dnsmasq will ignore DHCP requests  to Only MAC addresses listed on the <a "
+"href='basic-static.asp'>Static DHCP/ARP</a> page won't be able to obtain an "
+"IP address through DHCP."
+
+#: ../www/advanced-dhcpdns.asp:198 ../www/advanced-dhcpdns.asp:206
+msgid "Self-explanatory."
+msgstr "Self-explanatory."
+
+#: ../www/advanced-dhcpdns.asp:199
+msgid "Absolute maximum amount of time allowed for any DHCP lease to be valid."
+msgstr ""
+"Absolute maximum amount of time allowed for any DHCP lease to be valid."
+
+#: ../www/advanced-dhcpdns.asp:200
+msgid "Extra options to be added to the Dnsmasq configuration file."
+msgstr "Extra options to be added to the Dnsmasq configuration file."
+
+#: ../www/advanced-dhcpdns.asp:205
+msgid "Extra options for the DHCP client."
+msgstr "Extra options for the DHCP client."
+
+#: ../www/advanced-dhcpdns.asp:209
+msgid "Other relevant notes/hints"
+msgstr "Other relevant notes/hints"
+
+#: ../www/advanced-dhcpdns.asp:211
+msgid ""
+"The contents of file /etc/dnsmasq.custom are also added to the end of "
+"Dnsmasq's configuration file (if it exists)."
+msgstr ""
+"The contents of file /etc/dnsmasq.custom are also added to the end of "
+"Dnsmasq's configuration file (if it exists)."
+
+#: ../www/advanced-firewall.asp:18 ../www/advanced-firewall.asp:124
+#: ../www/tomato.js:2389
+msgid "Firewall"
+msgstr "Firewall"
+
+#: ../www/advanced-firewall.asp:53
+msgid "IGMPproxy must be enabled in least one LAN bridge"
+msgstr "IGMPproxy must be enabled in least one LAN bridge"
+
+#: ../www/advanced-firewall.asp:128
+msgid "Respond to ICMP ping"
+msgstr "Respond to ICMP ping"
+
+#: ../www/advanced-firewall.asp:129
+msgid "Limits per second"
+msgstr "Limits per second"
+
+#: ../www/advanced-firewall.asp:131
+msgid "Traceroute"
+msgstr "Traceroute"
+
+#: ../www/advanced-firewall.asp:133
+msgid "Enable SYN cookies"
+msgstr "Enable SYN cookies"
+
+#: ../www/advanced-firewall.asp:138
+msgid "NAT"
+msgstr "NAT"
+
+#: ../www/advanced-firewall.asp:142
+msgid "NAT loopback"
+msgstr "NAT loopback"
+
+#: ../www/advanced-firewall.asp:143
+msgid "NAT target"
+msgstr "NAT target"
+
+#: ../www/advanced-firewall.asp:143
+msgid "MASQUERADE"
+msgstr "MASQUERADE"
+
+#: ../www/advanced-firewall.asp:143
+msgid "SNAT"
+msgstr "SNAT"
+
+#: ../www/advanced-firewall.asp:148
+msgid "Multicast"
+msgstr "Multicast"
+
+#: ../www/advanced-firewall.asp:152
+msgid "Enable IGMPproxy"
+msgstr "Enable IGMPproxy"
+
+#: ../www/advanced-firewall.asp:153 ../www/status-overview.asp:413
+msgid "LAN"
+msgstr "LAN"
+
+#: ../www/advanced-firewall.asp:154
+msgid "LAN1"
+msgstr "LAN1"
+
+#: ../www/advanced-firewall.asp:155
+msgid "LAN2"
+msgstr "LAN2"
+
+#: ../www/advanced-firewall.asp:156
+msgid "LAN3"
+msgstr "LAN3"
+
+#: ../www/advanced-firewall.asp:158
+msgid "Enable Udpxy"
+msgstr "Enable Udpxy"
+
+#: ../www/advanced-firewall.asp:159
+msgid "Enable client statistics"
+msgstr "Enable client statistics"
+
+#: ../www/advanced-firewall.asp:160
+msgid "Max clients"
+msgstr "Max clients"
+
+#: ../www/advanced-firewall.asp:161
+msgid "Udpxy port"
+msgstr "Udpxy port"
+
+#: ../www/advanced-mac.asp:14 ../www/advanced-mac.asp:163
+#: ../www/basic-network.asp:1721 ../www/basic-network.asp:1774
+#: ../www/status-overview.asp:499 ../www/tomato.js:2390
+msgid "MAC Address"
+msgstr "MAC Address"
+
+#: ../www/advanced-mac.asp:108
+msgid "Addresses must be unique"
+msgstr "Addresses must be unique"
+
+#: ../www/advanced-mac.asp:120
+msgid ""
+"Warning: Changing the MAC address may require that you reboot all devices, "
+"computers or modem connected to this router. Continue anyway?"
+msgstr ""
+"Warning: Changing the MAC address may require that you reboot all devices, "
+"computers or modem connected to this router. Continue anyway?"
+
+#: ../www/advanced-mac.asp:168
+msgid "WAN Port"
+msgstr "WAN Port"
+
+#: ../www/advanced-mac.asp:169 ../www/advanced-mac.asp:177
+#: ../www/basic-ipv6.asp:340 ../www/basic-network.asp:1636
+#: ../www/basic-time.asp:30
+msgid "Default"
+msgstr "Default"
+
+#: ../www/advanced-mac.asp:169 ../www/advanced-mac.asp:177
+#: ../www/basic-network.asp:1745 ../www/basic-network.asp:1748
+msgid "Random"
+msgstr "Random"
+
+#: ../www/advanced-mac.asp:169 ../www/advanced-mac.asp:177
+msgid "Clone PC"
+msgstr "Clone PC"
+
+#: ../www/advanced-mac.asp:176
+msgid "Wireless Interface"
+msgstr "Wireless Interface"
+
+#: ../www/advanced-mac.asp:187
+msgid "Router's LAN MAC Address"
+msgstr "Router's LAN MAC Address"
+
+#: ../www/advanced-mac.asp:188
+msgid "Computer's MAC Address"
+msgstr "Computer's MAC Address"
 
 #: ../www/basic-ident.asp:14 ../www/tomato.js:2376 ../www/tomato.js:2401
 msgid "Basic"
@@ -46,20 +558,6 @@ msgstr "Hostname"
 #: ../www/basic-ident.asp:64
 msgid "Domain Name"
 msgstr "Domain Name"
-
-#: ../www/basic-ident.asp:74 ../www/basic-ipv6.asp:373
-#: ../www/basic-network.asp:1791 ../www/basic-time.asp:292
-msgid "Save"
-msgstr "Save"
-
-#: ../www/basic-ident.asp:75 ../www/basic-ipv6.asp:374
-#: ../www/basic-network.asp:1792 ../www/basic-time.asp:293
-msgid "Cancel"
-msgstr "Cancel"
-
-#: ../www/basic-ipv6.asp:305 ../www/status-overview.asp:341
-msgid "Tomato"
-msgstr "Tomato"
 
 #: ../www/basic-ipv6.asp:324
 msgid "IPv6 Configuration"
@@ -134,11 +632,6 @@ msgstr "Prefix Length"
 #: ../www/basic-ipv6.asp:339 ../www/status-overview.asp:470
 msgid "Router IPv6 Address"
 msgstr "Router IPv6 Address"
-
-#: ../www/basic-ipv6.asp:340 ../www/basic-network.asp:1636
-#: ../www/basic-time.asp:30
-msgid "Default"
-msgstr "Default"
 
 #: ../www/basic-ipv6.asp:340 ../www/basic-network.asp:1636
 msgid "Manual"
@@ -344,21 +837,12 @@ msgid "Type"
 msgstr "Type"
 
 #: ../www/basic-network.asp:1603 ../www/status-overview.asp:388
-#: ../www/status-overview.asp:474
-msgid "DHCP"
-msgstr "DHCP"
-
-#: ../www/basic-network.asp:1603 ../www/status-overview.asp:388
 msgid "PPPoE"
 msgstr "PPPoE"
 
 #: ../www/basic-network.asp:1603
 msgid "Static"
 msgstr "Static"
-
-#: ../www/basic-network.asp:1603 ../www/status-overview.asp:388
-msgid "PPTP"
-msgstr "PPTP"
 
 #: ../www/basic-network.asp:1603 ../www/status-overview.asp:388
 msgid "L2TP"
@@ -497,11 +981,6 @@ msgstr "Invert Ports Order"
 msgid "Enable Wireless"
 msgstr "Enable Wireless"
 
-#: ../www/basic-network.asp:1721 ../www/basic-network.asp:1774
-#: ../www/status-overview.asp:499 ../www/tomato.js:2390
-msgid "MAC Address"
-msgstr "MAC Address"
-
 #: ../www/basic-network.asp:1722 ../www/status-overview.asp:500
 msgid "Wireless Mode"
 msgstr "Wireless Mode"
@@ -619,10 +1098,6 @@ msgstr "TKIP / AES"
 msgid "Shared Key"
 msgstr "Shared Key"
 
-#: ../www/basic-network.asp:1745 ../www/basic-network.asp:1748
-msgid "Random"
-msgstr "Random"
-
 #: ../www/basic-network.asp:1750
 msgid "Group Key Renewal"
 msgstr "Group Key Renewal"
@@ -642,10 +1117,6 @@ msgstr "Generate"
 #: ../www/basic-network.asp:1764
 msgid "Key"
 msgstr "Key"
-
-#: ../www/basic-time.asp:29 ../www/basic-time.asp:208
-msgid "Custom"
-msgstr "Custom"
 
 #: ../www/basic-time.asp:31
 msgid "Africa"
@@ -1129,10 +1600,6 @@ msgstr "is now available"
 msgid "Click here to read more"
 msgstr "Click here to read more"
 
-#: ../www/status-overview.asp:342
-msgid "Version"
-msgstr "Version"
-
 #: ../www/status-overview.asp:354
 msgid "You did not configure <b>TomatoAnon project</b> setting."
 msgstr "You did not configure <b>TomatoAnon project</b> setting."
@@ -1218,10 +1685,6 @@ msgstr "Static IP"
 msgid "Previous WAN IP"
 msgstr "Previous WAN IP"
 
-#: ../www/status-overview.asp:396 ../www/status-overview.asp:473
-msgid "DNS"
-msgstr "DNS"
-
 #: ../www/status-overview.asp:399 ../www/tomato.js:2349
 msgid "Status"
 msgstr "Status"
@@ -1249,10 +1712,6 @@ msgstr "Connect"
 #: ../www/status-overview.asp:409
 msgid "Disconnect"
 msgstr "Disconnect"
-
-#: ../www/status-overview.asp:413
-msgid "LAN"
-msgstr "LAN"
 
 #: ../www/status-overview.asp:466
 msgid "Router MAC Address"
@@ -1374,10 +1833,6 @@ msgstr "Wireless Survey"
 msgid "WOL"
 msgstr "WOL"
 
-#: ../www/tomato.js:2377
-msgid "Network"
-msgstr "Network"
-
 #: ../www/tomato.js:2379
 msgid "IPv6"
 msgstr "IPv6"
@@ -1394,10 +1849,6 @@ msgstr "Static DHCP/ARP/IPT"
 msgid "Wireless Filter"
 msgstr "Wireless Filter"
 
-#: ../www/tomato.js:2386
-msgid "Advanced"
-msgstr "Advanced"
-
 #: ../www/tomato.js:2387
 msgid "Conntrack/Netfilter"
 msgstr "Conntrack/Netfilter"
@@ -1405,14 +1856,6 @@ msgstr "Conntrack/Netfilter"
 #: ../www/tomato.js:2388
 msgid "DHCP/DNS"
 msgstr "DHCP/DNS"
-
-#: ../www/tomato.js:2389
-msgid "Firewall"
-msgstr "Firewall"
-
-#: ../www/tomato.js:2391
-msgid "Miscellaneous"
-msgstr "Miscellaneous"
 
 #: ../www/tomato.js:2392
 msgid "Routing"
