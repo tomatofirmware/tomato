@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TomatoEgg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-03 23:34-0400\n"
-"PO-Revision-Date: 2013-09-03 23:54-0500\n"
+"POT-Creation-Date: 2013-09-04 00:14-0400\n"
+"PO-Revision-Date: 2013-09-04 00:14-0500\n"
 "Last-Translator: Zhiqiang <Wang.9264@gmail.com>\n"
 "Language-Team: TomatoEgg Translators <translate@tomatoegg.net>\n"
 "MIME-Version: 1.0\n"
@@ -43,13 +43,13 @@ msgstr "网络过滤"
 
 #: ../www/advanced-ctnf.asp:175 ../www/advanced-dhcpdns.asp:126
 #: ../www/advanced-firewall.asp:97 ../www/advanced-mac.asp:141
-#: ../www/basic-ipv6.asp:305 ../www/status-overview.asp:341
+#: ../www/basic-ipv6.asp:305 ../www/status-overview.asp:343
 msgid "Tomato"
 msgstr "Tomato"
 
 #: ../www/advanced-ctnf.asp:176 ../www/advanced-dhcpdns.asp:127
 #: ../www/advanced-firewall.asp:98 ../www/advanced-mac.asp:142
-#: ../www/status-overview.asp:342
+#: ../www/status-overview.asp:344
 msgid "Version"
 msgstr "版本"
 
@@ -163,7 +163,7 @@ msgid "GRE"
 msgstr "GRE"
 
 #: ../www/advanced-ctnf.asp:269 ../www/basic-network.asp:1603
-#: ../www/status-overview.asp:388
+#: ../www/status-overview.asp:396
 msgid "PPTP"
 msgstr "PPTP"
 
@@ -212,13 +212,13 @@ msgstr "取消"
 
 #: ../www/advanced-dhcpdns.asp:14 ../www/advanced-dhcpdns.asp:149
 #: ../www/advanced-dhcpdns.asp:190 ../www/basic-network.asp:1603
-#: ../www/status-overview.asp:388 ../www/status-overview.asp:474
+#: ../www/status-overview.asp:396 ../www/status-overview.asp:482
 msgid "DHCP"
 msgstr "自动获取"
 
 #: ../www/advanced-dhcpdns.asp:14 ../www/advanced-dhcpdns.asp:149
-#: ../www/advanced-dhcpdns.asp:190 ../www/status-overview.asp:396
-#: ../www/status-overview.asp:473
+#: ../www/advanced-dhcpdns.asp:190 ../www/status-overview.asp:404
+#: ../www/status-overview.asp:481
 msgid "DNS"
 msgstr "DNS"
 
@@ -448,7 +448,7 @@ msgstr "多播"
 msgid "Enable IGMPproxy"
 msgstr "启用IGMPproxy"
 
-#: ../www/advanced-firewall.asp:153 ../www/status-overview.asp:413
+#: ../www/advanced-firewall.asp:153 ../www/status-overview.asp:421
 msgid "LAN"
 msgstr "LAN"
 
@@ -482,7 +482,7 @@ msgstr "Udpxy端口"
 
 #: ../www/advanced-mac.asp:14 ../www/advanced-mac.asp:163
 #: ../www/basic-network.asp:1721 ../www/basic-network.asp:1774
-#: ../www/status-overview.asp:499 ../www/tomato.js:2390
+#: ../www/status-overview.asp:507 ../www/tomato.js:2390
 msgid "MAC Address"
 msgstr "MAC地址"
 
@@ -559,7 +559,7 @@ msgstr "IPv6服务类型"
 
 #: ../www/basic-ipv6.asp:331 ../www/basic-network.asp:95
 #: ../www/basic-network.asp:98 ../www/basic-network.asp:1609
-#: ../www/basic-network.asp:1740 ../www/status-overview.asp:503
+#: ../www/basic-network.asp:1740 ../www/status-overview.asp:511
 msgid "Disabled"
 msgstr "已禁用"
 
@@ -619,7 +619,7 @@ msgstr "一般为32"
 msgid "Prefix Length"
 msgstr "前缀长度"
 
-#: ../www/basic-ipv6.asp:339 ../www/status-overview.asp:470
+#: ../www/basic-ipv6.asp:339 ../www/status-overview.asp:478
 msgid "Router IPv6 Address"
 msgstr "路由器IPv6地址"
 
@@ -640,8 +640,8 @@ msgid "Tunnel Remote Endpoint"
 msgstr "隧道远程端口"
 
 #: ../www/basic-ipv6.asp:351 ../www/basic-ipv6.asp:352
-#: ../www/status-overview.asp:387 ../www/status-overview.asp:389
-#: ../www/status-overview.asp:394
+#: ../www/status-overview.asp:395 ../www/status-overview.asp:397
+#: ../www/status-overview.asp:402
 msgid "Address"
 msgstr "地址"
 
@@ -701,12 +701,12 @@ msgstr "(起/止)"
 msgid "Lease&nbsp;Time&nbsp;"
 msgstr "租约期限"
 
-#: ../www/basic-network.asp:60 ../www/status-overview.asp:372
+#: ../www/basic-network.asp:60 ../www/status-overview.asp:380
 msgid "mins"
 msgstr "分钟"
 
 #: ../www/basic-network.asp:95 ../www/basic-network.asp:98
-#: ../www/status-overview.asp:503
+#: ../www/status-overview.asp:511
 msgid "Enabled"
 msgstr "已启用"
 
@@ -818,7 +818,7 @@ msgstr "br0必须定义并且有一个有效的IP地址."
 msgid "Type"
 msgstr "类型"
 
-#: ../www/basic-network.asp:1603 ../www/status-overview.asp:388
+#: ../www/basic-network.asp:1603 ../www/status-overview.asp:396
 msgid "PPPoE"
 msgstr "PPPoE"
 
@@ -826,11 +826,11 @@ msgstr "PPPoE"
 msgid "Static"
 msgstr "静态"
 
-#: ../www/basic-network.asp:1603 ../www/status-overview.asp:388
+#: ../www/basic-network.asp:1603 ../www/status-overview.asp:396
 msgid "L2TP"
 msgstr "L2TP"
 
-#: ../www/basic-network.asp:1606 ../www/status-overview.asp:388
+#: ../www/basic-network.asp:1606 ../www/status-overview.asp:396
 msgid "3G Modem"
 msgstr "3G上网卡"
 
@@ -870,12 +870,12 @@ msgstr "L2TP服务器"
 msgid "Use DHCP"
 msgstr "使用DHCP"
 
-#: ../www/basic-network.asp:1621 ../www/status-overview.asp:391
+#: ../www/basic-network.asp:1621 ../www/status-overview.asp:399
 msgid "Subnet Mask"
 msgstr "子网掩码"
 
-#: ../www/basic-network.asp:1622 ../www/status-overview.asp:392
-#: ../www/status-overview.asp:468
+#: ../www/basic-network.asp:1622 ../www/status-overview.asp:400
+#: ../www/status-overview.asp:476
 msgid "Gateway"
 msgstr "网关"
 
@@ -907,7 +907,7 @@ msgstr "LCP Echo间隔"
 msgid "LCP Echo Link fail limit"
 msgstr "LCP Echo 连接失败限制"
 
-#: ../www/basic-network.asp:1635 ../www/status-overview.asp:397
+#: ../www/basic-network.asp:1635 ../www/status-overview.asp:405
 msgid "MTU"
 msgstr "MTU"
 
@@ -963,7 +963,7 @@ msgstr "反转端口顺序"
 msgid "Enable Wireless"
 msgstr "启用无线"
 
-#: ../www/basic-network.asp:1722 ../www/status-overview.asp:500
+#: ../www/basic-network.asp:1722 ../www/status-overview.asp:508
 msgid "Wireless Mode"
 msgstr "无线模式"
 
@@ -988,19 +988,19 @@ msgstr "无线转接桥"
 msgid "Radio Band"
 msgstr "无线频段"
 
-#: ../www/basic-network.asp:1727 ../www/status-overview.asp:501
+#: ../www/basic-network.asp:1727 ../www/status-overview.asp:509
 msgid "Wireless Network Mode"
 msgstr "无线网络模式"
 
-#: ../www/basic-network.asp:1730 ../www/status-overview.asp:507
+#: ../www/basic-network.asp:1730 ../www/status-overview.asp:515
 msgid "SSID"
 msgstr "SSID"
 
-#: ../www/basic-network.asp:1731 ../www/status-overview.asp:508
+#: ../www/basic-network.asp:1731 ../www/status-overview.asp:516
 msgid "Broadcast"
 msgstr "广播"
 
-#: ../www/basic-network.asp:1732 ../www/status-overview.asp:510
+#: ../www/basic-network.asp:1732 ../www/status-overview.asp:518
 msgid "Channel"
 msgstr "频道"
 
@@ -1008,7 +1008,7 @@ msgstr "频道"
 msgid "Scan"
 msgstr "扫描"
 
-#: ../www/basic-network.asp:1734 ../www/status-overview.asp:511
+#: ../www/basic-network.asp:1734 ../www/status-overview.asp:519
 msgid "Channel Width"
 msgstr "频道带宽"
 
@@ -1024,7 +1024,7 @@ msgstr "低"
 msgid "Upper"
 msgstr "高"
 
-#: ../www/basic-network.asp:1739 ../www/status-overview.asp:509
+#: ../www/basic-network.asp:1739 ../www/status-overview.asp:517
 msgid "Security"
 msgstr "安全"
 
@@ -1564,7 +1564,8 @@ msgstr "WPA2 个人版 (PSK)"
 msgid "Ethernet Ports State"
 msgstr "有线端口状态"
 
-#: ../www/status-overview.asp:226 ../www/status-overview.asp:353
+#: ../www/status-overview.asp:226 ../www/status-overview.asp:355
+#: ../www/status-overview.asp:361
 msgid "Attention"
 msgstr "注意"
 
@@ -1580,164 +1581,172 @@ msgstr "已经发布了"
 msgid "Click here to read more"
 msgstr "点击这里获取更多信息"
 
-#: ../www/status-overview.asp:354
+#: ../www/status-overview.asp:356
 msgid "You did not configure <b>TomatoAnon project</b> setting."
 msgstr "您还没有对<b>TomatoAnon 项目</b> 进行设置。"
 
-#: ../www/status-overview.asp:355
+#: ../www/status-overview.asp:357 ../www/status-overview.asp:363
 msgid "Please go to"
 msgstr "请进入"
 
-#: ../www/status-overview.asp:355
+#: ../www/status-overview.asp:357
 msgid "TomatoAnon configuration page"
 msgstr "TomatoAnon 配置页面"
 
-#: ../www/status-overview.asp:355
+#: ../www/status-overview.asp:357 ../www/status-overview.asp:363
 msgid "and make a choice."
 msgstr "进行配置。"
 
-#: ../www/status-overview.asp:359 ../www/tomato.js:2372
+#: ../www/status-overview.asp:362
+msgid "You did not configure language setting."
+msgstr "您还没有配置默认语言"
+
+#: ../www/status-overview.asp:363 ../www/tomato.js:2464
+msgid "Administration"
+msgstr "管理设定"
+
+#: ../www/status-overview.asp:367 ../www/tomato.js:2372
 msgid "System"
 msgstr "系统"
 
-#: ../www/status-overview.asp:359 ../www/status-overview.asp:383
-#: ../www/status-overview.asp:413
+#: ../www/status-overview.asp:367 ../www/status-overview.asp:391
+#: ../www/status-overview.asp:421
 msgid "hide"
 msgstr "隐藏"
 
-#: ../www/status-overview.asp:364
+#: ../www/status-overview.asp:372
 msgid "Name"
 msgstr "固件名称"
 
-#: ../www/status-overview.asp:365
+#: ../www/status-overview.asp:373
 msgid "Model"
 msgstr "型号"
 
-#: ../www/status-overview.asp:366
+#: ../www/status-overview.asp:374
 msgid "Chipset"
 msgstr "芯片"
 
-#: ../www/status-overview.asp:367
+#: ../www/status-overview.asp:375
 msgid "CPU Freq"
 msgstr "CPU频率"
 
-#: ../www/status-overview.asp:368
+#: ../www/status-overview.asp:376
 msgid "Flash Size"
 msgstr "闪存尺寸"
 
-#: ../www/status-overview.asp:370 ../www/tomato.js:2382
+#: ../www/status-overview.asp:378 ../www/tomato.js:2382
 msgid "Time"
 msgstr "时间"
 
-#: ../www/status-overview.asp:371
+#: ../www/status-overview.asp:379
 msgid "Uptime"
 msgstr "运行时长"
 
-#: ../www/status-overview.asp:372
+#: ../www/status-overview.asp:380
 msgid "CPU Load"
 msgstr "CPU负载"
 
-#: ../www/status-overview.asp:373
+#: ../www/status-overview.asp:381
 msgid "Total / Free Memory"
 msgstr "总/空闲内存"
 
-#: ../www/status-overview.asp:374
+#: ../www/status-overview.asp:382
 msgid "Total / Free Swap"
 msgstr "总/空闲交换空间"
 
-#: ../www/status-overview.asp:375
+#: ../www/status-overview.asp:383
 msgid "Total / Free NVRAM"
 msgstr "总/空闲闪存"
 
-#: ../www/status-overview.asp:383
+#: ../www/status-overview.asp:391
 msgid "WAN"
 msgstr "WAN"
 
-#: ../www/status-overview.asp:388
+#: ../www/status-overview.asp:396
 msgid "Connection Type"
 msgstr "连接类型"
 
-#: ../www/status-overview.asp:388
+#: ../www/status-overview.asp:396
 msgid "Static IP"
 msgstr "静态IP"
 
-#: ../www/status-overview.asp:390
+#: ../www/status-overview.asp:398
 msgid "Previous WAN IP"
 msgstr "上次WAN IP"
 
-#: ../www/status-overview.asp:399 ../www/tomato.js:2349
+#: ../www/status-overview.asp:407 ../www/tomato.js:2349
 msgid "Status"
 msgstr "状态"
 
-#: ../www/status-overview.asp:400
+#: ../www/status-overview.asp:408
 msgid "Connection Uptime"
 msgstr "连接时长"
 
-#: ../www/status-overview.asp:401
+#: ../www/status-overview.asp:409
 msgid "Remaining Lease Time"
 msgstr "离下次分配时长"
 
-#: ../www/status-overview.asp:405
+#: ../www/status-overview.asp:413
 msgid "Renew"
 msgstr "更新"
 
-#: ../www/status-overview.asp:406
+#: ../www/status-overview.asp:414
 msgid "Release"
 msgstr "释放"
 
-#: ../www/status-overview.asp:408
+#: ../www/status-overview.asp:416
 msgid "Connect"
 msgstr "连接"
 
-#: ../www/status-overview.asp:409
+#: ../www/status-overview.asp:417
 msgid "Disconnect"
 msgstr "断开"
 
-#: ../www/status-overview.asp:466
+#: ../www/status-overview.asp:474
 msgid "Router MAC Address"
 msgstr "路由器MAC地址"
 
-#: ../www/status-overview.asp:467
+#: ../www/status-overview.asp:475
 msgid "Router IP Addresses"
 msgstr "路由器IP地址"
 
-#: ../www/status-overview.asp:471
+#: ../www/status-overview.asp:479
 msgid "IPv6 Link-local Address"
 msgstr "IPv6本地链路地址"
 
-#: ../www/status-overview.asp:502
+#: ../www/status-overview.asp:510
 msgid "Interface Status"
 msgstr "接口状态"
 
-#: ../www/status-overview.asp:503
+#: ../www/status-overview.asp:511
 msgid "Radio"
 msgstr "无线信号"
 
-#: ../www/status-overview.asp:512
+#: ../www/status-overview.asp:520
 msgid "Interference Level"
 msgstr "干扰水平"
 
-#: ../www/status-overview.asp:513
+#: ../www/status-overview.asp:521
 msgid "Rate"
 msgstr "速率"
 
-#: ../www/status-overview.asp:514
+#: ../www/status-overview.asp:522
 msgid "RSSI"
 msgstr "RSSI"
 
-#: ../www/status-overview.asp:515
+#: ../www/status-overview.asp:523
 msgid "Noise"
 msgstr "噪声"
 
-#: ../www/status-overview.asp:516
+#: ../www/status-overview.asp:524
 msgid "Signal Quality"
 msgstr "信号质量"
 
-#: ../www/status-overview.asp:519
+#: ../www/status-overview.asp:527
 msgid "Enable"
 msgstr "启用"
 
-#: ../www/status-overview.asp:520
+#: ../www/status-overview.asp:528
 msgid "Disable"
 msgstr "禁用"
 
@@ -1960,10 +1969,6 @@ msgstr "PPTP在线列表"
 #: ../www/tomato.js:2459
 msgid "PPTP Client"
 msgstr "PPTP客户端"
-
-#: ../www/tomato.js:2464
-msgid "Administration"
-msgstr "管理设定"
 
 #: ../www/tomato.js:2465
 msgid "Admin Access"

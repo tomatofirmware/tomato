@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TomatoEgg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-03 23:34-0400\n"
-"PO-Revision-Date: 2013-09-03 23:35-0500\n"
+"POT-Creation-Date: 2013-09-04 00:14-0400\n"
+"PO-Revision-Date: 2013-09-04 00:14-0500\n"
 "Last-Translator: Zhiqiang <Wang.9264@gmail.com>\n"
 "Language-Team: TomatoEgg Translators <translate@tomatoegg.net>\n"
 "MIME-Version: 1.0\n"
@@ -43,13 +43,13 @@ msgstr "Netfilter"
 
 #: ../www/advanced-ctnf.asp:175 ../www/advanced-dhcpdns.asp:126
 #: ../www/advanced-firewall.asp:97 ../www/advanced-mac.asp:141
-#: ../www/basic-ipv6.asp:305 ../www/status-overview.asp:341
+#: ../www/basic-ipv6.asp:305 ../www/status-overview.asp:343
 msgid "Tomato"
 msgstr "Tomato"
 
 #: ../www/advanced-ctnf.asp:176 ../www/advanced-dhcpdns.asp:127
 #: ../www/advanced-firewall.asp:98 ../www/advanced-mac.asp:142
-#: ../www/status-overview.asp:342
+#: ../www/status-overview.asp:344
 msgid "Version"
 msgstr "Version"
 
@@ -163,7 +163,7 @@ msgid "GRE"
 msgstr "GRE"
 
 #: ../www/advanced-ctnf.asp:269 ../www/basic-network.asp:1603
-#: ../www/status-overview.asp:388
+#: ../www/status-overview.asp:396
 msgid "PPTP"
 msgstr "PPTP"
 
@@ -212,13 +212,13 @@ msgstr "Cancel"
 
 #: ../www/advanced-dhcpdns.asp:14 ../www/advanced-dhcpdns.asp:149
 #: ../www/advanced-dhcpdns.asp:190 ../www/basic-network.asp:1603
-#: ../www/status-overview.asp:388 ../www/status-overview.asp:474
+#: ../www/status-overview.asp:396 ../www/status-overview.asp:482
 msgid "DHCP"
 msgstr "DHCP"
 
 #: ../www/advanced-dhcpdns.asp:14 ../www/advanced-dhcpdns.asp:149
-#: ../www/advanced-dhcpdns.asp:190 ../www/status-overview.asp:396
-#: ../www/status-overview.asp:473
+#: ../www/advanced-dhcpdns.asp:190 ../www/status-overview.asp:404
+#: ../www/status-overview.asp:481
 msgid "DNS"
 msgstr "DNS"
 
@@ -458,7 +458,7 @@ msgstr "Multicast"
 msgid "Enable IGMPproxy"
 msgstr "Enable IGMPproxy"
 
-#: ../www/advanced-firewall.asp:153 ../www/status-overview.asp:413
+#: ../www/advanced-firewall.asp:153 ../www/status-overview.asp:421
 msgid "LAN"
 msgstr "LAN"
 
@@ -492,7 +492,7 @@ msgstr "Udpxy port"
 
 #: ../www/advanced-mac.asp:14 ../www/advanced-mac.asp:163
 #: ../www/basic-network.asp:1721 ../www/basic-network.asp:1774
-#: ../www/status-overview.asp:499 ../www/tomato.js:2390
+#: ../www/status-overview.asp:507 ../www/tomato.js:2390
 msgid "MAC Address"
 msgstr "MAC Address"
 
@@ -569,7 +569,7 @@ msgstr "IPv6 Service Type"
 
 #: ../www/basic-ipv6.asp:331 ../www/basic-network.asp:95
 #: ../www/basic-network.asp:98 ../www/basic-network.asp:1609
-#: ../www/basic-network.asp:1740 ../www/status-overview.asp:503
+#: ../www/basic-network.asp:1740 ../www/status-overview.asp:511
 msgid "Disabled"
 msgstr "Disabled"
 
@@ -629,7 +629,7 @@ msgstr "Usually 32"
 msgid "Prefix Length"
 msgstr "Prefix Length"
 
-#: ../www/basic-ipv6.asp:339 ../www/status-overview.asp:470
+#: ../www/basic-ipv6.asp:339 ../www/status-overview.asp:478
 msgid "Router IPv6 Address"
 msgstr "Router IPv6 Address"
 
@@ -650,8 +650,8 @@ msgid "Tunnel Remote Endpoint"
 msgstr "Tunnel Remote Endpoint"
 
 #: ../www/basic-ipv6.asp:351 ../www/basic-ipv6.asp:352
-#: ../www/status-overview.asp:387 ../www/status-overview.asp:389
-#: ../www/status-overview.asp:394
+#: ../www/status-overview.asp:395 ../www/status-overview.asp:397
+#: ../www/status-overview.asp:402
 msgid "Address"
 msgstr "Address"
 
@@ -711,12 +711,12 @@ msgstr "(first/last)"
 msgid "Lease&nbsp;Time&nbsp;"
 msgstr "Lease&nbsp;Time&nbsp;"
 
-#: ../www/basic-network.asp:60 ../www/status-overview.asp:372
+#: ../www/basic-network.asp:60 ../www/status-overview.asp:380
 msgid "mins"
 msgstr "mins"
 
 #: ../www/basic-network.asp:95 ../www/basic-network.asp:98
-#: ../www/status-overview.asp:503
+#: ../www/status-overview.asp:511
 msgid "Enabled"
 msgstr "Enabled"
 
@@ -836,7 +836,7 @@ msgstr "Bridge br0 must be always defined and have a valid IP address set."
 msgid "Type"
 msgstr "Type"
 
-#: ../www/basic-network.asp:1603 ../www/status-overview.asp:388
+#: ../www/basic-network.asp:1603 ../www/status-overview.asp:396
 msgid "PPPoE"
 msgstr "PPPoE"
 
@@ -844,11 +844,11 @@ msgstr "PPPoE"
 msgid "Static"
 msgstr "Static"
 
-#: ../www/basic-network.asp:1603 ../www/status-overview.asp:388
+#: ../www/basic-network.asp:1603 ../www/status-overview.asp:396
 msgid "L2TP"
 msgstr "L2TP"
 
-#: ../www/basic-network.asp:1606 ../www/status-overview.asp:388
+#: ../www/basic-network.asp:1606 ../www/status-overview.asp:396
 msgid "3G Modem"
 msgstr "3G Modem"
 
@@ -888,12 +888,12 @@ msgstr "L2TP Server"
 msgid "Use DHCP"
 msgstr "Use DHCP"
 
-#: ../www/basic-network.asp:1621 ../www/status-overview.asp:391
+#: ../www/basic-network.asp:1621 ../www/status-overview.asp:399
 msgid "Subnet Mask"
 msgstr "Subnet Mask"
 
-#: ../www/basic-network.asp:1622 ../www/status-overview.asp:392
-#: ../www/status-overview.asp:468
+#: ../www/basic-network.asp:1622 ../www/status-overview.asp:400
+#: ../www/status-overview.asp:476
 msgid "Gateway"
 msgstr "Gateway"
 
@@ -925,7 +925,7 @@ msgstr "LCP Echo Interval"
 msgid "LCP Echo Link fail limit"
 msgstr "LCP Echo Link fail limit"
 
-#: ../www/basic-network.asp:1635 ../www/status-overview.asp:397
+#: ../www/basic-network.asp:1635 ../www/status-overview.asp:405
 msgid "MTU"
 msgstr "MTU"
 
@@ -981,7 +981,7 @@ msgstr "Invert Ports Order"
 msgid "Enable Wireless"
 msgstr "Enable Wireless"
 
-#: ../www/basic-network.asp:1722 ../www/status-overview.asp:500
+#: ../www/basic-network.asp:1722 ../www/status-overview.asp:508
 msgid "Wireless Mode"
 msgstr "Wireless Mode"
 
@@ -1006,19 +1006,19 @@ msgstr "Wireless Ethernet Bridge"
 msgid "Radio Band"
 msgstr "Radio Band"
 
-#: ../www/basic-network.asp:1727 ../www/status-overview.asp:501
+#: ../www/basic-network.asp:1727 ../www/status-overview.asp:509
 msgid "Wireless Network Mode"
 msgstr "Wireless Network Mode"
 
-#: ../www/basic-network.asp:1730 ../www/status-overview.asp:507
+#: ../www/basic-network.asp:1730 ../www/status-overview.asp:515
 msgid "SSID"
 msgstr "SSID"
 
-#: ../www/basic-network.asp:1731 ../www/status-overview.asp:508
+#: ../www/basic-network.asp:1731 ../www/status-overview.asp:516
 msgid "Broadcast"
 msgstr "Broadcast"
 
-#: ../www/basic-network.asp:1732 ../www/status-overview.asp:510
+#: ../www/basic-network.asp:1732 ../www/status-overview.asp:518
 msgid "Channel"
 msgstr "Channel"
 
@@ -1026,7 +1026,7 @@ msgstr "Channel"
 msgid "Scan"
 msgstr "Scan"
 
-#: ../www/basic-network.asp:1734 ../www/status-overview.asp:511
+#: ../www/basic-network.asp:1734 ../www/status-overview.asp:519
 msgid "Channel Width"
 msgstr "Channel Width"
 
@@ -1042,7 +1042,7 @@ msgstr "Lower"
 msgid "Upper"
 msgstr "Upper"
 
-#: ../www/basic-network.asp:1739 ../www/status-overview.asp:509
+#: ../www/basic-network.asp:1739 ../www/status-overview.asp:517
 msgid "Security"
 msgstr "Security"
 
@@ -1584,7 +1584,8 @@ msgstr "WPA2 Personal (PSK)"
 msgid "Ethernet Ports State"
 msgstr "Ethernet Ports State"
 
-#: ../www/status-overview.asp:226 ../www/status-overview.asp:353
+#: ../www/status-overview.asp:226 ../www/status-overview.asp:355
+#: ../www/status-overview.asp:361
 msgid "Attention"
 msgstr "Attention"
 
@@ -1600,164 +1601,172 @@ msgstr "is now available"
 msgid "Click here to read more"
 msgstr "Click here to read more"
 
-#: ../www/status-overview.asp:354
+#: ../www/status-overview.asp:356
 msgid "You did not configure <b>TomatoAnon project</b> setting."
 msgstr "You did not configure <b>TomatoAnon project</b> setting."
 
-#: ../www/status-overview.asp:355
+#: ../www/status-overview.asp:357 ../www/status-overview.asp:363
 msgid "Please go to"
 msgstr "Please go to"
 
-#: ../www/status-overview.asp:355
+#: ../www/status-overview.asp:357
 msgid "TomatoAnon configuration page"
 msgstr "TomatoAnon configuration page"
 
-#: ../www/status-overview.asp:355
+#: ../www/status-overview.asp:357 ../www/status-overview.asp:363
 msgid "and make a choice."
 msgstr "and make a choice."
 
-#: ../www/status-overview.asp:359 ../www/tomato.js:2372
+#: ../www/status-overview.asp:362
+msgid "You did not configure language setting."
+msgstr "You did not configure language setting."
+
+#: ../www/status-overview.asp:363 ../www/tomato.js:2464
+msgid "Administration"
+msgstr "Administration"
+
+#: ../www/status-overview.asp:367 ../www/tomato.js:2372
 msgid "System"
 msgstr "System"
 
-#: ../www/status-overview.asp:359 ../www/status-overview.asp:383
-#: ../www/status-overview.asp:413
+#: ../www/status-overview.asp:367 ../www/status-overview.asp:391
+#: ../www/status-overview.asp:421
 msgid "hide"
 msgstr "hide"
 
-#: ../www/status-overview.asp:364
+#: ../www/status-overview.asp:372
 msgid "Name"
 msgstr "Name"
 
-#: ../www/status-overview.asp:365
+#: ../www/status-overview.asp:373
 msgid "Model"
 msgstr "Model"
 
-#: ../www/status-overview.asp:366
+#: ../www/status-overview.asp:374
 msgid "Chipset"
 msgstr "Chipset"
 
-#: ../www/status-overview.asp:367
+#: ../www/status-overview.asp:375
 msgid "CPU Freq"
 msgstr "CPU Freq"
 
-#: ../www/status-overview.asp:368
+#: ../www/status-overview.asp:376
 msgid "Flash Size"
 msgstr "Flash Size"
 
-#: ../www/status-overview.asp:370 ../www/tomato.js:2382
+#: ../www/status-overview.asp:378 ../www/tomato.js:2382
 msgid "Time"
 msgstr "Time"
 
-#: ../www/status-overview.asp:371
+#: ../www/status-overview.asp:379
 msgid "Uptime"
 msgstr "Uptime"
 
-#: ../www/status-overview.asp:372
+#: ../www/status-overview.asp:380
 msgid "CPU Load"
 msgstr "CPU Load"
 
-#: ../www/status-overview.asp:373
+#: ../www/status-overview.asp:381
 msgid "Total / Free Memory"
 msgstr "Total / Free Memory"
 
-#: ../www/status-overview.asp:374
+#: ../www/status-overview.asp:382
 msgid "Total / Free Swap"
 msgstr "Total / Free Swap"
 
-#: ../www/status-overview.asp:375
+#: ../www/status-overview.asp:383
 msgid "Total / Free NVRAM"
 msgstr "Total / Free NVRAM"
 
-#: ../www/status-overview.asp:383
+#: ../www/status-overview.asp:391
 msgid "WAN"
 msgstr "WAN"
 
-#: ../www/status-overview.asp:388
+#: ../www/status-overview.asp:396
 msgid "Connection Type"
 msgstr "Connection Type"
 
-#: ../www/status-overview.asp:388
+#: ../www/status-overview.asp:396
 msgid "Static IP"
 msgstr "Static IP"
 
-#: ../www/status-overview.asp:390
+#: ../www/status-overview.asp:398
 msgid "Previous WAN IP"
 msgstr "Previous WAN IP"
 
-#: ../www/status-overview.asp:399 ../www/tomato.js:2349
+#: ../www/status-overview.asp:407 ../www/tomato.js:2349
 msgid "Status"
 msgstr "Status"
 
-#: ../www/status-overview.asp:400
+#: ../www/status-overview.asp:408
 msgid "Connection Uptime"
 msgstr "Connection Uptime"
 
-#: ../www/status-overview.asp:401
+#: ../www/status-overview.asp:409
 msgid "Remaining Lease Time"
 msgstr "Remaining Lease Time"
 
-#: ../www/status-overview.asp:405
+#: ../www/status-overview.asp:413
 msgid "Renew"
 msgstr "Renew"
 
-#: ../www/status-overview.asp:406
+#: ../www/status-overview.asp:414
 msgid "Release"
 msgstr "Release"
 
-#: ../www/status-overview.asp:408
+#: ../www/status-overview.asp:416
 msgid "Connect"
 msgstr "Connect"
 
-#: ../www/status-overview.asp:409
+#: ../www/status-overview.asp:417
 msgid "Disconnect"
 msgstr "Disconnect"
 
-#: ../www/status-overview.asp:466
+#: ../www/status-overview.asp:474
 msgid "Router MAC Address"
 msgstr "Router MAC Address"
 
-#: ../www/status-overview.asp:467
+#: ../www/status-overview.asp:475
 msgid "Router IP Addresses"
 msgstr "Router IP Addresses"
 
-#: ../www/status-overview.asp:471
+#: ../www/status-overview.asp:479
 msgid "IPv6 Link-local Address"
 msgstr "IPv6 Link-local Address"
 
-#: ../www/status-overview.asp:502
+#: ../www/status-overview.asp:510
 msgid "Interface Status"
 msgstr "Interface Status"
 
-#: ../www/status-overview.asp:503
+#: ../www/status-overview.asp:511
 msgid "Radio"
 msgstr "Radio"
 
-#: ../www/status-overview.asp:512
+#: ../www/status-overview.asp:520
 msgid "Interference Level"
 msgstr "Interference Level"
 
-#: ../www/status-overview.asp:513
+#: ../www/status-overview.asp:521
 msgid "Rate"
 msgstr "Rate"
 
-#: ../www/status-overview.asp:514
+#: ../www/status-overview.asp:522
 msgid "RSSI"
 msgstr "RSSI"
 
-#: ../www/status-overview.asp:515
+#: ../www/status-overview.asp:523
 msgid "Noise"
 msgstr "Noise"
 
-#: ../www/status-overview.asp:516
+#: ../www/status-overview.asp:524
 msgid "Signal Quality"
 msgstr "Signal Quality"
 
-#: ../www/status-overview.asp:519
+#: ../www/status-overview.asp:527
 msgid "Enable"
 msgstr "Enable"
 
-#: ../www/status-overview.asp:520
+#: ../www/status-overview.asp:528
 msgid "Disable"
 msgstr "Disable"
 
@@ -1980,10 +1989,6 @@ msgstr "PPTP Online"
 #: ../www/tomato.js:2459
 msgid "PPTP Client"
 msgstr "PPTP Client"
-
-#: ../www/tomato.js:2464
-msgid "Administration"
-msgstr "Administration"
 
 #: ../www/tomato.js:2465
 msgid "Admin Access"
