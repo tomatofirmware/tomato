@@ -1603,7 +1603,7 @@ createFieldTable('', [
 	{ title: '<% _("Type"); %>', name: 'wan_proto', type: 'select', options: [['dhcp','<% _("DHCP"); %>'],['pppoe','<% _("PPPoE"); %>'],['static','<% _("Static"); %>'],['pptp','<% _("PPTP"); %>'],['l2tp','<% _("L2TP"); %>'],
 /* LINUX26-BEGIN */
 /* USB-BEGIN */
-		['ppp3g','<% _("3G Modem");'],
+		['ppp3g','<% _("3G Modem"); %>'],
 /* USB-END */
 /* LINUX26-END */
 		['disabled','<% _("Disabled"); %>']],
