@@ -183,7 +183,9 @@ void ipt_qos(void)
 		else {
 			saddr[0] = 0;
 		}
-
+		//by tomatoegg 
+		//temporary disable ipv6 qos to avoide kernel panic which enable ipv6 qos
+                v4v6_ok &= ~IPT_V6;
 
 		// -m connbytes --connbytes x:y --connbytes-dir both --connbytes-mode bytes
 		if (*bcount) {
@@ -316,7 +318,7 @@ void ipt_qos(void)
 #ifdef TCONFIG_IPV6
 			if (*wan6face)
 			{
-				ip6t_write("-A PREROUTING -i %s -j CONNMARK --restore-mark --mask 0xff\n", wan6face);
+				//removed by tomatoegg  ip6t_write("-A PREROUTING -i %s -j CONNMARK --restore-mark --mask 0xff\n", wan6face);
 
 				if (nvram_get_int("qos_udp")) {
 						ip6t_write("-A PREROUTING -i %s -p tcp -j IMQ --todev %s\n", wan6face, qosImqDeviceNumberString);	// pass only tcp
