@@ -6,6 +6,7 @@ all:
 
 src-rt-6.x:
 	make -C release/src-rt-6.x w1800rz V1=$(V1) V2=$(V2)
+	make -C release/src-rt-6.x z MIPS32=r2 NVRAM_64K=y NAND=y AC66U=1 NO_JFFS=y V1=$(V1) V2=$(V2)
 src-rt:
 	make -C release/src-rt n64b V1=$(V1) V2=$(V2)
 	make -C release/src-rt n60b V1=$(V1) V2=$(V2)
