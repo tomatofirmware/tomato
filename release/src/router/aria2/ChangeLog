@@ -1,0 +1,1037 @@
+commit dc8ed34cb014a0bdf22168fc73563086c8d8d1f2
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-26
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-26
+
+    Update pre compiled build README
+
+commit 3616b75e8ab869d76bf70564aa34cb5b44a9d038
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-26
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-26
+
+    Fix redeclaration warning on opensolaris
+
+commit 91e0fdbc248b8bac3a32a36a01eaa0c183f5b33c
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-26
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-26
+
+    Remove clean-local not to remove generated man pages with `make clean`
+    
+    Because we don't require sphinx-doc to build distributed archive, the
+    man pages are generated when making distribution. And We want to keep
+    the generated man pages with `make clean` there.
+
+commit ce9eec5cb2a4f6206e0c8900078e187715a3ff06
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-25
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-25
+
+    Include winsock2.h before windows.h
+
+commit e760b3bd6e50b4e227cee3b0a895c66462e5be1e
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-25
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-25
+
+    Fix compiler warning with openssl
+
+commit 84769bce57b3aa87ad23bbec80ce08712c1bba30
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-25
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-25
+
+    Fix compile error without message digest support
+
+commit bc3b162569e9300c3dc7b4aa942abc17ac7216b6
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-23
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-23
+
+    Remove open_ member from BufferedFile and GZipFile
+    
+    Just checking fp_ is sufficient.
+
+commit b0799b6e4627ca7ad483c49e04f17bd40c8feae0
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-23
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-23
+
+    Introduce IOFile abstract class to refactor BufferedFile and GZipFile
+    
+    IOFile provides the same interface of old BufferedFile. It provides
+    extension points as pure virtual functions. Those functions are
+    implemented by 2 concrete subclasses: BufferedFile and GZipFile.
+
+commit 6c0fa43fa583ad41a31a0191de6783cb856da55b
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-23
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-23
+
+    Update doc
+
+commit db1106101d16178bddc67ff917a970eea69a3866
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-23
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-23
+
+    Fix compile error without bittorrent support
+
+commit b9436e4d12b2918976a7edb5f780b0e27212e08d
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-23
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-23
+
+    Fix uninitialized values
+
+commit b7a3976456c92f9a3a518f5101d64a454c0683e8
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-23
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-23
+
+    Fix position of parenthesis
+
+commit 42d3408b50fd96961670e38ea80dce5591adbc9c
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-21
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-21
+
+    Add libaria2 tutorial
+
+commit e25c0955c5703e246adba11606b9ceb54668465d
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-04-02
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-05-19
+
+    Fix invalid reference return in IndexedListIterator
+
+commit 8d2191e488e36ad4363cdfc8452e9fe6a7e0e190
+Author:     ITriskTI <ITriskTI@gmail.com>
+AuthorDate: 2013-05-18
+Commit:     ITriskTI <ITriskTI@gmail.com>
+CommitDate: 2013-05-18
+
+    Update aria2c.rst
+
+commit 2ed68f7ea3697a2807bc8d6171f5dcb668ebc533
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-18
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-18
+
+    Don't install aria2.h when libaria2 is disabled
+
+commit 3aa63baa8c3feb21020531298653aa427a4a1cdf
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-18
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-18
+
+    Update NEWS for 1.17.1 release
+
+commit 798dd406f2372032baf6b59ec485f443f1638bf9
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-18
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-18
+
+    Match ru and pt doc style to en version
+
+commit aca6b0b68c2b6978c4abfeb6fe72df9e21180a8d
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-18
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-18
+
+    Update doc style
+
+commit 61a830c905474cb6bb92ea0a3aa103c963e6e62b
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-18
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-18
+
+    Bump up version 1.17.1
+
+commit bb194f6c6b2867f194f6b685a64f8dbff8b961a2
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-18
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-18
+
+    Add missing docs to EXTRA_DIST
+
+commit 93db904e48cadf27fed78f67aae9fca472cf4255
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-18
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-18
+
+    Add reference marker to EXIT STATUS section
+
+commit 8b7bac60eced4d082acacd1daa206a9127d957c9
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-18
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-18
+
+    Update libaria2.rst
+
+commit 8e347a69ccc93a5281722da0208ff21f494d6b29
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-18
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-18
+
+    Add doc about libaria2 in README.rst
+
+commit 0ed4fec8a8f8613868350cc3379c87453cd6788c
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-18
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-18
+
+    Update libaria2.rst
+
+commit b095292afb50bee7804ab7b9b369f3232bbd2731
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-18
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-18
+
+    Add examples directory to distribution
+
+commit eeab47cca23865f99183dfdc6e3e196e7556d838
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-18
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-18
+
+    Update doc
+
+commit f3876ad9abe742b17147078be2301993e848b2c9
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-18
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-18
+
+    Update libaria2ex.cc to use latest API
+
+commit a4b29ac2f7edfc77911cc92e08e345c1235cf6b9
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-18
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-18
+
+    Add getGlobalStat API
+
+commit c688f51f2e8c436fec55fc1f06e2bbb52b6592f4
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-17
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-17
+
+    Don't return hidden option from DownloadHandle::getOption and getGlobalOption
+
+commit 45506573a823cc34eb57f549f0469beb01c9cc33
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-17
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-17
+
+    Rename KeyVals DownloadHandle::getOption() as getOptions
+
+commit 06377d77c9a7bf2237f1bfcd5bf79e209b0e2247
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-17
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-17
+
+    Add changeGlobalOption, getGlobalOption, getGlobalOptions API
+
+commit 13e064e4e16aeae9479e1002c3e3fa1ba2cf303c
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-17
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-17
+
+    Add code to detect rst2html.py or rst2html
+
+commit 7ac096c3c0d40de0bde4731bb729e7facfa6ae97
+Merge: 51ddcaf b7ef53b
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-17
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-17
+
+    Merge branch 'signals-again' of https://github.com/nmaier/aria2 into nmaier-signals-again
+
+commit b7ef53b13de72dd5a149a7f84f060d391db97b9d
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-05-17
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-05-17
+
+    OSX (now) needs signal.h for sigaction
+
+commit 51ddcaf5b16ae39db18c5d4b840ee5ab43ab6b2f
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-05-17
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-05-17
+
+    AppleTLS: Properly support Snow Leopard (10.6)
+    
+    Tested on 10.6.8 + XCode 4.2 (llvm-gcc-4.2, clang)
+
+commit 0adc4b795e5c07784489240bebdc8a27e37598fe
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-16
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-16
+
+    Add gid option to Input File section
+
+commit c7c4d46672a12eec9531723037ee1fb7cd5028b4
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-16
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-16
+
+    Add changeOption and DownloadHandle::getOption API
+    
+    In aria2c.rst, define section label for "Input File" section so that
+    it can be referenced from other document.
+
+commit be4c9aa95e4ee240507d91de2925a6d6a2394ebf
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-15
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-15
+
+    Test failure without Metalink and BitTorrent support
+
+commit 8e8fb9ee36605a27463737aa803010afbadffec5
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-15
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-15
+
+    Add addTorrent API
+
+commit 4e8742597a12989a26ee15239e3c7c5af30d5b96
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-15
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-15
+
+    Add aria2api unit tests
+
+commit a8ef703b894c2c0376c872fa35f3fc4f0a17ffe8
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-15
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-15
+
+    Update doc
+
+commit a4a4a1049099dd563ce3a3cb87102a1e1da6206a
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-15
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-15
+
+    Remove NULL check for pref because pref is always non NULL
+
+commit fc0982587bc78648c918ae83deacca3e90d7e809
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-15
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-15
+
+    Release elements in routineCommands_ on destruction
+
+commit cef6db17ba08f40f39b879a9e1a7b71af1374df4
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-15
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-15
+
+    Add changePosition API
+
+commit 4f5d26a0c72e8906afa4b30118b6b5414c429c38
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-15
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-15
+
+    Use BtFileMode for TorrentAttribute::mode
+
+commit 5dcc2b7842120222f6e15db37e7c9d7f8d73c797
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-14
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-14
+
+    Add DownloadHandle::getBtMetaInfo() API
+
+commit b0b5e0df3803d0a92b0412717b53ae8924905a07
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-14
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-14
+
+    Enable multicast loopback in Bt LPD
+
+commit 390ad710f19edbaf196ec6c9c69a980cd2839eb7
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-11
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-11
+
+    Update copyright year in aria2c.rst
+
+commit 771af11212919baa294284156c101f44455ea0cd
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-11
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-11
+
+    Update doc theme
+
+commit e350df2d7597b73945d2e8a7eeef9b32867f98d2
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-11
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-11
+
+    Add download event callback API and its example
+
+commit 1c571f196af0013e1b0ad1c9e075ed9c711e915b
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-11
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-11
+
+    Refactor Notifier interface to accept DownloadEventListener interface
+    
+    WebSocketSessionMan now implements DownloadEventListener and is added
+    to Notifier. It becomes member variable of DownloadEngine.  The event
+    constant for download event is defined in aria2.h so that we can add
+    event callback API later.
+
+commit 9f4f888e399a7ac60f6adfbaed6544f02b87b018
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-10
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-10
+
+    Make DownloadHandle::getNumPieces() return int
+
+commit 1a953d5f9394cd03e128aabb9b59eda62023fc9e
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-10
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-10
+
+    Add DownloadHandle::getInfohash() and getPieceLength()
+
+commit 1b6827b060d1c2175cb82234de3c7ef4d037f07e
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-10
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-10
+
+    Revert d50021d045df809aa8e6debf1a7e5727dabcd95c
+    
+    It is safe to use prealloc for default, because of legacy fs (e.g.,
+    vfat) usage in Android.
+
+commit c056f747c6a592852ba1e3b7021deefa494b5aa9
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-10
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-10
+
+    Install libaria2.pc only when libaria2 is enabled
+
+commit 233501f768e08bd9fff3c90759999b136c315cc2
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-10
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-10
+
+    Enable TLS1.1 with gnutls build
+
+commit fb31e44d60a1134ee278e839994bfb7767063128
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-10
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-10
+
+    Change error code -1 to just negative error code
+
+commit 01d2cb197cea3f9c0babfb5df26ecc63fc26d4a8
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-10
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-10
+
+    Fix doc
+
+commit 742f8cc82260e22b36c65e44f2a0c3b5ee7b6a47
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-10
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-10
+
+    Document theme change
+    
+    Need to change ru and pt as well
+
+commit 16635f94ea6604abd639607781dcdedf8f670e56
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-10
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-10
+
+    Make DownloadHandle class
+
+commit 370584a12b0f1e893d86ae704f2e47729c0a0806
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-09
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-09
+
+    Update doc
+
+commit f2c2f085850697858f25e24bf48aace4c9a6b9d4
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-09
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-09
+
+    Support @class, fix execution failure
+
+commit ca6b46db847333327d1d3f742c3d0f530e7b9ec3
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-09
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-09
+
+    Generate libaria2 API doc from aria2.h
+
+commit 8940d2aafdf4de74b88cb1be9659426b933d775d
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-09
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-09
+
+    Change the way to receive resulting gids in addUri, addMetalink
+
+commit e4996e563bf542eb900d5892d2d9cae15bd2c16f
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-09
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-09
+
+    Use getFile(index) API
+
+commit b733431ac4d378c66d13eb590a771504bcb290dc
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-09
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-09
+
+    Add DownloadHandle::getNumFiles and getFile API
+
+commit 1f38699d3292e3a23f428edf6fac34e11b764730
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-09
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-09
+
+    Add libaria2 multi-threaded GUI examle program using wx
+
+commit 81359a7065207c489e4b4528da8d94f840b1b076
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-07
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-07
+
+    Add libaria2 examples
+
+commit d50021d045df809aa8e6debf1a7e5727dabcd95c
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-06
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-06
+
+    Use trunc as default value for --file-allocation on Android build
+
+commit 4c139eb0390d065e875bec2515331aa1d555a87d
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-06
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-06
+
+    Add TAG_DEPRECATED in DeprecatedOptionHandler ctor
+
+commit 512f87f4ff975790ae21a6abbb802fc20bf65b04
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-06
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-06
+
+    Fix compiler warning
+
+commit 5bc5665c6a7eaf95d90b78b415aea3ed00857835
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-06
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-06
+
+    Support off64_t for Android build
+    
+    Android NDK R8e does not provide ftruncate64, but bionic has the
+    assembler code to access kernel function. We borrowed those
+    ftruncate64.S files from android source code repository.  It turns out
+    that x86 asm.h in NDK R8e is also broken, so latest asm.h was also
+    borrowed.
+
+commit 3a4acead2d49243ec3a4aa33cc8bded648b5647f
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-05
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-05
+
+    Reset global::globalHaltRequested to 0 in MultiUrlRequestInfo::prepare()
+
+commit 774e1b8a1083cb315903a003c95225e1e0485f3e
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-05
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-05
+
+    Check zlib availability usin AC_CHECK_LIB
+    
+    This is workaround for zlib 1.2.3 which does not come with pkg-config
+    file.
+
+commit 1b920e4011678911397ebf2cf4dad8382b564946
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-05
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-05
+
+    Add --enable-libaria2 configure option
+    
+    By default, libaria2 feature is disabled. Use --enable-libaria2
+    to enable it. libaria2 static build is also disabled by default.
+    Use --enable-static to enable it.
+
+commit 2bf2dba5448cdb4231826612b15bc7205b8c4f0e
+Merge: 4410f0e 22b3e0a
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-05
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-05
+
+    Merge branch 'libaria2'
+
+commit 22b3e0a4ae030533bae766fbef19cbbf7a4529c5
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-05
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-05
+
+    Fix PREF_QUIET is set to A2_V_TRUE even if standalone is true
+
+commit ebfc5f55e50972520ead1fda7cabcdc494c61e3f
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-04
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-04
+
+    Add SessionConfig to store per Session config
+    
+    sessionConfigSetKeepRunning() was removed and SessionConfig has
+    keepRunning member instead. Signal handlers are now all prepared in
+    MultiUrlRequestGroup object. Setting SessionConfig.useSignalHandler to
+    false will avoid signal handler setup.
+
+commit 4410f0e56c4940d5ddee815329805897c9a338af
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-04
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-04
+
+    Treat response is completed if EOF is received before streamFilter completes
+
+commit 7d55341fded7b88f528b62a5527f9df8bc3259d8
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-02
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-02
+
+    Fix event polling not working with no downloads but keepRunning_ is true
+
+commit 98b132b4d12e417d7d17b4af20ce03b2daa185f3
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-02
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-02
+
+    Receive reference, not copy
+
+commit d07b3ff8d905ef7298c25e41c0e783c90d725e4a
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-02
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-02
+
+    Suppress console output for none-standalone mode
+
+commit 315c05ea3c9abc693a1f704c0fba8bb74374ef59
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-02
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-02
+
+    Suppress console log output for library use, enclose Platform in try-catch
+    
+    Still need to suppress global::cerr and global::cout
+
+commit f5d5d8fa8e0a77360c347837fa19206df9800f44
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-02
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-02
+
+    Fix empty unknown option name in OptionParser::parse
+
+commit 43895155e0173af8a2d0fab515188ccf8ae5cec4
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-02
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-02
+
+    Don't enter daemon mode if standalone is false
+
+commit aee621b3d40a270d827f5d3441dfccec66705ca9
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-02
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-02
+
+    Don't exit on error in option_processing
+    
+    Still it exits when -v or -h is given. They are now guarded by
+    standalone variable and only do so when it is true.
+
+commit e5cccd335cc99f28615d44d5cb0b4400239c63cd
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-02
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-02
+
+    Add addMetalink API function
+
+commit 24a6896bf44dcda62c9bbf0b41eb61b178ba6954
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-01
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-01
+
+    Add sessionConfigSetKeepRunning and shutdown API function
+    
+    Setting sessionConfigSetKeepRunning to true makes aria2 core keep
+    running even if there is no download to perform, just like --enable-rpc
+    option.
+
+commit a456d83de00340f6777defa369ddc261fc5a308b
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-01
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-01
+
+    Update API doc
+
+commit bbc8866cfb28c1ca867672f963b23803a65877f1
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-01
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-01
+
+    Add removeDownload, pauseDownload and unpauseDownload API function
+
+commit 4c50544f1aff35ffbe467e6aaf74c9f57ec73a57
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-01
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-01
+
+    Rename DOWNLOAD_STATUS as DownloadStatus
+
+commit 2109ba23a88b0c656cc69aa2edb15909b8b96df3
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-01
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-01
+
+    Add DownloadHandle::getFiles() API function
+
+commit 5e64d4c9a988b1016c9503f8e11836b562d0a4e1
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-01
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-01
+
+    Expose struct DownloadHandle interface to public API directly
+
+commit b886ade311849d382cf2759df1f5d21b2c8b75d1
+Merge: db2e221 cc8b006
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-05-01
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-05-01
+
+    Merge branch 'mallocs' of https://github.com/nmaier/aria2 into nmaier-mallocs
+
+commit cc8b006a8e6ef2ffca6295b54763161a9d4640c1
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-04-30
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-04-30
+
+    mallocs: Remove bogus pkg-config _LDFLAGS lines
+
+commit 8f659f49ec54a722498465f618bb2fda1a9e34b5
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-30
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-30
+
+    Rename gidToString as gidToHex, add hexToGid and isNull
+
+commit 1df4adefb58cf904caa1fea55ca35944b847a820
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-30
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-30
+
+    Add accessors for DownloadHandle
+    
+    Added downloadGetBitfield, downloadGetNumPieces,
+    downloadGetConnections, downloadGetErrorCode,
+    downloadGetFollowedBy, downloadGetBelongsTo and
+    downloadGetDir functions.
+
+commit d1252dcc5f7ff889f1bb6e331f214a1f30049693
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-30
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-30
+
+    Move aria2api.{cc,h} to libaria2_la_SOURCES
+
+commit db2e22132d1103d6a2de8ee260e482ceb8d0b0df
+Merge: 549dd5b a1a3e21
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-30
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-30
+
+    Merge branch 'libuv-eventpoll' of https://github.com/nmaier/aria2 into nmaier-libuv-eventpoll
+
+commit 549dd5b2a70d19fb4bc863f623ae5b208e3f27fc
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-29
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-29
+
+    uitos: Fix off-by-one error bug
+
+commit a1a3e21f73c8c9b1f2941da023c4b66344b54684
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-04-28
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-04-28
+
+    LibUV: Revert unrelated change
+
+commit e700ebd3e96638bb0e02dbec17010b13670c6486
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-04-28
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-04-28
+
+    LibUV: Reorder event poll preference
+    
+    *nix will keep epoll/kqueue/port as the default (when available), while
+    Windows, lacking all of these, will default to libuv (when available)
+
+commit d2c1fbd7925aafcefeb6cd833b89fbd41e2df8b3
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-02-27
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-04-28
+
+    Add configure support for linking tcmalloc_minimal and/or jemalloc
+    
+    Both tcmalloc_minimal and jemalloc outperform the native malloc
+    implemention on Windows (MSVCRT) in terms of committed memory
+    consumption (~-30%) and performance (e.g. far less page faults, ~-60%),
+    depending, of course, on the actual workload.
+    The longer the download queue, the bigger the impact ;)
+    
+    On *nix the picture is a little different... tcmalloc usually still
+    outperforms the native malloc implementation, but not that significantly
+    than on Windows. jemalloc however is only marginally better than recent
+    native Linux implementations, while it is already used by some BSD as the
+    native allocator.
+    
+    tcmalloc is part of gperftools and very mature and tested by now. It
+    doesn't work on OSX in the default configuration, however.
+    http://code.google.com/p/gperftools/
+    
+    jemalloc is the default allocator at least on FreeBSD and NetBSD and
+    used in Firefox.
+    http://www.canonware.com/jemalloc/index.html
+
+commit 6b7a51d5e043c5c916b394cf8f7580023f616b95
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-04-28
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-04-28
+
+    Close GZipFiles in the d'tor
+
+commit 28849e3ddf66711df375ee1c56fb5fff44b3009b
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-27
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-27
+
+    Add gidToString and getActiveDownload API functions
+
+commit 9734fa5447f2e45198b347959a12b10e3d49f2ea
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-27
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-27
+
+    Call onEndOfRun() on oneshot == true as well
+
+commit 0ef5f4eea13ab25ef47ff312001bc02fa638b93e
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-27
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-27
+
+    Add getDownloadHandle API
+
+commit 6fcf274f279603db02a1abc45fc8c0a34f37033b
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-26
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-26
+
+    Add initialization function and addUri API function for libaria2
+
+commit 90abec8a362d6224bfff76d12fc9365fac36ddaa
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-25
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-25
+
+    Move initialization code in aria2::main to struct Context
+
+commit bbb978948d87790c6dfb78eaca1d47d45101443d
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-25
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-25
+
+    Add preliminary libtool files for libaria2
+
+commit e548a1a2256bc204ce380da7f63e082a7a897137
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-25
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-25
+
+    Add missing check for sigaction
+
+commit b05454657f6e13abee94f74af3ce42c34ffb4fe2
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-23
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-23
+
+    Fix cached data is not flushed when downloaded data is less than 16KiB
+
+commit 9665a3491d8916ead0904491c559afe63fe08ad7
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-23
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-23
+
+    Avoid docutils bug
+    
+    Old docutils has bug which does not escape . at the start of the line,
+    which accidentally makes it manpage macro.
+
+commit 0cccc2d27ad90dae6294e260ba902a5e3afcd0c3
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-04-17
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-04-17
+
+    Libuv: Proper configure detection
+
+commit 539fda0b4fbfc0a343788b16bdbfece93d9bae43
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-04-11
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-04-17
+
+    LibUV: Code cleanup
+
+commit 1cd5dcc9b692ef9c32bcd5aaada54a9c80636595
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-04-10
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-04-17
+
+    LibUV: Correct event removal
+
+commit 9acd3df3cb833e429687347a0d049306353c6e2a
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-04-10
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-04-10
+
+    LibUV: Implement LibuvEventPoll
+    
+    LibUV event will use the best available polling method on a system, kind
+    of like aria2 does already with the different *EventPoll
+    implementations.
+    However, libuv may support different/newer polling mechanisms; for
+    example on Windows it will use IO Completion Ports which are superior to
+    select() ;)
