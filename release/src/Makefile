@@ -449,6 +449,10 @@ define RouterOptions
 		sed -i "/TCONFIG_I18N/d" $(1); \
 		echo "# TCONFIG_I18N is not set" >>$(1); \
 	fi; \
+	if [ "$(ARIA2)" = "y" ]; then \
+		sed -i "/TCONFIG_ARIA2 is not set/d" $(1); \
+		echo "TCONFIG_ARIA2=y" >>$(1); \
+	fi; \
 	if [ "$(NO_XXTP)" = "y" ]; then \
 		sed -i "/TCONFIG_L2TP/d" $(1); \
 		echo "# TCONFIG_L2TP is not set" >>$(1); \
@@ -1149,7 +1153,7 @@ e3200:
 ac66e:
 	@$(MAKE) e MIPS32=r2 NVRAM_64K=y NAND=y AC66U=1 NO_JFFS=y
 w1800rz:
-	@$(MAKE) z MIPS32=r2 NVRAM_64K=y W1800R=1
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="AIO" USB="USB" NOCAT=y NFS=y SNMP=y HFS=y DNSCRYPT=y UPS=y PPTPD=y TOR=y IPSEC=y RAID=y MIPS32=r2 NVRAM_64K=y W1800R=1 ARIA2=y
 endif
 
 setprofile:
