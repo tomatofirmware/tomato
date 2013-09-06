@@ -128,7 +128,9 @@ config TCONFIG_BT
 config TCONFIG_BBT
 	bool "  Bittorrent client binaries only"
 	default n
-
+config TCONFIG_ARIA2
+	bool " Aria2 download"
+	default n
 config TCONFIG_TR_EXTRAS
 	bool "  Transmission extra tools"
 	default n

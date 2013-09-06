@@ -155,6 +155,8 @@ sub fixDyn
 	fixDynDep("pppd", "rp-pppoe.so");
 #tomatoegg
 	fixDynDep("httpd", "libgnuintl.so.8.1.2");
+	fixDynDep("aria2c", "libstdc++.so.6.0.9");
+	fixDynDep("aria2c", "libexpat.so.1.6.0");
 #
 
 	fixDynDep("libcrypto.so.1.0.0", "libssl.so.1.0.0");
