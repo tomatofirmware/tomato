@@ -494,6 +494,7 @@ void start_aria2()
 	FILE *f;
 	struct statfs sf;
 	char session_file[255];
+
 	if (getpid() != 1) {
 		start_service("aria2");
 		return;
@@ -510,11 +511,34 @@ void start_aria2()
 		pid_aria2 = -2; // not mounted or not exists. try restart.
 		return;
 	}
+	if (nvram_match( "aria2_ssl_rpc","1")){
+		//certificate
+		mkdir("/etc/aria2c", 0700);
+		unlink("/etc/aria2c/aria2c_host_key");
+		unlink("/etc/aria2c/aria2c_host_cert");
+		if (!nvram_get_file("aria2c_ssl_key", "/etc/aria2c/aria2c_host_key", 2048) 
+			|| !nvram_get_file("aria2c_ssl_cert", "/etc/aria2c/aria2c_host_cert", 2048)) {
+			unlink("/etc/aria2c/aria2c_host_key");
+			unlink("/etc/aria2c/aria2c_host_cert");
+			eval("openssl", "req -x509 -nodes -newkey rsa:2048 -keyout /etc/aria2c/aria2c_host_key -out /etc/aria2c/aria2c_host_cert -days 3650 -subj \'/CN=aria2/O=Aria2./C=US\'");
+			if (nvram_set_file("aria2c_ssl_key", "/etc/aria2c/aria2c_host_key", 2048) 
+				&& nvram_set_file("aria2c_ssl_cert", "/etc/aria2c/aria2c_host_cert", 2048)) {
+				nvram_commit_x();
+			}
+		}
+	}
+
+
 	if ((f = fopen("/etc/aria2c.conf", "w")) == NULL) return;
 	
 	fprintf(f,"enable-rpc\n");
 	fprintf(f,"rpc-listen-all=true\n");
 	fprintf(f,"rpc-allow-origin-all=true\n");
+	if (nvram_match( "aria2_ssl_rpc","1")){
+		fprintf(f,"rpc-private-key=/etc/aria2c/aria2c_host_key\n");
+		fprintf(f,"rpc-certificate=/etc/aria2c/aria2c_host_cert\n");
+		fprintf(f,"rpc-secure=true\n");
+	}
 	fprintf(f,"listen-port=%s\n", nvram_safe_get("aria2_port"));
 	fprintf(f,"rpc-listen-port=%s\n", nvram_safe_get("aria2_port_rpc"));
 	fprintf(f,"rpc-user=admin\n");

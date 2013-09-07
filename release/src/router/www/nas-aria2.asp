@@ -21,15 +21,16 @@ textarea {
 }
 </style>
 <script type='text/javascript'>
-//	<% nvram("aria2_enable,aria2_custom,aria2_port,aria2_dir,aria2_settings,aria2_port_rpc"); %>
+//	<% nvram("aria2_enable,aria2_custom,aria2_port,aria2_dir,aria2_settings,aria2_port_rpc,aria2_ssl_rpc"); %>
 
 function verifyFields(focused, quiet)
 {
 	var ok = 1;
 
 	var a = E('_f_aria2_enable').checked;
-	
+
 	E('_aria2_custom').disabled = !a;
+	E('_aria2_ssl_rpc').disabled = !a;
 	E('_aria2_dir').disabled = !a;
 	E('_aria2_port').disabled = !a;
 	E('_aria2_settings').disabled = !a;
@@ -89,6 +90,7 @@ createFieldTable('', [
 <script type='text/javascript'>
 createFieldTable('', [
 	{ title: 'Listening RPC port', indent: 2, name: 'aria2_port_rpc', type: 'text', maxlen: 32, size: 5, value: nvram.aria2_port_rpc > 0 ? nvram.aria2_port_rpc : 6800, suffix: ' <small>*</small>' },
+	{ title: 'Use SSL to encrypt RPC traffic', indent: 2, name: 'aria2_ssl_rpc', type: 'checkout', value: nvram.aria2_ssl_rpc , suffix: ' <small>*</small>' },
 	{ title: 'Save settings location',name: 'aria2_settings', type: 'select', options: [
 			['down_dir','In the Download directory (Recommended)'],
 /* JFFS2-BEGIN */
@@ -106,6 +108,7 @@ createFieldTable('', [
 		<li><b>Enable torrent client</b> - Caution! - If your router only has 32MB of RAM, you'll have to use swap.
 		<li><b>Listening port</b> - Port used for torrent client. Make sure this port is not in use.
         <li><b>Listening RPC port</b> - Port used for Aria2 RPC. Make sure this port is not in use.
+		<li><b>Use SSL to encrypt RPC traffic</b> - Use ssl to encrypt RPC traffic. A self signed certificate will automaticaly generated.
 		<li><b>Allow remote access</b> - To open the Aria2 RPC port from the WAN side and allow the RPC to be accessed from the internet.
 				you have to goto <a href="/advanced-firewall.asp">Firewall</a> settings to allow incoming traffic to RPC port of Aria2.
         <li><b>RPC access in lan is automatically enabled. RPC auth is also enabled, user name is "admin" and password is your password to login Tomato. you can change this option for security reason.</b>

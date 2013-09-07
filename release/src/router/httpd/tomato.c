@@ -1233,12 +1233,13 @@ static const nvset_t nvset_list[] = {
 	{ "limit_br3_prio",              V_RANGE(0, 5)          },
     
 #ifdef TCONFIG_ARIA2
-    { "aria2_enable",                V_01                   },
-    { "aria2_custom",                V_TEXT(0, 2048)        },
-    { "aria2_port",                  V_PORT                 },
-    { "aria2_dir",                   V_LENGTH(0, 50)        },
-    { "aria2_settings",              V_LENGTH(0, 50)        },
-    { "aria2_port_rpc",              V_PORT                 },
+	{ "aria2_enable",                V_01                   },
+	{ "aria2_ssl_rpc",               V_01                   },
+	{ "aria2_custom",                V_TEXT(0, 2048)        },
+	{ "aria2_port",                  V_PORT                 },
+	{ "aria2_dir",                   V_LENGTH(0, 50)        },
+	{ "aria2_settings",              V_LENGTH(0, 50)        },
+	{ "aria2_port_rpc",              V_PORT                 },
 #endif
 
 #ifdef TCONFIG_BT
