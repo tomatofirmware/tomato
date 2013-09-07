@@ -2445,6 +2445,9 @@ REMOVE-END */
 /* BT-BEGIN */
 			,['<% _("BitTorrent Client"); %>',		'bittorrent.asp']
 /* BT-END */
+/* ARIA2-BEGIN */
+			,['<% _("Aria2 Client"); %>',		'aria2.asp']
+/* ARIA2-END */
 			] ],
 /* USB-END */
 /* VPN-BEGIN */
