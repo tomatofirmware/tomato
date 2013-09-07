@@ -18,7 +18,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Advanced: Virtual Wireless Interfaces</title>
+<title>[<% ident(); %>] <% _("Advanced"); %>: <% _("Virtual Wireless Interfaces"); %></title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
@@ -59,9 +59,9 @@ var max_no_vifs = 0;
 
 var wl_modes_available = [];
 
-wmo = {'ap':'Access Point','apwds':'Access Point + WDS','sta':'Wireless Client','wet':'Wireless Ethernet Bridge','wds':'WDS'};
+wmo = {'ap':'<% _("Access Point"); %>','apwds':'<% _("Access Point"); %> + WDS','sta':'<% _("Wireless Client"); %>','wet':'<% _("Wireless Ethernet Bridge"); %>','wds':'WDS'};
 
-tabs = [['overview', 'Overview']];
+tabs = [['overview', '<% _("Overview"); %>']];
 
 var xob = null;
 var refresher = [];
@@ -529,11 +529,11 @@ function init() {
 function toggleVisibility(whichone) {
 	if(E('sesdiv' + whichone).style.display=='') {
 		E('sesdiv' + whichone).style.display='none';
-		E('sesdiv' + whichone + 'showhide').innerHTML='(Click here to show)';
+		E('sesdiv' + whichone + 'showhide').innerHTML='(<% _("Click here to show"); %>)';
 		cookie.set('adv_wlvifs_' + whichone + '_vis', 0);
 	} else {
 		E('sesdiv' + whichone).style.display='';
-		E('sesdiv' + whichone + 'showhide').innerHTML='(Click here to hide)';
+		E('sesdiv' + whichone + 'showhide').innerHTML='(<% _("Click here to hide"); %>)';
 		cookie.set('adv_wlvifs_' + whichone + '_vis', 1);
 	}
 }
@@ -558,7 +558,7 @@ function tabSelect(name) {
 	}
 
 	elem.display('overview-tab', (name == 'overview'));
-	E('save-button').value = (name != 'overview') ? 'Overview' : 'Save';
+	E('save-button').value = (name != 'overview') ? '<% _("Overview"); %>' : '<% _("Save"); %>';
 
 	for (var i = 1; i < tabs.length; ++i) {
 		if (name == tabs[i][0]) {
@@ -1010,7 +1010,7 @@ function cancel() {
 }
 
 function save() {
-	if (E('save-button').value != 'Save') {
+	if (E('save-button').value != '<% _("Save"); %>') {
 		tabSelect('overview');
 		return;
 	}
@@ -1357,7 +1357,7 @@ function escapeText(s) {
 <div id='sesdiv' style='display:none'>
 
 <!-- / / / -->
-<div class='section-title'>Virtual Wireless Interfaces</div>
+<div class='section-title'><% _("Virtual Wireless Interfaces"); %></div>
 <div class='section'>
 
 <script type='text/javascript'>
@@ -1371,15 +1371,15 @@ tabCreate.apply(this, tabs);
 
 <!-- / / / -->
 
-<div class='section-title'>Wireless Interfaces Details <small><i><a href='javascript:toggleVisibility("details");'><span id='sesdivdetailsshowhide'>(Click here to show)</span></a></i></small></div>
+<div class='section-title'><% _("Wireless Interfaces Details"); %> <small><i><a href='javascript:toggleVisibility("details");'><span id='sesdivdetailsshowhide'>(<% _("Click here to show"); %>)</span></a></i></small></div>
 <div class='section' id='sesdivdetails' style='display:none'>
 
 <script type='text/javascript'>
 for (var uidx = 0; uidx < wl_ifaces.length; ++uidx) {
 	if (wl_sunit(uidx)<0) {
 		var c = [];
-		c.push({ title: 'Interface', text: 'wl' + wl_fface(uidx) + ' <small>(' + wl_display_ifname(uidx) + ')</small>' });
-		c.push({ title: 'Virtual Interfaces', indent: 2, rid: 'wl' + wl_fface(uidx) + '_vifs',
+		c.push({ title: '<% _("Interface"); %>', text: 'wl' + wl_fface(uidx) + ' <small>(' + wl_display_ifname(uidx) + ')</small>' });
+		c.push({ title: '<% _("Virtual Interfaces"); %>', indent: 2, rid: 'wl' + wl_fface(uidx) + '_vifs',
 			text: 'wl' + wl_fface(uidx) + ' ' +  nvram['wl' + wl_fface(uidx) + '_vifs'] + ' <small>(max ' + wl_ifaces[uidx][7] + ')</small>' });
 		createFieldTable('',c);
 	}
@@ -1390,7 +1390,7 @@ for (var uidx = 0; uidx < wl_ifaces.length; ++uidx) {
 <!-- / / / -->
 
 <!-- LINUX24-BEGIN -->
-<div class='section-title'>Options <small><i><a href='javascript:toggleVisibility("options");'><span id='sesdivoptionsshowhide'>(Click here to show)</span></a></i></small></div>
+<div class='section-title'><% _("Options"); %> <small><i><a href='javascript:toggleVisibility("options");'><span id='sesdivoptionsshowhide'>(<% _("Click here to show"); %>)</span></a></i></small></div>
 <div class='section' id='sesdivoptions' style='display:none'>
 <script type='text/javascript'>
 createFieldTable('', [
@@ -1402,15 +1402,15 @@ createFieldTable('', [
 
 <!-- / / / -->
 
-<div class='section-title'>Notes <small><i><a href='javascript:toggleVisibility("notes");'><span id='sesdivnotesshowhide'>(Click here to show)</span></a></i></small></div>
+<div class='section-title'><% _("Notes"); %> <small><i><a href='javascript:toggleVisibility("notes");'><span id='sesdivnotesshowhide'>(<% _("Click here to show"); %>)</span></a></i></small></div>
 <div class='section' id='sesdivnotes' style='display:none'>
 
 <ul>
-<li><b>Interface</b> - Wireless VIF name.</li>
-<li><b>Enabled</b> - If this VIF should be active and brought online.</li>
-<li><b>SSID</b> - Wireless Service Set Identifier.</li>
-<li><b>Mode</b> - Interface mode: Access Point, WDS, Wireless Client, etc...</li>
-<li><b>Bridge</b> - Which LAN bridge this VIF should be assigned.</li>
+<li><b><% _("Interface"); %></b> - <% _("Wireless VIF name"); %>.</li>
+<li><b><% _("Enabled"); %></b> - <% _("If this VIF should be active and brought online"); %>.</li>
+<li><b>SSID</b> - <% _("Wireless Service Set Identifier"); %>.</li>
+<li><b><% _("Mode"); %></b> - <% _("Interface mode"); %>: <% _("Access Point"); %>, WDS, <% _("Wireless Client"); %>, <% _("etc"); %>...</li>
+<li><b><% _("Bridge"); %></b> - <% _("Which LAN bridge this VIF should be assigned"); %>.</li>
 </ul>
 
 <ul>
@@ -1421,7 +1421,7 @@ createFieldTable('', [
 
 <small>
 <ul>
-<li><b>Other relevant notes/hints:</b>
+<li><b><% _("Other relevant notes/hints"); %>:</b>
 <ul>
 <li>When creating/defining a new wireless VIF, it's MAC address will be shown (incorrectly) as '00:00:00:00:00:00', as it's unknown at that moment (until network is restarted and this page is reloaded).</li>
 <li>When saving changes, the MAC addresses of all defined non-primary wireless VIFs could sometimes be (already) <i>set</i> but might be <i>recreated</i> by the WL driver (so that previously defined/saved settings might need to be updated/changed accordingly on <a href=advanced-mac.asp>Advanced/MAC Address</a> after saving settings and rebooting your router).</li>
@@ -1606,8 +1606,8 @@ for (var i = 1; i < tabs.length; ++i) {
 </td></tr>
 <tr><td id='footer' colspan=2>
 	<span id='footer-msg'></span>
-	<input type='button' value='Save' id='save-button' onclick='save()'>
-	<input type='button' value='Cancel' id='cancel-button' onclick='cancel()'>
+	<input type='button' value='<% _("Save"); %>' id='save-button' onclick='save()'>
+	<input type='button' value='<% _("Cancel"); %>' id='cancel-button' onclick='cancel()'>
 </td></tr>
 </table>
 </form>

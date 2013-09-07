@@ -99,7 +99,7 @@ createFieldTable('', [
 /* CIFS-BEGIN */
 			['/cifs1','CIFS 1'],['/cifs2','CIFS 2'],
 /* CIFS-END */
-			['/tmp','<% _(RAM (Temporary)"); %>']], value: nvram.aria2_settings, suffix: ' ' },
+			['/tmp','<% _("RAM (Temporary)"); %>']], value: nvram.aria2_settings, suffix: ' ' },
     null,
     { title: '<a href="http://aria2.sourceforge.net/manual/en/html/aria2c.html" target="_new"><% _("Aria2"); %></a><br><% _("Custom configuration"); %>', name: 'aria2_custom', type: 'textarea', value: nvram.aria2_custom }
 ]);
