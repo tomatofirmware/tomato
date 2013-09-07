@@ -10,7 +10,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Nas: Aria2 Client</title>
+<title>[<% ident(); %>] Nas:<% _(" Aria2 Client"); %></title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <link rel='stylesheet' type='text/css' href='color.css'>
 <script type='text/javascript' src='tomato.js'></script>
@@ -67,13 +67,13 @@ function init()
 <body onLoad="init()">
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
-<div class='title'>Tomato</div>
-<div class='version'>Version <% version(); %></div>
+<div class='title'><% _("Tomato"); %></div>
+<div class='version'><% _("Version"); %> <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
 <div id='ident'><% ident(); %></div>
-<div class='section-title'>Basic Settings</div>
+<div class='section-title'><% _("Basic Settings"); %></div>
 <div class='section' id='config-section'>
 <form id='_fom' method='post' action='tomato.cgi'>
 <input type='hidden' name='_nextpage' value='nas-aria2.asp'>
@@ -82,36 +82,35 @@ function init()
 
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: 'Enable torrent client', name: 'f_aria2_enable', type: 'checkbox', value: nvram.aria2_enable == '1', suffix: ' <small>*</small>' },
-	{ title: 'Listening port', name: 'aria2_port', type: 'text', maxlen: 5, size: 7, value: nvram.aria2_port > 0 ? nvram.aria2_port : 6881, suffix: ' <small>*</small>' },
-	{ title: 'Download directory', name: 'aria2_dir', type: 'text', maxlen: 40, size: 40, value: nvram.aria2_dir }
+	{ title: '<% _("Enable torrent client"); %>', name: 'f_aria2_enable', type: 'checkbox', value: nvram.aria2_enable == '1', suffix: ' <small>*</small>' },
+	{ title: '<% _("Listening port"); %>', name: 'aria2_port', type: 'text', maxlen: 5, size: 7, value: nvram.aria2_port > 0 ? nvram.aria2_port : 6881, suffix: ' <small>*</small>' },
+	{ title: '<% _("Download directory"); %>', name: 'aria2_dir', type: 'text', maxlen: 40, size: 40, value: nvram.aria2_dir }
 ]);
 </script>
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: 'Listening RPC port', indent: 2, name: 'aria2_port_rpc', type: 'text', maxlen: 32, size: 5, value: nvram.aria2_port_rpc > 0 ? nvram.aria2_port_rpc : 6800, suffix: ' <small>*</small>' },
-	{ title: 'Use SSL to encrypt RPC traffic', indent: 2, name: 'aria2_ssl_rpc', type: 'checkout', value: nvram.aria2_ssl_rpc , suffix: ' <small>*</small>' },
-	{ title: 'Save settings location',name: 'aria2_settings', type: 'select', options: [
-			['down_dir','In the Download directory (Recommended)'],
+	{ title: '<% _("Listening RPC port"); %>', indent: 2, name: 'aria2_port_rpc', type: 'text', maxlen: 32, size: 5, value: nvram.aria2_port_rpc > 0 ? nvram.aria2_port_rpc : 6800, suffix: ' <small>*</small>' },
+	{ title: '<% _("Use SSL to encrypt RPC traffic"); %>', indent: 2, name: 'aria2_ssl_rpc', type: 'checkout', value: nvram.aria2_ssl_rpc , suffix: ' <small>*</small>' },
+	{ title: '<% _("Save settings location"); %>',name: 'aria2_settings', type: 'select', options: [
+			['down_dir','<% _("In the Download directory (Recommended)"); %>'],
 /* JFFS2-BEGIN */
 			['/jffs','JFFS2'],
 /* JFFS2-END */
 /* CIFS-BEGIN */
 			['/cifs1','CIFS 1'],['/cifs2','CIFS 2'],
 /* CIFS-END */
-			['/tmp','RAM (Temporary)']], value: nvram.aria2_settings, suffix: ' ' },
+			['/tmp','<% _(RAM (Temporary)"); %>']], value: nvram.aria2_settings, suffix: ' ' },
     null,
-    { title: '<a href="http://aria2.sourceforge.net/manual/en/html/aria2c.html" target="_new">Aria2</a><br>Custom configuration', name: 'aria2_custom', type: 'textarea', value: nvram.aria2_custom }
+    { title: '<a href="http://aria2.sourceforge.net/manual/en/html/aria2c.html" target="_new"><% _("Aria2"); %></a><br><% _("Custom configuration"); %>', name: 'aria2_custom', type: 'textarea', value: nvram.aria2_custom }
 ]);
 </script>
 	<ul>
-		<li><b>Enable torrent client</b> - Caution! - If your router only has 32MB of RAM, you'll have to use swap.
-		<li><b>Listening port</b> - Port used for torrent client. Make sure this port is not in use.
-        <li><b>Listening RPC port</b> - Port used for Aria2 RPC. Make sure this port is not in use.
-		<li><b>Use SSL to encrypt RPC traffic</b> - Use ssl to encrypt RPC traffic. A self signed certificate will automaticaly generated.
-		<li><b>Allow remote access</b> - To open the Aria2 RPC port from the WAN side and allow the RPC to be accessed from the internet.
-				you have to goto <a href="/advanced-firewall.asp">Firewall</a> settings to allow incoming traffic to RPC port of Aria2.
-        <li><b>RPC access in lan is automatically enabled. RPC auth is also enabled, user name is "admin" and password is your password to login Tomato. you can change this option for security reason.</b>
+		<li><b><% _("Enable torrent client"); %></b> - <% _("Caution"); %>! - <% _("If your router only has 32MB of RAM, you'll have to use swap"); %>.
+		<li><b><% _("Listening port"); %></b> - <% _("Port used for torrent client"); %>. <% _("Make sure this port is not in use"); %>.
+        <li><b><% _("Listening RPC port"); %></b> - <% _("Port used for Aria2 RPC"); %>. <% _("Make sure this port is not in use"); %>.
+		<li><b><% _("Use SSL to encrypt RPC traffic"); %></b> - <% _("Use ssl to encrypt RPC traffic"); %>. A self signed certificate will automaticaly generated.
+		<li><b><% _("Allow remote access"); %></b> - <% _("To open the Aria2 RPC port from the WAN side and allow the RPC to be accessed from the internet. you have to goto"); %> <a href="/advanced-firewall.asp"><% _("Firewall"); %></a> <% _("settings to allow incoming traffic to RPC port of Aria2"); %>.
+        <li><b><% _("RPC access in lan is automatically enabled"); %>. <% _("RPC auth is also enabled, user name is "); %>"admin"<% _(" and password is your password to login Tomato"); %>. <% _("you can change this option for security reason"); %>.</b>
 	</ul>
 </div>
 </form>
@@ -120,8 +119,8 @@ createFieldTable('', [
 <tr><td id='footer' colspan=2>
  <form>
  <span id='footer-msg'></span>
- <input type='button' value='Save' id='save-button' onclick='save()'>
- <input type='button' value='Cancel' id='cancel-button' onclick='javascript:reloadPage();'>
+ <input type='button' value='<% _("Save"); %>' id='save-button' onclick='save()'>
+ <input type='button' value='<% _("Cancel"); %>' id='cancel-button' onclick='javascript:reloadPage();'>
  </form>
 </div>
 </td></tr>

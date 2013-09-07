@@ -10,7 +10,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Advanced: TOR Project</title>
+<title>[<% ident(); %>] <% _("Advanced"); %>: <% _("TOR Project"); %></title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <link rel='stylesheet' type='text/css' href='color.css'>
 <script type='text/javascript' src='tomato.js'></script>
@@ -52,43 +52,43 @@ function verifyFields(focused, quiet)
 	var s = E('_tor_custom');
 
 	if (s.value.search(/SocksPort/) == 0)  {
-		ferror.set(s, 'Cannot set "SocksPort" option here. You can set it in Tomato GUI', quiet);
+		ferror.set(s, '<% _("Cannot set"); %> "SocksPort" <% _("option here"); %>. <% _("You can set it in Tomato GUI"); %>', quiet);
 		ok = 0; }
 
 	if (s.value.search(/SocksBindAddress/) == 0)  {
-		ferror.set(s, 'Cannot set "SocksBindAddress" option here.', quiet);
+		ferror.set(s, '<% _("Cannot set"); %> "SocksBindAddress" <% _("option here"); %>.', quiet);
 		ok = 0; }
 
 	if (s.value.search(/AllowUnverifiedNodes/) == 0)  {
-		ferror.set(s, 'Cannot set "AllowUnverifiedNodes" option here.', quiet);
+		ferror.set(s, '<% _("Cannot set"); %> "AllowUnverifiedNodes" <% _("option here"); %>.', quiet);
 		ok = 0; }
 
 	if (s.value.search(/Log/) == 0)  {
-		ferror.set(s, 'Cannot set "Log" option here.', quiet);
+		ferror.set(s, '<% _("Cannot set"); %> "Log" <% _("option here"); %>.', quiet);
 		ok = 0; }
 
 	if (s.value.search(/DataDirectory/) == 0)  {
-		ferror.set(s, 'Cannot set "DataDirectory" option here. You can set it in Tomato GUI', quiet);
+		ferror.set(s, '<% _("Cannot set"); %> "DataDirectory" <% _("option here"); %>. <% _("You can set it in Tomato GUI"); %>', quiet);
 		ok = 0; }
 
 	if (s.value.search(/TransPort/) == 0)  {
-		ferror.set(s, 'Cannot set "TransPort" option here. You can set it in Tomato GUI', quiet);
+		ferror.set(s, '<% _("Cannot set"); %> "TransPort" <% _("option here"); %>. <% _("You can set it in Tomato GUI"); %>', quiet);
 		ok = 0; }
 
 	if (s.value.search(/TransListenAddress/) == 0)  {
-		ferror.set(s, 'Cannot set "TransListenAddress" option here.', quiet);
+		ferror.set(s, '<% _("Cannot set"); %> "TransListenAddress" <% _("option here"); %>.', quiet);
 		ok = 0; }
 
 	if (s.value.search(/DNSPort/) == 0)  {
-		ferror.set(s, 'Cannot set "DNSPort" option here. You can set it in Tomato GUI', quiet);
+		ferror.set(s, '<% _("Cannot set"); %> "DNSPort" <% _("option here"); %>. <% _("You can set it in Tomato GUI"); %>', quiet);
 		ok = 0; }
 
 	if (s.value.search(/DNSListenAddress/) == 0)  {
-		ferror.set(s, 'Cannot set "DNSListenAddress" option here.', quiet);
+		ferror.set(s, '<% _("Cannot set"); %> "DNSListenAddress" <% _("option here"); %>.', quiet);
 		ok = 0; }
 
 	if (s.value.search(/User/) == 0)  {
-		ferror.set(s, 'Cannot set "User" option here.', quiet);
+		ferror.set(s, '<% _("Cannot set"); %> "User" <% _("option here"); %>.', quiet);
 		ok = 0; }
 
 	return ok;
@@ -133,34 +133,34 @@ function init()
 
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: 'Enable TOR', name: 'f_tor_enable', type: 'checkbox', value: nvram.tor_enable == '1' },
+	{ title: '<% _("Enable TOR"); %>', name: 'f_tor_enable', type: 'checkbox', value: nvram.tor_enable == '1' },
 	null,
-	{ title: 'Socks Port', name: 'tor_socksport', type: 'text', maxlen: 5, size: 7, value: fixPort(nvram.tor_socksport, 9050) },
-	{ title: 'Trans Port', name: 'tor_transport', type: 'text', maxlen: 5, size: 7, value: fixPort(nvram.tor_transport, 9040) },
-	{ title: 'DNS Port', name: 'tor_dnsport', type: 'text', maxlen: 5, size: 7, value: fixPort(nvram.tor_dnsport, 9053) },
-	{ title: 'Data Directory', name: 'tor_datadir', type: 'text', maxlen: 24, size: 28, value: nvram.tor_datadir },
+	{ title: '<% _("Socks Port"); %>', name: 'tor_socksport', type: 'text', maxlen: 5, size: 7, value: fixPort(nvram.tor_socksport, 9050) },
+	{ title: '<% _("Trans Port"); %>', name: 'tor_transport', type: 'text', maxlen: 5, size: 7, value: fixPort(nvram.tor_transport, 9040) },
+	{ title: '<% _("DNS Port"); %>', name: 'tor_dnsport', type: 'text', maxlen: 5, size: 7, value: fixPort(nvram.tor_dnsport, 9053) },
+	{ title: '<% _("Data Directory"); %>', name: 'tor_datadir', type: 'text', maxlen: 24, size: 28, value: nvram.tor_datadir },
 	null,
-	{ title: 'Redirect all users from', multi: [
+	{ title: '<% _("Redirect all users from"); %>', multi: [
 		{ name: 'tor_iface', type: 'select', options: [
 			['br0','LAN (br0)'],
 			['br1','LAN1 (br1)'],
 			['br2','LAN2 (br2)'],
 			['br3','LAN3 (br3)'],
-			['custom','Only selected IP`s']
+			['custom','<% _("Only selected IP`s"); %>']
 				], value: nvram.tor_iface },
 		{ name: 'tor_users', type: 'text', maxlen: 512, size: 64, value: nvram.tor_users } ] },
 	null,
-	{ title: 'Custom Configuration', name: 'tor_custom', type: 'textarea', value: nvram.tor_custom }
+	{ title: '<% _("Custom Configuration"); %>', name: 'tor_custom', type: 'textarea', value: nvram.tor_custom }
 ]);
 </script>
 </div>
-<div class='section-title'>Notes</div>
+<div class='section-title'><% _("Notes"); %></div>
 <div class='section'>
 <ul>
-	<li><b>Enable TOR</b> - Be patient. Starting the TOR client can take from several seconds to several minutes.
-	<li><b>Only selected IP`s</b> - ex: 1.2.3.4,1.1.0/24,1.2.3.1-1.2.3.4
-	<li>•Only connections to destination port 80 are redirected to TOR.
-	<li>•Caution! - If your router only has 32MB of RAM, you'll have to use swap.
+	<li><b><% _("Enable TOR"); %></b> - <% _("Be patient"); %>. <% _("Starting the TOR client can take from several seconds to several minutes"); %>.
+	<li><b><% _("Only selected IP`s"); %></b> - ex: 1.2.3.4,1.1.0/24,1.2.3.1-1.2.3.4
+	<li>•<% _("Only connections to destination port 80 are redirected to TOR"); %>.
+	<li>•<% _("Caution"); %>! - <% _("If your router only has 32MB of RAM"); %>, <% _("you'll have to use swap"); %>.
 </ul>
 </div>
 </form>
@@ -169,8 +169,8 @@ createFieldTable('', [
 <tr><td id='footer' colspan=2>
  <form>
  <span id='footer-msg'></span>
- <input type='button' value='Save' id='save-button' onclick='save()'>
- <input type='button' value='Cancel' id='cancel-button' onclick='javascript:reloadPage();'>
+ <input type='button' value='<% _("Save"); %>' id='save-button' onclick='save()'>
+ <input type='button' value='<% _("Cancel"); %>' id='cancel-button' onclick='javascript:reloadPage();'>
  </form>
 </div>
 </td></tr>

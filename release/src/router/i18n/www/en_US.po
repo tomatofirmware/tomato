@@ -6,11 +6,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TomatoEgg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-04 15:00-0400\n"
-"PO-Revision-Date: 2013-09-04 00:14-0500\n"
+"POT-Creation-Date: 2013-09-07 16:18-0400\n"
+"PO-Revision-Date: 2013-09-07 16:17-0500\n"
 "Last-Translator: Zhiqiang <Wang.9264@gmail.com>\n"
 "Language-Team: TomatoEgg Translators <translate@tomatoegg.net>\n"
-"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -30,7 +29,9 @@ msgstr "Chinese"
 
 #: ../www/advanced-ctnf.asp:14 ../www/advanced-dhcpdns.asp:14
 #: ../www/advanced-firewall.asp:18 ../www/advanced-mac.asp:14
-#: ../www/tomato.js:2386
+#: ../www/advanced-misc.asp:14 ../www/advanced-routing.asp:14
+#: ../www/advanced-tor.asp:13 ../www/advanced-vlan.asp:22
+#: ../www/advanced-wlanvifs.asp:21 ../www/tomato.js:2386
 msgid "Advanced"
 msgstr "Advanced"
 
@@ -44,13 +45,16 @@ msgstr "Netfilter"
 
 #: ../www/advanced-ctnf.asp:175 ../www/advanced-dhcpdns.asp:126
 #: ../www/advanced-firewall.asp:97 ../www/advanced-mac.asp:141
-#: ../www/basic-ipv6.asp:305 ../www/status-overview.asp:343
+#: ../www/advanced-misc.asp:63 ../www/advanced-vlan.asp:862
+#: ../www/basic-ipv6.asp:305 ../www/nas-aria2.asp:70
+#: ../www/status-overview.asp:343
 msgid "Tomato"
 msgstr "Tomato"
 
 #: ../www/advanced-ctnf.asp:176 ../www/advanced-dhcpdns.asp:127
 #: ../www/advanced-firewall.asp:98 ../www/advanced-mac.asp:142
-#: ../www/status-overview.asp:344
+#: ../www/advanced-misc.asp:64 ../www/advanced-vlan.asp:863
+#: ../www/nas-aria2.asp:71 ../www/status-overview.asp:344
 msgid "Version"
 msgstr "Version"
 
@@ -180,7 +184,9 @@ msgstr "SIP"
 msgid "RTSP"
 msgstr "RTSP"
 
-#: ../www/advanced-ctnf.asp:279 ../www/tomato.js:2391
+#: ../www/advanced-ctnf.asp:279 ../www/advanced-misc.asp:14
+#: ../www/advanced-misc.asp:80 ../www/advanced-routing.asp:235
+#: ../www/tomato.js:2391
 msgid "Miscellaneous"
 msgstr "Miscellaneous"
 
@@ -199,15 +205,22 @@ msgstr "Inbound Layer 7"
 
 #: ../www/advanced-ctnf.asp:303 ../www/advanced-dhcpdns.asp:221
 #: ../www/advanced-firewall.asp:172 ../www/advanced-mac.asp:199
-#: ../www/basic-ident.asp:74 ../www/basic-ipv6.asp:373
-#: ../www/basic-network.asp:1791 ../www/basic-time.asp:292
+#: ../www/advanced-misc.asp:109 ../www/advanced-routing.asp:262
+#: ../www/advanced-tor.asp:172 ../www/advanced-vlan.asp:1035
+#: ../www/advanced-wlanvifs.asp:561 ../www/advanced-wlanvifs.asp:1013
+#: ../www/advanced-wlanvifs.asp:1609 ../www/basic-ident.asp:74
+#: ../www/basic-ipv6.asp:373 ../www/basic-network.asp:1791
+#: ../www/basic-time.asp:292 ../www/nas-aria2.asp:122
 msgid "Save"
 msgstr "Save"
 
 #: ../www/advanced-ctnf.asp:304 ../www/advanced-dhcpdns.asp:222
 #: ../www/advanced-firewall.asp:173 ../www/advanced-mac.asp:200
-#: ../www/basic-ident.asp:75 ../www/basic-ipv6.asp:374
-#: ../www/basic-network.asp:1792 ../www/basic-time.asp:293
+#: ../www/advanced-misc.asp:110 ../www/advanced-routing.asp:263
+#: ../www/advanced-tor.asp:173 ../www/advanced-vlan.asp:1036
+#: ../www/advanced-wlanvifs.asp:1610 ../www/basic-ident.asp:75
+#: ../www/basic-ipv6.asp:374 ../www/basic-network.asp:1792
+#: ../www/basic-time.asp:293 ../www/nas-aria2.asp:123
 msgid "Cancel"
 msgstr "Cancel"
 
@@ -292,6 +305,7 @@ msgid "Dnsmasq"
 msgstr "Dnsmasq"
 
 #: ../www/advanced-dhcpdns.asp:169 ../www/advanced-dhcpdns.asp:200
+#: ../www/nas-aria2.asp:104
 msgid "Custom configuration"
 msgstr "Custom configuration"
 
@@ -307,11 +321,15 @@ msgstr "DHCPC Options"
 msgid "Reduce packet size"
 msgstr "Reduce packet size"
 
-#: ../www/advanced-dhcpdns.asp:187
+#: ../www/advanced-dhcpdns.asp:187 ../www/advanced-tor.asp:157
+#: ../www/advanced-vlan.asp:975 ../www/advanced-wlanvifs.asp:1405
 msgid "Notes"
 msgstr "Notes"
 
-#: ../www/advanced-dhcpdns.asp:187
+#: ../www/advanced-dhcpdns.asp:187 ../www/advanced-vlan.asp:839
+#: ../www/advanced-vlan.asp:975 ../www/advanced-wlanvifs.asp:532
+#: ../www/advanced-wlanvifs.asp:1374 ../www/advanced-wlanvifs.asp:1393
+#: ../www/advanced-wlanvifs.asp:1405
 msgid "Click here to show"
 msgstr "Click here to show"
 
@@ -394,7 +412,8 @@ msgstr "Extra options to be added to the Dnsmasq configuration file."
 msgid "Extra options for the DHCP client."
 msgstr "Extra options for the DHCP client."
 
-#: ../www/advanced-dhcpdns.asp:209
+#: ../www/advanced-dhcpdns.asp:209 ../www/advanced-vlan.asp:1001
+#: ../www/advanced-wlanvifs.asp:1424
 msgid "Other relevant notes/hints"
 msgstr "Other relevant notes/hints"
 
@@ -407,7 +426,7 @@ msgstr ""
 "Dnsmasq's configuration file (if it exists)."
 
 #: ../www/advanced-firewall.asp:18 ../www/advanced-firewall.asp:124
-#: ../www/tomato.js:2389
+#: ../www/nas-aria2.asp:112 ../www/tomato.js:2389
 msgid "Firewall"
 msgstr "Firewall"
 
@@ -514,8 +533,8 @@ msgid "WAN Port"
 msgstr "WAN Port"
 
 #: ../www/advanced-mac.asp:169 ../www/advanced-mac.asp:177
-#: ../www/basic-ipv6.asp:340 ../www/basic-network.asp:1636
-#: ../www/basic-time.asp:30
+#: ../www/advanced-vlan.asp:987 ../www/basic-ipv6.asp:340
+#: ../www/basic-network.asp:1636 ../www/basic-time.asp:30
 msgid "Default"
 msgstr "Default"
 
@@ -539,6 +558,362 @@ msgstr "Router's LAN MAC Address"
 #: ../www/advanced-mac.asp:188
 msgid "Computer's MAC Address"
 msgstr "Computer's MAC Address"
+
+#: ../www/advanced-misc.asp:86
+msgid "Boot Wait Time"
+msgstr "Boot Wait Time"
+
+#: ../www/advanced-misc.asp:87
+msgid "WAN Port Speed"
+msgstr "WAN Port Speed"
+
+#: ../www/advanced-misc.asp:93
+msgid "Enable Jumbo Frames"
+msgstr "Enable Jumbo Frames"
+
+#: ../www/advanced-misc.asp:94
+msgid "Jumbo Frame Size"
+msgstr "Jumbo Frame Size"
+
+#: ../www/advanced-misc.asp:95
+msgid "Bytes"
+msgstr "Bytes"
+
+#: ../www/advanced-misc.asp:95
+msgid "range"
+msgstr "range"
+
+#: ../www/advanced-misc.asp:95
+msgid "default"
+msgstr "default"
+
+#: ../www/advanced-misc.asp:99
+msgid "Not all models support these options"
+msgstr "Not all models support these options"
+
+#: ../www/advanced-routing.asp:14 ../www/tomato.js:2392
+msgid "Routing"
+msgstr "Routing"
+
+#: ../www/advanced-routing.asp:225
+msgid "Current Routing Table"
+msgstr "Current Routing Table"
+
+#: ../www/advanced-routing.asp:230
+msgid "Static Routing Table"
+msgstr "Static Routing Table"
+
+#: ../www/advanced-routing.asp:239 ../www/advanced-wlanvifs.asp:1412
+msgid "Mode"
+msgstr "Mode"
+
+#: ../www/advanced-routing.asp:249
+msgid "Efficient Multicast Forwarding"
+msgstr "Efficient Multicast Forwarding"
+
+#: ../www/advanced-routing.asp:251
+msgid "DHCP Routes"
+msgstr "DHCP Routes"
+
+#: ../www/advanced-tor.asp:13 ../www/tomato.js:2394
+msgid "TOR Project"
+msgstr "TOR Project"
+
+#: ../www/advanced-tor.asp:55 ../www/advanced-tor.asp:59
+#: ../www/advanced-tor.asp:63 ../www/advanced-tor.asp:67
+#: ../www/advanced-tor.asp:71 ../www/advanced-tor.asp:75
+#: ../www/advanced-tor.asp:79 ../www/advanced-tor.asp:83
+#: ../www/advanced-tor.asp:87 ../www/advanced-tor.asp:91
+msgid "Cannot set"
+msgstr "Cannot set"
+
+#: ../www/advanced-tor.asp:55 ../www/advanced-tor.asp:59
+#: ../www/advanced-tor.asp:63 ../www/advanced-tor.asp:67
+#: ../www/advanced-tor.asp:71 ../www/advanced-tor.asp:75
+#: ../www/advanced-tor.asp:79 ../www/advanced-tor.asp:83
+#: ../www/advanced-tor.asp:87 ../www/advanced-tor.asp:91
+msgid "option here"
+msgstr "option here"
+
+#: ../www/advanced-tor.asp:55 ../www/advanced-tor.asp:71
+#: ../www/advanced-tor.asp:75 ../www/advanced-tor.asp:83
+msgid "You can set it in Tomato GUI"
+msgstr "You can set it in Tomato GUI"
+
+#: ../www/advanced-tor.asp:136 ../www/advanced-tor.asp:160
+msgid "Enable TOR"
+msgstr "Enable TOR"
+
+#: ../www/advanced-tor.asp:138
+msgid "Socks Port"
+msgstr "Socks Port"
+
+#: ../www/advanced-tor.asp:139
+msgid "Trans Port"
+msgstr "Trans Port"
+
+#: ../www/advanced-tor.asp:140
+msgid "DNS Port"
+msgstr "DNS Port"
+
+#: ../www/advanced-tor.asp:141
+msgid "Data Directory"
+msgstr "Data Directory"
+
+#: ../www/advanced-tor.asp:143
+msgid "Redirect all users from"
+msgstr "Redirect all users from"
+
+#: ../www/advanced-tor.asp:149 ../www/advanced-tor.asp:161
+msgid "Only selected IP`s"
+msgstr "Only selected IP`s"
+
+#: ../www/advanced-tor.asp:153
+msgid "Custom Configuration"
+msgstr "Custom Configuration"
+
+#: ../www/advanced-tor.asp:160
+msgid "Be patient"
+msgstr "Be patient"
+
+#: ../www/advanced-tor.asp:160
+msgid ""
+"Starting the TOR client can take from several seconds to several minutes"
+msgstr ""
+"Starting the TOR client can take from several seconds to several minutes"
+
+#: ../www/advanced-tor.asp:162
+msgid "Only connections to destination port 80 are redirected to TOR"
+msgstr "Only connections to destination port 80 are redirected to TOR"
+
+#: ../www/advanced-tor.asp:163 ../www/nas-aria2.asp:108
+msgid "Caution"
+msgstr "Caution"
+
+#: ../www/advanced-tor.asp:163
+msgid "If your router only has 32MB of RAM"
+msgstr "If your router only has 32MB of RAM"
+
+#: ../www/advanced-tor.asp:163
+msgid "you'll have to use swap"
+msgstr "you'll have to use swap"
+
+#: ../www/advanced-vlan.asp:22 ../www/tomato.js:2396
+msgid "VLAN"
+msgstr "VLAN"
+
+#: ../www/advanced-vlan.asp:396
+msgid "Router must be rebooted to proceed"
+msgstr "Router must be rebooted to proceed"
+
+#: ../www/advanced-vlan.asp:396
+msgid "Commit changes to NVRAM and reboot now"
+msgstr "Commit changes to NVRAM and reboot now"
+
+#: ../www/advanced-vlan.asp:424
+msgid "Tagged"
+msgstr "Tagged"
+
+#: ../www/advanced-vlan.asp:612
+msgid ""
+"Port 4 cannot be assigned to more than one VLAN unless frames are tagged on "
+"all VLANs Port 4 is member"
+msgstr ""
+"Port 4 cannot be assigned to more than one VLAN unless frames are tagged on "
+"all VLANs Port 4 is member"
+
+#: ../www/advanced-vlan.asp:620
+msgid ""
+"WAN port cannot be assigned to more than one VLAN unless frames are tagged "
+"on all VLANs WAN port is member"
+msgstr ""
+"WAN port cannot be assigned to more than one VLAN unless frames are tagged "
+"on all VLANs WAN port is member"
+
+#: ../www/advanced-vlan.asp:633
+msgid "Only one VID can be selected as the default VID"
+msgstr "Only one VID can be selected as the default VID"
+
+#: ../www/advanced-vlan.asp:640
+msgid "Cannot add more than one entry with VID"
+msgstr "Cannot add more than one entry with VID"
+
+#: ../www/advanced-vlan.asp:647
+msgid "Only one VID can be used as WAN at any time"
+msgstr "Only one VID can be used as WAN at any time"
+
+#: ../www/advanced-vlan.asp:655
+msgid ""
+"One and only one VID can be used for LAN' + ((i==0) ? '' : i ) + ' (br'+i+') "
+"at any time"
+msgstr ""
+"One and only one VID can be used for LAN' + ((i==0) ? '' : i ) + ' (br'+i+') "
+"at any time"
+
+#: ../www/advanced-vlan.asp:937
+msgid "VID Offset"
+msgstr "VID Offset"
+
+#: ../www/advanced-vlan.asp:950 ../www/advanced-vlan.asp:996
+#: ../www/tomato.js:2399
+msgid "Wireless"
+msgstr "Wireless"
+
+#: ../www/advanced-vlan.asp:966
+msgid "Trunk VLAN support override (experimental)"
+msgstr "Trunk VLAN support override (experimental)"
+
+#: ../www/advanced-vlan.asp:970 ../www/status-overview.asp:527
+msgid "Enable"
+msgstr "Enable"
+
+#: ../www/advanced-vlan.asp:978
+msgid "Unique identifier of a VLAN"
+msgstr "Unique identifier of a VLAN"
+
+#: ../www/advanced-vlan.asp:979 ../www/advanced-vlan.asp:992
+msgid "EXPERIMENTAL"
+msgstr "EXPERIMENTAL"
+
+#: ../www/advanced-vlan.asp:979
+msgid ""
+"Allows overriding 'traditional' VLAN/VID mapping with arbitrary VIDs for "
+"each VLAN (set to '0' to use 'regular' VLAN/VID mappings instead)"
+msgstr ""
+"Allows overriding 'traditional' VLAN/VID mapping with arbitrary VIDs for "
+"each VLAN (set to '0' to use 'regular' VLAN/VID mappings instead)"
+
+#: ../www/advanced-vlan.asp:979
+msgid "Warning"
+msgstr "Warning"
+
+#: ../www/advanced-vlan.asp:979
+msgid ""
+"this hasn't been verified/tested on anything but a Cisco/Linksys E3000 and "
+"may not be supported by your particular device/model"
+msgstr ""
+"this hasn't been verified/tested on anything but a Cisco/Linksys E3000 and "
+"may not be supported by your particular device/model"
+
+#: ../www/advanced-vlan.asp:979
+msgid "see notes on "
+msgstr "see notes on "
+
+#: ../www/advanced-vlan.asp:980
+msgid "Which ethernet ports on the router should be members of this VLAN"
+msgstr "Which ethernet ports on the router should be members of this VLAN"
+
+#: ../www/advanced-vlan.asp:981
+msgid "Enable 802.1Q tagging of ethernet frames on a particular port/VLAN"
+msgstr "Enable 802.1Q tagging of ethernet frames on a particular port/VLAN"
+
+#: ../www/advanced-vlan.asp:987
+msgid "VLAN ID assigned to untagged frames received by the router"
+msgstr "VLAN ID assigned to untagged frames received by the router"
+
+#: ../www/advanced-vlan.asp:988 ../www/advanced-wlanvifs.asp:1413
+#: ../www/basic-network.asp:60
+msgid "Bridge"
+msgstr "Bridge"
+
+#: ../www/advanced-vlan.asp:988
+msgid ""
+"Determines if this VLAN ID should be treated as WAN, part of a LAN bridge or "
+"just left alone"
+msgstr ""
+"Determines if this VLAN ID should be treated as WAN, part of a LAN bridge or "
+"just left alone"
+
+#: ../www/advanced-vlan.asp:988
+msgid ""
+"i.e. member of a 802.1Q trunk, being managed manually via scripts, etc..."
+msgstr ""
+"i.e. member of a 802.1Q trunk, being managed manually via scripts, etc..."
+
+#: ../www/advanced-vlan.asp:1003 ../www/advanced-vlan.asp:1004
+msgid "must"
+msgstr "must"
+
+#: ../www/advanced-vlan.asp:1014
+msgid "experimental"
+msgstr "experimental"
+
+#: ../www/advanced-vlan.asp:1025
+msgid "This feature is not supported on this router"
+msgstr "This feature is not supported on this router"
+
+#: ../www/advanced-wlanvifs.asp:21 ../www/advanced-wlanvifs.asp:1360
+msgid "Virtual Wireless Interfaces"
+msgstr "Virtual Wireless Interfaces"
+
+#: ../www/advanced-wlanvifs.asp:62 ../www/advanced-wlanvifs.asp:1412
+#: ../www/basic-network.asp:1723 ../www/status-overview.asp:42
+msgid "Access Point"
+msgstr "Access Point"
+
+#: ../www/advanced-wlanvifs.asp:62 ../www/advanced-wlanvifs.asp:1412
+#: ../www/basic-network.asp:1723 ../www/status-overview.asp:42
+msgid "Wireless Client"
+msgstr "Wireless Client"
+
+#: ../www/advanced-wlanvifs.asp:62 ../www/basic-network.asp:1723
+#: ../www/status-overview.asp:42
+msgid "Wireless Ethernet Bridge"
+msgstr "Wireless Ethernet Bridge"
+
+#: ../www/advanced-wlanvifs.asp:64 ../www/advanced-wlanvifs.asp:561
+#: ../www/tomato.js:2350
+msgid "Overview"
+msgstr "Overview"
+
+#: ../www/advanced-wlanvifs.asp:536
+msgid "Click here to hide"
+msgstr "Click here to hide"
+
+#: ../www/advanced-wlanvifs.asp:1374
+msgid "Wireless Interfaces Details"
+msgstr "Wireless Interfaces Details"
+
+#: ../www/advanced-wlanvifs.asp:1381 ../www/advanced-wlanvifs.asp:1409
+msgid "Interface"
+msgstr "Interface"
+
+#: ../www/advanced-wlanvifs.asp:1382
+msgid "Virtual Interfaces"
+msgstr "Virtual Interfaces"
+
+#: ../www/advanced-wlanvifs.asp:1393 ../www/basic-network.asp:1624
+msgid "Options"
+msgstr "Options"
+
+#: ../www/advanced-wlanvifs.asp:1409
+msgid "Wireless VIF name"
+msgstr "Wireless VIF name"
+
+#: ../www/advanced-wlanvifs.asp:1410 ../www/basic-network.asp:95
+#: ../www/basic-network.asp:98 ../www/status-overview.asp:511
+msgid "Enabled"
+msgstr "Enabled"
+
+#: ../www/advanced-wlanvifs.asp:1410
+msgid "If this VIF should be active and brought online"
+msgstr "If this VIF should be active and brought online"
+
+#: ../www/advanced-wlanvifs.asp:1411
+msgid "Wireless Service Set Identifier"
+msgstr "Wireless Service Set Identifier"
+
+#: ../www/advanced-wlanvifs.asp:1412
+msgid "Interface mode"
+msgstr "Interface mode"
+
+#: ../www/advanced-wlanvifs.asp:1412
+msgid "etc"
+msgstr "etc"
+
+#: ../www/advanced-wlanvifs.asp:1413
+msgid "Which LAN bridge this VIF should be assigned"
+msgstr "Which LAN bridge this VIF should be assigned"
 
 #: ../www/basic-ident.asp:14 ../www/tomato.js:2376 ../www/tomato.js:2401
 msgid "Basic"
@@ -688,10 +1063,6 @@ msgstr "0 for default"
 msgid "Tunnel TTL"
 msgstr "Tunnel TTL"
 
-#: ../www/basic-network.asp:60
-msgid "Bridge"
-msgstr "Bridge"
-
 #: ../www/basic-network.asp:60 ../www/basic-network.asp:1620
 msgid "IP Address"
 msgstr "IP Address"
@@ -715,11 +1086,6 @@ msgstr "Lease&nbsp;Time&nbsp;"
 #: ../www/basic-network.asp:60 ../www/status-overview.asp:380
 msgid "mins"
 msgstr "mins"
-
-#: ../www/basic-network.asp:95 ../www/basic-network.asp:98
-#: ../www/status-overview.asp:511
-msgid "Enabled"
-msgstr "Enabled"
 
 #: ../www/basic-network.asp:241
 msgid "Cannot add another entry for bridge"
@@ -902,10 +1268,6 @@ msgstr "Gateway"
 msgid "PPTP Gateway"
 msgstr "PPTP Gateway"
 
-#: ../www/basic-network.asp:1624
-msgid "Options"
-msgstr "Options"
-
 #: ../www/basic-network.asp:1625
 msgid "Connect Mode"
 msgstr "Connect Mode"
@@ -986,22 +1348,10 @@ msgstr "Enable Wireless"
 msgid "Wireless Mode"
 msgstr "Wireless Mode"
 
-#: ../www/basic-network.asp:1723 ../www/status-overview.asp:42
-msgid "Access Point"
-msgstr "Access Point"
-
 #: ../www/basic-network.asp:1723 ../www/basic-network.asp:1770
 #: ../www/status-overview.asp:42
 msgid "WDS"
 msgstr "WDS"
-
-#: ../www/basic-network.asp:1723 ../www/status-overview.asp:42
-msgid "Wireless Client"
-msgstr "Wireless Client"
-
-#: ../www/basic-network.asp:1723 ../www/status-overview.asp:42
-msgid "Wireless Ethernet Bridge"
-msgstr "Wireless Ethernet Bridge"
 
 #: ../www/basic-network.asp:1725
 msgid "Radio Band"
@@ -1573,6 +1923,102 @@ msgstr "Irkutsk"
 msgid "Krasnoyarsk"
 msgstr "Krasnoyarsk"
 
+#: ../www/nas-aria2.asp:13
+msgid " Aria2 Client"
+msgstr " Aria2 Client"
+
+#: ../www/nas-aria2.asp:76 ../www/tomato.js:2410
+msgid "Basic Settings"
+msgstr "Basic Settings"
+
+#: ../www/nas-aria2.asp:85 ../www/nas-aria2.asp:108
+msgid "Enable torrent client"
+msgstr "Enable torrent client"
+
+#: ../www/nas-aria2.asp:86 ../www/nas-aria2.asp:109
+msgid "Listening port"
+msgstr "Listening port"
+
+#: ../www/nas-aria2.asp:87
+msgid "Download directory"
+msgstr "Download directory"
+
+#: ../www/nas-aria2.asp:92 ../www/nas-aria2.asp:110
+msgid "Listening RPC port"
+msgstr "Listening RPC port"
+
+#: ../www/nas-aria2.asp:93 ../www/nas-aria2.asp:111
+msgid "Use SSL to encrypt RPC traffic"
+msgstr "Use SSL to encrypt RPC traffic"
+
+#: ../www/nas-aria2.asp:94
+msgid "Save settings location"
+msgstr "Save settings location"
+
+#: ../www/nas-aria2.asp:95
+msgid "In the Download directory (Recommended)"
+msgstr "In the Download directory (Recommended)"
+
+#: ../www/nas-aria2.asp:102
+msgid "RAM (Temporary)"
+msgstr "RAM (Temporary)"
+
+#: ../www/nas-aria2.asp:104
+msgid "Aria2"
+msgstr "Aria2"
+
+#: ../www/nas-aria2.asp:108
+msgid "If your router only has 32MB of RAM, you'll have to use swap"
+msgstr "If your router only has 32MB of RAM, you'll have to use swap"
+
+#: ../www/nas-aria2.asp:109
+msgid "Port used for torrent client"
+msgstr "Port used for torrent client"
+
+#: ../www/nas-aria2.asp:109 ../www/nas-aria2.asp:110
+msgid "Make sure this port is not in use"
+msgstr "Make sure this port is not in use"
+
+#: ../www/nas-aria2.asp:110
+msgid "Port used for Aria2 RPC"
+msgstr "Port used for Aria2 RPC"
+
+#: ../www/nas-aria2.asp:111
+msgid "Use ssl to encrypt RPC traffic"
+msgstr "Use ssl to encrypt RPC traffic"
+
+#: ../www/nas-aria2.asp:112
+msgid "Allow remote access"
+msgstr "Allow remote access"
+
+#: ../www/nas-aria2.asp:112
+msgid ""
+"To open the Aria2 RPC port from the WAN side and allow the RPC to be "
+"accessed from the internet. you have to goto"
+msgstr ""
+"To open the Aria2 RPC port from the WAN side and allow the RPC to be "
+"accessed from the internet. you have to goto"
+
+#: ../www/nas-aria2.asp:112
+msgid "settings to allow incoming traffic to RPC port of Aria2"
+msgstr "settings to allow incoming traffic to RPC port of Aria2"
+
+#: ../www/nas-aria2.asp:113
+msgid "RPC access in lan is automatically enabled"
+msgstr "RPC access in lan is automatically enabled"
+
+#: ../www/nas-aria2.asp:113
+msgid "RPC auth is also enabled, user name is "
+msgstr "RPC auth is also enabled, user name is "
+
+#: ../www/nas-aria2.asp:113
+msgid " and password is your password to login Tomato"
+msgstr " and password is your password to login Tomato"
+
+#: ../www/nas-aria2.asp:113
+msgid "you can change this option for security reason"
+msgstr "you can change this option for security reason"
+
 #: ../www/status-overview.asp:43
 msgid "WPA Personal (PSK)"
 msgstr "WPA Personal (PSK)"
@@ -1622,7 +2068,7 @@ msgstr "and make a choice."
 msgid "You did not configure language setting."
 msgstr "You did not configure language setting."
 
-#: ../www/status-overview.asp:363 ../www/tomato.js:2464
+#: ../www/status-overview.asp:363 ../www/tomato.js:2467
 msgid "Administration"
 msgstr "Administration"
 
@@ -1763,17 +2209,9 @@ msgstr "Noise"
 msgid "Signal Quality"
 msgstr "Signal Quality"
 
-#: ../www/status-overview.asp:527
-msgid "Enable"
-msgstr "Enable"
-
 #: ../www/status-overview.asp:528
 msgid "Disable"
 msgstr "Disable"
-
-#: ../www/tomato.js:2350
-msgid "Overview"
-msgstr "Overview"
 
 #: ../www/tomato.js:2351
 msgid "Device List"
@@ -1867,18 +2305,6 @@ msgstr "Conntrack/Netfilter"
 msgid "DHCP/DNS"
 msgstr "DHCP/DNS"
 
-#: ../www/tomato.js:2392
-msgid "Routing"
-msgstr "Routing"
-
-#: ../www/tomato.js:2394
-msgid "TOR Project"
-msgstr "TOR Project"
-
-#: ../www/tomato.js:2396
-msgid "VLAN"
-msgstr "VLAN"
-
 #: ../www/tomato.js:2397
 msgid "LAN Access"
 msgstr "LAN Access"
@@ -1886,10 +2312,6 @@ msgstr "LAN Access"
 #: ../www/tomato.js:2398
 msgid "Virtual Wireless"
 msgstr "Virtual Wireless"
-
-#: ../www/tomato.js:2399
-msgid "Wireless"
-msgstr "Wireless"
 
 #: ../www/tomato.js:2400
 msgid "Port Forwarding"
@@ -1918,10 +2340,6 @@ msgstr "Access Restriction"
 #: ../www/tomato.js:2409
 msgid "QoS"
 msgstr "QoS"
-
-#: ../www/tomato.js:2410
-msgid "Basic Settings"
-msgstr "Basic Settings"
 
 #: ../www/tomato.js:2411
 msgid "Classification"
@@ -1967,106 +2385,119 @@ msgstr "UPS Monitor"
 msgid "BitTorrent Client"
 msgstr "BitTorrent Client"
 
-#: ../www/tomato.js:2451
+#: ../www/tomato.js:2449
+msgid "Aria2 Client"
+msgstr "Aria2 Client"
+
+#: ../www/tomato.js:2454
 msgid "VPN Tunneling"
 msgstr "VPN Tunneling"
 
-#: ../www/tomato.js:2453
+#: ../www/tomato.js:2456
 msgid "OpenVPN Server"
 msgstr "OpenVPN Server"
 
-#: ../www/tomato.js:2454
+#: ../www/tomato.js:2457
 msgid "OpenVPN Client"
 msgstr "OpenVPN Client"
 
-#: ../www/tomato.js:2457
+#: ../www/tomato.js:2460
 msgid "PPTP Server"
 msgstr "PPTP Server"
 
-#: ../www/tomato.js:2458
+#: ../www/tomato.js:2461
 msgid "PPTP Online"
 msgstr "PPTP Online"
 
-#: ../www/tomato.js:2459
+#: ../www/tomato.js:2462
 msgid "PPTP Client"
 msgstr "PPTP Client"
 
-#: ../www/tomato.js:2465
+#: ../www/tomato.js:2468
 msgid "Admin Access"
 msgstr "Admin Access"
 
-#: ../www/tomato.js:2466
+#: ../www/tomato.js:2469
 msgid "TomatoAnon"
 msgstr "TomatoAnon"
 
-#: ../www/tomato.js:2467
+#: ../www/tomato.js:2470
 msgid "Bandwidth Monitoring"
 msgstr "Bandwidth Monitoring"
 
-#: ../www/tomato.js:2468
+#: ../www/tomato.js:2471
 msgid "IP Traffic Monitoring"
 msgstr "IP Traffic Monitoring"
 
-#: ../www/tomato.js:2469
+#: ../www/tomato.js:2472
 msgid "Buttons/LED"
 msgstr "Buttons/LED"
 
-#: ../www/tomato.js:2471
+#: ../www/tomato.js:2474
 msgid "CIFS Client"
 msgstr "CIFS Client"
 
-#: ../www/tomato.js:2474
+#: ../www/tomato.js:2477
 msgid "SDHC/MMC"
 msgstr "SDHC/MMC"
 
-#: ../www/tomato.js:2476
+#: ../www/tomato.js:2479
 msgid "Configuration"
 msgstr "Configuration"
 
-#: ../www/tomato.js:2477
+#: ../www/tomato.js:2480
 msgid "Debugging"
 msgstr "Debugging"
 
-#: ../www/tomato.js:2479
+#: ../www/tomato.js:2482
 msgid "JFFS"
 msgstr "JFFS"
 
-#: ../www/tomato.js:2482
+#: ../www/tomato.js:2485
 msgid "NFS Server"
 msgstr "NFS Server"
 
-#: ../www/tomato.js:2485
+#: ../www/tomato.js:2488
 msgid "SNMP"
 msgstr "SNMP"
 
-#: ../www/tomato.js:2487
+#: ../www/tomato.js:2490
 msgid "Logging"
 msgstr "Logging"
 
-#: ../www/tomato.js:2488
+#: ../www/tomato.js:2491
 msgid "Scheduler"
 msgstr "Scheduler"
 
-#: ../www/tomato.js:2489
+#: ../www/tomato.js:2492
 msgid "Scripts"
 msgstr "Scripts"
 
-#: ../www/tomato.js:2490
+#: ../www/tomato.js:2493
 msgid "Upgrade"
 msgstr "Upgrade"
 
-#: ../www/tomato.js:2492
+#: ../www/tomato.js:2495
 msgid "About"
 msgstr "About"
 
-#: ../www/tomato.js:2493
+#: ../www/tomato.js:2496
 msgid "Reboot"
 msgstr "Reboot"
 
-#: ../www/tomato.js:2494
+#: ../www/tomato.js:2497
 msgid "Shutdown"
 msgstr "Shutdown"
 
-#: ../www/tomato.js:2495
+#: ../www/tomato.js:2498
 msgid "Logout"
 msgstr "Logout"
+
+#~ msgid ""
+#~ "); %>']], value: nvram.aria2_settings, suffix: ' ' },\n"
+#~ "    null,\n"
+#~ "    { title: '<a href="
+#~ msgstr ""
+#~ "); %>']], value: nvram.aria2_settings, suffix: ' ' },\n"
+#~ "    null,\n"
+#~ "    { title: '<a href="

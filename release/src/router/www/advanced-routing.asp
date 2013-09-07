@@ -11,7 +11,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Advanced: Routing</title>
+<title>[<% ident(); %>] <% _("Advanced"); %>: <% _("Routing"); %></title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
@@ -222,21 +222,21 @@ function init()
 <input type='hidden' name='dr_wan_tx'>
 <input type='hidden' name='dr_wan_rx'>
 
-<div class='section-title'>Current Routing Table</div>
+<div class='section-title'><% _("Current Routing Table"); %></div>
 <div class='section'>
 	<table class='tomato-grid' id='ara-grid'></table>
 </div>
 
-<div class='section-title'>Static Routing Table</div>
+<div class='section-title'><% _("Static Routing Table"); %></div>
 <div class='section'>
 	<table class='tomato-grid' id='ars-grid'></table>
 </div>
 
-<div class='section-title'>Miscellaneous</div>
+<div class='section-title'><% _("Miscellaneous"); %></div>
 <div class='section'>
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: 'Mode', name: 'wk_mode', type: 'select', options: [['gateway','Gateway'],['router','Router']], value: nvram.wk_mode },
+	{ title: '<% _("Mode"); %>', name: 'wk_mode', type: 'select', options: [['gateway','Gateway'],['router','Router']], value: nvram.wk_mode },
 /* ZEBRA-BEGIN */
 	{ title: 'RIPv1 &amp; v2' },
 	{ title: 'LAN', indent: 2, name: 'f_dr_lan', type: 'checkbox', value: ((nvram.dr_lan_rx != '0') && (nvram.dr_lan_rx != '')) },
@@ -246,9 +246,9 @@ createFieldTable('', [
 	{ title: 'WAN', indent: 2, name: 'f_dr_wan', type: 'checkbox', value: ((nvram.dr_wan_rx != '0') && (nvram.dr_wan_rx != '')) },
 /* ZEBRA-END */
 /* EMF-BEGIN */
-	{ title: 'Efficient Multicast Forwarding', name: 'f_emf', type: 'checkbox', value: nvram.emf_enable != '0' },
+	{ title: '<% _("Efficient Multicast Forwarding"); %>', name: 'f_emf', type: 'checkbox', value: nvram.emf_enable != '0' },
 /* EMF-END */
-	{ title: 'DHCP Routes', name: 'f_dhcp_routes', type: 'checkbox', value: nvram.dhcp_routes != '0' },
+	{ title: '<% _("DHCP Routes"); %>', name: 'f_dhcp_routes', type: 'checkbox', value: nvram.dhcp_routes != '0' },
 ]);
 </script>
 </div>
@@ -259,8 +259,8 @@ createFieldTable('', [
 </td></tr>
 <tr><td id='footer' colspan=2>
 	<span id='footer-msg'></span>
-	<input type='button' value='Save' id='save-button' onclick='save()'>
-	<input type='button' value='Cancel' id='cancel-button' onclick='reloadPage();'>
+	<input type='button' value='<% _("Save"); %>' id='save-button' onclick='save()'>
+	<input type='button' value='<% _("Cancel"); %>' id='cancel-button' onclick='reloadPage();'>
 </td></tr>
 </table>
 </form>

@@ -6,11 +6,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TomatoEgg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-04 15:00-0400\n"
-"PO-Revision-Date: 2013-09-04 00:14-0500\n"
+"POT-Creation-Date: 2013-09-07 16:18-0400\n"
+"PO-Revision-Date: 2013-09-07 16:39-0500\n"
 "Last-Translator: Zhiqiang <Wang.9264@gmail.com>\n"
 "Language-Team: TomatoEgg Translators <translate@tomatoegg.net>\n"
-"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -30,7 +29,9 @@ msgstr "中文"
 
 #: ../www/advanced-ctnf.asp:14 ../www/advanced-dhcpdns.asp:14
 #: ../www/advanced-firewall.asp:18 ../www/advanced-mac.asp:14
-#: ../www/tomato.js:2386
+#: ../www/advanced-misc.asp:14 ../www/advanced-routing.asp:14
+#: ../www/advanced-tor.asp:13 ../www/advanced-vlan.asp:22
+#: ../www/advanced-wlanvifs.asp:21 ../www/tomato.js:2386
 msgid "Advanced"
 msgstr "高级设置"
 
@@ -44,13 +45,16 @@ msgstr "网络过滤"
 
 #: ../www/advanced-ctnf.asp:175 ../www/advanced-dhcpdns.asp:126
 #: ../www/advanced-firewall.asp:97 ../www/advanced-mac.asp:141
-#: ../www/basic-ipv6.asp:305 ../www/status-overview.asp:343
+#: ../www/advanced-misc.asp:63 ../www/advanced-vlan.asp:862
+#: ../www/basic-ipv6.asp:305 ../www/nas-aria2.asp:70
+#: ../www/status-overview.asp:343
 msgid "Tomato"
 msgstr "Tomato"
 
 #: ../www/advanced-ctnf.asp:176 ../www/advanced-dhcpdns.asp:127
 #: ../www/advanced-firewall.asp:98 ../www/advanced-mac.asp:142
-#: ../www/status-overview.asp:344
+#: ../www/advanced-misc.asp:64 ../www/advanced-vlan.asp:863
+#: ../www/nas-aria2.asp:71 ../www/status-overview.asp:344
 msgid "Version"
 msgstr "版本"
 
@@ -180,7 +184,9 @@ msgstr "SIP"
 msgid "RTSP"
 msgstr "RTSP"
 
-#: ../www/advanced-ctnf.asp:279 ../www/tomato.js:2391
+#: ../www/advanced-ctnf.asp:279 ../www/advanced-misc.asp:14
+#: ../www/advanced-misc.asp:80 ../www/advanced-routing.asp:235
+#: ../www/tomato.js:2391
 msgid "Miscellaneous"
 msgstr "其它设置"
 
@@ -199,15 +205,22 @@ msgstr "连入7层协议"
 
 #: ../www/advanced-ctnf.asp:303 ../www/advanced-dhcpdns.asp:221
 #: ../www/advanced-firewall.asp:172 ../www/advanced-mac.asp:199
-#: ../www/basic-ident.asp:74 ../www/basic-ipv6.asp:373
-#: ../www/basic-network.asp:1791 ../www/basic-time.asp:292
+#: ../www/advanced-misc.asp:109 ../www/advanced-routing.asp:262
+#: ../www/advanced-tor.asp:172 ../www/advanced-vlan.asp:1035
+#: ../www/advanced-wlanvifs.asp:561 ../www/advanced-wlanvifs.asp:1013
+#: ../www/advanced-wlanvifs.asp:1609 ../www/basic-ident.asp:74
+#: ../www/basic-ipv6.asp:373 ../www/basic-network.asp:1791
+#: ../www/basic-time.asp:292 ../www/nas-aria2.asp:122
 msgid "Save"
 msgstr "保存"
 
 #: ../www/advanced-ctnf.asp:304 ../www/advanced-dhcpdns.asp:222
 #: ../www/advanced-firewall.asp:173 ../www/advanced-mac.asp:200
-#: ../www/basic-ident.asp:75 ../www/basic-ipv6.asp:374
-#: ../www/basic-network.asp:1792 ../www/basic-time.asp:293
+#: ../www/advanced-misc.asp:110 ../www/advanced-routing.asp:263
+#: ../www/advanced-tor.asp:173 ../www/advanced-vlan.asp:1036
+#: ../www/advanced-wlanvifs.asp:1610 ../www/basic-ident.asp:75
+#: ../www/basic-ipv6.asp:374 ../www/basic-network.asp:1792
+#: ../www/basic-time.asp:293 ../www/nas-aria2.asp:123
 msgid "Cancel"
 msgstr "取消"
 
@@ -292,6 +305,7 @@ msgid "Dnsmasq"
 msgstr "Dnsmasq"
 
 #: ../www/advanced-dhcpdns.asp:169 ../www/advanced-dhcpdns.asp:200
+#: ../www/nas-aria2.asp:104
 msgid "Custom configuration"
 msgstr "自定义配置"
 
@@ -307,11 +321,15 @@ msgstr "DHCPC选项"
 msgid "Reduce packet size"
 msgstr "减小包尺寸"
 
-#: ../www/advanced-dhcpdns.asp:187
+#: ../www/advanced-dhcpdns.asp:187 ../www/advanced-tor.asp:157
+#: ../www/advanced-vlan.asp:975 ../www/advanced-wlanvifs.asp:1405
 msgid "Notes"
 msgstr "提示"
 
-#: ../www/advanced-dhcpdns.asp:187
+#: ../www/advanced-dhcpdns.asp:187 ../www/advanced-vlan.asp:839
+#: ../www/advanced-vlan.asp:975 ../www/advanced-wlanvifs.asp:532
+#: ../www/advanced-wlanvifs.asp:1374 ../www/advanced-wlanvifs.asp:1393
+#: ../www/advanced-wlanvifs.asp:1405
 msgid "Click here to show"
 msgstr "点击这里显示"
 
@@ -386,7 +404,8 @@ msgstr "其它附加到Dnsmasq配置文件中的选项"
 msgid "Extra options for the DHCP client."
 msgstr "发送到DHCP客户端的其它选项"
 
-#: ../www/advanced-dhcpdns.asp:209
+#: ../www/advanced-dhcpdns.asp:209 ../www/advanced-vlan.asp:1001
+#: ../www/advanced-wlanvifs.asp:1424
 msgid "Other relevant notes/hints"
 msgstr "其它相关提示"
 
@@ -397,7 +416,7 @@ msgid ""
 msgstr "/etc/dnsmasq.custom如果存在的话，也会附加到Dnsmasq配置文件尾部"
 
 #: ../www/advanced-firewall.asp:18 ../www/advanced-firewall.asp:124
-#: ../www/tomato.js:2389
+#: ../www/nas-aria2.asp:112 ../www/tomato.js:2389
 msgid "Firewall"
 msgstr "防火墙"
 
@@ -504,8 +523,8 @@ msgid "WAN Port"
 msgstr "WAN端口"
 
 #: ../www/advanced-mac.asp:169 ../www/advanced-mac.asp:177
-#: ../www/basic-ipv6.asp:340 ../www/basic-network.asp:1636
-#: ../www/basic-time.asp:30
+#: ../www/advanced-vlan.asp:987 ../www/basic-ipv6.asp:340
+#: ../www/basic-network.asp:1636 ../www/basic-time.asp:30
 msgid "Default"
 msgstr "默认"
 
@@ -529,6 +548,348 @@ msgstr "路由器局域网MAC地址"
 #: ../www/advanced-mac.asp:188
 msgid "Computer's MAC Address"
 msgstr "计算机MAC地址"
+
+#: ../www/advanced-misc.asp:86
+msgid "Boot Wait Time"
+msgstr "启动等待时间"
+
+#: ../www/advanced-misc.asp:87
+msgid "WAN Port Speed"
+msgstr "WAN口速度"
+
+#: ../www/advanced-misc.asp:93
+msgid "Enable Jumbo Frames"
+msgstr "启用巨大帧"
+
+#: ../www/advanced-misc.asp:94
+msgid "Jumbo Frame Size"
+msgstr "巨大帧大小"
+
+#: ../www/advanced-misc.asp:95
+msgid "Bytes"
+msgstr "字节"
+
+#: ../www/advanced-misc.asp:95
+msgid "range"
+msgstr "范围"
+
+#: ../www/advanced-misc.asp:95
+msgid "default"
+msgstr "默认值"
+
+#: ../www/advanced-misc.asp:99
+msgid "Not all models support these options"
+msgstr "不是所有的型号都支持这些功能"
+
+#: ../www/advanced-routing.asp:14 ../www/tomato.js:2392
+msgid "Routing"
+msgstr "路由"
+
+#: ../www/advanced-routing.asp:225
+msgid "Current Routing Table"
+msgstr "当前路由表"
+
+#: ../www/advanced-routing.asp:230
+msgid "Static Routing Table"
+msgstr "静态路由表"
+
+#: ../www/advanced-routing.asp:239 ../www/advanced-wlanvifs.asp:1412
+msgid "Mode"
+msgstr "模式"
+
+#: ../www/advanced-routing.asp:249
+msgid "Efficient Multicast Forwarding"
+msgstr "多播转发"
+
+#: ../www/advanced-routing.asp:251
+msgid "DHCP Routes"
+msgstr "DHCP路由"
+
+#: ../www/advanced-tor.asp:13 ../www/tomato.js:2394
+msgid "TOR Project"
+msgstr "TOR Project"
+
+#: ../www/advanced-tor.asp:55 ../www/advanced-tor.asp:59
+#: ../www/advanced-tor.asp:63 ../www/advanced-tor.asp:67
+#: ../www/advanced-tor.asp:71 ../www/advanced-tor.asp:75
+#: ../www/advanced-tor.asp:79 ../www/advanced-tor.asp:83
+#: ../www/advanced-tor.asp:87 ../www/advanced-tor.asp:91
+msgid "Cannot set"
+msgstr "这里不能设置"
+
+#: ../www/advanced-tor.asp:55 ../www/advanced-tor.asp:59
+#: ../www/advanced-tor.asp:63 ../www/advanced-tor.asp:67
+#: ../www/advanced-tor.asp:71 ../www/advanced-tor.asp:75
+#: ../www/advanced-tor.asp:79 ../www/advanced-tor.asp:83
+#: ../www/advanced-tor.asp:87 ../www/advanced-tor.asp:91
+msgid "option here"
+msgstr " "
+
+#: ../www/advanced-tor.asp:55 ../www/advanced-tor.asp:71
+#: ../www/advanced-tor.asp:75 ../www/advanced-tor.asp:83
+msgid "You can set it in Tomato GUI"
+msgstr "你可以在Tomato界面中设置"
+
+#: ../www/advanced-tor.asp:136 ../www/advanced-tor.asp:160
+msgid "Enable TOR"
+msgstr "启用TOR"
+
+#: ../www/advanced-tor.asp:138
+msgid "Socks Port"
+msgstr "Socks代理端口"
+
+#: ../www/advanced-tor.asp:139
+msgid "Trans Port"
+msgstr "传输端口"
+
+#: ../www/advanced-tor.asp:140
+msgid "DNS Port"
+msgstr "DNS端口"
+
+#: ../www/advanced-tor.asp:141
+msgid "Data Directory"
+msgstr "数据目录"
+
+#: ../www/advanced-tor.asp:143
+msgid "Redirect all users from"
+msgstr "重定向所有"
+
+#: ../www/advanced-tor.asp:149 ../www/advanced-tor.asp:161
+msgid "Only selected IP`s"
+msgstr "只重定向指定的IP地址"
+
+#: ../www/advanced-tor.asp:153
+msgid "Custom Configuration"
+msgstr "自定义选项"
+
+#: ../www/advanced-tor.asp:160
+msgid "Be patient"
+msgstr "请稍候"
+
+#: ../www/advanced-tor.asp:160
+msgid ""
+"Starting the TOR client can take from several seconds to several minutes"
+msgstr "启动TOR客户端可能需要几秒到几分钟的时间"
+
+#: ../www/advanced-tor.asp:162
+msgid "Only connections to destination port 80 are redirected to TOR"
+msgstr "只有目标端口是80的连接会重定向到TOR"
+
+#: ../www/advanced-tor.asp:163 ../www/nas-aria2.asp:108
+msgid "Caution"
+msgstr "注意"
+
+#: ../www/advanced-tor.asp:163
+msgid "If your router only has 32MB of RAM"
+msgstr "如果你的路由器只有32M内存"
+
+#: ../www/advanced-tor.asp:163
+msgid "you'll have to use swap"
+msgstr "你必须使用swap"
+
+#: ../www/advanced-vlan.asp:22 ../www/tomato.js:2396
+msgid "VLAN"
+msgstr "VLAN"
+
+#: ../www/advanced-vlan.asp:396
+msgid "Router must be rebooted to proceed"
+msgstr "路由器必须重启才能继续"
+
+#: ../www/advanced-vlan.asp:396
+msgid "Commit changes to NVRAM and reboot now"
+msgstr "保存所有更改到闪存并重启吗"
+
+#: ../www/advanced-vlan.asp:424
+msgid "Tagged"
+msgstr "标记"
+
+#: ../www/advanced-vlan.asp:612
+msgid ""
+"Port 4 cannot be assigned to more than one VLAN unless frames are tagged on "
+"all VLANs Port 4 is member"
+msgstr "Port 4只有在所在VLAN进行桢标记时才能属于多个VLAN"
+
+#: ../www/advanced-vlan.asp:620
+msgid ""
+"WAN port cannot be assigned to more than one VLAN unless frames are tagged "
+"on all VLANs WAN port is member"
+msgstr "WAN口只有在所在VLAN进行桢标记时才能属于多个VLAN"
+
+#: ../www/advanced-vlan.asp:633
+msgid "Only one VID can be selected as the default VID"
+msgstr "只有一个VID可以被指定为默认VID"
+
+#: ../www/advanced-vlan.asp:640
+msgid "Cannot add more than one entry with VID"
+msgstr "VID不能增加多于一个"
+
+#: ../www/advanced-vlan.asp:647
+msgid "Only one VID can be used as WAN at any time"
+msgstr "任何时候只有一个VID可以被用于WAN口"
+
+#: ../www/advanced-vlan.asp:655
+msgid ""
+"One and only one VID can be used for LAN' + ((i==0) ? '' : i ) + ' (br'+i+') "
+"at any time"
+msgstr "任何时候只有一个VID可以用于LAN' + ((i==0) ? '' : i ) + ' (br'+i+') "
+
+#: ../www/advanced-vlan.asp:937
+msgid "VID Offset"
+msgstr "VID偏移"
+
+#: ../www/advanced-vlan.asp:950 ../www/advanced-vlan.asp:996
+#: ../www/tomato.js:2399
+msgid "Wireless"
+msgstr "无线"
+
+#: ../www/advanced-vlan.asp:966
+msgid "Trunk VLAN support override (experimental)"
+msgstr "VLAN端口重用(试验支持)"
+
+#: ../www/advanced-vlan.asp:970 ../www/status-overview.asp:527
+msgid "Enable"
+msgstr "启用"
+
+#: ../www/advanced-vlan.asp:978
+msgid "Unique identifier of a VLAN"
+msgstr "唯一标识一个VLAN"
+
+#: ../www/advanced-vlan.asp:979 ../www/advanced-vlan.asp:992
+msgid "EXPERIMENTAL"
+msgstr "试验支持"
+
+#: ../www/advanced-vlan.asp:979
+msgid ""
+"Allows overriding 'traditional' VLAN/VID mapping with arbitrary VIDs for "
+"each VLAN (set to '0' to use 'regular' VLAN/VID mappings instead)"
+msgstr "允许使用任意的VID代替传统VLAN/VID映射(设为0表示使用传统VLAN/VID映射)"
+
+#: ../www/advanced-vlan.asp:979
+msgid "Warning"
+msgstr "警告"
+
+#: ../www/advanced-vlan.asp:979
+msgid ""
+"this hasn't been verified/tested on anything but a Cisco/Linksys E3000 and "
+"may not be supported by your particular device/model"
+msgstr "这些功能还有没有除了E3000上测试过"
+
+#: ../www/advanced-vlan.asp:979
+msgid "see notes on "
+msgstr "请查看注意事项"
+
+#: ../www/advanced-vlan.asp:980
+msgid "Which ethernet ports on the router should be members of this VLAN"
+msgstr "哪些有线端口是这个VLAN的成员"
+
+#: ../www/advanced-vlan.asp:981
+msgid "Enable 802.1Q tagging of ethernet frames on a particular port/VLAN"
+msgstr "启用802.1Q标识指定端口/VLAN的以太网络数据帧"
+
+#: ../www/advanced-vlan.asp:987
+msgid "VLAN ID assigned to untagged frames received by the router"
+msgstr "所有路由收到未标记数据帧默认的VLAN ID"
+
+#: ../www/advanced-vlan.asp:988 ../www/advanced-wlanvifs.asp:1413
+#: ../www/basic-network.asp:60
+msgid "Bridge"
+msgstr "网桥"
+
+#: ../www/advanced-vlan.asp:988
+msgid ""
+"Determines if this VLAN ID should be treated as WAN, part of a LAN bridge or "
+"just left alone"
+msgstr "指定这个VLAN ID是否应该是WAN口、LAN网桥或者不进行处理"
+
+#: ../www/advanced-vlan.asp:988
+msgid ""
+"i.e. member of a 802.1Q trunk, being managed manually via scripts, etc..."
+msgstr "例如，802.1Q成员,用代码处理等"
+
+#: ../www/advanced-vlan.asp:1003 ../www/advanced-vlan.asp:1004
+msgid "must"
+msgstr "必须"
+
+#: ../www/advanced-vlan.asp:1014
+msgid "experimental"
+msgstr "试验支持"
+
+#: ../www/advanced-vlan.asp:1025
+msgid "This feature is not supported on this router"
+msgstr "您的路由不支持这项功能"
+
+#: ../www/advanced-wlanvifs.asp:21 ../www/advanced-wlanvifs.asp:1360
+msgid "Virtual Wireless Interfaces"
+msgstr "虚拟无线接口"
+
+#: ../www/advanced-wlanvifs.asp:62 ../www/advanced-wlanvifs.asp:1412
+#: ../www/basic-network.asp:1723 ../www/status-overview.asp:42
+msgid "Access Point"
+msgstr "无线接入点"
+
+#: ../www/advanced-wlanvifs.asp:62 ../www/advanced-wlanvifs.asp:1412
+#: ../www/basic-network.asp:1723 ../www/status-overview.asp:42
+msgid "Wireless Client"
+msgstr "无线客户端"
+
+#: ../www/advanced-wlanvifs.asp:62 ../www/basic-network.asp:1723
+#: ../www/status-overview.asp:42
+msgid "Wireless Ethernet Bridge"
+msgstr "无线转接桥"
+
+#: ../www/advanced-wlanvifs.asp:64 ../www/advanced-wlanvifs.asp:561
+#: ../www/tomato.js:2350
+msgid "Overview"
+msgstr "概览"
+
+#: ../www/advanced-wlanvifs.asp:536
+msgid "Click here to hide"
+msgstr "点击这里隐藏"
+
+#: ../www/advanced-wlanvifs.asp:1374
+msgid "Wireless Interfaces Details"
+msgstr "无线接口详情"
+
+#: ../www/advanced-wlanvifs.asp:1381 ../www/advanced-wlanvifs.asp:1409
+msgid "Interface"
+msgstr "接口"
+
+#: ../www/advanced-wlanvifs.asp:1382
+msgid "Virtual Interfaces"
+msgstr "虚拟接口"
+
+#: ../www/advanced-wlanvifs.asp:1393 ../www/basic-network.asp:1624
+msgid "Options"
+msgstr "选项"
+
+#: ../www/advanced-wlanvifs.asp:1409
+msgid "Wireless VIF name"
+msgstr "无线网卡名称"
+
+#: ../www/advanced-wlanvifs.asp:1410 ../www/basic-network.asp:95
+#: ../www/basic-network.asp:98 ../www/status-overview.asp:511
+msgid "Enabled"
+msgstr "已启用"
+
+#: ../www/advanced-wlanvifs.asp:1410
+msgid "If this VIF should be active and brought online"
+msgstr "如果这个无线接口应该激活"
+
+#: ../www/advanced-wlanvifs.asp:1411
+msgid "Wireless Service Set Identifier"
+msgstr "无线接入点名称"
+
+#: ../www/advanced-wlanvifs.asp:1412
+msgid "Interface mode"
+msgstr "接口模式"
+
+#: ../www/advanced-wlanvifs.asp:1412
+msgid "etc"
+msgstr "其它"
+
+#: ../www/advanced-wlanvifs.asp:1413
+msgid "Which LAN bridge this VIF should be assigned"
+msgstr "无线接口所属网络"
 
 #: ../www/basic-ident.asp:14 ../www/tomato.js:2376 ../www/tomato.js:2401
 msgid "Basic"
@@ -678,10 +1039,6 @@ msgstr "填0使用默认值"
 msgid "Tunnel TTL"
 msgstr "隧道TTL"
 
-#: ../www/basic-network.asp:60
-msgid "Bridge"
-msgstr "网桥"
-
 #: ../www/basic-network.asp:60 ../www/basic-network.asp:1620
 msgid "IP Address"
 msgstr "IP地址"
@@ -705,11 +1062,6 @@ msgstr "租约期限"
 #: ../www/basic-network.asp:60 ../www/status-overview.asp:380
 msgid "mins"
 msgstr "分钟"
-
-#: ../www/basic-network.asp:95 ../www/basic-network.asp:98
-#: ../www/status-overview.asp:511
-msgid "Enabled"
-msgstr "已启用"
 
 #: ../www/basic-network.asp:241
 msgid "Cannot add another entry for bridge"
@@ -884,10 +1236,6 @@ msgstr "网关"
 msgid "PPTP Gateway"
 msgstr "PPTP网关"
 
-#: ../www/basic-network.asp:1624
-msgid "Options"
-msgstr "选项"
-
 #: ../www/basic-network.asp:1625
 msgid "Connect Mode"
 msgstr "连接类型"
@@ -968,22 +1316,10 @@ msgstr "启用无线"
 msgid "Wireless Mode"
 msgstr "无线模式"
 
-#: ../www/basic-network.asp:1723 ../www/status-overview.asp:42
-msgid "Access Point"
-msgstr "无线接入点"
-
 #: ../www/basic-network.asp:1723 ../www/basic-network.asp:1770
 #: ../www/status-overview.asp:42
 msgid "WDS"
 msgstr "WDS"
-
-#: ../www/basic-network.asp:1723 ../www/status-overview.asp:42
-msgid "Wireless Client"
-msgstr "无线客户端"
-
-#: ../www/basic-network.asp:1723 ../www/status-overview.asp:42
-msgid "Wireless Ethernet Bridge"
-msgstr "无线转接桥"
 
 #: ../www/basic-network.asp:1725
 msgid "Radio Band"
@@ -1553,6 +1889,100 @@ msgstr "伊尔库茨克"
 msgid "Krasnoyarsk"
 msgstr "克拉斯诺亚尔斯克"
 
+#: ../www/nas-aria2.asp:13
+msgid " Aria2 Client"
+msgstr "Aria2客户端"
+
+#: ../www/nas-aria2.asp:76 ../www/tomato.js:2410
+msgid "Basic Settings"
+msgstr "基础设置"
+
+#: ../www/nas-aria2.asp:85 ../www/nas-aria2.asp:108
+msgid "Enable torrent client"
+msgstr "启用BT客户端"
+
+#: ../www/nas-aria2.asp:86 ../www/nas-aria2.asp:109
+msgid "Listening port"
+msgstr "侦听端口"
+
+#: ../www/nas-aria2.asp:87
+msgid "Download directory"
+msgstr "下载目录"
+
+#: ../www/nas-aria2.asp:92 ../www/nas-aria2.asp:110
+msgid "Listening RPC port"
+msgstr "RPC侦听端口"
+
+#: ../www/nas-aria2.asp:93 ../www/nas-aria2.asp:111
+msgid "Use SSL to encrypt RPC traffic"
+msgstr "使用SSL加密"
+
+#: ../www/nas-aria2.asp:94
+msgid "Save settings location"
+msgstr "设置文件保存目录"
+
+#: ../www/nas-aria2.asp:95
+msgid "In the Download directory (Recommended)"
+msgstr "下载目录(推荐)"
+
+#: ../www/nas-aria2.asp:102
+msgid "RAM (Temporary)"
+msgstr "内存(重启后丢失)"
+
+#: ../www/nas-aria2.asp:104
+msgid "Aria2"
+msgstr "Aria2"
+
+#: ../www/nas-aria2.asp:108
+msgid "If your router only has 32MB of RAM, you'll have to use swap"
+msgstr "如果你的路由只有32M内存，你必须启用swap"
+
+#: ../www/nas-aria2.asp:109
+msgid "Port used for torrent client"
+msgstr "BT客户端端口"
+
+#: ../www/nas-aria2.asp:109 ../www/nas-aria2.asp:110
+msgid "Make sure this port is not in use"
+msgstr "请检查这个端口是否被占用"
+
+#: ../www/nas-aria2.asp:110
+msgid "Port used for Aria2 RPC"
+msgstr "Aria2 RPC端口"
+
+#: ../www/nas-aria2.asp:111
+msgid "Use ssl to encrypt RPC traffic"
+msgstr "使用SSL加密RPC通讯"
+
+#: ../www/nas-aria2.asp:112
+msgid "Allow remote access"
+msgstr "允许远程访问"
+
+#: ../www/nas-aria2.asp:112
+msgid ""
+"To open the Aria2 RPC port from the WAN side and allow the RPC to be "
+"accessed from the internet. you have to goto"
+msgstr "Aria2侦听所有网络，但你必须在"
+
+#: ../www/nas-aria2.asp:112
+msgid "settings to allow incoming traffic to RPC port of Aria2"
+msgstr "中允许外部网络访问才可以通过外网连接"
+
+#: ../www/nas-aria2.asp:113
+msgid "RPC access in lan is automatically enabled"
+msgstr "内部网络中RPC访问默认开启"
+
+#: ../www/nas-aria2.asp:113
+msgid "RPC auth is also enabled, user name is "
+msgstr "RPC验证也同时开启，用户名是"
+
+#: ../www/nas-aria2.asp:113
+msgid " and password is your password to login Tomato"
+msgstr "密码是你访问Tomato的密码"
+
+#: ../www/nas-aria2.asp:113
+msgid "you can change this option for security reason"
+msgstr "你不能修改这项设定"
+
 #: ../www/status-overview.asp:43
 msgid "WPA Personal (PSK)"
 msgstr "WPA 个人版 (PSK)"
@@ -1602,7 +2032,7 @@ msgstr "进行配置。"
 msgid "You did not configure language setting."
 msgstr "您还没有配置默认语言"
 
-#: ../www/status-overview.asp:363 ../www/tomato.js:2464
+#: ../www/status-overview.asp:363 ../www/tomato.js:2467
 msgid "Administration"
 msgstr "管理设定"
 
@@ -1743,17 +2173,9 @@ msgstr "噪声"
 msgid "Signal Quality"
 msgstr "信号质量"
 
-#: ../www/status-overview.asp:527
-msgid "Enable"
-msgstr "启用"
-
 #: ../www/status-overview.asp:528
 msgid "Disable"
 msgstr "禁用"
-
-#: ../www/tomato.js:2350
-msgid "Overview"
-msgstr "概览"
 
 #: ../www/tomato.js:2351
 msgid "Device List"
@@ -1847,18 +2269,6 @@ msgstr "连接限制/过滤"
 msgid "DHCP/DNS"
 msgstr "DHCP/DNS"
 
-#: ../www/tomato.js:2392
-msgid "Routing"
-msgstr "路由"
-
-#: ../www/tomato.js:2394
-msgid "TOR Project"
-msgstr "TOR Project"
-
-#: ../www/tomato.js:2396
-msgid "VLAN"
-msgstr "VLAN"
-
 #: ../www/tomato.js:2397
 msgid "LAN Access"
 msgstr "LAN Access"
@@ -1866,10 +2276,6 @@ msgstr "LAN Access"
 #: ../www/tomato.js:2398
 msgid "Virtual Wireless"
 msgstr "虚拟接入点"
-
-#: ../www/tomato.js:2399
-msgid "Wireless"
-msgstr "无线"
 
 #: ../www/tomato.js:2400
 msgid "Port Forwarding"
@@ -1898,10 +2304,6 @@ msgstr "访问限制"
 #: ../www/tomato.js:2409
 msgid "QoS"
 msgstr "QoS"
-
-#: ../www/tomato.js:2410
-msgid "Basic Settings"
-msgstr "基础设置"
 
 #: ../www/tomato.js:2411
 msgid "Classification"
@@ -1947,106 +2349,110 @@ msgstr "UPS监视"
 msgid "BitTorrent Client"
 msgstr "BT客户端"
 
-#: ../www/tomato.js:2451
+#: ../www/tomato.js:2449
+msgid "Aria2 Client"
+msgstr "Aria2客户端"
+
+#: ../www/tomato.js:2454
 msgid "VPN Tunneling"
 msgstr "虚拟专用网"
 
-#: ../www/tomato.js:2453
+#: ../www/tomato.js:2456
 msgid "OpenVPN Server"
 msgstr "OpenVPN服务器"
 
-#: ../www/tomato.js:2454
+#: ../www/tomato.js:2457
 msgid "OpenVPN Client"
 msgstr "OpenVPN客户端"
 
-#: ../www/tomato.js:2457
+#: ../www/tomato.js:2460
 msgid "PPTP Server"
 msgstr "PPTP服务器"
 
-#: ../www/tomato.js:2458
+#: ../www/tomato.js:2461
 msgid "PPTP Online"
 msgstr "PPTP在线列表"
 
-#: ../www/tomato.js:2459
+#: ../www/tomato.js:2462
 msgid "PPTP Client"
 msgstr "PPTP客户端"
 
-#: ../www/tomato.js:2465
+#: ../www/tomato.js:2468
 msgid "Admin Access"
 msgstr "访问控制"
 
-#: ../www/tomato.js:2466
+#: ../www/tomato.js:2469
 msgid "TomatoAnon"
 msgstr "TomatoAnon"
 
-#: ../www/tomato.js:2467
+#: ../www/tomato.js:2470
 msgid "Bandwidth Monitoring"
 msgstr "带宽监控"
 
-#: ../www/tomato.js:2468
+#: ../www/tomato.js:2471
 msgid "IP Traffic Monitoring"
 msgstr "IP流量监控"
 
-#: ../www/tomato.js:2469
+#: ../www/tomato.js:2472
 msgid "Buttons/LED"
 msgstr "按钮/LED"
 
-#: ../www/tomato.js:2471
+#: ../www/tomato.js:2474
 msgid "CIFS Client"
 msgstr "CIFS客户端"
 
-#: ../www/tomato.js:2474
+#: ../www/tomato.js:2477
 msgid "SDHC/MMC"
 msgstr "闪存卡"
 
-#: ../www/tomato.js:2476
+#: ../www/tomato.js:2479
 msgid "Configuration"
 msgstr "配置"
 
-#: ../www/tomato.js:2477
+#: ../www/tomato.js:2480
 msgid "Debugging"
 msgstr "调试"
 
-#: ../www/tomato.js:2479
+#: ../www/tomato.js:2482
 msgid "JFFS"
 msgstr "JFFS"
 
-#: ../www/tomato.js:2482
+#: ../www/tomato.js:2485
 msgid "NFS Server"
 msgstr "NFS服务器"
 
-#: ../www/tomato.js:2485
+#: ../www/tomato.js:2488
 msgid "SNMP"
 msgstr "SNMP"
 
-#: ../www/tomato.js:2487
+#: ../www/tomato.js:2490
 msgid "Logging"
 msgstr "日志"
 
-#: ../www/tomato.js:2488
+#: ../www/tomato.js:2491
 msgid "Scheduler"
 msgstr "计划调度"
 
-#: ../www/tomato.js:2489
+#: ../www/tomato.js:2492
 msgid "Scripts"
 msgstr "脚本管理"
 
-#: ../www/tomato.js:2490
+#: ../www/tomato.js:2493
 msgid "Upgrade"
 msgstr "升级"
 
-#: ../www/tomato.js:2492
+#: ../www/tomato.js:2495
 msgid "About"
 msgstr "关于"
 
-#: ../www/tomato.js:2493
+#: ../www/tomato.js:2496
 msgid "Reboot"
 msgstr "重启路由器"
 
-#: ../www/tomato.js:2494
+#: ../www/tomato.js:2497
 msgid "Shutdown"
 msgstr "关闭路由器"
 
-#: ../www/tomato.js:2495
+#: ../www/tomato.js:2498
 msgid "Logout"
 msgstr "退出"
