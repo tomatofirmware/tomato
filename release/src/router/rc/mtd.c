@@ -372,6 +372,7 @@ int mtd_write_main(int argc, char *argv[])
 	case TRX_MAGIC:
 		break;
 #ifdef CONFIG_BCMWL5
+#ifndef CONFIG_BCMWL6
 	case TRX_MAGIC_F7D3301:
 	case TRX_MAGIC_F7D3302:
 	case TRX_MAGIC_F7D4302:
@@ -379,6 +380,7 @@ int mtd_write_main(int argc, char *argv[])
 	case TRX_MAGIC_QA:
 		sig = TRX_MAGIC;
 		break;
+#endif
 #endif
 	default:
 		// moto
@@ -409,6 +411,7 @@ int mtd_write_main(int argc, char *argv[])
 
 	switch (model) {
 #ifdef CONFIG_BCMWL5
+#ifndef CONFIG_BCMWL6
 	case MODEL_F7D3301:
 		trx.magic = TRX_MAGIC_F7D3301;
 		break;
@@ -421,6 +424,7 @@ int mtd_write_main(int argc, char *argv[])
 	case MODEL_F5D8235v3:
 		trx.magic = TRX_MAGIC_F5D8235V3;
 		break;
+#endif
 #endif
 	default:
 		trx.magic = sig;

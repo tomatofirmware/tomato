@@ -296,6 +296,7 @@ int get_model(void)
 					fread(&sig, sizeof(sig), 1, fp);
 					fclose(fp);
 				}
+#ifndef CONFIG_BCMWL6
 				switch (sig) {
 				case TRX_MAGIC_F7D3301:
 					return MODEL_F7D3301;
@@ -304,6 +305,7 @@ int get_model(void)
 				default:
 					return MODEL_F7D4302;
 				}
+#endif
 			}
 			break;
 		}
