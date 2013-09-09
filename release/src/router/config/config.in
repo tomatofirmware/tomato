@@ -194,3 +194,6 @@ config TCONFIG_REMOVE_USBAPP
 config TCONFIG_I18N
 	bool "I18N"
 	default y
+config TCONFIG_BCM_CTF
+	bool "enable build broadcom CTF module"
+	default n

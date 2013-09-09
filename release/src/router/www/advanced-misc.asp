@@ -96,7 +96,8 @@ createFieldTable('', [
 ]);
 </script>
 <br>
-<small>* <% _("Not all models support these options"); %>.</small>
+<small>* <% _("Not all models support these options"); %>.</small><br/>
+<small>* <% _("CTF is broadcom proprietary driver. you have to disable QoS and/or portfowarding to get best performance. Enable this option might cause your router reboot while WAN to lan speed is more than 640 Mb/s."); %>.</small><br/>
 </div>
 
 

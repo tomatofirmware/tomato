@@ -181,7 +181,10 @@ ifeq ($(TCONFIG_REMOVE_USBAPP),y)
 endif
 
 # Only include CTF option if CTF module exists
+ifneq ($(TCONFIG_BCM_CTF),y)
+	sed -i $(INSTALLDIR)/www/advanced-misc.asp -e "/CTF-BEGIN/,/CTF-END/d"
 	test -d $(SRCBASE)/ctf/linux || sed -i $(INSTALLDIR)/www/advanced-misc.asp -e "/CTF-BEGIN/,/CTF-END/d"
+endif
 
 ifeq ($(TOMATO_EXPERIMENTAL),1)
 	cd $(INSTALLDIR)/www && \
