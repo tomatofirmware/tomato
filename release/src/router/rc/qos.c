@@ -270,8 +270,7 @@ void ipt_qos(void)
 	if ((i < 0) || (i > 9)) i = 3;	// "low"
 	class_num = i + 1;
 	class_num |= 0xFF00000; // use rule_num=255 for default
-	//tomatoegg changed from ip46t_write to ipt_write. to remove qos for IPv6
-	ipt_write("-A QOSO -j CONNMARK --set-return 0x%x\n", class_num);
+	ip46t_write("-A QOSO -j CONNMARK --set-return 0x%x\n", class_num);
 	
 	ipt_write(
 		"-A FORWARD -o %s -j QOSO\n"
