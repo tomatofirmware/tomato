@@ -49,9 +49,11 @@ obj-y += ntpc
 obj-y += rstats
 obj-y += cstats
 obj-y += udpxy
+ifneq ($(TCONFIG_BT)$(TCONFIG_BBT)$(TCONFIG_TOR)$(TCONFIG_ARIA2)$(MEDIA_SERVER_STATIC),)
+obj-y += zlib
+endif
 obj-$(TCONFIG_TOR) += tor
 obj-$(TCONFIG_TOR) += libevent
-obj-$(TCONFIG_TOR) += zlib
 obj-$(TCONFIG_DNSCRYPT) += dnscrypt
 obj-$(TCONFIG_SNMP) += snmp
 obj-$(TCONFIG_SDHC) += mmc
@@ -137,7 +139,6 @@ obj-$(TCONFIG_EBTABLES) += ebtables
 #obj-$(TCONFIG_IPV6) += radvd
 obj-$(TCONFIG_IPV6) += dhcpv6
 
-obj-$(TCONFIG_MEDIA_SERVER) += zlib
 obj-$(TCONFIG_MEDIA_SERVER) += sqlite
 obj-$(TCONFIG_MEDIA_SERVER) += ffmpeg
 obj-$(TCONFIG_MEDIA_SERVER) += libogg
@@ -161,7 +162,9 @@ obj-$(CONFIG_LINUX26) += ipset
 obj-$(TCONFIG_L2TP) += xl2tpd
 obj-$(TCONFIG_PPTP) += accel-pptp
 obj-$(TCONFIG_PPTPD) += pptpd
-obj-$(TCONFIG_HTTPS) += openssl
+ifneq ($(TCONFIG_HTTPS)$(TCONFIG_BBT)$(TCONFIG_ARIA2),)
+obj-y += openssl
+endif
 obj-$(TCONFIG_SSH) += dropbear
 obj-$(TCONFIG_ZEBRA) += zebra
 #	obj-$(TCONFIG_IPP2P) += ipp2p
@@ -171,33 +174,19 @@ obj-$(TCONFIG_OPENVPN) += openvpn_plugin_auth_nvram
 obj-$(TCONFIG_EMF) += emf
 obj-$(TCONFIG_EMF) += igs
 
-obj-$(TCONFIG_BBT) += openssl
 obj-$(TCONFIG_BBT) += libevent
 obj-$(TCONFIG_BBT) += libcurl
 obj-$(TCONFIG_BBT) += transmission
 obj-$(TCONFIG_BT) += btgui
-obj-$(TCONFIG_BBT) += zlib
 #obj-$(TCONFIG_BBT) += libiconv
 
 obj-$(CONFIG_LINUX26) += hotplug2
 obj-$(CONFIG_LINUX26) += udevtrigger
 
-ifeq ($(TCONFIG_OPENVPN),y)
+ifneq ($(TCONFIG_OPENVPN)$(TCONFIG_FTP_SSL)$(TCONFIG_BBT)$(TCONFIG_TOR)$(TCONFIG_ARIA2),)
   export FULL_OPENSSL := y
 else
-  ifeq ($(TCONFIG_FTP_SSL),y)
-    export FULL_OPENSSL := y
-  else
-    ifeq ($(TCONFIG_BBT),y)
-      export FULL_OPENSSL := y
-    else
-      ifeq ($(TCONFIG_TOR),y)
-        export FULL_OPENSSL := y
-      else
-        FULL_OPENSSL :=
-      endif
-    endif
-  endif
+  FULL_OPENSSL :=
 endif
 
 obj-y += wanuptime
@@ -1405,17 +1394,7 @@ zlib-clean:
 
 zlib-install: zlib
 	@$(SEP)
-ifneq ($(MEDIA_SERVER_STATIC),y)
-	install -d $(INSTALLDIR)/zlib/usr/lib
-	install -D zlib/libz.so.1 $(INSTALLDIR)/zlib/usr/lib/
-	$(STRIP) $(INSTALLDIR)/zlib/usr/lib/libz.so.1
-endif
-ifeq ($(TCONFIG_BT),y)
-	install -d $(INSTALLDIR)/zlib/usr/lib
-	install -D zlib/libz.so.1 $(INSTALLDIR)/zlib/usr/lib/
-	$(STRIP) $(INSTALLDIR)/zlib/usr/lib/libz.so.1
-endif
-ifeq ($(TCONFIG_TOR),y)
+ifneq ($(TCONFIG_BT)$(TCONFIG_BBT)$(TCONFIG_TOR)$(TCONFIG_ARIA2)$(MEDIA_SERVER_STATIC),)
 	install -d $(INSTALLDIR)/zlib/usr/lib
 	install -D zlib/libz.so.1 $(INSTALLDIR)/zlib/usr/lib/
 	$(STRIP) $(INSTALLDIR)/zlib/usr/lib/libz.so.1

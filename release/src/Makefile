@@ -566,6 +566,11 @@ define RouterOptions
 		sed -i "/TCONFIG_PPPOE_SERVER/d" $(1); \
 		echo "TCONFIG_PPPOE_SERVER=y" >>$(1); \
 	fi; \
+	if [ "$(NO_FTP)" = "y" ]; then \
+		sed -i "/TCONFIG_FTP/d" $(1); \
+		echo "# TCONFIG_FTP is not set" >>$(1); \
+		echo "# TCONFIG_FTP_SSL is not set" >>$(1); \
+	fi; \
 	)
 endef
 
