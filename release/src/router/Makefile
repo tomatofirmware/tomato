@@ -836,7 +836,7 @@ rp-pppoe/src/stamp-h1: rp-pppoe/src/Makefile.in
 	@touch rp-pppoe/src/stamp-h1
 
 rp-pppoe: pppd rp-pppoe/src/stamp-h1
-	$(MAKE) -C rp-pppoe/src pppoe-relay rp-pppoe.so $(PARALLEL_BUILD)
+	$(MAKE) -C rp-pppoe/src pppoe-relay rp-pppoe.so pppoe-server $(PARALLEL_BUILD)
 
 rp-pppoe-clean:
 	-@$(MAKE) -C rp-pppoe/src clean
@@ -846,8 +846,14 @@ rp-pppoe-clean:
 rp-pppoe-install: rp-pppoe
 	install -D rp-pppoe/src/rp-pppoe.so $(INSTALLDIR)/rp-pppoe/usr/lib/pppd/rp-pppoe.so
 	$(STRIP) $(INSTALLDIR)/rp-pppoe/usr/lib/pppd/*.so
-#	install -D rp-pppoe/src/pppoe-relay $(INSTALLDIR)/rp-pppoe/usr/sbin/pppoe-relay
-#	$(STRIP) $(INSTALLDIR)/rp-pppoe/usr/sbin/pppoe-relay
+ifeq ($(TCONFIG_PPPOE_RELAY),y)
+	install -D rp-pppoe/src/pppoe-relay $(INSTALLDIR)/rp-pppoe/usr/sbin/pppoe-relay
+	$(STRIP) $(INSTALLDIR)/rp-pppoe/usr/sbin/pppoe-relay
+endif
+ifeq ($(TCONFIG_PPPOE_SERVER),y)
+	install -D rp-pppoe/src/pppoe-server $(INSTALLDIR)/rp-pppoe/usr/sbin/pppoe-server
+	$(STRIP) $(INSTALLDIR)/rp-pppoe/usr/sbin/pppoe-server
+endif
 
 
 upnp: nvram shared iptables

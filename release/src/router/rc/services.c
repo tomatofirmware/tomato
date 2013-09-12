@@ -63,6 +63,9 @@ static pid_t pid_dnsmasq = -1;
 #ifdef TCONFIG_ARIA2
 static pid_t pid_aria2 = -1;
 #endif
+#ifdef TCONFIG_PPPOE_RELAY
+static pid_t pid_pppoerelay = -1;
+#endif
 
 static int is_wet(int idx, int unit, int subunit, void *param)
 {
@@ -560,7 +563,7 @@ void start_aria2()
 	xstart("aria2c", "--conf-path=/etc/aria2c.conf");
 	syslog(LOG_DEBUG, "aria2 started\n");
 	if (!nvram_contains_word("debug_norestart", "aria2")) {
-		pid_dnsmasq = -2;
+		pid_aria2 = -2;
 	}
 }
 void stop_aria2(void)
@@ -576,6 +579,38 @@ void stop_aria2(void)
 	syslog(LOG_DEBUG, "end\n");
 }
 #endif
+
+#ifdef TCONFIG_PPPOE_RELAY
+void start_pppoerelay()
+{
+	if (getpid() != 1) {
+		start_service("pppoerelay");
+		return;
+	}
+	if (!nvram_match( "pppoe_relay", "1" ) ){
+		pid_pppoerelay = -1;
+		return;
+	}
+
+	xstart("pppoe-relay", "-S", nvram_safe_get("wan_ifname"), "-C", nvram_safe_get("lan_ifname"));
+	syslog(LOG_DEBUG, "pppoerelay started\n");
+	if (!nvram_contains_word("debug_norestart", "pppoerelay")) {
+		pid_pppoerelay = -2;
+	}
+}
+void stop_pppoerelay(void)
+{
+	syslog(LOG_DEBUG, "stopping pppoerelay\n");
+	if (getpid() != 1) {
+		stop_service("pppoerelay");
+		return;
+	}
+	pid_pppoerelay = -1;
+	killall_tk("pppoe-relay");
+	syslog(LOG_DEBUG, "end\n");
+}
+#endif
+
 
 void clear_resolv(void)
 {
@@ -2215,6 +2250,9 @@ void check_services(void)
 #ifdef TCONFIG_ARIA2
 	_check(pid_aria2, "aria2c", start_aria2);
 #endif
+#ifdef TCONFIG_PPPOE_RELAY
+	_check(pid_pppoerelay, "pppoe-relay", start_pppoerelay);
+#endif
 
 //#ifdef TCONFIG_NOCAT
 //	if (nvram_get_int("NC_enable"))
@@ -2260,7 +2298,9 @@ void start_services(void)
 #endif
 
 	start_tomatoanon();
-
+#ifdef TCONFIG_PPPOE_RELAY
+	start_pppoerelay();
+#endif
 #ifdef TCONFIG_TOR
 	start_tor();
 #endif
@@ -2301,6 +2341,10 @@ void stop_services(void)
 
 #ifdef TCONFIG_TOR
 	stop_tor();
+#endif
+
+#ifdef TCONFIG_PPPOE_RELAY
+	stop_pppoerelay();
 #endif
 
 	stop_tomatoanon();
@@ -2927,6 +2971,13 @@ TOP:
 	if (strcmp(service, "aria2") == 0) {
 		if (action & A_STOP) stop_aria2();
 		if (action & A_START) start_aria2();
+		goto CLEAR;
+	}
+#endif
+#ifdef TCONFIG_PPPOE_RELAY
+	if (strcmp(service, "pppoerelay") == 0) {
+		if (action & A_STOP) stop_pppoerelay();
+		if (action & A_START) start_pppoerelay();
 		goto CLEAR;
 	}
 #endif

@@ -197,3 +197,9 @@ config TCONFIG_I18N
 config TCONFIG_BCM_CTF
 	bool "enable build broadcom CTF module"
 	default n
+config TCONFIG_PPPOE_RELAY
+	bool "enable PPPOE Relay"
+	default n
+config TCONFIG_PPPOE_SERVER
+	bool "enable PPPOE Server"
+	default n

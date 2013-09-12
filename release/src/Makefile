@@ -558,6 +558,14 @@ define RouterOptions
 			echo "# TCONFIG_SAMBA3 is not set" >>$(1); \
 		fi; \
 	fi; \
+	if [ "$(PPPOE_RELAY)" = "y" ]; then \
+		sed -i "/TCONFIG_PPPOE_RELAY/d" $(1); \
+		echo "TCONFIG_PPPOE_RELAY=y" >>$(1); \
+	fi; \
+	if [ "$(PPPOE_SERVER)" = "y" ]; then \
+		sed -i "/TCONFIG_PPPOE_SERVER/d" $(1); \
+		echo "TCONFIG_PPPOE_SERVER=y" >>$(1); \
+	fi; \
 	)
 endef
 
@@ -1158,7 +1166,7 @@ e3200:
 ac66e:
 	@$(MAKE) e MIPS32=r2 NVRAM_64K=y NAND=y AC66U=1 NO_JFFS=y
 w1800rz:
-	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="AIO" USB="USB" NOCAT=y NFS=y SNMP=y HFS=y DNSCRYPT=y UPS=y PPTPD=y TOR=y IPSEC=y RAID=y MIPS32=r2 NVRAM_64K=y W1800R=1 ARIA2=y CTF=y
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="AIO" USB="USB" NOCAT=y NFS=y SNMP=y HFS=y DNSCRYPT=y UPS=y PPTPD=y TOR=y IPSEC=y RAID=y MIPS32=r2 NVRAM_64K=y W1800R=1 ARIA2=y CTF=y PPPOE_RELAY=y PPPOE_SERVER=y
 endif
 
 setprofile:

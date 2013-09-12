@@ -612,7 +612,9 @@ static const nvset_t nvset_list[] = {
 	{ "modem_init",			V_LENGTH(0,25)			},
 	{ "modem_apn",			V_LENGTH(0,25)			},
 #endif
-
+#ifdef TCONFIG_PPPOE_RELAY
+	{ "pppoe_relay",                V_01                            },
+#endif
 	// LAN networks
 	{ "lan_ifname",			V_LENGTH(0, 5)			},
 
