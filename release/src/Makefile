@@ -883,10 +883,10 @@ else
 endif
 
 ## Roadkill
-## Make the "normal (with NTFS support) + VPN + NOCAT + NGINX (option) + VLAN (option)" build
+## Make the "VLAN + VPN + NOCAT + USB (Change switch) + NGINX (add option)" build
 nc:
 ifeq ($(CONFIG_LINUX26),y)
-	@$(MAKE) bin OPENVPN=y USERPPTP=y PPTPD=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y DNSCRYPT=y B=NC BUILD_DESC="$(VPN)" USB="USB" SNMP=y VLAN="$(VLAN)" NOCAT=y TCPDUMP="$(TCPDUMP)" BUILD_DESC+="-$(NC)" BUILD_DESC="$(NG)"
+	@$(MAKE) bin OPENVPN=y USERPPTP=y PPTPD=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y DNSCRYPT=y B=NC USB="USB" SNMP=y VLAN=y NOCAT=y TCPDUMP="$(TCPDUMP)"
 else
 	@$(MAKE) bin OPENVPN=y USERPPTP=y PPTPD=y NTFS=y DNSCRYPT=y B=NC BUILD_DESC="$(VPN)" USB="USB" VLAN="$(VLAN)" NOCAT=y TCPDUMP="$(TCPDUMP)" BUILD_DESC+=" $(NC)"
 endif
@@ -1230,7 +1230,7 @@ ifeq ($(CONFIG_LINUX26),y)
 	@echo "l600n    Rosewill L600N Build with wl_high module (dualband support)"
 	@echo "       Routers with AC WIRELESS"	
 	@echo "ac66e	ASUS RT-AC66"
-	@echo "ac56	ASUS RT-AC56"
+	@ECHO "ac56	ASUS RT-AC56"
 	@echo "w1800rz	Tenda 1800"
 
 endif
