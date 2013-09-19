@@ -101,6 +101,19 @@ version 2.67
 	    (provide TFTP to the same interfaces we provide DHCP to) 
 	    is retained. Thanks to Lonnie Abelbeck for the suggestion.
 
+	    Add --dhcp-relay config option. Many thanks to vtsl.net
+	    for sponsoring this development.
+
+	    Fix crash with empty tag: in --dhcp-range. Thanks to
+	    Kaspar Schleiser for the bug report.
+
+	    Add "baseline" and "bloatcheck" makefile targets, for 
+	    revealing size changes during development. Thanks to
+	    Vladislav Grishenko for the patch. 
+
+	    Cope with DHCPv6 clients which send REQUESTs without
+	    address options - treat them as SOLICIT with rapid commit.
+
 
 version 2.66
             Add the ability to act as an authoritative DNS

@@ -133,11 +133,12 @@ struct myoption {
 #define LOPT_PREF_CLSS 321
 #endif
 #define LOPT_FAST_RA   322
+#define LOPT_RELAY     323
 
 #ifdef HAVE_QUIET_DHCP //Originally TOMATO option
-#define LOPT_QUIET_DHCP 323
-#define LOPT_QUIET_DHCP6 324
-#define LOPT_QUIET_RA 325
+#define LOPT_QUIET_DHCP 324
+#define LOPT_QUIET_DHCP6 325
+#define LOPT_QUIET_RA 326
 #endif
 
 #ifdef HAVE_GETOPT_LONG
@@ -277,6 +278,7 @@ static const struct myoption opts[] =
     { "dhcp-prefix-class", 1, 0, LOPT_PREF_CLSS },
 #endif
     { "force-fast-ra", 0, 0, LOPT_FAST_RA },
+    { "dhcp-relay", 1, 0, LOPT_RELAY },
 #ifdef HAVE_QUIET_DHCP //Originally TOMATO option
     { "quiet-dhcp", 0, 0, LOPT_QUIET_DHCP },
     { "quiet-dhcp6", 0, 0, LOPT_QUIET_DHCP6 },
@@ -400,6 +402,7 @@ static struct {
   { LOPT_DHCP_FQDN, OPT_DHCP_FQDN, NULL, gettext_noop("Use only fully qualified domain names for DHCP clients."), NULL },
   { LOPT_GEN_NAMES, ARG_DUP, "[=tag:<tag>]", gettext_noop("Generate hostnames based on MAC address for nameless clients."), NULL},
   { LOPT_PROXY, ARG_DUP, "[=<ipaddr>]...", gettext_noop("Use these DHCP relays as full proxies."), NULL },
+  { LOPT_RELAY, ARG_DUP, "<local-addr>,<server>[,<interface>]", gettext_noop("Relay DHCP requests to a remote server"), NULL},
   { LOPT_CNAME, ARG_DUP, "<alias>,<target>", gettext_noop("Specify alias name for LOCAL DNS name."), NULL },
   { LOPT_PXE_PROMT, ARG_DUP, "<prompt>,[<timeout>]", gettext_noop("Prompt to send to PXE clients."), NULL },
   { LOPT_PXE_SERV, ARG_DUP, "<service>", gettext_noop("Boot service for PXE menu."), NULL },
@@ -2350,7 +2353,9 @@ static int one_opt(int option, char *arg, char *errstr, char *gen_err, int comma
 		    struct dhcp_netid *tt = opt_malloc(sizeof (struct dhcp_netid));
 		    tt->net = opt_string_alloc(arg+4);
 		    tt->next = new->filter;
-		    new->filter = tt;
+		    /* ignore empty tag */
+		    if (tt->net)
+		      new->filter = tt;
 		  }
 		else
 		  {
@@ -3194,6 +3199,31 @@ static int one_opt(int option, char *arg, char *errstr, char *gen_err, int comma
 	arg = comma;
       }
       break;
+
+    case LOPT_RELAY: /* --dhcp-relay */
+      {
+	struct dhcp_relay *new = opt_malloc(sizeof(struct dhcp_relay));
+	comma = split(arg);
+	new->interface = opt_string_alloc(split(comma));
+	new->iface_index = 0;
+	if (inet_pton(AF_INET, arg, &new->local) && inet_pton(AF_INET, comma, &new->server))
+	  {
+	    new->next = daemon->relay4;
+	    daemon->relay4 = new;
+	  }
+#ifdef HAVE_DHCP6
+	else if (inet_pton(AF_INET6, arg, &new->local) && inet_pton(AF_INET6, comma, &new->server))
+	  {
+	    new->next = daemon->relay6;
+	    daemon->relay6 = new;
+	  }
+#endif
+	else
+	  ret_err(_("Bad dhcp-relay"));
+	
+	break;
+      }
+
 #endif
       
 #ifdef HAVE_DHCP6
