@@ -37,6 +37,9 @@ endif
 # nas starter # AB multiSSID
 	install -m 0700 nas.sh $(INSTALLDIR)/usr/sbin
 
+#stealthMode
+	install -m 0700 stealthMode $(INSTALLDIR)/usr/sbin
+
 # keep winscp happy
 #	install -m 0700 groups $(INSTALLDIR)/usr/bin
 
