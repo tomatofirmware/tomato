@@ -4,7 +4,7 @@
 ## Makefile for OpenSSL
 ##
 
-VERSION=1.0.1c
+VERSION=1.0.1e
 MAJOR=1
 MINOR=0.1
 SHLIB_VERSION_NUMBER=1.0.0
@@ -72,7 +72,7 @@ RANLIB= $(CROSS_COMPILE)ranlib
 NM= $(CROSS_COMPILE)nm
 PERL= /usr/bin/perl
 TAR= tar
-TARFLAGS= --no-recursion
+TARFLAGS= --no-recursion --record-size=10240
 MAKEDEPPROG=makedepend
 LIBDIR=lib
 
@@ -138,7 +138,7 @@ FIPSCANLIB=
 
 BASEADDR=0xFB00000
 
-DIRS=   crypto ssl apps
+DIRS=   crypto ssl engines apps test tools
 ENGDIRS= 
 SHLIBDIRS= crypto ssl
 
@@ -149,7 +149,7 @@ SDIRS=  \
 	des aes rc2 rc4 rc5 idea bf cast modes \
 	bn rsa dsa dh dso engine \
 	buffer bio stack lhash rand err \
-	evp asn1 pem x509 x509v3 conf txt_db pkcs7 pkcs12 comp ocsp ui \
+	evp asn1 pem x509 x509v3 conf txt_db pkcs7 pkcs12 comp ocsp ui krb5 \
 	pqueue srp cmac
 # keep in mind that the above list is adjusted by ./Configure
 # according to no-xxx arguments...
@@ -170,7 +170,7 @@ SHELL=/bin/sh
 
 TOP=    .
 ONEDIRS=out tmp
-EDIRS=  times bugs util include certs ms shlib mt demos perl sf dep VMS
+EDIRS=  times doc bugs util include certs ms shlib mt demos perl sf dep VMS
 WDIRS=  windows
 LIBS=   libcrypto.a libssl.a
 SHARED_CRYPTO=libcrypto$(SHLIB_EXT)
@@ -271,7 +271,7 @@ reflect:
 	@[ -n "$(THIS)" ] && $(CLEARENV) && $(MAKE) $(THIS) -e $(BUILDENV)
 
 sub_all: build_all
-build_all: build_libs build_apps build_tools
+build_all: build_libs build_apps build_tests build_tools
 
 build_libs: build_crypto build_ssl build_engines
 
@@ -442,7 +442,7 @@ rehash.time: certs apps
 		[ -x "apps/openssl.exe" ] && OPENSSL="apps/openssl.exe" || :; \
 		OPENSSL_DEBUG_MEMORY=on; \
 		export OPENSSL OPENSSL_DEBUG_MEMORY; \
-		$(PERL) tools/c_rehash certs) && \
+		$(PERL) tools/c_rehash certs/demo) && \
 		touch rehash.time; \
 	else :; fi
 
@@ -535,7 +535,7 @@ dist:
 dist_pem_h:
 	(cd crypto/pem; $(MAKE) -e $(BUILDENV) pem.h; $(MAKE) clean)
 
-install: all install_sw
+install: all install_docs install_sw
 
 install_sw:
 	@$(PERL) $(TOP)/util/mkdir-p.pl $(INSTALL_PREFIX)$(INSTALLTOP)/bin \
