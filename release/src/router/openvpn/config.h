@@ -2,7 +2,7 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* Configuration settings */
-#define CONFIGURE_DEFINES "enable_crypto=yes enable_debug=no enable_def_auth=yes enable_dlopen=unknown enable_dlopen_self=unknown enable_dlopen_self_static=unknown enable_eurephia=yes enable_fast_install=yes enable_fragment=yes enable_http_proxy=yes enable_iproute2=no enable_libtool_lock=yes enable_lzo=yes enable_lzo_stub=no enable_management=yes enable_multi=yes enable_multihome=yes enable_pam_dlopen=no enable_password_save=yes enable_pedantic=no enable_pf=yes enable_pkcs11=no enable_plugin_auth_pam=no enable_plugin_down_root=no enable_plugins=no enable_port_share=yes enable_selinux=no enable_server=yes enable_shared=yes enable_shared_with_static_runtimes=no enable_small=yes enable_socks=no enable_ssl=yes enable_static=yes enable_strict=no enable_strict_options=no enable_systemd=no enable_win32_dll=yes enable_x509_alt_username=no with_crypto_library=openssl with_gnu_ld=yes with_iproute_path=/usr/sbin/ip with_mem_check=no with_plugindir='$(libdir)/openvpn/plugins'"
+#define CONFIGURE_DEFINES "enable_crypto=yes enable_debug=no enable_def_auth=yes enable_dlopen=unknown enable_dlopen_self=unknown enable_dlopen_self_static=unknown enable_eurephia=yes enable_fast_install=yes enable_fragment=yes enable_http_proxy=yes enable_iproute2=no enable_libtool_lock=yes enable_lzo=yes enable_lzo_stub=no enable_management=yes enable_multi=yes enable_multihome=yes enable_pam_dlopen=no enable_password_save=yes enable_pedantic=no enable_pf=yes enable_pkcs11=no enable_plugin_auth_pam=no enable_plugin_down_root=no enable_plugins=no enable_port_share=yes enable_selinux=no enable_server=yes enable_shared=yes enable_shared_with_static_runtimes=no enable_small=yes enable_socks=no enable_ssl=yes enable_static=yes enable_strict=no enable_strict_options=no enable_systemd=no enable_win32_dll=yes enable_x509_alt_username=no with_crypto_library=openssl with_gnu_ld=yes with_iproute_path=/usr/sbin/ip with_mem_check=no with_plugindir='$(libdir)/openvpn/plugins' with_sysroot=no"
 
 /* special build string */
 /* #undef CONFIGURE_SPECIAL_BUILD */
@@ -568,7 +568,7 @@
 #define LT_OBJDIR ".libs/"
 
 /* Version in windows resource format */
-#define OPENVPN_VERSION_RESOURCE 2,3,0,0
+#define OPENVPN_VERSION_RESOURCE 2,3,2,0
 
 /* Name of package */
 #define PACKAGE "openvpn"
@@ -580,7 +580,7 @@
 #define PACKAGE_NAME "OpenVPN"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "OpenVPN 2.3.0"
+#define PACKAGE_STRING "OpenVPN 2.3.2"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "openvpn"
@@ -589,7 +589,7 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "2.3.0"
+#define PACKAGE_VERSION "2.3.2"
 
 /* Path separator */
 #define PATH_SEPARATOR '/'
@@ -695,7 +695,7 @@
 /* #undef USE_VALGRIND */
 
 /* Version number of package */
-#define VERSION "2.3.0"
+#define VERSION "2.3.2"
 
 /* Define to 1 if on MINIX. */
 /* #undef _MINIX */
