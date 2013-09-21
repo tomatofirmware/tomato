@@ -523,7 +523,7 @@ void start_aria2()
 			|| !nvram_get_file("aria2c_ssl_cert", "/etc/aria2c/aria2c_host_cert", 2048)) {
 			unlink("/etc/aria2c/aria2c_host_key");
 			unlink("/etc/aria2c/aria2c_host_cert");
-			eval("openssl", "req -x509 -nodes -newkey rsa:2048 -keyout /etc/aria2c/aria2c_host_key -out /etc/aria2c/aria2c_host_cert -days 3650 -subj \'/CN=aria2/O=Aria2./C=US\'");
+			eval("/usr/sbin/openssl", "req", "-x509", "-nodes", "-newkey", "rsa:2048", "-keyout", "/etc/aria2c/aria2c_host_key", "-out", "/etc/aria2c/aria2c_host_cert", "-days", "3650",  "-subj",  "/CN=aria2/O=Aria2./C=US");
 			if (nvram_set_file("aria2c_ssl_key", "/etc/aria2c/aria2c_host_key", 2048) 
 				&& nvram_set_file("aria2c_ssl_cert", "/etc/aria2c/aria2c_host_cert", 2048)) {
 				nvram_commit_x();
