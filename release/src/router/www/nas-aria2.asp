@@ -30,7 +30,7 @@ function verifyFields(focused, quiet)
 	var a = E('_f_aria2_enable').checked;
 
 	E('_aria2_custom').disabled = !a;
-	E('_aria2_ssl_rpc').disabled = !a;
+	E('_f_aria2_ssl_rpc').disabled = !a;
 	E('_aria2_dir').disabled = !a;
 	E('_aria2_port').disabled = !a;
 	E('_aria2_settings').disabled = !a;
@@ -49,6 +49,7 @@ function save()
   if (verifyFields(null, 0)==0) return;
   var fom = E('_fom');
   fom.aria2_enable.value = E('_f_aria2_enable').checked ? 1 : 0;
+  fom.aria2_ssl_rpc.value = E('_f_aria2_ssl_rpc').checked ? 1 : 0;
   if (fom.aria2_enable.value == 0) {
   	fom._service.value = 'aria2-stop';
   }
@@ -79,6 +80,7 @@ function init()
 <input type='hidden' name='_nextpage' value='nas-aria2.asp'>
 <input type='hidden' name='_service' value='aria2-restart'>
 <input type='hidden' name='aria2_enable'>
+<input type='hidden' name='aria2_ssl_rpc'>
 
 <script type='text/javascript'>
 createFieldTable('', [
@@ -90,7 +92,7 @@ createFieldTable('', [
 <script type='text/javascript'>
 createFieldTable('', [
 	{ title: '<% _("Listening RPC port"); %>', indent: 2, name: 'aria2_port_rpc', type: 'text', maxlen: 32, size: 5, value: nvram.aria2_port_rpc > 0 ? nvram.aria2_port_rpc : 6800, suffix: ' <small>*</small>' },
-	{ title: '<% _("Use SSL to encrypt RPC traffic"); %>', indent: 2, name: 'aria2_ssl_rpc', type: 'checkout', value: nvram.aria2_ssl_rpc , suffix: ' <small>*</small>' },
+	{ title: '<% _("Use SSL to encrypt RPC traffic"); %>', indent: 2, name: 'f_aria2_ssl_rpc', type: 'checkbox', value: nvram.aria2_ssl_rpc , suffix: ' <small>*</small>' },
 	{ title: '<% _("Save settings location"); %>',name: 'aria2_settings', type: 'select', options: [
 			['down_dir','<% _("In the Download directory (Recommended)"); %>'],
 /* JFFS2-BEGIN */
