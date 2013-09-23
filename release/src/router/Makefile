@@ -1630,7 +1630,8 @@ libcurl/stamp-h1: zlib openssl
 	cd libcurl && CC=$(CC) STRIP='mipsel-uclibc-strip' \
 		CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
 		CPPFLAGS="-I$(TOP)/zlib" \
-		LDFLAGS="-L$(TOP)/zlib -ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC" \
+		LDFLAGS="-L$(TOP)/zlib -L$(TOP)/openssl -ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC" \
+		CURL_LIBS="-lssl -lcrypto" \
 		$(CONFIGURE) --prefix=/usr --disable-thread --enable-shared --enable-static \
 		--enable-ares --enable-cookies --enable-crypto-auth --enable-nonblocking \
 		--enable-file --enable-ftp --enable-http --enable-ipv6 --enable-tftp \
@@ -1639,8 +1640,6 @@ libcurl/stamp-h1: zlib openssl
 		--with-random="/dev/urandom" --with-ssl="$(TOP)/openssl" \
 		--without-gnutls --without-krb4 --without-libidn \
 		--with-linux-headers=$(LINUXDIR)/include \
-		OPENSSL_CFLAGS="-I$(TOP)/openssl/include" \
-		OPENSSL_LIBS="-L$(TOP)/openssl -lcrypto -lssl"
 		touch libcurl/stamp-h1
 
 libcurl: libcurl/stamp-h1
