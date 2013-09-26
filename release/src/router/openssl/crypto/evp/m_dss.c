@@ -60,7 +60,7 @@
 #include "cryptlib.h"
 #include <openssl/evp.h>
 #include <openssl/objects.h>
-#include <openssl/sha.h>
+#include <openssl/x509.h>
 #ifndef OPENSSL_NO_DSA
 #include <openssl/dsa.h>
 #endif

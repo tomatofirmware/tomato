@@ -2132,7 +2132,7 @@ X509_NAME *parse_name(char *subject, long chtype, int multirdn)
 	X509_NAME *n = NULL;
 	int nid;
 
-	if (!buf || !ne_types || !ne_values || !mval)
+	if (!buf || !ne_types || !ne_values)
 		{
 		BIO_printf(bio_err, "malloc error\n");
 		goto error;
@@ -2236,7 +2236,6 @@ X509_NAME *parse_name(char *subject, long chtype, int multirdn)
 	OPENSSL_free(ne_values);
 	OPENSSL_free(ne_types);
 	OPENSSL_free(buf);
-	OPENSSL_free(mval);
 	return n;
 
 error:
@@ -2245,8 +2244,6 @@ error:
 		OPENSSL_free(ne_values);
 	if (ne_types)
 		OPENSSL_free(ne_types);
-	if (mval)
-		OPENSSL_free(mval);
 	if (buf)
 		OPENSSL_free(buf);
 	return NULL;
