@@ -33,7 +33,6 @@ sub ::generic
 sub ::call	{ &::emit("call",(&::islabel($_[0]) or "$nmdecor$_[0]")); }
 sub ::call_ptr	{ &::emit("call",@_);	}
 sub ::jmp_ptr	{ &::emit("jmp",@_);	}
-sub ::lock	{ &::data_byte(0xf0);	}
 
 sub get_mem
 { my($size,$addr,$reg1,$reg2,$idx)=@_;

@@ -597,10 +597,8 @@ void SSL_free(SSL *s)
 		OPENSSL_free(s->next_proto_negotiated);
 #endif
 
-#ifndef OPENSSL_NO_SRTP
         if (s->srtp_profiles)
             sk_SRTP_PROTECTION_PROFILE_free(s->srtp_profiles);
-#endif
 
 	OPENSSL_free(s);
 	}
@@ -1954,10 +1952,8 @@ void SSL_CTX_free(SSL_CTX *a)
 	a->comp_methods = NULL;
 #endif
 
-#ifndef OPENSSL_NO_SRTP
         if (a->srtp_profiles)
                 sk_SRTP_PROTECTION_PROFILE_free(a->srtp_profiles);
-#endif
 
 #ifndef OPENSSL_NO_PSK
 	if (a->psk_identity_hint)
@@ -2291,7 +2287,7 @@ int ssl_check_srvr_ecc_cert_and_alg(X509 *x, SSL *s)
 #endif
 
 /* THIS NEEDS CLEANING UP */
-CERT_PKEY *ssl_get_server_send_pkey(const SSL *s)
+X509 *ssl_get_server_send_cert(SSL *s)
 	{
 	unsigned long alg_k,alg_a;
 	CERT *c;
@@ -2346,20 +2342,12 @@ CERT_PKEY *ssl_get_server_send_pkey(const SSL *s)
 		i=SSL_PKEY_GOST01;
 	else /* if (alg_a & SSL_aNULL) */
 		{
-		SSLerr(SSL_F_SSL_GET_SERVER_SEND_PKEY,ERR_R_INTERNAL_ERROR);
+		SSLerr(SSL_F_SSL_GET_SERVER_SEND_CERT,ERR_R_INTERNAL_ERROR);
 		return(NULL);
 		}
+	if (c->pkeys[i].x509 == NULL) return(NULL);
 
-	return c->pkeys + i;
-	}
-
-X509 *ssl_get_server_send_cert(const SSL *s)
-	{
-	CERT_PKEY *cpk;
-	cpk = ssl_get_server_send_pkey(s);
-	if (!cpk)
-		return NULL;
-	return cpk->x509;
+	return(c->pkeys[i].x509);
 	}
 
 EVP_PKEY *ssl_get_sign_pkey(SSL *s,const SSL_CIPHER *cipher, const EVP_MD **pmd)
@@ -2620,7 +2608,7 @@ const char *SSL_get_version(const SSL *s)
 		return("TLSv1.2");
 	else if (s->version == TLS1_1_VERSION)
 		return("TLSv1.1");
-	else if (s->version == TLS1_VERSION)
+	if (s->version == TLS1_VERSION)
 		return("TLSv1");
 	else if (s->version == SSL3_VERSION)
 		return("SSLv3");
@@ -2792,9 +2780,7 @@ void ssl_clear_cipher_ctx(SSL *s)
 /* Fix this function so that it takes an optional type parameter */
 X509 *SSL_get_certificate(const SSL *s)
 	{
-	if (s->server)
-		return(ssl_get_server_send_cert(s));
-	else if (s->cert != NULL)
+	if (s->cert != NULL)
 		return(s->cert->key->x509);
 	else
 		return(NULL);

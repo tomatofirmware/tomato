@@ -543,8 +543,8 @@ int main(int argc, char *argv[])
 	int comp = 0;
 #ifndef OPENSSL_NO_COMP
 	COMP_METHOD *cm = NULL;
-	STACK_OF(SSL_COMP) *ssl_comp_methods = NULL;
 #endif
+	STACK_OF(SSL_COMP) *ssl_comp_methods = NULL;
 	int test_cipherlist = 0;
 #ifdef OPENSSL_FIPS
 	int fips_mode=0;
