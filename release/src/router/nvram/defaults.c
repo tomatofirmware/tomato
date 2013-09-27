@@ -446,7 +446,7 @@ const defaults_t defaults[] = {
 	{ "block_wan_limit",		"1"			},
 	{ "block_wan_limit_icmp",	"1"			},
 	{ "block_wan_limit_tr",		"5"			},
-	{ "multicast_pass",		"0"				},	// enable multicast proxy
+	{ "multicast_pass",		"0"				},	// enable igmpproxy/multicast proxy
 #ifdef TCONFIG_VLAN
 	{ "multicast_lan",		"0"				},	// on LAN (br0)
 	{ "multicast_lan1",		"0"				},	// on LAN1 (br1)
@@ -548,12 +548,6 @@ const defaults_t defaults[] = {
 	{ "ne_valpha",			"2"				},	// "
 	{ "ne_vbeta",			"6"				},	// "
 	{ "ne_vgamma",			"2"				},	// "
-
-// qos-bw-limiter
-	{ "qosl_enable",		"0"			},
-//	{ "qosl_obw",			""			},	//unused - used qos_obw
-//	{ "qosl_ibw",			""			},	//unused - used qos_obw
-	{ "qosl_rules",			"" 			},
 
 // access restrictions
 	{ "rruleN",				"0"				},
@@ -1036,6 +1030,36 @@ const defaults_t defaults[] = {
 	{ "wd_aof",				""				},
 
 #endif	// 0
+
+// new_qoslimit
+	{ "new_qoslimit_enable",		"0"			},
+	{ "new_qoslimit_rules",			""			},
+	{ "qosl_enable",			"0"			},
+	{ "qosl_tcp",				"0"			},//unlimited
+	{ "qosl_udp",				"0"			},//unlimited
+	{ "qosl_dlc",				""			},
+	{ "qosl_ulc",				""			},
+	{ "qosl_dlr",				""			},
+	{ "qosl_ulr",				""			},
+	{ "limit_br1_enable",			"0"			},
+	{ "limit_br1_dlc",			""			},
+	{ "limit_br1_ulc",			""			},
+	{ "limit_br1_dlr",			""			},
+	{ "limit_br1_ulr",			""			},
+	{ "limit_br1_prio",			"2"			},
+	{ "limit_br2_enable",			"0"			},
+	{ "limit_br2_dlc",			""			},
+	{ "limit_br2_ulc",			""			},
+	{ "limit_br2_dlr",			""			},
+	{ "limit_br2_ulr",			""			},
+	{ "limit_br2_prio",			"2"			},
+	{ "limit_br3_enable",			"0"			},
+	{ "limit_br3_dlc",			""			},
+	{ "limit_br3_ulc",			""			},
+	{ "limit_br3_dlr",			""			},
+	{ "limit_br3_ulr",			""			},
+	{ "limit_br3_prio",			"2"			},
+
 
 // arpbind
 	{ "arpbind_enable",			"0"			},
