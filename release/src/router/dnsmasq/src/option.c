@@ -1587,6 +1587,8 @@ static int one_opt(int option, char *arg, char *errstr, char *gen_err, int comma
 	break;
       }
       
+
+#ifdef HAVE_AUTH
     case LOPT_AUTHSERV: /* --auth-server */
       if (!(comma = split(arg)))
 	ret_err(gen_err);
@@ -1709,6 +1711,7 @@ static int one_opt(int option, char *arg, char *errstr, char *gen_err, int comma
 	}
 
       break;
+#endif
 
     case 's':         /* --domain */
     case LOPT_SYNTH:  /* --synth-domain */
@@ -2420,6 +2423,7 @@ static int one_opt(int option, char *arg, char *errstr, char *gen_err, int comma
 #ifdef HAVE_DHCP6
 	else if (inet_pton(AF_INET6, a[0], &new->start6))
 	  {
+	    new->flags |= CONTEXT_V6; 
 	    new->prefix = 64; /* default */
 	    new->end6 = new->start6;
 	    new->next = daemon->dhcp6;
