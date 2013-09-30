@@ -1,3 +1,6 @@
+# Tomato RAF is a forked version of Tomato firmware conceived by Jonathan Zarate, 2007.
+# 
+#
 # Copyright 2001-2003, Broadcom Corporation
 # All Rights Reserved.
 #
@@ -15,11 +18,11 @@ convenience.
 To build the router:
  o Follow the instructions in the tools/ directory to install the toolchain
  o Ensure the tools in the release/tools directory are in your path
- o cd release/src
- o type 'make'
+ o cd release/src-rt
+ o type 'make help' to see the options to build for each model
 
-This will create a parallel directory to src called image that contains the
+This will create a parallel directory to src-rt called image that contains the
 final image.
 
-Base Image for Tomato-RAF-RT-N
-March, 8, 2012
+Base Image for Tomato-RAF-RT-N build 9013, v1.2i
+Sept 30th, 2013

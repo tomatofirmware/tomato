@@ -73,6 +73,7 @@ switch(nvram['boardtype']) {
   case '0x04ef':  // WRT320N/E2000
   case '0x04cf':  // WRT610Nv2/E3000, RT-N16
   case '0xf52c':  // E4200v1
+  case '0xf52a':  // E3200v1
   case '0xf5b2':  // RT-N66
     trunk_vlan_supported = 1;
     break;

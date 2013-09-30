@@ -850,7 +850,7 @@ endif
 ## Make the "normal (with NTFS support) + VPN" build
 e:
 ifeq ($(CONFIG_LINUX26),y)
-	@$(MAKE) bin OPENVPN=y USERPPTP=y PPTPD=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="$(VPN)" USB="USB" VLAN="$(VLAN)" SNMP=y DNSCRYPT=y TCPDUMP="$(TCPDUMP)"
+	@$(MAKE) bin OPENVPN=y USERPPTP=y PPTPD=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="$(VPN)" USB="USB" VLAN=y NGINX=y SNMP=y DNSCRYPT=y TCPDUMP="$(TCPDUMP)"
 else
 #	@$(MAKE) bin OPENVPN=y USERPPTP=y PPTPD=y NTFS=y B=E BUILD_DESC="$(VPN)" USB="USB" VLAN="$(VLAN)"
 	@$(MAKE) bin OPENVPN=y USERPPTP=y PPTPD=y BBEXTRAS=y USBEXTRAS=y NTFS=y B=E BUILD_DESC="$(VPN)" USB="USB" SNMP=y DNSCRYPT=y  VLAN="$(VLAN)" TCPDUMP="$(TCPDUMP)"
@@ -1095,7 +1095,7 @@ e2500:
 	@$(MAKE) bin MIPS32=r2 OPENVPN=y USERPPTP=y PPTPD=y NTFS=y BBEXTRAS=y NO_LIBOPT=y VLAN=y EBTABLES=y IPV6SUPP=y SNMP=y NOCAT=y NGINX=n USBAP=y NO_USBAPP=y NVRAM_SIZE=60 BUILD_DESC+="-$(VLAN)" BUILD_DESC="$(VPN)" BUILD_DESC+="-$(NC)" LINKSYS_E2500=y
 	
 e3200:
-	@$(MAKE) bin MIPS32=r2 OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y USB="USB" NOCAT=y BBEXTRAS=y SNMP=y DNSCRYPT=y USERPPTP=y PPTPD=y NGINX=y VLAN=y USBAP=y NO_USBAPP=y NVRAM_SIZE=60 LINKSYS_E3200=y
+	@$(MAKE) r2nc USBAP=y NVRAM_SIZE=60 LINKSYS_E3200=y
 
 ac66e:
 	@$(MAKE) e MIPS32=r2 NVRAM_64K=y NAND=y AC66U=1 NO_JFFS=y
@@ -1135,7 +1135,7 @@ setprofile:
 	echo 'TOMATO_BUILD_V1 = "${V1}"' >> tomato_profile.mak
 	echo 'TOMATO_BUILD_V2 = "${V2}"' >> tomato_profile.mak
 
-	echo 'export EXTRACFLAGS := $(EXTRA_CFLAGS) -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32 -mips32 $(if $(filter $(NVRAM_SIZE),0),,-DCONFIG_NVRAM_SIZE=$(NVRAM_SIZE)) $(EXTRA_64KCFLAG)' >> tomato_profile.mak
+	echo 'export EXTRACFLAGS := $(EXTRA_CFLAGS) -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 $(if $(filter $(NVRAM_SIZE),0),,-DCONFIG_NVRAM_SIZE=$(NVRAM_SIZE)) $(EXTRA_64KCFLAG)' >> tomato_profile.mak
 
 # Note that changes to variables in tomato_profile.mak don't
 # get propogated to this invocation of make!

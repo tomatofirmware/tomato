@@ -1,24 +1,6 @@
-Tomato RAF-RT-N Release 1.28.9013v1.1 z
-August 25th 2013
+Tomato RAF-RT-N Release 1.28.9013v1.2 i
+29 Sept. 2013
 victek@tomatoraf.com
-
-Changelog:
-http://repo.or.cz/w/tomato.git/commit/8c388cd0e634dfeec1dd3a0cc2ef4ebe982aebfe
-http://repo.or.cz/w/tomato.git/commit/426ff365fe9d05edf0cce4355b9e29910f65f1c0
-http://repo.or.cz/w/tomato.git/commit/ef6eb481edd69f8703f32c1eca8e357f055bb462
-http://repo.or.cz/w/tomato.git/commit/bfd8b0150e5c06b2178dcac618fa309d04cfa848
-http://repo.or.cz/w/tomato.git/commit/8c75e0ed9c344410db42ed7e49c3cb522b35bac1
-http://repo.or.cz/w/tomato.git/commit/19f78b767d9e7ba14c5aa06decc34eef4203c7ab
-http://repo.or.cz/w/tomato.git/commit/867c81831c714cd42d7c973c519ff4dabf22e118
-http://repo.or.cz/w/tomato.git/commit/5bb90db33fade94de7ec059b0d7cf166352d46e2
-http://repo.or.cz/w/tomato.git/commit/f4b1b614fe18c29f9e7d69503bfc5a6c276197b8
-http://repo.or.cz/w/tomato.git/commit/3d8f82cb4b5c4571f5185b4636925f0feec618a6
-http://repo.or.cz/w/tomato.git/commit/0be8c1a70b332cdd04062c4281ecd1f598c6fe59
-http://repo.or.cz/w/tomato.git/commit/87a50a5a66c5f58c13d2893957984373ac4ca2c1
-http://repo.or.cz/w/tomato.git/commit/d77ac9aa6b631602a8d4d6b79589e238f7e6fe37
-http://repo.or.cz/w/tomato.git/commit/ef567bd827bc4540cd15e4494c2af703d10aa908
-
-----------------------------------------------------------------------------------
 
 
 tomato-<VER>-<ND|K26>[USB]-<NNNN>[MIPSR2|MIPSR1][-subver]-[EDITION].[trx|bin]
