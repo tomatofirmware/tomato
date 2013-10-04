@@ -125,6 +125,11 @@ version 2.67
 	    range. This was originally to avoid SLAAC addresses, but
 	    we now explicitly autoconfig and privacy addresses instead.  
 
+	    Update Polish translation. Thanks to Jan Psota.
+
+	    Fix problem in DHCPv6 vendorclass/userclass matching
+	    code. Thanks to Tanguy Bouzeloc for the patch.
+
 
 version 2.66
             Add the ability to act as an authoritative DNS
