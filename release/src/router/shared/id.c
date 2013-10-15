@@ -82,6 +82,7 @@ RT-N66U				BCM4706               0xf5b2       00        0x1100    0x0110
 WNR3500L			BCM4718               0x04cf       3500      0x1213|02 0x0710|0x1710
 WNR3500Lv2			BCM47186              0x052b       3500(L)   02        0x710|0x1000
 WNR2000v2			BCM4716B0             0xe4cd       1         0x1700
+WNDR3700v3			BCM4718 	          0xf52c	   01	     0x1101    0x00001310	//8MB FLASH/64MB RAM/2.4-5/USB				
 
 F7D4301 v1			BCM4718               0xd4cf       12345     0x1204
 F7D3301/F7D3302/F7D4302 v1	BCM4718               0xa4cf       12345     0x1102
