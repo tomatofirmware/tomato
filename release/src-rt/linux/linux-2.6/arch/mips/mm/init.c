@@ -364,7 +364,7 @@ void __init paging_init(void)
 #endif /* CONFIG_FLATMEM */
 
 	cpu_early_probe_cache();
-	
+
 	pagetable_init();
 
 #ifdef CONFIG_HIGHMEM

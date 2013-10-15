@@ -272,27 +272,26 @@ static int is_config_in_context(struct dhcp_context *context, struct dhcp_config
   if (!context) /* called via find_config() from lease_update_from_configs() */
     return 1; 
 
-  if (!(context->flags & CONTEXT_V6))
-    {
-      if (!(config->flags & CONFIG_ADDR))
+  if (!(config->flags & (CONFIG_ADDR | CONFIG_ADDR6)))
+    return 1;
+  
+#ifdef HAVE_DHCP6
+  if ((context->flags & CONTEXT_V6) && (config->flags & CONFIG_WILDCARD))
+    return 1;
+#endif
+
+  for (; context; context = context->current)
+#ifdef HAVE_DHCP6
+    if (context->flags & CONTEXT_V6) 
+      {
+	if ((config->flags & CONFIG_ADDR6) && is_same_net6(&config->addr6, &context->start6, context->prefix))
+	  return 1;
+      }
+    else 
+#endif
+      if ((config->flags & CONFIG_ADDR) && is_same_net(config->addr, context->start, context->netmask))
 	return 1;
 
-      for (; context; context = context->current)
-	if (is_same_net(config->addr, context->start, context->netmask))
-	  return 1;
-    }
-#ifdef HAVE_DHCP6
-  else 
-    {
-      if (!(config->flags & CONFIG_ADDR6) || (config->flags & CONFIG_WILDCARD))
-	return 1;
-      
-      for (; context; context = context->current)
-	if (is_same_net6(&config->addr6, &context->start6, context->prefix))
-      return 1;
-    }
-#endif
-  
   return 0;
 }
 
@@ -445,7 +444,7 @@ void dhcp_update_configs(struct dhcp_config *configs)
 }
 
 #ifdef HAVE_LINUX_NETWORK 
-void bindtodevice(int fd)
+char *whichdevice(void)
 {
   /* If we are doing DHCP on exactly one interface, and running linux, do SO_BINDTODEVICE
      to that device. This is for the use case of  (eg) OpenStack, which runs a new
@@ -453,17 +452,20 @@ void bindtodevice(int fd)
      individual processes don't always see the packets they should.
      SO_BINDTODEVICE is only available Linux. 
 
-     Note that if wildcards are used in --interface, or a configured interface doesn't
-     yet exist, then more interfaces may arrive later, so we can't safely assert there
-     is only one interface and proceed.
+     Note that if wildcards are used in --interface, or --interface is not used at all,
+     or a configured interface doesn't yet exist, then more interfaces may arrive later, 
+     so we can't safely assert there is only one interface and proceed.
 */
   
   struct irec *iface, *found;
   struct iname *if_tmp;
-
+  
+  if (!daemon->if_names)
+    return NULL;
+  
   for (if_tmp = daemon->if_names; if_tmp; if_tmp = if_tmp->next)
     if (if_tmp->name && (!if_tmp->used || strchr(if_tmp->name, '*')))
-      return;
+      return NULL;
 
   for (found = NULL, iface = daemon->interfaces; iface; iface = iface->next)
     if (iface->dhcp_ok)
@@ -471,18 +473,24 @@ void bindtodevice(int fd)
 	if (!found)
 	  found = iface;
 	else if (strcmp(found->name, iface->name) != 0) 
-	  return; /* more than one. */
+	  return NULL; /* more than one. */
       }
-  
+
   if (found)
-    {
-      struct ifreq ifr;
-      strcpy(ifr.ifr_name, found->name);
-      /* only allowed by root. */
-      if (setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE, (void *)&ifr, sizeof(ifr)) == -1 &&
-	  errno != EPERM)
-	die(_("failed to set SO_BINDTODEVICE on DHCP socket: %s"), NULL, EC_BADNET);
-    }
+    return found->name;
+
+  return NULL;
+}
+ 
+void  bindtodevice(char *device, int fd)
+{
+  struct ifreq ifr;
+  
+  strcpy(ifr.ifr_name, device);
+  /* only allowed by root. */
+  if (setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE, (void *)&ifr, sizeof(ifr)) == -1 &&
+      errno != EPERM)
+    die(_("failed to set SO_BINDTODEVICE on DHCP socket: %s"), NULL, EC_BADNET);
 }
 #endif
 

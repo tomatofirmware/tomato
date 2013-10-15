@@ -221,17 +221,11 @@ struct event_desc {
 #define OPT_TFTP_LC        38
 #define OPT_CLEVERBIND     39
 #define OPT_TFTP           40
-#define OPT_FAST_RA        41
-
-#ifdef HAVE_QUIET_DHCP	//Originally a TOMATO option
+#define OPT_CLIENT_SUBNET  41
 #define OPT_QUIET_DHCP     42
 #define OPT_QUIET_DHCP6    43
 #define OPT_QUIET_RA	   44
 #define OPT_LAST           45
-#else
-#define OPT_LAST		   42
-#endif //HAVE_QUIET_DHCP
-
 
 /* extra flags for my_syslog, we use a couple of facilities since they are known 
    not to occupy the same bits as priorities, no matter how syslog.h is set up. */
@@ -343,8 +337,11 @@ struct crec {
   union {
     struct all_addr addr;
     struct {
-      struct crec *cache;
-      int uid;
+      union {
+	struct crec *cache;
+	struct interface_name *int_name;
+      } target;
+      int uid; /* -1 if union is interface-name */
     } cname;
     struct {
       struct keydata *keydata;
@@ -496,6 +493,7 @@ struct hostsfile {
 
 #define FREC_NOREBIND           1
 #define FREC_CHECKING_DISABLED  2
+#define FREC_HAS_SUBNET         4
 
 struct frec {
   union mysockaddr source;
@@ -710,6 +708,12 @@ struct prefix_class {
 };
 #endif
 
+struct ra_interface {
+  char *name;
+  int interval, lifetime, prio;
+  struct ra_interface *next;
+};
+
 struct dhcp_context {
   unsigned int lease_time, addr_epoch;
   struct in_addr netmask, broadcast;
@@ -811,6 +815,8 @@ extern struct daemon {
   struct auth_zone *auth_zones;
   struct interface_name *int_names;
   char *mxtarget;
+  int addr4_netmask;
+  int addr6_netmask;
   char *lease_file; 
   char *username, *groupname, *scriptuser;
   char *luascript;
@@ -834,6 +840,7 @@ extern struct daemon {
   unsigned long local_ttl, neg_ttl, max_ttl, max_cache_ttl, auth_ttl;
   struct hostsfile *addn_hosts;
   struct dhcp_context *dhcp, *dhcp6;
+  struct ra_interface *ra_interfaces;
   struct dhcp_config *dhcp_conf;
   struct dhcp_opt *dhcp_opts, *dhcp_match, *dhcp_opts6, *dhcp_match6;
   struct dhcp_vendor *dhcp_vendors;
@@ -937,6 +944,7 @@ struct in_addr a_record_from_hosts(char *name, time_t now);
 void cache_unhash_dhcp(void);
 void dump_cache(time_t now);
 char *cache_get_name(struct crec *crecp);
+char *cache_get_cname_target(struct crec *crecp);
 struct crec *cache_enumerate(int init);
 #ifdef HAVE_DNSSEC
 struct keydata *keydata_alloc(char *data, size_t len);
@@ -971,6 +979,8 @@ unsigned int questions_crc(struct dns_header *header, size_t plen, char *buff);
 size_t resize_packet(struct dns_header *header, size_t plen, 
 		  unsigned char *pheader, size_t hlen);
 size_t add_mac(struct dns_header *header, size_t plen, char *limit, union mysockaddr *l3);
+size_t add_source_addr(struct dns_header *header, size_t plen, char *limit, union mysockaddr *source);
+int check_source(struct dns_header *header, size_t plen, unsigned char *pseudoheader, union mysockaddr *peer);
 int add_resource_record(struct dns_header *header, char *limit, int *truncp,
 			int nameoffset, unsigned char **pp, unsigned long ttl, 
 			int *offset, unsigned short type, unsigned short class, char *format, ...);
@@ -1264,7 +1274,8 @@ struct dhcp_config *find_config(struct dhcp_config *configs,
 				int hw_type, char *hostname);
 int config_has_mac(struct dhcp_config *config, unsigned char *hwaddr, int len, int type);
 #ifdef HAVE_LINUX_NETWORK
-void bindtodevice(int fd);
+char *whichdevice(void);
+void bindtodevice(char *device, int fd);
 #endif
 #  ifdef HAVE_DHCP6
 void display_opts6(void);

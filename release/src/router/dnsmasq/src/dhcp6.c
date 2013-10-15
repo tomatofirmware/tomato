@@ -330,7 +330,7 @@ static int complete_context6(struct in6_addr *local,  int prefix,
 	    {
 	      if ((context->flags & CONTEXT_DHCP) &&
 		  !(context->flags & (CONTEXT_TEMPLATE | CONTEXT_OLD)) &&
-		  prefix == context->prefix &&
+		  prefix <= context->prefix &&
 		  is_same_net6(local, &context->start6, prefix) &&
 		  is_same_net6(local, &context->end6, prefix))
 		{
@@ -624,7 +624,8 @@ static int construct_worker(struct in6_addr *local, int prefix,
 	  }
 	
       }
-    else if (wildcard_match(template->template_interface, ifrn_name))
+    else if (wildcard_match(template->template_interface, ifrn_name) &&
+	     template->prefix == prefix)
       {
 	start6 = *local;
 	setaddr6part(&start6, addr6part(&template->start6));

@@ -1006,16 +1006,14 @@ void __init r4k_probe_cache(void)
 	ways = 1 + ((config1 >> 7) & 7);
 
 	if (lsize) {
-                shm_align_mask = max_t( unsigned long,
-                                        sets * lsize - 1,
-                                        PAGE_SIZE - 1);
+		shm_align_mask = max_t( unsigned long,
+					sets * lsize - 1,
+					PAGE_SIZE - 1);
 
-                if (shm_align_mask != (PAGE_SIZE - 1))
-                        shm_align_shift = ffs((shm_align_mask + 1)) - 1;
-        } else
-                shm_align_mask = PAGE_SIZE-1;
-
-		
+		if (shm_align_mask != (PAGE_SIZE - 1))
+			shm_align_shift = ffs((shm_align_mask + 1)) - 1;
+	} else
+		shm_align_mask = PAGE_SIZE-1;
 }
 
 /*

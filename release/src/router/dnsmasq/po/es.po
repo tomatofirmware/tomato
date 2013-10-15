@@ -1407,7 +1407,7 @@ msgstr "línea errónea en %s línea %d"
 msgid "ignoring %s line %d, duplicate name or IP address"
 msgstr "ignorando %s línea %d, nombre o dirección IP duplicada"
 
-#: dhcp.c:993 rfc3315.c:2047
+#: dhcp.c:993 rfc3315.c:2052
 #, c-format
 msgid "DHCP relay %s -> %s"
 msgstr "DHCP relay %s -> %s"
@@ -1459,7 +1459,7 @@ msgstr "vía"
 msgid "%u available DHCP subnet: %s/%s"
 msgstr "%u Subred DHCP disponible: %s/%s"
 
-#: rfc2131.c:354 rfc3315.c:292
+#: rfc2131.c:354 rfc3315.c:296
 #, fuzzy, c-format
 msgid "%u available DHCP range: %s -- %s"
 msgstr "%u Rango DHCP disponible: %s -- %s"
@@ -1478,12 +1478,12 @@ msgstr "%u Clase de usuario: %s"
 msgid "disabled"
 msgstr "deshabilitado"
 
-#: rfc2131.c:535 rfc2131.c:961 rfc2131.c:1379 rfc3315.c:593 rfc3315.c:813
-#: rfc3315.c:1082
+#: rfc2131.c:535 rfc2131.c:961 rfc2131.c:1379 rfc3315.c:598 rfc3315.c:818
+#: rfc3315.c:1087
 msgid "ignored"
 msgstr "ignorado"
 
-#: rfc2131.c:550 rfc2131.c:1199 rfc3315.c:863
+#: rfc2131.c:550 rfc2131.c:1199 rfc3315.c:868
 msgid "address in use"
 msgstr "dirección en uso"
 
@@ -1503,7 +1503,7 @@ msgstr "ninguna dirección configurada"
 msgid "no leases left"
 msgstr "no sobra ninguna concesión"
 
-#: rfc2131.c:687 rfc3315.c:466
+#: rfc2131.c:687 rfc3315.c:471
 #, fuzzy, c-format
 msgid "%u client provides name: %s"
 msgstr "%u cliente provee nombre: %s"
@@ -1512,7 +1512,7 @@ msgstr "%u cliente provee nombre: %s"
 msgid "PXE BIS not supported"
 msgstr "no hay soporte para BIS PXE"
 
-#: rfc2131.c:931 rfc3315.c:1176
+#: rfc2131.c:931 rfc3315.c:1181
 #, fuzzy, c-format
 msgid "disabling DHCP static address %s for %s"
 msgstr "deshabilitando dirección DHCP estática %s para %s"
@@ -1548,7 +1548,7 @@ msgstr "ID de servidor equivocada"
 msgid "wrong address"
 msgstr "dirección equivocada"
 
-#: rfc2131.c:1137 rfc3315.c:959
+#: rfc2131.c:1137 rfc3315.c:964
 msgid "lease not found"
 msgstr "concesión no encontrada"
 
@@ -1598,7 +1598,7 @@ msgstr "no se puede enviar opción DHCP/BOOTP %d: no queda espacio en el paquete"
 msgid "PXE menu too large"
 msgstr "menú PXE demasiado largo"
 
-#: rfc2131.c:2162 rfc3315.c:1420
+#: rfc2131.c:2162 rfc3315.c:1425
 #, fuzzy, c-format
 msgid "%u requested options: %s"
 msgstr "%u opciones solicitadas: %s"
@@ -1640,7 +1640,7 @@ msgstr "no se puede crear zócalo BPF DHCP: %s"
 msgid "DHCP request for unsupported hardware type (%d) received on %s"
 msgstr "pedido DHCP por tipo de hardware no-soportado (%d) recibido en %s"
 
-#: helper.c:151
+#: helper.c:153
 msgid "lease() function missing in Lua script"
 msgstr "la función lease() no se encuentra en el script Lua"
 
@@ -1707,81 +1707,81 @@ msgstr "no se pudo fijar SO_REUSE{ADDR|PORT} en zócalo DHCP: %s"
 msgid "failed to bind DHCPv6 server socket: %s"
 msgstr "no se pudo acoplar zócalo de servidor DHCP: %s"
 
-#: rfc3315.c:149
+#: rfc3315.c:153
 #, fuzzy, c-format
 msgid "no address range available for DHCPv6 request from relay at %s"
 msgstr "ningún rango de direcciónes disponible para pedido DHCP %s %s"
 
-#: rfc3315.c:158
+#: rfc3315.c:162
 #, fuzzy, c-format
 msgid "no address range available for DHCPv6 request via %s"
 msgstr "ningún rango de direcciónes disponible para pedido DHCP %s %s"
 
-#: rfc3315.c:289
+#: rfc3315.c:293
 #, fuzzy, c-format
 msgid "%u available DHCPv6 subnet: %s/%d"
 msgstr "%u Subred DHCP disponible: %s/%s"
 
-#: rfc3315.c:370
+#: rfc3315.c:375
 #, fuzzy, c-format
 msgid "%u vendor class: %u"
 msgstr "%u Clase de vendedor: %s"
 
-#: rfc3315.c:418
+#: rfc3315.c:423
 #, fuzzy, c-format
 msgid "%u client MAC address: %s"
 msgstr "%u cliente provee nombre: %s"
 
-#: rfc3315.c:650
+#: rfc3315.c:655
 #, fuzzy, c-format
 msgid "unknown prefix-class %d"
 msgstr "clase de prefijo desconocida"
 
-#: rfc3315.c:781 rfc3315.c:903
+#: rfc3315.c:786 rfc3315.c:908
 msgid "success"
 msgstr ""
 
-#: rfc3315.c:796 rfc3315.c:798 rfc3315.c:911 rfc3315.c:913
+#: rfc3315.c:801 rfc3315.c:803 rfc3315.c:916 rfc3315.c:918
 #, fuzzy
 msgid "no addresses available"
 msgstr "ninguna dirección disponible"
 
-#: rfc3315.c:855
+#: rfc3315.c:860
 #, fuzzy
 msgid "address unavailable"
 msgstr "dirección no disponible"
 
-#: rfc3315.c:890
+#: rfc3315.c:895
 msgid "not on link"
 msgstr "no en el enlace"
 
-#: rfc3315.c:963 rfc3315.c:1138 rfc3315.c:1215
+#: rfc3315.c:968 rfc3315.c:1143 rfc3315.c:1220
 msgid "no binding found"
 msgstr "uniones no encontradas"
 
-#: rfc3315.c:1001
+#: rfc3315.c:1006
 msgid "deprecated"
 msgstr "descartado"
 
-#: rfc3315.c:1006
+#: rfc3315.c:1011
 #, fuzzy
 msgid "address invalid"
 msgstr "dirección en uso"
 
-#: rfc3315.c:1048
+#: rfc3315.c:1053
 msgid "confirm failed"
 msgstr "confirmación falló"
 
-#: rfc3315.c:1059
+#: rfc3315.c:1064
 #, fuzzy
 msgid "all addresses still on link"
 msgstr "dirección errónea en %s línea %d"
 
-#: rfc3315.c:1147
+#: rfc3315.c:1152
 msgid "release received"
 msgstr "concesión recibida"
 
-#: rfc3315.c:2038
+#: rfc3315.c:2043
 msgid "Cannot multicast to DHCPv6 server without correct interface"
 msgstr "No puede hacer multicast DHCPv6 sin el interfase correcto"
 
@@ -1829,42 +1829,42 @@ msgstr ", prefijo descartado"
 msgid ", lease time "
 msgstr ", tiempo de concesión"
 
-#: dhcp-common.c:849
+#: dhcp-common.c:859
 #, c-format
 msgid "%s stateless on %s%.0s%.0s%s"
 msgstr "%s apátrida en %s%.0s%.0s%s"
 
-#: dhcp-common.c:851
+#: dhcp-common.c:861
 #, fuzzy, c-format
 msgid "%s, static leases only on %.0s%s%s%.0s"
 msgstr "DHCP, concesión estática solo en %.0s%s, tiempo de concesión %s"
 
-#: dhcp-common.c:853
+#: dhcp-common.c:863
 #, fuzzy, c-format
 msgid "%s, proxy on subnet %.0s%s%.0s%.0s"
 msgstr "DHCP, proxy en subred %.0s%s%.0s"
 
-#: dhcp-common.c:854
+#: dhcp-common.c:864
 #, fuzzy, c-format
 msgid "%s, IP range %s -- %s%s%.0s"
 msgstr "DHCP, rango de IPs %s -- %s, tiempo de concesión %s"
 
-#: dhcp-common.c:861
+#: dhcp-common.c:877
 #, c-format
 msgid "DHCPv4-derived IPv6 names on %s%s"
 msgstr ""
 
-#: dhcp-common.c:864
+#: dhcp-common.c:880
 #, fuzzy, c-format
 msgid "router advertisement on %s%s"
 msgstr "DHCP, concesión estáticos solo en %.0s%s, tiempo de concesión %s"
 
-#: dhcp-common.c:875
+#: dhcp-common.c:891
 #, c-format
 msgid "DHCP relay from %s to %s via %s"
 msgstr ""
 
-#: dhcp-common.c:877
+#: dhcp-common.c:893
 #, c-format
 msgid "DHCP relay from %s to %s"
 msgstr ""

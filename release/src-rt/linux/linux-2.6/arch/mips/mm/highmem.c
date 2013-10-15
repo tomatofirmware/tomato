@@ -39,7 +39,7 @@ void __kunmap(struct page *page)
 struct kmap_map {
 	struct page *page;
 	void        *vaddr;
-	unsigned long	pfn;
+	unsigned long   pfn;
 };
 
 struct {
@@ -82,13 +82,14 @@ void *__kmap_atomic(struct page *page, enum km_type type)
 	 * recalculate the idx from vaddr.
 	 */
 	set_pte(kmap_pte-(virt_to_fix(vaddr) - VALIAS_IDX(FIX_KMAP_BEGIN)), \
-		 mk_pte(page, kmap_prot));
+		mk_pte(page, kmap_prot));
 	local_flush_tlb_one((unsigned long)vaddr);
 
 	kmap_atomic_maps[smp_processor_id()].map[type].page = page;
 	kmap_atomic_maps[smp_processor_id()].map[type].vaddr = (void *)vaddr;
+
 	kmap_atomic_maps[smp_processor_id()].map[type].pfn = pfn;
-	
+
 	return (void*) vaddr;
 }
 
@@ -113,8 +114,9 @@ void __kunmap_atomic(void *kvaddr, enum km_type type)
 	if ( kmap_atomic_maps[smp_processor_id()].map[type].vaddr ) {
 		kmap_atomic_maps[smp_processor_id()].map[type].page = (struct page *)0;
 		kmap_atomic_maps[smp_processor_id()].map[type].vaddr = (void *) 0;
+
 		kmap_atomic_maps[smp_processor_id()].map[type].pfn = 0;
-		
+
 		flush_data_cache_page((unsigned long)vaddr);
 	}
 
@@ -147,12 +149,12 @@ void *kmap_atomic_pfn(unsigned long pfn, enum km_type type)
 	 * recalculate the idx from vaddr.
 	 */
 	set_pte(kmap_pte-(virt_to_fix(vaddr) - VALIAS_IDX(FIX_KMAP_BEGIN)), \
-		 pfn_pte(pfn, kmap_prot));
+		pfn_pte(pfn, kmap_prot));
 
 	kmap_atomic_maps[smp_processor_id()].map[type].page = (struct page *)0;
 	kmap_atomic_maps[smp_processor_id()].map[type].vaddr = (void *) vaddr;
 	kmap_atomic_maps[smp_processor_id()].map[type].pfn = pfn;
-	
+
 	flush_tlb_one(vaddr);
 
 	return (void*) vaddr;
