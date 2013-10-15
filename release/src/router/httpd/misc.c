@@ -380,7 +380,6 @@ void asp_calc6rdlocalprefix(int argc, char **argv)
 }
 #endif
 
-
 int get_flashsize()
 {
 /*

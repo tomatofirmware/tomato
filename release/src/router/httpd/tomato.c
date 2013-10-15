@@ -1170,9 +1170,35 @@ static const nvset_t nvset_list[] = {
 	{ "ne_vbeta",			V_NUM			},
 	{ "ne_vgamma",			V_NUM			},
 
-// qos-bw-limiter
-	{ "qosl_enable",		V_01                   },
-	{ "qosl_rules",			V_LENGTH(0, 4096)      },
+// new_qoslimit
+	{ "new_qoslimit_enable",         V_01                   },
+	{ "new_qoslimit_rules",          V_LENGTH(0, 4096)      },
+	{ "qosl_enable",                 V_01                   },
+	{ "qosl_ulr",                    V_RANGE(0, 999999)     },
+	{ "qosl_ulc",                    V_RANGE(0, 999999)     },
+	{ "qosl_dlr",                    V_RANGE(0, 999999)     },
+	{ "qosl_dlc",                    V_RANGE(0, 999999)     },
+	{ "qosl_tcp",                    V_RANGE(0, 1000)       },
+	{ "qosl_udp",                    V_RANGE(0, 100)        },
+	{ "limit_br1_enable",            V_01                   },
+	{ "limit_br1_ulr",               V_RANGE(0, 999999)     },
+	{ "limit_br1_ulc",               V_RANGE(0, 999999)     },
+	{ "limit_br1_dlr",               V_RANGE(0, 999999)     },
+	{ "limit_br1_dlc",               V_RANGE(0, 999999)     },
+	{ "limit_br1_prio",              V_RANGE(0, 5)          },
+	{ "limit_br2_enable",            V_01                   },
+	{ "limit_br2_ulr",               V_RANGE(0, 999999)     },
+	{ "limit_br2_ulc",               V_RANGE(0, 999999)     },
+	{ "limit_br2_dlr",               V_RANGE(0, 999999)     },
+	{ "limit_br2_dlc",               V_RANGE(0, 999999)     },
+	{ "limit_br2_prio",              V_RANGE(0, 5)          },
+	{ "limit_br3_enable",            V_01                   },
+	{ "limit_br3_ulr",               V_RANGE(0, 999999)     },
+	{ "limit_br3_ulc",               V_RANGE(0, 999999)     },
+	{ "limit_br3_dlr",               V_RANGE(0, 999999)     },
+	{ "limit_br3_dlc",               V_RANGE(0, 999999)     },
+	{ "limit_br3_prio",              V_RANGE(0, 5)          },
+
 	
 //NoCatSplash. Victek.
 #ifdef TCONFIG_NOCAT

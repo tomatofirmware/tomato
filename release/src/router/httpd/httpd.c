@@ -2,7 +2,7 @@
 
 	micro_httpd/mini_httpd
 
-	Copyright � 1999,2000 by Jef Poskanzer <jef@acme.com>.
+	Copyright © 1999,2000 by Jef Poskanzer <jef@acme.com>.
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -74,7 +74,7 @@
 #include "../mssl/mssl.h"
 int do_ssl;
 
-#define HTTP_MAX_LISTENERS 12
+#define HTTP_MAX_LISTENERS 8
 
 typedef struct {
 	int count;

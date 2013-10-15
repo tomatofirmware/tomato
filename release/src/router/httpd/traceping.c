@@ -9,6 +9,7 @@
 
 #include <ctype.h>
 
+
 static int check_addr(const char *addr, int max)
 {
 	const char *p;
@@ -18,7 +19,7 @@ static int check_addr(const char *addr, int max)
 	p = addr;
 	while (*p) {
 		c = *p;
-		if ((!isalnum(c)) && (c != '.') && (c != '-') && (c != ':')) return 0;  //Give IPv6 addresses a chance
+		if ((!isalnum(c)) && (c != '.') && (c != '-') && (c != ':')) return 0;	//Give IPv6 address a chance
 		++p;
 	}
 	return((p - addr) <= max);
