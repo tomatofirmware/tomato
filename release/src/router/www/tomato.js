@@ -2416,7 +2416,7 @@ REMOVE-END */
 		
 		['Access Restriction',		'restrict.asp'],
 		null,
-		['Bandwidth Limiter',		'qoslimit.asp'], 
+		['Bandwidth Limiter',		'bwlimit.asp'], 
 		/* NOCAT-BEGIN */
 		['Captive Portal',		'splashd.asp'],
 /* NOCAT-END */
