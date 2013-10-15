@@ -686,16 +686,16 @@ void enable_ipv6(int enable)
 
 	if ((dir = opendir("/proc/sys/net/ipv6/conf")) != NULL) {
 		while ((dirent = readdir(dir)) != NULL) {
-		if (strcmp("vlan1", dirent->d_name) &&
-			strcmp("eth0", dirent->d_name) &&
-			strcmp("all", dirent->d_name) &&
-			strcmp("eth1", dirent->d_name))
-		{
-			
-			sprintf(s, "/proc/sys/net/ipv6/conf/%s/disable_ipv6", dirent->d_name);
-			f_write_string(s, enable ? "0" : "1", 0, 0);
+			if (strcmp("vlan1", dirent->d_name) &&
+	                    strcmp("eth0", dirent->d_name) &&
+	                    strcmp("all", dirent->d_name) &&
+			    strcmp("eth1", dirent->d_name))
+			{
+
+				sprintf(s, "/proc/sys/net/ipv6/conf/%s/disable_ipv6", dirent->d_name);
+				f_write_string(s, enable ? "0" : "1", 0, 0);
+			}
 		}
-	}
 		closedir(dir);
 	}
 }
@@ -740,7 +740,7 @@ void start_lan(void)
 #endif
 	check_afterburner();
 #ifdef TCONFIG_IPV6
-	enable_ipv6(ipv6_enabled()); //tell Kernel to disable/enable IPv6 for most interfaces
+	enable_ipv6(ipv6_enabled());  //tell Kernel to disable/enable IPv6 for most interfaces
 #endif
 	vlan0tag = nvram_get_int("vlan0tag");
 
@@ -861,7 +861,7 @@ void start_lan(void)
 				}
 			
 				if ((nvram_get_int("wan_islan")) && (br==0) &&
-					((get_wan_proto() == WP_DISABLED) || (get_wan_proto() == WP_PPP3G) || (sta))) {
+					((get_wan_proto() == WP_DISABLED) || (sta))) {
 					ifname = nvram_get("wan_ifnameX");
 					if (ifconfig(ifname, IFUP, NULL, NULL) == 0)
 						eval("brctl", "addif", lan_ifname, ifname);
@@ -1041,8 +1041,8 @@ void do_static_routes(int add)
 
 	char *modem_ipaddr;
 	if ( (nvram_match("wan_proto", "pppoe") || nvram_match("wan_proto", "dhcp") || nvram_match("wan_proto", "static") )
-		&& (modem_ipaddr = nvram_safe_get("modem_ipaddr")) && *modem_ipaddr && !nvram_match("modem_ipaddr","0.0.0.0") 
-		&& (!foreach_wif(1, NULL, is_sta)) ) {
+	    && (modem_ipaddr = nvram_safe_get("modem_ipaddr")) && *modem_ipaddr && !nvram_match("modem_ipaddr","0.0.0.0") 
+	    && (!foreach_wif(1, NULL, is_sta)) ) {
 		char ip[16];
 		char *end = rindex(modem_ipaddr,'.')+1;
 		unsigned char c = atoi(end);
@@ -1051,7 +1051,6 @@ void do_static_routes(int add)
 		sprintf(ip, "%.*s%hhu", end-modem_ipaddr, modem_ipaddr, (unsigned char)(c^1^((c&2)^((c&1)<<1))) );
 		eval("ip", "addr", add ?"add":"del", ip, "peer", modem_ipaddr, "dev", iface);
 	}
-
 
 }
 

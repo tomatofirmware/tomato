@@ -86,11 +86,7 @@ void start_dnsmasq()
 	int do_dns;
 	int do_dhcpd_hosts;
 
-#ifdef TCONFIG_IPV6
-	char *prefix, *ipv6, *mtu;
-	int do_6to4, do_6rd;
-	int service;
-#endif
+
 
 	TRACE_PT("begin\n");
 
@@ -168,6 +164,7 @@ void start_dnsmasq()
 		if (n & 2) fprintf(f, "quiet-dhcp6\n");
 		if (n & 4) fprintf(f, "quiet-ra\n");
 	}
+
 	// dhcp
 	do_dhcpd_hosts=0;
 	char lanN_proto[] = "lanXX_proto";
@@ -353,14 +350,11 @@ void start_dnsmasq()
 		}
 
 		if ((do_dhcpd_hosts > 0) && (*mac != 0) && (strcmp(mac, "00:00:00:00:00:00") != 0)) {
-			char static_dhcp_lease[32];
-			strcpy(static_dhcp_lease, "");
-			if (nvram_get_int("dhcpd_slt") != 0)
-				sprintf(static_dhcp_lease, ",%s", sdhcp_lease);
-			if (df)
-				fprintf(df, "%s,%s%s\n", mac, ip, static_dhcp_lease);
-			else
-				fprintf(f, "dhcp-host=%s,%s%s\n", mac, ip, static_dhcp_lease);
+			if (nvram_get_int("dhcpd_slt") == 0) {
+				fprintf(f, "dhcp-host=%s,%s\n", mac, ip);
+			} else {
+				fprintf(f, "dhcp-host=%s,%s,%s\n", mac, ip, sdhcp_lease);
+			}
 		}
 	}
 
@@ -392,29 +386,16 @@ void start_dnsmasq()
 #endif
 
 #ifdef TCONFIG_IPV6
+//			if (!(*prefix)) prefix = "::";
+//			ipv6 = (char *)ipv6_router_address(NULL);
+//			fprintf(f, "enable-ra\ndhcp-range=tag:br0,%s, slaac, ra-names, 64\n", prefix);
+//			fprintf(fp, "dhcp-range=lan,::,constructor:%s,ra-stateless,ra-names,%d,%d\n",
+//			fprintf(f, "enable-ra\ndhcp-range=lan,::1, ::FFFF:FFFF, constructor:%s, ra-names, %d, %s\n",
+
+
 	if (ipv6_enabled() && nvram_get_int("ipv6_radvd")) {
-                service = get_ipv6_service();
-                do_6to4 = (service == IPV6_ANYCAST_6TO4);
-                do_6rd = (service == IPV6_6RD || service == IPV6_6RD_DHCP);
-                mtu = NULL;
-
-                switch (service) {
-                case IPV6_NATIVE_DHCP:
-                case IPV6_ANYCAST_6TO4:
-                case IPV6_6IN4:
-                case IPV6_6RD:
-                case IPV6_6RD_DHCP:
-                        mtu = (nvram_get_int("ipv6_tun_mtu") > 0) ? nvram_safe_get("ipv6_tun_mtu") : "1480";
-                        // fall through
-                default:
-                        prefix = do_6to4 ? "0:0:0:1::" : nvram_safe_get("ipv6_prefix");
-                        break;
-                }
-                if (!(*prefix)) prefix = "::";
-//                ipv6 = (char *)ipv6_router_address(NULL);
-
-		fprintf(f, "enable-ra\ndhcp-range=tag:br0,%s, slaac, ra-names, 64\n", prefix);
-
+		fprintf(f, "enable-ra\ndhcp-range=::1, ::FFFF:FFFF, constructor:%s, ra-names, %d, %s\n",
+                        nvram_safe_get("lan_ifname"), 64, "12h");
 	}
 #endif
 
@@ -461,6 +442,7 @@ void start_dnsmasq()
 #endif
 	}
 #endif
+
 }
 
 void stop_dnsmasq(void)
@@ -777,7 +759,7 @@ void start_ipv6(void)
 	int service;
 
 	service = get_ipv6_service();
-	enable_ip_forward();
+	enable_ip6_forward();
 
 	// Check if turned on
 	switch (service) {
@@ -932,7 +914,6 @@ void start_upnp(void)
 				}
 #endif
 
-				fappend(f, "/jffs/upnpconfig.custom");
 				fappend(f, "/etc/upnp/config.custom");
 				fprintf(f, "%s\n", nvram_safe_get("upnp_custom"));
 				fprintf(f, "\ndeny 0-65535 0.0.0.0/0 0-65535\n");
@@ -1300,7 +1281,8 @@ void start_igmp_proxy(void)
 				"quickleave\n"
 				"phyint %s upstream\n"
 				"\taltnet %s\n",
-				nvram_safe_get("wan_ifname"),
+//				"phyint %s downstream ratelimit 0\n",
+				get_wanface(),
 				nvram_get("multicast_altnet") ? : "0.0.0.0/0");
 //				nvram_safe_get("lan_ifname"));
 
@@ -2209,6 +2191,16 @@ void start_services(void)
 #ifdef TCONFIG_PPTPD
 	start_pptpd();
 #endif
+
+#ifdef TCONFIG_IPV6
+	/* note: starting radvd here might be too early in case of
+	 * DHCPv6 or 6to4 because we won't have received a prefix and
+	 * so it will disable advertisements. To restart them, we have
+	 * to send radvd a SIGHUP, or restart it.
+	 */
+	start_dnsmasq();
+#endif
+
 	restart_nas_services(1, 1);	// !!TB - Samba, FTP and Media Server
 
 #ifdef TCONFIG_SNMP
@@ -2364,14 +2356,14 @@ TOP:
 
 	if (strcmp(service, "qoslimit") == 0) {
 		if (action & A_STOP) {
-			stop_qoslimit();
+			new_qoslimit_stop();
 		}
 #ifdef TCONFIG_NOCAT
 		stop_splashd();
 #endif
 		stop_firewall(); start_firewall();		// always restarted
 		if (action & A_START) {
-			start_qoslimit();
+			new_qoslimit_start();
 		}
 #ifdef TCONFIG_NOCAT
 		start_splashd();

@@ -15,7 +15,7 @@ OBJS += firewall.o ppp.o telssh.o wnas.o
 OBJS += listen.o redial.o led.o qos.o forward.o misc.o mtd.o
 OBJS += buttons.o restrict.o gpio.o sched.o
 OBJS += arpbind.o
-OBJS += qoslimit.o
+OBJS += new_qoslimit.o
 OBJS += blink_5g.o 
 
 ifeq ($(TCONFIG_USB),y)

@@ -469,6 +469,7 @@ static int init_vlan_ports(void)
 	case MODEL_RTN15U:
 	case MODEL_E3200:
 	case MODEL_E4200:
+	case MODEL_WNDR3700v3:
 		dirty |= check_nv("vlan1ports", "0 1 2 3 8*");
 		dirty |= check_nv("vlan2ports", "4 8");
 		break;
@@ -576,6 +577,11 @@ static void check_bootnv(void)
 		break;
 	case MODEL_WNR2000v2:
 		dirty |= check_nv("ledbh5", "8");
+		break;
+	case MODEL_WNDR3700v3:
+		dirty |= check_nv("boardflags", "0x00001310");
+		dirty |= check_nv("vlan2hwname", "et0");
+		dirty |= check_nv("reset_gpio", "3");
 		break;
 	case MODEL_WRT320N:
 		dirty |= check_nv("reset_gpio", "5");
@@ -1188,6 +1194,66 @@ static int init_nvram(void)
 			nvram_unset("vlan0ports");
 		}
 		break;
+/*
+	case MODEL_RTAC56U:
+		mfr = "Asus";
+		name = "RT-AC56U";
+		features = SUP_SES | SUP_80211N | SUP_1000ET | SUP_80211AC;
+		nvram_set("vlan1hwname", "et0");
+		nvram_set("vlan2hwname", "et0");
+		nvram_set("lan_ifname", "br0");
+		nvram_set("0:ledbh3", "0x87");	  // since 163.42 //
+		nvram_set("1:ledbh10", "0x87");
+		nvram_set("landevs", "vlan1 wl0 wl1");
+		nvram_set("wl_ifnames", "eth1 eth2");
+		nvram_set("wl0_vifnames", "wl0.1 wl0.2 wl0.3");
+		nvram_set("wl1_vifnames", "wl1.1 wl1.2 wl1.3");
+		nvram_set_int("pwr_usb_gpio", 9|GPIO_ACTIVE_LOW);
+		nvram_set_int("pwr_usb_gpio2", 10|GPIO_ACTIVE_LOW);	// Use at the first shipment of RT-AC56U.
+		nvram_set_int("led_usb_gpio", 14|GPIO_ACTIVE_LOW);	// change led gpio(usb2/usb3) to sync the outer case
+		nvram_set_int("led_wan_gpio", 1|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_lan_gpio", 2|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_pwr_gpio", 3|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_wps_gpio", 3|GPIO_ACTIVE_LOW);
+		nvram_set_int("led_all_gpio", 4|GPIO_ACTIVE_LOW);	// actually, this is high active, and will power off all led when active; to fake LOW_ACTIVE to sync boardapi
+		nvram_set_int("led_5g_gpio", 6|GPIO_ACTIVE_LOW);	// 4352's fake led 5g
+		nvram_set_int("led_usb3_gpio", 0|GPIO_ACTIVE_LOW);	// change led gpio(usb2/usb3) to sync the outer case
+		nvram_set_int("btn_wps_gpio", 15|GPIO_ACTIVE_LOW);
+		nvram_set_int("btn_rst_gpio", 11|GPIO_ACTIVE_LOW);
+#ifdef RTCONFIG_WIFI_TOG_BTN
+		nvram_set_int("btn_wltog_gpio", 7|GPIO_ACTIVE_LOW);
+#endif
+#ifdef RTCONFIG_TURBO
+		nvram_set_int("btn_turbo_gpio", 5);
+#endif
+
+#ifdef RTCONFIG_XHCIMODE
+		nvram_set("xhci_ports", "1-1");
+		nvram_set("ehci_ports", "2-1 2-2");
+		nvram_set("ohci_ports", "3-1 3-2");
+#else
+		if(nvram_get_int("usb_usb3") == 1){
+			nvram_set("xhci_ports", "1-1");
+			nvram_set("ehci_ports", "2-1 2-2");
+			nvram_set("ohci_ports", "3-1 3-2");
+		}
+		else{
+			nvram_unset("xhci_ports");
+			nvram_set("ehci_ports", "1-1 1-2");
+			nvram_set("ohci_ports", "2-1 2-2");
+		}
+#endif
+
+		if(!nvram_get("ct_max"))
+			nvram_set("ct_max", "300000");
+		add_rc_support("mssid 2.4G 5G update usbX2");
+		add_rc_support("switchctrl"); // broadcom: for jumbo frame only
+		add_rc_support("manual_stb");
+		add_rc_support("pwrctrl");
+		add_rc_support("WIFI_LOGO");
+		add_rc_support("nandflash");
+		break;
+*/
 	case MODEL_RTN66U:
 		mfr = "Asus";
 #ifdef CONFIG_BCMWL6
@@ -1230,13 +1296,6 @@ static int init_nvram(void)
 			nvram_set("wl0_hwaddr", s);
 			inc_mac(s, +1);
 			nvram_set("wl1_hwaddr", s);
-
-//			nvram_set("wl0_phytype", "h");
-//			nvram_set("wl0_phytypes", "h");
-//			nvram_set("wl1_phytype", "h"); // "h" for now. For 80Mhz should be "v"
-//			nvram_set("wl1_phytypes", "h"); // "h" for now. For 80Mhz should be "v"
-//			nvram_set("wl1_unit" ,"1");
-
 
 			// bcm4360ac_defaults
 			nvram_set("pci/2/1/aa2g", "0");
@@ -1323,10 +1382,11 @@ static int init_nvram(void)
 			nvram_set("pci/2/1/ledbh3", "11");
 			nvram_set("pci/2/1/ledbh10", "7");
 
-			//force EU country for eth2
-			nvram_set("pci/2/1/ccode", "EU");
+			//force USA country for eth2
+			nvram_set("pci/2/1/ccode", "US");
 		}
 		break;
+
 	case MODEL_W1800R:
 		mfr = "Tenda";
 		name = "W1800R"; //id, board, rev same as N66
@@ -1478,6 +1538,25 @@ static int init_nvram(void)
 			nvram_set("lan_ifnames", "vlan0 eth1");
 			nvram_set("wan_ifnameX", "vlan1");
 			nvram_set("wl_ifname", "eth1");
+		}
+		break;
+	case MODEL_WNDR3700v3:
+		mfr = "Netgear";
+		name = "WNDR3700 v3";
+		features = SUP_SES | SUP_80211N | SUP_1000ET;
+#ifdef TCONFIG_USB
+		nvram_set("usb_uhci", "-1");
+#endif
+		if (!nvram_match("t_fix1", (char *)name)) {
+			nvram_set("sromrev", "8");
+			nvram_set("lan_ifnames", "vlan1 eth1 eth2");
+			nvram_set("landevs", "vlan1 wl0 wl1");
+			nvram_set("wan_ifnameX", "vlan2");
+			nvram_set("wl_ifname", "eth1");
+			nvram_set("wl_ifname", "eth2");
+			nvram_set("boardflags", "0x00001310"); //needed to enable USB
+			nvram_set("wandevs", "et0");
+			nvram_set("t_fix1", name);
 		}
 		break;
 	case MODEL_F7D3301:

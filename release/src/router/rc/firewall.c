@@ -1208,12 +1208,12 @@ static void filter_forward(void)
 
 				sprintf(lanN_ifname2, "lan%s_ifname", bridge2);
 				if (strncmp(nvram_safe_get(lanN_ifname2), "br", 2) == 0) {
-					ip46t_write("-A FORWARD -i %s -o %s -j DROP\n",
-								nvram_safe_get(lanN_ifname),
-								nvram_safe_get(lanN_ifname2));
+					ipt_write("-A FORWARD -i %s -o %s -j DROP\n",
+						nvram_safe_get(lanN_ifname),
+						nvram_safe_get(lanN_ifname2));
 				}
 			}
-//		ipt_write("-A FORWARD -i %s -j %s\n", nvram_safe_get(lanN_ifname), chain_out_accept);
+//		ip46t_write("-A FORWARD -i %s -j %s\n", nvram_safe_get(lanN_ifname), chain_out_accept);
 		}
 	}
 #endif
@@ -1229,7 +1229,8 @@ static void filter_forward(void)
 #ifdef TCONFIG_IPV6
 	// Filter out invalid WAN->WAN connections
 	if (*wan6face)
-		ip6t_write("-A FORWARD -o %s ! -i %s -j %s\n", wan6face, lanface, chain_in_drop);
+//		ip6t_write("-A FORWARD -o %s ! -i %s -j %s\n", wan6face, lanface, chain_in_drop); //shibby - we cant drop connections from WAN to LAN1-3
+		ip6t_write("-A FORWARD -o %s -i %s -j %s\n", wan6face, wan6face, chain_in_drop); //shibby - drop connection from WAN -> WAN only
 
 #ifdef LINUX26
 	modprobe("xt_length");
@@ -1270,29 +1271,13 @@ static void filter_forward(void)
 
 		sprintf(lanN_ifname, "lan%s_ifname", bridge);
 		if (strncmp(nvram_safe_get(lanN_ifname), "br", 2) == 0) {
-			ipt_write("-A FORWARD -i %s -j %s\n", nvram_safe_get(lanN_ifname), chain_out_accept);
+			ip46t_write("-A FORWARD -i %s -j %s\n", nvram_safe_get(lanN_ifname), chain_out_accept);
 		}
 	}
 #else
 	ipt_write("-A FORWARD -i %s -j %s\n", lanface, chain_out_accept);
 #endif
 
-// #ifdef TCONFIG_VLAN
-/*	for (i = 0; i < wanfaces.count; ++i) {
-		if (*(wanfaces.iface[i].name)) {
-			ipt_write("-A FORWARD -i %s -o %s -j %s\n", lanface, wanfaces.iface[i].name, chain_out_accept);
-			if (strcmp(lan1face,"")!=0)
-				ipt_write("-A FORWARD -i %s -o %s -j %s\n", lan1face, wanfaces.iface[i].name, chain_out_accept);
-			if (strcmp(lan2face,"")!=0)
-				ipt_write("-A FORWARD -i %s -o %s -j %s\n", lan2face, wanfaces.iface[i].name, chain_out_accept);
-			if (strcmp(lan3face,"")!=0)
-				ipt_write("-A FORWARD -i %s -o %s -j %s\n", lan3face, wanfaces.iface[i].name, chain_out_accept);
-		}
-	}
-*/
-// #else
-//	ipt_write("-A FORWARD -i %s -j %s\n", lanface, chain_out_accept);
-// #endif
 
 #ifdef TCONFIG_IPV6
 //IPv6 forward LAN->WAN accept

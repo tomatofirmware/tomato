@@ -684,7 +684,7 @@ void start_wan(int mode)
 	TRACE_PT("begin\n");
 
 	sysinfo(&si);
-	f_write(wan_connecting, &si.uptime, sizeof(si.uptime), 0, 0);
+	f_write(wan_connecting, NULL, 0, 0, 0);
 
 	//
 
@@ -754,7 +754,7 @@ void start_wan(int mode)
 	}
 	else {
 		mtu = nvram_get_int("wan_mtu");
-		if (mtu > max) mtu = max;
+		if (!(nvram_get_int("jumbo_frame_enable")) && (mtu > max)) mtu = max;
 			else if (mtu < 576) mtu = 576;
 	}
 	sprintf(buf, "%d", mtu);
@@ -974,7 +974,6 @@ void start_wan_done(char *wan_ifname)
 	start_dnsmasq();
 	start_firewall();
 	start_qos();
-	start_qoslimit();
 	start_arpbind();
 
 
@@ -1051,7 +1050,9 @@ void start_wan_done(char *wan_ifname)
 #endif
 
 	unlink(wan_connecting);
-	start_qoslimit(); //!! RAF
+
+	new_qoslimit_start(); //!! RAF
+
 	TRACE_PT("end\n");
 }
 
@@ -1069,7 +1070,9 @@ void stop_wan(void)
 	start_dnsmasq();
 #endif
 	stop_arpbind();
-	stop_qoslimit(); //!! RAF
+
+	new_qoslimit_stop(); //!! RAF
+
 	stop_qos();
 	stop_upnp();	//!!TB - moved from stop_services()
 	stop_firewall();
