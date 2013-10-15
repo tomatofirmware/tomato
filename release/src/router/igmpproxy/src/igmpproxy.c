@@ -37,6 +37,7 @@
 */
 
 #include "igmpproxy.h"
+#include <sys/sysinfo.h>
 
 static const char Usage[] = 
 "Usage: igmpproxy [-h] [-d] [-v [-v]] <configfile>\n"
@@ -74,7 +75,7 @@ int main( int ArgCn, char *ArgVc[] ) {
     int c;
 
     // Parse the commandline options and setup basic settings..
-    for (c; (c = getopt(ArgCn, ArgVc, "vdh")) != -1;) {
+    while ((c = getopt(ArgCn, ArgVc, "vdh")) != -1) {
         switch (c) {
         case 'd':
             Log2Stderr = true;
@@ -189,28 +190,24 @@ int igmpProxyInit() {
 
         for ( Ix = 0; (Dp = getIfByIx(Ix)); Ix++ ) {
 
-            if ( Dp->InAdr.s_addr && ! (Dp->Flags & IFF_LOOPBACK) ) {
+            if ( Dp->InAdr.s_addr && ! (Dp->Flags & IFF_LOOPBACK) && Dp->state != IF_STATE_DISABLED ) {
                 if(Dp->state == IF_STATE_UPSTREAM) {
                     if(upStreamVif == -1) {
                         upStreamVif = Ix;
                     } else {
-                        my_log(LOG_WARNING, 0, "Vif #%d was already upstream. Cannot set VIF #%d as upstream as well (skipping this VIF).",
+                        my_log(LOG_ERR, 0, "Vif #%d was already upstream. Cannot set VIF #%d as upstream as well.",
                             upStreamVif, Ix);
-                        Dp->state = IF_STATE_DISABLED;
                     }
                 }
 
-                if (Dp->state != IF_STATE_DISABLED) {
-                    addVIF( Dp );
-                    vifcount++;
-                }
+                addVIF( Dp );
+                vifcount++;
             }
         }
 
         // If there is only one VIF, or no defined upstream VIF, we send an error.
         if(vifcount < 2 || upStreamVif < 0) {
-            my_log(LOG_ERR, 0, "There must be at least 2 Vif's where one is upstream (count %d, upstream Vif %d).",
-                vifcount, upStreamVif);
+            my_log(LOG_ERR, 0, "There must be at least 2 Vif's where one is upstream.");
         }
     }  
     
@@ -238,6 +235,16 @@ void igmpProxyCleanUp() {
 
 }
 
+static void getuptime(struct timeval *tv)
+{
+    struct sysinfo si;
+
+    sysinfo(&si);
+
+    tv->tv_sec = si.uptime;
+    tv->tv_usec = 0;
+}
+
 /**
 *   Main daemon loop.
 */
@@ -255,7 +262,7 @@ void igmpProxyRun() {
 
     // Initialize timer vars
     difftime.tv_usec = 0;
-    gettimeofday(&curtime, NULL);
+    getuptime(&curtime);
     lasttime = curtime;
 
     // First thing we send a membership query in downstream VIF's...
@@ -318,14 +325,14 @@ void igmpProxyRun() {
             /*
              * If the select timed out, then there's no other
              * activity to account for and we don't need to
-             * call gettimeofday.
+             * call getuptime.
              */
             if (Rt == 0) {
                 curtime.tv_sec = lasttime.tv_sec + secs;
                 curtime.tv_usec = lasttime.tv_usec;
                 Rt = -1; /* don't do this next time through the loop */
             } else {
-                gettimeofday(&curtime, NULL);
+                getuptime(&curtime);
             }
             difftime.tv_sec = curtime.tv_sec - lasttime.tv_sec;
             difftime.tv_usec += curtime.tv_usec - lasttime.tv_usec;
