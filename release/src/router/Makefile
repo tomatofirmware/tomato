@@ -79,6 +79,7 @@ obj-$(TCONFIG_NOCAT) += nocat
 
 # !!TB
 obj-$(TCONFIG_USB) += p910nd
+obj-$(TCONFIG_USB) += comgt
 
 obj-$(TCONFIG_UPS) += apcupsd
 
@@ -2061,6 +2062,22 @@ i18n-install: i18n
 	install i18n/www/en_US.mo $(INSTALLDIR)/i18n/usr/share/locales/en_US/LC_MESSAGES/www.mo
 	install i18n/www/zh_CN.mo $(INSTALLDIR)/i18n/usr/share/locales/zh_CN/LC_MESSAGES/www.mo
 endif
+
+comgt:
+	@$(MAKE) -C comgt CC=$(CC) CFLAGS="$(EXTRACFLAGS)" LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections" comgt
+
+comgt-install: comgt
+	install -D comgt/comgt $(INSTALLDIR)/comgt/usr/sbin/comgt
+	cd $(INSTALLDIR)/comgt/usr/sbin/ && \
+		ln -sf comgt gcom
+	$(STRIP) -s $(INSTALLDIR)/comgt/usr/sbin/comgt
+	@mkdir -p $(TARGETDIR)/rom/etc/gcom
+	@cp -f comgt/gcom/* $(TARGETDIR)/rom/etc/gcom/
+
+
+comgt-clean:
+	-@$(MAKE) -C comgt clean
+
 #
 # Generic rules
 #
