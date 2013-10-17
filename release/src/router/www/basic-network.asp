@@ -1611,7 +1611,7 @@ createFieldTable('', [
 		['disabled','<% _("Disabled"); %>']],
 		value: nvram.wan_proto },
 	{ title: '<% _("Modem device"); %>', name: 'modem_dev', type: 'select', options: [['ttyUSB0', '/dev/ttyUSB0'],['ttyUSB1', '/dev/ttyUSB1'],['ttyUSB2', '/dev/ttyUSB2'],['ttyUSB3', '/dev/ttyUSB3'],['ttyUSB4', '/dev/ttyUSB4'],['ttyUSB5', '/dev/ttyUSB5'],['ttyUSB6', '/dev/ttyUSB6'],['ttyACM0', '/dev/ttyACM0']], value: nvram.modem_dev },
-	{ title: '<% _("PIN Code"); %>', name: 'modem_pin', type: 'text', maxlen: 6, size: 8, value: nvram.modem_pin },
+	{ title: '<% _("PIN Code"); %>', name: 'modem_pin', type: 'text', maxlen: 6, size: 8, value: nvram.modem_pin, suffix: ' <i><% _("Advised to turn off PIN Code"); %></i>' },
 	{ title: '<% _("Modem init string"); %>', name: 'modem_init', type: 'text', maxlen: 25, size: 32, value: nvram.modem_init },
 	{ title: '<% _("APN"); %>', name: 'modem_apn', type: 'text', maxlen: 25, size: 32, value: nvram.modem_apn },
 	{ title: '<% _("Username"); %>', name: 'ppp_username', type: 'text', maxlen: 60, size: 64, value: nvram.ppp_username },
