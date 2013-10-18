@@ -28,13 +28,13 @@ COMMONOBJS=dbutil.o buffer.o \
 		queue.o \
 		atomicio.o compat.o  fake-rfc2553.o 
 
-SVROBJS=svr-kex.o svr-algo.o svr-auth.o sshpty.o \
+SVROBJS=svr-kex.o svr-auth.o sshpty.o \
 		svr-authpasswd.o svr-authpubkey.o svr-authpubkeyoptions.o svr-session.o svr-service.o \
 		svr-chansession.o svr-runopts.o svr-agentfwd.o svr-main.o svr-x11fwd.o\
 		svr-tcpfwd.o svr-authpam.o
 
-CLIOBJS=cli-algo.o cli-main.o cli-auth.o cli-authpasswd.o cli-kex.o \
-		cli-session.o cli-service.o cli-runopts.o cli-chansession.o \
+CLIOBJS=cli-main.o cli-auth.o cli-authpasswd.o cli-kex.o \
+		cli-session.o cli-runopts.o cli-chansession.o \
 		cli-authpubkey.o cli-tcpfwd.o cli-channel.o cli-authinteract.o \
 		cli-agentfwd.o list.o
 
@@ -67,8 +67,10 @@ srcdir=.
 
 prefix=/usr/local
 exec_prefix=${prefix}
+datarootdir = ${prefix}/share
 bindir=${exec_prefix}/bin
 sbindir=${exec_prefix}/sbin
+mandir=${datarootdir}/man
 
 CC=mipsel-uclibc-gcc
 AR=mipsel-uclibc-ar
@@ -76,7 +78,7 @@ RANLIB=mipsel-uclibc-ranlib
 STRIP=mipsel-uclibc-strip -R .note -R .comment
 INSTALL=install
 CPPFLAGS=
-CFLAGS+=-I. -I$(srcdir) $(CPPFLAGS) -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32 -mips32   -DARGTYPE=3 -ffunction-sections -fdata-sections
+CFLAGS+=-I. -I$(srcdir) $(CPPFLAGS) -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2   -DARGTYPE=3 -ffunction-sections -fdata-sections
 LIBS+=-lutil 
 LDFLAGS=-ffunction-sections -fdata-sections -Wl,--gc-sections
 
