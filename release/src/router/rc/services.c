@@ -392,9 +392,11 @@ void start_dnsmasq()
 //			fprintf(fp, "dhcp-range=lan,::,constructor:%s,ra-stateless,ra-names,%d,%d\n",
 //			fprintf(f, "enable-ra\ndhcp-range=lan,::1, ::FFFF:FFFF, constructor:%s, ra-names, %d, %s\n",
 
-
 	if (ipv6_enabled() && nvram_get_int("ipv6_radvd")) {
-		fprintf(f, "enable-ra\ndhcp-range=::1, ::FFFF:FFFF, constructor:%s, ra-names, %d, %s\n",
+		fprintf(f, "enable-ra\n"
+			"ra-param=%s,%d,%d\n"
+			"dhcp-range=::1, ::FFFF:FFFF,constructor:%s,ra-stateless,ra-names, %d, %s\n",
+			nvram_safe_get("lan_ifname"), 10, 600*3,
                         nvram_safe_get("lan_ifname"), 64, "12h");
 	}
 #endif
