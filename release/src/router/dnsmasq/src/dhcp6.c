@@ -330,7 +330,7 @@ static int complete_context6(struct in6_addr *local,  int prefix,
 	    {
 	      if ((context->flags & CONTEXT_DHCP) &&
 		  !(context->flags & (CONTEXT_TEMPLATE | CONTEXT_OLD)) &&
-		  prefix <= context->prefix &&
+		  prefix == context->prefix &&
 		  is_same_net6(local, &context->start6, prefix) &&
 		  is_same_net6(local, &context->end6, prefix))
 		{
