@@ -63,6 +63,9 @@ static pid_t pid_dnsmasq = -1;
 #ifdef TCONFIG_ARIA2
 static pid_t pid_aria2 = -1;
 #endif
+#ifdef TCONFIG_AIRPLAY
+static pid_t pid_airplay = -1;
+#endif
 #ifdef TCONFIG_PPPOE_RELAY
 static pid_t pid_pppoerelay = -1;
 #endif
@@ -492,7 +495,7 @@ void stop_dnsmasq(void)
 }
 
 #ifdef TCONFIG_ARIA2
-void start_aria2()
+void start_aria2(void)
 {
 	FILE *f;
 	struct statfs sf;
@@ -579,7 +582,65 @@ void stop_aria2(void)
 	syslog(LOG_DEBUG, "end\n");
 }
 #endif
+#ifdef TCONFIG_AIRPLAY
+void start_airplay(void)
+{
+	FILE *f;
+	struct statfs sf;
+#ifndef DEBUG_RCTEST
+	if (getpid() != 1) {
+		start_service("shairport");
+		return;
+	}
+#endif
+	if (!nvram_match( "shairport_enable", "1" ) ){
+		pid_airplay = -1;
+		return;
+	}
+	modprobe("snd-usb-audio");
+	modprobe("snd-pcm-oss");
+	if (statfs(nvram_safe_get("shairport_audiodevice"), &sf) != 0) {
+		pid_airplay = -2; // not mounted or not exists. try restart.
+		return;
+	}
+	syslog(LOG_DEBUG, "starting shairport.audio dev f_type=%ld\n",sf.f_type);
+	char *argv[15];
 
+	int i = 0;
+	argv[i++] = "shairport";
+	argv[i++] = "-a";
+	argv[i++] = nvram_safe_get("shairport_name");
+	argv[i++] = "-m";
+	argv[i++] = "tinysvcmdns";
+	argv[i++] = "-i";
+	argv[i++] = nvram_safe_get("lan_ipaddr");
+	argv[i++] = "-b";
+	argv[i++] = nvram_safe_get("shairport_waitframes");
+	argv[i++] = "--output=oss";
+	argv[i++] = "--";
+	argv[i++] = nvram_safe_get("shairport_audiodevice");
+	argv[i++] = nvram_safe_get("shairport_dmabuffer");
+	argv[i++] = NULL;
+	_eval(argv,NULL,0,&pid_airplay);
+	syslog(LOG_DEBUG, "shairport started, pid=%d\n",pid_airplay);
+	if (!nvram_contains_word("debug_norestart", "shairport")) {
+		pid_airplay = -2;
+	}
+}
+void stop_airplay(void)
+{
+	syslog(LOG_DEBUG, "stopping airplay\n");
+#ifndef DEBUG_RCTEST
+	if (getpid() != 1) {
+		stop_service("shairport");
+		return;
+	}
+#endif
+	pid_airplay = -1;
+	killall_tk("shairport");
+	syslog(LOG_DEBUG, "end\n");
+}
+#endif
 #ifdef TCONFIG_PPPOE_RELAY
 void start_pppoerelay()
 {
@@ -2250,6 +2311,9 @@ void check_services(void)
 #ifdef TCONFIG_ARIA2
 	_check(pid_aria2, "aria2c", start_aria2);
 #endif
+#ifdef TCONFIG_AIRPLAY
+	_check(pid_airplay, "shairport", start_airplay);
+#endif
 #ifdef TCONFIG_PPPOE_RELAY
 	_check(pid_pppoerelay, "pppoe-relay", start_pppoerelay);
 #endif
@@ -2319,11 +2383,17 @@ void start_services(void)
 #ifdef TCONFIG_ARIA2
 	start_aria2();
 #endif
+#ifdef TCONFIG_AIRPLAY
+	start_airplay();
+#endif
 }
 
 void stop_services(void)
 {
 	clear_resolv();
+#ifdef TCONFIG_AIRPLAY
+	stop_airplay();
+#endif
 #ifdef TCONFIG_ARIA2
 	stop_aria2();
 #endif
@@ -2971,6 +3041,13 @@ TOP:
 	if (strcmp(service, "aria2") == 0) {
 		if (action & A_STOP) stop_aria2();
 		if (action & A_START) start_aria2();
+		goto CLEAR;
+	}
+#endif
+#ifdef TCONFIG_AIRPLAY
+	if (strcmp(service, "shairport") == 0) {
+		if (action & A_STOP) stop_airplay();
+		if (action & A_START) start_airplay();
 		goto CLEAR;
 	}
 #endif

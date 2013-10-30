@@ -113,7 +113,9 @@ Copyright (C) 2010 Keith Moyer,<br>
 <!-- OPENVPN-END -->
 <b>"TomatoEgg" Features:</b><br>
 - Openvpn username/password verify feature and configure GUI.<br>
-
+<!-- AIRPLAY-BEGIN -->
+- Airplay support with modified shairport. <br>
+<!-- AIRPLAY-END -->
 <b>"Shibby" features:</b><br>
 <!-- BBT-BEGIN -->
 - Transmission 2.81 integration<br>

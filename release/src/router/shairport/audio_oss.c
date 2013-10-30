@@ -44,12 +44,14 @@ static void start(int sample_rate) {
     int channel = 2;
     int status;
     int format = AFMT_S16_LE;
-    status = ioctl(fd, SNDCTL_DSP_SETFRAGMENT, &DMA);
-    if (status == -1)
-    {
-        perror("ioctl buffer size\n");
-        return;
-    }
+	if(DMA != 0){
+		status = ioctl(fd, SNDCTL_DSP_SETFRAGMENT, &DMA);
+		if (status == -1)
+		{
+			perror("ioctl buffer size\n");
+			return;
+		}
+	}
     status = ioctl(fd, SOUND_PCM_WRITE_BITS, &size);
     if (status == -1)
         perror("SOUND_PCM_WRITE_BITS ioctl failed");

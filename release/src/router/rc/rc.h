@@ -204,6 +204,14 @@ extern void clear_resolv(void);
 extern void dns_to_resolv(void);
 extern void start_dnsmasq(void);
 extern void stop_dnsmasq(void);
+#ifdef TCONFIG_ARIA2
+extern void start_aria2(void);
+extern void stop_aria2(void);
+#endif
+#ifdef TCONFIG_AIRPLAY
+extern void start_airplay(void);
+extern void stop_airplay(void);
+#endif
 extern void set_tz(void);
 extern void start_ntpc(void);
 extern void stop_ntpc(void);

@@ -1243,7 +1243,13 @@ static const nvset_t nvset_list[] = {
 	{ "aria2_settings",              V_LENGTH(0, 50)        },
 	{ "aria2_port_rpc",              V_PORT                 },
 #endif
-
+#ifdef TCONFIG_AIRPLAY
+	{ "shairport_enable",            V_01                   },
+	{ "shairport_name",              V_TEXT(0, 15)          },
+	{ "shairport_waitframes",        V_RANGE(1, 512)        },
+	{ "shairport_dmabuffer",         V_RANGE(1, 65535)      },
+	{ "shairport_audiodevice",       V_LENGTH(0, 50)        },
+#endif
 #ifdef TCONFIG_BT
 // nas-transmission
 	{ "bt_enable",                  V_01                            },

@@ -454,6 +454,10 @@ define RouterOptions
 		sed -i "/TCONFIG_ARIA2 is not set/d" $(1); \
 		echo "TCONFIG_ARIA2=y" >>$(1); \
 	fi; \
+	if [ "$(AIRPLAY)" = "y" ]; then \
+		sed -i "/TCONFIG_AIRPLAY is not set/d" $(1); \
+		echo "TCONFIG_AIRPLAY=y" >>$(1); \
+	fi; \
 	if [ "$(CTF)" = "y" ]; then \
 		sed -i "/TCONFIG_BCM_CTF is not set/d" $(1); \
 		echo "TCONFIG_BCM_CTF=y" >>$(1); \

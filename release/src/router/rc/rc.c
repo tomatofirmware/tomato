@@ -29,6 +29,12 @@ static int rctest_main(int argc, char *argv[])
 			start_6rd_tunnel();
 		}
 #endif
+#ifdef TCONFIG_AIRPLAY
+		if (strcmp(argv[1], "shairport") == 0) {
+			stop_airplay();
+			start_airplay();
+		}
+#endif
 #ifdef DEBUG_IPTFILE
 		else if (strcmp(argv[1], "iptfile") == 0) {
 			create_test_iptfile();

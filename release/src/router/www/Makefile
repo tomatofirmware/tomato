@@ -147,6 +147,11 @@ ifneq ($(TCONFIG_ARIA2),y)
 	sed -i $(INSTALLDIR)/www/tomato.js -e "/ARIA2-BEGIN/,/ARIA2-END/d"
 	sed -i $(INSTALLDIR)/www/about.asp -e "/ARIA2-BEGIN/,/ARIA2-END/d"
 endif
+ifneq ($(TCONFIG_AIRPLAY),y)
+	rm -f $(INSTALLDIR)/www/nas-shairport.asp
+	sed -i $(INSTALLDIR)/www/tomato.js -e "/AIRPLAY-BEGIN/,/AIRPLAY-END/d"
+	sed -i $(INSTALLDIR)/www/about.asp -e "/AIRPLAY-BEGIN/,/AIRPLAY-END/d"
+endif
 
 # Only include the UPS pages if apcupsd is configured in.
 ifneq ($(TCONFIG_UPS),y)
@@ -295,6 +300,8 @@ endif
 		-e "/HFS-BEGIN/d"	-e "/HFS-END/d"\
 		-e "/DNSCRYPT-BEGIN/d"	-e "/DNSCRYPT-END/d"\
 		-e "/TOR-BEGIN/d"	-e "/TOR-END/d"\
+		-e "/ARIA2-BEGIN/d"	-e "/ARIA2-END/d" \
+		-e "/AIRPLAY-BEGIN/d"	-e "/AIRPLAY-END/d" \
 		-e "/MICROSD-BEGIN/d"	-e "/MICROSD-END/d"\
 		|| true; \
 	done

@@ -2448,6 +2448,9 @@ REMOVE-END */
 /* ARIA2-BEGIN */
 			,['<% _("Aria2 Client"); %>',		'aria2.asp']
 /* ARIA2-END */
+/* AIRPLAY-BEGIN */
+			,['<% _("Airplay"); %>',		'shairport.asp']
+/* AIRPLAY-END */
 			] ],
 /* USB-END */
 /* VPN-BEGIN */
