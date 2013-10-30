@@ -194,6 +194,8 @@ obj-$(TCONFIG_I18N) += gettext
 obj-$(TCONFIG_I18N) += i18n
 obj-$(TCONFIG_ARIA2) += expat
 obj-$(TCONFIG_ARIA2) += aria2
+
+obj-$(TCONFIG_AIRPLAY) += shairport
 obj-clean := $(foreach obj, $(obj-y) $(obj-n) $(obj-), $(obj)-clean)
 obj-install := $(foreach obj,$(obj-y),$(obj)-install)
 
@@ -1778,6 +1780,16 @@ aria2-install: aria2
 	install -d $(INSTALLDIR)/aria2/usr/bin
 	install aria2/src/aria2c $(INSTALLDIR)/aria2/usr/bin
 	$(STRIP) -s $(INSTALLDIR)/aria2/usr/bin/aria2c
+shairport/config.mk:
+	echo "CONFIG_HAVE_GETOPT_H=yes" > $(TOP)/shairport/config.mk
+shairport/config.h:
+	echo "#define CONFIG_HAVE_GETOPT_H" > $(TOP)/shairport/config.h
+shairport: shairport/config.mk shairport/config.h openssl
+	@$(SEP)
+	$(MAKE) -C shairport shairport $(PARALLEL_BUILD) \
+		CC=$(CC) \
+		CFLAGS="-g -Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections -I$(TOP)/openssl/include" \
+		LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC -L$(TOP)/openssl -lssl -lcrypto -lpthread -lm"
 btgui:
 	@$(SEP)
 
