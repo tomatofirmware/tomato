@@ -36,14 +36,13 @@
 static int fd = -1;
 
 char *devname = NULL;
-
+int DMA;
 static void start(int sample_rate) {
     fd = open(devname, O_WRONLY);
     int size = 16;
     int rate = sample_rate;
     int channel = 2;
     int status;
-    int DMA = 0x0A0B;
     int format = AFMT_S16_LE;
     status = ioctl(fd, SNDCTL_DSP_SETFRAGMENT, &DMA);
     if (status == -1)
@@ -83,11 +82,12 @@ static void stop(void) {
 }
 
 static int init(int argc, char **argv) {
-    if (argc != 1)
+    if (argc != 2)
         die("bad argument(s) to pipe");
 
     devname = strdup(argv[0]);
-
+    DMA = atoi(argv[1]);
+    //0x0A0B
     // test open pipe so we error on startup if it's going to fail
     start(44100);
     stop();
@@ -103,7 +103,7 @@ static void deinit(void) {
 }
 
 static void help(void) {
-    printf("    oss takes 1 argument: the name of oss dev.\n");
+    printf("    oss takes 2 argument: the name of oss dev  and DMA bufferisze.\n");
 }
 
 audio_output audio_oss = {

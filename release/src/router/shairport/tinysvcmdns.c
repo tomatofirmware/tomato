@@ -1411,64 +1411,59 @@ static void main_loop(struct mdnsd *svr) {
 
         struct mdns_pkt *mdns_reply = malloc(sizeof(struct mdns_pkt));
         memset(mdns_reply, 0, sizeof(struct mdns_pkt));
-
+        struct timeval tv;
         while (! svr->stop_flag) {
-                FD_ZERO(&sockfd_set);
-                FD_SET(svr->sockfd, &sockfd_set);
-                FD_SET(svr->notify_pipe[0], &sockfd_set);
-                select(max_fd + 1, &sockfd_set, NULL, NULL, NULL);
+            FD_ZERO(&sockfd_set);
+            FD_SET(svr->sockfd, &sockfd_set);
+            FD_SET(svr->notify_pipe[0], &sockfd_set);
+            tv.tv_sec = 5;
+            tv.tv_usec = 0;
+            select(max_fd + 1, &sockfd_set, NULL, NULL, &tv);
 
-                if (FD_ISSET(svr->notify_pipe[0], &sockfd_set)) {
-                        // flush the notify_pipe
-                        read_pipe(svr->notify_pipe[0], (char*)&notify_buf, 1);
-                } else if (FD_ISSET(svr->sockfd, &sockfd_set)) {
-                        struct sockaddr_in fromaddr;
-                        socklen_t sockaddr_size = sizeof(struct sockaddr_in);
+            if (FD_ISSET(svr->notify_pipe[0], &sockfd_set)) {
+                    // flush the notify_pipe
+                    read_pipe(svr->notify_pipe[0], (char*)&notify_buf, 1);
+            } else if (FD_ISSET(svr->sockfd, &sockfd_set)) {
+                    struct sockaddr_in fromaddr;
+                    socklen_t sockaddr_size = sizeof(struct sockaddr_in);
 
-                        ssize_t recvsize = recvfrom(svr->sockfd, pkt_buffer, PACKET_SIZE, 0,
-                                (struct sockaddr *) &fromaddr, &sockaddr_size);
-                        if (recvsize < 0) {
-                                log_message(LOG_ERR, "recv(): %m");
-                        }
+                    ssize_t recvsize = recvfrom(svr->sockfd, pkt_buffer, PACKET_SIZE, 0,
+                            (struct sockaddr *) &fromaddr, &sockaddr_size);
+                    if (recvsize < 0) {
+                            log_message(LOG_ERR, "recv(): %m");
+                    }
 
-                        DEBUG_PRINTF("data from=%s size=%ld\n", inet_ntoa(fromaddr.sin_addr), (long) recvsize);
-                        struct mdns_pkt *mdns = mdns_parse_pkt(pkt_buffer, recvsize);
-                        if (mdns != NULL) {
-                                if (process_mdns_pkt(svr, mdns, mdns_reply)) {
-                                        size_t replylen = mdns_encode_pkt(mdns_reply, pkt_buffer, PACKET_SIZE);
-                                        send_packet(svr->sockfd, pkt_buffer, replylen);
-                                } else if (mdns->num_qn == 0) {
-                                        DEBUG_PRINTF("(no questions in packet)\n\n");
-                                }
+                    DEBUG_PRINTF("data from=%s size=%ld\n", inet_ntoa(fromaddr.sin_addr), (long) recvsize);
+                    struct mdns_pkt *mdns = mdns_parse_pkt(pkt_buffer, recvsize);
+                    if (mdns != NULL) {
+                            if (process_mdns_pkt(svr, mdns, mdns_reply)) {
+                                    size_t replylen = mdns_encode_pkt(mdns_reply, pkt_buffer, PACKET_SIZE);
+                                    send_packet(svr->sockfd, pkt_buffer, replylen);
+                            } else if (mdns->num_qn == 0) {
+                                    DEBUG_PRINTF("(no questions in packet)\n\n");
+                            }
 
-                                mdns_pkt_destroy(mdns);
-                        }
+                            mdns_pkt_destroy(mdns);
+                    }
+            }
+
+            // send out announces
+            struct rr_list *rrs = svr->announce;
+            while(rrs) {
+                if(rrs->e) {
+                    char *namestr = nlabel_to_str(rrs->e->name);
+                    DEBUG_PRINTF("sending announce for %s\n", namestr);
+                    free(namestr);
+
+                    announce_srv(svr, mdns_reply, rrs->e->name);
+
+                    if (mdns_reply->num_ans_rr > 0) {
+                            size_t replylen = mdns_encode_pkt(mdns_reply, pkt_buffer, PACKET_SIZE);
+                            send_packet(svr->sockfd, pkt_buffer, replylen);
+                    }
                 }
-
-                // send out announces
-                while (1) {
-                        struct rr_entry *ann_e = NULL;
-
-                        // extract from head of list
-                        pthread_mutex_lock(&svr->data_lock);
-                        if (svr->announce)
-                                ann_e = rr_list_remove(&svr->announce, svr->announce->e);
-                        pthread_mutex_unlock(&svr->data_lock);
-
-                        if (! ann_e)
-                                break;
-
-                        char *namestr = nlabel_to_str(ann_e->name);
-                        DEBUG_PRINTF("sending announce for %s\n", namestr);
-                        free(namestr);
-
-                        announce_srv(svr, mdns_reply, ann_e->name);
-
-                        if (mdns_reply->num_ans_rr > 0) {
-                                size_t replylen = mdns_encode_pkt(mdns_reply, pkt_buffer, PACKET_SIZE);
-                                send_packet(svr->sockfd, pkt_buffer, replylen);
-                        }
-                }
+                rrs = rrs->next;
+            }
         }
 
         // main thread terminating. send out "goodbye packets" for services
@@ -1661,16 +1656,18 @@ struct mdnsd *mdnsd_start() {
 void mdnsd_stop(struct mdnsd *s) {
         assert(s != NULL);
 
-        struct timeval tv = {
-                .tv_sec = 0,
-                .tv_usec = 500 * 1000,
-        };
+        
 
         s->stop_flag = 1;
         write_pipe(s->notify_pipe[1], ".", 1);
 
-        while (s->stop_flag != 2)
-                select(0, NULL, NULL, NULL, &tv);
+        while (s->stop_flag != 2){
+            struct timeval tv = {
+                    .tv_sec = 0,
+                    .tv_usec = 500 * 1000,
+            };
+            select(0, NULL, NULL, NULL, &tv);
+        }
 
         close_pipe(s->notify_pipe[0]);
         close_pipe(s->notify_pipe[1]);
