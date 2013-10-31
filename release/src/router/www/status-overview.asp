@@ -287,8 +287,6 @@ function show()
 
 function earlyInit()
 {
-	if ((stats.anon_enable == '-1') || (stats.anon_answer == '0'))
-		E('att1').style.display = '';
 	if ((nvram.web_lang== '') || (nvram.web_lang==null))
 		 E('att2').style.display = '';
 
@@ -351,12 +349,6 @@ function toggleVisibility(whichone) {
 <div class='section' id='nversion'>
 </div>
 
-<div style='display:none' id='att1'>
-<div class='section-title'><center>!! <% _("Attention"); %> !!</center></div>
-<div class='fields'><center><% _("You did not configure <b>TomatoAnon project</b> setting.");%>.
-<br><% _("Please go to"); %> <a href='admin-tomatoanon.asp'><% _("TomatoAnon configuration page"); %></a> <% _("and make a choice."); %></center></div>
-<br>
-</div>
 <div style='display:none' id='att2'>
 <div class='section-title'><center>!! <% _("Attention"); %> !!</center></div>
 <div class='fields'><center><% _("You did not configure language setting.");%>.

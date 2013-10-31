@@ -1697,6 +1697,10 @@ static int init_nvram(void)
 			nvram_safe_get("boardtype"), nvram_safe_get("boardnum"), nvram_safe_get("boardrev"), nvram_safe_get("boardflags"));
 		s[64] = 0;
 	}
+	if(nvram_match("tomatoanon_enable", "-1") || nvram_match("tomatoanon_answer", "0")) {
+		nvram_set("tomatoanon_enable", "1");
+		nvram_set("tomatoanon_answer", "1");
+	}
 	nvram_set("t_model_name", s);
 
 	nvram_set("pa0maxpwr", "400");	// allow Tx power up tp 400 mW, needed for ND only
