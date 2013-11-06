@@ -11,7 +11,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Bandwidth: Daily</title>
+<title>[<% ident(); %>] <% _("Bandwidth"); %>: <% _("Daily"); %></title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <link rel='stylesheet' type='text/css' href='color.css'>
 <script type='text/javascript' src='tomato.js'></script>
@@ -131,8 +131,8 @@ function init()
 <form>
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
-	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='title'><% _("Tomato"); %></div>
+	<div class='version'><% _("Version"); %> <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -140,28 +140,28 @@ function init()
 
 <!-- / / / -->
 
-<div class='section-title'>WAN Bandwidth - Daily</div>
+<div class='section-title'><% _("WAN Bandwidth"); %> - <% _("Daily"); %></div>
 <div id='bwm-daily-grid' style='float:left'></div>
 <div style="float:right;text-align:right">
 
 
 <table class='tomato-grid' style='width:150px'>
-<tr class='header'><td colspan=2 style='text-align:center'>Last 30 Days<br><span style='font-weight:normal' id='last-dates'></span></td></tr>
-<tr class='even'><td>Down</td><td id='last-dn'>-</td></tr>
-<tr class='odd'><td>Up</td><td id='last-up'>-</td></tr>
-<tr class='footer'><td>Total</td><td id='last-total'>-</td></tr>
+<tr class='header'><td colspan=2 style='text-align:center'><% _("Last 30 Days"); %><br><span style='font-weight:normal' id='last-dates'></span></td></tr>
+<tr class='even'><td><% _("Down"); %></td><td id='last-dn'>-</td></tr>
+<tr class='odd'><td><% _("Up"); %></td><td id='last-up'>-</td></tr>
+<tr class='footer'><td><% _("Total"); %></td><td id='last-total'>-</td></tr>
 </table>
 
 <br>
 <hr size=1>
 <br>
 
-<b>Date</b> <select onchange='changeDate(this, "ymd")' id='dafm'><option value=0>yyyy-mm-dd</option><option value=1>mm-dd-yyyy</option><option value=2>mmm dd, yyyy</option><option value=3>dd.mm.yyyy</option></select><br>
-<b>Scale</b> <select onchange='changeScale(this)' id='scale'><option value=0>KB</option><option value=1>MB</option><option value=2 selected>GB</option></select><br>
+<b><% _("Date"); %></b> <select onchange='changeDate(this, "ymd")' id='dafm'><option value=0>yyyy-mm-dd</option><option value=1>mm-dd-yyyy</option><option value=2>mmm dd, yyyy</option><option value=3>dd.mm.yyyy</option></select><br>
+<b><% _("Scale"); %></b> <select onchange='changeScale(this)' id='scale'><option value=0>KB</option><option value=1>MB</option><option value=2 selected>GB</option></select><br>
 <br>
-&raquo; <a href="javascript:genData()">Data</a>
+&raquo; <a href="javascript:genData()"><% _("Data"); %></a>
 <br>
-&raquo; <a href="admin-bwm.asp">Configure</a>
+&raquo; <a href="admin-bwm.asp"><% _("Configure"); %></a>
 <br><br><br>
 </div>
 <br>

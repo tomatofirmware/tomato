@@ -15,7 +15,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] IP Traffic: Monthly History</title>
+<title>[<% ident(); %>] <% _("IP Traffic"); %>: <% _("Monthly History"); %></title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
@@ -86,7 +86,7 @@ var dg = new TomatoGrid();
 
 dg.setup = function() {
 	this.init('monthly-grid', 'sort');
-	this.headerSet(['Date', 'Host', 'Download', 'Upload', 'Total']);
+	this.headerSet(['<% _("Date"); %>', '<% _("Host"); %>', '<% _("Download"); %>', '<% _("Upload"); %>', '<% _("Total"); %>']);
 }
 
 function redraw() {
@@ -180,10 +180,10 @@ function redraw() {
 			}
 			if (E('_f_shortcuts').checked) {
 				h = h + '<br><small>';
-				h = h + '<a href="javascript:viewQosDetail(' + i + ')" title="View QoS Details">[qosdetails]</a>';
-				h = h + '<a href="javascript:viewQosCTrates(' + i + ')" title="View transfer rates per connection">[qosrates]</a>';
-				h = h + '<a href="javascript:viewIptDetail(' + i + ')" title="View real-time IP Traffic for this address">[iptraf]</a>';
-				h = h + '<a href="javascript:addExcludeList(' + i + ')" title="Filter out this address">[hide]</a>';
+				h = h + '<a href="javascript:viewQosDetail(' + i + ')" title="<% _("View QoS Details"); %>">[qosdetails]</a>';
+				h = h + '<a href="javascript:viewQosCTrates(' + i + ')" title="<% _("View transfer rates per connection"); %>">[qosrates]</a>';
+				h = h + '<a href="javascript:viewIptDetail(' + i + ')" title="<% _("View real-time IP Traffic for this address"); %>">[iptraf]</a>';
+				h = h + '<a href="javascript:addExcludeList(' + i + ')" title="<% _("Filter out this address"); %>">[<% _("hide"); %>]</a>';
 				h = h + '</small>';
 			}
 			var ymd = getYMD(b[0]);
@@ -194,13 +194,13 @@ function redraw() {
 		dg.resort();
 		dg.recolor();
 		dg.footerSet([
-			'Total', 
+			'<% _("Total"); %>', 
 			('<small><i>(' +
 			(((hostslisted.length > 0) || (subnetslisted.length > 0)) ? 
 				((hostslisted.length > 0) ? (hostslisted.length + ' hosts') : '') +
 				(((hostslisted.length > 0) && (subnetslisted.length > 0)) ? ', ' : '') +
 				((subnetslisted.length > 0) ? (subnetslisted.length + ' subnets') : '')
-			: 'no data') +
+			: '<% _("no data"); %>') +
 			')</i></small>'),
 			rescale(rx), 
 			rescale(tx), 
@@ -363,11 +363,11 @@ function init() {
 function toggleVisibility(whichone) {
 	if(E('sesdiv' + whichone).style.display=='') {
 		E('sesdiv' + whichone).style.display='none';
-		E('sesdiv' + whichone + 'showhide').innerHTML='(Click here to show)';
+		E('sesdiv' + whichone + 'showhide').innerHTML='(<% _("Click here to show"); %>)';
 		cookie.set('ipt_history_' + whichone + '_vis', 0);
 	} else {
 		E('sesdiv' + whichone).style.display='';
-		E('sesdiv' + whichone + 'showhide').innerHTML='(Click here to hide)';
+		E('sesdiv' + whichone + 'showhide').innerHTML='(<% _("Click here to hide"); %>)';
 		cookie.set('ipt_history_' + whichone + '_vis', 1);
 	}
 }
@@ -440,8 +440,8 @@ function verifyFields(focused, quiet) {
 <form>
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
-	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='title'><% _("Tomato"); %></div>
+	<div class='version'><% _("Version"); %> <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -450,31 +450,31 @@ function verifyFields(focused, quiet) {
 <!-- / / / -->
 
 <div id='cstats'>
-<div class='section-title'>IP Traffic Monthly History</div>
+<div class='section-title'><% _("IP Traffic Monthly History"); %></div>
 <div class='section'>
 <table id='monthly-grid' class='tomato-grid' cellspacing=0 style='height:auto'></table>
 </div>
 
-<div class='section-title'>Options <small><i><a href='javascript:toggleVisibility("options");'><span id='sesdivoptionsshowhide'>(Click here to show)</span></a></i></small></div>
+<div class='section-title'><% _("Options"); %> <small><i><a href='javascript:toggleVisibility("options");'><span id='sesdivoptionsshowhide'>(<% _("Click here to show"); %>)</span></a></i></small></div>
 <div class='section' id='sesdivoptions' style='display:none'>
 <script type='text/javascript'>
 var c;
 c = [];
-c.push({ title: 'List only these IPs', name: 'f_filter_ip', size: 50, maxlen: 255, type: 'text', suffix: ' <small>(Comma separated list)</small>' });
-c.push({ title: 'Exclude these IPs', name: 'f_filter_ipe', size: 50, maxlen: 255, type: 'text', suffix: ' <small>(Comma separated list)</small>' });
-c.push({ title: 'Date Range', multi: [ { name: 'f_begin_date', type: 'select', options: [['0', 'Any']], suffix: ' - ' }, { name: 'f_end_date', type: 'select', options: [['0', 'Any']] } ] } );
-c.push({ title: 'Date Format', name: 'f_dafm', type: 'select', options: [['0', 'yyyy-mm'], ['1', 'mm-yyyy'], ['2', 'mmm, yyyy'], ['3', 'mm.yyyy']] });
-c.push({ title: 'Scale', name: 'f_scale', type: 'select', options: [['0', 'KB'], ['1', 'MB'], ['2', 'GB']] });
-c.push({ title: 'Show subnet totals', name: 'f_subnet', type: 'checkbox', suffix: ' <small>(Not considered when calculating total traffic on the last line)</small>' });
-c.push({ title: 'Hide IPs without traffic', name: 'f_ignorezeroes', type: 'checkbox' });
-c.push({ title: 'Show known hostnames', name: 'f_hostnames', type: 'checkbox' });
-c.push({ title: 'Show shortcuts', name: 'f_shortcuts', type: 'checkbox' });
+c.push({ title: '<% _("List only these IPs"); %>', name: 'f_filter_ip', size: 50, maxlen: 255, type: 'text', suffix: ' <small>(<% _("Comma separated list"); %>)</small>' });
+c.push({ title: '<% _("Exclude these IPs"); %>', name: 'f_filter_ipe', size: 50, maxlen: 255, type: 'text', suffix: ' <small>(<% _("Comma separated list"); %>)</small>' });
+c.push({ title: '<% _("Date Range"); %>', multi: [ { name: 'f_begin_date', type: 'select', options: [['0', 'Any']], suffix: ' - ' }, { name: 'f_end_date', type: 'select', options: [['0', '<% _("Any"); %>']] } ] } );
+c.push({ title: '<% _("Date Format"); %>', name: 'f_dafm', type: 'select', options: [['0', 'yyyy-mm'], ['1', 'mm-yyyy'], ['2', 'mmm, yyyy'], ['3', 'mm.yyyy']] });
+c.push({ title: '<% _("Scale"); %>', name: 'f_scale', type: 'select', options: [['0', 'KB'], ['1', 'MB'], ['2', 'GB']] });
+c.push({ title: '<% _("Show subnet totals"); %>', name: 'f_subnet', type: 'checkbox', suffix: ' <small>(<% _("Not considered when calculating total traffic on the last line"); %>)</small>' });
+c.push({ title: '<% _("Hide IPs without traffic"); %>', name: 'f_ignorezeroes', type: 'checkbox' });
+c.push({ title: '<% _("Show known hostnames"); %>', name: 'f_hostnames', type: 'checkbox' });
+c.push({ title: '<% _("Show shortcuts"); %>', name: 'f_shortcuts', type: 'checkbox' });
 createFieldTable('',c);
 </script>
 <div style="float:right;text-align:right">
-&raquo; <a href="javascript:genData()">Data</a>
+&raquo; <a href="javascript:genData()"><% _("Data"); %></a>
 <br>
-&raquo; <a href="admin-iptraffic.asp">Configure</a>
+&raquo; <a href="admin-iptraffic.asp"><% _("Configure"); %></a>
 </div>
 </div>
 </div>
@@ -486,7 +486,7 @@ createFieldTable('',c);
 
 </td></tr>
 <tr><td id='footer' colspan=2>
-<input type='button' value='Refresh' onclick='reloadPage()'>
+<input type='button' value='<% _("Refresh"); %>' onclick='reloadPage()'>
 </td></tr>
 </table>
 </form>

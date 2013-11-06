@@ -11,7 +11,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Bandwidth: Weekly</title>
+<title>[<% ident(); %>] <% _("Bandwidth"); %>: <% _("Weekly"); %></title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <link rel='stylesheet' type='text/css' href='color.css'>
 <script type='text/javascript' src='tomato.js'></script>
@@ -36,7 +36,7 @@ if (typeof(daily_history) == 'undefined') {
 	rstats_busy = 1;
 }
 
-var weeks = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+var weeks = ['<% _("Sunday"); %>', '<% _("Monday"); %>', '<% _("Tuesday"); %>', '<% _("Wednesday"); %>', '<% _("Thursday"); %>', '<% _("Friday"); %>', '<% _("Saturday"); %>'];
 var weeksShort = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 var startwk = 0;
 var summary = 1;
@@ -102,7 +102,7 @@ function redraw()
 
 	if (summary) {
 		grid = '<table class="bwmg" cellspacing="1">';
-		grid += makeRow('header', 'Date', 'Download', 'Upload', 'Total');
+		grid += makeRow('header', '<% _("Date"); %>', '<% _("Download"); %>', '<% _("Upload"); %>', '<% _("Total"); %>');
 	}
 	else {
 		grid = '';
@@ -112,9 +112,9 @@ function redraw()
 	{
 		grid += '<b>' + dbeg + ' to ' + dend + '</b>' +
 				'<table class="bwmg" cellspacing="1">' +
-				makeRow('header', 'Date', 'Download', 'Upload', 'Total') +
+				makeRow('header', '<% _("Date"); %>', '<% _("Download"); %>', '<% _("Upload"); %>', '<% _("Total"); %>') +
 				block.join('') +
-				makeRow('footer', 'Total', rescale(dl), rescale(ul), rescale(dl + ul)) +
+				makeRow('footer', '<% _("Total"); %>', rescale(dl), rescale(ul), rescale(dl + ul)) +
 				'</table><br>';
 	}
 
@@ -231,8 +231,8 @@ function init()
 <form>
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
-	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='title'><% _("Tomato"); %></div>
+	<div class='version'><% _("Version"); %> <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -240,15 +240,15 @@ function init()
 
 <!-- / / / -->
 
-<div class='section-title'>WAN Bandwidth - Weekly</div>
+<div class='section-title'><% _("WAN Bandwidth"); %> - <% _("Weekly"); %></div>
 <div id='bwm-weekly-grid' style='float:left'></div>
 <div style="float:right;text-align:right">
-<b>Show</b> <select onchange='changeMode(this)' id='shmode'><option value=1 selected>Summary<option value=0>Full</select><br>
-<b>Date</b> <select onchange='changeDate(this, "ymd")' id='dafm'><option value=0>yyyy-mm-dd</option><option value=1>mm-dd-yyyy</option><option value=2>mmm dd, yyyy</option><option value=3>dd.mm.yyyy</option></select><br>
-<b>Start</b> <select onchange='changeStart(this)' id='startwk'><option value=0 selected>Sun<option value=1>Mon<option value=2>Tue<option value=3>Wed<option value=4>Thu<option value=5>Fri<option value=6>Sat</select><br>
-<b>Scale</b> <select onchange='changeScale(this)' id='scale'><option value=0>KB</option><option value=1>MB</option><option value=2 selected>GB</option></select><br>
+<b><% _("Show"); %></b> <select onchange='changeMode(this)' id='shmode'><option value=1 selected><% _("Summary"); %><option value=0><% _("Full"); %></select><br>
+<b><% _("Date"); %></b> <select onchange='changeDate(this, "ymd")' id='dafm'><option value=0>yyyy-mm-dd</option><option value=1>mm-dd-yyyy</option><option value=2>mmm dd, yyyy</option><option value=3>dd.mm.yyyy</option></select><br>
+<b><% _("Start"); %></b> <select onchange='changeStart(this)' id='startwk'><option value=0 selected>Sun<option value=1>Mon<option value=2>Tue<option value=3>Wed<option value=4>Thu<option value=5>Fri<option value=6>Sat</select><br>
+<b><% _("Scale"); %></b> <select onchange='changeScale(this)' id='scale'><option value=0>KB</option><option value=1>MB</option><option value=2 selected>GB</option></select><br>
 <br>
-&raquo; <a href="admin-bwm.asp">Configure</a>
+&raquo; <a href="admin-bwm.asp"><% _("Configure"); %></a>
 <br><br><br>
 </div>
 <br>

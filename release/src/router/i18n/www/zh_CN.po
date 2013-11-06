@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TomatoEgg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-07 16:18-0400\n"
-"PO-Revision-Date: 2013-09-07 16:39-0500\n"
+"POT-Creation-Date: 2013-11-06 10:57-0500\n"
+"PO-Revision-Date: 2013-11-06 11:24-0500\n"
 "Last-Translator: Zhiqiang <Wang.9264@gmail.com>\n"
 "Language-Team: TomatoEgg Translators <translate@tomatoegg.net>\n"
 "MIME-Version: 1.0\n"
@@ -45,16 +45,30 @@ msgstr "网络过滤"
 
 #: ../www/advanced-ctnf.asp:175 ../www/advanced-dhcpdns.asp:126
 #: ../www/advanced-firewall.asp:97 ../www/advanced-mac.asp:141
-#: ../www/advanced-misc.asp:63 ../www/advanced-vlan.asp:862
-#: ../www/basic-ipv6.asp:305 ../www/nas-aria2.asp:70
-#: ../www/status-overview.asp:343
+#: ../www/advanced-misc.asp:63 ../www/advanced-vlan.asp:870
+#: ../www/basic-ipv6.asp:305 ../www/bwm-24.asp:153 ../www/bwm-daily.asp:134
+#: ../www/bwm-monthly.asp:107 ../www/bwm-realtime.asp:144
+#: ../www/bwm-weekly.asp:234 ../www/ipt-24.asp:313 ../www/ipt-daily.asp:441
+#: ../www/ipt-details.asp:448 ../www/ipt-graphs.asp:299
+#: ../www/ipt-monthly.asp:443 ../www/ipt-realtime.asp:268
+#: ../www/nas-aria2.asp:71 ../www/nas-shairport.asp:62
+#: ../www/status-devices.asp:340 ../www/status-log.asp:47
+#: ../www/status-overview.asp:341 ../www/status-webmon.asp:360
+#: ../www/tools-ping.asp:193
 msgid "Tomato"
 msgstr "Tomato"
 
 #: ../www/advanced-ctnf.asp:176 ../www/advanced-dhcpdns.asp:127
 #: ../www/advanced-firewall.asp:98 ../www/advanced-mac.asp:142
-#: ../www/advanced-misc.asp:64 ../www/advanced-vlan.asp:863
-#: ../www/nas-aria2.asp:71 ../www/status-overview.asp:344
+#: ../www/advanced-misc.asp:64 ../www/advanced-vlan.asp:871
+#: ../www/bwm-24.asp:154 ../www/bwm-daily.asp:135 ../www/bwm-monthly.asp:108
+#: ../www/bwm-realtime.asp:145 ../www/bwm-weekly.asp:235 ../www/ipt-24.asp:314
+#: ../www/ipt-daily.asp:442 ../www/ipt-details.asp:449
+#: ../www/ipt-graphs.asp:300 ../www/ipt-monthly.asp:444
+#: ../www/ipt-realtime.asp:269 ../www/nas-aria2.asp:72
+#: ../www/nas-shairport.asp:63 ../www/status-devices.asp:341
+#: ../www/status-log.asp:48 ../www/status-overview.asp:342
+#: ../www/status-webmon.asp:361 ../www/tools-ping.asp:194
 msgid "Version"
 msgstr "版本"
 
@@ -167,8 +181,8 @@ msgstr "FTP"
 msgid "GRE"
 msgstr "GRE"
 
-#: ../www/advanced-ctnf.asp:269 ../www/basic-network.asp:1603
-#: ../www/status-overview.asp:396
+#: ../www/advanced-ctnf.asp:269 ../www/basic-network.asp:1605
+#: ../www/status-overview.asp:388
 msgid "PPTP"
 msgstr "PPTP"
 
@@ -205,34 +219,36 @@ msgstr "连入7层协议"
 
 #: ../www/advanced-ctnf.asp:303 ../www/advanced-dhcpdns.asp:221
 #: ../www/advanced-firewall.asp:172 ../www/advanced-mac.asp:199
-#: ../www/advanced-misc.asp:109 ../www/advanced-routing.asp:262
-#: ../www/advanced-tor.asp:172 ../www/advanced-vlan.asp:1035
+#: ../www/advanced-misc.asp:110 ../www/advanced-routing.asp:262
+#: ../www/advanced-tor.asp:172 ../www/advanced-vlan.asp:1043
 #: ../www/advanced-wlanvifs.asp:561 ../www/advanced-wlanvifs.asp:1013
 #: ../www/advanced-wlanvifs.asp:1609 ../www/basic-ident.asp:74
-#: ../www/basic-ipv6.asp:373 ../www/basic-network.asp:1791
-#: ../www/basic-time.asp:292 ../www/nas-aria2.asp:122
+#: ../www/basic-ipv6.asp:373 ../www/basic-network.asp:1796
+#: ../www/basic-time.asp:292 ../www/nas-aria2.asp:124
+#: ../www/nas-shairport.asp:100
 msgid "Save"
 msgstr "保存"
 
 #: ../www/advanced-ctnf.asp:304 ../www/advanced-dhcpdns.asp:222
 #: ../www/advanced-firewall.asp:173 ../www/advanced-mac.asp:200
-#: ../www/advanced-misc.asp:110 ../www/advanced-routing.asp:263
-#: ../www/advanced-tor.asp:173 ../www/advanced-vlan.asp:1036
+#: ../www/advanced-misc.asp:111 ../www/advanced-routing.asp:263
+#: ../www/advanced-tor.asp:173 ../www/advanced-vlan.asp:1044
 #: ../www/advanced-wlanvifs.asp:1610 ../www/basic-ident.asp:75
-#: ../www/basic-ipv6.asp:374 ../www/basic-network.asp:1792
-#: ../www/basic-time.asp:293 ../www/nas-aria2.asp:123
+#: ../www/basic-ipv6.asp:374 ../www/basic-network.asp:1797
+#: ../www/basic-time.asp:293 ../www/nas-aria2.asp:125
+#: ../www/nas-shairport.asp:101
 msgid "Cancel"
 msgstr "取消"
 
 #: ../www/advanced-dhcpdns.asp:14 ../www/advanced-dhcpdns.asp:149
-#: ../www/advanced-dhcpdns.asp:190 ../www/basic-network.asp:1603
-#: ../www/status-overview.asp:396 ../www/status-overview.asp:482
+#: ../www/advanced-dhcpdns.asp:190 ../www/basic-network.asp:1605
+#: ../www/status-overview.asp:388 ../www/status-overview.asp:474
 msgid "DHCP"
 msgstr "自动获取"
 
 #: ../www/advanced-dhcpdns.asp:14 ../www/advanced-dhcpdns.asp:149
-#: ../www/advanced-dhcpdns.asp:190 ../www/status-overview.asp:404
-#: ../www/status-overview.asp:481
+#: ../www/advanced-dhcpdns.asp:190 ../www/status-overview.asp:396
+#: ../www/status-overview.asp:473
 msgid "DNS"
 msgstr "DNS"
 
@@ -305,7 +321,7 @@ msgid "Dnsmasq"
 msgstr "Dnsmasq"
 
 #: ../www/advanced-dhcpdns.asp:169 ../www/advanced-dhcpdns.asp:200
-#: ../www/nas-aria2.asp:104
+#: ../www/nas-aria2.asp:106
 msgid "Custom configuration"
 msgstr "自定义配置"
 
@@ -322,14 +338,15 @@ msgid "Reduce packet size"
 msgstr "减小包尺寸"
 
 #: ../www/advanced-dhcpdns.asp:187 ../www/advanced-tor.asp:157
-#: ../www/advanced-vlan.asp:975 ../www/advanced-wlanvifs.asp:1405
+#: ../www/advanced-vlan.asp:983 ../www/advanced-wlanvifs.asp:1405
 msgid "Notes"
 msgstr "提示"
 
-#: ../www/advanced-dhcpdns.asp:187 ../www/advanced-vlan.asp:839
-#: ../www/advanced-vlan.asp:975 ../www/advanced-wlanvifs.asp:532
+#: ../www/advanced-dhcpdns.asp:187 ../www/advanced-vlan.asp:847
+#: ../www/advanced-vlan.asp:983 ../www/advanced-wlanvifs.asp:532
 #: ../www/advanced-wlanvifs.asp:1374 ../www/advanced-wlanvifs.asp:1393
-#: ../www/advanced-wlanvifs.asp:1405
+#: ../www/advanced-wlanvifs.asp:1405 ../www/ipt-details.asp:467
+#: ../www/ipt-monthly.asp:366 ../www/ipt-monthly.asp:458
 msgid "Click here to show"
 msgstr "点击这里显示"
 
@@ -404,7 +421,7 @@ msgstr "其它附加到Dnsmasq配置文件中的选项"
 msgid "Extra options for the DHCP client."
 msgstr "发送到DHCP客户端的其它选项"
 
-#: ../www/advanced-dhcpdns.asp:209 ../www/advanced-vlan.asp:1001
+#: ../www/advanced-dhcpdns.asp:209 ../www/advanced-vlan.asp:1009
 #: ../www/advanced-wlanvifs.asp:1424
 msgid "Other relevant notes/hints"
 msgstr "其它相关提示"
@@ -416,7 +433,7 @@ msgid ""
 msgstr "/etc/dnsmasq.custom如果存在的话，也会附加到Dnsmasq配置文件尾部"
 
 #: ../www/advanced-firewall.asp:18 ../www/advanced-firewall.asp:124
-#: ../www/nas-aria2.asp:112 ../www/tomato.js:2389
+#: ../www/nas-aria2.asp:114 ../www/tomato.js:2389
 msgid "Firewall"
 msgstr "防火墙"
 
@@ -468,7 +485,7 @@ msgstr "多播"
 msgid "Enable IGMPproxy"
 msgstr "启用IGMPproxy"
 
-#: ../www/advanced-firewall.asp:153 ../www/status-overview.asp:421
+#: ../www/advanced-firewall.asp:153 ../www/status-overview.asp:413
 msgid "LAN"
 msgstr "LAN"
 
@@ -501,8 +518,9 @@ msgid "Udpxy port"
 msgstr "Udpxy端口"
 
 #: ../www/advanced-mac.asp:14 ../www/advanced-mac.asp:163
-#: ../www/basic-network.asp:1721 ../www/basic-network.asp:1774
-#: ../www/status-overview.asp:507 ../www/tomato.js:2390
+#: ../www/basic-network.asp:1726 ../www/basic-network.asp:1779
+#: ../www/status-devices.asp:320 ../www/status-overview.asp:499
+#: ../www/tomato.js:2390
 msgid "MAC Address"
 msgstr "MAC地址"
 
@@ -523,13 +541,13 @@ msgid "WAN Port"
 msgstr "WAN端口"
 
 #: ../www/advanced-mac.asp:169 ../www/advanced-mac.asp:177
-#: ../www/advanced-vlan.asp:987 ../www/basic-ipv6.asp:340
-#: ../www/basic-network.asp:1636 ../www/basic-time.asp:30
+#: ../www/advanced-vlan.asp:995 ../www/basic-ipv6.asp:340
+#: ../www/basic-network.asp:1638 ../www/basic-time.asp:30
 msgid "Default"
 msgstr "默认"
 
 #: ../www/advanced-mac.asp:169 ../www/advanced-mac.asp:177
-#: ../www/basic-network.asp:1745 ../www/basic-network.asp:1748
+#: ../www/basic-network.asp:1750 ../www/basic-network.asp:1753
 msgid "Random"
 msgstr "随机"
 
@@ -580,6 +598,15 @@ msgstr "默认值"
 #: ../www/advanced-misc.asp:99
 msgid "Not all models support these options"
 msgstr "不是所有的型号都支持这些功能"
+
+#: ../www/advanced-misc.asp:100
+msgid ""
+"CTF is broadcom proprietary driver. you have to disable QoS and/or "
+"portfowarding to get best performance. Enable this option might cause your "
+"router reboot while WAN to lan speed is more than 640 Mb/s."
+msgstr ""
+"CTF是博通公司私有驱动。你可能必须禁用QoS和/或端口映射才能达到最高速度。启用这"
+"个功能可能会在WAN口速度达到640Mb/秒时导致你的路由重启。"
 
 #: ../www/advanced-routing.asp:14 ../www/tomato.js:2392
 msgid "Routing"
@@ -675,7 +702,7 @@ msgstr "启动TOR客户端可能需要几秒到几分钟的时间"
 msgid "Only connections to destination port 80 are redirected to TOR"
 msgstr "只有目标端口是80的连接会重定向到TOR"
 
-#: ../www/advanced-tor.asp:163 ../www/nas-aria2.asp:108
+#: ../www/advanced-tor.asp:163 ../www/nas-aria2.asp:110
 msgid "Caution"
 msgstr "注意"
 
@@ -691,130 +718,133 @@ msgstr "你必须使用swap"
 msgid "VLAN"
 msgstr "VLAN"
 
-#: ../www/advanced-vlan.asp:396
+#: ../www/advanced-vlan.asp:404
 msgid "Router must be rebooted to proceed"
 msgstr "路由器必须重启才能继续"
 
-#: ../www/advanced-vlan.asp:396
+#: ../www/advanced-vlan.asp:404
 msgid "Commit changes to NVRAM and reboot now"
 msgstr "保存所有更改到闪存并重启吗"
 
-#: ../www/advanced-vlan.asp:424
+#: ../www/advanced-vlan.asp:432
 msgid "Tagged"
 msgstr "标记"
 
-#: ../www/advanced-vlan.asp:612
+#: ../www/advanced-vlan.asp:620
 msgid ""
 "Port 4 cannot be assigned to more than one VLAN unless frames are tagged on "
 "all VLANs Port 4 is member"
 msgstr "Port 4只有在所在VLAN进行桢标记时才能属于多个VLAN"
 
-#: ../www/advanced-vlan.asp:620
+#: ../www/advanced-vlan.asp:628
 msgid ""
 "WAN port cannot be assigned to more than one VLAN unless frames are tagged "
 "on all VLANs WAN port is member"
 msgstr "WAN口只有在所在VLAN进行桢标记时才能属于多个VLAN"
 
-#: ../www/advanced-vlan.asp:633
+#: ../www/advanced-vlan.asp:641
 msgid "Only one VID can be selected as the default VID"
 msgstr "只有一个VID可以被指定为默认VID"
 
-#: ../www/advanced-vlan.asp:640
+#: ../www/advanced-vlan.asp:648
 msgid "Cannot add more than one entry with VID"
 msgstr "VID不能增加多于一个"
 
-#: ../www/advanced-vlan.asp:647
+#: ../www/advanced-vlan.asp:655
 msgid "Only one VID can be used as WAN at any time"
 msgstr "任何时候只有一个VID可以被用于WAN口"
 
-#: ../www/advanced-vlan.asp:655
+#: ../www/advanced-vlan.asp:663
 msgid ""
 "One and only one VID can be used for LAN' + ((i==0) ? '' : i ) + ' (br'+i+') "
 "at any time"
 msgstr "任何时候只有一个VID可以用于LAN' + ((i==0) ? '' : i ) + ' (br'+i+') "
 
-#: ../www/advanced-vlan.asp:937
+#: ../www/advanced-vlan.asp:945
 msgid "VID Offset"
 msgstr "VID偏移"
 
-#: ../www/advanced-vlan.asp:950 ../www/advanced-vlan.asp:996
+#: ../www/advanced-vlan.asp:958 ../www/advanced-vlan.asp:1004
 #: ../www/tomato.js:2399
 msgid "Wireless"
 msgstr "无线"
 
-#: ../www/advanced-vlan.asp:966
+#: ../www/advanced-vlan.asp:974
 msgid "Trunk VLAN support override (experimental)"
 msgstr "VLAN端口重用(试验支持)"
 
-#: ../www/advanced-vlan.asp:970 ../www/status-overview.asp:527
+#: ../www/advanced-vlan.asp:978 ../www/bwm-24.asp:231 ../www/ipt-24.asp:409
+#: ../www/ipt-realtime.asp:354 ../www/status-log.asp:72
+#: ../www/status-overview.asp:519 ../www/status-webmon.asp:415
 msgid "Enable"
 msgstr "启用"
 
-#: ../www/advanced-vlan.asp:978
+#: ../www/advanced-vlan.asp:986
 msgid "Unique identifier of a VLAN"
 msgstr "唯一标识一个VLAN"
 
-#: ../www/advanced-vlan.asp:979 ../www/advanced-vlan.asp:992
+#: ../www/advanced-vlan.asp:987 ../www/advanced-vlan.asp:1000
 msgid "EXPERIMENTAL"
 msgstr "试验支持"
 
-#: ../www/advanced-vlan.asp:979
+#: ../www/advanced-vlan.asp:987
 msgid ""
 "Allows overriding 'traditional' VLAN/VID mapping with arbitrary VIDs for "
 "each VLAN (set to '0' to use 'regular' VLAN/VID mappings instead)"
 msgstr "允许使用任意的VID代替传统VLAN/VID映射(设为0表示使用传统VLAN/VID映射)"
 
-#: ../www/advanced-vlan.asp:979
+#: ../www/advanced-vlan.asp:987 ../www/bwm-realtime.asp:218
+#: ../www/ipt-realtime.asp:365
 msgid "Warning"
 msgstr "警告"
 
-#: ../www/advanced-vlan.asp:979
+#: ../www/advanced-vlan.asp:987
 msgid ""
 "this hasn't been verified/tested on anything but a Cisco/Linksys E3000 and "
 "may not be supported by your particular device/model"
 msgstr "这些功能还有没有除了E3000上测试过"
 
-#: ../www/advanced-vlan.asp:979
+#: ../www/advanced-vlan.asp:987
 msgid "see notes on "
 msgstr "请查看注意事项"
 
-#: ../www/advanced-vlan.asp:980
+#: ../www/advanced-vlan.asp:988
 msgid "Which ethernet ports on the router should be members of this VLAN"
 msgstr "哪些有线端口是这个VLAN的成员"
 
-#: ../www/advanced-vlan.asp:981
+#: ../www/advanced-vlan.asp:989
 msgid "Enable 802.1Q tagging of ethernet frames on a particular port/VLAN"
 msgstr "启用802.1Q标识指定端口/VLAN的以太网络数据帧"
 
-#: ../www/advanced-vlan.asp:987
+#: ../www/advanced-vlan.asp:995
 msgid "VLAN ID assigned to untagged frames received by the router"
 msgstr "所有路由收到未标记数据帧默认的VLAN ID"
 
-#: ../www/advanced-vlan.asp:988 ../www/advanced-wlanvifs.asp:1413
+#: ../www/advanced-vlan.asp:996 ../www/advanced-wlanvifs.asp:1413
 #: ../www/basic-network.asp:60
 msgid "Bridge"
 msgstr "网桥"
 
-#: ../www/advanced-vlan.asp:988
+#: ../www/advanced-vlan.asp:996
 msgid ""
 "Determines if this VLAN ID should be treated as WAN, part of a LAN bridge or "
 "just left alone"
 msgstr "指定这个VLAN ID是否应该是WAN口、LAN网桥或者不进行处理"
 
-#: ../www/advanced-vlan.asp:988
+#: ../www/advanced-vlan.asp:996
 msgid ""
 "i.e. member of a 802.1Q trunk, being managed manually via scripts, etc..."
 msgstr "例如，802.1Q成员,用代码处理等"
 
-#: ../www/advanced-vlan.asp:1003 ../www/advanced-vlan.asp:1004
+#: ../www/advanced-vlan.asp:1011 ../www/advanced-vlan.asp:1012
 msgid "must"
 msgstr "必须"
 
-#: ../www/advanced-vlan.asp:1014
+#: ../www/advanced-vlan.asp:1022
 msgid "experimental"
 msgstr "试验支持"
 
-#: ../www/advanced-vlan.asp:1025
+#: ../www/advanced-vlan.asp:1033
 msgid "This feature is not supported on this router"
 msgstr "您的路由不支持这项功能"
 
@@ -823,16 +853,16 @@ msgid "Virtual Wireless Interfaces"
 msgstr "虚拟无线接口"
 
 #: ../www/advanced-wlanvifs.asp:62 ../www/advanced-wlanvifs.asp:1412
-#: ../www/basic-network.asp:1723 ../www/status-overview.asp:42
+#: ../www/basic-network.asp:1728 ../www/status-overview.asp:42
 msgid "Access Point"
 msgstr "无线接入点"
 
 #: ../www/advanced-wlanvifs.asp:62 ../www/advanced-wlanvifs.asp:1412
-#: ../www/basic-network.asp:1723 ../www/status-overview.asp:42
+#: ../www/basic-network.asp:1728 ../www/status-overview.asp:42
 msgid "Wireless Client"
 msgstr "无线客户端"
 
-#: ../www/advanced-wlanvifs.asp:62 ../www/basic-network.asp:1723
+#: ../www/advanced-wlanvifs.asp:62 ../www/basic-network.asp:1728
 #: ../www/status-overview.asp:42
 msgid "Wireless Ethernet Bridge"
 msgstr "无线转接桥"
@@ -842,7 +872,7 @@ msgstr "无线转接桥"
 msgid "Overview"
 msgstr "概览"
 
-#: ../www/advanced-wlanvifs.asp:536
+#: ../www/advanced-wlanvifs.asp:536 ../www/ipt-monthly.asp:370
 msgid "Click here to hide"
 msgstr "点击这里隐藏"
 
@@ -851,6 +881,7 @@ msgid "Wireless Interfaces Details"
 msgstr "无线接口详情"
 
 #: ../www/advanced-wlanvifs.asp:1381 ../www/advanced-wlanvifs.asp:1409
+#: ../www/status-devices.asp:320
 msgid "Interface"
 msgstr "接口"
 
@@ -858,7 +889,9 @@ msgstr "接口"
 msgid "Virtual Interfaces"
 msgstr "虚拟接口"
 
-#: ../www/advanced-wlanvifs.asp:1393 ../www/basic-network.asp:1624
+#: ../www/advanced-wlanvifs.asp:1393 ../www/basic-network.asp:1626
+#: ../www/ipt-daily.asp:456 ../www/ipt-details.asp:467
+#: ../www/ipt-monthly.asp:458
 msgid "Options"
 msgstr "选项"
 
@@ -867,7 +900,7 @@ msgid "Wireless VIF name"
 msgstr "无线网卡名称"
 
 #: ../www/advanced-wlanvifs.asp:1410 ../www/basic-network.asp:95
-#: ../www/basic-network.asp:98 ../www/status-overview.asp:511
+#: ../www/basic-network.asp:98 ../www/status-overview.asp:503
 msgid "Enabled"
 msgstr "已启用"
 
@@ -920,8 +953,8 @@ msgid "IPv6 Service Type"
 msgstr "IPv6服务类型"
 
 #: ../www/basic-ipv6.asp:331 ../www/basic-network.asp:95
-#: ../www/basic-network.asp:98 ../www/basic-network.asp:1609
-#: ../www/basic-network.asp:1740 ../www/status-overview.asp:511
+#: ../www/basic-network.asp:98 ../www/basic-network.asp:1611
+#: ../www/basic-network.asp:1745 ../www/status-overview.asp:503
 msgid "Disabled"
 msgstr "已禁用"
 
@@ -981,15 +1014,15 @@ msgstr "一般为32"
 msgid "Prefix Length"
 msgstr "前缀长度"
 
-#: ../www/basic-ipv6.asp:339 ../www/status-overview.asp:478
+#: ../www/basic-ipv6.asp:339 ../www/status-overview.asp:470
 msgid "Router IPv6 Address"
 msgstr "路由器IPv6地址"
 
-#: ../www/basic-ipv6.asp:340 ../www/basic-network.asp:1636
+#: ../www/basic-ipv6.asp:340 ../www/basic-network.asp:1638
 msgid "Manual"
 msgstr "手动"
 
-#: ../www/basic-ipv6.asp:343 ../www/basic-network.asp:1661
+#: ../www/basic-ipv6.asp:343 ../www/basic-network.asp:1666
 msgid "Static DNS"
 msgstr "静态DNS"
 
@@ -1002,8 +1035,9 @@ msgid "Tunnel Remote Endpoint"
 msgstr "隧道远程端口"
 
 #: ../www/basic-ipv6.asp:351 ../www/basic-ipv6.asp:352
-#: ../www/status-overview.asp:395 ../www/status-overview.asp:397
-#: ../www/status-overview.asp:402
+#: ../www/status-overview.asp:387 ../www/status-overview.asp:389
+#: ../www/status-overview.asp:394 ../www/tools-ping.asp:49
+#: ../www/tools-ping.asp:206
 msgid "Address"
 msgstr "地址"
 
@@ -1039,7 +1073,8 @@ msgstr "填0使用默认值"
 msgid "Tunnel TTL"
 msgstr "隧道TTL"
 
-#: ../www/basic-network.asp:60 ../www/basic-network.asp:1620
+#: ../www/basic-network.asp:60 ../www/basic-network.asp:1622
+#: ../www/status-devices.asp:320
 msgid "IP Address"
 msgstr "IP地址"
 
@@ -1059,7 +1094,7 @@ msgstr "(起/止)"
 msgid "Lease&nbsp;Time&nbsp;"
 msgstr "租约期限"
 
-#: ../www/basic-network.asp:60 ../www/status-overview.asp:380
+#: ../www/basic-network.asp:60 ../www/status-overview.asp:372
 msgid "mins"
 msgstr "分钟"
 
@@ -1167,273 +1202,282 @@ msgstr "不能继续,两个或更多的网桥的IP地址或子网存在冲突"
 msgid "Bridge br0 must be always defined and have a valid IP address set."
 msgstr "br0必须定义并且有一个有效的IP地址."
 
-#: ../www/basic-network.asp:1603
+#: ../www/basic-network.asp:1605
 msgid "Type"
 msgstr "类型"
 
-#: ../www/basic-network.asp:1603 ../www/status-overview.asp:396
+#: ../www/basic-network.asp:1605 ../www/status-overview.asp:388
 msgid "PPPoE"
 msgstr "PPPoE"
 
-#: ../www/basic-network.asp:1603
+#: ../www/basic-network.asp:1605
 msgid "Static"
 msgstr "静态"
 
-#: ../www/basic-network.asp:1603 ../www/status-overview.asp:396
+#: ../www/basic-network.asp:1605 ../www/status-overview.asp:388
 msgid "L2TP"
 msgstr "L2TP"
 
-#: ../www/basic-network.asp:1606 ../www/status-overview.asp:396
+#: ../www/basic-network.asp:1608 ../www/status-overview.asp:388
 msgid "3G Modem"
 msgstr "3G上网卡"
 
-#: ../www/basic-network.asp:1611
+#: ../www/basic-network.asp:1613
 msgid "Modem device"
 msgstr "Modem设备"
 
-#: ../www/basic-network.asp:1612
+#: ../www/basic-network.asp:1614
 msgid "PIN Code"
 msgstr "PIN码"
 
-#: ../www/basic-network.asp:1613
+#: ../www/basic-network.asp:1615
 msgid "Modem init string"
 msgstr "Modem初始化字符串"
 
-#: ../www/basic-network.asp:1614
+#: ../www/basic-network.asp:1616
 msgid "APN"
 msgstr "接入点"
 
-#: ../www/basic-network.asp:1615
+#: ../www/basic-network.asp:1617
 msgid "Username"
 msgstr "用户名"
 
-#: ../www/basic-network.asp:1616
+#: ../www/basic-network.asp:1618
 msgid "Password"
 msgstr "密码"
 
-#: ../www/basic-network.asp:1617
+#: ../www/basic-network.asp:1619
 msgid "Service Name"
 msgstr "服务名"
 
-#: ../www/basic-network.asp:1618
+#: ../www/basic-network.asp:1620
 msgid "L2TP Server"
 msgstr "L2TP服务器"
 
-#: ../www/basic-network.asp:1619
+#: ../www/basic-network.asp:1621
 msgid "Use DHCP"
 msgstr "使用DHCP"
 
-#: ../www/basic-network.asp:1621 ../www/status-overview.asp:399
+#: ../www/basic-network.asp:1623 ../www/status-overview.asp:391
 msgid "Subnet Mask"
 msgstr "子网掩码"
 
-#: ../www/basic-network.asp:1622 ../www/status-overview.asp:400
-#: ../www/status-overview.asp:476
+#: ../www/basic-network.asp:1624 ../www/status-overview.asp:392
+#: ../www/status-overview.asp:468
 msgid "Gateway"
 msgstr "网关"
 
-#: ../www/basic-network.asp:1623
+#: ../www/basic-network.asp:1625
 msgid "PPTP Gateway"
 msgstr "PPTP网关"
 
-#: ../www/basic-network.asp:1625
+#: ../www/basic-network.asp:1627
 msgid "Connect Mode"
 msgstr "连接类型"
 
-#: ../www/basic-network.asp:1627
+#: ../www/basic-network.asp:1629
 msgid "Max Idle Time"
 msgstr "最大空闲时间"
 
-#: ../www/basic-network.asp:1629
+#: ../www/basic-network.asp:1631
 msgid "Redial Interval"
 msgstr "重拨间隔"
 
-#: ../www/basic-network.asp:1631
+#: ../www/basic-network.asp:1633
 msgid "LCP Echo Interval"
 msgstr "LCP Echo间隔"
 
-#: ../www/basic-network.asp:1633
+#: ../www/basic-network.asp:1635
 msgid "LCP Echo Link fail limit"
 msgstr "LCP Echo 连接失败限制"
 
-#: ../www/basic-network.asp:1635 ../www/status-overview.asp:405
+#: ../www/basic-network.asp:1637 ../www/status-overview.asp:397
 msgid "MTU"
 msgstr "MTU"
 
-#: ../www/basic-network.asp:1638
+#: ../www/basic-network.asp:1640
 msgid "Single Line MLPPP"
 msgstr "单链路MLPPP"
 
-#: ../www/basic-network.asp:1640
+#: ../www/basic-network.asp:1642
 msgid "Route Modem IP"
 msgstr "Modem路由地址"
 
-#: ../www/basic-network.asp:1640
+#: ../www/basic-network.asp:1642
 msgid "must be in different subnet to router, 0.0.0.0 to disable"
 msgstr "必须与路由器子网不同,0.0.0.0禁用"
 
-#: ../www/basic-network.asp:1642
+#: ../www/basic-network.asp:1644
 msgid "Bridge WAN port to primary LAN"
 msgstr "将WAN口桥接到LAN"
 
-#: ../www/basic-network.asp:1660
+#: ../www/basic-network.asp:1646
+msgid "Enable PPPoE Relay on this interface"
+msgstr "在这个接口上启用PPPeE转发"
+
+#: ../www/basic-network.asp:1646
+msgid ""
+"only first lan is relayed. you might need to adjust MTU to use this feature."
+msgstr "只有第一个lan会被转发。你可能需要调整MTU数据才能使用这项功能"
+
+#: ../www/basic-network.asp:1665
 msgid "Default Gateway"
 msgstr "默认网关"
 
-#: ../www/basic-network.asp:1665
+#: ../www/basic-network.asp:1670
 msgid "Use dnscrypt-proxy"
 msgstr "使用DNS加密代理"
 
-#: ../www/basic-network.asp:1666
+#: ../www/basic-network.asp:1671
 msgid "Local Port"
 msgstr "本地端口"
 
-#: ../www/basic-network.asp:1667
+#: ../www/basic-network.asp:1672
 msgid "Startup Parameters"
 msgstr "启动参数"
 
-#: ../www/basic-network.asp:1667
+#: ../www/basic-network.asp:1672
 msgid "optional"
 msgstr "可选"
 
-#: ../www/basic-network.asp:1678
+#: ../www/basic-network.asp:1683
 msgid "Enable Ports State"
 msgstr "启用端口状态监视"
 
-#: ../www/basic-network.asp:1679
+#: ../www/basic-network.asp:1684
 msgid "Show Speed Info"
 msgstr "显示速度信息"
 
-#: ../www/basic-network.asp:1680
+#: ../www/basic-network.asp:1685
 msgid "Invert Ports Order"
 msgstr "反转端口顺序"
 
-#: ../www/basic-network.asp:1719
+#: ../www/basic-network.asp:1724
 msgid "Enable Wireless"
 msgstr "启用无线"
 
-#: ../www/basic-network.asp:1722 ../www/status-overview.asp:508
+#: ../www/basic-network.asp:1727 ../www/status-overview.asp:500
 msgid "Wireless Mode"
 msgstr "无线模式"
 
-#: ../www/basic-network.asp:1723 ../www/basic-network.asp:1770
+#: ../www/basic-network.asp:1728 ../www/basic-network.asp:1775
 #: ../www/status-overview.asp:42
 msgid "WDS"
 msgstr "WDS"
 
-#: ../www/basic-network.asp:1725
+#: ../www/basic-network.asp:1730
 msgid "Radio Band"
 msgstr "无线频段"
 
-#: ../www/basic-network.asp:1727 ../www/status-overview.asp:509
+#: ../www/basic-network.asp:1732 ../www/status-overview.asp:501
 msgid "Wireless Network Mode"
 msgstr "无线网络模式"
 
-#: ../www/basic-network.asp:1730 ../www/status-overview.asp:515
+#: ../www/basic-network.asp:1735 ../www/status-overview.asp:507
 msgid "SSID"
 msgstr "SSID"
 
-#: ../www/basic-network.asp:1731 ../www/status-overview.asp:516
+#: ../www/basic-network.asp:1736 ../www/status-overview.asp:508
 msgid "Broadcast"
 msgstr "广播"
 
-#: ../www/basic-network.asp:1732 ../www/status-overview.asp:518
+#: ../www/basic-network.asp:1737 ../www/status-overview.asp:510
 msgid "Channel"
 msgstr "频道"
 
-#: ../www/basic-network.asp:1732
+#: ../www/basic-network.asp:1737
 msgid "Scan"
 msgstr "扫描"
 
-#: ../www/basic-network.asp:1734 ../www/status-overview.asp:519
+#: ../www/basic-network.asp:1739 ../www/status-overview.asp:511
 msgid "Channel Width"
 msgstr "频道带宽"
 
-#: ../www/basic-network.asp:1736
+#: ../www/basic-network.asp:1741
 msgid "Control Sideband"
 msgstr "控制频道"
 
-#: ../www/basic-network.asp:1736
+#: ../www/basic-network.asp:1741
 msgid "Lower"
 msgstr "低"
 
-#: ../www/basic-network.asp:1736
+#: ../www/basic-network.asp:1741
 msgid "Upper"
 msgstr "高"
 
-#: ../www/basic-network.asp:1739 ../www/status-overview.asp:517
+#: ../www/basic-network.asp:1744 ../www/status-overview.asp:509
 msgid "Security"
 msgstr "安全"
 
-#: ../www/basic-network.asp:1740
+#: ../www/basic-network.asp:1745
 msgid "WEP"
 msgstr "WEP"
 
-#: ../www/basic-network.asp:1740
+#: ../www/basic-network.asp:1745
 msgid "WPA Personal"
 msgstr "WPA个人"
 
-#: ../www/basic-network.asp:1740 ../www/status-overview.asp:43
+#: ../www/basic-network.asp:1745 ../www/status-overview.asp:43
 msgid "WPA Enterprise"
 msgstr "WPA 企业版"
 
-#: ../www/basic-network.asp:1740
+#: ../www/basic-network.asp:1745
 msgid "WPA2 Personal"
 msgstr "WPA2个人"
 
-#: ../www/basic-network.asp:1740 ../www/status-overview.asp:43
+#: ../www/basic-network.asp:1745 ../www/status-overview.asp:43
 msgid "WPA2 Enterprise"
 msgstr "WPA2 企业版"
 
-#: ../www/basic-network.asp:1740 ../www/status-overview.asp:43
+#: ../www/basic-network.asp:1745 ../www/status-overview.asp:43
 msgid "WPA / WPA2 Personal"
 msgstr "WPA / WPA2 个人版"
 
-#: ../www/basic-network.asp:1740 ../www/status-overview.asp:43
+#: ../www/basic-network.asp:1745 ../www/status-overview.asp:43
 msgid "WPA / WPA2 Enterprise"
 msgstr "WPA / WPA2 企业版"
 
-#: ../www/basic-network.asp:1740 ../www/status-overview.asp:43
+#: ../www/basic-network.asp:1745 ../www/status-overview.asp:43
 msgid "Radius"
 msgstr "Radius"
 
-#: ../www/basic-network.asp:1742 ../www/basic-network.asp:1755
+#: ../www/basic-network.asp:1747 ../www/basic-network.asp:1760
 msgid "Encryption"
 msgstr "加密"
 
-#: ../www/basic-network.asp:1743
+#: ../www/basic-network.asp:1748
 msgid "TKIP"
 msgstr "TKIP"
 
-#: ../www/basic-network.asp:1743
+#: ../www/basic-network.asp:1748
 msgid "AES"
 msgstr "AES"
 
-#: ../www/basic-network.asp:1743
+#: ../www/basic-network.asp:1748
 msgid "TKIP / AES"
 msgstr "TKIP / AES"
 
-#: ../www/basic-network.asp:1744 ../www/basic-network.asp:1747
+#: ../www/basic-network.asp:1749 ../www/basic-network.asp:1752
 msgid "Shared Key"
 msgstr "共享密钥"
 
-#: ../www/basic-network.asp:1750
+#: ../www/basic-network.asp:1755
 msgid "Group Key Renewal"
 msgstr "组密钥更新间隔"
 
-#: ../www/basic-network.asp:1752
+#: ../www/basic-network.asp:1757
 msgid "Radius Server"
 msgstr "Radius服务器"
 
-#: ../www/basic-network.asp:1757
+#: ../www/basic-network.asp:1762
 msgid "Passphrase"
 msgstr "密钥"
 
-#: ../www/basic-network.asp:1758
+#: ../www/basic-network.asp:1763
 msgid "Generate"
 msgstr "生成"
 
-#: ../www/basic-network.asp:1764
+#: ../www/basic-network.asp:1769
 msgid "Key"
 msgstr "密钥"
 
@@ -1869,7 +1913,8 @@ msgid ""
 "the server:"
 msgstr "下面的时钟服务器已经自动阻止从服务器发出的请求"
 
-#: ../www/basic-time.asp:283
+#: ../www/basic-time.asp:283 ../www/status-webmon.asp:61
+#: ../www/status-webmon.asp:376 ../www/status-webmon.asp:387
 msgid "Clear"
 msgstr "清除"
 
@@ -1889,99 +1934,656 @@ msgstr "伊尔库茨克"
 msgid "Krasnoyarsk"
 msgstr "克拉斯诺亚尔斯克"
 
+#: ../www/bwm-24.asp:14 ../www/bwm-daily.asp:14 ../www/bwm-monthly.asp:14
+#: ../www/bwm-realtime.asp:14 ../www/bwm-weekly.asp:14
+#: ../www/ipt-realtime.asp:14 ../www/tomato.js:2354
+msgid "Bandwidth"
+msgstr "带宽统计"
+
+#: ../www/bwm-24.asp:14 ../www/ipt-24.asp:18 ../www/tomato.js:2356
+#: ../www/tomato.js:2363
+msgid "Last 24 Hours"
+msgstr "近24小时"
+
+#: ../www/bwm-24.asp:101 ../www/ipt-24.asp:144
+msgid "Stop"
+msgstr "停止"
+
+#: ../www/bwm-24.asp:101 ../www/bwm-weekly.asp:248 ../www/ipt-24.asp:144
+msgid "Start"
+msgstr "开始"
+
+#: ../www/bwm-24.asp:173 ../www/ipt-24.asp:333
+msgid "2 minute interval"
+msgstr "间隔时间2分钟"
+
+#: ../www/bwm-24.asp:184 ../www/bwm-realtime.asp:167 ../www/ipt-24.asp:344
+#: ../www/ipt-realtime.asp:290
+msgid "Off"
+msgstr "关"
+
+#: ../www/bwm-24.asp:190 ../www/bwm-realtime.asp:173 ../www/ipt-24.asp:350
+#: ../www/ipt-realtime.asp:296
+msgid "Uniform"
+msgstr "平衡"
+
+#: ../www/bwm-24.asp:191 ../www/bwm-realtime.asp:174
+msgid "Per IF"
+msgstr "每接口"
+
+#: ../www/bwm-24.asp:193 ../www/bwm-realtime.asp:176 ../www/ipt-24.asp:353
+#: ../www/ipt-realtime.asp:299
+msgid "Solid"
+msgstr "填充"
+
+#: ../www/bwm-24.asp:194 ../www/bwm-realtime.asp:177 ../www/ipt-24.asp:354
+#: ../www/ipt-realtime.asp:300
+msgid "Line"
+msgstr "线"
+
+#: ../www/bwm-24.asp:196 ../www/bwm-realtime.asp:179 ../www/ipt-24.asp:356
+#: ../www/ipt-realtime.asp:302
+msgid "reverse"
+msgstr "反转"
+
+#: ../www/bwm-24.asp:198 ../www/bwm-daily.asp:164 ../www/bwm-monthly.asp:124
+#: ../www/bwm-realtime.asp:182 ../www/bwm-weekly.asp:251 ../www/ipt-24.asp:358
+#: ../www/ipt-daily.asp:475 ../www/ipt-details.asp:481
+#: ../www/ipt-monthly.asp:477 ../www/ipt-realtime.asp:305
+msgid "Configure"
+msgstr "配置"
+
+#: ../www/bwm-24.asp:204 ../www/bwm-realtime.asp:188 ../www/ipt-24.asp:364
+#: ../www/ipt-realtime.asp:311
+msgid "RX"
+msgstr "接收"
+
+#: ../www/bwm-24.asp:206 ../www/bwm-24.asp:217 ../www/bwm-realtime.asp:166
+#: ../www/bwm-realtime.asp:190 ../www/bwm-realtime.asp:201
+#: ../www/ipt-24.asp:343 ../www/ipt-24.asp:366 ../www/ipt-24.asp:377
+#: ../www/ipt-realtime.asp:289 ../www/ipt-realtime.asp:313
+#: ../www/ipt-realtime.asp:324
+msgid "Avg"
+msgstr "平均"
+
+#: ../www/bwm-24.asp:208 ../www/bwm-24.asp:219 ../www/bwm-realtime.asp:192
+#: ../www/bwm-realtime.asp:203 ../www/ipt-24.asp:368 ../www/ipt-24.asp:379
+#: ../www/ipt-realtime.asp:315 ../www/ipt-realtime.asp:326
+msgid "Peak"
+msgstr "最高"
+
+#: ../www/bwm-24.asp:210 ../www/bwm-24.asp:221 ../www/bwm-daily.asp:152
+#: ../www/bwm-monthly.asp:70 ../www/bwm-realtime.asp:194
+#: ../www/bwm-realtime.asp:205 ../www/bwm-weekly.asp:105
+#: ../www/bwm-weekly.asp:115 ../www/bwm-weekly.asp:117 ../www/ipt-24.asp:370
+#: ../www/ipt-24.asp:381 ../www/ipt-graphs.asp:321 ../www/ipt-graphs.asp:350
+#: ../www/ipt-graphs.asp:379 ../www/ipt-monthly.asp:89
+#: ../www/ipt-monthly.asp:197 ../www/ipt-realtime.asp:317
+#: ../www/ipt-realtime.asp:328
+msgid "Total"
+msgstr "合计"
+
+#: ../www/bwm-24.asp:215 ../www/bwm-realtime.asp:199 ../www/ipt-24.asp:375
+#: ../www/ipt-realtime.asp:322
+msgid "TX"
+msgstr "发送"
+
+#: ../www/bwm-24.asp:231
+msgid "Bandwidth monitoring disabled"
+msgstr "带宽监视已禁用"
+
+#: ../www/bwm-24.asp:235
+msgid "The rstats program is not responding or is busy"
+msgstr "rstats程序没有响应或正忙"
+
+#: ../www/bwm-24.asp:235 ../www/ipt-24.asp:412 ../www/ipt-realtime.asp:357
+msgid "Try reloading after a few seconds"
+msgstr "请数秒后刷新再试"
+
+#: ../www/bwm-daily.asp:14 ../www/bwm-daily.asp:143 ../www/tomato.js:2357
+#: ../www/tomato.js:2366
+msgid "Daily"
+msgstr "按日"
+
+#: ../www/bwm-daily.asp:143 ../www/bwm-monthly.asp:116
+#: ../www/bwm-weekly.asp:243
+msgid "WAN Bandwidth"
+msgstr "WAN口带宽"
+
+#: ../www/bwm-daily.asp:149
+msgid "Last 30 Days"
+msgstr "最近30天"
+
+#: ../www/bwm-daily.asp:150
+msgid "Down"
+msgstr "下"
+
+#: ../www/bwm-daily.asp:151
+msgid "Up"
+msgstr "上"
+
+#: ../www/bwm-daily.asp:159 ../www/bwm-monthly.asp:70
+#: ../www/bwm-monthly.asp:119 ../www/bwm-weekly.asp:105
+#: ../www/bwm-weekly.asp:115 ../www/bwm-weekly.asp:247
+#: ../www/ipt-monthly.asp:89
+msgid "Date"
+msgstr "日期"
+
+#: ../www/bwm-daily.asp:160 ../www/bwm-monthly.asp:120
+#: ../www/bwm-weekly.asp:249 ../www/ipt-daily.asp:465
+#: ../www/ipt-details.asp:474 ../www/ipt-monthly.asp:467
+msgid "Scale"
+msgstr "单位"
+
+#: ../www/bwm-daily.asp:162 ../www/bwm-monthly.asp:122
+#: ../www/ipt-daily.asp:473 ../www/ipt-monthly.asp:475
+msgid "Data"
+msgstr "数据"
+
+#: ../www/bwm-monthly.asp:14 ../www/bwm-monthly.asp:116 ../www/tomato.js:2359
+#: ../www/tomato.js:2367
+msgid "Monthly"
+msgstr "按月"
+
+#: ../www/bwm-monthly.asp:70 ../www/bwm-weekly.asp:105
+#: ../www/bwm-weekly.asp:115 ../www/ipt-details.asp:315
+#: ../www/ipt-monthly.asp:89 ../www/status-webmon.asp:374
+#: ../www/status-webmon.asp:385
+msgid "Download"
+msgstr "下载"
+
+#: ../www/bwm-monthly.asp:70 ../www/bwm-weekly.asp:105
+#: ../www/bwm-weekly.asp:115 ../www/ipt-details.asp:315
+#: ../www/ipt-monthly.asp:89
+msgid "Upload"
+msgstr "上传"
+
+#: ../www/bwm-monthly.asp:135 ../www/ipt-monthly.asp:489
+msgid "Refresh"
+msgstr "刷新"
+
+#: ../www/bwm-realtime.asp:14 ../www/tomato.js:2355 ../www/tomato.js:2362
+msgid "Real-Time"
+msgstr "实时"
+
+#: ../www/bwm-realtime.asp:164
+msgid "10 minute window"
+msgstr "10分钟窗口"
+
+#: ../www/bwm-realtime.asp:164
+msgid "2 second interval"
+msgstr "2分钟间隔"
+
+#: ../www/bwm-realtime.asp:172 ../www/ipt-24.asp:349
+#: ../www/ipt-realtime.asp:295
+msgid "Max"
+msgstr "最大"
+
+#: ../www/bwm-realtime.asp:175 ../www/ipt-24.asp:352
+#: ../www/ipt-realtime.asp:298
+msgid "Display"
+msgstr "显示"
+
+#: ../www/bwm-realtime.asp:178 ../www/ipt-24.asp:355
+#: ../www/ipt-realtime.asp:301
+msgid "Color"
+msgstr "颜色"
+
+#: ../www/bwm-realtime.asp:218 ../www/ipt-realtime.asp:365
+msgid "10 second timeout"
+msgstr "10秒超时"
+
+#: ../www/bwm-realtime.asp:218 ../www/ipt-realtime.asp:365
+msgid "restarting"
+msgstr "重启"
+
+#: ../www/bwm-weekly.asp:14 ../www/bwm-weekly.asp:243 ../www/tomato.js:2358
+msgid "Weekly"
+msgstr "按周"
+
+#: ../www/bwm-weekly.asp:39
+msgid "Sunday"
+msgstr "星期日"
+
+#: ../www/bwm-weekly.asp:39
+msgid "Monday"
+msgstr "星期一"
+
+#: ../www/bwm-weekly.asp:39
+msgid "Tuesday"
+msgstr "星期二"
+
+#: ../www/bwm-weekly.asp:39
+msgid "Wednesday"
+msgstr "星期三"
+
+#: ../www/bwm-weekly.asp:39
+msgid "Thursday"
+msgstr "星期四"
+
+#: ../www/bwm-weekly.asp:39
+msgid "Friday"
+msgstr "星期五"
+
+#: ../www/bwm-weekly.asp:39
+msgid "Saturday"
+msgstr "星期六"
+
+#: ../www/bwm-weekly.asp:246
+msgid "Show"
+msgstr "显示"
+
+#: ../www/bwm-weekly.asp:246
+msgid "Summary"
+msgstr "概要"
+
+#: ../www/bwm-weekly.asp:246
+msgid "Full"
+msgstr "完整"
+
+#: ../www/ipt-24.asp:18 ../www/ipt-daily.asp:18 ../www/ipt-details.asp:18
+#: ../www/ipt-graphs.asp:14 ../www/ipt-monthly.asp:18 ../www/tomato.js:2361
+msgid "IP Traffic"
+msgstr "IP流量"
+
+#: ../www/ipt-24.asp:335
+msgid "Hours"
+msgstr "小时"
+
+#: ../www/ipt-24.asp:351 ../www/ipt-realtime.asp:297
+msgid "Per Address"
+msgstr "每地址"
+
+#: ../www/ipt-24.asp:394 ../www/ipt-realtime.asp:341
+msgid "IPs currently on graphic"
+msgstr "图表上的IP地址"
+
+#: ../www/ipt-24.asp:394 ../www/ipt-realtime.asp:341
+msgid "Click/select a device from this list to hide it"
+msgstr "点击/选择隐藏设备"
+
+#: ../www/ipt-24.asp:395 ../www/ipt-realtime.asp:342
+msgid "Hidden addresses"
+msgstr "隐藏地址"
+
+#: ../www/ipt-24.asp:395 ../www/ipt-realtime.asp:342
+msgid "Click/select to show it again"
+msgstr "点击/选中显示设备"
+
+#: ../www/ipt-24.asp:409 ../www/ipt-realtime.asp:354
+msgid "IP Traffic monitoring disabled"
+msgstr "IP流量监控已禁用"
+
+#: ../www/ipt-24.asp:412 ../www/ipt-realtime.asp:357
+msgid "The cstats program is not responding or is busy"
+msgstr "cstats程序无响应或正忙"
+
+#: ../www/ipt-daily.asp:18
+msgid "Daily History"
+msgstr "日历史"
+
+#: ../www/ipt-daily.asp:451
+msgid "IP Traffic Daily History"
+msgstr "IP流量日历史"
+
+#: ../www/ipt-daily.asp:461 ../www/ipt-monthly.asp:463
+msgid "List only these IPs"
+msgstr "只显示这些IP地址"
+
+#: ../www/ipt-daily.asp:461 ../www/ipt-daily.asp:462
+#: ../www/ipt-details.asp:472 ../www/ipt-details.asp:473
+#: ../www/ipt-monthly.asp:463 ../www/ipt-monthly.asp:464
+msgid "Comma separated list"
+msgstr "以逗号隔开"
+
+#: ../www/ipt-daily.asp:462 ../www/ipt-details.asp:473
+#: ../www/ipt-monthly.asp:464
+msgid "Exclude these IPs"
+msgstr "排除这些IP"
+
+#: ../www/ipt-daily.asp:463 ../www/ipt-monthly.asp:465
+msgid "Date Range"
+msgstr "日期范围"
+
+#: ../www/ipt-daily.asp:463 ../www/ipt-monthly.asp:465
+msgid "Any"
+msgstr "任意"
+
+#: ../www/ipt-daily.asp:464 ../www/ipt-monthly.asp:466
+msgid "Date Format"
+msgstr "日期格式"
+
+#: ../www/ipt-daily.asp:466 ../www/ipt-monthly.asp:468
+msgid "Show subnet totals"
+msgstr "显示子网合计"
+
+#: ../www/ipt-daily.asp:466 ../www/ipt-monthly.asp:468
+msgid "Not considered when calculating total traffic on the last line"
+msgstr "统计最后一行总计流量时不包含此项"
+
+#: ../www/ipt-daily.asp:467 ../www/ipt-monthly.asp:469
+msgid "Hide IPs without traffic"
+msgstr "隐藏无流量IP"
+
+#: ../www/ipt-daily.asp:468 ../www/ipt-monthly.asp:470
+msgid "Show known hostnames"
+msgstr "显示已知主机名"
+
+#: ../www/ipt-daily.asp:469 ../www/ipt-details.asp:477
+#: ../www/ipt-monthly.asp:471
+msgid "Show shortcuts"
+msgstr "显示连接"
+
+#: ../www/ipt-details.asp:18
+msgid "Details"
+msgstr "详情"
+
+#: ../www/ipt-details.asp:206 ../www/ipt-monthly.asp:183
+msgid "View QoS Details"
+msgstr "显示QoS详情"
+
+#: ../www/ipt-details.asp:207 ../www/ipt-monthly.asp:184
+msgid "View transfer rates per connection"
+msgstr "查看每个连接传输速度"
+
+#: ../www/ipt-details.asp:208
+msgid "View IP Traffic History"
+msgstr "显示IP流量历史"
+
+#: ../www/ipt-details.asp:208
+msgid "history"
+msgstr "历史"
+
+#: ../www/ipt-details.asp:209 ../www/ipt-monthly.asp:186
+msgid "Filter out this address"
+msgstr "排除此地址"
+
+#: ../www/ipt-details.asp:209 ../www/ipt-monthly.asp:186
+#: ../www/status-overview.asp:359 ../www/status-overview.asp:383
+#: ../www/status-overview.asp:413
+msgid "hide"
+msgstr "隐藏"
+
+#: ../www/ipt-details.asp:230
+msgid "Total "
+msgstr "合计"
+
+#: ../www/ipt-details.asp:230
+msgid "hosts"
+msgstr "主机"
+
+#: ../www/ipt-details.asp:230 ../www/ipt-monthly.asp:203
+msgid "no data"
+msgstr "没有数据"
+
+#: ../www/ipt-details.asp:315 ../www/ipt-monthly.asp:89
+msgid "Host"
+msgstr "主机"
+
+#: ../www/ipt-details.asp:315
+msgid "IN/OUT"
+msgstr "入/出"
+
+#: ../www/ipt-details.asp:315
+msgid "TCP Connections"
+msgstr "TCP连接"
+
+#: ../www/ipt-details.asp:315
+msgid "UDP Connections"
+msgstr "UDP连接"
+
+#: ../www/ipt-details.asp:458
+msgid "IP Traffic Details"
+msgstr "IP传输详情"
+
+#: ../www/ipt-details.asp:462
+msgid "Loading"
+msgstr "加载中"
+
+#: ../www/ipt-details.asp:472
+msgid "Only these IPs"
+msgstr "仅这些IP地址"
+
+#: ../www/ipt-details.asp:475
+msgid "Ignore inactive hosts"
+msgstr "忽略无活动主机"
+
+#: ../www/ipt-details.asp:476
+msgid "Show hostnames"
+msgstr "显示主机名"
+
+#: ../www/ipt-graphs.asp:14 ../www/tomato.js:2364 ../www/tomato.js:2412
+msgid "View Graphs"
+msgstr "查看图表"
+
+#: ../www/ipt-graphs.asp:308
+msgid "Connections Distribution"
+msgstr "连接状态"
+
+#: ../www/ipt-graphs.asp:335 ../www/ipt-graphs.asp:364
+msgid "Bandwidth Distribution"
+msgstr "带宽状态"
+
+#: ../www/ipt-graphs.asp:335
+msgid "Inbound"
+msgstr "入站"
+
+#: ../www/ipt-graphs.asp:364
+msgid "Outbound"
+msgstr "出站"
+
+#: ../www/ipt-monthly.asp:18
+msgid "Monthly History"
+msgstr "按月历史"
+
+#: ../www/ipt-monthly.asp:185
+msgid "View real-time IP Traffic for this address"
+msgstr "查看此IP实时流量"
+
+#: ../www/ipt-monthly.asp:453
+msgid "IP Traffic Monthly History"
+msgstr "按月IP传输历史"
+
+#: ../www/ipt-realtime.asp:14
+msgid "Real-Time Client Monitor"
+msgstr "实时客户端监控"
+
+#: ../www/ipt-realtime.asp:287
+msgid "minute window"
+msgstr "分钟"
+
+#: ../www/ipt-realtime.asp:287
+msgid "second interval"
+msgstr "秒间隔"
+
 #: ../www/nas-aria2.asp:13
 msgid " Aria2 Client"
 msgstr "Aria2客户端"
 
-#: ../www/nas-aria2.asp:76 ../www/tomato.js:2410
+#: ../www/nas-aria2.asp:77 ../www/tomato.js:2410
 msgid "Basic Settings"
 msgstr "基础设置"
 
-#: ../www/nas-aria2.asp:85 ../www/nas-aria2.asp:108
+#: ../www/nas-aria2.asp:87 ../www/nas-aria2.asp:110
 msgid "Enable torrent client"
 msgstr "启用BT客户端"
 
-#: ../www/nas-aria2.asp:86 ../www/nas-aria2.asp:109
+#: ../www/nas-aria2.asp:88 ../www/nas-aria2.asp:111
 msgid "Listening port"
 msgstr "侦听端口"
 
-#: ../www/nas-aria2.asp:87
+#: ../www/nas-aria2.asp:89
 msgid "Download directory"
 msgstr "下载目录"
 
-#: ../www/nas-aria2.asp:92 ../www/nas-aria2.asp:110
+#: ../www/nas-aria2.asp:94 ../www/nas-aria2.asp:112
 msgid "Listening RPC port"
 msgstr "RPC侦听端口"
 
-#: ../www/nas-aria2.asp:93 ../www/nas-aria2.asp:111
+#: ../www/nas-aria2.asp:95 ../www/nas-aria2.asp:113
 msgid "Use SSL to encrypt RPC traffic"
 msgstr "使用SSL加密"
 
-#: ../www/nas-aria2.asp:94
+#: ../www/nas-aria2.asp:96
 msgid "Save settings location"
 msgstr "设置文件保存目录"
 
-#: ../www/nas-aria2.asp:95
+#: ../www/nas-aria2.asp:97
 msgid "In the Download directory (Recommended)"
 msgstr "下载目录(推荐)"
 
-#: ../www/nas-aria2.asp:102
+#: ../www/nas-aria2.asp:104
 msgid "RAM (Temporary)"
 msgstr "内存(重启后丢失)"
 
-#: ../www/nas-aria2.asp:104
+#: ../www/nas-aria2.asp:106
 msgid "Aria2"
 msgstr "Aria2"
 
-#: ../www/nas-aria2.asp:108
+#: ../www/nas-aria2.asp:110
 msgid "If your router only has 32MB of RAM, you'll have to use swap"
 msgstr "如果你的路由只有32M内存，你必须启用swap"
 
-#: ../www/nas-aria2.asp:109
+#: ../www/nas-aria2.asp:111
 msgid "Port used for torrent client"
 msgstr "BT客户端端口"
 
-#: ../www/nas-aria2.asp:109 ../www/nas-aria2.asp:110
+#: ../www/nas-aria2.asp:111 ../www/nas-aria2.asp:112
 msgid "Make sure this port is not in use"
 msgstr "请检查这个端口是否被占用"
 
-#: ../www/nas-aria2.asp:110
+#: ../www/nas-aria2.asp:112
 msgid "Port used for Aria2 RPC"
 msgstr "Aria2 RPC端口"
 
-#: ../www/nas-aria2.asp:111
+#: ../www/nas-aria2.asp:113
 msgid "Use ssl to encrypt RPC traffic"
 msgstr "使用SSL加密RPC通讯"
 
-#: ../www/nas-aria2.asp:112
+#: ../www/nas-aria2.asp:114
 msgid "Allow remote access"
 msgstr "允许远程访问"
 
-#: ../www/nas-aria2.asp:112
+#: ../www/nas-aria2.asp:114
 msgid ""
 "To open the Aria2 RPC port from the WAN side and allow the RPC to be "
 "accessed from the internet. you have to goto"
 msgstr "Aria2侦听所有网络，但你必须在"
 
-#: ../www/nas-aria2.asp:112
+#: ../www/nas-aria2.asp:114
 msgid "settings to allow incoming traffic to RPC port of Aria2"
 msgstr "中允许外部网络访问才可以通过外网连接"
 
-#: ../www/nas-aria2.asp:113
+#: ../www/nas-aria2.asp:115
 msgid "RPC access in lan is automatically enabled"
 msgstr "内部网络中RPC访问默认开启"
 
-#: ../www/nas-aria2.asp:113
+#: ../www/nas-aria2.asp:115
 msgid "RPC auth is also enabled, user name is "
 msgstr "RPC验证也同时开启，用户名是"
 
-#: ../www/nas-aria2.asp:113
+#: ../www/nas-aria2.asp:115
 msgid " and password is your password to login Tomato"
 msgstr "密码是你访问Tomato的密码"
 
-#: ../www/nas-aria2.asp:113
+#: ../www/nas-aria2.asp:115
 msgid "you can change this option for security reason"
 msgstr "你不能修改这项设定"
+
+#: ../www/nas-shairport.asp:13
+msgid "Shairport"
+msgstr "Shairport"
+
+#: ../www/nas-shairport.asp:68
+msgid "Airplay Settings"
+msgstr "Airplay设定"
+
+#: ../www/nas-shairport.asp:76
+msgid "Enable Airplay service"
+msgstr "启用Airplay服务"
+
+#: ../www/nas-shairport.asp:77
+msgid "Advertised Name"
+msgstr "广播名称"
+
+#: ../www/nas-shairport.asp:78
+msgid "Wait Frames before Play"
+msgstr "播放前缓冲帧数"
+
+#: ../www/nas-shairport.asp:79
+msgid "DMA Buffer"
+msgstr "DMA缓存"
+
+#: ../www/nas-shairport.asp:80
+msgid "Audio Device"
+msgstr "声音设备"
+
+#: ../www/status-devices.asp:18 ../www/status-log.asp:14
+#: ../www/status-overview.asp:399 ../www/status-webmon.asp:12
+#: ../www/tomato.js:2349
+msgid "Status"
+msgstr "状态"
+
+#: ../www/status-devices.asp:18 ../www/status-devices.asp:349
+#: ../www/tomato.js:2351
+msgid "Device List"
+msgstr "设备列表"
+
+#: ../www/status-devices.asp:320 ../www/status-overview.asp:364
+msgid "Name"
+msgstr "固件名称"
+
+#: ../www/status-devices.asp:320 ../www/status-overview.asp:514
+msgid "RSSI"
+msgstr "RSSI"
+
+#: ../www/status-devices.asp:320
+msgid "Quality"
+msgstr "质量"
+
+#: ../www/status-devices.asp:320
+msgid "TX/RX Rate"
+msgstr "发送/接收"
+
+#: ../www/status-devices.asp:320
+msgid "Lease"
+msgstr "租约"
+
+#: ../www/status-log.asp:14 ../www/status-log.asp:57 ../www/tomato.js:2353
+msgid "Logs"
+msgstr "日志"
+
+#: ../www/status-log.asp:59
+msgid "View Last 25 Lines"
+msgstr "查看最近25条"
+
+#: ../www/status-log.asp:60
+msgid "View Last 50 Lines"
+msgstr "果看最近50条"
+
+#: ../www/status-log.asp:61
+msgid "View Last 100 Lines"
+msgstr "查看最近100条"
+
+#: ../www/status-log.asp:62
+msgid "View All"
+msgstr "查看所有"
+
+#: ../www/status-log.asp:63
+msgid "Download Log File"
+msgstr "下载日志文件"
+
+#: ../www/status-log.asp:64
+msgid "Find"
+msgstr "查找"
+
+#: ../www/status-log.asp:66
+msgid "Logging Configuration"
+msgstr "日志配置"
+
+#: ../www/status-log.asp:72
+msgid "Internal logging disabled"
+msgstr "间隔日志已禁用"
 
 #: ../www/status-overview.asp:43
 msgid "WPA Personal (PSK)"
@@ -1995,8 +2597,7 @@ msgstr "WPA2 个人版 (PSK)"
 msgid "Ethernet Ports State"
 msgstr "有线端口状态"
 
-#: ../www/status-overview.asp:226 ../www/status-overview.asp:355
-#: ../www/status-overview.asp:361
+#: ../www/status-overview.asp:226 ../www/status-overview.asp:353
 msgid "Attention"
 msgstr "注意"
 
@@ -2012,226 +2613,213 @@ msgstr "已经发布了"
 msgid "Click here to read more"
 msgstr "点击这里获取更多信息"
 
-#: ../www/status-overview.asp:356
-msgid "You did not configure <b>TomatoAnon project</b> setting."
-msgstr "您还没有对<b>TomatoAnon 项目</b> 进行设置。"
-
-#: ../www/status-overview.asp:357 ../www/status-overview.asp:363
-msgid "Please go to"
-msgstr "请进入"
-
-#: ../www/status-overview.asp:357
-msgid "TomatoAnon configuration page"
-msgstr "TomatoAnon 配置页面"
-
-#: ../www/status-overview.asp:357 ../www/status-overview.asp:363
-msgid "and make a choice."
-msgstr "进行配置。"
-
-#: ../www/status-overview.asp:362
+#: ../www/status-overview.asp:354
 msgid "You did not configure language setting."
 msgstr "您还没有配置默认语言"
 
-#: ../www/status-overview.asp:363 ../www/tomato.js:2467
+#: ../www/status-overview.asp:355
+msgid "Please go to"
+msgstr "请进入"
+
+#: ../www/status-overview.asp:355 ../www/tomato.js:2470
 msgid "Administration"
 msgstr "管理设定"
 
-#: ../www/status-overview.asp:367 ../www/tomato.js:2372
+#: ../www/status-overview.asp:355
+msgid "and make a choice."
+msgstr "进行配置。"
+
+#: ../www/status-overview.asp:359 ../www/tomato.js:2372
 msgid "System"
 msgstr "系统"
 
-#: ../www/status-overview.asp:367 ../www/status-overview.asp:391
-#: ../www/status-overview.asp:421
-msgid "hide"
-msgstr "隐藏"
-
-#: ../www/status-overview.asp:372
-msgid "Name"
-msgstr "固件名称"
-
-#: ../www/status-overview.asp:373
+#: ../www/status-overview.asp:365
 msgid "Model"
 msgstr "型号"
 
-#: ../www/status-overview.asp:374
+#: ../www/status-overview.asp:366
 msgid "Chipset"
 msgstr "芯片"
 
-#: ../www/status-overview.asp:375
+#: ../www/status-overview.asp:367
 msgid "CPU Freq"
 msgstr "CPU频率"
 
-#: ../www/status-overview.asp:376
+#: ../www/status-overview.asp:368
 msgid "Flash Size"
 msgstr "闪存尺寸"
 
-#: ../www/status-overview.asp:378 ../www/tomato.js:2382
+#: ../www/status-overview.asp:370 ../www/tomato.js:2382
 msgid "Time"
 msgstr "时间"
 
-#: ../www/status-overview.asp:379
+#: ../www/status-overview.asp:371
 msgid "Uptime"
 msgstr "运行时长"
 
-#: ../www/status-overview.asp:380
+#: ../www/status-overview.asp:372
 msgid "CPU Load"
 msgstr "CPU负载"
 
-#: ../www/status-overview.asp:381
+#: ../www/status-overview.asp:373
 msgid "Total / Free Memory"
 msgstr "总/空闲内存"
 
-#: ../www/status-overview.asp:382
+#: ../www/status-overview.asp:374
 msgid "Total / Free Swap"
 msgstr "总/空闲交换空间"
 
-#: ../www/status-overview.asp:383
+#: ../www/status-overview.asp:375
 msgid "Total / Free NVRAM"
 msgstr "总/空闲闪存"
 
-#: ../www/status-overview.asp:391
+#: ../www/status-overview.asp:383
 msgid "WAN"
 msgstr "WAN"
 
-#: ../www/status-overview.asp:396
+#: ../www/status-overview.asp:388
 msgid "Connection Type"
 msgstr "连接类型"
 
-#: ../www/status-overview.asp:396
+#: ../www/status-overview.asp:388
 msgid "Static IP"
 msgstr "静态IP"
 
-#: ../www/status-overview.asp:398
+#: ../www/status-overview.asp:390
 msgid "Previous WAN IP"
 msgstr "上次WAN IP"
 
-#: ../www/status-overview.asp:407 ../www/tomato.js:2349
-msgid "Status"
-msgstr "状态"
-
-#: ../www/status-overview.asp:408
+#: ../www/status-overview.asp:400
 msgid "Connection Uptime"
 msgstr "连接时长"
 
-#: ../www/status-overview.asp:409
+#: ../www/status-overview.asp:401
 msgid "Remaining Lease Time"
 msgstr "离下次分配时长"
 
-#: ../www/status-overview.asp:413
+#: ../www/status-overview.asp:405
 msgid "Renew"
 msgstr "更新"
 
-#: ../www/status-overview.asp:414
+#: ../www/status-overview.asp:406
 msgid "Release"
 msgstr "释放"
 
-#: ../www/status-overview.asp:416
+#: ../www/status-overview.asp:408
 msgid "Connect"
 msgstr "连接"
 
-#: ../www/status-overview.asp:417
+#: ../www/status-overview.asp:409
 msgid "Disconnect"
 msgstr "断开"
 
-#: ../www/status-overview.asp:474
+#: ../www/status-overview.asp:466
 msgid "Router MAC Address"
 msgstr "路由器MAC地址"
 
-#: ../www/status-overview.asp:475
+#: ../www/status-overview.asp:467
 msgid "Router IP Addresses"
 msgstr "路由器IP地址"
 
-#: ../www/status-overview.asp:479
+#: ../www/status-overview.asp:471
 msgid "IPv6 Link-local Address"
 msgstr "IPv6本地链路地址"
 
-#: ../www/status-overview.asp:510
+#: ../www/status-overview.asp:502
 msgid "Interface Status"
 msgstr "接口状态"
 
-#: ../www/status-overview.asp:511
+#: ../www/status-overview.asp:503
 msgid "Radio"
 msgstr "无线信号"
 
-#: ../www/status-overview.asp:520
+#: ../www/status-overview.asp:512
 msgid "Interference Level"
 msgstr "干扰水平"
 
-#: ../www/status-overview.asp:521
+#: ../www/status-overview.asp:513
 msgid "Rate"
 msgstr "速率"
 
-#: ../www/status-overview.asp:522
-msgid "RSSI"
-msgstr "RSSI"
-
-#: ../www/status-overview.asp:523
+#: ../www/status-overview.asp:515
 msgid "Noise"
 msgstr "噪声"
 
-#: ../www/status-overview.asp:524
+#: ../www/status-overview.asp:516
 msgid "Signal Quality"
 msgstr "信号质量"
 
-#: ../www/status-overview.asp:528
+#: ../www/status-overview.asp:520
 msgid "Disable"
 msgstr "禁用"
 
-#: ../www/tomato.js:2351
-msgid "Device List"
-msgstr "设备列表"
-
-#: ../www/tomato.js:2352
+#: ../www/status-webmon.asp:12 ../www/tomato.js:2352
 msgid "Web Usage"
 msgstr "WEB使用状况"
 
-#: ../www/tomato.js:2353
-msgid "Logs"
-msgstr "日志"
+#: ../www/status-webmon.asp:70 ../www/tools-ping.asp:214
+msgid "Please wait"
+msgstr "请稍候"
 
-#: ../www/tomato.js:2354
-msgid "Bandwidth"
-msgstr "带宽统计"
+#: ../www/status-webmon.asp:371
+msgid "Recently Visited Web Sites"
+msgstr "最近访问网站"
 
-#: ../www/tomato.js:2355 ../www/tomato.js:2362
-msgid "Real-Time"
-msgstr "实时"
+#: ../www/status-webmon.asp:382
+msgid "Recent Web Searches"
+msgstr "最近搜索"
 
-#: ../www/tomato.js:2356 ../www/tomato.js:2363
-msgid "Last 24 Hours"
-msgstr "近24小时"
+#: ../www/status-webmon.asp:394
+msgid "Show up to"
+msgstr "显示最多"
 
-#: ../www/tomato.js:2357 ../www/tomato.js:2366
-msgid "Daily"
-msgstr "按日"
+#: ../www/status-webmon.asp:403
+msgid "All"
+msgstr "所有"
 
-#: ../www/tomato.js:2358
-msgid "Weekly"
-msgstr "按周"
+#: ../www/status-webmon.asp:404
+msgid "available entries"
+msgstr "可用"
 
-#: ../www/tomato.js:2359 ../www/tomato.js:2367
-msgid "Monthly"
-msgstr "按月"
+#: ../www/status-webmon.asp:406
+msgid "Web Monitor Configuration"
+msgstr "网络访问监控配置"
 
-#: ../www/tomato.js:2361
-msgid "IP Traffic"
-msgstr "IP流量"
+#: ../www/status-webmon.asp:413
+msgid "Web Monitoring disabled"
+msgstr "网络访问监控已禁用"
 
-#: ../www/tomato.js:2364 ../www/tomato.js:2412
-msgid "View Graphs"
-msgstr "查看图表"
+#: ../www/tools-ping.asp:14 ../www/tomato.js:2369
+msgid "Tools"
+msgstr "工具"
+
+#: ../www/tools-ping.asp:14 ../www/tools-ping.asp:202 ../www/tomato.js:2370
+msgid "Ping"
+msgstr "Ping"
+
+#: ../www/tools-ping.asp:49
+msgid "Seq"
+msgstr "序号"
+
+#: ../www/tools-ping.asp:49
+msgid "RX Bytes"
+msgstr "接收字节数"
+
+#: ../www/tools-ping.asp:126
+msgid "Invalid hostname/address"
+msgstr "无效的主机名/IP地址"
+
+#: ../www/tools-ping.asp:208
+msgid "Ping Count"
+msgstr "Ping计数"
+
+#: ../www/tools-ping.asp:209
+msgid "Packet Size"
+msgstr "包大小"
 
 #: ../www/tomato.js:2365 ../www/tomato.js:2414
 msgid "Transfer Rates"
 msgstr "传输速率"
-
-#: ../www/tomato.js:2369
-msgid "Tools"
-msgstr "工具"
-
-#: ../www/tomato.js:2370
-msgid "Ping"
-msgstr "Ping"
 
 #: ../www/tomato.js:2371
 msgid "Trace"
@@ -2353,106 +2941,116 @@ msgstr "BT客户端"
 msgid "Aria2 Client"
 msgstr "Aria2客户端"
 
-#: ../www/tomato.js:2454
+#: ../www/tomato.js:2452
+msgid "Airplay"
+msgstr "Airplay"
+
+#: ../www/tomato.js:2457
 msgid "VPN Tunneling"
 msgstr "虚拟专用网"
 
-#: ../www/tomato.js:2456
+#: ../www/tomato.js:2459
 msgid "OpenVPN Server"
 msgstr "OpenVPN服务器"
 
-#: ../www/tomato.js:2457
+#: ../www/tomato.js:2460
 msgid "OpenVPN Client"
 msgstr "OpenVPN客户端"
 
-#: ../www/tomato.js:2460
+#: ../www/tomato.js:2463
 msgid "PPTP Server"
 msgstr "PPTP服务器"
 
-#: ../www/tomato.js:2461
+#: ../www/tomato.js:2464
 msgid "PPTP Online"
 msgstr "PPTP在线列表"
 
-#: ../www/tomato.js:2462
+#: ../www/tomato.js:2465
 msgid "PPTP Client"
 msgstr "PPTP客户端"
 
-#: ../www/tomato.js:2468
+#: ../www/tomato.js:2471
 msgid "Admin Access"
 msgstr "访问控制"
 
-#: ../www/tomato.js:2469
+#: ../www/tomato.js:2472
 msgid "TomatoAnon"
 msgstr "TomatoAnon"
 
-#: ../www/tomato.js:2470
+#: ../www/tomato.js:2473
 msgid "Bandwidth Monitoring"
 msgstr "带宽监控"
 
-#: ../www/tomato.js:2471
+#: ../www/tomato.js:2474
 msgid "IP Traffic Monitoring"
 msgstr "IP流量监控"
 
-#: ../www/tomato.js:2472
+#: ../www/tomato.js:2475
 msgid "Buttons/LED"
 msgstr "按钮/LED"
 
-#: ../www/tomato.js:2474
+#: ../www/tomato.js:2477
 msgid "CIFS Client"
 msgstr "CIFS客户端"
 
-#: ../www/tomato.js:2477
+#: ../www/tomato.js:2480
 msgid "SDHC/MMC"
 msgstr "闪存卡"
 
-#: ../www/tomato.js:2479
+#: ../www/tomato.js:2482
 msgid "Configuration"
 msgstr "配置"
 
-#: ../www/tomato.js:2480
+#: ../www/tomato.js:2483
 msgid "Debugging"
 msgstr "调试"
 
-#: ../www/tomato.js:2482
+#: ../www/tomato.js:2485
 msgid "JFFS"
 msgstr "JFFS"
 
-#: ../www/tomato.js:2485
+#: ../www/tomato.js:2488
 msgid "NFS Server"
 msgstr "NFS服务器"
 
-#: ../www/tomato.js:2488
+#: ../www/tomato.js:2491
 msgid "SNMP"
 msgstr "SNMP"
 
-#: ../www/tomato.js:2490
+#: ../www/tomato.js:2493
 msgid "Logging"
 msgstr "日志"
 
-#: ../www/tomato.js:2491
+#: ../www/tomato.js:2494
 msgid "Scheduler"
 msgstr "计划调度"
 
-#: ../www/tomato.js:2492
+#: ../www/tomato.js:2495
 msgid "Scripts"
 msgstr "脚本管理"
 
-#: ../www/tomato.js:2493
+#: ../www/tomato.js:2496
 msgid "Upgrade"
 msgstr "升级"
 
-#: ../www/tomato.js:2495
+#: ../www/tomato.js:2498
 msgid "About"
 msgstr "关于"
 
-#: ../www/tomato.js:2496
+#: ../www/tomato.js:2499
 msgid "Reboot"
 msgstr "重启路由器"
 
-#: ../www/tomato.js:2497
+#: ../www/tomato.js:2500
 msgid "Shutdown"
 msgstr "关闭路由器"
 
-#: ../www/tomato.js:2498
+#: ../www/tomato.js:2501
 msgid "Logout"
 msgstr "退出"
+
+#~ msgid "You did not configure <b>TomatoAnon project</b> setting."
+#~ msgstr "您还没有对<b>TomatoAnon 项目</b> 进行设置。"
+
+#~ msgid "TomatoAnon configuration page"
+#~ msgstr "TomatoAnon 配置页面"

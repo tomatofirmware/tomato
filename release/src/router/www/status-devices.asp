@@ -15,7 +15,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Status: Device List</title>
+<title>[<% ident(); %>] <% _("Status"); %>: <% _("Device List"); %></title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
@@ -317,7 +317,7 @@ dg.populate = function()
 dg.setup = function()
 {
 	this.init('dev-grid', 'sort');
-	this.headerSet(['Interface', 'MAC Address', 'IP Address', 'Name', 'RSSI &nbsp; &nbsp; ', 'Quality', 'TX/RX Rate&nbsp;', 'Lease &nbsp; &nbsp; ']);
+	this.headerSet(['<% _("Interface"); %>', '<% _("MAC Address"); %>', '<% _("IP Address"); %>', '<% _("Name"); %>', '<% _("RSSI"); %> &nbsp; &nbsp; ', '<% _("Quality"); %>', '<% _("TX/RX Rate"); %>&nbsp;', '<% _("Lease"); %> &nbsp; &nbsp; ']);
 	this.populate();
 	this.sort(2);
 }
@@ -337,8 +337,8 @@ function init()
 <body onload='init()'>
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
-	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='title'><% _("Tomato"); %></div>
+	<div class='version'><% _("Version"); %> <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -346,7 +346,7 @@ function init()
 
 <!-- / / / -->
 
-<div class='section-title'>Device List</div>
+<div class='section-title'><% _("Device List"); %></div>
 <div class='section'>
 	<table id='dev-grid' class='tomato-grid' cellspacing=0></table>
 

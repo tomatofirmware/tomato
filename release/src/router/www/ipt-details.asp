@@ -15,7 +15,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] IP Traffic: Details</title>
+<title>[<% ident(); %>] <% _("IP Traffic"); %>: <% _("Details"); %></title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
@@ -203,10 +203,10 @@ grid.populate = function() {
 
 		if (E('_f_shortcuts').checked) {
 			h = h + '<br><small>';
-			h = h + '<a href="javascript:viewQosDetail(' + i + ')" title="View QoS Details">[qosdetails]</a>';
-			h = h + '<a href="javascript:viewQosCTrates(' + i + ')" title="View transfer rates per connection">[qosrates]</a>';
-			h = h + '<a href="javascript:viewIptHistory(' + i + ')" title="View IP Traffic History">[history]</a>';
-			h = h + '<a href="javascript:addExcludeList(' + i + ')" title="Filter out this address">[hide]</a>';
+			h = h + '<a href="javascript:viewQosDetail(' + i + ')" title="<% _("View QoS Details"); %>">[qosdetails]</a>';
+			h = h + '<a href="javascript:viewQosCTrates(' + i + ')" title="<% _("View transfer rates per connection"); %>">[qosrates]</a>';
+			h = h + '<a href="javascript:viewIptHistory(' + i + ')" title="<% _("View IP Traffic History"); %>">[<% _("history"); %>]</a>';
+			h = h + '<a href="javascript:addExcludeList(' + i + ')" title="<% _("Filter out this address"); %>">[<% _("hide"); %>]</a>';
 			h = h + '</small>';
 		}
 
@@ -227,7 +227,7 @@ grid.populate = function() {
 
 	grid.resort();
 	grid.recolor();
-	grid.footerSet([ 'Total ' + ('<small><i>(' + ((hostslisted.length > 0) ? (hostslisted.length + ' hosts') : 'no data') + ')</i></small>'),
+	grid.footerSet([ '<% _("Total "); %>' + ('<small><i>(' + ((hostslisted.length > 0) ? (hostslisted.length + ' <% _("hosts"); %>') : '<% _("no data"); %>') + ')</i></small>'),
 		rescale((rx/1024).toFixed(2)).toString(),
 		rescale((tx/1024).toFixed(2)).toString(),
 		tcpi.toFixed(0).toString() + '/' + tcpo.toFixed(0).toString(),
@@ -312,7 +312,7 @@ grid.dataToView = function(data) {
 
 grid.setup = function() {
 	this.init('grid', 'sort');
-	this.headerSet(['Host', 'Download (bytes/s)', 'Upload (bytes/s)', 'TCP IN/OUT (pkt/s)', 'UDP IN/OUT (pkt/s)', 'ICMP IN/OUT (pkt/s)', 'TCP Connections', 'UDP Connections']);
+	this.headerSet(['<% _("Host"); %>', '<% _("Download"); %> (bytes/s)', '<% _("Upload"); %> (bytes/s)', 'TCP <% _("IN/OUT"); %> (pkt/s)', 'UDP <% _("IN/OUT"); %> (pkt/s)', 'ICMP <% _("IN/OUT"); %> (pkt/s)', '<% _("TCP Connections"); %>', '<% _("UDP Connections"); %>']);
 }
 
 function init() {
@@ -445,8 +445,8 @@ function toggleVisibility(whichone) {
 <form id='_fom' action='javascript:{}'>
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
-	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='title'><% _("Tomato"); %></div>
+	<div class='version'><% _("Version"); %> <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -455,30 +455,30 @@ function toggleVisibility(whichone) {
 <div id='cstats'>
 <!-- / / / -->
 
-<div class='section-title'>IP Traffic Details</div>
+<div class='section-title'><% _("IP Traffic Details"); %></div>
 <div class='section'>
 <table id='grid' class='tomato-grid' style="float:left" cellspacing=1></table>
 
-<div id='loading'><br><b>Loading...</b></div>
+<div id='loading'><br><b><% _("Loading"); %>...</b></div>
 </div>
 
 <!-- / / / -->
 
-<div class='section-title'>Options <small><i><a href='javascript:toggleVisibility("options");'><span id='sesdivoptionsshowhide'>(Click here to show)</span></a></i></small></div>
+<div class='section-title'><% _("Options"); %> <small><i><a href='javascript:toggleVisibility("options");'><span id='sesdivoptionsshowhide'>(<% _("Click here to show"); %>)</span></a></i></small></div>
 <div class='section' id='sesdivoptions' style='display:none'>
 <script type='text/javascript'>
 var c;
 c = [];
-c.push({ title: 'Only these IPs', name: 'f_filter_ip', size: 50, maxlen: 255, type: 'text', suffix: ' <small>(Comma separated list)</small>' });
-c.push({ title: 'Exclude these IPs', name: 'f_filter_ipe', size: 50, maxlen: 255, type: 'text', suffix: ' <small>(Comma separated list)</small>' });
-c.push({ title: 'Scale', name: 'f_scale', type: 'select', options: [['0', 'KB'], ['1', 'MB'], ['2', 'GB']] });
-c.push({ title: 'Ignore inactive hosts', name: 'f_onlyactive', type: 'checkbox' });
-c.push({ title: 'Show hostnames', name: 'f_hostnames', type: 'checkbox' });
-c.push({ title: 'Show shortcuts', name: 'f_shortcuts', type: 'checkbox' });
+c.push({ title: '<% _("Only these IPs"); %>', name: 'f_filter_ip', size: 50, maxlen: 255, type: 'text', suffix: ' <small>(<% _("Comma separated list"); %>)</small>' });
+c.push({ title: '<% _("Exclude these IPs"); %>', name: 'f_filter_ipe', size: 50, maxlen: 255, type: 'text', suffix: ' <small>(<% _("Comma separated list"); %>)</small>' });
+c.push({ title: '<% _("Scale"); %>', name: 'f_scale', type: 'select', options: [['0', 'KB'], ['1', 'MB'], ['2', 'GB']] });
+c.push({ title: '<% _("Ignore inactive hosts"); %>', name: 'f_onlyactive', type: 'checkbox' });
+c.push({ title: '<% _("Show hostnames"); %>', name: 'f_hostnames', type: 'checkbox' });
+c.push({ title: '<% _("Show shortcuts"); %>', name: 'f_shortcuts', type: 'checkbox' });
 createFieldTable('',c);
 </script>
 <div style="float:right;text-align:right">
-&raquo; <a href="admin-iptraffic.asp">Configure</a>
+&raquo; <a href="admin-iptraffic.asp"><% _("Configure"); %></a>
 </div>
 </div>
 

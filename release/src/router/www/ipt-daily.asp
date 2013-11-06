@@ -15,7 +15,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] IP Traffic: Daily History</title>
+<title>[<% ident(); %>] <% _("IP Traffic"); %>: <% _("Daily History"); %></title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
@@ -438,8 +438,8 @@ function verifyFields(focused, quiet) {
 <form>
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
-	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='title'><% _("Tomato"); %></div>
+	<div class='version'><% _("Version"); %> <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -448,31 +448,31 @@ function verifyFields(focused, quiet) {
 <!-- / / / -->
 
 <div id='cstats'>
-<div class='section-title'>IP Traffic Daily History</div>
+<div class='section-title'><% _("IP Traffic Daily History"); %></div>
 <div class='section'>
 <table id='daily-grid' class='tomato-grid' cellspacing=0 style='height:auto'></table>
 </div>
 
-<div class='section-title'>Options <small><i><a href='javascript:toggleVisibility("options");'><span id='sesdivoptionsshowhide'>(Click here to show)</span></a></i></small></div>
+<div class='section-title'><% _("Options"); %> <small><i><a href='javascript:toggleVisibility("options");'><span id='sesdivoptionsshowhide'>(Click here to show)</span></a></i></small></div>
 <div class='section' id='sesdivoptions' style='display:none'>
 <script type='text/javascript'>
 var c;
 c = [];
-c.push({ title: 'List only these IPs', name: 'f_filter_ip', size: 50, maxlen: 255, type: 'text', suffix: ' <small>(Comma separated list)</small>' });
-c.push({ title: 'Exclude these IPs', name: 'f_filter_ipe', size: 50, maxlen: 255, type: 'text', suffix: ' <small>(Comma separated list)</small>' });
-c.push({ title: 'Date Range', multi: [ { name: 'f_begin_date', type: 'select', options: [['0', 'Any']], suffix: ' - ' }, { name: 'f_end_date', type: 'select', options: [['0', 'Any']] } ] } );
-c.push({ title: 'Date Format', name: 'f_dafm', type: 'select', options: [['0', 'yyyy-mm-dd'], ['1', 'mm-dd-yyyy'], ['2', 'mmm dd, yyyy'], ['3', 'dd.mm.yyyy']] });
-c.push({ title: 'Scale', name: 'f_scale', type: 'select', options: [['0', 'KB'], ['1', 'MB'], ['2', 'GB']] });
-c.push({ title: 'Show subnet totals', name: 'f_subnet', type: 'checkbox', suffix: ' <small>(Not considered when calculating total traffic on the last line)</small>' });
-c.push({ title: 'Hide IPs without traffic', name: 'f_ignorezeroes', type: 'checkbox' });
-c.push({ title: 'Show known hostnames', name: 'f_hostnames', type: 'checkbox' });
-c.push({ title: 'Show shortcuts', name: 'f_shortcuts', type: 'checkbox' });
+c.push({ title: '<% _("List only these IPs"); %>', name: 'f_filter_ip', size: 50, maxlen: 255, type: 'text', suffix: ' <small>(<% _("Comma separated list"); %>)</small>' });
+c.push({ title: '<% _("Exclude these IPs"); %>', name: 'f_filter_ipe', size: 50, maxlen: 255, type: 'text', suffix: ' <small>(<% _("Comma separated list"); %>)</small>' });
+c.push({ title: '<% _("Date Range"); %>', multi: [ { name: 'f_begin_date', type: 'select', options: [['0', 'Any']], suffix: ' - ' }, { name: 'f_end_date', type: 'select', options: [['0', '<% _("Any"); %>']] } ] } );
+c.push({ title: '<% _("Date Format"); %>', name: 'f_dafm', type: 'select', options: [['0', 'yyyy-mm-dd'], ['1', 'mm-dd-yyyy'], ['2', 'mmm dd, yyyy'], ['3', 'dd.mm.yyyy']] });
+c.push({ title: '<% _("Scale"); %>', name: 'f_scale', type: 'select', options: [['0', 'KB'], ['1', 'MB'], ['2', 'GB']] });
+c.push({ title: '<% _("Show subnet totals"); %>', name: 'f_subnet', type: 'checkbox', suffix: ' <small>(<% _("Not considered when calculating total traffic on the last line"); %>)</small>' });
+c.push({ title: '<% _("Hide IPs without traffic"); %>', name: 'f_ignorezeroes', type: 'checkbox' });
+c.push({ title: '<% _("Show known hostnames"); %>', name: 'f_hostnames', type: 'checkbox' });
+c.push({ title: '<% _("Show shortcuts"); %>', name: 'f_shortcuts', type: 'checkbox' });
 createFieldTable('',c);
 </script>
 <div style="float:right;text-align:right">
-&raquo; <a href="javascript:genData()">Data</a>
+&raquo; <a href="javascript:genData()"><% _("Data"); %></a>
 <br>
-&raquo; <a href="admin-iptraffic.asp">Configure</a>
+&raquo; <a href="admin-iptraffic.asp"><% _("Configure"); %></a>
 </div>
 </div>
 </div>
