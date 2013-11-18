@@ -49,3 +49,4 @@ TCONFIG_I18N=y
 # TCONFIG_BCM_CTF is not set
 # TCONFIG_PPPOE_RELAY is not set
 # TCONFIG_PPPOE_SERVER is not set
+# TCONFIG_UFSD is not set

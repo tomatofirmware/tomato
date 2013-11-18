@@ -206,3 +206,7 @@ config TCONFIG_PPPOE_RELAY
 config TCONFIG_PPPOE_SERVER
 	bool "enable PPPOE Server"
 	default n
+
+config TCONFIG_UFSD
+	bool "Paragon NTFS driver for Asus routers"
+	default n
