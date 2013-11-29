@@ -423,7 +423,7 @@ static struct {
   { LOPT_AUTHSFS, ARG_DUP, "<NS>[,<NS>...]", gettext_noop("Secondary authoritative nameservers for forward domains"), NULL },
   { LOPT_AUTHPEER, ARG_DUP, "<ipaddr>[,<ipaddr>...]", gettext_noop("Peers which are allowed to do zone transfer"), NULL },
   { LOPT_IPSET, ARG_DUP, "/<domain>/<ipset>[,<ipset>...]", gettext_noop("Specify ipsets to which matching domains should be added"), NULL },
-  { LOPT_SYNTH, ARG_DUP, "<domain>,<range>,[<prefix>]", gettext_noop("Specify a domain and address range for sythesised names"), NULL },
+  { LOPT_SYNTH, ARG_DUP, "<domain>,<range>,[<prefix>]", gettext_noop("Specify a domain and address range for synthesised names"), NULL },
 #ifdef OPTION6_PREFIX_CLASS 
   { LOPT_PREF_CLSS, ARG_DUP, "set:tag,<class>", gettext_noop("Specify DHCPv6 prefix class"), NULL },
 #endif
@@ -1615,8 +1615,22 @@ static int one_opt(int option, char *arg, char *errstr, char *gen_err, int comma
 	  new->addr.sa.sa_family = AF_INET6;
 #endif
 	else
-	  new->name = opt_string_alloc(arg);
-	
+	  {
+	    char *fam = split_chr(arg, '/');
+	    new->name = opt_string_alloc(arg);
+	    new->addr.sa.sa_family = 0;
+	    if (fam)
+	      {
+		if (strcmp(fam, "4") == 0)
+		  new->addr.sa.sa_family = AF_INET;
+#ifdef HAVE_IPV6
+		else if (strcmp(fam, "6") == 0)
+		  new->addr.sa.sa_family = AF_INET6;
+#endif
+		else
+		  ret_err(gen_err);
+	      } 
+	  }
 	new->next = daemon->authinterface;
 	daemon->authinterface = new;
 	
@@ -1649,6 +1663,7 @@ static int one_opt(int option, char *arg, char *errstr, char *gen_err, int comma
 	new = opt_malloc(sizeof(struct auth_zone));
 	new->domain = opt_string_alloc(arg);
 	new->subnet = NULL;
+	new->interface_names = NULL;
 	new->next = daemon->auth_zones;
 	daemon->auth_zones = new;
 
@@ -1656,10 +1671,8 @@ static int one_opt(int option, char *arg, char *errstr, char *gen_err, int comma
 	  {
 	    int prefixlen = 0;
 	    char *prefix;
-	    struct subnet *subnet =  opt_malloc(sizeof(struct subnet));
-	    
-	    subnet->next = new->subnet;
-	    new->subnet = subnet;
+	    struct addrlist *subnet =  NULL;
+	    struct all_addr addr;
 
 	    comma = split(arg);
 	    prefix = split_chr(arg, '/');
@@ -1667,24 +1680,50 @@ static int one_opt(int option, char *arg, char *errstr, char *gen_err, int comma
 	    if (prefix && !atoi_check(prefix, &prefixlen))
 	      ret_err(gen_err);
 	    
-	    if (inet_pton(AF_INET, arg, &subnet->addr4))
+	    if (inet_pton(AF_INET, arg, &addr.addr.addr4))
 	      {
+		subnet = opt_malloc(sizeof(struct addrlist));
 		subnet->prefixlen = (prefixlen == 0) ? 24 : prefixlen;
-		subnet->is6 = 0;
+		subnet->flags = ADDRLIST_LITERAL;
 	      }
 #ifdef HAVE_IPV6
-	    else if (inet_pton(AF_INET6, arg, &subnet->addr6))
+	    else if (inet_pton(AF_INET6, arg, &addr.addr.addr6))
 	      {
+		subnet = opt_malloc(sizeof(struct addrlist));
 		subnet->prefixlen = (prefixlen == 0) ? 64 : prefixlen;
-		subnet->is6 = 1;
+		subnet->flags = ADDRLIST_LITERAL | ADDRLIST_IPV6;
 	      }
 #endif
-	    else
-	        ret_err(gen_err);
+	    else 
+	      {
+		struct auth_name_list *name =  opt_malloc(sizeof(struct auth_name_list));
+		name->name = opt_string_alloc(arg);
+		name->flags = AUTH4 | AUTH6;
+		name->next = new->interface_names;
+		new->interface_names = name;
+		if (prefix)
+		  {
+		    if (prefixlen == 4)
+		      name->flags &= ~AUTH6;
+#ifdef HAVE_IPV6
+		    else if (prefixlen == 6)
+		      name->flags &= ~AUTH4;
+#endif
+		    else
+		      ret_err(gen_err);
+		  }
+	      }
+	    
+	    if (subnet)
+	      {
+		subnet->addr = addr;
+		subnet->next = new->subnet;
+		new->subnet = subnet;
+	      }
 	  }
 	break;
       }
-
+      
     case  LOPT_AUTHSOA: /* --auth-soa */
       comma = split(arg);
       daemon->soa_sn = (u32)atoi(arg);
@@ -1860,9 +1899,12 @@ static int one_opt(int option, char *arg, char *errstr, char *gen_err, int comma
 		      else
 			ret_err(gen_err);
 		    }
-		  else  
+		  else
 		    {
+		      char *prefstr;
 		      arg = split(comma);
+		      prefstr = split(arg);
+
 		      if (inet_pton(AF_INET, comma, &new->start))
 			{
 			  new->is6 = 0;
@@ -1883,6 +1925,13 @@ static int one_opt(int option, char *arg, char *errstr, char *gen_err, int comma
 #endif
 		      else 
 			ret_err(gen_err);
+
+		      if (option != 's' && prefstr)
+			{
+			  if (!(new->prefix = canonicalise_opt(prefstr)) ||
+			      strlen(new->prefix) > MAXLABEL - INET_ADDRSTRLEN)
+			    ret_err(_("bad prefix"));
+			}
 		    }
 
 		  new->domain = d;
@@ -2453,11 +2502,6 @@ static int one_opt(int option, char *arg, char *errstr, char *gen_err, int comma
 		  {
 		    new->template_interface = opt_string_alloc(a[leasepos] + 12);
 		    new->flags |= CONTEXT_TEMPLATE;
-		  }
-		else if (strstr(a[leasepos], "constructor-noauth:") == a[leasepos])
-		  {
-		    new->template_interface = opt_string_alloc(a[leasepos] + 19);
-		    new->flags |= CONTEXT_TEMPLATE | CONTEXT_NOAUTH;
 		  }
 		else  
 		  break;
@@ -3325,15 +3369,26 @@ static int one_opt(int option, char *arg, char *errstr, char *gen_err, int comma
 	
 	new = opt_malloc(sizeof(struct interface_name));
 	new->next = NULL;
-	new->addr4 = NULL;
-#ifdef HAVE_IPV6
-	new->addr6 = NULL;
-#endif
+	new->addr = NULL;
+	
 	/* Add to the end of the list, so that first name
 	   of an interface is used for PTR lookups. */
 	for (up = &daemon->int_names; *up; up = &((*up)->next));
 	*up = new;
 	new->name = domain;
+	new->family = 0;
+	arg = split_chr(comma, '/');
+	if (arg)
+	  {
+	    if (strcmp(arg, "4") == 0)
+	      new->family = AF_INET;
+#ifdef HAVE_IPV6
+	    else if (strcmp(arg, "6") == 0)
+	      new->family = AF_INET6;
+#endif
+	    else
+	      ret_err(gen_err);
+	  } 
 	new->intr = opt_string_alloc(comma);
 	break;
       }
@@ -3427,7 +3482,7 @@ static int one_opt(int option, char *arg, char *errstr, char *gen_err, int comma
     case LOPT_RR: /* dns-rr */
       {
        	struct txt_record *new;
-	size_t len;
+	size_t len = len;
 	char *data;
 	int val;
 

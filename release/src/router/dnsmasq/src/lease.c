@@ -438,15 +438,21 @@ void lease_find_interfaces(time_t now)
   iface_enumerate(AF_INET, &now, find_interface_v4);
 #ifdef HAVE_DHCP6
   iface_enumerate(AF_INET6, &now, find_interface_v6);
+#endif
+}
 
+#ifdef HAVE_DHCP6
+void lease_make_duid(time_t now)
+{
   /* If we're not doing DHCPv6, and there are not v6 leases, don't add the DUID to the database */
-  if (!daemon->duid && daemon->dhcp6)
+  if (!daemon->duid && daemon->doing_dhcp6)
     {
       file_dirty = 1;
       make_duid(now);
     }
-#endif
 }
+#endif
+
 
 
 
@@ -1160,9 +1166,11 @@ void tomato_helper(time_t now)
 	if ((f = fopen("/var/tmp/dhcp/leases.!", "w")) != NULL) {
 		for (lease = leases; lease; lease = lease->next) {
 			if (lease->hwaddr_type == ARPHRD_ETHER) {
+#ifdef HAVE_DHCP6 //only dump dhcpv6 if we have it
                            if (lease->flags & (LEASE_TA | LEASE_NA))
                                 inet_ntop(AF_INET6, &lease->addr6, buf, ADDRSTRLEN);
                            else
+#endif // Thanks to Shibby :-)
                                 inet_ntop(AF_INET, &lease->addr, buf, ADDRSTRLEN);
 
 				fprintf(f, "%lu %02X:%02X:%02X:%02X:%02X:%02X %s %s\n",

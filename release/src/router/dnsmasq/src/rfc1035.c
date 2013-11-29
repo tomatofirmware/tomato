@@ -637,7 +637,7 @@ struct subnet_opt {
 #endif
 };
 
-size_t calc_subnet_opt(struct subnet_opt *opt, union mysockaddr *source)
+static size_t calc_subnet_opt(struct subnet_opt *opt, union mysockaddr *source)
 {
   /* http://tools.ietf.org/html/draft-vandergaast-edns-client-subnet-02 */
   
@@ -1221,7 +1221,7 @@ int check_for_local_domain(char *name, time_t now)
   struct naptr *naptr;
 
   if ((crecp = cache_find_by_name(NULL, name, now, F_IPV4 | F_IPV6 | F_CNAME)) &&
-      (crecp->flags & (F_HOSTS | F_DHCP)))
+      (crecp->flags & (F_HOSTS | F_DHCP | F_CONFIG)))
     return 1;
   
   for (naptr = daemon->naptr; naptr; naptr = naptr->next)
@@ -1550,8 +1550,8 @@ size_t answer_request(struct dns_header *header, char *limit, size_t qlen,
 		  {
 		    struct addrlist *addrlist;
 		    
-		    for (addrlist = intr->addr4; addrlist; addrlist = addrlist->next)
-		      if (addr.addr.addr4.s_addr == addrlist->addr.addr.addr4.s_addr)
+		    for (addrlist = intr->addr; addrlist; addrlist = addrlist->next)
+		      if (!(addrlist->flags & ADDRLIST_IPV6) && addr.addr.addr4.s_addr == addrlist->addr.addr.addr4.s_addr)
 			break;
 		    
 		    if (addrlist)
@@ -1566,8 +1566,8 @@ size_t answer_request(struct dns_header *header, char *limit, size_t qlen,
 		  {
 		    struct addrlist *addrlist;
 		    
-		    for (addrlist = intr->addr6; addrlist; addrlist = addrlist->next)
-		      if (IN6_ARE_ADDR_EQUAL(&addr.addr.addr6, &addrlist->addr.addr.addr6))
+		    for (addrlist = intr->addr; addrlist; addrlist = addrlist->next)
+		      if ((addrlist->flags & ADDRLIST_IPV6) && IN6_ARE_ADDR_EQUAL(&addr.addr.addr6, &addrlist->addr.addr.addr6))
 			break;
 		    
 		    if (addrlist)
@@ -1725,29 +1725,35 @@ size_t answer_request(struct dns_header *header, char *limit, size_t qlen,
 	      if (intr)
 		{
 		  struct addrlist *addrlist;
+		  int gotit = 0;
 
 		  enumerate_interfaces(0);
 		  
-		  addrlist = intr->addr4;
-#ifdef HAVE_IPV6
-		  if (type == T_AAAA)
-		    addrlist = intr->addr6;
-#endif		  
-		  ans = 1;
-		  if (!dryrun)
-		    {
-		      if (!addrlist)
-			log_query(F_FORWARD | F_CONFIG | flag | F_NEG, name, NULL, NULL);
-		      else 
-			for (; addrlist; addrlist = addrlist->next)
+		  for (intr = daemon->int_names; intr; intr = intr->next)
+		    if (hostname_isequal(name, intr->name))
+		      {
+			ans = 1;
+			if (!dryrun)
 			  {
-			    log_query(F_FORWARD | F_CONFIG | flag, name, &addrlist->addr, NULL);
-			    if (add_resource_record(header, limit, &trunc, nameoffset, &ansp, 
-						    daemon->local_ttl, NULL, type, C_IN, 
-						    type == T_A ? "4" : "6", &addrlist->addr))
-			      anscount++;
+			    
+			    for (addrlist = intr->addr; addrlist; addrlist = addrlist->next)
+#ifdef HAVE_IPV6
+			      if (((addrlist->flags & ADDRLIST_IPV6) ? T_AAAA : T_A) == type)
+#endif
+				{
+				  gotit = 1;
+				  log_query(F_FORWARD | F_CONFIG | flag, name, &addrlist->addr, NULL);
+				  if (add_resource_record(header, limit, &trunc, nameoffset, &ansp, 
+							  daemon->local_ttl, NULL, type, C_IN, 
+							  type == T_A ? "4" : "6", &addrlist->addr))
+				    anscount++;
+				}
 			  }
-		    }
+		      }
+		  
+		  if (!dryrun && !gotit)
+		    log_query(F_FORWARD | F_CONFIG | flag | F_NEG, name, NULL, NULL);
+		     
 		  continue;
 		}
 
@@ -1851,7 +1857,7 @@ size_t answer_request(struct dns_header *header, char *limit, size_t qlen,
 	  if (qtype == T_CNAME || qtype == T_ANY)
 	    {
 	      if ((crecp = cache_find_by_name(NULL, name, now, F_CNAME)) &&
-		  (qtype == T_CNAME || (crecp->flags & (F_HOSTS | F_DHCP))))
+		  (qtype == T_CNAME || (crecp->flags & (F_HOSTS | F_DHCP | F_CONFIG))))
 		{
 		  ans = 1;
 		  if (!dryrun)
