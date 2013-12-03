@@ -1294,11 +1294,6 @@ void poll_resolv(int force, int do_reload, time_t now)
 	      {
 		last_change = statbuf.st_mtime;
 		latest = res;
-/* This is now commented out
-#ifdef HAVE_TOMATO
-		break;
-#endif //TOMATO - Really don't understand what this break is trying to acheive/avoid
-*/
 	      }
 	  }
       }
