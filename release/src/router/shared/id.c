@@ -122,7 +122,7 @@ Viewsonic WR100		BCM4712               0x0101       44        0x10      0x0188  
 WLA2-G54L			BCM4712               0x0101       00        0x10      0x0188      buffalo_id=29129
 
 TrueMobile 2300		                      bcm94710ap   44                              "ModelId=WX-5565", Rev A00
-TENDA W1800R            HW_BCM4706      0x05d8          21(EU)/60(CN)   0x1200  0x00000110
+TENDA W1800R            HW_BCM4706      0x05d8          18(EN?)/21(EU)/60(CN)   0x1200  0x00000110
 
 * not supported/not tested
 
@@ -496,6 +496,7 @@ int get_model(void)
 	case 56:
 		if (hw == HW_BCM5350) return MODEL_WTR54GS;
 		break;
+	case 18:
 	case 21:
 	case 60:
 		if (hw == HW_BCM4706) return MODEL_W1800R;
