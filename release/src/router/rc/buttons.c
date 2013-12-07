@@ -9,6 +9,7 @@
 #include <sys/reboot.h>
 #include <wlutils.h>
 #include <wlioctl.h>
+#include <syslog.h>
 
 //	#define DEBUG_TEST
 
@@ -191,6 +192,11 @@ int buttons_main(int argc, char *argv[])
 		ses_mask = 1 << 0;
 		ses_led = LED_AOSS;
 		break;
+	case MODEL_WNDR4000:
+		reset_mask = 1 << 3;
+		ses_mask = 1 << 2;
+		ses_led = LED_AOSS;
+		break;	
 	case MODEL_F7D3301:
 	case MODEL_F7D3302:
 	case MODEL_F7D4301:
@@ -301,7 +307,7 @@ int buttons_main(int argc, char *argv[])
 #ifdef DEBUG_TEST
 			cprintf("reset down\n");
 #endif
-
+			//syslog(LOG_INFO, "reset down\n");
 			led(LED_DIAG, 0);
 
 			count = 0;
@@ -361,7 +367,7 @@ int buttons_main(int argc, char *argv[])
 				cprintf("ses func=%d\n", n);
 #else
 				sprintf(s, "sesx_b%d", n);
-				//	syslog(LOG_DEBUG, "ses-func: count=%d %s='%s'", count, s, nvram_safe_get(s));
+				syslog(LOG_DEBUG, "ses-func: count=%d %s='%s'", count, s, nvram_safe_get(s));
 				if ((p = nvram_get(s)) != NULL) {
 					switch (*p) {
 					case '1':	// toggle wl

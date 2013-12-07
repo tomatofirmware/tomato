@@ -239,7 +239,8 @@ enum {
 	MODEL_WZRG300N,
 	MODEL_WRT300N,
 	MODEL_WL330GE,
-	MODEL_W1800R
+	MODEL_W1800R,
+	MODEL_WNDR4000
 };
 
 /* NOTE: Do not insert new entries in the middle of this enum,
@@ -331,6 +332,7 @@ extern int f_wait_notexists(const char *name, int max);
 #define LED_PROBE			3
 
 extern const char *led_names[];
+extern const char *led_modes[];
 
 extern int gpio_open(uint32_t mask);
 extern void gpio_write(uint32_t bit, int en);

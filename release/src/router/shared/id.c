@@ -16,7 +16,7 @@
 
 /*
 
-		HW_*                  boardtype    boardnum  boardrev  boardflags  others
+HW_*                boardtype             boardnum     boardrev  boardflags others
 					--------------------- ------------ --------- --------- ----------- ---------------
 WRT54G 1.x			BCM4702               bcm94710dev  42
 WRT54G 2.0			BCM4712               0x0101       42        0x10      0x0188
@@ -40,6 +40,7 @@ E3200               BCM47186              0xf52a       42        0x1100         
 WRT320N/E2000       BCM4717               0x04ef       42/66     0x1304/0x1305/0x1307  boardflags: 0x0040F10 / 0x00000602 (??)
 WRT610Nv2/E3000     BCM4718               0x04cf       42/??     ??                    boot_hw_model=WRT610N/E300
 E4200               BCM4718               0xf52c       42        0x1101                boot_hw_model=E4200
+WNDR4000            BCM4718               0xf52c       01        0x1101    0x00001301 
 
 WHR-G54S            BCM5352E              0x467        00        0x13      0x2758      melco_id=30182
 WHR-HP-G54S         BCM5352E              0x467        00        0x13      0x2758      melco_id=30189
@@ -287,6 +288,9 @@ int get_model(void)
 			return MODEL_WRT610Nv2;
 		if (nvram_match("boot_hw_model", "E4200"))
 			return MODEL_E4200;
+		if (nvram_match("boardmfg", "NETGEAR")) {
+			if (nvram_match("boardflags", "0x00001310")) return MODEL_WNDR4000;
+		}
 		switch (strtoul(nvram_safe_get("boardtype"), NULL, 0)) {
 		case 0xd4cf:
 			if (nvram_match("boardrev", "0x1204")) return MODEL_F7D4301;

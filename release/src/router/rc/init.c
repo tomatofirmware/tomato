@@ -474,6 +474,7 @@ static int init_vlan_ports(void)
 	case MODEL_RTN15U:
 	case MODEL_E3200:
 	case MODEL_E4200:
+	case MODEL_WNDR4000:
 		dirty |= check_nv("vlan1ports", "0 1 2 3 8*");
 		dirty |= check_nv("vlan2ports", "4 8");
 		break;
@@ -630,6 +631,17 @@ static void check_bootnv(void)
 			dirty |= check_nv("pci/1/1/macaddr", mac);
 		}
 		break;
+        case MODEL_WNDR4000:
+                dirty |= check_nv("vlan2hwname", "et0");
+                if (strncasecmp(nvram_safe_get("pci/1/1/macaddr"), "84:1B:5E", 8) == 0 ||
+                    strncasecmp(nvram_safe_get("sb/1/macaddr"), "84:1B:5E", 8) == 0) {
+                        strcpy(mac, nvram_safe_get("et0macaddr"));
+                        inc_mac(mac, 2);
+                        dirty |= check_nv("sb/1/macaddr", mac);
+                        inc_mac(mac, 1);
+                        dirty |= check_nv("pci/1/1/macaddr", mac);
+                }
+                break;
 	case MODEL_E900:
 	case MODEL_E1000v2:
 	case MODEL_E1500:
@@ -1577,6 +1589,19 @@ static int init_nvram(void)
 			nvram_set("wl_ifname", "eth1");
 		}
 		break;
+        case MODEL_WNDR4000:
+                mfr = "Netgear";
+                name = "WNDR4000";
+                features = SUP_SES | SUP_80211N | SUP_1000ET;
+#ifdef TCONFIG_USB
+                nvram_set("usb_uhci", "-1");
+#endif
+                if (!nvram_match("t_fix1", (char *)name)) {
+                        nvram_set("lan_ifnames", "vlan1 eth1 eth2");
+                        nvram_set("wan_ifnameX", "vlan2");
+                        nvram_set("wl_ifname", "eth1");
+                }
+                break;
 #endif	// CONFIG_BCMWL5
 
 	case MODEL_WL330GE:
