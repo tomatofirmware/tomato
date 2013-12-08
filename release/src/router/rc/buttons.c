@@ -367,7 +367,7 @@ int buttons_main(int argc, char *argv[])
 				cprintf("ses func=%d\n", n);
 #else
 				sprintf(s, "sesx_b%d", n);
-				syslog(LOG_DEBUG, "ses-func: count=%d %s='%s'", count, s, nvram_safe_get(s));
+				//syslog(LOG_DEBUG, "ses-func: count=%d %s='%s'", count, s, nvram_safe_get(s));
 				if ((p = nvram_get(s)) != NULL) {
 					switch (*p) {
 					case '1':	// toggle wl

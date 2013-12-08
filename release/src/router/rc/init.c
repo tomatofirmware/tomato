@@ -2105,8 +2105,9 @@ int init_main(int argc, char *argv[])
 
 			syslog(LOG_INFO, "%s: Tomato %s", nvram_safe_get("t_model_name"), tomato_version);
 
-			led(LED_DIAG, 0);
-			led(LED_WHITE, 1);
+			// System is up, set LEDs. Set “WHITE” LED to GREEN (power LED). Note that AMBER / DIAG = amber for power LED (across all HW?).
+			led(LED_DIAG, LED_OFF);
+			led(LED_WHITE, LED_ON);
 			notice_set("sysup", "");
 			break;
 		}

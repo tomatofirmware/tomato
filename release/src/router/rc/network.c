@@ -655,6 +655,11 @@ void start_wl(void)
 
 #ifdef CONFIG_BCMWL5
 					eval("wlconf", ifname, "start"); /* start wl iface */
+					// Enable LED if wireless interface is enabled
+					if (nvram_get_int(wl_nvname("radio", unit, 0))) {
+						if (unit == 0) led(LED_WLAN, LED_ON);
+						else led(LED_5G, LED_ON);						
+					}
 #endif	// CONFIG_BCMWL5
 				}
 				free(lan_ifnames);

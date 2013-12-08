@@ -520,7 +520,7 @@ int get_radio(int unit)
 void set_radio(int on, int unit)
 {
 	uint32 n;
-
+	// syslog(LOG_INFO, "Set Radio State, state = %d, unit = %d\n", on, unit);
 #ifndef WL_BSS_INFO_VERSION
 #error WL_BSS_INFO_VERSION
 #endif
@@ -529,14 +529,19 @@ void set_radio(int on, int unit)
 	n = on ? (WL_RADIO_SW_DISABLE << 16) : ((WL_RADIO_SW_DISABLE << 16) | 1);
 	wl_ioctl(nvram_safe_get(wl_nvname("ifname", unit, 0)), WLC_SET_RADIO, &n, sizeof(n));
 	if (!on) {
-		led(LED_WLAN, 0);
-		led(LED_DIAG, 0);
+		if (unit == 0) led(LED_WLAN, LED_OFF);
+		else led(LED_5G, LED_OFF);
+	} else {
+		if (unit == 0) led(LED_WLAN, LED_ON);
+		else led(LED_5G, LED_ON);
 	}
 #else
 	n = on ? 0 : WL_RADIO_SW_DISABLE;
 	wl_ioctl(nvram_safe_get(wl_nvname("ifname", unit, 0)), WLC_SET_RADIO, &n, sizeof(n));
 	if (!on) {
-		led(LED_DIAG, 0);
+		led(LED_WLAN, LED_OFF);
+	} else {
+		led(LED_WLAN, LED_ON);
 	}
 #endif
 }

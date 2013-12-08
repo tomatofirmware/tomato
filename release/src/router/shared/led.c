@@ -225,7 +225,7 @@ char * strBits(int input, int binarySize)
 		return (char *)NULL;
 }
 
-
+// All bit positions start at zero, given shifts (and shift logic). 255 means a particular LED is not avaiable / accessible
 int do_led(int which, int mode)
 {
 //				    WLAN  DIAG  WHITE AMBER DMZ   AOSS  BRIDG MYST/USB 5G
@@ -407,7 +407,7 @@ int do_led(int which, int mode)
 	case MODEL_WNDR4000:
 		// Special Case, shift register control ... so write accordingly. Syslog below for debugging, turn back on if needed.
 		b = wndr4000[which];
-		syslog(LOG_INFO, "WNDR4000 Shift Register (do_led): Bit Name = %s, which = %d, b = %d, Mode = %s\n", led_names[which], which, b, led_modes[mode]);
+		//syslog(LOG_INFO, "WNDR4000 Shift Register (do_led): Bit Name = %s, which = %d, b = %d, Mode = %s\n", led_names[which], which, b, led_modes[mode]);
 		if ((mode == LED_ON) || (mode == LED_OFF)) {
 			if (b < 16) {
 				// Read bit-mask from file, for tracking / updates (as this process is called clean each LED update, so cannot use static variable!)
@@ -432,7 +432,7 @@ int do_led(int which, int mode)
 				}
 
 				// And write to LEDs (Shift Register)
-				syslog(LOG_INFO, "WNDR4000 Shift Register (do_led): Writing to Shift Register, intExtendedLEDStatus = %s\n", strBits(intExtendedLEDStatus, 8));
+				//syslog(LOG_INFO, "WNDR4000 Shift Register (do_led): Writing to Shift Register, intExtendedLEDStatus = %s\n", strBits(intExtendedLEDStatus, 8));
 				gpio_write_shiftregister(intExtendedLEDStatus, 7, 6, 7);
 				// Write bit-mask to file, for tracking / updates (as this process is called clean each LED update, so cannot use static variable!)
 				if (fileExtGPIOstatus = fopen("/tmp/.ext_led_value", "wb")) {
