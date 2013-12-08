@@ -2108,6 +2108,7 @@ int init_main(int argc, char *argv[])
 			// System is up, set LEDs. Set “WHITE” LED to GREEN (power LED). Note that AMBER / DIAG = amber for power LED (across all HW?).
 			led(LED_DIAG, LED_OFF);
 			led(LED_WHITE, LED_ON);
+			led(LED_AOSS, LED_ON);
 			notice_set("sysup", "");
 			break;
 		}
