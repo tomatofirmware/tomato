@@ -27,6 +27,233 @@ static int get_btn(const char *name, uint32_t *bit, uint32_t *pushed)
 	return 0;
 }
 
+int init_button(uint32_t *reset_mask, uint32_t *ses_pushed, uint32_t *ses_mask, uint32_t *reset_pushed, uint32_t *brau_mask, uint32_t *brau_state, uint32_t *ses_led) {
+	*ses_mask = *ses_pushed = 0;
+	*reset_pushed = 0;
+	*brau_mask = 0;
+	*brau_state = ~0;
+	*ses_led = LED_DIAG;
+
+	// moveme
+	switch (nvram_get_int("btn_override") ? MODEL_UNKNOWN : get_model()) {
+	case MODEL_WRT54G:
+	case MODEL_WRTSL54GS:
+		*reset_mask = 1 << 6;
+		*ses_mask = 1 << 4;
+		*ses_led = LED_DMZ;
+		break;
+/*		
+	case MODEL_WRH54G:
+		reset_mask = 1 << 6;
+		break;
+*/
+	case MODEL_WTR54GS:
+		*reset_mask = 1 << 3;
+		*ses_mask = 1 << 2;
+		break;
+	case MODEL_WHRG54S:
+	case MODEL_WHRHPG54:
+	case MODEL_WHR2A54G54:
+	case MODEL_WHR3AG54:
+	case MODEL_WHRG125:
+		*reset_mask = *reset_pushed = 1 << 4;
+		*ses_mask = 1 << 0;
+		*brau_mask = 1 << 5;
+		break;
+	case MODEL_WBRG54:
+		*reset_mask = *reset_pushed = 1 << 4;
+		break;
+	case MODEL_WBR2G54:
+		*reset_mask = *reset_pushed = 1 << 7;
+		*ses_mask = *ses_pushed = 1 << 4;
+		*ses_led = LED_AOSS;
+		break;
+	case MODEL_WZRG54:
+	case MODEL_WZRHPG54:
+	case MODEL_WZRRSG54:
+	case MODEL_WZRRSG54HP:
+	case MODEL_WVRG54NF:
+		*reset_mask = *reset_pushed = 1 << 4;
+		*ses_mask = 1 << 0;
+		*ses_led = LED_AOSS;
+		break;
+	case MODEL_WZRG108:
+		*reset_mask = *reset_pushed = 1 << 7;
+		*ses_mask = 1 << 0;
+		*ses_led = LED_AOSS;
+		break;
+	case MODEL_WR850GV1:
+		*reset_mask = 1 << 0;
+		break;
+	case MODEL_WR850GV2:
+	case MODEL_WR100:
+		*reset_mask = 1 << 5;
+		break;
+	case MODEL_WL500GP:
+		*reset_mask = *reset_pushed = 1 << 0;
+		*ses_mask = *ses_pushed = 1 << 4;
+		break;
+	case MODEL_WL500W:
+		*reset_mask = *reset_pushed = 1 << 6;
+		*ses_mask = *ses_pushed = 1 << 7;
+		break;		
+	case MODEL_DIR320:
+	case MODEL_H618B:
+		*reset_mask = 1 << 7;
+		*ses_mask = 1 << 6;	// WLAN button on H618B
+		break;		
+	case MODEL_WL500GPv2:
+	case MODEL_WL520GU:
+	case MODEL_WL330GE:
+		*reset_mask = 1 << 2;
+		*ses_mask = 1 << 3;
+		break;		
+//	case MODEL_MN700:
+//?		*reset_mask = *reset_pushed = 1 << 7;
+//		break;
+	case MODEL_WLA2G54L:
+		*reset_mask = *reset_pushed = 1 << 7;
+		break;
+	case MODEL_WL1600GL:
+		*reset_mask = 1 << 3;
+		*ses_mask = 1 << 4;
+		*ses_led = LED_AOSS;
+		break;
+#ifdef CONFIG_BCMWL5
+	case MODEL_RTN10:
+		*reset_mask = 1 << 3;
+		*ses_mask = 1 << 2;
+		break;
+	case MODEL_RTN10U:
+		*reset_mask = 1 << 21;
+		*ses_mask = 1 << 20;
+		*ses_led = LED_AOSS;
+		break;
+	case MODEL_RTN10P:
+		*reset_mask = 1 << 20;
+		*ses_mask = 1 << 21;
+		*ses_led = LED_AOSS;
+		break;
+	case MODEL_RTN12:
+		*reset_mask = 1 << 1;
+		*ses_mask = 1 << 0;
+		*brau_mask = (1 << 4) | (1 << 5) | (1 << 6);
+		break;
+	case MODEL_RTN15U:
+		*reset_mask = 1 << 5;
+		*ses_mask = 1 << 8;
+		break;
+	case MODEL_RTN16:
+		*reset_mask = 1 << 6;
+		*ses_mask = 1 << 8;
+		break;
+	case MODEL_RTN53:
+		*reset_mask = 1 << 3;
+		*ses_mask = 1 << 7;
+		break;
+	case MODEL_RTN53A1:
+		*reset_mask = 1 << 7;
+		*ses_mask = 1 << 3;
+		break;
+	case MODEL_RTN66U:
+		*reset_mask = 1 << 9;
+		*ses_mask = 1 << 4;
+		break;
+	case MODEL_W1800R:
+		*reset_mask = 1 << 14;
+		break;
+	case MODEL_WNR3500L:
+	case MODEL_WNR3500LV2:
+		*reset_mask = 1 << 4;
+		*ses_mask = 1 << 6;
+		*ses_led = LED_AOSS;
+		break;
+	case MODEL_WNR2000v2:
+		*reset_mask = 1 << 1;
+		*ses_mask = 1 << 0;
+		*ses_led = LED_AOSS;
+		break;
+	case MODEL_F7D3301:
+	case MODEL_F7D3302:
+	case MODEL_F7D4301:
+	case MODEL_F7D4302:
+	case MODEL_F5D8235v3:
+		*reset_mask = 1 << 6;
+		*ses_mask = 1 << 8;
+		*ses_led = LED_AOSS;
+		break;
+	case MODEL_E900:
+	case MODEL_E1000v2:
+	case MODEL_E1500:
+	case MODEL_E1550:
+	case MODEL_E2500:
+		*reset_mask = 1 << 10;
+		*ses_mask = 1 << 9;
+		break;
+	case MODEL_E3200:
+		*reset_mask = 1 << 5;
+		*ses_mask = 1 << 8;
+		break;
+	case MODEL_WRT160Nv3:
+		*reset_mask = 1 << 6;
+		*ses_mask = 1 << 5;
+		break;
+	case MODEL_WRT320N:
+		*reset_mask = 1 << 8;
+		*ses_mask = 1 << 5;
+		*ses_led = LED_AMBER;
+		break;
+	case MODEL_WRT610Nv2:
+		*reset_mask = 1 << 6;
+		*ses_mask = 1 << 4;
+		*ses_led = LED_AMBER;
+		break;
+	case MODEL_E4200:
+		*reset_mask = 1 << 6;
+		*ses_mask = 1 << 4;
+		*ses_led = LED_WHITE;
+		break;
+	case MODEL_L600N:
+		*reset_mask = 1 << 21;
+		*ses_mask = 1 << 20;
+		//wlan button = 1 >> 10
+		break;
+	case MODEL_DIR620C1:
+		*reset_mask = 1 << 21;
+		*ses_mask = 1 << 20;
+		break;
+#endif
+	case MODEL_WRT160Nv1:
+	case MODEL_WRT300N:
+		*reset_mask = 1 << 6;
+		*ses_mask = 1 << 4;
+		break;
+	case MODEL_WRT310Nv1:
+		*reset_mask = 1 << 6;
+		*ses_mask = 1 << 8;
+		break;
+	// Added by BWQ
+	case MODEL_RG200E_CA:
+	case MODEL_H218N:
+		*reset_mask = 1 << 30;
+		*ses_mask = 1 << 28;
+		break;
+	case MODEL_HG320:
+		*reset_mask = 1 << 30;
+		*ses_mask = 1 << 29;
+		break;
+	// BWQ end.
+	default:
+		get_btn("btn_ses", ses_mask, ses_pushed);
+		if (!get_btn("btn_reset", reset_mask, reset_pushed)) {
+//			fprintf(stderr, "Not supported.\n");
+			return 1;
+		}
+		break;
+	}
+	return 0;
+}
+
 int buttons_main(int argc, char *argv[])
 {
 	uint32_t gpio;
@@ -45,230 +272,11 @@ int buttons_main(int argc, char *argv[])
 	char *p;
 	int n;
 	int ses_led;
+	int initbtn_res;
 
-	ses_mask = ses_pushed = 0;
-	reset_pushed = 0;
-	brau_mask = 0;
-	brau_state = ~0;
-	ses_led = LED_DIAG;
-
-	// moveme
-	switch (nvram_get_int("btn_override") ? MODEL_UNKNOWN : get_model()) {
-	case MODEL_WRT54G:
-	case MODEL_WRTSL54GS:
-		reset_mask = 1 << 6;
-		ses_mask = 1 << 4;
-		ses_led = LED_DMZ;
-		break;
-/*		
-	case MODEL_WRH54G:
-		reset_mask = 1 << 6;
-		break;
-*/
-	case MODEL_WTR54GS:
-		reset_mask = 1 << 3;
-		ses_mask = 1 << 2;
-		break;
-	case MODEL_WHRG54S:
-	case MODEL_WHRHPG54:
-	case MODEL_WHR2A54G54:
-	case MODEL_WHR3AG54:
-	case MODEL_WHRG125:
-		reset_mask = reset_pushed = 1 << 4;
-		ses_mask = 1 << 0;
-		brau_mask = 1 << 5;
-		break;
-	case MODEL_WBRG54:
-		reset_mask = reset_pushed = 1 << 4;
-		break;
-	case MODEL_WBR2G54:
-		reset_mask = reset_pushed = 1 << 7;
-		ses_mask = ses_pushed = 1 << 4;
-		ses_led = LED_AOSS;
-		break;
-	case MODEL_WZRG54:
-	case MODEL_WZRHPG54:
-	case MODEL_WZRRSG54:
-	case MODEL_WZRRSG54HP:
-	case MODEL_WVRG54NF:
-		reset_mask = reset_pushed = 1 << 4;
-		ses_mask = 1 << 0;
-		ses_led = LED_AOSS;
-		break;
-	case MODEL_WZRG108:
-		reset_mask = reset_pushed = 1 << 7;
-		ses_mask = 1 << 0;
-		ses_led = LED_AOSS;
-		break;
-	case MODEL_WR850GV1:
-		reset_mask = 1 << 0;
-		break;
-	case MODEL_WR850GV2:
-	case MODEL_WR100:
-		reset_mask = 1 << 5;
-		break;
-	case MODEL_WL500GP:
-		reset_mask = reset_pushed = 1 << 0;
-		ses_mask = ses_pushed = 1 << 4;
-		break;
-	case MODEL_WL500W:
-		reset_mask = reset_pushed = 1 << 6;
-		ses_mask = ses_pushed = 1 << 7;
-		break;		
-	case MODEL_DIR320:
-	case MODEL_H618B:
-		reset_mask = 1 << 7;
-		ses_mask = 1 << 6;	// WLAN button on H618B
-		break;		
-	case MODEL_WL500GPv2:
-	case MODEL_WL520GU:
-	case MODEL_WL330GE:
-		reset_mask = 1 << 2;
-		ses_mask = 1 << 3;
-		break;		
-//	case MODEL_MN700:
-//?		reset_mask = reset_pushed = 1 << 7;
-//		break;
-	case MODEL_WLA2G54L:
-		reset_mask = reset_pushed = 1 << 7;
-		break;
-	case MODEL_WL1600GL:
-		reset_mask = 1 << 3;
-		ses_mask = 1 << 4;
-		ses_led = LED_AOSS;
-		break;
-#ifdef CONFIG_BCMWL5
-	case MODEL_RTN10:
-		reset_mask = 1 << 3;
-		ses_mask = 1 << 2;
-		break;
-	case MODEL_RTN10U:
-		reset_mask = 1 << 21;
-		ses_mask = 1 << 20;
-		ses_led = LED_AOSS;
-		break;
-	case MODEL_RTN10P:
-		reset_mask = 1 << 20;
-		ses_mask = 1 << 21;
-		ses_led = LED_AOSS;
-		break;
-	case MODEL_RTN12:
-		reset_mask = 1 << 1;
-		ses_mask = 1 << 0;
-		brau_mask = (1 << 4) | (1 << 5) | (1 << 6);
-		break;
-	case MODEL_RTN15U:
-		reset_mask = 1 << 5;
-		ses_mask = 1 << 8;
-		break;
-	case MODEL_RTN16:
-		reset_mask = 1 << 6;
-		ses_mask = 1 << 8;
-		break;
-	case MODEL_RTN53:
-		reset_mask = 1 << 3;
-		ses_mask = 1 << 7;
-		break;
-	case MODEL_RTN53A1:
-		reset_mask = 1 << 7;
-		ses_mask = 1 << 3;
-		break;
-	case MODEL_RTN66U:
-		reset_mask = 1 << 9;
-		ses_mask = 1 << 4;
-		break;
-	case MODEL_W1800R:
-		reset_mask = 1 << 14;
-		break;
-	case MODEL_WNR3500L:
-	case MODEL_WNR3500LV2:
-		reset_mask = 1 << 4;
-		ses_mask = 1 << 6;
-		ses_led = LED_AOSS;
-		break;
-	case MODEL_WNR2000v2:
-		reset_mask = 1 << 1;
-		ses_mask = 1 << 0;
-		ses_led = LED_AOSS;
-		break;
-	case MODEL_F7D3301:
-	case MODEL_F7D3302:
-	case MODEL_F7D4301:
-	case MODEL_F7D4302:
-	case MODEL_F5D8235v3:
-		reset_mask = 1 << 6;
-		ses_mask = 1 << 8;
-		ses_led = LED_AOSS;
-		break;
-	case MODEL_E900:
-	case MODEL_E1000v2:
-	case MODEL_E1500:
-	case MODEL_E1550:
-	case MODEL_E2500:
-		reset_mask = 1 << 10;
-		ses_mask = 1 << 9;
-		break;
-	case MODEL_E3200:
-		reset_mask = 1 << 5;
-		ses_mask = 1 << 8;
-		break;
-	case MODEL_WRT160Nv3:
-		reset_mask = 1 << 6;
-		ses_mask = 1 << 5;
-		break;
-	case MODEL_WRT320N:
-		reset_mask = 1 << 8;
-		ses_mask = 1 << 5;
-		ses_led = LED_AMBER;
-		break;
-	case MODEL_WRT610Nv2:
-		reset_mask = 1 << 6;
-		ses_mask = 1 << 4;
-		ses_led = LED_AMBER;
-		break;
-	case MODEL_E4200:
-		reset_mask = 1 << 6;
-		ses_mask = 1 << 4;
-		ses_led = LED_WHITE;
-		break;
-	case MODEL_L600N:
-		reset_mask = 1 << 21;
-		ses_mask = 1 << 20;
-		//wlan button = 1 >> 10
-		break;
-	case MODEL_DIR620C1:
-		reset_mask = 1 << 21;
-		ses_mask = 1 << 20;
-		break;
-#endif
-	case MODEL_WRT160Nv1:
-	case MODEL_WRT300N:
-		reset_mask = 1 << 6;
-		ses_mask = 1 << 4;
-		break;
-	case MODEL_WRT310Nv1:
-		reset_mask = 1 << 6;
-		ses_mask = 1 << 8;
-		break;
-	// Added by BWQ
-	case MODEL_RG200E_CA:
-	case MODEL_H218N:
-		reset_mask = 1 << 30;
-		ses_mask = 1 << 28;
-		break;
-	case MODEL_HG320:
-		reset_mask = 1 << 30;
-		ses_mask = 1 << 29;
-		break;
-	// BWQ end.
-	default:
-		get_btn("btn_ses", &ses_mask, &ses_pushed);
-		if (!get_btn("btn_reset", &reset_mask, &reset_pushed)) {
-//			fprintf(stderr, "Not supported.\n");
-			return 1;
-		}
-		break;
-	}
+	initbtn_res = init_button(&reset_mask, &ses_pushed, &ses_mask, &reset_pushed, &brau_mask, &brau_state, &ses_led);
+	if(initbtn_res)
+		return initbtn_res;
 	mask = reset_mask | ses_mask | brau_mask;
 
 #ifdef DEBUG_TEST

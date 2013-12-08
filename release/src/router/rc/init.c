@@ -1998,6 +1998,36 @@ static void sysinit(void)
 
 	check_bootnv();
 
+	//if reset button pushed?
+	uint32_t gpio;
+	uint32_t mask;
+	uint32_t ses_mask;
+	uint32_t ses_pushed;
+	uint32_t reset_mask;
+	uint32_t reset_pushed;
+	uint32_t brau_mask;
+	uint32_t brau_state;
+	int ses_led,gf;
+
+	if(!init_button(&reset_mask, &ses_pushed, &ses_mask, &reset_pushed, &brau_mask, &brau_state, &ses_led)){
+		mask = reset_mask | ses_mask | brau_mask;
+		if ((gf = gpio_open(mask)) >= 0) {
+			int count = 0;
+			while (((gpio = _gpio_read(gf)) != ~0) && ((gpio & reset_mask) == reset_pushed)) {
+				sleep(1);
+				if (++count == 3) led(LED_DIAG, 1);
+			}
+			close(gf);
+			if (count >= 3) {
+				eval("mtd-erase", "-d", "nvram");
+				sync();
+				reboot(RB_AUTOBOOT);
+			}
+
+		}
+	}
+
+
 #ifdef TCONFIG_IPV6
 	// disable IPv6 by default on all interfaces
 	f_write_string("/proc/sys/net/ipv6/conf/default/disable_ipv6", "1", 0, 0);

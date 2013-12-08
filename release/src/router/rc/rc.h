@@ -399,7 +399,7 @@ extern int mtd_unlock_erase_main(int argc, char *argv[]);
 
 // buttons.c
 extern int buttons_main(int argc, char *argv[]);
-
+extern int init_button(uint32_t *reset_mask, uint32_t *ses_pushed, uint32_t *ses_mask, uint32_t *reset_pushed, uint32_t *brau_mask, uint32_t *brau_state, uint32_t *ses_led);
 // blink_5g.c
 extern int blink_5g_main(int argc, char *argv[]);
 
