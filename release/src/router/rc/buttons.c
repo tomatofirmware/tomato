@@ -347,6 +347,7 @@ int buttons_main(int argc, char *argv[])
 				++count;
 			} while (((gpio = _gpio_read(gf)) != ~0) && ((gpio & ses_mask) == ses_pushed));
 			gpio &= mask;
+			led(ses_led, LED_ON);
 
 			if ((ses_led == LED_DMZ) && (nvram_get_int("dmz_enable") > 0)) led(LED_DMZ, 1);
 
