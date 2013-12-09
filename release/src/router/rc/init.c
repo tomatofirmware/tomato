@@ -1593,6 +1593,7 @@ static int init_nvram(void)
                 mfr = "Netgear";
                 name = "WNDR4000";
                 features = SUP_SES | SUP_80211N | SUP_1000ET;
+                nvram_set("blink_wl", "1");
 #ifdef TCONFIG_USB
                 nvram_set("usb_uhci", "-1");
 #endif
@@ -1979,9 +1980,9 @@ static void sysinit(void)
 
 	eval("buttons");
 
-#ifdef CONFIG_BCMWL6
+//#ifdef CONFIG_BCMWL6
 	eval("blink_5g");
-#endif
+//#endif
 
 	if (!noconsole) xstart("console");
 
