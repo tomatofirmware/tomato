@@ -27,7 +27,7 @@ static int get_btn(const char *name, uint32_t *bit, uint32_t *pushed)
 	return 0;
 }
 
-int init_button(uint32_t *reset_mask, uint32_t *ses_pushed, uint32_t *ses_mask, uint32_t *reset_pushed, uint32_t *brau_mask, uint32_t *brau_state, uint32_t *ses_led) {
+int init_button(int model, uint32_t *reset_mask, uint32_t *ses_pushed, uint32_t *ses_mask, uint32_t *reset_pushed, uint32_t *brau_mask, uint32_t *brau_state, uint32_t *ses_led) {
 	*ses_mask = *ses_pushed = 0;
 	*reset_pushed = 0;
 	*brau_mask = 0;
@@ -35,7 +35,7 @@ int init_button(uint32_t *reset_mask, uint32_t *ses_pushed, uint32_t *ses_mask, 
 	*ses_led = LED_DIAG;
 
 	// moveme
-	switch (nvram_get_int("btn_override") ? MODEL_UNKNOWN : get_model()) {
+	switch (model) {
 	case MODEL_WRT54G:
 	case MODEL_WRTSL54GS:
 		*reset_mask = 1 << 6;
@@ -274,7 +274,7 @@ int buttons_main(int argc, char *argv[])
 	int ses_led;
 	int initbtn_res;
 
-	initbtn_res = init_button(&reset_mask, &ses_pushed, &ses_mask, &reset_pushed, &brau_mask, &brau_state, &ses_led);
+	initbtn_res = init_button(nvram_get_int("btn_override") ? MODEL_UNKNOWN : get_model(), &reset_mask, &ses_pushed, &ses_mask, &reset_pushed, &brau_mask, &brau_state, &ses_led);
 	if(initbtn_res)
 		return initbtn_res;
 	mask = reset_mask | ses_mask | brau_mask;

@@ -1912,7 +1912,8 @@ static void sysinit(void)
 
 	check_bootnv();
 
-	//if reset button pushed?
+#ifdef COMPILEING_MODEL
+	//is reset button pushed?
 	uint32_t gpio;
 	uint32_t mask;
 	uint32_t ses_mask;
@@ -1923,7 +1924,7 @@ static void sysinit(void)
 	uint32_t brau_state;
 	int ses_led,gf;
 
-	if(!init_button(&reset_mask, &ses_pushed, &ses_mask, &reset_pushed, &brau_mask, &brau_state, &ses_led)){
+	if(!init_button(COMPILEING_MODEL, &reset_mask, &ses_pushed, &ses_mask, &reset_pushed, &brau_mask, &brau_state, &ses_led)){
 		mask = reset_mask | ses_mask | brau_mask;
 		if ((gf = gpio_open(mask)) >= 0) {
 			int count = 0;
@@ -1940,7 +1941,7 @@ static void sysinit(void)
 
 		}
 	}
-
+#endif
 
 #ifdef TCONFIG_IPV6
 	// disable IPv6 by default on all interfaces
