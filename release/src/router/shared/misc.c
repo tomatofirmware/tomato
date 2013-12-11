@@ -520,7 +520,6 @@ int get_radio(int unit)
 void set_radio(int on, int unit)
 {
 	uint32 n;
-	// syslog(LOG_INFO, "Set Radio State, state = %d, unit = %d\n", on, unit);
 #ifndef WL_BSS_INFO_VERSION
 #error WL_BSS_INFO_VERSION
 #endif

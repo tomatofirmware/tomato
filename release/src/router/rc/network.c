@@ -660,11 +660,11 @@ void start_wl(void)
 						if (unit == 0) {
 							led(LED_WLAN, LED_ON);
 							if (nvram_get_int("blink_wl"))
-								eval("blink", ifname, "wlan");
+								eval("blink", ifname, "wlan", "20", "8192");
 						} else {
 							led(LED_5G, LED_ON);
 							if (nvram_get_int("blink_wl"))
-								eval("blink", ifname, "5g");
+								eval("blink", ifname, "5g", "20", "8192");
 						}
 						// 
 					}
