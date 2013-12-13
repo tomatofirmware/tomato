@@ -37,7 +37,6 @@
 
 //	<% nvstat(); %>
 //	<% etherstates(); %>
-//	<% anonupdate(); %>
 
 wmo = {'ap':'<% _("Access Point"); %>','sta':'<% _("Wireless Client"); %>','wet':'<% _("Wireless Ethernet Bridge"); %>','wds':'<% _("WDS"); %>'};
 auth = {'disabled':'-','wep':'WEP','wpa_personal':'<% _("WPA Personal (PSK)"); %>','wpa_enterprise':'<% _("WPA Enterprise"); %>','wpa2_personal':'<% _("WPA2 Personal (PSK)"); %>','wpa2_enterprise':'<% _("WPA2 Enterprise"); %>','wpaX_personal':'<% _("WPA / WPA2 Personal"); %>','wpaX_enterprise':'<% _("WPA / WPA2 Enterprise"); %>','radius':'<% _("Radius"); %>'};
@@ -218,16 +217,6 @@ function ethstates()
 	E("ports").innerHTML = code;
 }
 
-function anon_update()
-{
-	update = anonupdate.update;
-	if (update == "no") { return 0; }
-
-	var code = '<div class="section-title"><center>!! <% _("Attention"); %> !!</center></div>';
-	code += '<div class="fields"><center><% _("Tomato by Shibby "); %>' + update + ' <% _("is now available"); %>. <a target="_blank" href="http://tomato.groov.pl/"><% _("Click here to read more"); %></a>.</center></div>';
-	code += '<br></div>';
-	E("nversion").innerHTML = code;
-}
 
 function show()
 {
@@ -300,8 +289,6 @@ function earlyInit()
 	}
 
 	ethstates();
-
-	anon_update()
 
 	show();
 }
