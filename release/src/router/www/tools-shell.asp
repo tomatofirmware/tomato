@@ -9,7 +9,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Tools: System Commands</title>
+<title>[<% ident(); %>] <% _("Tools: System Commands"); %></title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <link rel='stylesheet' type='text/css' href='color.css'>
 <script type='text/javascript' src='tomato.js'></script>
@@ -103,8 +103,8 @@ function init()
 <form action='javascript:{}'>
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
-	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='title'><% _("Tomato"); %></div>
+	<div class='version'><% _("Version"); %> <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -112,18 +112,18 @@ function init()
 
 <!-- / / / -->
 
-<div class='section-title'>Execute System Commands</div>
+<div class='section-title'><% _("Execute System Commands"); %></div>
 <div class='section'>
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: 'Command', name: 'f_cmd', type: 'textarea', wrap: 'off', value: '' }
+	{ title: '<% _("Command"); %>', name: 'f_cmd', type: 'textarea', wrap: 'off', value: '' }
 ]);
 </script>
 <div style='float:left'><input type='button' value='Execute' onclick='execute()' id='execb'></div>
 <script type='text/javascript'>genStdRefresh(1,5,'ref.toggle()');</script>
 </div>
 
-<div style="visibility:hidden;text-align:right" id="wait">Please wait... <img src='spin.gif' style="vertical-align:top"></div>
+<div style="visibility:hidden;text-align:right" id="wait"><% _("Please wait"); %>... <img src='spin.gif' style="vertical-align:top"></div>
 <pre id='result'></pre>
 
 <!-- / / / -->
