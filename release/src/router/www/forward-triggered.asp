@@ -11,7 +11,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Forwarding: Triggered</title>
+<title>[<% ident(); %>] <% _("Forwarding"); %>: <% _("Triggered"); %></title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <link rel='stylesheet' type='text/css' href='color.css'>
 <script type='text/javascript' src='tomato.js'></script>
@@ -95,11 +95,11 @@ tg.resetNewEditor = function() {
 tg.setup = function() {
 	this.init('tg-grid', 'sort', 50, [
 		{ type: 'checkbox' },
-		{ type: 'select', options: [[1, 'TCP'],[2, 'UDP'],[3,'Both']] },
+		{ type: 'select', options: [[1, 'TCP'],[2, 'UDP'],[3,'<% _("Both"); %>']] },
 		{ type: 'text', maxlen: 16 },
 		{ type: 'text', maxlen: 16 },
 		{ type: 'text', maxlen: 32 }]);
-	this.headerSet(['On', 'Protocol', 'Trigger Ports', 'Forwarded Ports', 'Description']);
+	this.headerSet(['On', '<% _("Protocol"); %>', '<% _("Trigger Ports"); %>', '<% _("Forwarded Ports"); %>', '<% _("Description"); %>']);
 	var nv = nvram.trigforward.split('>');
 	for (var i = 0; i < nv.length; ++i) {
 		var r;
@@ -143,8 +143,8 @@ function init()
 <form id='_fom' method='post' action='tomato.cgi'>
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
-	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='title'><% _("Tomato"); %></div>
+	<div class='version'><% _("Version"); %> <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -157,7 +157,7 @@ function init()
 
 <input type='hidden' name='trigforward'>
 
-<div class='section-title'>Triggered Port Forwarding</div>
+<div class='section-title'><% _("Triggered Port Forwarding"); %></div>
 <div class='section'>
 	<table class='tomato-grid' cellspacing=1 id='tg-grid'></table>
 	<script type='text/javascript'>tg.setup();</script>
@@ -165,10 +165,10 @@ function init()
 
 <div>
 <ul>
-<li>Use "-" to specify a range of ports (200-300).
-<li>Trigger Ports are the initial LAN to WAN "trigger".
-<li>Forwarded Ports are the WAN to LAN ports that are opened if the "trigger" is activated.
-<li>These ports are automatically closed after a few minutes of inactivity.
+<li><% _("Use "-" to specify a range of ports"); %> (200-300).
+<li><% _("Trigger Ports are the initial LAN to WAN 'trigger'"); %>.
+<li><% _("Forwarded Ports are the WAN to LAN ports that are opened if the 'trigger' is activated"); %>.
+<li><% _("These ports are automatically closed after a few minutes of inactivity"); %>.
 </ul>
 </div>
 
@@ -177,8 +177,8 @@ function init()
 </td></tr>
 <tr><td id='footer' colspan=2>
 	<span id='footer-msg'></span>
-	<input type='button' value='Save' id='save-button' onclick='save()'>
-	<input type='button' value='Cancel' id='cancel-button' onclick='reloadPage();'>
+	<input type='button' value='<% _("Save"); %>' id='save-button' onclick='save()'>
+	<input type='button' value='<% _("Cancel"); %>' id='cancel-button' onclick='reloadPage();'>
 </td></tr>
 </table>
 </form>

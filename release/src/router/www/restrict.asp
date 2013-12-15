@@ -11,7 +11,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Access Restrictions</title>
+<title>[<% ident(); %>] <% _("Access Restrictions"); %></title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <link rel='stylesheet' type='text/css' href='color.css'>
 <script type='text/javascript' src='tomato.js'></script>
@@ -44,8 +44,8 @@ var dowNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 var og = new TomatoGrid();
 og.setup = function() {
 	this.init('res-over-grid', 'sort');
-	this.headerSet(['Description', 'Schedule']);
-	var r = this.footerSet(['<input type="button" value="Add" onclick="TGO(this).addEntry()" id="res-over-add">']);
+	this.headerSet(['<% _("Description"); %>', 'Schedule']);
+	var r = this.footerSet(['<input type="button" value="<% _("Add"); %>" onclick="TGO(this).addEntry()" id="res-over-add">']);
 	r.cells[0].colSpan = 2;
 }
 og.populate = function() {
@@ -76,9 +76,9 @@ og.populate = function() {
 
 		if ((v[1] >= 0) && (v[2] >= 0)) {
 			s += '<br>' + timeString(v[1]) + ' to ' + timeString(v[2]);
-			if (v[2] <= v[1]) s += ' <small>(the following day)</small>';
+			if (v[2] <= v[1]) s += ' <small>(<% _("the following day"); %>)</small>';
 		}
-		if (v[0] != '1') s += '<br><i><b>Disabled</b></i>';
+		if (v[0] != '1') s += '<br><i><b><% _("Disabled"); %></b></i>';
 		this.insertData(-1, [i, v[8], s]);
 	}
 	og.sort(0);
@@ -110,8 +110,8 @@ function init()
 <form name='_fom' id='_fom' method='post' action='tomato.cgi'>
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
-	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='title'><% _("Tomato"); %></div>
+	<div class='version'><% _("Version"); %> <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -123,7 +123,7 @@ function init()
 <input type='hidden' name='_commit' value='0'>
 <input type='hidden' name='rruleN' id='_rruleN' value=''>
 
-<div class='section-title'>Access Restriction Overview</div>
+<div class='section-title'><% _("Access Restriction Overview"); %></div>
 <div class='section'>
 	<table class='tomato-grid' cellspacing=1 id='res-over-grid'></table>
 </div>

@@ -11,7 +11,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Tools: WOL</title>
+<title>[<% ident(); %>] <% _("Tools"); %>: <% _("WOL"); %></title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <link rel='stylesheet' type='text/css' href='color.css'>
 <script type='text/javascript' src='tomato.js'></script>
@@ -50,7 +50,7 @@ textarea {
 var wg = new TomatoGrid();
 wg.setup = function() {
 	this.init('wol-grid', 'sort');
-	this.headerSet(['MAC Address', 'IP Address', 'Status', 'Name']);
+	this.headerSet(['<% _("MAC Address"); %>', '<% _("IP Address"); %>', '<% _("Status"); %>', '<% _("Name"); %>']);
 	this.sort(3);
 }
 wg.sortCompare = function(a, b) {
@@ -169,7 +169,7 @@ function refresh()
 function refreshClick()
 {
 	running ^= 1;
-	E('refreshb').value = running ? 'Stop' : 'Refresh';
+	E('refreshb').value = running ? '<% _("Stop"); %>' : '<% _("Refresh"); %>';
 	E('spin').style.visibility = running ? 'visible' : 'hidden';
 	if (running) refresh();
 }
@@ -185,8 +185,8 @@ function init()
 <form id='_fom' action='wakeup.cgi' method='post'>
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
-	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='title'><% _("Tomato"); %></div>
+	<div class='version'><% _("Version"); %> <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -198,20 +198,20 @@ function init()
 <input type='hidden' name='_nextwait' value='1'>
 <input type='hidden' name='mac' value='' id='_mac'>
 
-<div class='section-title'>Wake On LAN</div>
+<div class='section-title'><% _("Wake On LAN"); %></div>
 <div class='section'>
 	<table id='wol-grid' class='tomato-grid' cellspacing=1></table>
-	<div style='float:right'><img src='spin.gif' id='spin' style='vertical-align:middle;visibility:hidden'> &nbsp; <input type='button' value='Refresh' onclick='refreshClick()' id='refreshb'></div>
+	<div style='float:right'><img src='spin.gif' id='spin' style='vertical-align:middle;visibility:hidden'> &nbsp; <input type='button' value='<% _("Refresh"); %>' onclick='refreshClick()' id='refreshb'></div>
 </div>
 <div id='msg' style='visibility:hidden;background:#ffffa0;margin:auto;width:50%;text-align:center;padding:2px;border:1px solid #fee'></div>
 <div class='section-title'></div>
 <div class='section'>
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: 'MAC Address List', name: 'f_mac', type: 'textarea', value: cookie.get('wakemac') || '' },
+	{ title: '<% _("MAC Address List"); %>', name: 'f_mac', type: 'textarea', value: cookie.get('wakemac') || '' },
 ]);
 </script>
-<div style='float:right'><input type='button' value='Wake Up' onclick='wake(null)' id='save-button'></div>
+<div style='float:right'><input type='button' value='<% _("Wake Up"); %>' onclick='wake(null)' id='save-button'></div>
 </div>
 
 <!-- / / / -->

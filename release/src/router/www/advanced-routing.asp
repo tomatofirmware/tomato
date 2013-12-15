@@ -54,7 +54,7 @@ ara.setup = function() {
 	var i, a;
 
 	this.init('ara-grid', 'sort');
-	this.headerSet(['Destination', 'Gateway / Next Hop', 'Subnet Mask', 'Metric', 'Interface']);
+	this.headerSet(['<% _("Destination"); %>', '<% _("Gateway"); %> / <% _("Next Hop"); %>', '<% _("Subnet Mask"); %>', '<% _("Metric"); %>', '<% _("Interface"); %>']);
 	for (i = 0; i < activeroutes.length; ++i) {
 		a = activeroutes[i];
 		if (a[0] == nvram.lan_ifname) a[0] += ' (LAN)';
@@ -80,7 +80,7 @@ ars.setup = function() {
 		{ type: 'text', maxlen: 15 }, { type: 'text', maxlen: 15 }, { type: 'text', maxlen: 15 },
 		{ type: 'text', maxlen: 3 }, { type: 'select', options: [['LAN','LAN'],['LAN1','LAN1'],['LAN2','LAN2'],['LAN3','LAN3'],['WAN','WAN'],['MAN','MAN']] }, { type: 'text', maxlen: 32 }]);
 
-	this.headerSet(['Destination', 'Gateway', 'Subnet Mask', 'Metric', 'Interface', 'Description']);
+	this.headerSet(['<% _("Destination"); %>', '<% _("Gateway"); %>', '<% _("Subnet Mask"); %>', '<% _("Metric"); %>', '<% _("Interface"); %>', '<% _("Description"); %>']);
 	var routes = nvram.routes_static.split('>');
 	for (var i = 0; i < routes.length; ++i) {
 		var r;
@@ -196,8 +196,8 @@ function init()
 <form id='_fom' method='post' action='tomato.cgi'>
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
-	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='title'><% _("Tomato"); %></div>
+	<div class='version'><% _("Version"); %> <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -236,7 +236,7 @@ function init()
 <div class='section'>
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: '<% _("Mode"); %>', name: 'wk_mode', type: 'select', options: [['gateway','Gateway'],['router','Router']], value: nvram.wk_mode },
+	{ title: '<% _("Mode"); %>', name: 'wk_mode', type: 'select', options: [['gateway','<% _("Gateway"); %>'],['router','<% _("Router"); %>']], value: nvram.wk_mode },
 /* ZEBRA-BEGIN */
 	{ title: 'RIPv1 &amp; v2' },
 	{ title: 'LAN', indent: 2, name: 'f_dr_lan', type: 'checkbox', value: ((nvram.dr_lan_rx != '0') && (nvram.dr_lan_rx != '')) },

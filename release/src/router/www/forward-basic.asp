@@ -11,7 +11,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Forwarding: Basic</title>
+<title>[<% ident(); %>] <% _("Forwarding"); %>: <% _("Basic"); %></title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <link rel='stylesheet' type='text/css' href='color.css'>
 <script type='text/javascript' src='tomato.js'></script>
@@ -78,7 +78,7 @@ fog.sortCompare = function(a, b) {
 }
 
 fog.dataToView = function(data) {
-	return [(data[0] != '0') ? 'On' : '', ['TCP', 'UDP', 'Both'][data[1] - 1], (data[2].match(/(.+)-(.+)/)) ? (RegExp.$1 + ' -<br>' + RegExp.$2) : data[2], data[3], data[4], data[5], data[6]];
+	return [(data[0] != '0') ? 'On' : '', ['TCP', 'UDP', '<% _("Both"); %>'][data[1] - 1], (data[2].match(/(.+)-(.+)/)) ? (RegExp.$1 + ' -<br>' + RegExp.$2) : data[2], data[3], data[4], data[5], data[6]];
 }
 
 fog.fieldValuesToData = function(row) {
@@ -139,7 +139,7 @@ fog.setup = function() {
 		{ type: 'text', maxlen: 5 },
 		{ type: 'text', maxlen: 15 },
 		{ type: 'text', maxlen: 32 }]);
-	this.headerSet(['On', 'Proto', 'Src Address', 'Ext Ports', 'Int Port', 'Int Address', 'Description']);
+	this.headerSet(['<% _("On"); %>', '<% _("Proto"); %>', '<% _("Src Address"); %>', '<% _("Ext Ports"); %>', '<% _("Int Port"); %>', '<% _("Int Address"); %>', '<% _("Description"); %>']);
 	var nv = nvram.portforward.split('>');
 	for (var i = 0; i < nv.length; ++i) {
 		var r;
@@ -198,8 +198,8 @@ function init()
 <form id='_fom' method='post' action='javascript:{}'>
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
-	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='title'><% _("Tomato"); %></div>
+	<div class='version'><% _("Version"); %> <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -212,7 +212,7 @@ function init()
 
 <input type='hidden' name='portforward'>
 
-<div class='section-title'>Port Forwarding</div>
+<div class='section-title'><% _("Port Forwarding"); %></div>
 <div class='section'>
 	<table class='tomato-grid' cellspacing=1 id='fo-grid'></table>
 	<script type='text/javascript'>fog.setup();</script>
@@ -220,12 +220,11 @@ function init()
 
 <div>
 <ul>
-<li><b>Src Address</b> <i>(optional)</i> - Forward only if from this address. Ex: "1.2.3.4", "1.2.3.4 - 2.3.4.5", "1.2.3.0/24", "me.example.com".
-<li><b>Ext Ports</b> - The ports to be forwarded, as seen from the WAN. Ex: "2345", "200,300", "200-300,400".
-<li><b>Int Port</b> <i>(optional)</i> - The destination port inside the LAN. If blank, the destination port
-is the same as <i>Ext Ports</i>. Only one port per entry is supported when forwarding to a different internal
-port.
-<li><b>Int Address</b> - The destination address inside the LAN.
+<li><b><% _("Src Address"); %></b> <i>(<% _("optional"); %>)</i> - <% _("Forward only if from this address"); %>. <% _("Ex"); %>: "1.2.3.4", "1.2.3.4 - 2.3.4.5", "1.2.3.0/24", "me.example.com".
+<li><b><% _("Ext Ports"); %></b> - <% _("The ports to be forwarded, as seen from the WAN"); %>. <% _("Ex"); %>: "2345", "200,300", "200-300,400".
+<li><b><% _("Int Port"); %></b> <i>(<% _("optional"); %>)</i> - <% _("The destination port inside the LAN. If blank, the destination port is the same as <i>Ext Ports</i>. Only one port per entry is supported when forwarding to a different internal"); %>
+port"); %>.
+<li><b><% _("Int Address"); %></b> - <% _("The destination address inside the LAN"); %>.
 </ul>
 </div>
 
@@ -237,8 +236,8 @@ port.
 </td></tr>
 <tr><td id='footer' colspan=2>
 	<span id='footer-msg'></span>
-	<input type='button' value='Save' id='save-button' onclick='save()'>
-	<input type='button' value='Cancel' id='cancel-button' onclick='reloadPage();'>
+	<input type='button' value='<% _("Save"); %>' id='save-button' onclick='save()'>
+	<input type='button' value='<% _("Cancel"); %>' id='cancel-button' onclick='reloadPage();'>
 </td></tr>
 </table>
 </form>

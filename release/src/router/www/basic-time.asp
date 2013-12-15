@@ -11,7 +11,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Basic: Time</title>
+<title>[<% ident(); %>] <% _("Basic"); %>: <% _("Time"); %></title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <link rel='stylesheet' type='text/css' href='color.css'>
 <script type='text/javascript' src='tomato.js'></script>
@@ -143,8 +143,8 @@ function earlyInit()
 <form id='_fom' method='post' action='tomato.cgi'>
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
-	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='title'><% _("Tomato"); %></div>
+	<div class='version'><% _("Version"); %> <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -164,7 +164,7 @@ function earlyInit()
 <input type='hidden' name='ntp_kiss' value='' disabled>
 
 
-<div class='section-title'>Time</div>
+<div class='section-title'><% _("Time"); %></div>
 <div class='section'>
 <script type='text/javascript'>
 
@@ -263,7 +263,7 @@ createFieldTable('', [
 	{ title: '<% _("Auto Daylight Savings Time"); %>', indent: 2, name: 'f_tm_dst', type: 'checkbox', value: nvram.tm_dst != '0' },
 	{ title: '<% _("Custom TZ String"); %>', indent: 2, name: 'f_tm_tz', type: 'text', maxlen: 32, size: 34, value: nvram.tm_tz || '' },
 	null,
-	{ title: '<% _("Auto Update Time"); %>', name: 'ntp_updates', type: 'select', options: [[-1,'<% _("Never"); %>'],[0,'<% _("Only at startup"); %>'],[1,'<% _("Every hour"); %>'],[2,'<% _("Every 2 hours"); %>'],[4,'<% _("Every 4 hours"0; %>'],[6,'<% _("Every 6 hours"); %>'],[8,'<% _("Every 8 hours"); %>'],[12,'<% _("Every 12 hours"); %>'],[24,'<% _("Every 24 hours"); %>']],
+	{ title: '<% _("Auto Update Time"); %>', name: 'ntp_updates', type: 'select', options: [[-1,'<% _("Never"); %>'],[0,'<% _("Only at startup"); %>'],[1,'<% _("Every hour"); %>'],[2,'<% _("Every 2 hours"); %>'],[4,'<% _("Every 4 hours"); %>'],[6,'<% _("Every 6 hours"); %>'],[8,'<% _("Every 8 hours"); %>'],[12,'<% _("Every 12 hours"); %>'],[24,'<% _("Every 24 hours"); %>']],
 		value: nvram.ntp_updates },
 	{ title: '<% _("Trigger Connect On Demand"); %>', indent: 2, name: 'f_ntp_tdod', type: 'checkbox', value: nvram.ntp_tdod != '0' },
 	{ title: '<% _("NTP Time Server"); %>', name: 'f_ntp_server', type: 'select', options: ntpList, value: ntpSel },

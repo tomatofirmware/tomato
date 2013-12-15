@@ -11,7 +11,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Basic: DDNS</title>
+<title>[<% ident(); %>] <% _("Basic"); %>: <% _("DDNS"); %></title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <link rel='stylesheet' type='text/css' href='color.css'>
 <script type='text/javascript' src='tomato.js'></script>
@@ -86,7 +86,7 @@ function msgLoc(s)
 	if (r = s.match(/^(.*?): (.*)/)) {
 		r[2] = r[2].replace(/#RETRY (\d+) (\d+)/,
 			function(s, min, num) {
-				return '<br><small>(' + ((num >= 1) ? (num + '/3: ') : '') + 'Automatically retrying in ' + min + ' minutes)</small>';
+				return '<br><small>(' + ((num >= 1) ? (num + '/3: ') : '') + '<% _("Automatically retrying in ' + min + ' minutes"); %>)</small>';
 			}
 		);
 		return '<small>' + (new Date(r[1])).toLocaleString() + ':</small><br>' + r[2];
@@ -165,7 +165,7 @@ function verifyFields(focused, quiet)
 					e.value = 'http://';
 				}
 				if (e.value.search(/http(s?):\/\/./) != 0)  {
-					ferror.set(e, 'Expecting a URL -- http://... or https://...', quiet)
+					ferror.set(e, '<% _("Expecting a URL"); %> -- http://... or https://...', quiet)
 					r = 0;
 				}
 				else {
@@ -335,7 +335,7 @@ function init()
 {
 	if ('<% psup("ddns-update"); %>' != 0) {
 		var e = E('footer-msg');
-		e.innerHTML = 'DDNS update is running. Please refresh after a few seconds.';
+		e.innerHTML = '<% _("DDNS update is running"); %>. <% _("Please refresh after a few seconds"); %>.';
 		e.style.visibility = 'visible';
 	}
 }
@@ -346,8 +346,8 @@ function init()
 <form id='_fom' method='post' action='tomato.cgi'>
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
-	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='title'><% _("Tomato"); %></div>
+	<div class='version'><% _("Version"); %> <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -368,25 +368,25 @@ function init()
 <input type='hidden' name='ddnsx_save' value=''>
 
 
-<div class='section-title'>Dynamic DNS</div>
+<div class='section-title'><% _("Dynamic DNS"); %></div>
 <div class='section'>
 <script type='text/javascript'>
 s = nvram.ddnsx_ip;
 a = (s != '') && (s.indexOf('@') != 0) && (s != '0.0.0.0') && (s != '1.1.1.1') && (s != '10.1.1.1');
 createFieldTable('', [
-	{ title: 'IP address', name: 'f_ddnsx_ip', type: 'select',
+	{ title: '<% _("IP address"); %>', name: 'f_ddnsx_ip', type: 'select',
 		options: [
-			['', 'Use WAN IP Address ' + ddnsx_ip + ' (recommended)'],
-			['@', 'Use External IP Address Checker (every 10 minutes)'],
-			['0.0.0.0', 'Offline (0.0.0.0)'],
-			['1.1.1.1', 'Offline (1.1.1.1)'],
-			['10.1.1.1', 'Offline (10.1.1.1)'],
-			['custom', 'Custom IP Address...']
+			['', '<% _("Use WAN IP Address"); %> ' + ddnsx_ip + ' (<% _("recommended"); %>)'],
+			['@', '<% _("Use External IP Address Checker"); %> (<% _("every 10 minutes"); %>)'],
+			['0.0.0.0', '<% _("Offline"); %> (0.0.0.0)'],
+			['1.1.1.1', '<% _("Offline"); %> (1.1.1.1)'],
+			['10.1.1.1', '<% _("Offline"); %> (10.1.1.1)'],
+			['custom', '<% _("Custom IP Address"); %>...']
 			],
 		value: a ? 'custom' : nvram.ddnsx_ip },
-	{ title: 'Custom IP address', indent: 2, name: 'f_custom_ip', type: 'text', maxlen: 15, size: 20,
+	{ title: '<% _("Custom IP address"); %>', indent: 2, name: 'f_custom_ip', type: 'text', maxlen: 15, size: 20,
 		value: a ? nvram.ddnsx_ip : '', hidden: !a },
-	{ title: 'Auto refresh every', name: 'ddnsx_refresh', type: 'text', maxlen: 8, size: 8, suffix: ' days <small>(0 = disable)</small>', value: fixInt(nvram.ddnsx_refresh, 0, 90, 28) }
+	{ title: '<% _("Auto refresh every"); %>', name: 'ddnsx_refresh', type: 'text', maxlen: 8, size: 8, suffix: ' <% _("days"); %> <small>(0 = <% _("disable"); %>)</small>', value: fixInt(nvram.ddnsx_refresh, 0, 90, 28) }
 ]);
 </script>
 </div>
@@ -428,28 +428,28 @@ for (i = 0; i < 2; ++i) {
 	if (u.length != 2) u = ['', ''];
 	h = (v[0] == '');
 
-	W('<div class="section-title">Dynamic DNS ' + (i + 1) + '</div><div class="section">');
+	W('<div class="section-title"><% _("Dynamic DNS"); %> ' + (i + 1) + '</div><div class="section">');
 	createFieldTable('', [
-		{ title: 'Service', name: 'f_service' + i, type: 'select', options: services, value: v[0] },
-		{ title: 'URL', indent: 2, text: '<a href="" id="url' + i + '" target="tomato-ext-ddns"></a>', hidden: 1 },
-		{ title: '&nbsp;', text: '<small>* This service determines the IP address using its own method.</small>', hidden: 1, rid: 'row_z' + i },
-		{ title: 'Hostname', name: 'f_hosttop' + i, type: 'text', maxlen: 96, size: 35, value: v[2], hidden: 1 },
-		{ title: 'Username', name: 'f_user' + i, type: 'text', maxlen: 64, size: 35, value: u[0], hidden: 1 },
-		{ title: 'Password', name: 'f_pass' + i, type: 'password', maxlen: 64, size: 35, peekaboo: 1, value: u[1], hidden: 1 },
-		{ title: 'Hostname', name: 'f_host' + i, type: 'text', maxlen: 255, size: 80, value: v[2], hidden: 1 },
-		{ title: 'URL', name: 'f_cust' + i, type: 'text', maxlen: 255, size: 80, value: v[6], hidden: 1 },
-		{ title: ' ', text: '(Use @IP for the current IP address)', rid: ('custmsg' + i), hidden: 1 },
-		{ title: 'Wildcard', indent: 2, name: 'f_wild' + i, type: 'checkbox', value: v[3] != '0', hidden: 1 },
-		{ title: 'MX', name: 'f_mx' + i, type: 'text', maxlen: 32, size: 35, value: v[4], hidden: 1 },
-		{ title: 'Backup MX', indent: 2, name: 'f_bmx' + i, type: 'checkbox', value: v[5] != '0', hidden: 1 },
-		{ title: 'Use as DNS', name: 'f_opendns' + i, type: 'checkbox', value: (opendnsInUse == opendns.length),
-			suffix: '<br><small>(Current DNS: ' + dns  + ')</small>', hidden: 1 },
-		{ title: 'Token / URL', name: 'f_afraid' + i, type: 'text', maxlen: 255, size: 80, value: v[6], hidden: 1 },
-		{ title: 'Save state when IP changes (nvram commit)', name: 'f_ddnsx_save' + i, type: 'checkbox', value: nvram.ddnsx_save == '1', hidden: 1 },
-		{ title: 'Force next update', name: 'f_force' + i, type: 'checkbox', value: 0, hidden: 1 },
+		{ title: '<% _("Service"); %>', name: 'f_service' + i, type: 'select', options: services, value: v[0] },
+		{ title: '<% _("URL"); %>', indent: 2, text: '<a href="" id="url' + i + '" target="tomato-ext-ddns"></a>', hidden: 1 },
+		{ title: '&nbsp;', text: '<small>* <% _("This service determines the IP address using its own method"); %>.</small>', hidden: 1, rid: 'row_z' + i },
+		{ title: '<% _("Hostname"); %>', name: 'f_hosttop' + i, type: 'text', maxlen: 96, size: 35, value: v[2], hidden: 1 },
+		{ title: '<% _("Username"); %>', name: 'f_user' + i, type: 'text', maxlen: 64, size: 35, value: u[0], hidden: 1 },
+		{ title: '<% _("Password"); %>', name: 'f_pass' + i, type: 'password', maxlen: 64, size: 35, peekaboo: 1, value: u[1], hidden: 1 },
+		{ title: '<% _("Hostname"); %>', name: 'f_host' + i, type: 'text', maxlen: 255, size: 80, value: v[2], hidden: 1 },
+		{ title: '<% _("URL"); %>', name: 'f_cust' + i, type: 'text', maxlen: 255, size: 80, value: v[6], hidden: 1 },
+		{ title: ' ', text: '(<% _("Use @IP for the current IP address"); %>)', rid: ('custmsg' + i), hidden: 1 },
+		{ title: '<% _("Wildcard"); %>', indent: 2, name: 'f_wild' + i, type: 'checkbox', value: v[3] != '0', hidden: 1 },
+		{ title: '<% _("MX"); %>', name: 'f_mx' + i, type: 'text', maxlen: 32, size: 35, value: v[4], hidden: 1 },
+		{ title: '<% _("Backup MX"); %>', indent: 2, name: 'f_bmx' + i, type: 'checkbox', value: v[5] != '0', hidden: 1 },
+		{ title: '<% _("Use as DNS"); %>', name: 'f_opendns' + i, type: 'checkbox', value: (opendnsInUse == opendns.length),
+			suffix: '<br><small>(<% _("Current DNS"); %>: ' + dns  + ')</small>', hidden: 1 },
+		{ title: '<% _("Token"); %> / <% _("URL"); %>', name: 'f_afraid' + i, type: 'text', maxlen: 255, size: 80, value: v[6], hidden: 1 },
+		{ title: '<% _("Save state when IP changes"); %> (<% _("nvram commit"); %>)', name: 'f_ddnsx_save' + i, type: 'checkbox', value: nvram.ddnsx_save == '1', hidden: 1 },
+		{ title: '<% _("Force next update"); %>', name: 'f_force' + i, type: 'checkbox', value: 0, hidden: 1 },
 		null,
-		{ title: 'Last IP Address', custom: msgLoc(ddnsx_last[i]), rid: 'last-update' + i, hidden: 1 },
-		{ title: 'Last Result', custom: msgLoc(ddnsx_msg[i]), rid: 'last-response' + i, hidden: h }
+		{ title: '<% _("Last IP Address"); %>', custom: msgLoc(ddnsx_last[i]), rid: 'last-update' + i, hidden: 1 },
+		{ title: '<% _("Last Result"); %>', custom: msgLoc(ddnsx_msg[i]), rid: 'last-response' + i, hidden: h }
 	]);
 	W('</div>');
 }
@@ -461,8 +461,8 @@ for (i = 0; i < 2; ++i) {
 </td></tr>
 <tr><td id='footer' colspan=2>
 	<span id='footer-msg'></span>
-	<input type='button' value='Save' id='save-button' onclick='save()'>
-	<input type='button' value='Cancel' id='cancel-button' onclick='reloadPage();'>
+	<input type='button' value='<% _("Save"); %>' id='save-button' onclick='save()'>
+	<input type='button' value='<% _("Cancel"); %>' id='cancel-button' onclick='reloadPage();'>
 </td></tr>
 </table>
 <script type='text/javascript'>verifyFields(null, 1);</script>

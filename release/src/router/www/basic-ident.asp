@@ -42,8 +42,8 @@ function save()
 <form id='_fom' method='post' action='tomato.cgi'>
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
-	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='title'><% _("Tomato"); %></div>
+	<div class='version'><% _("Version"); %> <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -55,7 +55,7 @@ function save()
 <input type='hidden' name='_service' value='*'>
 
 
-<div class='section-title'>Router Identification</div>
+<div class='section-title'><% _("Router Identification"); %></div>
 <div class='section'>
 <script type='text/javascript'>
 createFieldTable('', [

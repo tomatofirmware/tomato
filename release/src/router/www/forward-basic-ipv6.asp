@@ -11,7 +11,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Forwarding: Basic IPv6</title>
+<title>[<% ident(); %>] <% _("Forwarding"); %>: <% _("Basic IPv6"); %></title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <link rel='stylesheet' type='text/css' href='color.css'>
 <script type='text/javascript' src='tomato.js'></script>
@@ -69,7 +69,7 @@ fog.sortCompare = function(a, b) {
 }
 
 fog.dataToView = function(data) {
-	return [(data[0] != '0') ? 'On' : '', ['TCP', 'UDP', 'Both'][data[1] - 1], (data[2].match(/(.+)-(.+)/)) ? (RegExp.$1 + ' -<br>' + RegExp.$2) : data[2], data[3], data[4], data[5]];
+	return [(data[0] != '0') ? 'On' : '', ['TCP', 'UDP', '<% _("Both"); %>'][data[1] - 1], (data[2].match(/(.+)-(.+)/)) ? (RegExp.$1 + ' -<br>' + RegExp.$2) : data[2], data[3], data[4], data[5]];
 }
 
 fog.fieldValuesToData = function(row) {
@@ -114,7 +114,7 @@ fog.setup = function() {
 		{ type: 'text', maxlen: 140 },
 		{ type: 'text', maxlen: 16 },
 		{ type: 'text', maxlen: 32 }]);
-	this.headerSet(['On', 'Proto', 'Src Address', 'Dest Address', 'Dest Ports', 'Description']);
+	this.headerSet(['On', '<% _("Proto"); %>', '<% _("Src Address"); %>', '<% _("Dest Address"); %>', '<% _("Dest Ports"); %>', '<% _("Description"); %>']);
 	var nv = nvram.ipv6_portforward.split('>');
 	for (var i = 0; i < nv.length; ++i) {
 		var r;
@@ -163,8 +163,8 @@ function init()
 <form id='_fom' method='post' action='javascript:{}'>
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
-	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='title'><% _("Tomato"); %></div>
+	<div class='version'><% _("Version"); %> <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -177,18 +177,18 @@ function init()
 
 <input type='hidden' name='ipv6_portforward'>
 
-<div class='section-title'>IPv6 Port Forwarding</div>
+<div class='section-title'><% _("IPv6 Port Forwarding"); %></div>
 <div class='section'>
 	<table class='tomato-grid' cellspacing=1 id='fo-grid6'></table>
 	<script type='text/javascript'>fog.setup();</script>
 </div>
 
 <div>
-Opens access to ports on machines inside the LAN, but does <b>not</b> re-map ports.
+<% _("Opens access to ports on machines inside the LAN, but does <b>not</b> re-map ports"); %>.
 <ul>
-<li><b>Src Address</b> <i>(optional)</i> - Forward only if from this address. Ex: "2001:4860:800b::/48", "me.example.com".
-<li><b>Dest Address</b> <i>(optional)</i> - The destination address inside the LAN.
-<li><b>Dest Ports</b> - The ports to be opened for forwarding. Ex: "2345", "200,300", "200-300,400".
+<li><b><% _("Src Address"); %></b> <i>(<% _("optional"); %>)</i> - <% _("Forward only if from this address"); %>. <% _("Ex"); %>: "2001:4860:800b::/48", "me.example.com".
+<li><b><% _("Dest Address"); %></b> <i>(<% _("optional"); %>)</i> - <% _("The destination address inside the LAN"); %>.
+<li><b><% _("Dest Ports"); %></b> - <% _("The ports to be opened for forwarding"); %>. <% _("Ex"); %>: "2345", "200,300", "200-300,400".
 </ul>
 </div>
 
@@ -200,8 +200,8 @@ Opens access to ports on machines inside the LAN, but does <b>not</b> re-map por
 </td></tr>
 <tr><td id='footer' colspan=2>
 	<span id='footer-msg'></span>
-	<input type='button' value='Save' id='save-button' onclick='save()'>
-	<input type='button' value='Cancel' id='cancel-button' onclick='reloadPage();'>
+	<input type='button' value='<% _("Save"); %>' id='save-button' onclick='save()'>
+	<input type='button' value='<% _("Cancel"); %>' id='cancel-button' onclick='reloadPage();'>
 </td></tr>
 </table>
 </form>

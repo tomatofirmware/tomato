@@ -127,8 +127,8 @@ function save()
 createFieldTable('', [
 	{ title: '<% _("Respond to ICMP ping"); %>', name: 'f_icmp', type: 'checkbox', value: nvram.block_wan == '0' },
 	{ title: '<% _("Limits per second"); %>', name: 'f_icmp_limit', type: 'checkbox', value: nvram.block_wan_limit != '0' },
-	{ title: '<% _("ICMP"); %>', indent: 2, name: 'f_icmp_limit_icmp', type: 'text', maxlen: 3, size: 3, suffix: ' <small> request per second</small>', value: fixInt(nvram.block_wan_limit_icmp || 1, 1, 300, 5) },
-	{ title: '<% _("Traceroute"); %>', indent: 2, name: 'f_icmp_limit_traceroute', type: 'text', maxlen: 3, size: 3, suffix: ' <small> request per second</small>', value: fixInt(nvram.block_wan_limit_tr || 5, 1, 300, 5) },
+	{ title: '<% _("ICMP"); %>', indent: 2, name: 'f_icmp_limit_icmp', type: 'text', maxlen: 3, size: 3, suffix: ' <small> <% _("request per second"); %></small>', value: fixInt(nvram.block_wan_limit_icmp || 1, 1, 300, 5) },
+	{ title: '<% _("Traceroute"); %>', indent: 2, name: 'f_icmp_limit_traceroute', type: 'text', maxlen: 3, size: 3, suffix: ' <small> <% _("request per second"); %></small>', value: fixInt(nvram.block_wan_limit_tr || 5, 1, 300, 5) },
 	null,
 	{ title: '<% _("Enable SYN cookies"); %>', name: 'f_syncookies', type: 'checkbox', value: nvram.ne_syncookies != '0' }
 ]);

@@ -335,7 +335,7 @@ wlg.onAdd = function() {
 	verifyFields(null,1);
 
 	var e = E('footer-msg');
-	e.innerHTML = 'After configuring this VIF, review and save your settings on the Overview tab.';
+	e.innerHTML = '<% _("After configuring this VIF, review and save your settings on the Overview tab"); %>.';
 	e.style.visibility = 'visible';
 /* REMOVE-BEGIN */
 //	setTimeout(
@@ -502,7 +502,7 @@ function init() {
 
 	E('sesdiv').style.display = '';
 	if (uninit < 0) {
-		E('sesdiv').innerHTML = '<i>This feature is not supported on this router.</i>';
+		E('sesdiv').innerHTML = '<i><% _("This feature is not supported on this router"); %>.</i>';
 		return;
 	}
 
@@ -880,7 +880,7 @@ REMOVE-END */
 			case 'mixed':
 			case 'n-only':
 				if (nphy && (a.value == 'tkip') && (sm2.indexOf('wpa') != -1)) {
-					ferror.set(a, 'TKIP encryption is not supported with WPA / WPA2 in N mode.', quiet || !ok);
+					ferror.set(a, '<% _("TKIP encryption is not supported with WPA / WPA2 in N mode"); %>.', quiet || !ok);
 					ok = 0;
 				}
 				else ferror.clear(a);
@@ -897,11 +897,11 @@ REMOVE-END */
 		if ((wmode == 'sta') || (wmode == 'wet')) {
 			++wlclnt;
 			if (wlclnt > 1) {
-				ferror.set(b, 'Only one wireless interface can be configured in client mode.', quiet || !ok);
+				ferror.set(b, '<% _("Only one wireless interface can be configured in client mode"); %>.', quiet || !ok);
 				ok = 0;
 			}
 			else if (a.value == 'n-only') {
-				ferror.set(a, 'N-only is not supported in wireless client modes, use Auto.', quiet || !ok);
+				ferror.set(a, '<% _("N-only is not supported in wireless client modes, use Auto"); %>.', quiet || !ok);
 				ok = 0;
 			}
 		}
@@ -910,7 +910,7 @@ REMOVE-END */
 		ferror.clear(a);
 		if (wl_vis[vidx]._f_wl_wpa_psk == 1) {
 			if ((a.value.length < 8) || ((a.value.length == 64) && (a.value.search(/[^0-9A-Fa-f]/) != -1))) {
-				ferror.set('_wl'+u+'_wpa_psk', 'Invalid pre-shared key. Please enter at least 8 characters or 64 hexadecimal digits.', quiet || !ok);
+				ferror.set('_wl'+u+'_wpa_psk', '<% _("Invalid pre-shared key"); %>. <% _("Please enter at least 8 characters or 64 hexadecimal digits"); %>.', quiet || !ok);
 				ok = 0;
 			}
 		}
@@ -918,7 +918,7 @@ REMOVE-END */
 		if (u.toString().indexOf('.') < 0) {
 			// wl channel
 			if (((wmode == 'wds') || (wmode == 'apwds')) && (wl_vis[vidx]._wl_channel == 1) && (E('_wl'+u+'_channel').value == '0')) {
-				ferror.set('_wl'+u+'_channel', 'Fixed wireless channel required in WDS mode.', quiet || !ok);
+				ferror.set('_wl'+u+'_channel', '<% _("Fixed wireless channel required in WDS mode"); %>.', quiet || !ok);
 				ok = 0;
 			}
 			else ferror.clear('_wl'+u+'_channel');
@@ -980,7 +980,7 @@ REMOVE-END */
 					else if (!isMAC0(a.value)) b = 1;
 			}
 			if (!b) {
-				ferror.set('_f_wl'+u+'_wds_0', 'WDS MAC address required.', quiet || !ok);
+				ferror.set('_f_wl'+u+'_wds_0', '<% _("WDS MAC address required"); %>.', quiet || !ok);
 				ok = 0;
 			}
 		}
@@ -1215,7 +1215,7 @@ var cmd = null;
 function do_pre_submit_form(fom) {
 
 	var footermsg = E('footer-msg');
-	footermsg.innerHTML = 'Saving...';
+	footermsg.innerHTML = '<% _("Saving"); %>...';
 	footermsg.style.visibility = 'visible';
 
 	E('save-button').disabled = 1;
@@ -1330,8 +1330,8 @@ function escapeText(s) {
 <form id='_fom' method='post' action='tomato.cgi'>
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
-  <div class='title'>Tomato</div>
-  <div class='version'>Version <% version(); %></div>
+  <div class='title'><% _("Tomato"); %></div>
+  <div class='version'><% _("Version"); %> <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -1394,7 +1394,7 @@ for (var uidx = 0; uidx < wl_ifaces.length; ++uidx) {
 <div class='section' id='sesdivoptions' style='display:none'>
 <script type='text/javascript'>
 createFieldTable('', [
-{ title: 'Use alternate NAS startup sequence', name: 'f_nas_alternate', type: 'checkbox', value: nvram.nas_alternate == '1' }
+{ title: '<% _("Use alternate NAS startup sequence"); %>', name: 'f_nas_alternate', type: 'checkbox', value: nvram.nas_alternate == '1' }
 ]);
 </script>
 </div>

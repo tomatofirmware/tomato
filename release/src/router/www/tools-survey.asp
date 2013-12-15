@@ -11,7 +11,7 @@
 <head>
 <meta http-equiv='content-type' content='text/html;charset=utf-8'>
 <meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] Tools: Wireless Survey</title>
+<title>[<% ident(); %>] <% _("Tools"); %>: <% _("Wireless Survey"); %></title>
 <link rel='stylesheet' type='text/css' href='tomato.css'>
 <link rel='stylesheet' type='text/css' href='color.css'>
 <script type='text/javascript' src='tomato.js'></script>
@@ -136,7 +136,7 @@ sg.populate = function()
 		e.ssid = s[1];
 		e.channel = s[2];
 		if (s[7] != 0 && s[9] != 0) {
-			e.channel = e.channel + '<br><small>' + s[9] + ' MHz</small>';
+			e.channel = e.channel + '<br><small>' + s[9] + ' <% _("MHz"); %></small>';
 		}
 		e.rssi = s[4];
 		e.noise = s[5];
@@ -236,7 +236,7 @@ sg.populate = function()
 
 		mac = e.bssid;
 		if (mac.match(/^(..):(..):(..)/))
-			mac = '<a href="http://standards.ieee.org/cgi-bin/ouisearch?' + RegExp.$1 + '-' + RegExp.$2 + '-' + RegExp.$3 + '" target="_new" title="OUI search">' + mac + '</a>';
+			mac = '<a href="http://standards.ieee.org/cgi-bin/ouisearch?' + RegExp.$1 + '-' + RegExp.$2 + '-' + RegExp.$3 + '" target="_new" title="OUI <% _("search"); %>">' + mac + '</a>';
 
 		sg.insert(-1, e, [
 			'<small>' + seen + '</small>',
@@ -251,10 +251,10 @@ sg.populate = function()
 	}
 
 	s = '';
-	if (useAjax()) s = added + ' added, ' + removed + ' removed, ';
-	s += entries.length + ' total.';
+	if (useAjax()) s = added + ' <% _("added"); %>, ' + removed + ' <% _("removed"); %>, ';
+	s += entries.length + ' <% _("total"); %>.';
 
-	s += '<br><br><small>Last updated: ' + (new Date()).toWHMS() + '</small>';
+	s += '<br><br><small><% _("Last updated"); %>: ' + (new Date()).toWHMS() + '</small>';
 	setMsg(s);
 
 	wlscandata = [];
@@ -262,7 +262,7 @@ sg.populate = function()
 
 sg.setup = function() {
 	this.init('survey-grid', 'sort');
-	this.headerSet(['Last Seen', 'SSID', 'BSSID', 'RSSI &nbsp; &nbsp; ', 'Noise &nbsp; &nbsp; ', 'Quality', 'Ch', 'Capabilities', 'Rates']);
+	this.headerSet(['<% _("Last Seen"); %>', 'SSID', 'BSSID', 'RSSI &nbsp; &nbsp; ', '<% _("Noise"); %> &nbsp; &nbsp; ', '<% _("Quality"); %>', 'Ch', '<% _("Capabilities"); %>', '<% _("Rates"); %>']);
 	this.populate();
 	this.sort(0);
 }
@@ -306,8 +306,8 @@ function init()
 <form action='javascript:{}'>
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
-	<div class='title'>Tomato</div>
-	<div class='version'>Version <% version(); %></div>
+	<div class='title'><% _("Tomato"); %></div>
+	<div class='version'><% _("Version"); %> <% version(); %></div>
 </td></tr>
 <tr id='body'><td id='navi'><script type='text/javascript'>navi()</script></td>
 <td id='content'>
@@ -315,7 +315,7 @@ function init()
 
 <!-- / / / -->
 
-<div class='section-title'>Wireless Site Survey</div>
+<div class='section-title'><% _("Wireless Site Survey"); %></div>
 <div class='section'>
 	<table id='survey-grid' class='tomato-grid' cellspacing=0></table>
 	<div id='survey-msg'></div>
@@ -331,7 +331,7 @@ function init()
 	<br><br><br><br>
 	<script type='text/javascript'>
 	if ('<% wlclient(); %>' == '0') {
-		document.write('<small>Warning: Wireless connections to this router may be disrupted while using this tool.</small>');
+		document.write('<small><% _("Warning"); %>: <% _("Wireless connections to this router may be disrupted while using this tool"); %>.</small>');
 	}
 	</script>
 </div>

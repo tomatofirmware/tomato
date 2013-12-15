@@ -119,7 +119,7 @@ createFieldTable('', [
 	{ title: '<% _("Command"); %>', name: 'f_cmd', type: 'textarea', wrap: 'off', value: '' }
 ]);
 </script>
-<div style='float:left'><input type='button' value='Execute' onclick='execute()' id='execb'></div>
+<div style='float:left'><input type='button' value='<% _("Execute"); %>' onclick='execute()' id='execb'></div>
 <script type='text/javascript'>genStdRefresh(1,5,'ref.toggle()');</script>
 </div>
 

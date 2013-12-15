@@ -377,7 +377,7 @@ REMOVE-END */
   var e = E('footer-msg');
 
   if(vlg.countWan() != 1) {
-    e.innerHTML = 'Cannot proceed: one VID must be assigned to WAN.';
+    e.innerHTML = '<% _("Cannot proceed: one VID must be assigned to WAN"); %>.';
     e.style.visibility = 'visible';
     setTimeout(
       function() {
@@ -388,7 +388,7 @@ REMOVE-END */
   }
 
   if(vlg.countLan(0) != 1) {
-    e.innerHTML = 'Cannot proceed: one and only one VID must be assigned to the primary LAN (br0).';
+    e.innerHTML = '<% _("Cannot proceed: one and only one VID must be assigned to the primary LAN (br0)"); %>.';
     e.style.visibility = 'visible';
     setTimeout(
       function() {
@@ -399,7 +399,7 @@ REMOVE-END */
   }
 
   if (v.length < 1) {
-    e.innerHTML = 'Cannot proceed without setting a default VID';
+    e.innerHTML = '<% _("Cannot proceed without setting a default VID"); %>';
     e.style.visibility = 'visible';
     setTimeout(
       function() {
@@ -437,7 +437,7 @@ if(port_vlan_supported) { // aka if(supported_hardware) block
     { type: 'checkbox', prefix: '<div class="centered">', suffix: '</div>' },
     { type: 'select', options: [[1, 'none'],[2, 'WAN'],[3, 'LAN (br0)'],[4, 'LAN1 (br1)'],[5, 'LAN2 (br2)'],[6, 'LAN3 (br3)']], prefix: '<div class="centered">', suffix: '</div>' }]);
 
-    this.headerSet(['VLAN', 'VID', 'Port 1', '<% _("Tagged"); %>', 'Port 2', '<% _("Tagged"); %>', 'Port 3', '<% _("Tagged"); %>', 'Port 4', '<% _("Tagged"); %>', 'WAN Port', '<% _("Tagged"); %>', 'Default', 'Bridge']);
+    this.headerSet(['VLAN', 'VID', '<% _("Port 1"); %>', '<% _("Tagged"); %>', '<% _("Port 2"); %>', '<% _("Tagged"); %>', '<% _("Port 3"); %>', '<% _("Tagged"); %>', '<% _("Port 4"); %>', '<% _("Tagged"); %>', '<% _("WAN Port"); %>', '<% _("Tagged"); %>', '<% _("Default"); %>', '<% _("Bridge"); %>']);
 
 	vlg.populate();
     vlg.canDelete = false;
@@ -601,7 +601,7 @@ REMOVE-END */
 
     if ((f[COL_P0].checked == 1) && (this.countElem(COL_P0,1)>0)) {
       if (((this.countElem(COL_P0,1) != this.countElem(COL_P0T,1)) || (f[COL_P0T].checked==0))) {
-        ferror.set(f[COL_P0T], 'Port 1 cannot be assigned to more than one VLAN unless frames are tagged on all VLANs Port 1 is member', quiet);
+        ferror.set(f[COL_P0T], '<% _("Port 1 cannot be assigned to more than one VLAN unless frames are tagged on all VLANs Port 1 is member"); %>', quiet);
         valid=0;
       } else {
         ferror.clear(f[COL_P0T]);
@@ -609,7 +609,7 @@ REMOVE-END */
     }
     if ((f[COL_P1].checked == 1) && (this.countElem(COL_P1,1)>0)) {
       if (((this.countElem(COL_P1,1) != this.countElem(COL_P1T,1)) || (f[COL_P1T].checked==0))) {
-        ferror.set(f[COL_P1T], 'Port 2 cannot be assigned to more than one VLAN unless frames are tagged on all VLANs Port 2 is member', quiet);
+        ferror.set(f[COL_P1T], '<% _("Port 2 cannot be assigned to more than one VLAN unless frames are tagged on all VLANs Port 2 is member"); %>', quiet);
         valid=0;
       } else {
         ferror.clear(f[COL_P1T]);
@@ -617,7 +617,7 @@ REMOVE-END */
     }
     if ((f[COL_P2].checked == 1) && (this.countElem(COL_P2,1)>0)) {
       if (((this.countElem(COL_P2,1) != this.countElem(COL_P2T,1)) || (f[COL_P2T].checked==0))) {
-        ferror.set(f[COL_P2T], 'Port 3 cannot be assigned to more than one VLAN unless frames are tagged on all VLANs Port 3 is member', quiet);
+        ferror.set(f[COL_P2T], '<% _("Port 3 cannot be assigned to more than one VLAN unless frames are tagged on all VLANs Port 3 is member"); %>', quiet);
         valid=0;
       } else {
         ferror.clear(f[COL_P2T]);
@@ -681,16 +681,16 @@ REMOVE-END */
   vlg.dataToView = function(data) {
     return [data[COL_VID],
     ((data[COL_MAP].toString() == '') || (data[COL_MAP].toString() == '0')) ? (parseInt(E('_vlan0tag').value) * 1 + data[COL_VID] *1 ).toString() : data[COL_MAP].toString(),
-    (data[COL_P0].toString() != '0') ? 'Yes' : '',
-    (data[COL_P0T].toString() != '0') ? 'On' : '',
-    (data[COL_P1].toString() != '0') ? 'Yes' : '',
-    (data[COL_P1T].toString() != '0') ? 'On' : '',
-    (data[COL_P2].toString() != '0') ? 'Yes' : '',
-    (data[COL_P2T].toString() != '0') ? 'On' : '',
-    (data[COL_P3].toString() != '0') ? 'Yes' : '',
-    (data[COL_P3T].toString() != '0') ? 'On' : '',
-    (data[COL_P4].toString() != '0') ? 'Yes' : '',
-    (data[COL_P4T].toString() != '0') ? 'On' : '',
+    (data[COL_P0].toString() != '0') ? '<% _("Yes"); %>' : '',
+    (data[COL_P0T].toString() != '0') ? '<% _("On"); %>' : '',
+    (data[COL_P1].toString() != '0') ? '<% _("Yes"); %>' : '',
+    (data[COL_P1T].toString() != '0') ? '<% _("On"); %>' : '',
+    (data[COL_P2].toString() != '0') ? '<% _("Yes"); %>' : '',
+    (data[COL_P2T].toString() != '0') ? '<% _("On"); %>' : '',
+    (data[COL_P3].toString() != '0') ? '<% _("Yes"); %>' : '',
+    (data[COL_P3T].toString() != '0') ? '<% _("On"); %>' : '',
+    (data[COL_P4].toString() != '0') ? '<% _("Yes"); %>' : '',
+    (data[COL_P4T].toString() != '0') ? '<% _("On"); %>' : '',
     (data[COL_VID_DEF].toString() != '0') ? '*' : '',
     ['', 'WAN', 'LAN (br0)', 'LAN1 (br1)', 'LAN2 (br2)', 'LAN3 (br3)' ][data[COL_BRI] - 1]];
   }
@@ -954,9 +954,9 @@ function earlyInit() {
 <div class='section'>
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: 'First 802.1Q VLAN tag', name: 'vlan0tag', type: 'text', maxlen:4, size:6,
+	{ title: '<% _("First 802.1Q VLAN tag"); %>', name: 'vlan0tag', type: 'text', maxlen:4, size:6,
 		value: fixInt(nvram.vlan0tag, 0, 4080, 0),
-		suffix: ' <small><i>(range: 0 - 4080; must be a multiple of 16; set to 0 to disable)</i></small>' }
+		suffix: ' <small><i>(<% _("range: 0 - 4080"); %>; <% _("must be a multiple of 16"); %>; <% _("set to 0 to disable"); %>)</i></small>' }
 ]);
 </script>
 </div>
@@ -970,7 +970,7 @@ var f = [];
 for (var uidx = 0; uidx < wl_ifaces.length; ++uidx) {
   var u = wl_fface(uidx);
   f.push(
-    { title: ('Bridge ' + wl_ifaces[uidx][0] + ' to'), name: ('f_bridge_wlan'+u+'_to'), type: 'select', 
+    { title: ('<% _("Bridge"); %> ' + wl_ifaces[uidx][0] + ' <% _("to"); %>'), name: ('f_bridge_wlan'+u+'_to'), type: 'select', 
      options: [[0,'LAN (br0)'],[1,'LAN1  (br1)'],[2,'LAN2 (br2)'],[3,'LAN3 (br3)'],[4,'none']], value: 4 } );
 }
 createFieldTable('',f);
@@ -1005,19 +1005,19 @@ if(!trunk_vlan_supported)
 </ul>
 
 <ul>
-<li><b>VID Offset</b> - <i><% _("EXPERIMENTAL"); %></i> - First 802.1Q VLAN tag to be used as <i>base/initial tag/VID</i> for VLAN and VID assignments. This allows using VIDs larger than 15 on (older) devices such as the Linksys WRT54GL v1.1 (in contiguous blocks/ranges with up to 16 VLANs/VIDs). Set to '0' (zero) to disable this feature and VLANs will have the very same/identical value for its VID, as usual (from 0 to 15).</li>
+<li><b><% _("VID Offset"); %></b> - <i><% _("EXPERIMENTAL"); %></i> - <% _("First 802.1Q VLAN tag to be used as <i>base/initial tag/VID</i> for VLAN and VID assignments. This allows using VIDs larger than 15 on (older) devices such as the Linksys WRT54GL v1.1 (in contiguous blocks/ranges with up to 16 VLANs/VIDs). Set to '0' (zero) to disable this feature and VLANs will have the very same/identical value for its VID, as usual (from 0 to 15)"); %>.</li>
 </ul>
 
 <ul>
-<li><b><% _("Wireless"); %></b> - Assignments of wireless interfaces to different LAN briges. You should probably be using and/or check things on <a href=advanced-wlanvifs.asp>Advanced/Virtual Wireless</a> and <a href=basic-network.asp>Basic/Network</a>.</li>
+<li><b><% _("Wireless"); %></b> - <% _("Assignments of wireless interfaces to different LAN briges. You should probably be using and/or check things on <a href=advanced-wlanvifs.asp>Advanced/Virtual Wireless</a> and <a href=basic-network.asp>Basic/Network</a>"); %>.</li>
 </ul>
 
 <small>
 <ul>
 <li><b><% _("Other relevant notes/hints"); %>:</b>
 <ul>
-<li>One VID <i><% _("must"); %></i> be assigned to WAN.</li>
-<li>One VID <i><% _("must"); %></i> be selected as the default.</li>
+<li><% _("One VID"); %> <i><% _("must"); %></i> <% _("be assigned to"); %> WAN.</li>
+<li><% _("One VID"); %> <i><% _("must"); %></i> <% _("be selected as the default"); %>.</li>
 <script type='text/javascript'>
 if((trunk_vlan_supported) || (nvram.trunk_vlan_so == '1')) {
   W('<li>To prevent 802.1Q compatibility issues, avoid using VID "0" as 802.1Q specifies that frames with a tag of "0" do not belong to any VLAN (the tag contains only user priority information).</li>');
