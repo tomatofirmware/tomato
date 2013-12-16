@@ -631,17 +631,19 @@ static void check_bootnv(void)
 			dirty |= check_nv("pci/1/1/macaddr", mac);
 		}
 		break;
-        case MODEL_WNDR4000:
-                dirty |= check_nv("vlan2hwname", "et0");
-                if (strncasecmp(nvram_safe_get("pci/1/1/macaddr"), "84:1B:5E", 8) == 0 ||
-                    strncasecmp(nvram_safe_get("sb/1/macaddr"), "84:1B:5E", 8) == 0) {
-                        strcpy(mac, nvram_safe_get("et0macaddr"));
-                        inc_mac(mac, 2);
-                        dirty |= check_nv("sb/1/macaddr", mac);
-                        inc_mac(mac, 1);
-                        dirty |= check_nv("pci/1/1/macaddr", mac);
-                }
-                break;
+    case MODEL_WNDR4000:
+		// Have to check MAC addresses, specific configuration needed: 
+		// Part of MAC information is in CFE, the rest in board_data (which easily gets broken when playing with firmware ... :-))
+		// Note that after a clean (30/30/30) reset, addresses are "broken" ... but the code below fixes them, tied to et0macaddr!
+		// Also, CFE will update what it sees based on NVRAM ... 
+		//    so after 30/30/30 reset it sees different values than after a full Tomato boot (that fixes these, updating NVRAM)
+        dirty |= check_nv("vlan2hwname", "et0");
+        strcpy(mac, nvram_safe_get("et0macaddr"));
+        // inc_mac(mac, 2);
+        dirty |= check_nv("sb/1/macaddr", mac);
+        inc_mac(mac, -1);
+        dirty |= check_nv("pci/1/1/macaddr", mac);
+        break;
 	case MODEL_E900:
 	case MODEL_E1000v2:
 	case MODEL_E1500:
@@ -1589,20 +1591,110 @@ static int init_nvram(void)
 			nvram_set("wl_ifname", "eth1");
 		}
 		break;
-        case MODEL_WNDR4000:
-                mfr = "Netgear";
-                name = "WNDR4000";
-                features = SUP_SES | SUP_80211N | SUP_1000ET;
-                nvram_set("blink_wl", "1");
+    case MODEL_WNDR4000:
+        mfr = "Netgear";
+        name = "WNDR4000";
+        features = SUP_SES | SUP_80211N | SUP_1000ET;
+        nvram_set("blink_wl", "1");
 #ifdef TCONFIG_USB
-                nvram_set("usb_uhci", "-1");
+        nvram_set("usb_uhci", "-1");
 #endif
-                if (!nvram_match("t_fix1", (char *)name)) {
-                        nvram_set("lan_ifnames", "vlan1 eth1 eth2");
-                        nvram_set("wan_ifnameX", "vlan2");
-                        nvram_set("wl_ifname", "eth1");
-                }
-                break;
+        if (!nvram_match("t_fix1", (char *)name)) {
+                nvram_set("lan_ifnames", "vlan1 eth1 eth2");
+                nvram_set("wan_ifnameX", "vlan2");
+                nvram_set("wl_ifname", "eth1");
+        }
+        
+        // Set Key Parameters for Wireless Interfaces: SB (Southbridge) and PCI, to configure HW (as Netgear intends)
+        // Credit for the nvram_tuple approach below goes to DD-WRT (borrowed here for simplicity)!
+        // Parameters optimized based on clean Netgear build (NVRAM extracted and checked vs. Tomato 30/30/30 Reset version of NVRAM)
+		struct nvram_tuple wndr4000_sb_1_params[] = {
+
+			{"cck2gpo", "0x1111", 0},
+			//{"ccode", "EU", 0},
+			{"cddpo", "0x1111", 0},
+			{"extpagain2g", "3", 0},
+			{"maxp2ga0", "0x56", 0},
+			{"maxp2ga1", "0x56", 0},
+			{"mcs2gpo0", "0x1000", 0},
+			{"mcs2gpo1", "0x7531", 0},
+			{"mcs2gpo2", "0x2111", 0},
+			{"mcs2gpo3", "0xA864", 0},
+			{"mcs2gpo4", "0x3333", 0},
+			{"mcs2gpo5", "0x9864", 0},
+			{"mcs2gpo6", "0x3333", 0},
+			{"mcs2gpo7", "0xB975", 0},
+			{"ofdm2gpo", "0x75331111", 0},
+			{"pa2gw0a0", "0xFEA6", 0},
+			{"pa2gw0a1", "0xFE9E", 0},
+			{"pa2gw1a0", "0x191D", 0},
+			{"pa2gw1a1", "0x1809", 0},
+			{"pa2gw2a0", "0xFA18", 0},
+			{"pa2gw2a1", "0xFA4B", 0},
+			{"regrev", "15", 0},
+			{"stbcpo", "0x1111", 0},
+
+			{0, 0, 0}
+		};
+
+		/*
+		 * set router's extra parameters 
+		 */
+        struct nvram_tuple *basic_params = NULL;
+        struct nvram_tuple *extra_params = NULL;
+		extra_params = wndr4000_sb_1_params;
+		while (extra_params->name) {
+			sprintf(s, "sb/1/%s", extra_params->name);
+			nvram_set(s, extra_params->value);
+			extra_params++;
+		}
+
+		struct nvram_tuple wndr4000_pci_1_1_params[] = {
+
+			{"boardflags2", "0x04000000", 0},
+			{"ccode", "EU", 0},
+			{"extpagain2g", "0", 0},
+			{"extpagain5g", "0", 0},
+			{"legofdm40duppo", "0x2222", 0},
+			{"legofdmbw205ghpo", "0x88642100", 0},
+			{"legofdmbw205gmpo", "0x33221100", 0},
+			{"legofdmbw20ul5ghpo", "0x88642100", 0},
+			{"legofdmbw20ul5gmpo", "0x33221100", 0},
+			{"maxp5ga0", "0x4E", 0},
+			{"maxp5ga1", "0x4E", 0},
+			{"maxp5ga2", "0x4E", 0},
+			{"maxp5gha0", "0x4E", 0},
+			{"maxp5gha1", "0x4E", 0},
+			{"maxp5gha2", "0x4E", 0},
+			{"maxp5gla0", "0x48", 0},
+			{"maxp5gla1", "0x48", 0},
+			{"maxp5gla2", "0x48", 0},
+			{"mcs32po", "0x2222", 0},
+			{"mcsbw205ghpo", "0x88642100", 0},
+			{"mcsbw205glpo", "0x11000000", 0},
+			{"mcsbw205gmpo", "0x44221100", 0},
+			{"mcsbw20ul5ghpo", "0x88642100", 0},
+			{"mcsbw20ul5glpo", "0x11000000", 0},
+			{"mcsbw20ul5gmpo", "0x44221100", 0},
+			{"mcsbw405ghpo", "0x99875310", 0},
+			{"mcsbw405glpo", "0x33222222", 0},
+			{"mcsbw405gmpo", "0x66443322", 0},
+			{"pa5ghw1a1", "0x155F", 0},
+			{"pa5ghw2a1", "0xFAB0", 0},
+			{"regrev", "15", 0},
+
+			{0, 0, 0}
+		};
+		/*
+		 * set router's extra parameters 
+		 */
+		extra_params = wndr4000_pci_1_1_params;
+		while (extra_params->name) {
+			sprintf(s, "pci/1/1/%s", extra_params->name);
+			nvram_set(s, extra_params->value);
+			extra_params++;
+		}
+        break;
 #endif	// CONFIG_BCMWL5
 
 	case MODEL_WL330GE:
