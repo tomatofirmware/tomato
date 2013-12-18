@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -20,7 +20,7 @@
  *
  ***************************************************************************/
 
-#include "setup.h"
+#include "curl_setup.h"
 
 #if !defined(CURL_DISABLE_HTTP) && !defined(CURL_DISABLE_CRYPTO_AUTH)
 
@@ -267,6 +267,38 @@ static void md5_to_ascii(unsigned char *source, /* 16 bytes */
     snprintf((char *)&dest[i*2], 3, "%02x", source[i]);
 }
 
+/* Perform quoted-string escaping as described in RFC2616 and its errata */
+static char *string_quoted(const char *source)
+{
+  char *dest, *d;
+  const char *s = source;
+  size_t n = 1; /* null terminator */
+
+  /* Calculate size needed */
+  while(*s) {
+    ++n;
+    if(*s == '"' || *s == '\\') {
+      ++n;
+    }
+    ++s;
+  }
+
+  dest = (char *)malloc(n);
+  if(dest) {
+    s = source;
+    d = dest;
+    while(*s) {
+      if(*s == '"' || *s == '\\') {
+        *d++ = '\\';
+      }
+      *d++ = *s++;
+    }
+    *d = 0;
+  }
+
+  return dest;
+}
+
 CURLcode Curl_output_digest(struct connectdata *conn,
                             bool proxy,
                             const unsigned char *request,
@@ -280,14 +312,16 @@ CURLcode Curl_output_digest(struct connectdata *conn,
   unsigned char *md5this;
   unsigned char *ha1;
   unsigned char ha2[33];/* 32 digits and 1 zero byte */
-  char cnoncebuf[7];
+  char cnoncebuf[33];
   char *cnonce = NULL;
   size_t cnonce_sz = 0;
   char *tmp = NULL;
   struct timeval now;
 
   char **allocuserpwd;
+  size_t userlen;
   const char *userp;
+  char *userp_quoted;
   const char *passwdp;
   struct auth *authp;
 
@@ -344,7 +378,8 @@ CURLcode Curl_output_digest(struct connectdata *conn,
   if(!d->cnonce) {
     /* Generate a cnonce */
     now = Curl_tvnow();
-    snprintf(cnoncebuf, sizeof(cnoncebuf), "%06ld", (long)now.tv_sec);
+    snprintf(cnoncebuf, sizeof(cnoncebuf), "%32ld",
+             (long)now.tv_sec + now.tv_usec);
 
     rc = Curl_base64_encode(data, cnoncebuf, strlen(cnoncebuf),
                             &cnonce, &cnonce_sz);
@@ -423,16 +458,20 @@ CURLcode Curl_output_digest(struct connectdata *conn,
   else
     md5this = (unsigned char *)aprintf("%s:%s", request, uripath);
 
+  if(d->qop && Curl_raw_equal(d->qop, "auth-int")) {
+    /* We don't support auth-int for PUT or POST at the moment.
+       TODO: replace md5 of empty string with entity-body for PUT/POST */
+    unsigned char *md5this2 = (unsigned char *)
+      aprintf("%s:%s", md5this, "d41d8cd98f00b204e9800998ecf8427e");
+    free(md5this);
+    md5this = md5this2;
+  }
+
   if(!md5this) {
     free(ha1);
     return CURLE_OUT_OF_MEMORY;
   }
 
-  if(d->qop && Curl_raw_equal(d->qop, "auth-int")) {
-    /* We don't support auth-int at the moment. I can't see a easy way to get
-       entity-body here */
-    /* TODO: Append H(entity-body)*/
-  }
   CURL_OUTPUT_DIGEST_CONV(data, md5this); /* convert on non-ASCII machines */
   Curl_md5it(md5buf, md5this);
   free(md5this); /* free this again */
@@ -466,7 +505,18 @@ CURLcode Curl_output_digest(struct connectdata *conn,
 
     Authorization: Digest username="testuser", realm="testrealm", \
     nonce="1053604145", uri="/64", response="c55f7f30d83d774a3d2dcacf725abaca"
+
+    Digest parameters are all quoted strings.  Username which is provided by
+    the user will need double quotes and backslashes within it escaped.  For
+    the other fields, this shouldn't be an issue.  realm, nonce, and opaque
+    are copied as is from the server, escapes and all.  cnonce is generated
+    with web-safe characters.  uri is already percent encoded.  nc is 8 hex
+    characters.  algorithm and qop with standard values only contain web-safe
+    chracters.
   */
+  userp_quoted = string_quoted(userp);
+  if(!*userp_quoted)
+    return CURLE_OUT_OF_MEMORY;
 
   if(d->qop) {
     *allocuserpwd =
@@ -477,10 +527,10 @@ CURLcode Curl_output_digest(struct connectdata *conn,
                "uri=\"%s\", "
                "cnonce=\"%s\", "
                "nc=%08x, "
-               "qop=\"%s\", "
+               "qop=%s, "
                "response=\"%s\"",
                proxy?"Proxy-":"",
-               userp,
+               userp_quoted,
                d->realm,
                d->nonce,
                uripath, /* this is the PATH part of the URL */
@@ -503,12 +553,13 @@ CURLcode Curl_output_digest(struct connectdata *conn,
                "uri=\"%s\", "
                "response=\"%s\"",
                proxy?"Proxy-":"",
-               userp,
+               userp_quoted,
                d->realm,
                d->nonce,
                uripath, /* this is the PATH part of the URL */
                request_digest);
   }
+  free(userp_quoted);
   if(!*allocuserpwd)
     return CURLE_OUT_OF_MEMORY;
 
@@ -532,10 +583,11 @@ CURLcode Curl_output_digest(struct connectdata *conn,
   }
 
   /* append CRLF + zero (3 bytes) to the userpwd header */
-  tmp = realloc(*allocuserpwd, strlen(*allocuserpwd) + 3);
+  userlen = strlen(*allocuserpwd);
+  tmp = realloc(*allocuserpwd, userlen + 3);
   if(!tmp)
     return CURLE_OUT_OF_MEMORY;
-  strcat(tmp, "\r\n");
+  strcpy(&tmp[userlen], "\r\n"); /* append the data */
   *allocuserpwd = tmp;
 
   return CURLE_OK;

@@ -3,7 +3,7 @@ include ../common.mak
 WARN    := -W -Wall -Wstrict-prototypes -Wmissing-prototypes -fno-strict-aliasing -mips32
 INCLUDE := -isystem $(TOP)/../linux/linux/include
 CFLAGS  := -O2 -DMODULE -D__KERNEL__ ${WARN} ${INCLUDE} -fno-pic -mno-abicalls -mlong-calls
-CC      := /opt/brcm24/hndtools-mipsel-linux-3.2.3/bin/mipsel-linux-gcc
+CC      := /opt/brcm/K24/hndtools-mipsel-uclibc-4.2.4/bin/mipsel-linux-gcc-3.4.6
 
 all:	mmc.o
 

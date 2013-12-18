@@ -898,6 +898,8 @@ static void filter_input(void)
 	char *hit;
 	int n;
 	char *p, *c;
+	char outp[MAX_PORTS][PORT_SIZE];
+	int i, count;
 
 	if ((nvram_get_int("nf_loopback") != 0) && (wanup)) {	// 0 = all
 		for (n = 0; n < wanfaces.count; ++n) {
@@ -1088,16 +1090,61 @@ static void filter_input(void)
 		ipt_write("-A INPUT -p udp --dport 520 -j ACCEPT\n");
 	}
 
+#ifdef TCONFIG_BT
 	//BT Client ports from WAN interface
 	if (nvram_match("bt_enable", "1")) {
-		ipt_write( "-A INPUT -p tcp --dport %s -j ACCEPT\n", nvram_safe_get( "bt_port" ) );
-		if (nvram_match( "bt_rpc_wan", "1") )
+		strcpy (t, nvram_safe_get("bt_port"));
+		count = splitport(t, outp);
+		for (i = 0; i < count; i ++) ipt_write( "-A INPUT -p tcp --dport %s -j ACCEPT\n", outp[i] );
+		if (nvram_match( "bt_rpc_enable", "1") )
 		{
 			ipt_write( "-A INPUT -p tcp --dport %s -j ACCEPT\n", nvram_safe_get( "bt_port_gui" ) );
 		}
 	}
-
-	// if logging
+#endif
+#ifdef TCONFIG_ARIA2
+	//Aria2c ports for WAN interface, bwq518, Hyzoom
+	if (nvram_match("aria2_enable", "1")) 
+	{
+		strcpy (t, nvram_safe_get("aria2_listen_port"));
+		count = splitport(t, outp);
+		for (i = 0; i < count; i ++) ipt_write( "-A INPUT -p tcp --dport %s -j ACCEPT\n", outp[i] );
+		if (nvram_match( "aria2_enable_rpc", "1") )
+		{
+			strcpy (t, nvram_safe_get("aria2_rpc_listen_port"));
+			count = splitport(t, outp);
+			for (i = 0; i < count; i ++) ipt_write( "-A INPUT -p tcp --dport %s -j ACCEPT\n", outp[i] );
+		}
+		if (nvram_match("aria2_enable_dht","1"))
+		{
+			strcpy (t, nvram_safe_get("aria2_dht_listen_port"));
+			count = splitport(t, outp);
+			for (i = 0; i < count; i ++) ipt_write( "-A INPUT -p udp --dport %s -j ACCEPT\n", outp[i] );
+		}
+	}
+#endif
+#ifdef TCONFIG_GAEPROXY
+	//GAEProxy ports for WAN interface, bwq518, Hyzoom
+	if( nvram_match( "gaeproxy_enable", "1" ) )
+	{
+		ipt_write( "-A INPUT -p tcp --dport %s -j ACCEPT\n",nvram_safe_get("gaeproxy_listen_port"));
+		if(nvram_match("gaeproxy_gae_enable","1")) 
+			ipt_write( "-A INPUT -p tcp --dport %s -j ACCEPT\n",nvram_safe_get("gaeproxy_gae_listen"));
+		if(nvram_match("gaeproxy_paas_enable","1"))
+			ipt_write( "-A INPUT -p tcp --dport %s -j ACCEPT\n",nvram_safe_get("gaeproxy_paas_listen"));
+	}
+#endif
+#ifdef TCONFIG_SAMBASRV
+	//SAMBA ports, bwq518, Hyzoom
+	if( nvram_match( "smbd_enable", "1" ) )
+	{
+		ipt_write( "-A INPUT -p udp --dport 137 -j ACCEPT\n");
+		ipt_write( "-A INPUT -p udp --dport 138 -j ACCEPT\n");
+		ipt_write( "-A INPUT -p tcp --dport 139 -j ACCEPT\n");
+		ipt_write( "-A INPUT -p tcp --dport 445 -j ACCEPT\n");
+	}
+#endif
+	//if logging
 	if (*chain_in_drop == 'l') {
 		ipt_write( "-A INPUT -j %s\n", chain_in_drop);
 	}

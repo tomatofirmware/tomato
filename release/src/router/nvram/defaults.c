@@ -199,7 +199,7 @@ const defaults_t defaults[] = {
 	{ "wl_radioids",		""				},	// List of radio IDs
 	{ "wl_ssid",			"Tomato24"		},	// Service set ID (network name)
 	{ "wl1_ssid",			"Tomato50"		},
-	{ "wl_country_code",		""		},		// Country (default obtained from driver)
+	{ "wl_country_code",		"CN"		},		// Country (default obtained from driver)
 	{ "wl_radio",			"1"				},	// Enable (1) or disable (0) radio
 	{ "wl1_radio",			"1"				},	// Enable (1) or disable (0) radio
 	{ "wl_closed",			"0"				},	// Closed (hidden) network
@@ -372,12 +372,12 @@ const defaults_t defaults[] = {
 	{ "wan_domain",			""				},
 
 // basic-time
-	{ "tm_sel",				"CET-1CEST,M3.5.0/2,M10.5.0/3"	},
-	{ "tm_tz",				"CET-1CEST,M3.5.0/2,M10.5.0/3"	},
+	{ "tm_sel",				"UTC-8"	},
+	{ "tm_tz",				"UTC-8"	},
 	{ "tm_dst",				"1",							},
 	{ "ntp_updates",		"4"								},
 	{ "ntp_tdod",			"0"								},
-	{ "ntp_server",			"0.europe.pool.ntp.org 1.europe.pool.ntp.org 2.europe.pool.ntp.org" },
+	{ "ntp_server",			"0.asia.pool.ntp.org 1.asia.pool.ntp.org 2.asia.pool.ntp.org" },
 	{ "ntp_kiss",			""								},
 	{ "ntp_kiss_ignore",	""								},
 
@@ -572,7 +572,7 @@ const defaults_t defaults[] = {
 	{ "https_crt_file",		""				},
 	{ "https_crt",			""				},
 	{ "web_wl_filter",		"0"				},	// Allow/Deny Wireless Access Web
-	{ "web_css",			"openlinksys"			},
+	{ "web_css",			"hyzoom"			},
 	{ "ttb_css",			"example"			},	//Tomato Themes Base
 	{ "web_svg",			"1"				},
 	{ "telnetd_eas",		"1"				},
@@ -685,8 +685,8 @@ const defaults_t defaults[] = {
 	{ "jffs2_exec",			""				},
 
 // admin-tomatoanon
-	{ "tomatoanon_enable",		"-1"				},
-	{ "tomatoanon_answer",		"0"				},
+	{ "tomatoanon_enable",		"1"				},
+	{ "tomatoanon_answer",		"1"				},
 	{ "tomatoanon_cru",		"6"				},
 	{ "tomatoanon_id",		""				},
 	{ "tomatoanon_notify",		"1"				},
@@ -773,13 +773,14 @@ const defaults_t defaults[] = {
 	},
 	{ "smbd_user",			"nas"				},
 	{ "smbd_passwd",		""				},
+	{ "smbd_wan_enable",		"0"				},
 #endif
 
 #ifdef TCONFIG_MEDIA_SERVER
 // nas-media
 	{ "ms_enable",			"0"				},	/* 0:Disable 1:Enable 2:Enable&Rescan */
 	{ "ms_dirs",			"/mnt<"				},
-	{ "ms_port",			"0"				},
+	{ "ms_port",			"8200"				},
 	{ "ms_dbdir",			""				},
 	{ "ms_tivo",			"0"				},
 	{ "ms_stdlna",			"0"				},
@@ -1012,6 +1013,140 @@ const defaults_t defaults[] = {
 	{ "bt_ul_queue_size",			"5"			},
 	{ "bt_message",				"2"			},
 #endif
+
+#ifdef TCONFIG_ARIA2
+// nas-aria2
+	{ "aria2_enable",				"0"			},
+	{ "aria2_sleep",				"10"			},
+	{ "aria2_check",				"1"			},
+	{ "aria2_check_time",				"15"			},
+	{ "aria2_binary",				"internal"		},
+	{ "aria2_binary_custom",			"/mnt/opt/bin"		},
+	{ "aria2_custom",
+		"ca-certificate=false\n"
+		"check-certificate=false\n"
+	},
+	{ "aria2_enable_rpc",				"1"			},
+	{ "aria2_rpc_allow_origin_all",			"1"			},
+	{ "aria2_rpc_listen_all",			"1"			},
+	{ "aria2_rpc_listen_port",			"6800"			},
+	{ "aria2_event_poll",				"select"		},
+	{ "aria2_rpc_user",				""			},
+	{ "aria2_rpc_passwd",				""			},
+	{ "aria2_max_concurrent_downloads",		"3"			},
+	{ "aria2_continue",				"1"			},
+	{ "aria2_max_tries",				"0"			},
+	{ "aria2_retry_wait",				"10"			},
+	{ "aria2_max_connection_per_server",		"3"			},
+	{ "aria2_min_split_size",			"10M"			},
+	{ "aria2_split",				"5"			},
+	{ "aria2_max_overall_download_limit",		"0"			},
+	{ "aria2_max_download_limit",			"0"			},
+	{ "aria2_max_overall_upload_limit",		"0"			},
+	{ "aria2_max_upload_limit",			"0"			},
+	{ "aria2_lowest_speed_limit",			"0"			},
+	{ "aria2_referer",				"*"			},
+	{ "aria2_input_file",				""			},
+	{ "aria2_save_session",				""			},
+	{ "aria2_usb_enable",				"1"			},
+	{ "aria2_dlroot",				""			},
+	{ "aria2_dir",					"downloads"		},
+	{ "aria2_disk_cache",				"0"			},
+	{ "aria2_enable_mmap",				"0"			},
+	{ "aria2_file_allocation",			"none"			},
+	{ "aria2_bt_enable_lpd",			"0"			},
+	{ "aria2_bt_tracker",				""			},
+	{ "aria2_bt_max_peers",				"55"			},
+	{ "aria2_bt_require_crypto",			"1"			},
+	{ "aria2_follow_torrent",			"1"			},
+	{ "aria2_listen_port",				"6881-6889,51413"	},
+	{ "aria2_enable_dht",				"1"			},
+	{ "aria2_dht_listen_port",			"6881-6999"		},
+	{ "aria2_enable_peer_exchange",			"1"			},
+	{ "aria2_user_agent",				"uTorrent/2210(25130)"	},
+	{ "aria2_peer_id_prefix",			"-UT2210-"		},
+	{ "aria2_seed_ratio",				"1.0"			},
+	{ "aria2_force_save",				"1"			},
+	{ "aria2_bt_hash_check_seed",			"1"			},
+	{ "aria2_bt_seed_unverified",			"0"			},
+	{ "aria2_bt_save_metadata",			"0"			},
+	{ "aria2_save_session_interval",		"60"			},
+#endif //TCONFIG_ARIA2
+
+#ifdef TCONFIG_GAEPROXY
+// advanced-gaeproxy
+	{ "gaeproxy_enable",				"0"			},
+	{ "gaeproxy_sleep",				"5"			},
+	{ "gaeproxy_check",				"1"			},
+	{ "gaeproxy_check_time",			"5"			},
+	{ "gaeproxy_binary",				"internal"		},
+	{ "gaeproxy_binary_custom",			"/mnt/opt/wallproxy/local/startup.py"		},
+	{ "gaeproxy_binary_download",			"http://www.hyzoom.com/tomato/wallproxy.zip"		},
+	{ "gaeproxy_listen_ip",				"0.0.0.0"		},
+	{ "gaeproxy_listen_port",			"8086"			},
+	{ "gaeproxy_listen_web_username",		"admin"			},
+	{ "gaeproxy_listen_web_password",		"admin"			},
+	{ "gaeproxy_listen_username",			""			},
+	{ "gaeproxy_listen_password",			""			},
+	{ "gaeproxy_listen_transparent_enable",		"0"			},
+	{ "gaeproxy_pac_enable",			"1"			},
+	{ "gaeproxy_pac_file_enable",			"0"		},
+	{ "gaeproxy_pac_file",				"proxy.pac"		},
+	{ "gaeproxy_pac_https_mode",			"2"			},
+	{ "gaeproxy_gae_enable",			"1"			},
+	{ "gaeproxy_gae_appid",				"app1|app2|app3"	},
+	{ "gaeproxy_gae_password",			"xxxxxxxx"		},
+	{ "gaeproxy_gae_listen",			"8087"			},
+	{ "gaeproxy_gae_profile",			"google_hk"		},
+	{ "gaeproxy_gae_max_threads",			"3"			},
+	{ "gaeproxy_gae_fetch_mode",			"1"			},
+	{ "gaeproxy_hosts_enable",			"1"			},
+//	{ "gaeproxy_hosts_crlf",			"1"			},
+//	{ "gaeproxy_hosts_crlf_rules",			"/^https?:\\/\\/[^\/]+\\.c\\.youtube\\.com\\/liveplay\\?/ \\n /^https?:\\/\\/upload\\.youtube\\.com\\// \\n /^https?:\\/\\/www\\.youtube\\.com\\/upload\\// \\n /^https?:\\/\\/[^\\/]+\\.googlevideo\\.com\\/crossdomain\\.xml/ \\n /^https?:\\/\\/www\\.youtube\\.com\\/watch\\?/"		},
+	{ "gaeproxy_hosts_dns",				"168.95.1.1"		},
+	{ "gaeproxy_hosts_resolve",			"talk.google.com|talkx.l.google.com|.youtube.com|.facebook.com|.googlevideo.com"		},
+	{ "gaeproxy_autorange_enable",			"1"			},
+//	{ "gaeproxy_autorange_hosts",			".c.youtube.com|.atm.youku.com|.googlevideo.com|av.vimeo.com|smile-*.nicovideo.jp|video.*.fbcdn.net|s*.last.fm|x*.last.fm|.x.xvideos.com|.edgecastcdn.net|.d.rncdn3.com|cdn*.public.tube8.com|videos.flv*.redtubefiles.com|cdn*.public.extremetube.phncdn.com|cdn*.video.pornhub.phncdn.com|.mms.vlog.xuite.net|vs*.thisav.com|archive.rthk.hk|video*.modimovie.com|v*.cache*.c.docs.google.com"			},
+//	{ "gaeproxy_autorange_rules",			"/^https?:\\/\\/[^\\/]+\\/[^?]+\\.(?:cab|f4v|flv|hlv|m4v|mp4|mp3|ogg|avi|exe|zip|iso|ipa|rar|bz2|xz|deb|dmg|3gp)(?:$|\\?)/ \\n http*://*.googleusercontent.com/videoplayback?"			},
+	{ "gaeproxy_autorange_maxsize",			"1000000"		},
+	{ "gaeproxy_autorange_waitsize",		"500000"			},
+	{ "gaeproxy_autorange_bufsize",			"8192"			},
+	{ "gaeproxy_proxy_enable",			"0"			},
+	{ "gaeproxy_proxy_host",			"10.0.0.100"		},
+	{ "gaeproxy_proxy_port",			"8080"			},
+	{ "gaeproxy_proxy_username",			"admin"			},
+	{ "gaeproxy_proxy_password",			"123456"		},
+	{ "gaeproxy_useragent_enable",			"1"			},
+	{ "gaeproxy_useragent_match",			"(?!)mobile"		},
+	{ "gaeproxy_useragent_rules",			"||twitter.com"		},
+	{ "gaeproxy_useragent_string",			"Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4"		},
+	{ "gaeproxy_autoupload_enable",			"0"			},
+	{ "gaeproxy_autoupload_gmail",			""			},
+	{ "gaeproxy_autoupload_password",		""			},
+	{ "gaeproxy_paas_enable",			"0"			},
+	{ "gaeproxy_paas_password",			""			},
+	{ "gaeproxy_paas_listen",			"8088"			},
+	{ "gaeproxy_paas_fetchserver",			"http://demo1.app.com/|http://demo2.app.com/"			},
+	{ "gaeproxy_paas_proxy_enable",			"0"			},
+	{ "gaeproxy_paas_proxy",			"http://127.0.0.1:8087/"			},
+//	{ "gaeproxy_urlfetch_nofallback",		"/^https?:\\/\\/(?:[\\w-]+|127(?:\\.\\d+){3}|10(?:\\.\\d+){3}|192\\.168(?:\\.\\d+){2}|172\\.(?:1[6-9]|2\\d|3[01])(?:\\.\\d+){2}|\\[.+?\\])(?::\\d+)?\\//"			},
+//	{ "gaeproxy_urlfetch_redirects",		"[(r'(?i).+?\\.unionabcd\\.com[:/].+?&surl=([^&]+).*', r'http://\\1/?')]"	},
+
+#endif // TCONFIG_GAEPROXY
+
+#ifdef TCONFIG_SIMPROXY
+// advanced-proxy
+	{ "proxy_tiny_enable",				"0"			},
+	{ "proxy_tiny_sleep",				"10"			},
+	{ "proxy_tiny_check",				"1"			},
+	{ "proxy_tiny_check_time",			"15"			},
+	{ "proxy_tiny_User",			"nobody"			},
+	{ "proxy_tiny_Group",			"nobody"			},
+	{ "proxy_srelay_enable",				"0"			},
+	{ "proxy_srelay_sleep",				"10"			},
+	{ "proxy_srelay_check",				"1"			},
+	{ "proxy_srelay_check_time",			"15"			},
+#endif // TCONFIG_SIMPROXY
 
 #if 0
 // safe to remove?

@@ -408,6 +408,10 @@ mtd1: 007d0000 00010000 "linux"
 		else if ((size > 0x400000) && (size < 0x800000)) return 8;
 		else if ((size > 0x200000) && (size < 0x400000)) return 4;
 		else if ((size > 0x100000) && (size < 0x200000)) return 2;
+		else if ((strtoul(nvram_safe_get("boardtype"), NULL, 0) == 0xf5b2) && nvram_match("boardrev", "0x1100")) return 128; //RT-AC66U has 128MB NAND flash but linux partition has only 32MB, bwq518
+		else if ((strtoul(nvram_safe_get("boardtype"), NULL, 0) == 0x05d8) && nvram_match("boardrev", "0x1200")) return 256; //Tenda W1800R has 256MB NAND flash but linux partition has only 32MB, bwq518
+		else if ((strtoul(nvram_safe_get("boardtype"), NULL, 0) == 0xf52e) && nvram_match("boardrev", "0x1204")) return 128; //WZR-D1800H has 128MB NAND flash but linux partition has only 32MB, bwq518
+		else if ((strtoul(nvram_safe_get("boardtype"), NULL, 0) == 0xc617) && nvram_match("modelNumber", "EA6500")) return 128; //Linksys EA6500 has 128MB NAND flash but linux partition has only 32MB, bwq518
 		else return 1;
 	}
 	else {
@@ -484,7 +488,9 @@ void asp_sysinfo(int argc, char **argv)
 	char cpu_model[64];
 	char bogomips[8];
 	char cpuclk[8];
+	char wl_tempsense[128];
 
+	get_wl_tempsense(wl_tempsense);
 	get_cpuinfo(system_type, cpu_model, bogomips, cpuclk);
 
 	web_puts("\nsysinfo = {\n");
@@ -498,6 +504,7 @@ void asp_sysinfo(int argc, char **argv)
 		"\tuptime: %ld,\n"
 		"\tuptime_s: '%s',\n"
 		"\tloads: [%ld, %ld, %ld],\n"
+		"\tget_cpupercent: %d,\n"
 		"\ttotalram: %ld,\n"
 		"\tfreeram: %ld,\n"
 		"\tshareram: %ld,\n"
@@ -511,10 +518,12 @@ void asp_sysinfo(int argc, char **argv)
 		"\tsystemtype: '%s',\n"
 		"\tcpumodel: '%s',\n"
 		"\tbogomips: '%s',\n"
-		"\tcpuclk: '%s'",
+		"\tcpuclk: '%s',\n"
+		"\twlsense: '%s'",
 			si.uptime,
 			reltime(s, si.uptime),
 			si.loads[0], si.loads[1], si.loads[2],
+			(int)get_cpupercent(),
 			mem.total, mem.free,
 			mem.shared, mem.buffers, mem.cached,
 			mem.swaptotal, mem.swapfree,
@@ -524,7 +533,8 @@ void asp_sysinfo(int argc, char **argv)
 			system_type,
 			cpu_model,
 			bogomips,
-			cpuclk);
+			cpuclk,
+			wl_tempsense);
 
 	web_puts("};\n");
 }

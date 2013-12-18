@@ -1,49 +1,71 @@
-Curl and libcurl 7.25.0
+Curl and libcurl 7.31.0
 
- Public curl releases:         127
- Command line options:         151
+ Public curl releases:         133
+ Command line options:         152
  curl_easy_setopt() options:   199
  Public functions in libcurl:  58
- Known libcurl bindings:       39
- Contributors:                 929
+ Known libcurl bindings:       42
+ Contributors:                 1005
+
+***
+  krb4 support is up for removal. If you care about it at all, speak up
+  on the curl-library list asap!
+***
 
 This release includes the following changes:
 
- o configure: add option disable --libcurl output [1]
- o --ssl-allow-beast and CURLOPT_SSL_OPTIONS added [2]
- o Added CURLOPT_TCP_KEEPALIVE, CURLOPT_TCP_KEEPIDLE, CURLOPT_TCP_KEEPINTVL [4]
- o curl: use new library-side TCP_KEEPALIVE options [5]
- o Added a new CURLOPT_MAIL_AUTH option [13]
- o Added support for --mail-auth [14]
- o --libcurl now also works with -F and more! [15]
+ o darwinssl: add TLS session resumption
+ o darwinssl: add TLS crypto authentication
+ o imap/pop3/smtp: Added support for ;auth=<mech> in the URL
+ o imap/pop3/smtp: Added support for ;auth=<mech> to CURLOPT_USERPWD
+ o usercertinmem.c: add example showing user cert in memory
+ o url: Added smtp and pop3 hostnames to the protocol detection list
+ o imap/pop3/smtp: Added support for enabling the SASL initial response [8]
+ o curl -E: allow to use ':' in certificate nicknames [10]
 
 This release includes the following bugfixes:
 
- o --max-redirs: allow negative numbers as option value [3]
- o parse_proxy: bail out on zero-length proxy names [6]
- o configure: don't modify LD_LIBRARY_PATH for cross compiles [7]
- o curl_easy_reset: reset the referer string [8]
- o curl tool: don't abort glob-loop due to failures [9]
- o CONNECT: send correct Host: with IPv6 numerical address [10]
- o Explicitly link to the nettle/gcrypt libraries [11]
- o more resilient connection times among IP addresses [12]
- o winbuild: fix IPV6 and IDN options
- o SMTP: Fixed error when using CURLOPT_CONNECT_ONLY
- o cyassl: update to CyaSSL 2.0.x API
- o smtp: Fixed an issue with the EOB checking
- o pop3: Fixed drop of final CRLF in EOB checking [16]
- o smtp: Fixed an issue with writing postdata
- o smtp: Added support for returning SMTP response codes
- o CONNECT: fix ipv6 address in the Request-Line [17]
- o curl-config: only provide libraries with --libs
- o LWIP: don't consider HAVE_ERRNO_H to be winsock [19]
- o ssh: tunnel through HTTP proxy if requested
- o cookies: strip off [brackets] from numerical ipv6 host names [20]
- o libcurl docs: version corrections [18]
- o cmake: list_spaces_append_once failure [22]
- o resolve with c-ares: don't resolve IPv6 when not working [21]
- o smtp: changed error code for EHLO and HELO responses
- o parsedate: fix a numeric overflow
+ o SECURITY VULNERABILITY: curl_easy_unescape() may parse data beyond the end
+   of the input buffer [26]
+
+ o FTP: access files in root dir correctly [1]
+ o configure: try pthread_create without -lpthread [2]
+ o FTP: handle a 230 welcome response [3]
+ o curl-config: don't output static libs when they are disabled
+ o CURL_CHECK_CA_BUNDLE: don't check for paths when cross-compiling [4]
+ o Various documentation updates
+ o getinfo.c: reset timecond when clearing session-info variables [5]
+ o FILE: prevent an artificial timeout event due to stale speed-check data [6]
+ o ftp_state_pasv_resp: connect through proxy also when set by env [7]
+ o sshserver: disable StrictHostKeyChecking
+ o ftpserver: Fixed imap logout confirmation data
+ o curl_easy_init: use less mallocs
+ o smtp: Fixed unknown percentage complete in progress bar
+ o smtp: Fixed sending of double CRLF caused by first in EOB
+ o bindlocal: move brace out of #ifdef [9]
+ o winssl: Fixed invalid memory access during SSL shutdown [11]
+ o OS X framework: fix invalid symbolic link
+ o OpenSSL: allow empty server certificate subject [12]
+ o axtls: prevent memleaks on SSL handshake failures
+ o cookies: only consider full path matches
+ o Revert win32 MemoryTracking: wcsdup() _wcsdup() and _tcsdup() [13]
+ o Curl_cookie_add: handle IPv6 hosts [14]
+ o ossl_send: SSL_write() returning 0 is an error too
+ o ossl_recv: SSL_read() returning 0 is an error too
+ o Digest auth: escape user names with \ or " in them [15]
+ o curl_formadd.3: fixed wrong "end-marker" syntax [16]
+ o libcurl-tutorial.3: fix incorrect backslash [17]
+ o curl_multi_wait: reduce timeout if the multi handle wants to [18]
+ o tests/Makefile: typo in the perlcheck target [19]
+ o axtls: honor disabled VERIFYHOST
+ o OpenSSL: avoid double free in the PKCS12 certificate code [20]
+ o multi_socket: reduce timeout inaccuracy margin [21]
+ o digest: support auth-int for empty entity body [22]
+ o axtls: now done non-blocking
+ o lib1900: use tutil_tvnow instead of gettimeofday
+ o curl_easy_perform: avoid busy-looping [23]
+ o CURLOPT_COOKIELIST: take cookie share lock [24]
+ o multi_socket: react on socket close immediately [25]
 
 This release includes the following known bugs:
 
@@ -52,35 +74,43 @@ This release includes the following known bugs:
 This release would not have looked like this without help, code, reports and
 advice from friends like these:
 
- Colin Hogben, Alessandro Ghedini, Kamil Dudka, Rob Ward, Dave Reisner,
- Martin Storsjo, Pierre Ynard, Pierre Joye, Yang Tse, Dan Fandrich,
- Michael Day, Juan Barreto, Chandrakant Bagul, Steve Holme, Todd Ouska,
- Rich Gray, John Joseph Bachir, Armel Asselin, Andrei Cipu,
- Maxim Prohorov
- 
+ David Strauss, Kamil Dudka, Steve Holme, Nick Zitzmann, Sam Deane, Duncan,
+ Anders Havn, Dan Fandrich, Paul Howarth, Dave Reisner, Wouter Van Rooy,
+ Linus Nielsen Feltzing, Ishan SinghLevett, Alessandro Ghedini,
+ Ludovico Cavedon, Zdenek Pavlas, Zekun Ni, Lars Johannesen, Marc Hoersken,
+ Renaud Guillard, John Gardiner Myers, Jared Jennings, Eric Hu,
+ Yamada Yasuharu, Stefan Neis, Mike Giancola, Eric S. Raymond, Andrii Moiseiev,
+ Christian Weisgerber, Peter Gal, Aleksey Tulinov, Hang Su, Sergei Nikulov,
+ Miguel Angel, Nach M. S., Benjamin Gilbert, Erik Johansson, Timo Sirainen,
+ Guenter Knauf
+
         Thanks! (and sorry if I forgot to mention someone)
 
 References to bug reports and discussions on issues:
 
- [1] = http://curl.haxx.se/mail/lib-2012-02/0009.html
- [2] = http://curl.haxx.se/mail/lib-2012-02/0001.html
- [3] = http://curl.haxx.se/mail/lib-2012-02/0098.html
- [4] = http://curl.haxx.se/mail/lib-2012-01/0264.html
- [5] = http://curl.haxx.se/mail/lib-2012-01/0263.html
- [6] = http://curl.haxx.se/mail/lib-2012-02/0000.html
- [7] = http://curl.haxx.se/mail/lib-2012-02/0052.html
- [8] = http://curl.haxx.se/bug/view.cgi?id=3481551
- [9] = http://curl.haxx.se/bug/view.cgi?id=3481223
- [10] = http://curl.haxx.se/bug/view.cgi?id=3482093
- [11] = http://curl.haxx.se/mail/lib-2012-01/0303.html
- [12] = http://curl.haxx.se/mail/lib-2012-01/0190.html
- [13] = http://curl.haxx.se/libcurl/c/curl_easy_setopt.html#CURLOPTMAILAUTH
- [14] = http://curl.haxx.se/docs/manpage.html#--mail-auth
- [15] = http://curl.haxx.se/docs/manpage.html#--libcurl
- [16] = http://curl.haxx.se/mail/lib-2012-02/0051.html
- [17] = http://curl.haxx.se/bug/view.cgi?id=3493129
- [18] = http://curl.haxx.se/bug/view.cgi?id=3494091
- [19] = http://curl.haxx.se/mail/lib-2012-03/0046.html
- [20] = http://curl.haxx.se/mail/lib-2012-03/0036.html
- [21] = http://curl.haxx.se/mail/lib-2012-03/0045.html
- [22] = http://curl.haxx.se/bug/view.cgi?id=3494968
+ [1] = http://curl.haxx.se/mail/lib-2013-04/0142.html
+ [2] = http://curl.haxx.se/bug/view.cgi?id=1216
+ [3] = http://curl.haxx.se/mail/lib-2013-02/0102.html
+ [4] = http://curl.haxx.se/mail/lib-2013-04/0294.html
+ [5] = http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=705783
+ [6] = https://bugzilla.redhat.com/906031
+ [7] = http://curl.haxx.se/bug/view.cgi?id=1218
+ [8] = http://curl.haxx.se/mail/lib-2012-03/0114.html
+ [9] = http://curl.haxx.se/mail/lib-2013-05/0000.html
+ [10] = http://curl.haxx.se/bug/view.cgi?id=1196
+ [11] = http://curl.haxx.se/bug/view.cgi?id=1219
+ [12] = http://curl.haxx.se/bug/view.cgi?id=1220
+ [13] = http://curl.haxx.se/mail/lib-2013-05/0070.html
+ [14] = http://curl.haxx.se/bug/view.cgi?id=1221
+ [15] = http://curl.haxx.se/bug/view.cgi?id=1230
+ [16] = http://curl.haxx.se/bug/view.cgi?id=1233
+ [17] = http://curl.haxx.se/bug/view.cgi?id=1234
+ [18] = http://curl.haxx.se/bug/view.cgi?id=1224
+ [19] = http://curl.haxx.se/bug/view.cgi?id=1239
+ [20] = http://curl.haxx.se/bug/view.cgi?id=1236
+ [21] = http://curl.haxx.se/bug/view.cgi?id=1228
+ [22] = http://curl.haxx.se/bug/view.cgi?id=1235
+ [23] = http://curl.haxx.se/bug/view.cgi?id=1238
+ [24] = http://curl.haxx.se/bug/view.cgi?id=1215
+ [25] = http://curl.haxx.se/bug/view.cgi?id=1248
+ [26] = http://curl.haxx.se/docs/adv_20130622.html

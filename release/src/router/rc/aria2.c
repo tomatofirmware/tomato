@@ -1,0 +1,557 @@
+/*
+ * aria2.c
+ *
+ * Copyright (C) 2013 bwq518, Hyzoom
+ *
+ */
+#include <stdlib.h>
+#include <rc.h>
+#include <shutils.h>
+#include <utils.h>
+#include <syslog.h>
+#include <sys/stat.h>
+
+#define MAX_PORTS 64
+#define PORT_SIZE 16
+
+int is_port(char *str)
+{
+	int i;
+
+	for(i=0; str[i]!='\0'; i++) //执行到'\0'的前面那个
+	{
+		if ((isdigit(str[i])==0) && (str[i] != ':') && (str[i] != '-') && (str[i] != ' '))
+			return 0;
+	}
+	return 1;
+}
+
+char *filter_space(char *str)
+{
+	int i = 0,j = 0;
+
+	while(str[i])
+	{
+		if(str[i]!=' ')
+			str[j++]=str[i];
+		i++;
+	}
+	str[j]='\0';
+	return str;
+}
+
+char* format_port(char *str)
+{
+	int i;
+
+	filter_space(str);
+	for (i = 0; i < strlen(str); i ++)
+	{
+		if ( str[i] == '-') str[i] = ':';
+	}
+	return str;
+}
+
+int splitport(char *in_ports, char out_port[MAX_PORTS][PORT_SIZE])
+{
+	int i, j = 0, k = 0, len;
+
+	trimstr(in_ports);
+	if ((len=strlen(in_ports)) == 0) return 0;
+	for (i = 0; i < len; i ++)
+	{
+		if ((in_ports[i] == ',') || (in_ports[i] == ' '))
+		{
+			out_port[j][k] = '\0';
+			trimstr(out_port[j]);
+
+			/* 若字符串长度大于0，且全部为数字 */
+			if ((strlen (out_port[j]) > 0)  && (is_port(out_port[j]) == 1))
+			{
+				format_port(out_port[j]);
+				j ++;
+			}
+			/* 若端口数超过 MAX_PORTS, 忽略后续的字符 */
+			if (j >= MAX_PORTS) break;
+			k = 0;
+		}
+		else
+		{
+			printf("%c\n",in_ports[i]);
+			out_port[j][k] = in_ports[i];
+			/* 若大于最大尺寸PORT_SIZE，忽略后续的字符 */
+			if (k < PORT_SIZE) k ++;
+		}
+	}
+	out_port[j][k] = '\0';
+	trimstr(out_port[j]);
+	if (strlen (out_port[j]) > 0)
+	{
+		format_port(out_port[j]);
+		j ++;
+	}
+	return j;
+
+}
+
+void start_aria2(void)
+{
+	FILE *fp;
+	char *pch;
+	char *per;
+	char *praoa;
+	char *prla;
+	char *pco;
+	char *pem;
+	char *pbel;
+	char *pbrc;
+	char *pft;
+	char *ped;
+	char *pepe;
+	char *pfs;
+	char *pbhcs;
+	char *pbsu;
+	char *pbsm;
+	char *pbi;
+	char ppr[64];
+	char *pdir;
+	char savedir[256], f_path[256], f_file[256];
+	char tmp1[256],tmp2[256];
+	char errstr[256];
+
+// make sure its really stop
+	stop_aria2();
+
+//only if enable...
+	if( !nvram_match( "aria2_enable", "1" ) ) return;
+
+	//collecting data
+	if (nvram_match( "aria2_check", "1") )
+	{
+		pch = "true";
+	}
+	else
+	{
+		pch = "false";
+	}
+	if (nvram_match( "aria2_enable_rpc", "1") )
+	{
+		per = "true";
+	}
+	else
+	{
+		per = "false";
+	}
+	if (nvram_match( "aria2_rpc_allow_origin_all", "1") )
+	{
+		praoa = "true";
+	}
+	else
+	{
+		praoa = "false";
+	}
+	if (nvram_match( "aria2_rpc_listen_all", "1") )
+	{
+		prla = "true";
+	}
+	else
+	{
+		prla = "false";
+	}
+	if (nvram_match( "aria2_continue", "1") )
+	{
+		pco = "true";
+	}
+	else
+	{
+		pco = "false";
+	}
+	if (nvram_match( "aria2_enable_mmap", "1") )
+	{
+		pem = "true";
+	}
+	else
+	{
+		pem = "false";
+	}
+	if (nvram_match( "aria2_bt_enable_lpd", "1") )
+	{
+		pbel = "true";
+	}
+	else
+	{
+		pbel = "false";
+	}
+	if (nvram_match( "aria2_bt_require_crypto", "1") )
+	{
+		pbrc = "true";
+	}
+	else
+	{
+		pbrc = "false";
+	}
+	if (nvram_match( "aria2_follow_torrent", "1") )
+	{
+		pft = "true";
+	}
+	else
+	{
+		pft = "false";
+	}
+	if (nvram_match( "aria2_enable_dht", "1") )
+	{
+		ped = "true";
+	}
+	else
+	{
+		ped = "false";
+	}
+	if (nvram_match( "aria2_enable_peer_exchange", "1") )
+	{
+		pepe = "true";
+	}
+	else
+	{
+		pepe = "false";
+	}
+	if (nvram_match( "aria2_force_save", "1") )
+	{
+		pfs = "true";
+	}
+	else
+	{
+		pfs = "false";
+	}
+	if (nvram_match( "aria2_bt_hash_check_seed", "1") )
+	{
+		pbhcs = "true";
+	}
+	else
+	{
+		pbhcs = "false";
+	}
+	if (nvram_match( "aria2_bt_seed_unverified", "1") )
+	{
+		pbsu = "true";
+	}
+	else
+	{
+		pbsu = "false";
+	}
+	if (nvram_match( "aria2_bt_save_metadata", "1") )
+	{
+		pbsm = "true";
+	}
+	else
+	{
+		pbsm = "false";
+	}
+
+	if (nvram_match( "aria2_binary", "internal" ) )
+	{
+		pbi = "/usr/bin";
+	}
+	else if (nvram_match( "aria2_binary", "optware" ) )
+	{
+		pbi = "/opt/bin";
+	}
+	else
+	{
+		pbi = nvram_safe_get( "aria2_binary_custom" );
+	}
+
+	/* Generate download saved path based on USB partition (aria2_dlroot) and directory name (aria2_dir) */
+	if (nvram_match("aria2_usb_enable", "1"))
+	{
+		tmp1[0] = 0;
+		tmp2[0] = 0;
+		strcpy(tmp1,nvram_safe_get("aria2_dlroot"));
+		trimstr(tmp1);
+		if ( tmp1[0] != '/')
+		{
+			sprintf(tmp2, "/%s", tmp1);
+			strcpy(tmp1,tmp2);
+		}
+		strcpy(ppr, tmp1);
+		if(ppr[strlen(ppr)-1] == '/')
+		{
+			ppr[strlen(ppr)-1] = 0;
+		}
+		if(strlen(ppr) == 0)
+		{
+			perror( "Found no mounted USB partition" );
+			return;
+		}
+	}
+	else
+	{
+		ppr[0] = '\0';
+	}
+
+	tmp2[0] = 0;
+	strcpy(tmp2, nvram_safe_get("aria2_dir"));
+	trimstr(tmp2);
+	pdir = tmp2;
+	if(pdir[strlen(pdir)-1] == '/')
+	{
+		pdir[strlen(pdir)-1] = 0;
+	}
+	if(strlen(pdir) == 0)
+	{
+		strcpy (pdir, "downloads");
+		nvram_set("aria2_dir","downloads");
+	}
+	if(pdir[0] == '/')
+	{
+		sprintf(savedir,"%s%s",ppr,pdir);
+	}
+	else
+	{
+		sprintf(savedir,"%s/%s",ppr,pdir);
+	}
+
+	pdir = savedir; /* pdir is a FULL PATH for saving download file */
+
+	//writing data to file
+	if( !( fp = fopen( "/etc/aria2.conf", "w" ) ) )
+	{
+		perror( "/etc/aria2.conf" );
+		return;
+	}
+
+	fprintf( fp, "# Config for aria2c, auto generated by 'service aria2 start' command.\n") ;
+	fprintf( fp, "# DO NOT Edit this file. Any revision will be overwritten when aria2c started.\n") ;
+	fprintf( fp, "# By Hyzoom bwq518@gmail.com\n") ;
+	fprintf( fp, "enable-rpc=%s\n", per );
+	fprintf( fp, "rpc-allow-origin-all=%s\n", praoa );
+	fprintf( fp, "rpc-listen-all=%s\n", prla );
+	fprintf( fp, "rpc-listen-port=%s\n", nvram_safe_get("aria2_rpc_listen_port") );
+	fprintf( fp, "event-poll=%s\n", nvram_safe_get("aria2_event_poll") );
+	fprintf( fp, "rpc-user=%s\n", nvram_safe_get("aria2_rpc_user") );
+	fprintf( fp, "rpc-passwd=%s\n", nvram_safe_get("aria2_rpc_passwd") );
+	fprintf( fp, "max-concurrent-downloads=%s\n", nvram_safe_get("aria2_max_concurrent_downloads") );
+	fprintf( fp, "continue=%s\n", pco );
+	fprintf( fp, "max-tries=%s\n", nvram_safe_get("aria2_max_tries") );
+	fprintf( fp, "retry-wait=%s\n", nvram_safe_get("aria2_retry_wait") );
+	fprintf( fp, "max-connection-per-server=%s\n", nvram_safe_get("aria2_max_connection_per_server") );
+	fprintf( fp, "min-split-size=%s\n", nvram_safe_get("aria2_min_split_size") );
+	fprintf( fp, "split=%s\n", nvram_safe_get("aria2_split") );
+	fprintf( fp, "max-overall-download-limit=%s\n", nvram_safe_get("aria2_max_overall_download_limit") );
+	fprintf( fp, "max-download-limit=%s\n", nvram_safe_get("aria2_max_download_limit") );
+	fprintf( fp, "max-overall-upload-limit=%s\n", nvram_safe_get("aria2_max_overall_upload_limit") );
+	fprintf( fp, "max-upload-limit=%s\n", nvram_safe_get("aria2_max_upload_limit") );
+	fprintf( fp, "lowest-speed-limit=%s\n", nvram_safe_get("aria2_lowest_speed_limit") );
+	fprintf( fp, "referer=%s\n", nvram_safe_get("aria2_referer") );
+
+	tmp1[0] = 0;
+	tmp2[0] = 0;
+	strcpy( tmp1, nvram_safe_get("aria2_input_file"));
+	trimstr(tmp1);
+	sprintf( tmp2, "%s/aria2.session", pdir);
+	if( strlen (tmp1) > 0)
+	{
+		if( !f_exists( tmp1 ))
+		{
+			nvram_set( "aria2_input_file", tmp2);
+			fprintf( fp, "input-file=%s\n", tmp2 );
+			sprintf( errstr, "Input file: %s does not exists. The default %s will be used.", tmp1, tmp2);
+			perror( errstr );
+		}
+		else
+		{
+			fprintf( fp, "input-file=%s\n", tmp1 );
+		}
+	}
+	else
+	{
+		fprintf( fp, "input-file=%s\n", tmp2);
+		nvram_set( "aria2_input_file", tmp2);
+	}
+	printf("The %s will be used as input-file.\n", nvram_safe_get("aria2_input_file") );
+
+	tmp1[0] = 0;
+	tmp2[0] = 0;
+	strcpy(tmp1,nvram_safe_get("aria2_save_session"));
+	trimstr(tmp1);
+	if(strlen(tmp1) > 0)
+	{
+		splitpath(tmp1, f_path, f_file);
+		if( strlen(f_path) == 0 )
+		{
+			if (strlen(f_file) == 0)
+			{
+				sprintf( tmp2, "%s/aria2.session", pdir);
+			}
+			else
+			{
+				sprintf( tmp2, "%s/%s", pdir, f_file);
+			}
+
+			nvram_set( "aria2_save_session", tmp2);
+			fprintf( fp, "save-session=%s\n", tmp2);
+		}
+		else
+		{
+			if (strlen(f_file) == 0)
+			{
+				sprintf( tmp2, "%s/aria2.session", f_path);
+			}
+			else
+			{
+				sprintf( tmp2, tmp1);
+			}
+			nvram_set( "aria2_save_session", tmp2);
+			fprintf( fp, "save-session=%s\n", tmp2);
+		}
+	}
+	else
+	{
+		sprintf( tmp2, "%s/aria2.session", pdir);
+		fprintf( fp, "save-session=%s\n", tmp2);
+		nvram_set( "aria2_save_session", tmp2);
+	}
+	fprintf( stderr, "The %s will be used to save session.\n", nvram_safe_get("aria2_save_session") );
+
+	fprintf( fp, "dir=%s\n", pdir );
+	fprintf( fp, "disk-cache=%s\n", nvram_safe_get("aria2_disk_cache") );
+	fprintf( fp, "enable-mmap=%s\n", pem );
+	fprintf( fp, "file-allocation=%s\n", nvram_safe_get("aria2_file_allocation") );
+	fprintf( fp, "bt-enable-lpd=%s\n", pbel );
+	fprintf( fp, "bt-tracker=%s\n", nvram_safe_get("aria2_bt_tracker") );
+	fprintf( fp, "bt-max-peers=%s\n", nvram_safe_get("aria2_bt_max_peers") );
+	fprintf( fp, "bt-require-crypto=%s\n", pbrc );
+	fprintf( fp, "follow-torrent=%s\n", pft );
+	fprintf( fp, "listen-port=%s\n", nvram_safe_get("aria2_listen_port") );
+	fprintf( fp, "enable-dht=%s\n", ped );
+	fprintf( fp, "dht-listen-port=%s\n", nvram_safe_get("aria2_dht_listen_port") );
+	fprintf( fp, "enable-peer-exchange=%s\n", pepe );
+	fprintf( fp, "user-agent=%s\n", nvram_safe_get("aria2_user_agent") );
+	fprintf( fp, "peer-id-prefix=%s\n", nvram_safe_get("aria2_peer_id_prefix") );
+	fprintf( fp, "seed-ratio=%s\n", nvram_safe_get("aria2_seed_ratio") );
+	fprintf( fp, "force-save=%s\n", pfs );
+	fprintf( fp, "bt-hash-check-seed=%s\n", pbhcs );
+	fprintf( fp, "bt-seed-unverified=%s\n", pbsu );
+	fprintf( fp, "bt-save-metadata=%s\n", pbsm );
+	fprintf( fp, "save-session-interval=%s\n", nvram_safe_get("aria2_save_session_interval") );
+	fprintf( fp, "%s\n", nvram_safe_get("aria2_custom"));
+	fprintf( fp, "\n");
+
+	fclose( fp );
+	chmod( "/etc/aria2.conf", 0644 );
+
+//start file
+	if( !( fp = fopen( "/tmp/start_aria2.sh", "w" ) ) )
+	{
+		perror( "/tmp/start_aria2.sh" );
+		return;
+	}
+
+	strcpy(tmp2, nvram_safe_get("aria2_dir"));
+	trimstr(tmp2);
+	pdir = tmp2;
+	if(pdir[strlen(pdir)-1] == '/')
+	{
+		pdir[strlen(pdir)-1] = 0;
+	}
+	fprintf( fp, "#!/bin/sh\n\n" );
+	/***********  已经在 firewall.c 中打开端口了
+	    char outp[MAX_PORTS][PORT_SIZE];
+	    int i, count;
+
+	    fprintf( fp, "del_iptables()\n");
+	    fprintf( fp, "{\n");
+	    fprintf( fp, "    local port\n");
+	    fprintf( fp, "    local proto\n");
+	    fprintf( fp, "    port=$1\n");
+	    fprintf( fp, "    proto=$2\n");
+	    fprintf( fp, "    TOTALRULES=`iptables -L INPUT --line-number | grep tcp | grep dpt:$port | wc -l`\n");
+	    fprintf( fp, "    while [ \"$TOTALRULES\" -gt 0 ]; do\n");
+	    fprintf( fp, "        ALLLINENUM=`iptables -L INPUT --line-number | grep $proto | grep dpt:$port | awk '{print $1; }'`\n");
+	    fprintf( fp, "        DELLINENUM=`echo $ALLLINENUM | awk '{print $1; }'`\n");
+	    fprintf( fp, "        iptables -D INPUT $DELLINENUM\n");
+	    fprintf( fp, "        TOTALRULES=`iptables -L INPUT --line-number | grep $proto | grep dpt:$port | wc -l`\n");
+	    fprintf( fp, "    done\n");
+	    fprintf( fp, "}\n");
+	    fprintf( fp, "add_iptables()\n");
+	    fprintf( fp, "{\n");
+	    fprintf( fp, "    local port\n");
+	    fprintf( fp, "    local proto\n");
+	    fprintf( fp, "    port=$1\n");
+	    fprintf( fp, "    proto=$2\n");
+	    fprintf( fp, "    del_iptables $port $proto\n");
+	    fprintf( fp, "    iptables -I INPUT -p $proto --dport $port -j ACCEPT\n");
+	    fprintf( fp, "}\n\n");
+	************/
+	fprintf( fp, "sleep %s\n", nvram_safe_get( "aria2_sleep" ) );
+	fprintf( fp, "# if it is a file, remove it.\n");
+	fprintf( fp, "if [ -f \"%s\" ]; then\n",  pdir);
+	fprintf( fp, "    rm -f %s\n", pdir );
+	fprintf( fp, "fi\n");
+	fprintf( fp, "if [ ! -d \"%s\" ]; then\n",  pdir);
+	fprintf( fp, "    mkdir -p %s\n", pdir );
+	fprintf( fp, "fi\n");
+	fprintf( fp, "cp -f /etc/aria2.conf %s\n", pdir );
+	fprintf( fp, "touch %s\n", nvram_safe_get("aria2_input_file") );
+
+	strcpy(tmp1, nvram_safe_get("aria2_save_session"));
+	splitpath(tmp1, f_path, f_file);
+	fprintf( fp, "if [ ! -d \"%s\" ]; then\n",  f_path);
+	fprintf( fp, "    mkdir -p %s\n", f_path );
+	fprintf( fp, "fi\n");
+	fprintf( fp, "touch %s\n", tmp1 );
+	fprintf( fp, "chmod 0644 %s\n", tmp1 );
+
+	fprintf( fp, "%s/aria2c --conf-path=/etc/aria2.conf -D\n", pbi );
+	/***********  已经在 firewall.c 中打开端口了
+	    strcpy (tmp1, nvram_safe_get("aria2_listen_port"));
+	    count = splitport(tmp1, outp);
+	    for (i = 0; i < count; i ++) fprintf( fp, "add_iptables %s tcp\n",outp[i]);
+	    if (nvram_match( "aria2_enable_rpc", "1") )
+	    {
+	        strcpy (tmp1, nvram_safe_get("aria2_rpc_listen_port"));
+	        count = splitport(tmp1, outp);
+	        for (i = 0; i < count; i ++) fprintf( fp, "add_iptables %s tcp\n",outp[i]);
+	    }
+	    if (nvram_match("aria2_enable_dht","1"))
+	    {
+	        strcpy (tmp1, nvram_safe_get("aria2_dht_listen_port"));
+	        count = splitport(tmp1, outp);
+	        for (i = 0; i < count; i ++) fprintf( fp, "add_iptables %s udp\n",outp[i]);
+	    }
+	*****************/
+	fprintf( fp, "sleep 2\n" );
+
+	fprintf( fp, "/usr/bin/archeck addcru\n");
+
+	fclose( fp );
+
+	chmod( "/tmp/start_aria2.sh", 0755 );
+
+	xstart( "/tmp/start_aria2.sh" );
+	return;
+
+}
+
+void stop_aria2(void)
+{
+	FILE *fp;
+
+//stop file
+	if( !( fp = fopen( "/tmp/stop_aria2.sh", "w" ) ) )
+	{
+		perror( "/tmp/stop_aria2.sh" );
+		return;
+	}
+
+	fprintf( fp, "#!/bin/sh\n\n" );
+	fprintf( fp, "killall -KILL aria2c\n");
+	fprintf( fp, "logger \"aria2c successfully stoped\" \n");
+	fprintf( fp, "sleep 2\n");
+	fprintf( fp, "/usr/bin/archeck addcru\n");
+
+	fclose( fp );
+	chmod( "/tmp/stop_aria2.sh", 0755 );
+
+	xstart( "/tmp/stop_aria2.sh" );
+	return;
+}

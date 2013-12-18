@@ -1,0 +1,22 @@
+#!/bin/sh
+TOP=/raid1/tomato/tomato.git/release.ar.wp.chs/src-rt/router
+CONFIGURE="./configure"
+CC=mipsel-linux-gcc
+CXX=mipsel-linux-gcc
+
+CC=$CC CXX=$CXX STRIP='mipsel-uclibc-strip' \
+	CFLAGS="-Os -Wall -fno-delete-null-pointer-checks -funit-at-a-time \
+	--param large-function-growth=800 --param max-inline-insns-single=3000 \
+	-ffunction-sections -fdata-sections" \
+	LDFLAGS="-L$TOP/libexpat/.libs -L$TOP/libiconv/lib/.libs -L$TOP/libstdc++/prebuilt -L$TOP/zlib -L$TOP/sqlite/.libs -L$TOP/libcares/.libs -L$TOP/openssl -ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC" \
+	CPPFLAGS="-I$TOP/libexpat/lib -I$TOP/libiconv/include -I$TOP/sqlite -I$TOP/zlib -I$TOP/libcares -I$TOP/openssl/include" \
+	LIBS="-liconv -lstdc++ -lexpat -lz -lsqlite3 -lcares -lssl -lcrypto" \
+	$CONFIGURE --host=mipsel-linux --build=x86_64-linux-gnu --target=mipsel-linux --prefix=/usr --enable-nls --enable-shared --without-libxml2 --without-gnutls --with-openssl --without-libintl \
+	SQLITE3_CFLAGS="-I$TOP/sqlite" \
+	SQLITE3_LIBS="-L$TOP/sqlite/.libs -lsqlite3" \
+	ZLIB_CFLAGS="-I$TOP/zlib" \
+	ZLIB_LIBS="-L$TOP/zlib -lz" \
+	LIBCARES_CFLAGS="-I$TOP/libcares" \
+	LIBCARES_LIBS="-L$TOP/libcares/.libs -lcares" \
+	OPENSSL_CFLAGS="-I$TOP/openssl/include" \
+	OPENSSL_LIBS="-L$TOP/openssl -lcrypto -lssl"

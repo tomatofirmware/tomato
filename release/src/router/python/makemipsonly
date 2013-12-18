@@ -1,0 +1,15 @@
+#!/bin/sh
+TOP=/raid1/tomato/tomato.git/release.ar.wp.chs/src-rt/router
+PYTHONHOME=$TOP/python/hostpy
+PYTHONPATH=$PATH:$PYTHONHOME/usr/lib:$PYTHONHOME/usr/lib/python2.7:$PYTHONHOME/usr/lib/python2.7/lib-dynload
+PATH=$PATH:$PYTHONHOME/usr/bin
+CONFIGURE="$TOP/python/configure"
+CC=mipsel-linux-gcc
+CXX=mipsel-linux-g++
+AR=mipsel-linux-ar
+RANLIB=mipsel-linux-ranlib
+
+make prefix=/usr HOSTPYTHON=./hostpython HOSTPGEN=./Parser/hostpgen BLDSHARED="mipsel-linux-gcc -shared" CROSS_COMPILE=mipsel-linux- CROSS_COMPILE_TARGET=yes HOSTARCH=mipsel-linux BUILDARCH=x86_64-linux-gnu
+
+make install DESTDIR=$TOP/python/staged HOSTPYTHON=./hostpython HOSTPGEN=./Parser/hostpgen BLDSHARED="mipsel-linux-gcc -shared" CROSS_COMPILE=mipsel-linux- CROSS_COMPILE_TARGET=yes HOSTARCH=mipsel-linux BUILDARCH=x86_64-linux-gnu
+

@@ -1,0 +1,13 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=/usr/include
+
+Name: Python
+Description: Python library
+Requires: 
+Version: 2.7
+Libs.private: -lpthread -ldl -lbz2 -lcurl -lsqlite3 -lz -lcares -lssl -lcrypto -lev -lreadline -lncurses -lform -lmenu -lpanel -ldb-4.8 -lexpat -lrt -lcrypt -lutil
+Libs: -L${libdir} -lpython2.7
+Cflags: -I${includedir}/python2.7 
+

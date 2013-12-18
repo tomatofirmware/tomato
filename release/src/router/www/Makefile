@@ -142,6 +142,31 @@ ifneq ($(TCONFIG_BT),y)
 	sed -i $(INSTALLDIR)/www/about.asp -e "/BT-BEGIN/,/BT-END/d"
 endif
 
+# Only include the aria2 pages if aria2 is configured in.
+ifneq ($(TCONFIG_ARIA2),y)
+	rm -f $(INSTALLDIR)/www/nas-aria2.asp
+	sed -i $(INSTALLDIR)/www/tomato.js -e "/ARIA2-BEGIN/,/ARIA2-END/d"
+	sed -i $(INSTALLDIR)/www/about.asp -e "/ARIA2-BEGIN/,/ARIA2-END/d"
+endif
+
+# Only include the Proxy pages if Proxy is configured in.
+ifneq ($(TCONFIG_SIMPROXY),y)
+	rm -f $(INSTALLDIR)/www/advanced-proxy.asp
+	sed -i $(INSTALLDIR)/www/tomato.js -e "/SIMPROXY-BEGIN/,/SIMPROXY-END/d"
+	sed -i $(INSTALLDIR)/www/about.asp -e "/SIMPROXY-BEGIN/,/SIMPROXY-END/d"
+endif
+
+# Only include the Python if Python is configured in.
+ifneq ($(TCONFIG_PYTHON),y)
+	-sed -i $(INSTALLDIR)/www/about.asp -e "/PYTHON-BEGIN/,/PYTHON-END/d"
+endif
+# Only include the WallProxy pages if Proxy is configured in.
+ifneq ($(TCONFIG_GAEPROXY),y)
+	-rm -f $(INSTALLDIR)/www/advanced-wallproxy.asp
+	-sed -i $(INSTALLDIR)/www/tomato.js -e "/GAEPROXY-BEGIN/,/GAEPROXY-END/d"
+	-sed -i $(INSTALLDIR)/www/about.asp -e "/GAEPROXY-BEGIN/,/GAEPROXY-END/d"
+endif
+
 # Only include the UPS pages if apcupsd is configured in.
 ifneq ($(TCONFIG_UPS),y)
 	rm -f $(INSTALLDIR)/www/nas-ups.asp
@@ -277,6 +302,9 @@ endif
 		-e "/CTF-BEGIN/d"	-e "/CTF-END/d" \
 		-e "/BBT-BEGIN/d"	-e "/BBT-END/d" \
 		-e "/BT-BEGIN/d"	-e "/BT-END/d" \
+		-e "/ARIA2-BEGIN/d"	-e "/ARIA2-END/d" \
+		-e "/SIMPROXY-BEGIN/d"	-e "/SIMPROXY-END/d" \
+		-e "/GAEPROXY-BEGIN/d"	-e "/GAEPROXY-END/d" \
 		-e "/NFS-BEGIN/d"	-e "/NFS-END/d" \
 		-e "/NOCAT-BEGIN/d"	-e "/NOCAT-END/d"\
 		-e "/SNMP-BEGIN/d"	-e "/SNMP-END/d"\
@@ -299,4 +327,15 @@ endif
 # remove C-style comments from java files. All "control" comments have been processed by now.
 	for F in $(wildcard *.js *.jsx); do \
 		[ -f $(INSTALLDIR)/www/$$F ] && $(TOP)/www/remcoms2.sh $(INSTALLDIR)/www/$$F c; \
+	done
+
+# remove all zero sized file. Hyzoom bwq518
+	cd $(INSTALLDIR)/www && \
+	for F in $(wildcard *.js *.jsx *.asp); do \
+		F_SIZE=(`ls -l $$F | awk '{print $$5}'`); \
+		if [[ $$F_SIZE = 0 ]]; \
+		then \
+			ls -l $$F; \
+			rm -f $$F; \
+		fi; \
 	done

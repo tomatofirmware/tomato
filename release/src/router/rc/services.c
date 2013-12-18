@@ -1731,6 +1731,7 @@ static void start_samba(void)
 	char nlsmod[15];
 	int mode;
 	char *nv;
+	char interfaces[128];
 
 	if (getpid() != 1) {
 		start_service("smbd");
@@ -1744,9 +1745,13 @@ static void start_samba(void)
 	if ((fp = fopen("/etc/smb.conf", "w")) == NULL)
 		return;
 
+	if (nvram_match("smbd_wan_enable","1"))
+		sprintf(interfaces,"%s %s %s",nvram_safe_get("lan_ifname"),nvram_safe_get("lan_ifnames"),nvram_safe_get("wan_ifname"));
+	else
+		sprintf(interfaces,"%s %s",nvram_safe_get("lan_ifname"),nvram_safe_get("lan_ifnames"));
 	fprintf(fp, "[global]\n"
 		" interfaces = %s\n"
-		" bind interfaces only = yes\n"
+		" bind interfaces only = no\n"
 		" workgroup = %s\n"
 		" netbios name = %s\n"
 		" server string = %s\n"
@@ -1762,7 +1767,7 @@ static void start_samba(void)
 		" encrypt passwords = yes\n"
 		" preserve case = yes\n"
 		" short preserve case = yes\n",
-		nvram_safe_get("lan_ifname"),
+		interfaces,
 		nvram_get("smbd_wgroup") ? : "WORKGROUP",
 		nvram_safe_get("lan_hostname"),
 		nvram_get("router_name") ? : "Tomato",
@@ -2175,6 +2180,18 @@ void start_services(void)
 	start_bittorrent();
 #endif
 
+#ifdef TCONFIG_ARIA2
+	start_aria2();
+#endif
+
+#ifdef TCONFIG_SIMPROXY
+	start_proxy();
+#endif
+
+#ifdef TCONFIG_GAEPROXY
+	start_gaeproxy();
+#endif
+
 #ifdef TCONFIG_NOCAT
 	start_splashd();
 #endif
@@ -2190,6 +2207,18 @@ void stop_services(void)
 
 #ifdef TCONFIG_BT
 	stop_bittorrent();
+#endif
+
+#ifdef TCONFIG_ARIA2
+	stop_aria2();
+#endif
+
+#ifdef TCONFIG_SIMPROXY
+	stop_proxy();
+#endif
+
+#ifdef TCONFIG_GAEPROXY
+	stop_gaeproxy();
 #endif
 
 #ifdef TCONFIG_NOCAT
@@ -2682,6 +2711,48 @@ TOP:
 	}
 #endif
 
+#ifdef TCONFIG_ARIA2
+	if (strcmp(service, "aria2") == 0) {
+		if (action & A_STOP) {
+			stop_aria2();
+		}
+		//端口的打开和关闭是在防火墙启动时处理的，因此需重启防火墙
+		stop_firewall(); start_firewall();		// always restarted
+		if (action & A_START) {
+			start_aria2();
+		}
+		goto CLEAR;
+	}
+#endif
+
+#ifdef TCONFIG_SIMPROXY
+	if (strcmp(service, "proxy") == 0) {
+		if (action & A_STOP) {
+			stop_proxy();
+		}
+		//端口的打开和关闭是在防火墙启动时处理的，因此需重启防火墙
+		stop_firewall(); start_firewall();		// always restarted
+		if (action & A_START) {
+			start_proxy();
+		}
+		goto CLEAR;
+	}
+#endif
+
+#ifdef TCONFIG_GAEPROXY
+	if (strcmp(service, "gaeproxy") == 0) {
+		if (action & A_STOP) {
+			stop_gaeproxy();
+		}
+		//端口的打开和关闭是在防火墙启动时处理的，因此需重启防火墙
+		stop_firewall(); start_firewall();		// always restarted
+		if (action & A_START) {
+			start_gaeproxy();
+		}
+		goto CLEAR;
+	}
+#endif
+
 #ifdef TCONFIG_NFS
 	if (strcmp(service, "nfs") == 0) {
 		if (action & A_STOP) stop_nfs();
@@ -2768,6 +2839,8 @@ TOP:
 	// !!TB - Samba
 	if (strcmp(service, "samba") == 0 || strcmp(service, "smbd") == 0) {
 		if (action & A_STOP) stop_samba();
+		//端口的打开和关闭是在防火墙启动时处理的，因此需重启防火墙
+		stop_firewall(); start_firewall();		// always restarted
 		if (action & A_START) {
 			create_passwd();
 			stop_dnsmasq();

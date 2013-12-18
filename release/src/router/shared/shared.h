@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <errno.h>
 #include <net/if.h>
+#include <string.h>
 
 #ifdef TCONFIG_USB
 #include <mntent.h>	// !!TB
@@ -187,6 +188,8 @@ enum {
 	MODEL_HG320,
 	MODEL_RG200E_CA,
 	MODEL_H218N,
+	MODEL_TDN60,
+	MODEL_TDN6,
 	MODEL_WL1600GL,
 	MODEL_WBRG54,
 	MODEL_WBR2G54,
@@ -239,7 +242,9 @@ enum {
 	MODEL_WZRG300N,
 	MODEL_WRT300N,
 	MODEL_WL330GE,
-	MODEL_W1800R
+	MODEL_W1800R,
+	MODEL_D1800H,
+	MODEL_EA6500V1
 };
 
 /* NOTE: Do not insert new entries in the middle of this enum,
@@ -302,6 +307,8 @@ extern int ppid(int pid);
 
 extern unsigned long f_size(const char *path);
 extern int f_exists(const char *file);
+//bwq518
+extern int d_exists(const char *file);
 extern int f_read(const char *file, void *buffer, int max);												// returns bytes read
 extern int f_write(const char *file, const void *buffer, int len, unsigned flags, unsigned cmode);		//
 extern int f_read_string(const char *file, char *buffer, int max);										// returns bytes read, not including term; max includes term
@@ -354,5 +361,14 @@ extern int base64_decoded_len(int len);										// maximum possible, not actual
 // strings.c
 extern const char *find_word(const char *buffer, const char *word);
 extern int remove_word(char *buffer, const char *word);
-
+// Hyzoom bwq518
+#define MAX_PORTS 64 
+#define PORT_SIZE 16 
+extern int is_port(char *str);
+extern char *filter_space(char *str);
+extern char* format_port(char *str);
+extern char* trimstr(char *str);
+extern char* splitpath( char *str, char *pathname, char *filename);
+extern int splitport(char *in_ports, char out_port[MAX_PORTS][PORT_SIZE]);
+extern int is_number(char *a);
 #endif

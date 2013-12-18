@@ -34,3 +34,23 @@ ln -sf /www/ext/proxy.pac www/wpad.dat
 mkdir -p -m 0755 nas
 mkdir -p -m 0755 bkp
 mkdir -p -m 0777 tftpboot
+
+# Hyzoom bwq518
+#if [ -d "usr/lib/python2.7/site-packages/gaeproxy" ]; then
+#   ln -sf /tmp/gaeproxy/proxy.ini usr/lib/python2.7/site-packages/gaeproxy/local/proxy.ini
+#   ln -sf /tmp/gaeproxy/config.py usr/lib/python2.7/site-packages/gaeproxy/local/config.py
+#   ln -sf /tmp/gaeproxy/pac usr/lib/python2.7/site-packages/gaeproxy/local/pac
+#   ln -sf /tmp/gaeproxy/misc usr/lib/python2.7/site-packages/gaeproxy/local/misc
+#   ln -sf /tmp/gaeproxy/cert usr/lib/python2.7/site-packages/gaeproxy/local/cert
+#   ln -sf /tmp/gaeproxy/autoupload.py usr/lib/python2.7/site-packages/gaeproxy/server/autoupload.py
+#   rm -f usr/lib/python2.7/site-packages/gaeproxy/server/python/app.yaml
+#   ln -sf /tmp/gaeproxy/app.yaml usr/lib/python2.7/site-packages/gaeproxy/server/python/app.yaml
+#fi
+#if [ -d "usr/lib/python2.7/site-packages/goagent" ]; then
+#   ln -sf /tmp/goagent/proxy.ini usr/lib/python2.7/site-packages/goagent/proxy.ini
+#   ln -sf /tmp/goagent/proxy.pac usr/lib/python2.7/site-packages/goagent/proxy.pac
+#   ln -sf /tmp/goagent/certs usr/lib/python2.7/site-packages/goagent/certs
+#fi
+# for debuging, bwq518
+#rm -f www/advanced-gaeproxy.asp
+#ln -sf /tmp/advanced-gaeproxy.asp www/advanced-gaeproxy.asp

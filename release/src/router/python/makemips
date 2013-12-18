@@ -1,0 +1,37 @@
+#!/bin/sh
+TOP=/raid1/tomato/tomato.git/release.ar.wp.chs/src-rt/router
+PYTHONHOME=$TOP/python/hostpy
+PYTHONPATH=$PATH:$PYTHONHOME/usr/lib:$PYTHONHOME/usr/lib/python2.7:$PYTHONHOME/usr/lib/python2.7/lib-dynload
+PATH=$PATH:$PYTHONHOME/usr/bin
+CONFIGURE="$TOP/python/configure"
+CC=mipsel-linux-gcc
+CXX=mipsel-linux-g++
+AR=mipsel-linux-ar
+RANLIB=mipsel-linux-ranlib
+
+echo "Recovering .hostpython.tgz file ... ..."
+tar xvfz .hostpython.tgz >/dev/null 2>&1
+echo "Recovering done."
+
+CC=$CC CXX=$CXX AR=$AR RANLIB=$RANLIB STRIP='mipsel-uclibc-strip' \
+	CFLAGS="-O2 -Wall -fno-delete-null-pointer-checks -funit-at-a-time \
+	--param large-function-growth=800 --param max-inline-insns-single=3000 \
+	-ffunction-sections -fdata-sections -EL -DREADLINE_LIBRARY" \
+	LDFLAGS="-L/opt/brcm/K26/hndtools-mipsel-uclibc-4.2.4/lib -L$TOP/bzip2 -L$TOP/libcurl/lib/.libs -L$TOP/sqlite/.libs -L$TOP/libstdc++/prebuilt -L$TOP/zlib -L$TOP/libcares/.libs -L$TOP/libexpat/.libs -L$TOP/openssl -L$TOP/libev/.libs -L$TOP/libreadline/shlib -L$TOP/libncurses/lib -L$TOP/libdb/build_unix/.libs -L$TOP/python -ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC -EL" \
+	CPPFLAGS="-I$TOP/bzip2 -I$TOP/libcurl/include -I$TOP/sqlite -I$TOP/zlib -I$TOP/libcares -I$TOP/libexpat/lib -I$TOP/openssl/include -I$TOP/libev -I$TOP/libreadline -I$TOP/libncurses/include -I$TOP/libdb/build_unix" \
+	LIBS="-lbz2 -lcurl -lsqlite3 -lstdc++ -lz -lcares -lssl -lcrypto -lev -lreadline -lncurses -lform -lmenu -lpanel -ldb-4.8 -lexpat -lcrypt" \
+	$CONFIGURE --host=mipsel-linux --build=x86_64-linux-gnu  --prefix=/usr --disable-ipv6 --with-system-expat --enable-shared CONFIG_SITE=$TOP/python/config.site --oldincludedir=/opt/brcm/K26/hndtools-mipsel-uclibc-4.2.4/include
+
+#make clean
+
+sed -i Makefile -e "s/-DNDEBUG -g -fwrapv -O3/-DNDEBUG -fwrapv -O2/g"
+sed -i pyconfig.h -e "s/#define HAVE_CURSES_IS_TERM_RESIZED 1/#undef HAVE_CURSES_IS_TERM_RESIZED/g"
+sed -i pyconfig.h -e "s/#define HAVE_CURSES_RESIZETERM 1/#undef HAVE_CURSES_RESIZETERM/g" 
+sed -i pyconfig.h -e "s/#define HAVE_CURSES_RESIZE_TERM 1/#undef HAVE_CURSES_RESIZE_TERM/g" 
+sed -i pyconfig.h -e "s/\/\* #undef HAVE_DB_H \*\//#define HAVE_DB_H 1/g"
+sed -i pyconfig.h -e "s/\/\* #undef HAVE_DB_185_H \*\//#define HAVE_DB_185_H 1/g"
+
+make prefix=/usr HOSTPYTHON=./hostpython HOSTPGEN=./Parser/hostpgen BLDSHARED="mipsel-linux-gcc -shared" CROSS_COMPILE=mipsel-linux- CROSS_COMPILE_TARGET=yes HOSTARCH=mipsel-linux BUILDARCH=x86_64-linux-gnu
+
+make install DESTDIR=$TOP/python/staged HOSTPYTHON=./hostpython HOSTPGEN=./Parser/hostpgen BLDSHARED="mipsel-linux-gcc -shared" CROSS_COMPILE=mipsel-linux- CROSS_COMPILE_TARGET=yes HOSTARCH=mipsel-linux BUILDARCH=x86_64-linux-gnu
+

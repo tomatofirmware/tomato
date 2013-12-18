@@ -2390,6 +2390,12 @@ function navi()
 			['MAC Address',			'mac.asp'],
 			['Miscellaneous',		'misc.asp'],
 			['Routing',			'routing.asp'],
+/* GAEPROXY-BEGIN */
+			['GAE Proxy',			'gaeproxy.asp'],
+/* GAEPROXY-END */
+/* SIMPROXY-BEGIN */
+			['Proxy Server',		'proxy.asp'],
+/* SIMPROXY-END */
 /* TOR-BEGIN */
 			['TOR Project',			'tor.asp'],
 /* TOR-END */
@@ -2445,6 +2451,9 @@ REMOVE-END */
 /* BT-BEGIN */
 			,['BitTorrent Client',		'bittorrent.asp']
 /* BT-END */
+/* ARIA2-BEGIN */
+			,['Aria2 Client',		'aria2.asp']
+/* ARIA2-END */
 			] ],
 /* USB-END */
 /* VPN-BEGIN */

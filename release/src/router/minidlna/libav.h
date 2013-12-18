@@ -1,3 +1,4 @@
+
 #if HAVE_FFMPEG_LIBAVUTIL_AVUTIL_H
 #include <ffmpeg/libavutil/avutil.h>
 #elif HAVE_LIBAV_LIBAVUTIL_AVUTIL_H
@@ -39,3 +40,4 @@
 #elif HAVE_AVFORMAT_H
 #include <avformat.h>
 #endif
+

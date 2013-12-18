@@ -1,0 +1,44 @@
+#!/bin/sh
+
+case "$1" in
+  addcru)
+   ISCRU=`cru l | grep gaeproxy_inside | wc -l`
+
+   INTERVAL=`nvram get gaeproxy_check_time`
+
+   WPON=`nvram get gaeproxy_enable`
+   if [ "$WPON" == "1" ]; then
+    WPCHK=`nvram get gaeproxy_check`
+    if [ "$WPCHK" == "1" ]; then
+     if [ "$ISCRU" == "0" ]; then
+      cru a gaeproxy_inside "*/$INTERVAL * * * * /usr/bin/wpcheck check"
+     else
+      cru d gaeproxy_inside
+      cru a gaeproxy_inside "*/$INTERVAL * * * * /usr/bin/wpcheck check"
+     fi
+    else
+     if [ "$ISCRU" == "1" ]; then
+      cru d gaeproxy_inside
+     fi
+    fi
+   else
+    if [ "$ISCRU" == "1" ]; then
+      cru d gaeproxy_inside
+    fi
+   fi
+  ;;
+  check)
+   WPON=`nvram get gaeproxy_enable`
+   if [ "$WPON" == "1" ]; then
+    WPCHK=`nvram get gaeproxy_check`
+    if [ "$WPCHK" == "1" ]; then
+     ON=`ps w | grep python | grep startup.py | wc -l`
+     if [ "$ON" == "0" ]; then
+      logger gaeproxy stopped? Starting...
+      service gaeproxy restart
+     fi
+    fi
+   fi
+  ;;
+esac
+exit 0

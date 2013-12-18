@@ -134,6 +134,22 @@ config TCONFIG_TR_EXTRAS
 	default n
 	depends on TCONFIG_BT
 
+config TCONFIG_ARIA2
+	bool "  Aria2c download toolkit"
+	default n
+
+config TCONFIG_SIMPROXY
+	bool "  TinyProxy and Socks-Relay"
+	default n
+
+config TCONFIG_PYTHON
+	bool "  Python, Gevent and Greenlet"
+	default n
+
+config TCONFIG_GAEPROXY
+	bool "  WallProxy or GoAgent"
+	default n
+
 config TCONFIG_NFS
 	bool "  NFS Server"
 	default n

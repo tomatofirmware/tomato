@@ -28,7 +28,7 @@
 
 export ac_cv_func_malloc_0_nonnull=yes
 export SRCBASE := $(shell pwd)
-export SRCBASEDIR := $(shell pwd | sed 's/.*release\///g')
+export SRCBASEDIR := $(shell pwd | sed 's/.*release.*\///g')
 RELEASEDIR := $(shell (cd $(SRCBASE)/.. && pwd -P))
 PATH := $(RELEASEDIR)/tools:$(PATH)
 export TPROFILE := N
@@ -85,6 +85,8 @@ current_BUILD_NAME = $(strip $(shell grep "^TOMATO_BUILD_NAME" tomato_profile.ma
 current_BUILD_DESC = $(strip $(shell grep "^TOMATO_BUILD_DESC" tomato_profile.mak  | cut -d"=" -f2 | sed -e "s/ //g"))
 current_BUILD_USB  = $(strip $(shell grep "^TOMATO_BUILD_USB"  tomato_profile.mak  | cut -d"=" -f2 | sed -e "s/ //g"))
 current_TOMATO_VER = $(strip $(shell grep "TOMATO_MAJOR" router/shared/tomato_version.h  | cut -d"\"" -f2)).$(strip $(shell grep "TOMATO_MINOR" router/shared/tomato_version.h  | cut -d"\"" -f2))
+current_TOMATO_V1 = $(V1)
+current_TOMATO_V2 = $(V2)
 
 uppercase_N = $(shell echo $(N) | tr a-z  A-Z)
 lowercase_N = $(shell echo $(N) | tr A-Z a-z)
@@ -128,6 +130,11 @@ all: tomato_ver
 	@rm -f image/tomato-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).bin
 
 ifneq ($(ASUS_TRX),0)
+ifeq ($(ASUS_TRX),EA6500V1)
+	@btools/fpkg -i lzma-loader/loader.gz -i $(LINUXDIR)/arch/mips/brcm-boards/bcm947xx/compressed/vmlinuz -a 1024 -i router/mipsel-uclibc/target.image \
+		-t image/tomato-$(ASUS_TRX)_$(V1)$(V2)-$(current_BUILD_DESC).trx \
+		| tee -a fpkg.log
+else
 	$(MAKE) -C ctools
 	ctools/objcopy -O binary -R .reginfo -R .note -R .comment -R .mdebug -S $(LINUXDIR)/vmlinux ctools/piggy
 	ctools/lzma_4k e ctools/piggy  ctools/vmlinuz-lzma
@@ -136,6 +143,7 @@ ifneq ($(ASUS_TRX),0)
 	ctools/trx_asus -i image/linux-lzma.trx -r $(BUILD_NAME),$(KERNEL_VER).$(FS_VER),image/tomato-$(ASUS_TRX)_$(V1)$(V2)-$(current_BUILD_DESC).trx
 	@rm -f image/linux-lzma.trx
 	@echo ""
+endif
 endif
 
 ifeq ($(WNR3500LV2),1)
@@ -203,7 +211,6 @@ ifeq ($(LINKSYS_E),y)
 	# Linksys E-series(60k Nvram) images
 	@btools/fpkg -i lzma-loader/loader.gz -i $(LINUXDIR)/arch/mips/brcm-boards/bcm947xx/compressed/vmlinuz -a 1024 -i router/mipsel-uclibc/target.image \
 		-l 1550,image/tomato-E1550$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).bin \
-		-l 4200,image/tomato-E4200$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).bin \
 		-l 61XN,image/tomato-E3000$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).bin \
 		-l 32XN,image/tomato-E2000$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).bin \
 		| tee -a fpkg.log
@@ -218,6 +225,12 @@ ifeq ($(LINKSYS_E3200),y)
 	# Linksys E3200(60k Nvram) image
 	@btools/fpkg -i lzma-loader/loader.gz -i $(LINUXDIR)/arch/mips/brcm-boards/bcm947xx/compressed/vmlinuz -a 1024 -i router/mipsel-uclibc/target.image \
 		-l 3200,image/tomato-E3200$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).bin \
+		| tee -a fpkg.log
+endif
+ifeq ($(LINKSYS_E_4200),y)
+	# Linksys E4200(60k Nvram) images
+	@btools/fpkg -i lzma-loader/loader.gz -i $(LINUXDIR)/arch/mips/brcm-boards/bcm947xx/compressed/vmlinuz -a 1024 -i router/mipsel-uclibc/target.image \
+		-l 4200,image/tomato-E4200$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).bin \
 		| tee -a fpkg.log
 endif
 ifeq ($(LINKSYS_E_64k),y)
@@ -276,7 +289,7 @@ clean:
 	@rm -f router/config_[a-z]
 	@rm -f router/busybox/config_[a-z]
 	@$(MAKE) -C router $@
-	@-rmdir router/mipsel-uclibc
+	@rm -rf router/mipsel-uclibc
 
 cleanimage:
 	@rm -f fpkg.log
@@ -350,6 +363,7 @@ what:
 # NO_CIFS, NO_SSH, NO_ZEBRA, NO_SAMBA, NO_HTTPS, NO_XXTP, NO_LIBOPT
 # SAMBA3, OPENVPN, IPV6SUPP, EBTABLES, NTFS, UFSD, MEDIASRV, BBEXTRAS, USBEXTRAS, BCM57, SLIM, NOCAT CTF
 # NFS BTCLIENT BTGUI TR_EXTRAS SNMP SDHC HFS UPS DNSCRYPT PPTPD TOR IPSEC RAID MICROSD USBAP NO_USBAPP
+# ARIA2 SIMPROXY PYTHON GAEPROXY NO_FTP REMOVE_USBAPP    by Hyzoom bwq518
 
 define RouterOptions
 	@( \
@@ -413,6 +427,8 @@ define RouterOptions
 	if [ "$(NO_SAMBA)" = "y" ]; then \
 		sed -i "/TCONFIG_SAMBASRV/d" $(1); \
 		echo "# TCONFIG_SAMBASRV is not set" >>$(1); \
+		sed -i "/TCONFIG_SAMBA3/d" $(1); \
+		echo "# TCONFIG_SAMBA3 is not set" >>$(1); \
 	fi; \
 	if [ "$(NO_ZEBRA)" = "y" ]; then \
 		sed -i "/TCONFIG_ZEBRA/d" $(1); \
@@ -482,6 +498,27 @@ define RouterOptions
 		sed -i "/TCONFIG_BT/d" $(1); \
 		echo "TCONFIG_BT=y" >>$(1); \
 	fi; \
+	if [ "$(NO_FTP)" = "y" ]; then \
+		sed -i "/TCONFIG_FTP/d" $(1); \
+		echo "# TCONFIG_FTP is not set" >>$(1); \
+		echo "# TCONFIG_FTP_SSL is not set" >>$(1); \
+	fi; \
+	if [ "$(ARIA2)" = "y" ]; then \
+		sed -i "/TCONFIG_ARIA2/d" $(1); \
+		echo "TCONFIG_ARIA2=y" >>$(1); \
+	fi; \
+	if [ "$(SIMPROXY)" = "y" ]; then \
+		sed -i "/TCONFIG_SIMPROXY/d" $(1); \
+		echo "TCONFIG_SIMPROXY=y" >>$(1); \
+	fi; \
+	if [ "$(PYTHON)" = "y" ]; then \
+		sed -i "/TCONFIG_PYTHON/d" $(1); \
+		echo "TCONFIG_PYTHON=y" >>$(1); \
+	fi; \
+	if [ "$(GAEPROXY)" = "y" ]; then \
+		sed -i "/TCONFIG_GAEPROXY/d" $(1); \
+		echo "TCONFIG_GAEPROXY=y" >>$(1); \
+	fi; \
 	if [ "$(TR_EXTRAS)" = "y" ]; then \
 		sed -i "/TCONFIG_TR_EXTRAS/d" $(1); \
 		echo "TCONFIG_TR_EXTRAS=y" >>$(1); \
@@ -546,6 +583,10 @@ define RouterOptions
 	if [ "$(CTF)" = "y" ]; then \
 		sed -i "/TCONFIG_CTF/d" $(1); \
 		echo "TCONFIG_CTF=y" >>$(1); \
+	fi; \
+	if [ "$(REMOVE_USBAPP)" = "y" ]; then \
+		sed -i "/TCONFIG_REMOVE_USBAPP/d" $(1); \
+		echo "TCONFIG_REMOVE_USBAPP=y" >>$(1); \
 	fi; \
 	)
 endef
@@ -941,9 +982,100 @@ ifeq ($(CONFIG_LINUX26),y)
 	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="AIO" USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y NFS=y SNMP=y HFS=y DNSCRYPT=y UPS=y PPTPD=y TOR=y IPSEC=y RAID=y
 endif
 
+## All-In-One (AIO) MIPS1 - only for router with more than 8MB flash!! ZTE H618B
+16mt:
+ifeq ($(CONFIG_LINUX26),y)
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-TR" USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y NFS=y SNMP=y HFS=y DNSCRYPT=y UPS=y PPTPD=y TOR=y IPSEC=y RAID=y KERN_SIZE_OPT=y
+endif
+
+## All-In-One (AIO) MIPS1 - replace transmission with aria2, only for router with more than 8MB flash!! ZTE H618B
+16ma:
+ifeq ($(CONFIG_LINUX26),y)
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-AR" USB="USB" NOCAT=y ARIA2=y NFS=y SNMP=y HFS=y DNSCRYPT=y UPS=y PPTPD=y TOR=y IPSEC=y RAID=y KERN_SIZE_OPT=y
+endif
+
+## All-In-One (AIO) MIPS1 - transmission and aria2, only for router with more than 8MB flash!! ZTE H618B
+16mat:
+ifeq ($(CONFIG_LINUX26),y)
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-AR-TR" USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y ARIA2=y NFS=y SNMP=y HFS=y DNSCRYPT=y UPS=y PPTPD=y TOR=y IPSEC=y RAID=y KERN_SIZE_OPT=y
+endif
+
+## All-In-One (AIO) MIPS1 - Transmission + Aria2 + Python2.7.3 + Gevent/Greenlet/pyOpenSSL, only for router with more than 8MB flash!!
+16matp:
+ifeq ($(CONFIG_LINUX26),y)
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-AR-TR-PY" USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y ARIA2=y NFS=y SNMP=y HFS=y DNSCRYPT=y PPTPD=y TOR=y IPSEC=y PYTHON=y KERN_SIZE_OPT=y
+endif
+16matg:
+ifeq ($(CONFIG_LINUX26),y)
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-AR-TR-PY-GAE" USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y ARIA2=y NFS=y SNMP=y HFS=y DNSCRYPT=y PPTPD=y TOR=y IPSEC=y PYTHON=y GAEPROXY=y KERN_SIZE_OPT=y
+endif
+16matg5g:
+ifeq ($(CONFIG_LINUX26),y)
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-AR-TR-PY-GAE-5G" USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y ARIA2=y NFS=y SNMP=y HFS=y DNSCRYPT=y PPTPD=y TOR=y IPSEC=y PYTHON=y GAEPROXY=y KERN_SIZE_OPT=y USBAP=y
+endif
+16matg64k:
+ifeq ($(CONFIG_LINUX26),y)
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-AR-TR-PY-GAE-64K" USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y ARIA2=y NFS=y SNMP=y HFS=y DNSCRYPT=y PPTPD=y TOR=y IPSEC=y PYTHON=y GAEPROXY=y KERN_SIZE_OPT=y NVRAM_SIZE=64
+endif
+16matg64k5g:
+ifeq ($(CONFIG_LINUX26),y)
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-AR-TR-PY-GAE-64K-5G" USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y ARIA2=y NFS=y SNMP=y HFS=y DNSCRYPT=y PPTPD=y TOR=y IPSEC=y PYTHON=y GAEPROXY=y KERN_SIZE_OPT=y NVRAM_SIZE=64 USBAP=y
+endif
+## Max build for router with 8MB flash without USB Support (like WRT54GS v1)
+8mm:
+ifeq ($(CONFIG_LINUX26),y)
+	@$(MAKE) bin OPENVPN=y BBEXTRAS=y EBTABLES=y IPV6SUPP=y B=E BUILD_DESC="8M-VPN-IPv6-Max" USB="" NOCAT=y NFS=y SNMP=y DNSCRYPT=y PPTPD=y TOR=y IPSEC=y
+else
+	@$(MAKE) bin OPENVPN=y BBEXTRAS=y B=E BUILD_DESC="8M-VPN-IPv6-Max" USB="" NOCAT=y NFS=y SNMP=y DNSCRYPT=y PPTPD=y TOR=y
+endif
+
+8mm5g:
+ifeq ($(CONFIG_LINUX26),y)
+	@$(MAKE) bin OPENVPN=y BBEXTRAS=y EBTABLES=y IPV6SUPP=y B=E BUILD_DESC="8M-VPN-IPv6-Max-5G" USB="USB" NFS=y SNMP=y DNSCRYPT=y PPTPD=y IPSEC=y USBAP=y NO_USBAPP=y
+endif
+
+## 8M-Trans
+8mt:
+ifeq ($(CONFIG_LINUX26),y)
+	@$(MAKE) bin OPENVPN=y NTFS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y IPV6SUPP=y B=M BUILD_DESC="8M-VPN-TR" USB="USB" BTCLIENT=y NO_JFFS=y PPTPD=y NOCAT=y SAMBA3=y KERN_SIZE_OPT=y
+else
+	@$(MAKE) bin OPENVPN=y NTFS=y USBEXTRAS=y B=M BUILD_DESC="8M-VPN-TR" USB="USB" BTCLIENT=y NO_JFFS=y PPTPD=y NOCAT=y SAMBA3=y KERN_SIZE_OPT=y
+endif
+
+## 8M-Aria2
+8ma:
+ifeq ($(CONFIG_LINUX26),y)
+	@$(MAKE) bin OPENVPN=y EBTABLES=y NO_LIBOPT=y IPV6SUPP=y B=M BUILD_DESC="8M-VPN-AR" USB="USB" ARIA2=y NO_JFFS=y PPTPD=y SAMBA3=y KERN_SIZE_OPT=y
+else
+	@$(MAKE) bin OPENVPN=y B=M BUILD_DESC="8M-VPN-AR" USB="USB" ARIA2=y NO_JFFS=y PPTPD=y SAMBA3=y KERN_SIZE_OPT=y
+endif
+
+#################################
 #################################
 
 ifeq ($(CONFIG_LINUX26),y)
+
+## 4M - targeted for 4MB flash routers
+4mmini:
+	@$(MAKE) bin NO_JFFS=y NO_CIFS=y NO_ZEBRA=y B=F BUILD_DESC="4M-Mini" USB="" NO_LIBOPT=y EBTABLES=y NO_HTTPS=y NO_SAMBA=y NO_FTP=y KERN_SIZE_OPT=y
+
+4mipv6:
+	@$(MAKE) bin NO_JFFS=y NO_CIFS=y NO_ZEBRA=y IPV6SUPP=y B=F BUILD_DESC="4M-IPv6" USB="" NO_LIBOPT=y NO_HTTPS=y NO_SAMBA=y NO_FTP=y KERN_SIZE_OPT=y
+
+4mvpn:
+	@$(MAKE) bin NO_JFFS=y NO_CIFS=y NO_ZEBRA=y B=F BUILD_DESC="4M-VPN" USB="" PPTPD=y NO_SSH=y NO_SAMBA=y NO_FTP=y KERN_SIZE_OPT=y
+
+fxd4m:
+	@$(MAKE) bin NO_JFFS=y NO_CIFS=y NO_ZEBRA=y B=F BUILD_DESC="4M-Mini" USB="" NO_LIBOPT=y EBTABLES=y NO_HTTPS=y NO_SAMBA=y NO_FTP=y MIPS32=r2 KERN_SIZE_OPT=y BELKIN=y
+
+fxd8m:
+	@$(MAKE) bin OPENVPN=y EBTABLES=y BBEXTRAS=y NO_LIBOPT=y IPV6SUPP=y MEDIASRV=y B=E BUILD_DESC="8M-VPN-IPv6-Max" USB="USB" NO_JFFS=y NO_CIFS=y NO_ZEBRA=y NOCAT=y NTFS=y NFS=y DNSCRYPT=y PPTPD=y IPSEC=y MIPS32=r2 KERN_SIZE_OPT=y BELKIN=y
+
+fxd8ma:
+	@$(MAKE) bin OPENVPN=y EBTABLES=y NO_LIBOPT=y IPV6SUPP=y B=E BUILD_DESC="8M-VPN-AR" USB="USB" ARIA2=y NO_JFFS=y PPTPD=y SAMBA3=y KERN_SIZE_OPT=y MIPS32=r2 BELKIN=y
+
+fxd8mt:
+	@$(MAKE) bin OPENVPN=y NTFS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y IPV6SUPP=y B=M BUILD_DESC="8M-VPN-TR" USB="USB" BTCLIENT=y NO_JFFS=y PPTPD=y NOCAT=y SAMBA3=y KERN_SIZE_OPT=y MIPS32=r2 BELKIN=y
 
 ## Mini - targeted for Netgear routers
 f:
@@ -970,6 +1102,8 @@ endif
 m:
 ifeq ($(CONFIG_LINUX26),y)
 	@$(MAKE) bin OPENVPN=y BBEXTRAS=y EBTABLES=y IPV6SUPP=y B=E BUILD_DESC="Max" USB="" NOCAT=y NFS=y SNMP=y DNSCRYPT=y PPTPD=y TOR=y IPSEC=y
+else
+	@$(MAKE) bin OPENVPN=y BBEXTRAS=y B=E BUILD_DESC="Max" USB="" NOCAT=y NFS=y SNMP=y DNSCRYPT=y PPTPD=y TOR=y
 endif
 
 ## SD-VPN - Only k24
@@ -985,6 +1119,102 @@ ifeq ($(CONFIG_LINUX26),y)
 #AIO MIPS2 for RT-N16 and E4200
 r2z:
 	@$(MAKE) z MIPS32=r2
+
+r2-16mt:
+	@$(MAKE) 16mt MIPS32=r2
+
+r2-16ma:
+	@$(MAKE) 16ma MIPS32=r2
+
+r2-16mat:
+	@$(MAKE) 16mat MIPS32=r2
+
+r2-16matp:
+	@$(MAKE) 16matp MIPS32=r2
+
+r2-16matg:
+	@$(MAKE) 16matg MIPS32=r2
+
+r2-16matg5g:
+	@$(MAKE) 16matg5g MIPS32=r2
+
+r2-16matg64k:
+	@$(MAKE) 16matg64k MIPS32=r2
+
+r2-16matg64k5g:
+	@$(MAKE) 16matg64k5g MIPS32=r2
+
+r2-8mm5g:
+	@$(MAKE) 8mm5g MIPS32=r2
+
+r2-8mm:
+	@$(MAKE) 8mm MIPS32=r2
+
+r2-8mt:
+	@$(MAKE) 8mt MIPS32=r2
+
+r2-8ma:
+	@$(MAKE) 8ma MIPS32=r2
+
+r2-4mmini:
+	@$(MAKE) 4mmini MIPS32=r2
+
+r2-4mipv6:
+	@$(MAKE) 4mipv6 MIPS32=r2
+
+r2-4mvpn:
+	@$(MAKE) 4mvpn MIPS32=r2
+
+l600na:
+	@$(MAKE) bin MIPS32=r2 OPENVPN=y BBEXTRAS=y EBTABLES=y NO_LIBOPT=y IPV6SUPP=y B=E BUILD_DESC="8M-L600N-Max" USB="USB" SNMP=y DNSCRYPT=y PPTPD=y TOR=y NOCAT=y USBAP=y
+
+n60za16m:
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-AR-TR" USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y ARIA2=y NFS=y SNMP=y HFS=y DNSCRYPT=y UPS=y PPTPD=y TOR=y IPSEC=y RAID=y KERN_SIZE_OPT=y MIPS32=r2 NVRAM_SIZE=60 LINKSYS_E=y USBAP=y
+
+n60za16mg:
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-AR-TR-PY-GAE" PYTHON=y GAEPROXY=y USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y ARIA2=y NFS=y SNMP=y HFS=y DNSCRYPT=y PPTPD=y TOR=y IPSEC=y KERN_SIZE_OPT=y MIPS32=r2 NVRAM_SIZE=60 LINKSYS_E=y USBAP=y
+
+n60za8m:
+	@$(MAKE) bin OPENVPN=y EBTABLES=y NO_LIBOPT=y IPV6SUPP=y B=E BUILD_DESC="8M-VPN-AR" USB="USB" ARIA2=y NO_JFFS=y PPTPD=y SAMBA3=y KERN_SIZE_OPT=y MIPS32=r2 NVRAM_SIZE=60 LINKSYS_E=y
+
+n64za16m:
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-AR-TR" USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y ARIA2=y NFS=y SNMP=y HFS=y DNSCRYPT=y UPS=y PPTPD=y TOR=y IPSEC=y RAID=y KERN_SIZE_OPT=y MIPS32=r2 NVRAM_SIZE=64 LINKSYS_E_64k=y
+
+n64za16mg:
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-AR-TR-PY-GAE" PYTHON=y GAEPROXY=y USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y ARIA2=y NFS=y SNMP=y HFS=y DNSCRYPT=y PPTPD=y TOR=y IPSEC=y KERN_SIZE_OPT=y MIPS32=r2 NVRAM_SIZE=64 LINKSYS_E_64k=y
+
+n64za8m:
+	@$(MAKE) bin OPENVPN=y EBTABLES=y NO_LIBOPT=y IPV6SUPP=y B=M BUILD_DESC="8M-VPN-AR" USB="USB" ARIA2=y NO_JFFS=y PPTPD=y SAMBA3=y KERN_SIZE_OPT=y MIPS32=r2 NVRAM_SIZE=64 LINKSYS_E_64k=y
+
+rtn53a:
+	@$(MAKE) bin MIPS32=r2 OPENVPN=y BBEXTRAS=y EBTABLES=y NO_LIBOPT=y IPV6SUPP=y B=E BUILD_DESC="8M-RT-N53-Max" USB="USB" SNMP=y DNSCRYPT=y PPTPD=y TOR=y NOCAT=y USBAP=y NO_USBAPP=y KERN_SIZE_OPT=y
+
+wnr3500a:
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-AR-TR" USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y ARIA2=y NFS=y SNMP=y HFS=y DNSCRYPT=y UPS=y PPTPD=y TOR=y IPSEC=y RAID=y MIPS32=r2 WNR3500LV2=1 NO_JFFS=y KERN_SIZE_OPT=y
+
+wnr3500ag:
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-AR-TR-PY-GAE" PYTHON=y GAEPROXY=y USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y ARIA2=y NFS=y SNMP=y HFS=y DNSCRYPT=y PPTPD=y TOR=y IPSEC=y MIPS32=r2 WNR3500LV2=1 NO_JFFS=y KERN_SIZE_OPT=y
+
+e4200a:
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-AR-TR" USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y ARIA2=y NFS=y SNMP=y HFS=y DNSCRYPT=y UPS=y PPTPD=y TOR=y IPSEC=y RAID=y KERN_SIZE_OPT=y MIPS32=r2 NVRAM_SIZE=60 LINKSYS_E_4200=y USBAP=y
+
+e4200ag:
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-AR-TR-PY-GAE" PYTHON=y GAEPROXY=y USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y ARIA2=y NFS=y SNMP=y HFS=y DNSCRYPT=y PPTPD=y TOR=y IPSEC=y KERN_SIZE_OPT=y MIPS32=r2 NVRAM_SIZE=60 LINKSYS_E_4200=y USBAP=y
+
+e2500a: 
+	@$(MAKE) bin OPENVPN=y EBTABLES=y BBEXTRAS=y NO_LIBOPT=y IPV6SUPP=y B=E BUILD_DESC="8M-VPN-AR" USB="USB" ARIA2=y NFS=y IPSEC=y NO_JFFS=y NO_CIFS=y PPTPD=y USBAP=y NO_USBAPP=y KERN_SIZE_OPT=y MIPS32=r2 NVRAM_SIZE=60 LINKSYS_E2500=y
+
+e3200a:
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-AR-TR" USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y ARIA2=y NFS=y SNMP=y HFS=y DNSCRYPT=y UPS=y PPTPD=y TOR=y IPSEC=y RAID=y KERN_SIZE_OPT=y MIPS32=r2 USBAP=y NVRAM_SIZE=60 LINKSYS_E3200=y
+
+e3200ag:
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-AR-TR-PY-GAE" PYTHON=y GAEPROXY=y USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y ARIA2=y NFS=y SNMP=y HFS=y DNSCRYPT=y PPTPD=y TOR=y IPSEC=y KERN_SIZE_OPT=y MIPS32=r2 USBAP=y NVRAM_SIZE=60 LINKSYS_E3200=y
+
+e1000v24m:
+	@$(MAKE) bin NO_JFFS=y NO_CIFS=y NO_ZEBRA=y B=F BUILD_DESC="4M-Mini" USB=""  NO_HTTPS=y MIPS32=r2 NVRAM_SIZE=32 LINKSYS_E1000v2=y
+
+e1200v14m:
+	@$(MAKE) bin NO_JFFS=y NO_CIFS=y NO_ZEBRA=y B=F BUILD_DESC="4M-Mini" USB=""  NO_HTTPS=y MIPS32=r2 NVRAM_SIZE=64 LINKSYS_E1200v1=y
 
 r2e:
 	@$(MAKE) e MIPS32=r2
@@ -1151,6 +1381,36 @@ r64e:
 endif
 
 ifeq ($(CONFIG_BCMWL6),y)
+rtn66a:
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-AR-TR-PY" PYTHON=y USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y ARIA2=y NFS=y SNMP=y HFS=y DNSCRYPT=y UPS=y PPTPD=y TOR=y IPSEC=y RAID=y KERN_SIZE_OPT=y MIPS32=r2 NVRAM_64K=y KERN_SIZE_OPT=y MICROSD=y ASUS_TRX="RT-N66U" UFSD=y
+
+rtn66ag:
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-AR-TR-PY-GAE" PYTHON=y GAEPROXY=y USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y ARIA2=y NFS=y SNMP=y HFS=y DNSCRYPT=y PPTPD=y TOR=y IPSEC=y KERN_SIZE_OPT=y MIPS32=r2 NVRAM_64K=y KERN_SIZE_OPT=y MICROSD=y ASUS_TRX="RT-N66U" UFSD=y
+
+ac66atg:
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-AR-TR-PY-GAE" USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y ARIA2=y NFS=y SNMP=y HFS=y DNSCRYPT=y UPS=y PPTPD=y TOR=y IPSEC=y RAID=y PYTHON=y GAEPROXY=y KERN_SIZE_OPT=y MIPS32=r2 NVRAM_64K=y NAND=y ASUS_TRX="RT-AC66U" UFSD=y
+
+ac66atp:
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-AR-TR-PY" USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y ARIA2=y NFS=y SNMP=y HFS=y DNSCRYPT=y UPS=y PPTPD=y TOR=y IPSEC=y RAID=y PYTHON=y KERN_SIZE_OPT=y MIPS32=r2 NVRAM_64K=y NAND=y ASUS_TRX="RT-AC66U" UFSD=y
+
+w1800ratg:
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-AR-TR-PY-GAE" USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y ARIA2=y NFS=y SNMP=y HFS=y DNSCRYPT=y UPS=y PPTPD=y TOR=y IPSEC=y RAID=y PYTHON=y GAEPROXY=y KERN_SIZE_OPT=y MIPS32=r2 NVRAM_64K=y CTF=y ASUS_TRX="W1800R" UFSD=y
+
+w1800ratp:
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-AR-TR-PY" USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y ARIA2=y NFS=y SNMP=y HFS=y DNSCRYPT=y UPS=y PPTPD=y TOR=y IPSEC=y RAID=y PYTHON=y KERN_SIZE_OPT=y MIPS32=r2 NVRAM_64K=y CTF=y ASUS_TRX="W1800R" UFSD=y
+
+d1800hatg:
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-AR-TR-PY-GAE" USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y ARIA2=y NFS=y SNMP=y HFS=y DNSCRYPT=y UPS=y PPTPD=y TOR=y IPSEC=y RAID=y PYTHON=y GAEPROXY=y KERN_SIZE_OPT=y MIPS32=r2 NVRAM_64K=y CTF=y NAND=y ASUS_TRX="D1800H" UFSD=y
+
+d1800hatp:
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-AR-TR-PY" USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y ARIA2=y NFS=y SNMP=y HFS=y DNSCRYPT=y UPS=y PPTPD=y TOR=y IPSEC=y RAID=y PYTHON=y KERN_SIZE_OPT=y MIPS32=r2 NVRAM_64K=y CTF=y NAND=y ASUS_TRX="D1800H" UFSD=y
+
+ea6500atg:
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-AR-TR-PY-GAE" USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y ARIA2=y NFS=y SNMP=y HFS=y DNSCRYPT=y UPS=y PPTPD=y TOR=y IPSEC=y RAID=y PYTHON=y GAEPROXY=y KERN_SIZE_OPT=y MIPS32=r2 NVRAM_64K=y ASUS_TRX="EA6500V1" UFSD=y
+
+ea6500atp:
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-AR-TR-PY" USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y ARIA2=y NFS=y SNMP=y HFS=y DNSCRYPT=y UPS=y PPTPD=y TOR=y IPSEC=y RAID=y PYTHON=y KERN_SIZE_OPT=y MIPS32=r2 NVRAM_64K=y ASUS_TRX="EA6500V1" UFSD=y
+
 ac66e:
 	@$(MAKE) e MIPS32=r2 NVRAM_64K=y NAND=y ASUS_TRX="RT-AC66U" UFSD=y
 
@@ -1216,7 +1476,7 @@ setprofile:
 	@$(MAKE) -C router oldconfig
 
 help:
-	@echo "n            Mini-USB - for oruter with 4MB flash and USB port - K24 only"
+	@echo "n            Mini-USB - for router with 4MB flash and USB port - K24 only"
 	@echo "e            VPN - (standard plus VPN, extra utilities and NTFS support)"
 	@echo "c            BTgui-VPN - (Ext plus BT gui)"
 	@echo "d            Nocat-VPN - (BTgui plus VPN plus Nocat)"
@@ -1290,6 +1550,72 @@ ifeq ($(CONFIG_LINUX26),y)
 	@echo "r64t         RT-N66u build BT-VPN"
 	@echo "r64o         RT-N66u build Mega-VPN"
 	@echo "r64z         RT-N66u build AIO"
+	@echo
+	@echo "--- By bwq518   ----------------------------------------------------------------------------"
+	@echo "4mmini         R1 4M-Mini - for 4MB flash and no USB support minus CIFS and RIPv1/2"
+	@echo "4mvpn          R1 4M-VPN - with VPN for 4MB flash and no USB,SSH support minus CIFS and RIPv1/2"
+	@echo "4mipv6         R1 4M-IPv6 - with IPv6 for 4MB flash and no USB,HTTPS support minus CIFS and RIPv1/2"
+	@echo "8mm5g          R1 8M-VPN-IPv6-Max-5G - Max build withour USB support"
+	@echo "8mm            R1 8M-VPN-IPv6-Max - Max build withour USB support"
+	@echo "8mt            R1 8M-VPN-TR - VPN + Transmission + BTGUI with NTFS support"
+	@echo "8ma            R1 8M-VPN-AR - VPN + Aria2 + YAAW with NO NTFS support"
+	@echo "16mt           R1 16M-AIO-TR - AIO (Include Transmission + BTGUI)"
+	@echo "16ma           R1 16M-AIO-AR - AIO (Include Aria2 + YAAW)"
+	@echo "16mat          R1 16M-AIO-AR-TR - AIO (Include Trans.+ BTGUI + Aria2 + YAAW)"
+	@echo "16matp         R1 16M-AIO-AR-PY - AIO (Include Aria2 + YAAW + Python)"
+	@echo "16matg         R1 16M-AIO-AR-PY-GAE - AIO (Include Aria2 + YAAW + Proxy)"
+	@echo "16matg5g       R1 16M-AIO-AR-PY-GAE-5G - AIO&5G (Include Aria2 + YAAW + Python + WallProxy)"
+	@echo "16matg64k      R1 16M-AIO-AR-PY-GAE - 64K NVRAM AIO (Include Aria2 + YAAW + Python + wallProxy)"
+	@echo "16matg64k5g    R1 16M-AIO-AR-PY-GAE-5G - 64K NVRAM AIO&5G (Include Aria2 + YAAW + Python + wallProxy)"
+	@echo "r2-4mmini      R2 4M-Mini - for 4MB flash and no USB support minus CIFS and RIPv1/2"
+	@echo "r2-4mvpn       R2 4M-VPN - with VPN for 4MB flash and no USB,SSH support minus CIFS and RIPv1/2"
+	@echo "r2-4mipv6      R2 4M-IPv6 - with IPv6 for 4MB flash and no USB,HTTPS support minus CIFS and RIPv1/2"
+	@echo "r2-8mm5g       R2 8M-VPN-IPv6-Max-5G - Max build withour USB support"
+	@echo "r2-8mm         R2 8M-VPN-IPv6-Max - Max build withour USB support"
+	@echo "r2-8mt         R2 8M-VPN-TR - VPN + Transmission + BTGUI"
+	@echo "r2-8ma         R2 8M-VPN-AR - VPN + Aria2 + YAAW"
+	@echo "r2-16mt        R2 16M-AIO-TR - AIO (Include Transmission + BTGUI)"
+	@echo "r2-16ma        R2 16M-AIO-AR - AIO (Include Aria2 + YAAW)"
+	@echo "r2-16mat       R2 16M-AIO-AR-TR - AIO (Include Trans.+ BTGUI + Aria2 + YAAW)"
+	@echo "r2-16matp      R2 16M-AIO-AR-PY - AIO (Include Aria2 + YAAW + Python)"
+	@echo "r2-16matg      R2 16M-AIO-AR-PY-GAE - AIO (Include Aria2 + YAAW + Python + WallProxy)"
+	@echo "r2-16matg5g    R2 16M-AIO-AR-PY-GAE-5G - AIO&5G (Include Aria2 + YAAW + Python + WallProxy)"
+	@echo "r2-16matg64k   R2 16M-AIO-AR-PY-GAE - 64K NVRAM AIO (Include Aria2 + YAAW + Python + wallProxy)"
+	@echo "r2-16matg64k5g R2 16M-AIO-AR-PY-GAE-5G - 64K NVRAM AIO&5G (Include Aria2 + YAAW + Python + wallProxy)"
+	@echo "e1000v24m      R2 Linksys E1000v2-v2.1/Cisco M10v2 4M Mini"
+	@echo "e1200v14m      R2 Linksys E1200v1 4M Mini"
+	@echo "e2500a         R2 Linksys E2500 with wl_high module (dualband support, Aria2+YAAW)"
+	@echo "e3200a         R2 Linksys E3200 with wl_high module (dualband support, Aria2+YAAW)"
+	@echo "e3200ag        R2 Linksys E3200 with wl_high module (dualband support, Aria2+YAAW+Python)"
+	@echo "e4200a         R2 Linksys E4200 with wl_high module (dualband support, Aria2+YAAW)"
+	@echo "e4200ag        R2 Linksys E4200 with wl_high module (dualband support, Aria2+YAAW+Python)"
+	@echo "n60za16m       R2 Linksys E-series 16M flash & 60K NVRAM build AIO (with Aria2+YAAW)"
+	@echo "n60za16mg      R2 Linksys E-series 16M flash & 60K NVRAM build AIO (with Aria2+YAAW+Python)"
+	@echo "n60za8m        R2 Linksys E-series 8M flahs & 60K NVRAM VPN + Aria2 + YAAW with no NTFS support"
+	@echo "n64za16m       R2 Linksys E-series 16M flash & 64K NVRAM build AIO (with Aria2 + YAAW)"
+	@echo "n64za16mg      R2 Linksys E-series 16M flash & 64K NVRAM build AIO (with Aria2+YAAW+Python)"
+	@echo "n64za8m        R2 Linksys E-series 8M flash & 64K NVRAM VPN + Aria2 + YAAW with no NTFS support"
+	@echo "rtn66a         R2 RT-N66u build AIO (with Aria2+YAAW+Python)"
+	@echo "rtn66ag        R2 RT-N66u build AIO (with Aria2+YAAW+Python+WallProxy)"
+	@echo "rtn53a         R2 Asus RT-N53 with wl_high module (dualband support, Aria2+YAAW)"
+	@echo "l600na         R2 Rosewill L600N Build with wl_high module (dualband support)"
+ifeq ($(CONFIG_BCMWL6),y)
+	@echo "---            ------------------------------------------------------------------------------"
+	@echo "ac66atg        R2 RT-AC66U 16M-AIO-AR-TR-PY-GAE (Include Aria2 + YAAW + Proxy)"
+	@echo "ac66atp        R2 RT-AC66U 16M-AIO-AR-TR-PY (Include Aria2 + YAAW + Python)"
+	@echo "wnr3500a       R2 Netgear WNR3500Lv2 16M-AIO-AR-TR-PY build AIO (with Aria2+YAAW)"
+	@echo "wnr3500ag      R2 Netgear WNR3500Lv2 16M-AIO-AR-TR-PY-GAE build AIO (with Aria2+YAAW+PY)"
+	@echo "w1800ratg      R2 Tenda W1800R 16M-AIO-AR-TR-PY-GAE NO_JFFS (Include Aria2 + YAAW + Proxy)"
+	@echo "w1800ratp      R2 Tenda W1800R 16M-AIO-AR-TR-PY NO_JFFS (Include Aria2 + YAAW + Python)"
+	@echo "d1800hatp      R2 Buffalo WZR-D1800H/D1800H 16M-AIO-AR-TR-PY JFFS (Include Aria2 + YAAW + Python)"
+	@echo "d1800hatg      R2 Buffalo WZR-D1800H/D1800H 16M-AIO-AR-TR-PY-GAE JFFS (Include Aria2 + YAAW + Proxy)"
+endif
+	@echo "fxd4m           R2 4M-Mini for Belkin F7D3301/3302/4302,F5D8235v3 routers(4M, Mini)"
+	@echo "fxd8m           R2 8M-VPN-IPv6-Max for Belkin F7D3301/3302/4302,F5D8235v3 routers(8M,Big-VPN)"
+	@echo "fxd8ma          R2 8M-VPN-AR for Belkin F7D3301/3302/4302,F5D8235v3 routers(8M,Big-VPN+AR)"
+	@echo "fxd8mt          R2 8M-VPN-TR for Belkin F7D3301/3302/4302,F5D8235v3 routers(8M,Big-VPN+TR)"
+	@echo "---            ------------------------------------------------------------------------------"
+	@echo
 endif
 	@echo ""
 	@echo "..etc..      other build configs"
