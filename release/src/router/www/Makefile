@@ -50,6 +50,10 @@ else
 	done
 endif
 
+# Add Build Information to about.asp page (placeholders exist)
+	sed -i $(INSTALLDIR)/www/about.asp -e "s/#param-blddate#/`date +"%Y %B %d, %H:%M %P"`/"
+	sed -i $(INSTALLDIR)/www/about.asp -e "s/#param-bldmach#/`uname -m -r -s -n`/"
+
 # Only include the CIFS pages if CIFS is configured in.
 ifneq ($(TCONFIG_CIFS),y)
 	rm -f $(INSTALLDIR)/www/admin-cifs.asp
