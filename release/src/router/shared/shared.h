@@ -240,7 +240,8 @@ enum {
 	MODEL_WRT300N,
 	MODEL_WL330GE,
 	MODEL_W1800R,
-	MODEL_WNDR4000
+	MODEL_WNDR4000,
+	MODEL_WNDR3700v3
 };
 
 /* NOTE: Do not insert new entries in the middle of this enum,

@@ -13,6 +13,7 @@
 #include <bcmdevs.h>
 #include <trxhdr.h>
 #include "shared.h"
+#include <syslog.h>
 
 /*
 
@@ -213,6 +214,21 @@ int check_hw_type(void)
 	return HW_UNKNOWN;
 }
 
+// Find partition with defined name (and return partition number as an integer). Borrorwed from DD-WRT, credit is due there!
+int getMTD(char *name)
+{
+	char buf[128];
+	int device;
+
+	sprintf(buf, "cat /proc/mtd|grep \"%s\"", name);
+	FILE *fp = popen(buf, "rb");
+
+	fscanf(fp, "%s", &buf[0]);
+	device = buf[3] - '0';
+	pclose(fp);
+	return device;
+}
+
 int get_model(void)
 {
 	int hw;
@@ -288,9 +304,41 @@ int get_model(void)
 			return MODEL_WRT610Nv2;
 		if (nvram_match("boot_hw_model", "E4200"))
 			return MODEL_E4200;
+			
 		if (nvram_match("boardmfg", "NETGEAR")) {
-			if (nvram_match("boardflags", "0x00001310")) return MODEL_WNDR4000;
+			// Netgear Router ... so check board_data partition information (as at least WNDR4000 and WNDR3700v3 need this to identify)
+			// Note that boardmfg is stored in CFE - so always present
+			int mtd = getMTD("board_data");
+			char devname[32];
+			sprintf(devname, "/dev/mtd%dro", mtd);
+			FILE *model = fopen(devname, "rb");
+			if (model) {
+				#define	WNDR4000		"U12H181T00_NETGEAR"
+				#define WNDR3700v3		"U12H194T00_NETGEAR"
+				char modelstr[32];
+				// Get Model string from board_data partition, null terminated in NVRAM already (checked using dd dump)
+				fread(modelstr, 1, 32, model);
+				nvram_set("board_id", modelstr);
+				fclose(model);
+				// Determine / return router model (based on Model string)
+				if (!strcmp(modelstr, WNDR3700v3)) {
+					fclose(model);
+					//syslog(LOG_INFO, "NETGEAR: Model detected based on board_data model string, result = wndr3700\n");
+					nvram_set("netgear_model", "wndr3700");
+					return MODEL_WNDR3700v3;
+				} else {
+					//syslog(LOG_INFO, "NETGEAR: Model detected based on board_data model string, result = wndr4000\n");
+					nvram_set("netgear_model", "wndr4000");
+					return MODEL_WNDR4000;
+				}
+			} else {
+				// Can't open board_data partition, so default to WNDR4000 ... but log to syslog
+				syslog(LOG_INFO, "NETGEAR: Cannot open board_data partition to check model string, defaulting to WNDR4000 ... but this may not be correct!\n");
+				nvram_set("netgear_model", "wndr4000");
+				return MODEL_WNDR4000;
+			}
 		}
+		
 		switch (strtoul(nvram_safe_get("boardtype"), NULL, 0)) {
 		case 0xd4cf:
 			if (nvram_match("boardrev", "0x1204")) return MODEL_F7D4301;
