@@ -1,4 +1,3 @@
-# By bwq518
 # Copyright 2001-2003, Broadcom Corporation
 # All Rights Reserved.
 #
