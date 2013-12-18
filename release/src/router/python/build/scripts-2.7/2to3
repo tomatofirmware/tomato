@@ -1,0 +1,5 @@
+#!/raid1/tomato/tomato.git.115RT/release.ar.wp/src/router/python/hostpython
+import sys
+from lib2to3.main import main
+
+sys.exit(main("lib2to3.fixes"))

@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <errno.h>
 #include <net/if.h>
+#include <string.h>
 
 #ifdef TCONFIG_USB
 #include <mntent.h>	// !!TB
@@ -275,6 +276,8 @@ extern int ppid(int pid);
 
 extern unsigned long f_size(const char *path);
 extern int f_exists(const char *file);
+//bwq518
+extern int d_exists(const char *file);
 extern int f_read(const char *file, void *buffer, int max);												// returns bytes read
 extern int f_write(const char *file, const void *buffer, int len, unsigned flags, unsigned cmode);		//
 extern int f_read_string(const char *file, char *buffer, int max);										// returns bytes read, not including term; max includes term
@@ -295,7 +298,8 @@ extern int f_wait_notexists(const char *name, int max);
 #define LED_BRIDGE			6
 #define LED_USB				7
 #define LED_MYSTERY			LED_USB	// (unmarked LED between wireless and bridge on WHR-G54S)
-#define LED_COUNT			8
+#define LED_5G				8
+#define LED_COUNT			9
 
 #define	LED_OFF				0
 #define	LED_ON				1
@@ -326,5 +330,14 @@ extern int base64_decoded_len(int len);										// maximum possible, not actual
 // strings.c
 extern const char *find_word(const char *buffer, const char *word);
 extern int remove_word(char *buffer, const char *word);
-
+// Hyzoom bwq518
+#define MAX_PORTS 64 
+#define PORT_SIZE 16 
+extern int is_port(char *str);
+extern char *filter_space(char *str);
+extern char* format_port(char *str);
+extern char* trimstr(char *str);
+extern char* splitpath( char *str, char *pathname, char *filename);
+extern int splitport(char *in_ports, char out_port[MAX_PORTS][PORT_SIZE]);
+extern int is_number(char *);
 #endif

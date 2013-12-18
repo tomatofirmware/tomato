@@ -24,7 +24,7 @@
 # make V1=8516 V2="-jffs.1" a b c d m s n o
 
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+# ARIA2 SIMPROXY PYTHON GAEPROXY NO_FTP REMOVE_USBAPP    by Hyzoom bwq518
 
 export ac_cv_func_malloc_0_nonnull=yes
 export SRCBASE := $(shell pwd)
@@ -59,6 +59,8 @@ current_BUILD_NAME = $(strip $(shell grep "^TOMATO_BUILD_NAME" tomato_profile.ma
 current_BUILD_DESC = $(strip $(shell grep "^TOMATO_BUILD_DESC" tomato_profile.mak  | cut -d"=" -f2 | sed -e "s/ //g"))
 current_BUILD_USB  = $(strip $(shell grep "^TOMATO_BUILD_USB"  tomato_profile.mak  | cut -d"=" -f2 | sed -e "s/ //g"))
 current_TOMATO_VER = $(strip $(shell grep "TOMATO_MAJOR" router/shared/tomato_version.h  | cut -d"\"" -f2)).$(strip $(shell grep "TOMATO_MINOR" router/shared/tomato_version.h  | cut -d"\"" -f2))
+current_TOMATO_V1 = $(V1)
+current_TOMATO_V2 = $(V2)
 
 uppercase_N = $(shell echo $(N) | tr a-z  A-Z)
 lowercase_N = $(shell echo $(N) | tr A-Z a-z)
@@ -171,7 +173,7 @@ clean:
 	@rm -f router/config_[a-z]
 	@rm -f router/busybox/config_[a-z]
 	@$(MAKE) -C router $@
-	@-rmdir router/mipsel-uclibc
+	@rm -rf router/mipsel-uclibc
 
 cleanimage:
 	@rm -f fpkg.log
@@ -303,6 +305,8 @@ define RouterOptions
 	if [ "$(NO_SAMBA)" = "y" ]; then \
 		sed -i "/TCONFIG_SAMBASRV/d" $(1); \
 		echo "# TCONFIG_SAMBASRV is not set" >>$(1); \
+		sed -i "/TCONFIG_SAMBA3/d" $(1); \
+		echo "# TCONFIG_SAMBA3 is not set" >>$(1); \
 	fi; \
 	if [ "$(NO_ZEBRA)" = "y" ]; then \
 		sed -i "/TCONFIG_ZEBRA/d" $(1); \
@@ -371,6 +375,27 @@ define RouterOptions
 	if [ "$(BTGUI)" = "y" ]; then \
 		sed -i "/TCONFIG_BT/d" $(1); \
 		echo "TCONFIG_BT=y" >>$(1); \
+	fi; \
+	if [ "$(NO_FTP)" = "y" ]; then \
+		sed -i "/TCONFIG_FTP/d" $(1); \
+		echo "# TCONFIG_FTP is not set" >>$(1); \
+		echo "# TCONFIG_FTP_SSL is not set" >>$(1); \
+	fi; \
+	if [ "$(ARIA2)" = "y" ]; then \
+		sed -i "/TCONFIG_ARIA2/d" $(1); \
+		echo "TCONFIG_ARIA2=y" >>$(1); \
+	fi; \
+	if [ "$(SIMPROXY)" = "y" ]; then \
+		sed -i "/TCONFIG_SIMPROXY/d" $(1); \
+		echo "TCONFIG_SIMPROXY=y" >>$(1); \
+	fi; \
+	if [ "$(PYTHON)" = "y" ]; then \
+		sed -i "/TCONFIG_PYTHON/d" $(1); \
+		echo "TCONFIG_PYTHON=y" >>$(1); \
+	fi; \
+	if [ "$(GAEPROXY)" = "y" ]; then \
+		sed -i "/TCONFIG_GAEPROXY/d" $(1); \
+		echo "TCONFIG_GAEPROXY=y" >>$(1); \
 	fi; \
 	if [ "$(TR_EXTRAS)" = "y" ]; then \
 		sed -i "/TCONFIG_TR_EXTRAS/d" $(1); \
@@ -672,6 +697,10 @@ define KernelConfig
 			echo "CONFIG_BRIDGE_EBT_IP6=m" >>$(1); \
 		fi; \
 	fi; \
+	if [ "$(REMOVE_USBAPP)" = "y" ]; then \
+		sed -i "/TCONFIG_REMOVE_USBAPP/d" $(1); \
+		echo "TCONFIG_REMOVE_USBAPP=y" >>$(1); \
+	fi; \
 	)
 endef
 
@@ -766,9 +795,95 @@ ifeq ($(CONFIG_LINUX26),y)
 	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="AIO" USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y NFS=y SNMP=y HFS=y DNSCRYPT=y UPS=y PPTPD=y TOR=y IPSEC=y RAID=y
 endif
 
+## All-In-One (AIO) MIPS1 - only for router with more than 8MB flash!! ZTE H618B
+16mt:
+ifeq ($(CONFIG_LINUX26),y)
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-TR" USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y NFS=y SNMP=y HFS=y DNSCRYPT=y UPS=y PPTPD=y TOR=y IPSEC=y RAID=y KERN_SIZE_OPT=y
+endif
+
+## All-In-One (AIO) MIPS1 - replace transmission with aria2, only for router with more than 8MB flash!! ZTE H618B
+16ma:
+ifeq ($(CONFIG_LINUX26),y)
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-AR" USB="USB" NOCAT=y ARIA2=y NFS=y SNMP=y HFS=y DNSCRYPT=y UPS=y PPTPD=y TOR=y IPSEC=y RAID=y KERN_SIZE_OPT=y
+endif
+
+## All-In-One (AIO) MIPS1 - transmission and aria2, only for router with more than 8MB flash!! ZTE H618B
+16mat:
+ifeq ($(CONFIG_LINUX26),y)
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-AR-TR" USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y ARIA2=y NFS=y SNMP=y HFS=y DNSCRYPT=y UPS=y PPTPD=y TOR=y IPSEC=y RAID=y KERN_SIZE_OPT=y
+endif
+
+## All-In-One (AIO) MIPS1 - Transmission + Aria2 + Python2.7.3 + Gevent/Greenlet/pyOpenSSL, only for router with more than 8MB flash!!
+16matp:
+ifeq ($(CONFIG_LINUX26),y)
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-AR-TR-PY" USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y ARIA2=y NFS=y SNMP=y HFS=y DNSCRYPT=y PPTPD=y TOR=y IPSEC=y PYTHON=y KERN_SIZE_OPT=y
+endif
+16matg:
+ifeq ($(CONFIG_LINUX26),y)
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-AR-TR-PY-GAE" USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y ARIA2=y NFS=y SNMP=y HFS=y DNSCRYPT=y PPTPD=y TOR=y IPSEC=y PYTHON=y GAEPROXY=y KERN_SIZE_OPT=y
+endif
+n60za16m:
+ifeq ($(CONFIG_LINUX26),y)
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-AR-TR" USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y ARIA2=y NFS=y SNMP=y HFS=y DNSCRYPT=y UPS=y PPTPD=y TOR=y IPSEC=y RAID=y KERN_SIZE_OPT=y MIPS32=r2 NVRAM_SIZE=60 LINKSYS_E=1
+endif
+n60za16mg:
+ifeq ($(CONFIG_LINUX26),y)
+	@$(MAKE) bin OPENVPN=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="16M-AIO-AR-TR-PY-GAE" PYTHON=y GAEPROXY=y USB="USB" NOCAT=y BTCLIENT=y TR_EXTRAS=y ARIA2=y NFS=y SNMP=y HFS=y DNSCRYPT=y PPTPD=y TOR=y IPSEC=y KERN_SIZE_OPT=y MIPS32=r2 NVRAM_SIZE=60 LINKSYS_E=1
+endif
+n60za8m:
+ifeq ($(CONFIG_LINUX26),y)
+	@$(MAKE) bin OPENVPN=y EBTABLES=y NO_LIBOPT=y IPV6SUPP=y B=E BUILD_DESC="8M-VPN-AR" USB="USB" ARIA2=y NO_JFFS=y PPTPD=y SAMBA3=y KERN_SIZE_OPT=y MIPS32=r2 NVRAM_SIZE=60 LINKSYS_E=1
+endif
+## Max build for router with 8MB flash without USB Support (like WRT54GS v1)
+8mm:
+ifeq ($(CONFIG_LINUX26),y)
+	@$(MAKE) bin OPENVPN=y BBEXTRAS=y EBTABLES=y IPV6SUPP=y B=E BUILD_DESC="8M-VPN-IPv6-Max" USB="" NOCAT=y NFS=y SNMP=y DNSCRYPT=y PPTPD=y TOR=y IPSEC=y
+else
+	@$(MAKE) bin OPENVPN=y BBEXTRAS=y B=E BUILD_DESC="8M-VPN-IPv6-Max" USB="" NOCAT=y NFS=y SNMP=y DNSCRYPT=y PPTPD=y TOR=y
+endif
+
+## 8M-Trans
+8mt:
+ifeq ($(CONFIG_LINUX26),y)
+	@$(MAKE) bin OPENVPN=y NTFS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y IPV6SUPP=y B=M BUILD_DESC="8M-VPN-TR" USB="USB" BTCLIENT=y NO_JFFS=y PPTPD=y NOCAT=y SAMBA3=y KERN_SIZE_OPT=y
+else
+	@$(MAKE) bin OPENVPN=y NTFS=y USBEXTRAS=y B=M BUILD_DESC="8M-VPN-TR" USB="USB" BTCLIENT=y NO_JFFS=y PPTPD=y NOCAT=y SAMBA3=y KERN_SIZE_OPT=y
+endif
+
+## 8M-Aria2
+8ma:
+ifeq ($(CONFIG_LINUX26),y)
+	@$(MAKE) bin OPENVPN=y EBTABLES=y NO_LIBOPT=y IPV6SUPP=y B=M BUILD_DESC="8M-VPN-AR" USB="USB" ARIA2=y NO_JFFS=y PPTPD=y SAMBA3=y KERN_SIZE_OPT=y
+else
+	@$(MAKE) bin OPENVPN=y B=M BUILD_DESC="8M-VPN-AR" USB="USB" ARIA2=y NO_JFFS=y PPTPD=y SAMBA3=y KERN_SIZE_OPT=y
+endif
+
+#################################
 #################################
 
 ifeq ($(CONFIG_LINUX26),y)
+
+## 4M - targeted for 4MB flash routers
+4mmini:
+	@$(MAKE) bin NO_JFFS=y NO_CIFS=y NO_ZEBRA=y B=F BUILD_DESC="4M-Mini" USB="" NO_LIBOPT=y NO_SAMBA=y NO_FTP=y KERN_SIZE_OPT=y
+
+4mipv6:
+	@$(MAKE) bin NO_JFFS=y NO_CIFS=y NO_ZEBRA=y IPV6SUPP=y B=F BUILD_DESC="4M-IPv6" USB="" NO_LIBOPT=y NO_HTTPS=y NO_SAMBA=y NO_FTP=y KERN_SIZE_OPT=y
+
+4mvpn:
+	@$(MAKE) bin NO_JFFS=y NO_CIFS=y NO_ZEBRA=y B=F BUILD_DESC="4M-VPN" USB="" PPTPD=y OPENVPN=y NO_SSH=y NO_SAMBA=y NO_FTP=y KERN_SIZE_OPT=y
+
+fxd4m:
+	@$(MAKE) bin NO_JFFS=y NO_CIFS=y NO_ZEBRA=y B=F BUILD_DESC="4M-Mini" USB="" NO_LIBOPT=y EBTABLES=y NO_HTTPS=y NO_SAMBA=y NO_FTP=y MIPS32=r2 KERN_SIZE_OPT=y BELKIN=y
+
+fxd8m:
+	@$(MAKE) bin OPENVPN=y EBTABLES=y BBEXTRAS=y NO_LIBOPT=y IPV6SUPP=y MEDIASRV=y B=E BUILD_DESC="8M-VPN-IPv6-Max" USB="USB" NO_JFFS=y NO_CIFS=y NO_ZEBRA=y NOCAT=y NTFS=y NFS=y DNSCRYPT=y PPTPD=y IPSEC=y MIPS32=r2 KERN_SIZE_OPT=y BELKIN=y
+
+fxd8ma:
+	@$(MAKE) bin OPENVPN=y EBTABLES=y NO_LIBOPT=y IPV6SUPP=y B=E BUILD_DESC="8M-VPN-AR" USB="USB" ARIA2=y NO_JFFS=y PPTPD=y SAMBA3=y KERN_SIZE_OPT=y MIPS32=r2 BELKIN=y
+
+fxd8mt:
+	@$(MAKE) bin OPENVPN=y NTFS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y IPV6SUPP=y B=M BUILD_DESC="8M-VPN-TR" USB="USB" BTCLIENT=y NO_JFFS=y PPTPD=y NOCAT=y SAMBA3=y KERN_SIZE_OPT=y MIPS32=r2 BELKIN=y
 
 ## Mini - targeted for Netgear routers
 f:
@@ -811,6 +926,39 @@ endif
 #AIO MIPS2 for RT-N16 and E4200
 r2z:
 	@$(MAKE) z MIPS32=r2
+
+r2-16mt:
+	@$(MAKE) 16mt MIPS32=r2
+
+r2-16ma:
+	@$(MAKE) 16ma MIPS32=r2
+
+r2-16mat:
+	@$(MAKE) 16mat MIPS32=r2
+
+r2-16matp:
+	@$(MAKE) 16matp MIPS32=r2
+
+r2-16matg:
+	@$(MAKE) 16matg MIPS32=r2
+
+r2-8mm:
+	@$(MAKE) 8mm MIPS32=r2
+
+r2-8mt:
+	@$(MAKE) 8mt MIPS32=r2
+
+r2-8ma:
+	@$(MAKE) 8ma MIPS32=r2
+
+r2-4mmini:
+	@$(MAKE) 4mmini MIPS32=r2
+
+r2-4mipv6:
+	@$(MAKE) 4mipv6 MIPS32=r2
+
+r2-4mvpn:
+	@$(MAKE) 4mvpn MIPS32=r2
 
 r2e:
 	@$(MAKE) e MIPS32=r2
@@ -937,7 +1085,7 @@ setprofile:
 	@$(MAKE) -C router oldconfig
 
 help:
-	@echo "n            Mini-USB - for oruter with 4MB flash and USB port - K24 only"
+	@echo "n            Mini-USB - for router with 4MB flash and USB port - K24 only"
 	@echo "e            VPN - (standard plus VPN, extra utilities and NTFS support)"
 	@echo "c            BTgui-VPN - (Ext plus BT gui)"
 	@echo "d            Nocat-VPN - (BTgui plus VPN plus Nocat)"
@@ -978,6 +1126,40 @@ ifeq ($(CONFIG_LINUX26),y)
 	@echo "n60z         Linksys E-series build AIO"
 	@echo "n60v         Linksys E-series build IPv6-VPN for E2000"
 	@echo "n60m         Linksys E-series build Max for E2000"
+
+	@echo
+	@echo "--- By bwq518   ----------------------------------------------------------------------------"
+	@echo "4mmini          R1 4M-Mini - for 4MB flash and no USB support minus CIFS and RIPv1/2"
+	@echo "4mvpn           R1 4M-VPN - with VPN for 4MB flash and no USB,SSH support minus CIFS and RIPv1/2"
+	@echo "4mipv6          R1 4M-IPv6 - with IPv6 for 4MB flash and no USB,HTTPS support minus CIFS and RIPv1/2"
+	@echo "8mm             R1 8M-VPN-IPv6-Max - Max build withour USB support"
+	@echo "8mt             R1 8M-VPN-TR - VPN + Transmission + BTGUI with NTFS support"
+	@echo "8ma             R1 8M-VPN-AR - VPN + Aria2 + YAAW with NO NTFS support"
+	@echo "16mt            R1 16M-AIO-TR - AIO (Include Transmission + BTGUI)"
+	@echo "16ma            R1 16M-AIO-AR - AIO (Include Aria2 + YAAW)"
+	@echo "16mat           R1 16M-AIO-AR-TR - AIO (Include Trans.+ BTGUI + Aria2 + YAAW)"
+	@echo "16matp          R1 16M-AIO-AR-PY - AIO (Include Aria2 + YAAW + Python)"
+	@echo "16matg          R1 16M-AIO-AR-PY-GAE - AIO (Include Aria2 + YAAW + Proxy)"
+	@echo "r2-4mmini       R2 4M-Mini - for 4MB flash and no USB support minus CIFS and RIPv1/2"
+	@echo "r2-4mvpn        R2 4M-VPN - with VPN for 4MB flash and no USB,SSH support minus CIFS and RIPv1/2"
+	@echo "r2-4mipv6       R2 4M-IPv6 - with IPv6 for 4MB flash and no USB,HTTPS support minus CIFS and RIPv1/2"
+	@echo "r2-8mm          R2 8M-VPN-IPv6-Max - Max build withour USB support"
+	@echo "r2-8mt          R2 8M-VPN-TR - VPN + Transmission + BTGUI"
+	@echo "r2-8ma          R2 8M-VPN-AR - VPN + Aria2 + YAAW"
+	@echo "r2-16mt         R2 16M-AIO-TR - AIO (Include Transmission + BTGUI)"
+	@echo "r2-16ma         R2 16M-AIO-AR - AIO (Include Aria2 + YAAW)"
+	@echo "r2-16mat        R2 16M-AIO-AR-TR - AIO (Include Trans.+ BTGUI + Aria2 + YAAW)"
+	@echo "r2-16matp       R2 16M-AIO-AR-PY - AIO (Include Aria2 + YAAW + Python)"
+	@echo "r2-16matg       R2 16M-AIO-AR-PY-GAE - AIO (Include Aria2 + YAAW + Python + WallProxy)"
+	@echo "n60za16m        R2 Linksys E-series 16M flash & 60K NVRAM build AIO (with Aria2+YAAW)"
+	@echo "n60za16mg       R2 Linksys E-series 16M flash & 60K NVRAM build AIO (with Aria2+YAAW+Python)"
+	@echo "n60za8m         R2 Linksys E-series 8M flahs & 60K NVRAM VPN + Aria2 + YAAW with no NTFS support"
+	@echo "fxd4m           R2 4M-Mini for Belkin F7D3301/3302/4302,F5D8235v3 routers(4M, Mini)"
+	@echo "fxd8m           R2 8M-VPN-IPv6-Max for Belkin F7D3301/3302/4302,F5D8235v3 routers(8M,Big-VPN)"
+	@echo "fxd8ma          R2 8M-VPN-AR for Belkin F7D3301/3302/4302,F5D8235v3 routers(8M,Big-VPN+AR)"
+	@echo "fxd8mt          R2 8M-VPN-TR for Belkin F7D3301/3302/4302,F5D8235v3 routers(8M,Big-VPN+TR)"
+	@echo "---             ------------------------------------------------------------------------------"
+	@echo
 endif
 	@echo "..etc..      other build configs"
 	@echo "clean        -C router clean"

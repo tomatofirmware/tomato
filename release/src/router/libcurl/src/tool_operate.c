@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -19,13 +19,7 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "setup.h"
-
-#include <curl/curl.h>
-
-#ifdef HAVE_UNISTD_H
-#  include <unistd.h>
-#endif
+#include "tool_setup.h"
 
 #ifdef HAVE_FCNTL_H
 #  include <fcntl.h>
@@ -67,6 +61,7 @@
 #include "tool_homedir.h"
 #include "tool_libinfo.h"
 #include "tool_main.h"
+#include "tool_metalink.h"
 #include "tool_msgs.h"
 #include "tool_operate.h"
 #include "tool_operhlp.h"
@@ -78,6 +73,7 @@
 #include "tool_writeenv.h"
 #include "tool_writeout.h"
 #include "tool_xattr.h"
+#include "tool_vms.h"
 
 #include "memdebug.h" /* keep this as LAST include */
 
@@ -129,7 +125,10 @@ int operate(struct Configurable *config, int argc, argv_item_t argv[])
   struct ProgressData progressbar;
   struct getout *urlnode;
 
+  struct HdrCbData hdrcbdata;
   struct OutStruct heads;
+
+  metalinkfile *mlfile_last = NULL;
 
   CURL *curl = NULL;
   char *httpgetfields = NULL;
@@ -138,8 +137,12 @@ int operate(struct Configurable *config, int argc, argv_item_t argv[])
   int res = 0;
   int i;
 
+  bool orig_noprogress;
+  bool orig_isatty;
+
   errorbuffer[0] = '\0';
   /* default headers output stream is stdout */
+  memset(&hdrcbdata, 0, sizeof(struct HdrCbData));
   memset(&heads, 0, sizeof(struct OutStruct));
   heads.stream = stdout;
   heads.config = config;
@@ -220,7 +223,7 @@ int operate(struct Configurable *config, int argc, argv_item_t argv[])
        ('-' == argv[i][0])) {
       char *nextarg;
       bool passarg;
-      char *origopt = argv[i];
+      char *orig_opt = argv[i];
 
       char *flag = argv[i];
 
@@ -236,7 +239,7 @@ int operate(struct Configurable *config, int argc, argv_item_t argv[])
           int retval = CURLE_OK;
           if(res != PARAM_HELP_REQUESTED) {
             const char *reason = param2text(res);
-            helpf(config->errors, "option %s: %s\n", origopt, reason);
+            helpf(config->errors, "option %s: %s\n", orig_opt, reason);
             retval = CURLE_FAILED_INIT;
           }
           res = retval;
@@ -390,6 +393,10 @@ int operate(struct Configurable *config, int argc, argv_item_t argv[])
     }
   }
 
+  /* save the values of noprogress and isatty to restore them later on */
+  orig_noprogress = config->noprogress;
+  orig_isatty = config->isatty;
+
   /*
   ** Nested loops start here.
   */
@@ -404,9 +411,27 @@ int operate(struct Configurable *config, int argc, argv_item_t argv[])
     int infilenum;
     URLGlob *inglob;
 
+    int metalink = 0; /* nonzero for metalink download. */
+    metalinkfile *mlfile;
+    metalink_resource *mlres;
+
     outfiles = NULL;
     infilenum = 1;
     inglob = NULL;
+
+    if(urlnode->flags & GETOUT_METALINK) {
+      metalink = 1;
+      if(mlfile_last == NULL) {
+        mlfile_last = config->metalinkfile_list;
+      }
+      mlfile = mlfile_last;
+      mlfile_last = mlfile_last->next;
+      mlres = mlfile->resource;
+    }
+    else {
+      mlfile = NULL;
+      mlres = NULL;
+    }
 
     /* urlnode->url is the full URL (it might be NULL) */
 
@@ -451,7 +476,6 @@ int operate(struct Configurable *config, int argc, argv_item_t argv[])
       int urlnum;
 
       uploadfile = NULL;
-      separator = 0;
       urls = NULL;
       urlnum = 0;
 
@@ -476,6 +500,12 @@ int operate(struct Configurable *config, int argc, argv_item_t argv[])
           break;
       }
 
+      if(metalink) {
+        /* For Metalink download, we don't use glob. Instead we use
+           the number of resources as urlnum. */
+        urlnum = count_next_metalink_resource(mlfile);
+      }
+      else
       if(!config->globoff) {
         /* Unless explicitly shut off, we expand '{...}' and '[...]'
            expressions and return total number of URLs in pattern set */
@@ -505,7 +535,8 @@ int operate(struct Configurable *config, int argc, argv_item_t argv[])
         long retry_numretries;
         long retry_sleep_default;
         long retry_sleep;
-        char *this_url;
+        char *this_url = NULL;
+        int metalink_next_res = 0;
 
         outfile = NULL;
         infdopen = FALSE;
@@ -517,33 +548,50 @@ int operate(struct Configurable *config, int argc, argv_item_t argv[])
         outs.stream = stdout;
         outs.config = config;
 
-        if(urls) {
-          res = glob_next_url(&this_url, urls);
-          if(res)
+        if(metalink) {
+          /* For Metalink download, use name in Metalink file as
+             filename. */
+          outfile = strdup(mlfile->filename);
+          if(!outfile) {
+            res = CURLE_OUT_OF_MEMORY;
             goto show_error;
-        }
-        else if(!i) {
-          this_url = strdup(urlnode->url);
+          }
+          this_url = strdup(mlres->url);
           if(!this_url) {
             res = CURLE_OUT_OF_MEMORY;
             goto show_error;
           }
         }
-        else
-          this_url = NULL;
-        if(!this_url)
-          break;
+        else {
+          if(urls) {
+            res = glob_next_url(&this_url, urls);
+            if(res)
+              goto show_error;
+          }
+          else if(!i) {
+            this_url = strdup(urlnode->url);
+            if(!this_url) {
+              res = CURLE_OUT_OF_MEMORY;
+              goto show_error;
+            }
+          }
+          else
+            this_url = NULL;
+          if(!this_url)
+            break;
 
-        if(outfiles) {
-          outfile = strdup(outfiles);
-          if(!outfile) {
-            res = CURLE_OUT_OF_MEMORY;
-            goto show_error;
+          if(outfiles) {
+            outfile = strdup(outfiles);
+            if(!outfile) {
+              res = CURLE_OUT_OF_MEMORY;
+              goto show_error;
+            }
           }
         }
 
-        if((urlnode->flags&GETOUT_USEREMOTE) ||
-           (outfile && !curlx_strequal("-", outfile)) ) {
+        if(((urlnode->flags&GETOUT_USEREMOTE) ||
+            (outfile && !curlx_strequal("-", outfile))) &&
+           (metalink || !config->use_metalink)) {
 
           /*
            * We have specified a file name to store the result in, or we have
@@ -585,7 +633,7 @@ int operate(struct Configurable *config, int argc, argv_item_t argv[])
           /* Create the directory hierarchy, if not pre-existent to a multiple
              file output call */
 
-          if(config->create_dirs) {
+          if(config->create_dirs || metalink) {
             res = create_dir_hierarchy(outfile, config->errors);
             /* create_dir_hierarchy shows error upon CURLE_WRITE_ERROR */
             if(res == CURLE_WRITE_ERROR)
@@ -682,7 +730,7 @@ int operate(struct Configurable *config, int argc, argv_item_t argv[])
           int authbits = 0;
           int bitcheck = 0;
           while(bitcheck < 32) {
-            if(config->authtype & (1 << bitcheck++)) {
+            if(config->authtype & (1UL << bitcheck++)) {
               authbits++;
               if(authbits > 1) {
                 /* more than one, we're done! */
@@ -721,6 +769,12 @@ int operate(struct Configurable *config, int argc, argv_item_t argv[])
           /* we send the output to a tty, therefore we switch off the progress
              meter */
           config->noprogress = config->isatty = TRUE;
+        else {
+          /* progress meter is per download, so restore config
+             values */
+          config->noprogress = orig_noprogress;
+          config->isatty = orig_isatty;
+        }
 
         if(urlnum > 1 && !(config->mute)) {
           fprintf(config->errors, "\n[%d/%d]: %s --> %s\n",
@@ -751,18 +805,18 @@ int operate(struct Configurable *config, int argc, argv_item_t argv[])
           /*
            * Then append ? followed by the get fields to the url.
            */
-          urlbuffer = malloc(strlen(this_url) + strlen(httpgetfields) + 3);
-          if(!urlbuffer) {
-            res = CURLE_OUT_OF_MEMORY;
-            goto show_error;
-          }
           if(pc)
-            sprintf(urlbuffer, "%s%c%s", this_url, sep, httpgetfields);
+            urlbuffer = aprintf("%s%c%s", this_url, sep, httpgetfields);
           else
             /* Append  / before the ? to create a well-formed url
                if the url contains a hostname only
             */
-            sprintf(urlbuffer, "%s/?%s", this_url, httpgetfields);
+            urlbuffer = aprintf("%s/?%s", this_url, httpgetfields);
+
+          if(!urlbuffer) {
+            res = CURLE_OUT_OF_MEMORY;
+            goto show_error;
+          }
 
           Curl_safefree(this_url); /* free previous URL */
           this_url = urlbuffer; /* use our new URL instead! */
@@ -782,8 +836,15 @@ int operate(struct Configurable *config, int argc, argv_item_t argv[])
 
         /* where to store */
         my_setopt(curl, CURLOPT_WRITEDATA, &outs);
-        /* what call to write */
-        my_setopt(curl, CURLOPT_WRITEFUNCTION, tool_write_cb);
+        if(metalink || !config->use_metalink)
+          /* what call to write */
+          my_setopt(curl, CURLOPT_WRITEFUNCTION, tool_write_cb);
+#ifdef USE_METALINK
+        else
+          /* Set Metalink specific write callback function to parse
+             XML data progressively. */
+          my_setopt(curl, CURLOPT_WRITEFUNCTION, metalink_write_cb);
+#endif /* USE_METALINK */
 
         /* for uploads */
         input.fd = infd;
@@ -818,7 +879,10 @@ int operate(struct Configurable *config, int argc, argv_item_t argv[])
           my_setopt(curl, CURLOPT_NOBODY, 1);
           my_setopt(curl, CURLOPT_HEADER, 1);
         }
-        else
+        /* If --metalink is used, we ignore --include (headers in
+           output) option because mixing headers to the body will
+           confuse XML parser and/or hash check will fail. */
+        else if(!config->use_metalink)
           my_setopt(curl, CURLOPT_HEADER, config->include_headers);
 
 #if !defined(CURL_DISABLE_PROXY)
@@ -843,15 +907,20 @@ int operate(struct Configurable *config, int argc, argv_item_t argv[])
 
           /* new in libcurl 7.10.6 */
           if(config->proxyanyauth)
-            my_setopt_flags(curl, CURLOPT_PROXYAUTH, CURLAUTH_ANY);
+            my_setopt_bitmask(curl, CURLOPT_PROXYAUTH,
+                              (long) CURLAUTH_ANY);
           else if(config->proxynegotiate)
-            my_setopt_flags(curl, CURLOPT_PROXYAUTH, CURLAUTH_GSSNEGOTIATE);
+            my_setopt_bitmask(curl, CURLOPT_PROXYAUTH,
+                              (long) CURLAUTH_GSSNEGOTIATE);
           else if(config->proxyntlm)
-            my_setopt_flags(curl, CURLOPT_PROXYAUTH, CURLAUTH_NTLM);
+            my_setopt_bitmask(curl, CURLOPT_PROXYAUTH,
+                              (long) CURLAUTH_NTLM);
           else if(config->proxydigest)
-            my_setopt_flags(curl, CURLOPT_PROXYAUTH, CURLAUTH_DIGEST);
+            my_setopt_bitmask(curl, CURLOPT_PROXYAUTH,
+                              (long) CURLAUTH_DIGEST);
           else if(config->proxybasic)
-            my_setopt_flags(curl, CURLOPT_PROXYAUTH, CURLAUTH_BASIC);
+            my_setopt_bitmask(curl, CURLOPT_PROXYAUTH,
+                              (long) CURLAUTH_BASIC);
 
           /* new in libcurl 7.19.4 */
           my_setopt(curl, CURLOPT_NOPROXY, config->noproxy);
@@ -880,6 +949,8 @@ int operate(struct Configurable *config, int argc, argv_item_t argv[])
         my_setopt(curl, CURLOPT_TIMEOUT, config->timeout);
 
         if(built_in_protos & CURLPROTO_HTTP) {
+
+          long postRedir = 0;
 
           my_setopt(curl, CURLOPT_FOLLOWLOCATION,
                     config->followlocation);
@@ -914,11 +985,17 @@ int operate(struct Configurable *config, int argc, argv_item_t argv[])
 
           /* new in libcurl 7.10.6 (default is Basic) */
           if(config->authtype)
-            my_setopt_flags(curl, CURLOPT_HTTPAUTH, config->authtype);
+            my_setopt_bitmask(curl, CURLOPT_HTTPAUTH, (long) config->authtype);
 
-          /* curl 7.19.1 (the 301 version existed in 7.18.2) */
-          my_setopt(curl, CURLOPT_POSTREDIR, config->post301 |
-                    (config->post302 ? CURL_REDIR_POST_302 : FALSE));
+          /* curl 7.19.1 (the 301 version existed in 7.18.2),
+             303 was added in 7.26.0 */
+          if(config->post301)
+            postRedir |= CURL_REDIR_POST_301;
+          if(config->post302)
+            postRedir |= CURL_REDIR_POST_302;
+          if(config->post303)
+            postRedir |= CURL_REDIR_POST_303;
+          my_setopt(curl, CURLOPT_POSTREDIR, postRedir);
 
           /* new in libcurl 7.21.6 */
           if(config->encoding)
@@ -971,7 +1048,7 @@ int operate(struct Configurable *config, int argc, argv_item_t argv[])
         if(curlinfo->features & CURL_VERSION_SSL) {
           if(config->insecure_ok) {
             my_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-            my_setopt(curl, CURLOPT_SSL_VERIFYHOST, 1L);
+            my_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
           }
           else {
             my_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1L);
@@ -1200,17 +1277,19 @@ int operate(struct Configurable *config, int argc, argv_item_t argv[])
         if(config->proto_redir_present)
           my_setopt_flags(curl, CURLOPT_REDIR_PROTOCOLS, config->proto_redir);
 
-        if((urlnode->flags & GETOUT_USEREMOTE)
-           && config->content_disposition) {
-          my_setopt(curl, CURLOPT_HEADERFUNCTION, tool_header_cb);
-          my_setopt(curl, CURLOPT_HEADERDATA, &outs);
-        }
-        else {
-          /* if HEADERFUNCTION was set to something in the previous loop, it
-             is important that we set it (back) to NULL now */
-          my_setopt(curl, CURLOPT_HEADERFUNCTION, NULL);
-          my_setopt(curl, CURLOPT_HEADERDATA, config->headerfile?&heads:NULL);
-        }
+        if(config->content_disposition
+           && (urlnode->flags & GETOUT_USEREMOTE)
+           && (checkprefix("http://", this_url) ||
+               checkprefix("https://", this_url)))
+          hdrcbdata.honor_cd_filename = TRUE;
+        else
+          hdrcbdata.honor_cd_filename = FALSE;
+
+        hdrcbdata.outs = &outs;
+        hdrcbdata.heads = &heads;
+
+        my_setopt(curl, CURLOPT_HEADERFUNCTION, tool_header_cb);
+        my_setopt(curl, CURLOPT_HEADERDATA, &hdrcbdata);
 
         if(config->resolve)
           /* new in 7.21.3 */
@@ -1241,6 +1320,10 @@ int operate(struct Configurable *config, int argc, argv_item_t argv[])
         if(config->mail_auth)
           my_setopt_str(curl, CURLOPT_MAIL_AUTH, config->mail_auth);
 
+        /* new in 7.31.0 */
+        if(config->sasl_ir)
+          my_setopt(curl, CURLOPT_SASL_IR, (long)TRUE);
+
         /* initialize retry vars for loop below */
         retry_sleep_default = (config->retry_delay) ?
           config->retry_delay*1000L : RETRY_SLEEP_DEFAULT; /* ms */
@@ -1257,9 +1340,27 @@ int operate(struct Configurable *config, int argc, argv_item_t argv[])
 #endif
 
         for(;;) {
+#ifdef USE_METALINK
+          if(!metalink && config->use_metalink) {
+            /* If outs.metalink_parser is non-NULL, delete it first. */
+            if(outs.metalink_parser)
+              metalink_parser_context_delete(outs.metalink_parser);
+            outs.metalink_parser = metalink_parser_context_new();
+            if(outs.metalink_parser == NULL) {
+              res = CURLE_OUT_OF_MEMORY;
+              goto show_error;
+            }
+            fprintf(config->errors, "Metalink: parsing (%s) metalink/XML...\n",
+                    this_url);
+          }
+          else if(metalink)
+            fprintf(config->errors, "Metalink: fetching (%s) from (%s)...\n",
+                    mlfile->filename, this_url);
+#endif /* USE_METALINK */
+
           res = curl_easy_perform(curl);
 
-          if(config->content_disposition && outs.stream && !config->mute &&
+          if(outs.is_cd_filename && outs.stream && !config->mute &&
              outs.filename)
             printf("curl: Saved to filename '%s'\n", outs.filename);
 
@@ -1378,6 +1479,41 @@ int operate(struct Configurable *config, int argc, argv_item_t argv[])
               continue; /* curl_easy_perform loop */
             }
           } /* if retry_numretries */
+          else if(metalink) {
+            /* Metalink: Decide to try the next resource or
+               not. Basically, we want to try the next resource if
+               download was not successful. */
+            long response;
+            if(CURLE_OK == res) {
+              /* TODO We want to try next resource when download was
+                 not successful. How to know that? */
+              char *effective_url = NULL;
+              curl_easy_getinfo(curl, CURLINFO_EFFECTIVE_URL, &effective_url);
+              if(effective_url &&
+                 curlx_strnequal(effective_url, "http", 4)) {
+                /* This was HTTP(S) */
+                curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response);
+                if(response != 200 && response != 206) {
+                  metalink_next_res = 1;
+                  fprintf(config->errors,
+                          "Metalink: fetching (%s) from (%s) FAILED "
+                          "(HTTP status code %d)\n",
+                          mlfile->filename, this_url, response);
+                }
+              }
+            }
+            else {
+              metalink_next_res = 1;
+              fprintf(config->errors,
+                      "Metalink: fetching (%s) from (%s) FAILED (%s)\n",
+                      mlfile->filename, this_url,
+                      (errorbuffer[0]) ?
+                      errorbuffer : curl_easy_strerror((CURLcode)res));
+            }
+          }
+          if(metalink && !metalink_next_res)
+            fprintf(config->errors, "Metalink: fetching (%s) from (%s) OK\n",
+                    mlfile->filename, this_url);
 
           /* In all ordinary cases, just break out of loop here */
           break; /* curl_easy_perform loop */
@@ -1391,7 +1527,7 @@ int operate(struct Configurable *config, int argc, argv_item_t argv[])
           fputs("\n", progressbar.out);
 
         if(config->writeout)
-          ourWriteOut(curl, config->writeout);
+          ourWriteOut(curl, &outs, config->writeout);
 
         if(config->writeenv)
           ourWriteEnv(curl);
@@ -1486,22 +1622,57 @@ int operate(struct Configurable *config, int argc, argv_item_t argv[])
           }
         }
 #endif
+
+#ifdef USE_METALINK
+        if(!metalink && config->use_metalink && res == CURLE_OK) {
+          int rv = parse_metalink(config, &outs, this_url);
+          if(rv == 0)
+            fprintf(config->errors, "Metalink: parsing (%s) OK\n", this_url);
+          else if(rv == -1)
+            fprintf(config->errors, "Metalink: parsing (%s) FAILED\n",
+                    this_url);
+        }
+        else if(metalink && res == CURLE_OK && !metalink_next_res) {
+          int rv = metalink_check_hash(config, mlfile, outs.filename);
+          if(rv == 0) {
+            metalink_next_res = 1;
+          }
+        }
+#endif /* USE_METALINK */
+
         /* No more business with this output struct */
         if(outs.alloc_filename)
           Curl_safefree(outs.filename);
+#ifdef USE_METALINK
+        if(outs.metalink_parser)
+          metalink_parser_context_delete(outs.metalink_parser);
+#endif /* USE_METALINK */
         memset(&outs, 0, sizeof(struct OutStruct));
+        hdrcbdata.outs = NULL;
 
         /* Free loop-local allocated memory and close loop-local opened fd */
 
         Curl_safefree(outfile);
         Curl_safefree(this_url);
 
-        if(infdopen) {
+        if(infdopen)
           close(infd);
-          infdopen = FALSE;
-          infd = STDIN_FILENO;
-        }
 
+        if(metalink) {
+          /* Should exit if error is fatal. */
+          if(is_fatal_error(res)) {
+            break;
+          }
+          if(!metalink_next_res)
+            break;
+          mlres = mlres->next;
+          if(mlres == NULL)
+            /* TODO If metalink_next_res is 1 and mlres is NULL,
+             * set res to error code
+             */
+            break;
+        }
+        else
         if(urlnum > 1) {
           /* when url globbing, exit loop upon critical error */
           if(is_fatal_error(res))
@@ -1581,6 +1752,8 @@ int operate(struct Configurable *config, int argc, argv_item_t argv[])
   easysrc_cleanup();
 #endif
 
+  hdrcbdata.heads = NULL;
+
   /* Close function-local opened file descriptors */
 
   if(heads.fopened && heads.stream)
@@ -1600,6 +1773,9 @@ int operate(struct Configurable *config, int argc, argv_item_t argv[])
 
   if(config->errors_fopened && config->errors)
     fclose(config->errors);
+
+  /* Release metalink related resources here */
+  clean_metalink(config);
 
   main_free(); /* cleanup */
 

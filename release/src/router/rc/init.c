@@ -391,6 +391,7 @@ static int init_vlan_ports(void)
 	case MODEL_H618B:
 		dirty |= (nvram_get("vlan2ports") != NULL);
 		nvram_unset("vlan2ports");
+		dirty |= check_nv("vlan0ports", "1 2 3 4 5*");
 		dirty |= check_nv("vlan1ports", "0 5");
 		break;
 	case MODEL_WRT310Nv1:
@@ -493,7 +494,9 @@ static void check_bootnv(void)
 		dirty |= check_nv("wl0gpio0", "0x88");
 		break;
 	case MODEL_WL500GP:
-		dirty |= check_nv("sdram_init", "0x0009");	// 32MB; defaults: 0x000b, 0x0009
+                if (nvram_match("sdram_init", "0x000b")){
+			dirty |= check_nv("sdram_init", "0x0009");	// 32MB; defaults: 0x000b, 0x0009
+		}
 		dirty |= check_nv("wl0gpio0", "136");
 		break;
 	case MODEL_WL500GPv2:
@@ -513,6 +516,7 @@ static void check_bootnv(void)
 		}
 		if (nvram_get("vlan2hwname") != NULL) {
 			nvram_unset("vlan2hwname");
+			nvram_unset("vlan2ports");
 			dirty = 1;
 		}
 		dirty |= check_nv("wandevs", "vlan1");
@@ -521,6 +525,12 @@ static void check_bootnv(void)
 		dirty |= check_nv("wl0gpio1", "0");
 		dirty |= check_nv("wl0gpio2", "0");
 		dirty |= check_nv("wl0gpio3", "0");
+		break;
+	case MODEL_H618B:
+		dirty |= check_nv("wandevs", "vlan1");
+		dirty |= check_nv("vlan0hwname", "et0");
+		dirty |= check_nv("vlan1hwname", "et0");
+		break;
 	case MODEL_WL1600GL:
 		if (invalid_mac(nvram_get("et0macaddr"))) {
 			dirty |= find_sercom_mac_addr();
@@ -772,7 +782,7 @@ static int init_nvram(void)
 		case 0x1758:
 		case 0x2758:
 		case 0x3758:
-			if (nvram_match("wlx_hpamp", "")) {
+			if ( nvram_is_empty("wlx_hpamp") || nvram_match("wlx_hpamp", "")) {
 				if (nvram_get_int("wl_txpwr") > 10) nvram_set("wl_txpwr", "10");
 				nvram_set("wlx_hpamp", "1");
 				nvram_set("wlx_hperx", "0");
@@ -950,8 +960,10 @@ static int init_nvram(void)
 		name = "RT-N12";
 		features = SUP_SES | SUP_BRAU | SUP_80211N;
 		if (!nvram_match("t_fix1", (char *)name)) {
-			nvram_set("lan_ifnames", "vlan0 eth1");
-			nvram_set("wan_ifnameX", "vlan1");
+			nvram_set("lan_ifnames", "vlan1 eth1");
+			nvram_set("wan_ifname", "vlan2");
+			nvram_set("wan_ifnames", "vlan2");
+			nvram_set("wan_ifnameX", "vlan2");
 			nvram_set("wl_ifname", "eth1");
 		}
 		break;
@@ -986,6 +998,8 @@ static int init_nvram(void)
 		features = SUP_SES | SUP_AOSS_LED | SUP_80211N;
 		if (!nvram_match("t_fix1", (char *)name)) {
 			nvram_set("lan_ifnames", "vlan0 eth1");
+			nvram_set("wan_ifname", "vlan1");
+			nvram_set("wan_ifnames", "vlan1");
 			nvram_set("wan_ifnameX", "vlan1");
 			nvram_set("wl_ifname", "eth1");
 		}
@@ -1115,6 +1129,8 @@ static int init_nvram(void)
 		if (!nvram_match("t_fix1", (char *)name)) {
 			nvram_set("wl_ifname", "eth1");
 			nvram_set("lan_ifnames", "vlan0 eth1");
+			nvram_set("wan_ifname", "vlan1");
+			nvram_set("wan_ifnames", "vlan1");
 			nvram_set("wan_ifnameX", "vlan1");
 			nvram_unset("wl0gpio0");
 		}
@@ -1126,12 +1142,26 @@ static int init_nvram(void)
 		if (!nvram_match("t_fix1", (char *)name)) {
 			nvram_set("wan_ifnameX", "vlan1");
 			nvram_set("wl_ifname", "eth1");
+                        nvram_set("lan_ifnames", "vlan0 eth1");
+                        nvram_set("wan_ifname", "vlan1");
+                        nvram_set("wan_ifnames", "vlan1");
 		}
 		break;
 	case MODEL_H618B:
 		mfr = "ZTE";
 		name = "ZXV10 H618B";
 		features = SUP_SES | SUP_AOSS_LED;
+#ifdef TCONFIG_USB
+                nvram_set("usb_uhci", "-1");
+#endif
+                if (!nvram_match("t_fix1", (char *)name)) {
+                        nvram_set("lan_ifnames", "vlan0 eth1");
+                        nvram_set("wan_ifname", "vlan1");
+                        nvram_set("wan_ifnames", "vlan1");
+                        nvram_set("wan_ifnameX", "vlan1");
+                        nvram_set("wl_ifname", "eth1");
+                }
+
 		break;
 	case MODEL_WL1600GL:
 		mfr = "Ovislink";
@@ -1160,6 +1190,8 @@ static int init_nvram(void)
 		features = SUP_SES | SUP_80211N | SUP_WHAM_LED | SUP_1000ET;
 		if (!nvram_match("t_fix1", (char *)name)) {
 			nvram_set("lan_ifnames", "vlan1 eth1");
+			nvram_set("wan_ifname", "vlan2");
+			nvram_set("wan_ifnameX", "vlan2");
 			nvram_set("wan_ifnameX", "vlan2");
 			nvram_set("wl_ifname", "eth1");
 		}

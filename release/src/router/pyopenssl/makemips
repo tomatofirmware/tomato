@@ -1,0 +1,26 @@
+#!/bin/sh
+TOP=/raid1/tomato/tomato.git/release.ar.wp.chs/src-rt/router
+PYTHONHOME=$TOP/python/hostpy/usr
+PATH=$PYTHONHOME/bin:$PATH
+CONFIGURE="$TOP/python/configure"
+CC=mipsel-linux-gcc
+CCSHARED=mipsel-linux-gcc
+LDSHARED=mipsel-linux-gcc
+CXX=mipsel-linux-g++
+AR=mipsel-linux-ar
+RANLIB=mipsel-linux-ranlib
+CSTRIP=mipsel-uclibc-strip
+
+CC=$CC CXX=$CXX AR=$AR RANLIB=$RANLIB STRIP=$CSTRIP \
+	LDSHARED="mipsel-linux-gcc -shared" CCSHARED="mipsel-linux-gcc -shared" CROSS_COMPILE=mipsel-linux- CROSS_COMPILE_TARGET=yes \
+	HOSTARCH=mipsel-linux ARCH=mipsel-linux BUILDARCH=x86_64-linux-gnu HOSTPYTHON=$TOP/python/hostpython HOSTPGEN=$TOP/python/Parser/hostpgen \
+	CFLAGS="-O2 -Wall -fno-delete-null-pointer-checks -funit-at-a-time \
+	--param large-function-growth=800 --param max-inline-insns-single=3000 \
+	-ffunction-sections -fdata-sections -EL -DREADLINE_LIBRARY" \
+	LDFLAGS="-L$TOP/bzip2 -L$TOP/libcurl/lib/.libs -L$TOP/sqlite/.libs -L$TOP/libstdc++/prebuilt -L$TOP/zlib -L$TOP/libcares/.libs -L$TOP/libexpat/.libs -L$TOP/openssl -L$TOP/libev/.libs -L$TOP/libreadline/shlib -L$TOP/libncurses/lib -L$TOP/libdb/build_unix/.libs -L$TOP/python/staged/usr/lib -ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC -EL" \
+	CPPFLAGS="-I$TOP/bzip2 -I$TOP/libcurl/include -I$TOP/sqlite -I$TOP/zlib -I$TOP/libcares -I$TOP/libexpat/lib -I$TOP/openssl/include -I$TOP/libev -I$TOP/libreadline -I$TOP/libncurses/include -I$TOP/libdb/build_unix -I$TOP/python/staged/usr/include/python2.7" \
+	LIBS="-lbz2 -lcurl -lsqlite3 -lstdc++ -lz -lcares -lssl -lcrypto -lev -lreadline -lncurses -lform -lmenu -lpanel -ldb-4.8 -lexpat" \
+	$TOP/python/hostpython setup.py build_ext -I$TOP/python/staged/usr/include/python2.7:$TOP/openssl/include -L$TOP/python/staged/usr/lib:$TOP/openssl
+	$TOP/python/hostpython setup.py build
+	$TOP/python/hostpython setup.py install --prefix=staged
+

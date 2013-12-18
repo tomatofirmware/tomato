@@ -220,6 +220,28 @@ Copyright (C) 2009 Tomasz Słodkowicz<br>
 <br>
 <!-- SDHC-END -->
 
+<b>"Hyzoom bwq518" feature:</b><br>
+- Support Simple Chinese UI<br>
+- Display wireless chip temperature and txpwr<br>
+- Display CPU occupancy rate<br>
+- Add support for Tenda W1800R and N60 models<br>
+- Add support for HG320, H218N and RG200E-CA models<br>
+<!-- ARIA2-BEGIN -->
+- Aria2 integration and GUI<br>
+<!-- ARIA2-END -->
+<!-- SIMPROXY-BEGIN -->
+- TinyProxy and Srelay integration and GUI<br>
+<!-- SIMPROXY-END -->
+<!-- PYTHON-BEGIN -->
+- Python 2.7.3(Full), gevent/greelet/pyOpenSSL integration<br>
+<!-- PYTHON-END -->
+<!-- GAEPROXY-BEGIN -->
+- GoAgent/Wallproxy integration<br>
+<!-- GAEPROXY-END -->
+Copyright (C) 2013 Bao Weiquan, Hyzoom<br>
+<a href='mailto:bwq518@gmail.com'>bwq518@gmail.com</a><br>
+<br>
+
 <b>"Victek/PrinceAMD/Phykris/Shibby" feature:</b><br>
 - Revised IP/MAC Bandwidth Limiter<br>
 <br>

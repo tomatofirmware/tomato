@@ -139,6 +139,7 @@ obj-$(TCONFIG_IPV6) += dhcpv6
 obj-$(TCONFIG_MEDIA_SERVER) += zlib
 obj-$(TCONFIG_MEDIA_SERVER) += sqlite
 obj-$(TCONFIG_MEDIA_SERVER) += ffmpeg
+obj-$(TCONFIG_MEDIA_SERVER) += libiconv
 obj-$(TCONFIG_MEDIA_SERVER) += libogg
 obj-$(TCONFIG_MEDIA_SERVER) += flac
 obj-$(TCONFIG_MEDIA_SERVER) += jpeg
@@ -146,7 +147,9 @@ obj-$(TCONFIG_MEDIA_SERVER) += libexif
 obj-$(TCONFIG_MEDIA_SERVER) += libid3tag
 obj-$(TCONFIG_MEDIA_SERVER) += libvorbis
 obj-$(TCONFIG_MEDIA_SERVER) += minidlna
-MEDIA_SERVER_STATIC=y
+# Set minidlna use shared lib or linked with static lib. bwq518
+# for using static libs, replace the following line as MEDIA_SERVER_STATIC := y
+MEDIA_SERVER_STATIC :=
 
 obj-y += libnfnetlink
 obj-y += miniupnpd
@@ -178,6 +181,35 @@ obj-$(TCONFIG_BT) += btgui
 obj-$(TCONFIG_BBT) += zlib
 #obj-$(TCONFIG_BBT) += libiconv
 
+obj-$(TCONFIG_ARIA2) += openssl
+obj-$(TCONFIG_ARIA2) += libiconv
+obj-$(TCONFIG_ARIA2) += libcares
+obj-$(TCONFIG_ARIA2) += zlib
+obj-$(TCONFIG_ARIA2) += libexpat
+obj-$(TCONFIG_ARIA2) += sqlite
+obj-$(TCONFIG_ARIA2) += aria2
+
+obj-$(TCONFIG_SIMPROXY) += tinyproxy
+obj-$(TCONFIG_SIMPROXY) += srelay
+
+obj-$(TCONFIG_PYTHON) += libreadline
+obj-$(TCONFIG_PYTHON) += libcares
+obj-$(TCONFIG_PYTHON) += libcurl
+obj-$(TCONFIG_PYTHON) += libncurses
+obj-$(TCONFIG_PYTHON) += sqlite
+obj-$(TCONFIG_PYTHON) += libdb
+obj-$(TCONFIG_PYTHON) += zlib
+obj-$(TCONFIG_PYTHON) += bzip2
+obj-$(TCONFIG_PYTHON) += libev
+obj-$(TCONFIG_PYTHON) += openssl
+obj-$(TCONFIG_PYTHON) += pyopenssl
+obj-$(TCONFIG_PYTHON) += greenlet
+obj-$(TCONFIG_PYTHON) += gevent
+obj-$(TCONFIG_PYTHON) += python
+#obj-$(TCONFIG_GAEPROXY) += wget
+obj-$(TCONFIG_GAEPROXY) += gaeproxy
+#obj-$(TCONFIG_GAEPROXY) += goagent
+
 obj-$(CONFIG_LINUX26) += hotplug2
 obj-$(CONFIG_LINUX26) += udevtrigger
 
@@ -193,7 +225,15 @@ else
       ifeq ($(TCONFIG_TOR),y)
         export FULL_OPENSSL := y
       else
-        FULL_OPENSSL :=
+        ifeq ($(TCONFIG_ARIA2),y)
+          export FULL_OPENSSL := y
+        else
+          ifeq ($(TCONFIG_PYTHON),y)
+            export FULL_OPENSSL := y
+          else
+            FULL_OPENSSL :=
+          endif
+        endif
       endif
     endif
   endif
@@ -351,11 +391,27 @@ endif
 	install $(LIBDIR)/libdl.so.0 $(TARGETDIR)/lib/
 	install $(LIBDIR)/libm.so.0 $(TARGETDIR)/lib/
 	install $(LIBDIR)/libnsl.so.0 $(TARGETDIR)/lib/
+ifeq ($(TCONFIG_PPTPD),y)
+	install $(LIBDIR)/libutil.so.0 $(TARGETDIR)/lib/
+endif
 ifeq ($(TCONFIG_SSH),y)
+	install $(LIBDIR)/libutil.so.0 $(TARGETDIR)/lib/
+endif
+ifeq ($(TCONFIG_PYTHON),y)
 	install $(LIBDIR)/libutil.so.0 $(TARGETDIR)/lib/
 endif
 ifeq ($(TCONFIG_BBT),y)
 	install $(LIBDIR)/librt-0.9.30.1.so $(TARGETDIR)/lib/librt.so.0
+endif
+ifeq ($(TCONFIG_ARIA2),y)
+	install $(LIBDIR)/libstdc++.so.6 $(TARGETDIR)/lib/libstdc++.so.6
+	cd $(TARGETDIR)/lib && ln -sf libstdc++.so.6 libstdc++.so
+	$(STRIP) $(TARGETDIR)/lib/libstdc++.so.6
+endif
+ifeq ($(TCONFIG_PYTHON),y)
+	install $(LIBDIR)/libstdc++.so.6 $(TARGETDIR)/lib/libstdc++.so.6
+	cd $(TARGETDIR)/lib && ln -sf libstdc++.so.6 libstdc++.so
+	$(STRIP) $(TARGETDIR)/lib/libstdc++.so.6
 endif
 ifneq ($(TCONFIG_OPTIMIZE_SHARED_LIBS),y)
 	install $(LIBDIR)/libresolv.so.0 $(TARGETDIR)/lib/
@@ -536,7 +592,6 @@ ifeq ($(TCONFIG_PPTPD),y)
 	cp rc/vpn/* $(TARGETDIR)/rom/etc/vpn
 	chmod +x $(TARGETDIR)/rom/etc/vpn/*
 endif
-
 	busybox/examples/depmod.pl -k $(LINUXDIR)/vmlinux -b $(TARGETDIR)/lib/modules/*/
 	@mv $(TARGETDIR)/lib/modules/*/modules.dep $(TARGETDIR)/lib/modules/
 	@echo ---
@@ -572,16 +627,16 @@ libc:	$(LIBDIR)/ld-uClibc.so.0
 #
 
 clean: clean-build $(obj-clean)
-	rm -rf layer7/squished
-	rm -f .ipv6-y .ipv6-n
-	rm -f .fullssl-y .fullssl-n
-	make -C config clean
+	-rm -rf layer7/squished
+	-rm -f .ipv6-y .ipv6-n
+	-rm -f .fullssl-y .fullssl-n
+	-make -C config clean
 
 clean-build: dummy
-	rm -rf $(TARGETDIR)
-	rm -rf $(INSTALLDIR)
-	rm -f $(PLATFORMDIR)/linux.trx $(PLATFORMDIR)/vmlinuz $(PLATFORMDIR)/target.image
-	rm -rf $(PLATFORMDIR)/extras
+	-rm -rf $(TARGETDIR)
+	-rm -rf $(INSTALLDIR)
+	-rm -f $(PLATFORMDIR)/linux.trx $(PLATFORMDIR)/vmlinuz $(PLATFORMDIR)/target.image
+	-rm -rf $(PLATFORMDIR)/extras
 
 distclean: clean
 ifneq ($(INSIDE_MAK),1)
@@ -711,14 +766,17 @@ openssl/stamp-h1:
 	no-ec no-ecdh no-ecdsa no-err no-hw no-jpake no-threads \
 	no-zlib no-engines no-sse2 \
 	no-dtls1 no-store no-psk no-md2 no-mdc2 no-ts
-
-	@$(MAKE) -C openssl clean
+	
+	@$(MAKE) -C openssl clean $(PARALLEL_BUILD)
+#	-cd openssl/include && find ../crypto -name "*.h" -print | xargs -i cp -sf {} . && find ../ssl -name "*.h" -print | xargs -i cp -sf {} .
+#	-mkdir -p openssl/lib && cd openssl/lib && rm -f * && cp -sf ../*.a . && cp -sf ../*.so . 
 	@touch openssl/stamp-h1
 
 openssl: openssl/stamp-h1
 
 openssl-clean:
 	-@$(MAKE) -C openssl clean
+	@rm -f openssl/lib
 	@rm -f openssl/stamp-h1
 
 openssl-install: openssl
@@ -914,7 +972,7 @@ ntfs-3g-install: ntfs-3g
 
 libusb10/Makefile: libusb10/Makefile.in
 	cd libusb10 && CFLAGS="-Os -Wall $(EXTRACFLAGS)" LIBS="-lpthread" \
-	$(CONFIGURE) --prefix=/usr ac_cv_lib_rt_clock_gettime=no
+	$(CONFIGURE) --prefix=/usr --build=x86_64-linux-gnu  --host=mipsel-linux --enable-shared --enable-static ac_cv_lib_rt_clock_gettime=no
 
 libusb10: libusb10/Makefile
 	$(MAKE) -C $@
@@ -930,6 +988,7 @@ libusb10-clean:
 libusb/Makefile: libusb/Makefile.in
 	cd libusb && CFLAGS="-Wall -Os $(EXTRACFLAGS)" \
 	$(CONFIGURE) --prefix=/usr \
+		--build=x86_64-linux-gnu  --host=mipsel-linux --enable-shared --enable-static \
 		LIBUSB_1_0_CFLAGS="-I$(TOP)/libusb10/libusb" \
 		LIBUSB_1_0_LIBS="-L$(TOP)/libusb10/libusb/.libs -lusb-1.0 -lpthread \
 		-Wl,-R/lib:/usr/lib:/opt/usr/lib:/usr/local/share"
@@ -1218,8 +1277,9 @@ sqlite/stamp-h1:
 	cd sqlite && \
 	CC=$(CC) CFLAGS="-Os $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
 		LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections" \
+		LIBS="-ldl" \
 		$(CONFIGURE) --prefix=/usr --enable-shared --enable-static \
-		--disable-readline --disable-dynamic-extensions --enable-threadsafe
+		--disable-readline --enable-dynamic-extensions --enable-threadsafe
 	touch sqlite/stamp-h1
 
 sqlite: sqlite/stamp-h1
@@ -1234,6 +1294,20 @@ sqlite-install: sqlite
 ifneq ($(MEDIA_SERVER_STATIC),y)
 	install -D sqlite/.libs/libsqlite3.so.0 $(INSTALLDIR)/sqlite/usr/lib/libsqlite3.so.0
 	$(STRIP) $(INSTALLDIR)/sqlite/usr/lib/libsqlite3.so.0
+	cd $(INSTALLDIR)/sqlite/usr/lib/ && \
+		ln -sf libsqlite3.so.0 libsqlite3.so
+endif
+ifeq ($(TCONFIG_ARIA2),y)
+	install -D sqlite/.libs/libsqlite3.so.0 $(INSTALLDIR)/sqlite/usr/lib/libsqlite3.so.0
+	$(STRIP) $(INSTALLDIR)/sqlite/usr/lib/libsqlite3.so.0
+	cd $(INSTALLDIR)/sqlite/usr/lib/ && \
+		ln -sf libsqlite3.so.0 libsqlite3.so
+endif
+ifeq ($(TCONFIG_PYTHON),y)
+	install -D sqlite/.libs/libsqlite3.so.0 $(INSTALLDIR)/sqlite/usr/lib/libsqlite3.so.0
+	$(STRIP) $(INSTALLDIR)/sqlite/usr/lib/libsqlite3.so.0
+	cd $(INSTALLDIR)/sqlite/usr/lib/ && \
+		ln -sf libsqlite3.so.0 libsqlite3.so
 endif
 
 FFMPEG_FILTER_CONFIG= $(foreach c, $(2), --$(1)="$(c)")
@@ -1401,6 +1475,85 @@ ifeq ($(TCONFIG_TOR),y)
 	install -D zlib/libz.so.1 $(INSTALLDIR)/zlib/usr/lib/
 	$(STRIP) $(INSTALLDIR)/zlib/usr/lib/libz.so.1
 endif
+ifeq ($(TCONFIG_ARIA2),y)
+	install -d $(INSTALLDIR)/zlib/usr/lib
+	install -D zlib/libz.so.1 $(INSTALLDIR)/zlib/usr/lib/
+	$(STRIP) $(INSTALLDIR)/zlib/usr/lib/libz.so.1
+endif
+ifeq ($(TCONFIG_PYTHON),y)
+	install -d $(INSTALLDIR)/zlib/usr/lib
+	install -D zlib/libz.so.1 $(INSTALLDIR)/zlib/usr/lib/
+	$(STRIP) $(INSTALLDIR)/zlib/usr/lib/libz.so.1
+endif
+
+bzip2/stamp-h1:
+	cd bzip2 && \
+	touch stamp-h1
+
+bzip2: bzip2/stamp-h1
+	@$(MAKE) -C bzip2 all $(PARALLEL_BUILD)
+	cd bzip2 && ln -sf libbz2.so.1.0.6 libbz2.so
+
+bzip2-clean:
+	-@$(MAKE) -C bzip2 clean
+	@rm -f bzip2/stamp-h1 bzip2/libbz2.so
+
+bzip2-install: bzip2
+	@$(SEP)
+	install -d $(INSTALLDIR)/bzip2/usr/lib
+	install -D bzip2/libbz2.so.1.0.6 $(INSTALLDIR)/bzip2/usr/lib/libbz2.so.1.0
+	$(STRIP) $(INSTALLDIR)/bzip2/usr/lib/libbz2.so.1.0
+
+wget/stamp-h1:
+	cd wget && \
+	CC=$(CC) CXX=$(CXX) AR=$(AR) RANLIB=$(RANLIB) STRIP='mipsel-uclibc-strip' HOST=mipsel-linux \
+	CFLAGS="-Os -Wall -fno-delete-null-pointer-checks -funit-at-a-time \
+		--param large-function-growth=800 --param max-inline-insns-single=3000 \
+		-ffunction-sections -fdata-sections" \
+	LDFLAGS="-L$(TOP)/openssl -L$(TOP)/zlib -ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC" \
+	CPPFLAGS="-I$(TOP)/openssl/include -I$(TOP)/zlib" \
+	LIBS="-lssl -lcrypto -lz" \
+	$(CONFIGURE) --host=mipsel-linux --build=x86_64-linux-gnu  --host=mipsel-linux --disable-debug \
+		--with-libiconv-prefix=$(TOP)/libiconv --with-ssl=openssl
+	touch wget/stamp-h1
+
+wget: wget/stamp-h1
+	@$(MAKE) -C wget all $(PARALLEL_BUILD)
+
+wget-clean:
+	-@$(MAKE) -C wget clean
+	@rm -f wget/stamp-h1
+
+wget-install: wget 
+	@$(SEP)
+	install -d $(INSTALLDIR)/wget/usr/bin
+	install -D wget/src/wget $(INSTALLDIR)/wget/usr/bin/wgetpro
+	$(STRIP) $(INSTALLDIR)/wget/usr/bin/wgetpro
+
+libdb/build_unix/stamp-h1:
+	cd libdb/build_unix && \
+	CC=$(CC) STRIP='mipsel-uclibc-strip' \
+	CFLAGS="-Os -Wall $(EXTRACFLAGS) -fno-delete-null-pointer-checks -funit-at-a-time \
+		--param large-function-growth=800 --param max-inline-insns-single=3000 \
+		-ffunction-sections -fdata-sections" \
+	../dist/configure --host=mipsel-linux --build=x86_64-linux-gnu  --prefix=/usr \
+		--enable-dbm --enable-compat185 --enable-shared --disable-static
+	touch libdb/build_unix/stamp-h1
+
+libdb: libdb/build_unix/stamp-h1
+	@$(MAKE) -C libdb/build_unix all $(PARALLEL_BUILD)
+
+libdb-clean:
+	-@$(MAKE) -C libdb/build_unix clean
+	@rm -f libdb/build_unix/stamp-h1
+
+libdb-install: libdb
+	@$(SEP)
+	install -d $(INSTALLDIR)/libdb/usr/lib
+	install -D libdb/build_unix/.libs/libdb-4.8.so $(INSTALLDIR)/libdb/usr/lib/libdb-4.8.so
+	$(STRIP) $(INSTALLDIR)/libdb/usr/lib/libdb-4.8.so
+	cd $(INSTALLDIR)/libdb/usr/lib/ && \
+		ln -sf libdb-4.8.so libdb.so
 
 libid3tag/stamp-h1: zlib
 	cd libid3tag && \
@@ -1448,13 +1601,50 @@ ifneq ($(MEDIA_SERVER_STATIC),y)
 	$(STRIP) $(INSTALLDIR)/libvorbis/usr/lib/libvorbis.so.0
 endif
 
-minidlna: zlib sqlite ffmpeg libogg flac jpeg libexif libid3tag libvorbis
-	@$(SEP)
-	@$(MAKE) -C minidlna CC=$(CC) $(if $(MEDIA_SERVER_STATIC),STATIC=1,) minidlna $(PARALLEL_BUILD)
+minidlna/stamp-h1: zlib sqlite ffmpeg libogg flac jpeg libexif libid3tag libvorbis libiconv
+	cd minidlna && CC=$(CC) CXX=$(CXX) AR=$(AR) RANLIB=$(RANLIB) STRIP='mipsel-uclibc-strip' HOST=mipsel-linux \
+	CFLAGS="-Wall -Os -D_GNU_SOURCE $(EXTRACFLAGS) -D_FILE_OFFSET_BITS=64 \
+	-ffunction-sections -fdata-sections \
+	-I$(TOP)/ffmpeg/libavutil -I$(TOP)/ffmpeg/libavcodec -I$(TOP)/ffmpeg/libavformat \
+	-I$(TOP)/ffmpeg/libswscale -I$(TOP)/ffmpeg \
+	-I$(TOP)/flac/include -I$(TOP)/sqlite -I$(TOP)/jpeg \
+	-I$(TOP)/libexif -I$(TOP)/libid3tag -I$(TOP)/libogg/include \
+	-I$(TOP)/libvorbis/include \
+	-I$(TOP)/libiconv/include \
+	-I$(TOP)/sqlite" \
+	LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC \
+	-L$(TOP)/zlib -L$(TOP)/sqlite/.libs -L$(TOP)/jpeg -L$(TOP)/libvorbis/lib/.libs \
+	-L$(TOP)/libogg/src/.libs -L$(TOP)/libexif/libexif/.libs -L$(TOP)/flac/src/libFLAC/.libs \
+	-L$(TOP)/ffmpeg/libavutil -L$(TOP)/ffmpeg/libavcodec -L$(TOP)/ffmpeg/libavformat \
+	-L$(TOP)/libid3tag/.libs -L$(TOP)/libiconv/lib/.libs" \
+	CPPFLAGS="-Wall -Os -D_GNU_SOURCE $(EXTRACFLAGS) -D_FILE_OFFSET_BITS=64 \
+	-ffunction-sections -fdata-sections \
+	-I$(TOP)/ffmpeg/libavutil -I$(TOP)/ffmpeg/libavcodec -I$(TOP)/ffmpeg/libavformat \
+	-I$(TOP)/ffmpeg/libswscale -I$(TOP)/ffmpeg \
+	-I$(TOP)/flac/include -I$(TOP)/sqlite -I$(TOP)/jpeg \
+	-I$(TOP)/libexif -I$(TOP)/libid3tag -I$(TOP)/libogg/include \
+	-I$(TOP)/libvorbis/include \
+	-I$(TOP)/libiconv/include \
+	-I$(TOP)/sqlite" \
+	LIBS="-lpthread -lexif -ljpeg -lsqlite3 -lavformat -lavutil -lavcodec -lid3tag -lFLAC -logg -lvorbis -lm -ldl -lz" \
+	$(CONFIGURE) --host=mipsel-linux --build=x86_64-linux-gnu
+	touch minidlna/stamp-h1
 
+minidlna: minidlna/stamp-h1
+	@$(SEP)
+	@$(MAKE) -C minidlna all $(PARALLEL_BUILD)
+
+minidlna-clean:
+	-@$(MAKE) -C minidlna clean
+	@rm -f minidlna/stamp-h1
+
+minidlna-install: minidlan
+	@$(SEP)
+	install -D minidlna/minidlnad $(INSTALLDIR)/minidlna/usr/sbin/minidlna
+	$(STRIP) $(INSTALLDIR)/minidlna/usr/sbin/minidlna
 
 igmpproxy/src/Makefile: igmpproxy/src/Makefile.in
-	cd igmpproxy && CFLAGS="-O2 -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
+	cd igmpproxy && CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
 	LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections" \
 	$(CONFIGURE) --prefix=/usr
 
@@ -1536,7 +1726,8 @@ ebtables-clean:
 #Roadkill
 glib/stamp-h1:
 	@$(SEP)
-	@cd glib && $(CONFIGURE) --prefix=/usr glib_cv_prog_cc_ansi_proto=no glib_cv_has__inline=yes glib_cv_has__inline__=yes glib_cv_hasinline=yes \
+	@cd glib && $(CONFIGURE) --prefix=/usr --build=x86_64-linux-gnu  --host=mipsel-linux --enable-shared --enable-static \
+		glib_cv_prog_cc_ansi_proto=no glib_cv_has__inline=yes glib_cv_has__inline__=yes glib_cv_hasinline=yes \
 		glib_cv_sane_realloc=yes glib_cv_va_copy=no glib_cv___va_copy=yes glib_cv_va_val_copy=yes glib_cv_rtldglobal_broken=no \
 		glib_cv_uscore=no glib_cv_func_pthread_mutex_trylock_posix=yes glib_cv_func_pthread_cond_timedwait_posix=yes glib_cv_sizeof_gmutex=24 \
 		glib_cv_byte_contents_gmutex="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0" glib_cv_sys_pthread_getspecific_posix=yes \
@@ -1629,8 +1820,7 @@ openvpn_plugin_auth_nvram:nvram
 #shibby
 libcurl/stamp-h1: zlib openssl
 	cd libcurl && CC=$(CC) STRIP='mipsel-uclibc-strip' \
-		CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
-		CPPFLAGS="-I$(TOP)/zlib" \
+		CPPFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections -I$(TOP)/zlib" \
 		LDFLAGS="-L$(TOP)/zlib -ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC" \
 		$(CONFIGURE) --prefix=/usr --disable-thread --enable-shared --enable-static \
 		--enable-ares --enable-cookies --enable-crypto-auth --enable-nonblocking \
@@ -1653,11 +1843,11 @@ libcurl-clean:
 
 libcurl-install: libcurl
 	install -d $(INSTALLDIR)/libcurl/usr/lib
-	install -D libcurl/lib/.libs/libcurl.so.4.2.0 $(INSTALLDIR)/libcurl/usr/lib/libcurl.so.4.2.0
-	$(STRIP) -s $(INSTALLDIR)/libcurl/usr/lib/libcurl.so.4.2.0
+	install -D libcurl/lib/.libs/libcurl.so.4.3.0 $(INSTALLDIR)/libcurl/usr/lib/libcurl.so.4.3.0
+	$(STRIP) -s $(INSTALLDIR)/libcurl/usr/lib/libcurl.so.4.3.0
 	cd $(INSTALLDIR)/libcurl/usr/lib/ && \
-		ln -sf libcurl.so.4.2.0 libcurl.so.4 && \
-		ln -sf libcurl.so.4.2.0 libcurl.so
+		ln -sf libcurl.so.4.3.0 libcurl.so.4 && \
+		ln -sf libcurl.so.4.3.0 libcurl.so
 
 libevent/stamp-h1:
 	cd libevent && CC=$(CC) \
@@ -1681,11 +1871,36 @@ libevent-install: libevent
 	install libevent/.libs/libevent-2.0.so.5.1.9 $(INSTALLDIR)/libevent/usr/lib/libevent-2.0.so.5
 	$(STRIP) -s $(INSTALLDIR)/libevent/usr/lib/libevent-2.0.so.5
 
+libev/stamp-h1:
+	cd libev && CC=$(CC) \
+		CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
+		LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC" \
+		$(CONFIGURE) --host=mipsel-linux --build=x86_64-linux-gnu --target=mipsel-linux --prefix=/usr --enable-shared
+		touch libev/stamp-h1
+
+libev: libev/stamp-h1
+	@$(SEP)
+	$(MAKE) -C libev $(PARALLEL_BUILD)
+	$(MAKE) -C libev DESTDIR=$(TOP)/libev/staged install
+
+libev-clean:
+	-@$(MAKE) -C libev clean
+	@rm -f libev/stamp-h1 libev/Makefile
+	@rm -rf libev/staged
+
+libev-install: libev
+	install -d $(INSTALLDIR)/libev/usr/lib
+	install libev/.libs/libev.so.4.0.0 $(INSTALLDIR)/libev/usr/lib/libev.so.4.0.0
+	$(STRIP) -s $(INSTALLDIR)/libev/usr/lib/libev.so.4.0.0
+	cd $(INSTALLDIR)/libev/usr/lib/ && \
+		ln -sf libev.so.4.0.0 libev.so.4 && \
+		ln -sf libev.so.4.0.0 libev.so
+
 libiconv/stamp-h1:
 	cd libiconv && CC=$(CC) \
 	CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
 	LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC" \
-	$(CONFIGURE) --prefix=/usr --disable-nls --enable-static
+	$(CONFIGURE) --prefix=/usr --disable-nls --enable-static --enable-shared
 	touch libiconv/stamp-h1
 
 libiconv: libiconv/stamp-h1
@@ -1698,25 +1913,434 @@ libiconv-clean:
 
 libiconv-install: libiconv
 	install -d $(INSTALLDIR)/libiconv/usr/lib
-	install libiconv/lib/.libs/libiconv.so.2.4.0 $(INSTALLDIR)/libiconv/usr/lib/libiconv.so.2
-	$(STRIP)-s $(INSTALLDIR)/libiconv/usr/lib/libiconv.so.2
+	install libiconv/lib/.libs/libiconv.so.2.4.0 $(INSTALLDIR)/libiconv/usr/lib/libiconv.so.2.4.0
+	$(STRIP)-s $(INSTALLDIR)/libiconv/usr/lib/libiconv.so.2.4.0
+	cd $(INSTALLDIR)/libiconv/usr/lib/ && \
+		ln -sf libiconv.so.2.4.0 libiconv.so.2 && \
+		ln -sf libiconv.so.2.4.0 libiconv.so
+
+libexpat/stamp-h1:
+	cd libexpat && CC=$(CC) \
+	CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections -fPIC" \
+	LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC" \
+	$(CONFIGURE) --prefix=/usr --disable-nls --enable-shared --enable-static
+	touch libexpat/stamp-h1
+
+libexpat: libexpat/stamp-h1
+	@$(SEP)
+	$(MAKE) -C libexpat $(PARALLEL_BUILD)
+
+libexpat-clean:
+	-@$(MAKE) -C libexpat clean
+	@rm -f libexpat/stamp-h1 libexpat/Makefile
+
+libexpat-install: libexpat
+	install -d $(INSTALLDIR)/libexpat/usr/lib
+	install libexpat/.libs/libexpat.so.1.6.0 $(INSTALLDIR)/libexpat/usr/lib/libexpat.so.1.6.0
+	$(STRIP) $(INSTALLDIR)/libexpat/usr/lib/libexpat.so.1.6.0
+	cd $(INSTALLDIR)/libexpat/usr/lib/ && \
+		ln -sf libexpat.so.1.6.0 libexpat.so.1 && \
+		ln -sf libexpat.so.1.6.0 libexpat.so
+
+libxml2/stamp-h1:
+	cd libxml2 && CC=$(CC) \
+	CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections -fPIC" \
+	LDFLAGS="-L$(TOP)/zlib -L$(TOP)/libiconv/lib/.libs -L$(TOP)/python -ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC" \
+	CPPFLAGS="-I$(TOP)/zlib -I$(TOP)/libiconv/include -I$(TOP)/python/Include" \
+	$(CONFIGURE) --prefix=/usr --with-zlib=$(TOP)/zlib --with-iconv=$(TOP)/libiconv --enable-shared --enable-static --with-python=$(TOP)/python --enable-ipv6
+	touch libxml2/stamp-h1
+
+libxml2: libxml2/stamp-h1
+	@$(SEP)
+	$(MAKE) -C libxml2 $(PARALLEL_BUILD)
+	$(MAKE) -C libxml2 DESTDIR=$(TOP)/libxml2/staged install
+
+libxml2-clean:
+	-@$(MAKE) -C libxml2 clean
+	@rm -f libxml2/stamp-h1 libxml2/Makefile
+	@rm -rf libxml2/staged
+
+libxml2-install: libxml2
+	install -d $(INSTALLDIR)/libxml2/usr/lib
+	install libxml2/.libs/libxml2.so.2.9.1 $(INSTALLDIR)/libxml2/usr/lib/libxml2.so.2.9.1
+	$(STRIP) $(INSTALLDIR)/libxml2/usr/lib/libxml2.so.2.9.1
+	cd $(INSTALLDIR)/libxml2/usr/lib/ && \
+		ln -sf libxml2.so.2.9.1 libxml2.so && \
+		ln -sf libxml2.so.2.9.1 libxml2.so.2 
+
+gevent/stamp-h1: python
+	cd gevent && export LIBEV_EMBED=0 && export CARES_EMBED=0 && export PYTHONHOME=$(TOP)/python/hostpy/usr && \
+	export PYTHONPATH=$(PATH):$(PYTHONHOME)/lib:$(PYTHONHOME)/lib/python2.7:$(PYTHONHOME)/lib/python2.7/site-packages:$(PYTHONHOME)/lib/python2.7/lib-dynload && \
+	CC=$(CC) CXX=$(CXX) AR=$(AR) RANLIB=$(RANLIB) \
+	LDSHARED="mipsel-linux-gcc -shared" CCSHARED="mipsel-linux-gcc -shared" CROSS_COMPILE=mipsel-linux- CROSS_COMPILE_TARGET=yes \
+	HOSTARCH=mipsel-linux BUILDARCH=x86_64-linux-gnu HOSTPYTHON=$(TOP)/python/hostpython HOSTPGEN=$(TOP)/python/Parser/hostpgen \
+	CFLAGS="-Os -Wall -fno-delete-null-pointer-checks -funit-at-a-time \
+		--param large-function-growth=800 --param max-inline-insns-single=3000 \
+		-ffunction-sections -fdata-sections -EL -DREADLINE_LIBRARY" \
+	LDFLAGS="-L/opt/brcm/K26/hndtools-mipsel-uclibc-4.2.4/lib -L$(TOP)/bzip2 -L$(TOP)/libcurl/lib/.libs -L$(TOP)/sqlite/.libs -L$(TOP)/zlib -L$(TOP)/libcares/.libs -L$(TOP)/libexpat/.libs -L$(TOP)/openssl -L$(TOP)/libev/.libs -L$(TOP)/libreadline/shlib -L$(TOP)/libncurses/lib -L$(TOP)/libdb/build_unix/.libs -L$(TOP)/python/staged/usr/lib -ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC -EL" \
+	CPPFLAGS="-I$(TOP)/bzip2 -I$(TOP)/libcurl/include -I$(TOP)/sqlite -I$(TOP)/zlib -I$(TOP)/libcares -I$(TOP)/libexpat/lib -I$(TOP)/openssl/include -I$(TOP)/libev -I$(TOP)/libreadline -I$(TOP)/libncurses/include -I$(TOP)/libdb/build_unix -I$(TOP)/python/staged/usr/include/python2.7" \
+	LIBS="-lbz2 -lcurl -lsqlite3 -lstdc++ -lz -lcares -lssl -lcrypto -lev -lreadline -lncurses -lform -lmenu -lpanel -ldb-4.8 -lexpat" \
+	$(TOP)/python/hostpython setup.py build && \
+	$(TOP)/python/hostpython setup.py install --prefix=staged && \
+	unset LIBEV_EMBED && unset CARES_EMBED && unset PYTHONHOME && unset PYTHONPATH
+	touch gevent/stamp-h1
+
+gevent: gevent/stamp-h1
+	@$(SEP)
+
+gevent-clean:
+	-cd gevent && $(TOP)/python/hostpython setup.py clean
+	-@rm -f gevent/stamp-h1
+	-@rm -rf gevent/staged gevent/build/*
+
+gevent-install: gevent 
+	install -d $(INSTALLDIR)/gevent/usr/lib
+	install -d $(INSTALLDIR)/gevent/usr/lib/python2.7
+	install -d $(INSTALLDIR)/gevent/usr/lib/python2.7/site-packages
+	install -d $(INSTALLDIR)/gevent/usr/lib/python2.7/site-packages/gevent
+	-@for i in gevent/staged/lib/python2.7/site-packages/gevent/*.so ; do \
+		echo "Install $$i ====> $(INSTALLDIR)/gevent/usr/lib/python2.7/site-packages/gevent"; \
+		install $$i $(INSTALLDIR)/gevent/usr/lib/python2.7/site-packages/gevent; \
+		$(STRIP) -s $(INSTALLDIR)/gevent/usr/lib/python2.7/site-packages/gevent/`basename $$i`; \
+	done
+	-@for i in gevent/staged/lib/python2.7/site-packages/gevent/*.pyc ; do \
+		echo "Install $$i ====> $(INSTALLDIR)/gevent/usr/lib/python2.7/site-packages/gevent"; \
+		install -m0644 $$i $(INSTALLDIR)/gevent/usr/lib/python2.7/site-packages/gevent; \
+	done
+
+
+greenlet/stamp-h1: python
+	cd greenlet && export PYTHONHOME=$(TOP)/python/hostpy/usr && \
+	CC=$(CC) CXX=$(CXX) AR=$(AR) RANLIB=$(RANLIB) \
+	LDSHARED="mipsel-linux-gcc -shared" CCSHARED="mipsel-linux-gcc -shared" CROSS_COMPILE=mipsel-linux- CROSS_COMPILE_TARGET=yes \
+	HOSTARCH=mipsel-linux BUILDARCH=x86_64-linux-gnu HOSTPYTHON=$(TOP)/python/hostpython HOSTPGEN=$(TOP)/python/Parser/hostpgen \
+	CFLAGS="-Os -Wall -fno-delete-null-pointer-checks -funit-at-a-time \
+		--param large-function-growth=800 --param max-inline-insns-single=3000 \
+		-ffunction-sections -fdata-sections -EL -DREADLINE_LIBRARY" \
+	LDFLAGS="-L/opt/brcm/K26/hndtools-mipsel-uclibc-4.2.4/lib -L$(TOP)/bzip2 -L$(TOP)/libcurl/lib/.libs -L$(TOP)/sqlite/.libs -L$(TOP)/zlib -L$(TOP)/libcares/.libs -L$(TOP)/libexpat/.libs -L$(TOP)/openssl -L$(TOP)/libev/.libs -L$(TOP)/libreadline/shlib -L$(TOP)/libncurses/lib -L$(TOP)/libdb/build_unix/.libs -L$(TOP)/python/staged/usr/lib -ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC -EL" \
+	CPPFLAGS="-I$(TOP)/bzip2 -I$(TOP)/libcurl/include -I$(TOP)/sqlite -I$(TOP)/zlib -I$(TOP)/libcares -I$(TOP)/libexpat/lib -I$(TOP)/openssl/include -I$(TOP)/libev -I$(TOP)/libreadline -I$(TOP)/libncurses/include -I$(TOP)/libdb/build_unix -I$(TOP)/python/staged/usr/include/python2.7" \
+	LIBS="-lbz2 -lcurl -lsqlite3 -lstdc++ -lz -lcares -lssl -lcrypto -lev -lreadline -lncurses -lform -lmenu -lpanel -ldb-4.8 -lexpat" \
+	$(TOP)/python/hostpython setup.py build_ext --inplace && \
+	unset PYTHONHOME
+	touch greenlet/stamp-h1
+
+greenlet: greenlet/stamp-h1
+	@$(SEP)
+
+greenlet-clean:
+	-cd greenlet && $(TOP)/python/hostpython setup.py clean
+	-@rm -f greenlet/stamp-h1
+	-@rm -rf greenlet/build/*
+
+greenlet-install: greenlet
+	install -d $(INSTALLDIR)/greenlet/usr/lib
+	install -d $(INSTALLDIR)/greenlet/usr/lib/python2.7
+	install -d $(INSTALLDIR)/greenlet/usr/lib/python2.7/site-packages
+	install greenlet/greenlet.so $(INSTALLDIR)/greenlet/usr/lib/python2.7/site-packages/greenlet.so
+	$(STRIP) -s $(INSTALLDIR)/greenlet/usr/lib/python2.7/site-packages/greenlet.so
+
+pyopenssl/stamp-h1: python
+	cd pyopenssl && export PYTHONHOME=$(TOP)/python/hostpy/usr && \
+	CC=$(CC) CXX=$(CXX) AR=$(AR) RANLIB=$(RANLIB) \
+	LDSHARED="mipsel-linux-gcc -shared" CCSHARED="mipsel-linux-gcc -shared" CROSS_COMPILE=mipsel-linux- CROSS_COMPILE_TARGET=yes \
+	HOSTARCH=mipsel-linux BUILDARCH=x86_64-linux-gnu HOSTPYTHON=$(TOP)/python/hostpython HOSTPGEN=$(TOP)/python/Parser/hostpgen \
+	CFLAGS="-Os -Wall -fno-delete-null-pointer-checks -funit-at-a-time \
+		--param large-function-growth=800 --param max-inline-insns-single=3000 \
+		-ffunction-sections -fdata-sections -EL -DREADLINE_LIBRARY" \
+	LDFLAGS="-L/opt/brcm/K26/hndtools-mipsel-uclibc-4.2.4/lib -L$(TOP)/bzip2 -L$(TOP)/libcurl/lib/.libs -L$(TOP)/sqlite/.libs -L$(TOP)/zlib -L$(TOP)/libcares/.libs -L$(TOP)/libexpat/.libs -L$(TOP)/openssl -L$(TOP)/libev/.libs -L$(TOP)/libreadline/shlib -L$(TOP)/libncurses/lib -L$(TOP)/libdb/build_unix/.libs -L$(TOP)/python/staged/usr/lib -ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC -EL" \
+	CPPFLAGS="-I$(TOP)/bzip2 -I$(TOP)/libcurl/include -I$(TOP)/sqlite -I$(TOP)/zlib -I$(TOP)/libcares -I$(TOP)/libexpat/lib -I$(TOP)/openssl/include -I$(TOP)/libev -I$(TOP)/libreadline -I$(TOP)/libncurses/include -I$(TOP)/libdb/build_unix -I$(TOP)/python/staged/usr/include/python2.7" \
+	LIBS="-lbz2 -lcurl -lsqlite3 -lstdc++ -lz -lcares -lssl -lcrypto -lev -lreadline -lncurses -lform -lmenu -lpanel -ldb-4.8 -lexpat" \
+	$(TOP)/python/hostpython setup.py build_ext -I$(TOP)/python/staged/usr/include/python2.7:$(TOP)/openssl/include -L$(TOP)/python/staged/usr/lib:$(TOP)/openssl && \
+	$(TOP)/python/hostpython setup.py build && \
+	$(TOP)/python/hostpython setup.py install --prefix=staged && \
+	unset PYTHONHOME
+	touch pyopenssl/stamp-h1
+
+pyopenssl: pyopenssl/stamp-h1
+	@$(SEP)
+
+pyopenssl-clean:
+	-cd pyopenssl && $(TOP)/python/hostpython setup.py clean
+	-@rm -f pyopenssl/stamp-h1
+	-@rm -rf pyopenssl/staged pyopenssl/build/*
+
+pyopenssl-install: pyopenssl
+	install -d $(INSTALLDIR)/pyopenssl/usr/lib
+	install -d $(INSTALLDIR)/pyopenssl/usr/lib/python2.7
+	install -d $(INSTALLDIR)/pyopenssl/usr/lib/python2.7/site-packages
+	install -d $(INSTALLDIR)/pyopenssl/usr/lib/python2.7/site-packages/OpenSSL
+	-@for i in pyopenssl/staged/lib/python2.7/site-packages/OpenSSL/*.so ; do \
+		echo "Install $$i ====> $(INSTALLDIR)/pyopenssl/usr/lib/python2.7/site-packages/OpenSSL"; \
+		install $$i $(INSTALLDIR)/pyopenssl/usr/lib/python2.7/site-packages/OpenSSL; \
+		$(STRIP) -s $(INSTALLDIR)/pyopenssl/usr/lib/python2.7/site-packages/OpenSSL/`basename $$i`; \
+	done
+	-@for i in pyopenssl/staged/lib/python2.7/site-packages/OpenSSL/*.pyc ; do \
+		echo "Install $$i ====> $(INSTALLDIR)/pyopenssl/usr/lib/python2.7/site-packages/OpenSSL"; \
+		install -m 0644 $$i $(INSTALLDIR)/pyopenssl/usr/lib/python2.7/site-packages/OpenSSL; \
+	done
+
+goagent/stamp-h1: python
+	touch goagent/stamp-h1
+
+goagent: goagent/stamp-h1
+	@$(SEP)
+
+goagent-clean:
+	-@rm -f goagent/stamp-h1
+
+goagent-install: goagent
+	install -d $(INSTALLDIR)/goagent/usr/lib
+	install -d $(INSTALLDIR)/goagent/usr/lib/python2.7
+	install -d $(INSTALLDIR)/goagent/usr/lib/python2.7/site-packages
+	-rm -f .goagent.tgz && tar cvfz .goagent.tgz goagent/* --exclude=goagent/stamp-h1 && \
+	install -m 0644 .goagent.tgz $(INSTALLDIR)/goagent/usr/lib/python2.7/site-packages/goagent.tgz 
+
+gaeproxy/stamp-h1: python
+	touch gaeproxy/stamp-h1
+
+gaeproxy: gaeproxy/stamp-h1
+	@$(SEP)
+
+gaeproxy-clean:
+	-@rm -f gaeproxy/stamp-h1
+
+gaeproxy-install: gaeproxy
+	install -d $(INSTALLDIR)/gaeproxy/usr/lib
+	install -d $(INSTALLDIR)/gaeproxy/usr/bin
+	install -d $(INSTALLDIR)/gaeproxy/usr/lib/python2.7
+	install -d $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages
+	install -d $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy
+	install -d $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/server
+	install -d $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/server/php
+	install -d $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/server/python
+	install -d $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local
+	install -d $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/src.zip
+	install -d $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/src.zip/web
+	install -d $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/src.zip/web/js
+	install -d $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/src.zip/web/js/codemirror
+	install -d $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/src.zip/web/css
+	install -d $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/src.zip/web/css/themes
+	install -d $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/src.zip/web/css/themes/default
+	install -d $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/src.zip/web/css/themes/default/images
+	install -d $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/cert
+	install -d $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/misc
+	install gaeproxy/wpcheck $(INSTALLDIR)/gaeproxy/usr/bin/wpcheck
+	install -m 0644 gaeproxy/local/startup.py $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/startup.py 
+	install -m 0644 gaeproxy/local/pac $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/pac
+	install -m 0644 gaeproxy/local/proxy.ini $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/proxy.ini
+	install -m 0644 gaeproxy/local/misc/userlist.ini  $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/misc/userlist.ini
+	install -m 0644 gaeproxy/local/misc/SwitchyOptions.bak  $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/misc/SwitchyOptions.bak
+	install -m 0644 gaeproxy/autoupload.py $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/server/autoupload.py
+	-@for i in gaeproxy/local/src.zip/*.py ; do \
+		echo "Install $$i ====> $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/src.zip"; \
+		install -m 0644 $$i $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/src.zip; \
+	done
+	-@for i in gaeproxy/local/src.zip/web/* ; do \
+		echo "Install $$i ====> $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/src.zip/web"; \
+		install -m 0644 $$i $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/src.zip/web; \
+	done
+	-@for i in gaeproxy/local/src.zip/web/css/* ; do \
+		echo "Install $$i ====> $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/src.zip/web/css"; \
+		install -m 0644 $$i $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/src.zip/web/css; \
+	done
+	-@for i in gaeproxy/local/src.zip/web/css/themes/default/* ; do \
+		echo "Install $$i ====> $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/src.zip/web/css/themes/default"; \
+		install -m 0644 $$i $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/src.zip/web/css/themes/default; \
+	done
+	-@for i in gaeproxy/local/src.zip/web/css/themes/default/images/* ; do \
+		echo "Install $$i ====> $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/src.zip/web/css/themes/default/images"; \
+		install -m 0644 $$i $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/src.zip/web/css/themes/default/images; \
+	done
+	-@for i in gaeproxy/local/src.zip/web/js/* ; do \
+		echo "Install $$i ====> $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/src.zip/web/js"; \
+		install -m 0644 $$i $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/src.zip/web/js; \
+	done
+	-@for i in gaeproxy/local/src.zip/web/js/codemirror/* ; do \
+		echo "Install $$i ====> $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/src.zip/web/js/codemirror"; \
+		install -m 0644 $$i $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/src.zip/web/js/codemirror; \
+	done
+	-@for i in gaeproxy/local/cert/* ; do \
+		echo "Install $$i ====> $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/cert"; \
+		install -m 0644 $$i $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/cert; \
+	done
+	install -m 0644 gaeproxy/CA.crt $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/cert
+	install -m 0644 gaeproxy/CA.key $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/cert
+
+python/stamp-h1: bzip2 zlib openssl libreadline libncurses sqlite libcares libexpat libev libcurl libdb
+	cd python && tar xvfz .hostpython.tgz >/dev/null 2>&1 && ln -sf $(TOP)/python/hostpy/usr/bin/python hostpython && \
+	CC=$(CC) AR=$(AR) LD=$(LD) RANLIB=$(RANLIB) \
+	CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections -fPIC -EL -DREADLINE_LIBRARY" \
+	LDFLAGS="-L$(TOP)/bzip2 -L$(TOP)/libcurl/lib/.libs -L$(TOP)/sqlite/.libs -L$(TOP)/zlib -L$(TOP)/libcares/.libs -L$(TOP)/libexpat/.libs -L$(TOP)/openssl -L$(TOP)/libev/.libs -L$(TOP)/libreadline/shlib -L$(TOP)/libncurses/lib -L$(TOP)/libdb/build_unix/.libs -ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC -EL" \
+	CPPFLAGS="-I$(TOP)/bzip2 -I$(TOP)/libcurl/include -I$(TOP)/sqlite -I$(TOP)/zlib -I$(TOP)/libcares -I$(TOP)/libexpat/lib -I$(TOP)/openssl/include -I$(TOP)/libev -I$(TOP)/libreadline -I$(TOP)/libncurses/include -I$(TOP)/libdb/build_unix" \
+	LIBS="-lbz2 -lcurl -lsqlite3 -lstdc++ -lz -lcares -lexpat -lssl -lcrypto -lev -lreadline -lncurses -lpanel -lform -lmenu -ldb-4.8 -lcrypt" \
+	$(CONFIGURE) CONFIG_SITE=$(TOP)/python/config.site --prefix=/usr --enable-shared --enable-static --disable-ipv6 --includedir=/opt/brcm/K26/hndtools-mipsel-uclibc-4.2.4/include
+	-sed -i Makefile -e "s/-DNDEBUG -fwrapv/-DNDEBUG -fwrapv/g"
+	-sed -i python/pyconfig.h -e "s/#define HAVE_CURSES_IS_TERM_RESIZED 1/#undef HAVE_CURSES_IS_TERM_RESIZED/g"
+	-sed -i python/pyconfig.h -e "s/#define HAVE_CURSES_RESIZETERM 1/#undef HAVE_CURSES_RESIZETERM/g"
+	-sed -i python/pyconfig.h -e "s/#define HAVE_CURSES_RESIZE_TERM 1/#undef HAVE_CURSES_RESIZE_TERM/g"
+	-sed -i python/pyconfig.h -e "s/\/\* #undef HAVE_DB_H \*\//#define HAVE_DB_H 1/g"
+	-sed -i python/pyconfig.h -e "s/\/\* #undef HAVE_DB_185_H \*\//#define HAVE_DB_185_H 1/g"
+	touch python/stamp-h1
+
+python: python/stamp-h1
+	@$(SEP)
+	PYTHONHOME=$(TOP)/python/hostpy/usr \
+	$(MAKE) -C python prefix=/usr HOSTPYTHON=./hostpython HOSTPGEN=./Parser/hostpgen BLDSHARED="mipsel-linux-gcc -shared" CROSS_COMPILE=mipsel-linux- CROSS_COMPILE_TARGET=yes HOSTARCH=mipsel-linux BUILDARCH=x86_64-linux-gnu $(PARALLEL_BUILD)
+	PYTHONHOME=$(TOP)/python/hostpy/usr \
+	$(MAKE) -C python  install DESTDIR=$(TOP)/python/staged HOSTPYTHON=./hostpython HOSTPGEN=./Parser/hostpgen BLDSHARED="mipsel-linux-gcc -shared" CROSS_COMPILE=mipsel-linux- CROSS_COMPILE_TARGET=yes
+
+python-clean:
+	-@$(MAKE) -C python clean
+	-@rm -f python/stamp-h1 python/Makefile
+	-@rm -rf python/staged
+
+python-install: python
+	install -d $(INSTALLDIR)/python/usr/lib
+	install -d $(INSTALLDIR)/python/usr/lib/python2.7
+	install -d $(INSTALLDIR)/python/usr/lib/python2.7/config
+	install -d $(INSTALLDIR)/python/usr/lib/python2.7/lib-dynload
+	install -d $(INSTALLDIR)/python/usr/lib/python2.7/encodings
+	install -d $(INSTALLDIR)/python/usr/lib/python2.7/site-packages
+	install -d $(INSTALLDIR)/python/usr/bin
+	install -d $(INSTALLDIR)/python/usr/include
+	install -d $(INSTALLDIR)/python/usr/include/python2.7
+	install python/staged/usr/lib/libpython2.7.so.1.0 $(INSTALLDIR)/python/usr/lib/libpython2.7.so.1.0
+	install python/staged/usr/bin/python2.7-config $(INSTALLDIR)/python/usr/bin/python2.7-config
+	install python/staged/usr/bin/python2.7 $(INSTALLDIR)/python/usr/bin/python2.7
+	$(STRIP) -s $(INSTALLDIR)/python/usr/lib/libpython2.7.so.1.0
+	$(STRIP) -s $(INSTALLDIR)/python/usr/bin/python2.7
+	cd $(INSTALLDIR)/python/usr/lib/ && \
+		ln -sf libpython2.7.so.1.0 libpython2.7.so
+	cd $(INSTALLDIR)/python/usr/bin/ && \
+		ln -sf python2.7 python && \
+		ln -sf python2.7 python2 && \
+		ln -sf python2.7-config python2-config && \
+		ln -sf python2.7-config python-config
+	install -D -m 0644 python/staged/usr/include/python2.7/pyconfig.h $(INSTALLDIR)/python/usr/include/python2.7/pyconfig.h
+	install -D -m 0644 python/staged/usr/lib/python2.7/config/Makefile $(INSTALLDIR)/python/usr/lib/python2.7/config/Makefile
+	-@cd $(TOP)/python/staged/usr/lib/python2.7 && for i in `find . -name "*.pyc" -print | sed "s/\.\///g" | sort`; do \
+		echo "$$i ====> $(INSTALLDIR)/python/usr/lib/python2.7"; \
+		install -d $(INSTALLDIR)/python/usr/lib/python2.7/`dirname $$i`; \
+		install -D -m 0644 $$i $(INSTALLDIR)/python/usr/lib/python2.7/`dirname $$i`; \
+	done
+	-@cd $(TOP)/python/staged/usr/lib/python2.7/lib-dynload && for i in `find . -name "*.so" -print | sed "s/\.\///g" | sort`; do \
+		echo "Install $$i ====> $(INSTALLDIR)/python/usr/lib/python2.7/lib-dynload"; \
+		install $$i $(INSTALLDIR)/python/usr/lib/python2.7/lib-dynload; \
+		$(STRIP) -s $(INSTALLDIR)/python/usr/lib/python2.7/lib-dynload/$$i; \
+	done
+	install -D -m 0644 pexpect/ANSI.pyc $(INSTALLDIR)/python/usr/lib/python2.7/ANSI.pyc
+	install -D -m 0644 pexpect/fdpexpect.pyc $(INSTALLDIR)/python/usr/lib/python2.7/fdpexpect.pyc
+	install -D -m 0644 pexpect/FSM.pyc $(INSTALLDIR)/python/usr/lib/python2.7/FSM.pyc
+	install -D -m 0644 pexpect/pexpect.pyc $(INSTALLDIR)/python/usr/lib/python2.7/pexpect.pyc
+	install -D -m 0644 pexpect/pxssh.pyc $(INSTALLDIR)/python/usr/lib/python2.7/pxssh.pyc
+	install -D -m 0644 pexpect/screen.pyc $(INSTALLDIR)/python/usr/lib/python2.7/screen.pyc
+# clean all unused files
+	-cd $(INSTALLDIR)/python/usr/lib/python2.7 && find . -name test -print | xargs rm -rf
+	-cd $(INSTALLDIR)/python/usr/lib/python2.7 && find . -name tests -print | xargs rm -rf
+	-cd $(INSTALLDIR)/python/usr/lib/python2.7 && rm -rf compiler distutils lib2to3 lib-tk bsddb sqlite3 bdb.pyc pdb.pyc *dbm.pyc
+	-cd $(INSTALLDIR)/python/usr/lib/python2.7/lib-dynload && rm -f _bsddb.so dbm.so linuxaudiodev.so ossaudiodev.so _sqlite3.so
+
+libncurses/stamp-h1:
+	cd libncurses && CC=$(CC) \
+	CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections -fPIC" \
+	LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC" \
+	LIBS="-lstdc++" \
+	$(CONFIGURE) --prefix=/usr --with-shared --with-normal --disable-debug --without-ada --without-manpages --without-progs --without-tests 
+	touch libncurses/stamp-h1
+
+libncurses: libncurses/stamp-h1
+	@$(SEP)
+	$(MAKE) -C libncurses $(PARALLEL_BUILD)
+
+libncurses-clean:
+	-@$(MAKE) -C libncurses clean
+	@rm -f libncurses/stamp-h1 libncurses/Makefile
+
+libncurses-install: libncurses
+	install -d $(INSTALLDIR)/libncurses/usr/lib
+	install libncurses/lib/libncurses.so.5.9 $(INSTALLDIR)/libncurses/usr/lib/libncurses.so.5
+	$(STRIP) $(INSTALLDIR)/libncurses/usr/lib/libncurses.so.5
+	install libncurses/lib/libpanel.so.5.9 $(INSTALLDIR)/libncurses/usr/lib/libpanel.so.5
+	$(STRIP) $(INSTALLDIR)/libncurses/usr/lib/libpanel.so.5
+	install libncurses/lib/libform.so.5.9 $(INSTALLDIR)/libncurses/usr/lib/libform.so.5
+	$(STRIP) $(INSTALLDIR)/libncurses/usr/lib/libform.so.5
+	install libncurses/lib/libmenu.so.5.9 $(INSTALLDIR)/libncurses/usr/lib/libmenu.so.5
+	$(STRIP) $(INSTALLDIR)/libncurses/usr/lib/libmenu.so.5
+	cd $(INSTALLDIR)/libncurses/usr/lib/ && \
+		ln -sf libncurses.so.5 libncurses.so && \
+		ln -sf libpanel.so.5 libpanel.so && \
+		ln -sf libform.so.5 libform.so && \
+		ln -sf libmenu.so.5 libmenu.so
+
+libreadline/stamp-h1:
+	cd libreadline && CC=$(CC) \
+	CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections -fPIC" \
+	LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC" \
+	$(CONFIGURE) --host=mipsel-linux --build=x86_64-linux-gnu --target=mipsel-linux --prefix=/usr --enable-shared
+	touch libreadline/stamp-h1
+
+libreadline: libreadline/stamp-h1
+	@$(SEP)
+	$(MAKE) -C libreadline $(PARALLEL_BUILD)
+	cd libreadline/shlib && ln -sf libreadline.so.6.2 libreadline.so && ln -sf libhistory.so.6.2 libhistory.so
+
+libreadline-clean:
+	-@$(MAKE) -C libreadline clean
+	@rm -f libreadline/stamp-h1 libreadline/Makefile libreadline/shlib/libreadline.so libreadline/shlib/libhistory.so
+
+libreadline-install: libreadline
+	install -d $(INSTALLDIR)/libreadline/usr/lib
+	install libreadline/shlib/libreadline.so.6.2 $(INSTALLDIR)/libreadline/usr/lib/libreadline.so.6.2
+	$(STRIP) $(INSTALLDIR)/libreadline/usr/lib/libreadline.so.6.2
+	cd $(INSTALLDIR)/libreadline/usr/lib/ && \
+		ln -sf libreadline.so.6.2 libreadline.so && \
+		ln -sf libreadline.so.6.2 libreadline.so.6
+
+libcares/stamp-h1:
+	cd libcares && CC=$(CC) \
+	CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections -fPIC" \
+	LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC" \
+	$(CONFIGURE) --prefix=/usr --enable-shared --enable-static --disable-debug
+	touch libcares/stamp-h1
+
+libcares: libcares/stamp-h1
+	@$(SEP)
+	$(MAKE) -C libcares $(PARALLEL_BUILD)
+
+libcares-clean:
+	-@$(MAKE) -C libcares clean
+	@rm -f libcares/stamp-h1 libcares/Makefile
+
+libcares-install: libcares
+	install -d $(INSTALLDIR)/libcares/usr/lib
+	install libcares/.libs/libcares.so.2.0.0 $(INSTALLDIR)/libcares/usr/lib/libcares.so.2.0.0
+	$(STRIP) $(INSTALLDIR)/libcares/usr/lib/libcares.so.2.0.0
+	cd $(INSTALLDIR)/libcares/usr/lib/ && \
+		ln -sf libcares.so.2.0.0 libcares.so && \
+		ln -sf libcares.so.2.0.0 libcares.so.2
 
 transmission/stamp-h1: openssl libcurl libevent zlib
 	cd transmission && CC=$(CC) STRIP='mipsel-uclibc-strip' \
 		CFLAGS="-Os -Wall -fno-delete-null-pointer-checks -funit-at-a-time \
 			--param large-function-growth=800 --param max-inline-insns-single=3000 \
 			-ffunction-sections -fdata-sections" \
-		LDFLAGS="-L$(TOP)/zlib -ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC" \
-		CPPFLAGS="-I$(TOP)/zlib" \
+		LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC \
+			-L$(TOP)/zlib -L$(TOP)/openssl -L$(TOP)/libcurl/lib/.libs -L$(TOP)/libevent/.libs" \
 		HAVE_CXX=yes \
-		$(CONFIGURE) --target=mipsel-linux --prefix=/usr --disable-nls \
+		$(CONFIGURE) --target=mipsel-linux --host=mipsel-linux --build=x86_64-linux-gnu --prefix=/usr --disable-nls \
 		--enable-lightweight --enable-largefile --enable-utp --without-gtk \
 		LIBCURL_CFLAGS="-I$(TOP)/libcurl/include" \
-		LIBCURL_LIBS="-L$(TOP)/libcurl/lib/.libs -lcurl" \
+		LIBCURL_LDFLAGS="-L$(TOP)/libcurl/lib/.libs/" \
+		LIBCURL_LIBS="-lcurl" \
 		LIBEVENT_CFLAGS="-I$(TOP)/libevent/include" \
-		LIBEVENT_LIBS="-L$(TOP)/libevent/.libs -levent" \
+		LIBEVENT_LDFLAGS="-L$(TOP)/libevent/.libs" \
+		LIBEVENT_LIBS="-levent" \
 		OPENSSL_CFLAGS="-I$(TOP)/openssl/include" \
-		OPENSSL_LIBS="-L$(TOP)/openssl -lcrypto -lssl"
+		OPENSSL_LDFLAGS="-L$(TOP)/openssl" \
+		OPENSSL_LIBS="-lcrypto -lssl" \
+		ZLIB_CFLAGS="-I$(TOP)/zlib" \
+		ZLIB_LDFLAGS="-L$(TOP)/zlib" \
+		ZLIB_LIBS="-lz"
 		touch transmission/stamp-h1
 
 transmission: transmission/stamp-h1
@@ -1740,6 +2364,111 @@ ifeq ($(TCONFIG_TR_EXTRAS),y)
 else
 	@rm -rf $(INSTALLDIR)/transmission/usr/bin/transmission-remote
 endif
+
+aria2/stamp-h1: openssl zlib libexpat sqlite libiconv libcares
+	cd aria2 && CC=$(CC) STRIP='mipsel-uclibc-strip' \
+		CFLAGS="-Os -Wall -fno-delete-null-pointer-checks -funit-at-a-time \
+			--param large-function-growth=800 --param max-inline-insns-single=3000 \
+			-ffunction-sections -fdata-sections" \
+		LDFLAGS="-L$(TOP)/libexpat/.libs -L$(TOP)/libiconv/lib/.libs -L$(TOP)/zlib -L$(TOP)/sqlite/.libs -L$(TOP)/libcares/.libs -L$(TOP)/openssl -ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC" \
+		CPPFLAGS="-I$(TOP)/libexpat/lib -I$(TOP)/libiconv/include -I$(TOP)/sqlite -I$(TOP)/zlib -I$(TOP)/libcares -I$(TOP)/openssl/include" \
+		LIBS="-liconv -lstdc++ -lexpat -lz -lsqlite3 -lcares -lssl -lcrypto" \
+		$(CONFIGURE) --target=mipsel-linux --prefix=/usr --enable-nls --enable-shared --enable-static --without-libxml2 --without-gnutls --with-openssl \
+		LIBCURL_CFLAGS="-I$(TOP)/libcurl/include" \
+		LIBCURL_LDFLAGS="-L$(TOP)/libcurl/lib/.libs/" \
+		LIBCURL_LIBS="-lcurl" \
+		LIBEVENT_CFLAGS="-I$(TOP)/libevent/include" \
+		LIBEVENT_LDFLAGS="-L$(TOP)/libevent/.libs" \
+		LIBEVENT_LIBS="-levent" \
+		OPENSSL_CFLAGS="-I$(TOP)/openssl/include" \
+		OPENSSL_LDFLAGS="-L$(TOP)/openssl" \
+		OPENSSL_LIBS="-lcrypto -lssl" \
+		ZLIB_CFLAGS="-I$(TOP)/zlib" \
+		ZLIB_LDFLAGS="-L$(TOP)/zlib" \
+		ZLIB_LIBS="-lz"
+		touch aria2/stamp-h1
+
+aria2: aria2/stamp-h1
+	@$(SEP)
+	$(MAKE) -C aria2 $(PARALLEL_BUILD)
+
+aria2-clean:
+	-@$(MAKE) -C aria2 clean
+	@rm -f aria2/stamp-h1 aria2/Makefile
+
+aria2-install: aria2
+	install -d $(INSTALLDIR)/aria2/usr/bin
+	@rm -rf $(INSTALLDIR)/aria2/usr/share/man
+	@rm -rf $(INSTALLDIR)/aria2/usr/share/doc
+	install -D $(TOP)/aria2/src/.libs/aria2c $(INSTALLDIR)/aria2/usr/bin/aria2c
+	install -D $(TOP)/aria2/archeck $(INSTALLDIR)/aria2/usr/bin/archeck
+	$(STRIP) -s $(INSTALLDIR)/aria2/usr/bin/aria2c
+	install -d $(INSTALLDIR)/aria2/www/yaaw
+	install -d $(INSTALLDIR)/aria2/www/yaaw/css
+	install -d $(INSTALLDIR)/aria2/www/yaaw/js
+	install -d $(INSTALLDIR)/aria2/www/yaaw/img
+	install -D $(TOP)/aria2/yaaw/index.html $(INSTALLDIR)/aria2/www/yaaw/index.html
+	install -D $(TOP)/aria2/yaaw/css/bootstrap.min.css $(INSTALLDIR)/aria2/www/yaaw/css/bootstrap.min.css
+	install -D $(TOP)/aria2/yaaw/css/bootstrap-responsive.min.css $(INSTALLDIR)/aria2/www/yaaw/css/bootstrap-responsive.min.css
+	install -D $(TOP)/aria2/yaaw/css/main.css $(INSTALLDIR)/aria2/www/yaaw/css/main.css
+	install -D $(TOP)/aria2/yaaw/js/aria2.js $(INSTALLDIR)/aria2/www/yaaw/js/aria2.js
+	install -D $(TOP)/aria2/yaaw/js/bootstrap.min.js $(INSTALLDIR)/aria2/www/yaaw/js/bootstrap.min.js
+	install -D $(TOP)/aria2/yaaw/js/jquery.base64.min.js $(INSTALLDIR)/aria2/www/yaaw/js/jquery.base64.min.js
+	install -D $(TOP)/aria2/yaaw/js/jquery.jsonrpc.js $(INSTALLDIR)/aria2/www/yaaw/js/jquery.jsonrpc.js
+	install -D $(TOP)/aria2/yaaw/js/jquery.Storage.js $(INSTALLDIR)/aria2/www/yaaw/js/jquery.Storage.js
+	install -D $(TOP)/aria2/yaaw/js/jquery-1.7.2.min.js $(INSTALLDIR)/aria2/www/yaaw/js/jquery-1.7.2.min.js
+	install -D $(TOP)/aria2/yaaw/js/mustache.js $(INSTALLDIR)/aria2/www/yaaw/js/mustache.js
+	install -D $(TOP)/aria2/yaaw/js/yaaw.js $(INSTALLDIR)/aria2/www/yaaw/js/yaaw.js
+	install -D $(TOP)/aria2/yaaw/img/glyphicons-halflings.png $(INSTALLDIR)/aria2/www/yaaw/img/glyphicons-halflings.png
+	install -D $(TOP)/aria2/yaaw/img/glyphicons-halflings-white.png $(INSTALLDIR)/aria2/www/yaaw/img/glyphicons-halflings-white.png
+
+srelay/stamp-h1:
+	cd srelay && CC=$(CC) STRIP='mipsel-uclibc-strip' \
+		CFLAGS="-Os -Wall -fno-delete-null-pointer-checks -funit-at-a-time \
+			--param large-function-growth=800 --param max-inline-insns-single=3000 \
+			-ffunction-sections -fdata-sections" \
+		LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC" \
+		$(CONFIGURE) --target=mipsel-linux --prefix=/usr --disable-thread
+		touch srelay/stamp-h1
+
+srelay: srelay/stamp-h1
+	@$(SEP)
+	$(MAKE) -C srelay $(PARALLEL_BUILD)
+
+srelay-clean:
+	-@$(MAKE) -C srelay clean
+	@rm -f srelay/stamp-h1 srelay/Makefile
+
+srelay-install: srelay
+	install -d $(INSTALLDIR)/srelay/usr/bin
+	install -D $(TOP)/srelay/srelay $(INSTALLDIR)/srelay/usr/bin/srelay
+	$(STRIP) -s $(INSTALLDIR)/srelay/usr/bin/srelay
+
+tinyproxy/stamp-h1:
+	cd tinyproxy && CC=$(CC) STRIP='mipsel-uclibc-strip' \
+		CFLAGS="-Os -Wall -fno-delete-null-pointer-checks -funit-at-a-time \
+			--param large-function-growth=800 --param max-inline-insns-single=3000 \
+			-ffunction-sections -fdata-sections" \
+		LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC" \
+		$(CONFIGURE) --target=mipsel-linux --prefix=/usr -enable-reverse --enable-transparent \
+			--enable-filter --enable-upstream --enable-xtinyproxy --disable-debug
+		touch tinyproxy/stamp-h1
+
+tinyproxy: tinyproxy/stamp-h1
+	@$(SEP)
+	$(MAKE) -C tinyproxy $(PARALLEL_BUILD)
+
+tinyproxy-clean:
+	-@$(MAKE) -C tinyproxy clean
+	@rm -f tinyproxy/stamp-h1 tinyproxy/Makefile
+
+tinyproxy-install: tinyproxy
+	install -d $(INSTALLDIR)/tinyproxy/usr/bin
+	install -D $(TOP)/tinyproxy/src/tinyproxy $(INSTALLDIR)/tinyproxy/usr/bin/tinyproxy
+	$(STRIP) -s $(INSTALLDIR)/tinyproxy/usr/bin/tinyproxy
+
+btgui:
+	@$(SEP)
 
 btgui:
 	@$(SEP)

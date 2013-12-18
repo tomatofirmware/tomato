@@ -41,7 +41,7 @@ textarea {
 
 <script type='text/javascript'>
 
-//	<% nvram("smbd_enable,smbd_user,smbd_passwd,smbd_wgroup,smbd_cpage,smbd_custom,smbd_master,smbd_wins,smbd_shares,smbd_autoshare,wan_wins"); %>
+//	<% nvram("smbd_enable,smbd_user,smbd_passwd,smbd_wgroup,smbd_cpage,smbd_custom,smbd_master,smbd_wins,smbd_shares,smbd_autoshare,wan_wins,smbd_wan_enable"); %>
 
 var ssg = new TomatoGrid();
 
@@ -157,6 +157,7 @@ function verifyFields(focused, quiet)
 	E('_smbd_autoshare').disabled = (a == 0);
 	E('_f_smbd_master').disabled = (a == 0);
 	E('_f_smbd_wins').disabled = (a == 0 || (nvram.wan_wins != '' && nvram.wan_wins != '0.0.0.0'));
+	E('_f_smbd_wan_enable').disabled = (a == 0);
 
 	if (a != 0 && !v_length('_smbd_custom', quiet, 0, 2048)) return 0;
 
@@ -187,6 +188,7 @@ function save()
 	for (var i = 0; i < data.length; ++i) r.push(data[i].join('<'));
 	fom.smbd_shares.value = r.join('>');
 	fom.smbd_master.value = E('_f_smbd_master').checked ? 1 : 0;
+	fom.smbd_wan_enable.value = E('_f_smbd_wan_enable').checked ? 1 : 0;
 	if (nvram.wan_wins == '' || nvram.wan_wins == '0.0.0.0')
 		fom.smbd_wins.value = E('_f_smbd_wins').checked ? 1 : 0;
 	else
@@ -216,6 +218,7 @@ function save()
 <input type='hidden' name='smbd_master'>
 <input type='hidden' name='smbd_wins'>
 <input type='hidden' name='smbd_shares'>
+<input type='hidden' name='smbd_wan_enable'>
 
 <div class='section-title'>Samba File Sharing</div>
 <div class='section'>
@@ -224,6 +227,7 @@ createFieldTable('', [
 	{ title: 'Enable File Sharing', name: 'smbd_enable', type: 'select',
 		options: [['0', 'No'],['1', 'Yes, no Authentication'],['2', 'Yes, Authentication required']],
 		value: nvram.smbd_enable },
+	{ title: 'Enable WAN Listening', name: 'f_smbd_wan_enable', type: 'checkbox', value: nvram.smbd_wan_enable == 1 },
 	{ title: 'User Name', indent: 2, name: 'smbd_user', type: 'text', maxlen: 50, size: 32,
 		value: nvram.smbd_user },
 	{ title: 'Password', indent: 2, name: 'smbd_passwd', type: 'password', maxlen: 50, size: 32, peekaboo: 1,

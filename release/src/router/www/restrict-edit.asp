@@ -93,6 +93,7 @@ var ipp2p = [
 	];
 
 var dowNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+var dowLow = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 
 //
 
@@ -348,7 +349,7 @@ function saveRule()
 	else {
 		n = 0;
 		for (i = 0; i < 7; ++i) {
-			if (E('_f_sched_' + dowNames[i].toLowerCase()).checked) n |= (1 << i);
+			if (E('_f_sched_' + dowLow[i]).checked) n |= (1 << i);
 		}
 		if (n == 0) n = 0x7F;
 	}

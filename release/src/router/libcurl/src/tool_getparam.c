@@ -19,9 +19,7 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-#include "setup.h"
-
-#include <curl/curl.h>
+#include "tool_setup.h"
 
 #include "rawstr.h"
 
@@ -30,7 +28,7 @@
 #include "curlx.h"
 
 #ifdef USE_MANUAL
-#  include "hugehelp.h"
+#  include "tool_hugehelp.h"
 #endif
 
 #include "tool_binmode.h"
@@ -41,6 +39,7 @@
 #include "tool_help.h"
 #include "tool_helpers.h"
 #include "tool_libinfo.h"
+#include "tool_metalink.h"
 #include "tool_msgs.h"
 #include "tool_paramhlp.h"
 #include "tool_parsecfg.h"
@@ -57,10 +56,11 @@
     free(*(str)); \
     *(str) = NULL; \
   } \
-  if((val)) \
+  if((val)) {              \
     *(str) = strdup((val)); \
-  if(!(val)) \
-    return PARAM_NO_MEM; \
+    if(!(*(str)))          \
+      return PARAM_NO_MEM; \
+  } \
 } WHILE_FALSE
 
 struct LongShort {
@@ -171,6 +171,9 @@ static const struct LongShort aliases[]= {
   {"$F", "resolve",                  TRUE},
   {"$G", "delegation",               TRUE},
   {"$H", "mail-auth",                TRUE},
+  {"$I", "post303",                  FALSE},
+  {"$J", "metalink",                 FALSE},
+  {"$K", "sasl-ir",                  FALSE},
   {"0",  "http1.0",                  FALSE},
   {"1",  "tlsv1",                    FALSE},
   {"2",  "sslv2",                    FALSE},
@@ -282,6 +285,105 @@ static const struct feat feats[] = {
   {"CharConv",       CURL_VERSION_CONV},
   {"TLS-SRP",        CURL_VERSION_TLSAUTH_SRP}
 };
+
+/* Split the argument of -E to 'certname' and 'passphrase' separated by colon.
+ * We allow ':' and '\' to be escaped by '\' so that we can use certificate
+ * nicknames containing ':'.  See <https://sourceforge.net/p/curl/bugs/1196/>
+ * for details. */
+#ifndef UNITTESTS
+static
+#endif
+void parse_cert_parameter(const char *cert_parameter,
+                          char **certname,
+                          char **passphrase)
+{
+  size_t param_length = strlen(cert_parameter);
+  size_t span;
+  const char *param_place = NULL;
+  char *certname_place = NULL;
+  *certname = NULL;
+  *passphrase = NULL;
+
+  /* most trivial assumption: cert_parameter is empty */
+  if(param_length == 0)
+    return;
+
+  /* next less trivial: cert_parameter contains no colon nor backslash; this
+   * means no passphrase was given and no characters escaped */
+  if(!strpbrk(cert_parameter, ":\\")) {
+    *certname = strdup(cert_parameter);
+    return;
+  }
+  /* deal with escaped chars; find unescaped colon if it exists */
+  certname_place = malloc(param_length + 1);
+  if(!certname_place)
+    return;
+
+  *certname = certname_place;
+  param_place = cert_parameter;
+  while(*param_place) {
+    span = strcspn(param_place, ":\\");
+    strncpy(certname_place, param_place, span);
+    param_place += span;
+    certname_place += span;
+    /* we just ate all the non-special chars. now we're on either a special
+     * char or the end of the string. */
+    switch(*param_place) {
+    case '\0':
+      break;
+    case '\\':
+      param_place++;
+      switch(*param_place) {
+        case '\0':
+          *certname_place++ = '\\';
+          break;
+        case '\\':
+          *certname_place++ = '\\';
+          param_place++;
+          break;
+        case ':':
+          *certname_place++ = ':';
+          param_place++;
+          break;
+        default:
+          *certname_place++ = '\\';
+          *certname_place++ = *param_place;
+          param_place++;
+          break;
+      }
+      break;
+    case ':':
+      /* Since we live in a world of weirdness and confusion, the win32
+         dudes can use : when using drive letters and thus c:\file:password
+         needs to work. In order not to break compatibility, we still use : as
+         separator, but we try to detect when it is used for a file name! On
+         windows. */
+#ifdef WIN32
+      if(param_place &&
+          (param_place == &cert_parameter[1]) &&
+          (cert_parameter[2] == '\\' || cert_parameter[2] == '/') &&
+          (ISALPHA(cert_parameter[0])) ) {
+        /* colon in the second column, followed by a backslash, and the
+           first character is an alphabetic letter:
+
+           this is a drive letter colon */
+        *certname_place++ = ':';
+        param_place++;
+        break;
+      }
+#endif
+      /* escaped colons and Windows drive letter colons were handled
+       * above; if we're still here, this is a separating colon */
+      param_place++;
+      if(strlen(param_place) > 0) {
+        *passphrase = strdup(param_place);
+      }
+      goto done;
+    }
+  }
+done:
+  *certname_place = '\0';
+}
 
 ParameterError getparameter(char *flag,    /* f or -long-flag */
                             char *nextarg, /* NULL if unset */
@@ -396,8 +498,9 @@ ParameterError getparameter(char *flag,    /* f or -long-flag */
         GetStr(&config->egd_file, nextarg);
         break;
       case 'c': /* connect-timeout */
-        if(str2num(&config->connecttimeout, nextarg))
-          return PARAM_BAD_NUMERIC;
+        err = str2unum(&config->connecttimeout, nextarg);
+        if(err)
+          return err;
         break;
       case 'd': /* ciphers */
         GetStr(&config->cipher_list, nextarg);
@@ -540,8 +643,12 @@ ParameterError getparameter(char *flag,    /* f or -long-flag */
         break;
 
       case 's': /* --max-redirs */
-        /* specified max no of redirects (http(s)) */
-        if(str2num(&config->maxredirs, nextarg))
+        /* specified max no of redirects (http(s)), this accepts -1 as a
+           special condition */
+        err = str2num(&config->maxredirs, nextarg);
+        if(err)
+          return err;
+        if(config->maxredirs < -1)
           return PARAM_BAD_NUMERIC;
         break;
 
@@ -585,8 +692,9 @@ ParameterError getparameter(char *flag,    /* f or -long-flag */
           return PARAM_LIBCURL_DOESNT_SUPPORT;
         break;
       case 'y': /* --max-filesize */
-        if(str2offset(&config->max_filesize, nextarg))
-          return PARAM_BAD_NUMERIC;
+        err = str2offset(&config->max_filesize, nextarg);
+        if(err)
+          return err;
         break;
       case 'z': /* --disable-eprt */
         config->disable_eprt = toggle;
@@ -662,16 +770,19 @@ ParameterError getparameter(char *flag,    /* f or -long-flag */
         config->proxybasic = toggle;
         break;
       case 'g': /* --retry */
-        if(str2num(&config->req_retry, nextarg))
-          return PARAM_BAD_NUMERIC;
+        err = str2unum(&config->req_retry, nextarg);
+        if(err)
+          return err;
         break;
       case 'h': /* --retry-delay */
-        if(str2num(&config->retry_delay, nextarg))
-          return PARAM_BAD_NUMERIC;
+        err = str2unum(&config->retry_delay, nextarg);
+        if(err)
+          return err;
         break;
       case 'i': /* --retry-max-time */
-        if(str2num(&config->retry_maxtime, nextarg))
-          return PARAM_BAD_NUMERIC;
+        err = str2unum(&config->retry_maxtime, nextarg);
+        if(err)
+          return err;
         break;
 
       case 'k': /* --proxy-negotiate */
@@ -758,11 +869,15 @@ ParameterError getparameter(char *flag,    /* f or -long-flag */
         config->nokeepalive = (!toggle)?TRUE:FALSE;
         break;
       case '3': /* --keepalive-time */
-        if(str2num(&config->alivetime, nextarg))
-          return PARAM_BAD_NUMERIC;
+        err = str2unum(&config->alivetime, nextarg);
+        if(err)
+          return err;
         break;
       case '4': /* --post302 */
         config->post302 = toggle;
+        break;
+      case 'I': /* --post303 */
+        config->post303 = toggle;
         break;
       case '5': /* --noproxy */
         /* This specifies the noproxy list */
@@ -782,7 +897,9 @@ ParameterError getparameter(char *flag,    /* f or -long-flag */
         config->proxyver = CURLPROXY_HTTP_1_0;
         break;
       case '9': /* --tftp-blksize */
-        str2num(&config->tftp_blksize, nextarg);
+        err = str2unum(&config->tftp_blksize, nextarg);
+        if(err)
+          return err;
         break;
       case 'A': /* --mail-from */
         GetStr(&config->mail_from, nextarg);
@@ -816,6 +933,33 @@ ParameterError getparameter(char *flag,    /* f or -long-flag */
         break;
       case 'H': /* --mail-auth */
         GetStr(&config->mail_auth, nextarg);
+        break;
+      case 'J': /* --metalink */
+        {
+#ifdef USE_METALINK
+          int mlmaj, mlmin, mlpatch;
+          metalink_get_version(&mlmaj, &mlmin, &mlpatch);
+          if((mlmaj*10000)+(mlmin*100)+mlpatch < CURL_REQ_LIBMETALINK_VERS) {
+            warnf(config,
+                  "--metalink option cannot be used because the version of "
+                  "the linked libmetalink library is too old. "
+                  "Required: %d.%d.%d, found %d.%d.%d\n",
+                  CURL_REQ_LIBMETALINK_MAJOR,
+                  CURL_REQ_LIBMETALINK_MINOR,
+                  CURL_REQ_LIBMETALINK_PATCH,
+                  mlmaj, mlmin, mlpatch);
+            return PARAM_BAD_USE;
+          }
+          else
+            config->use_metalink = toggle;
+#else
+          warnf(config, "--metalink option is ignored because the binary is "
+                "built without the Metalink support.\n");
+#endif
+          break;
+        }
+      case 'K': /* --sasl-ir */
+        config->sasl_ir = TRUE;
         break;
       }
       break;
@@ -883,8 +1027,9 @@ ParameterError getparameter(char *flag,    /* f or -long-flag */
     case 'C':
       /* This makes us continue an ftp transfer at given position */
       if(!curlx_strequal(nextarg, "-")) {
-        if(str2offset(&config->resume_from, nextarg))
-          return PARAM_BAD_NUMERIC;
+        err = str2offset(&config->resume_from, nextarg);
+        if(err)
+          return err;
         config->resume_from_current = FALSE;
       }
       else {
@@ -1161,30 +1306,14 @@ ParameterError getparameter(char *flag,    /* f or -long-flag */
         break;
       default: /* certificate file */
       {
-        char *ptr = strchr(nextarg, ':');
-        /* Since we live in a world of weirdness and confusion, the win32
-           dudes can use : when using drive letters and thus
-           c:\file:password needs to work. In order not to break
-           compatibility, we still use : as separator, but we try to detect
-           when it is used for a file name! On windows. */
-#ifdef WIN32
-        if(ptr &&
-           (ptr == &nextarg[1]) &&
-           (nextarg[2] == '\\' || nextarg[2] == '/') &&
-           (ISALPHA(nextarg[0])) )
-          /* colon in the second column, followed by a backslash, and the
-             first character is an alphabetic letter:
-
-             this is a drive letter colon */
-          ptr = strchr(&nextarg[3], ':'); /* find the next one instead */
-#endif
-        if(ptr) {
-          /* we have a password too */
-          *ptr = '\0';
-          ptr++;
-          GetStr(&config->key_passwd, ptr);
+        char *certname, *passphrase;
+        parse_cert_parameter(nextarg, &certname, &passphrase);
+        Curl_safefree(config->cert);
+        config->cert = certname;
+        if(passphrase) {
+          Curl_safefree(config->key_passwd);
+          config->key_passwd = passphrase;
         }
-        GetStr(&config->cert, nextarg);
         cleanarg(nextarg);
       }
       }
@@ -1275,8 +1404,9 @@ ParameterError getparameter(char *flag,    /* f or -long-flag */
       break;
     case 'm':
       /* specified max time */
-      if(str2num(&config->timeout, nextarg))
-        return PARAM_BAD_NUMERIC;
+      err = str2unum(&config->timeout, nextarg);
+      if(err)
+        return err;
       break;
     case 'M': /* M for manual, huge help */
       if(toggle) { /* --no-manual shows no manual... */
@@ -1545,6 +1675,9 @@ ParameterError getparameter(char *flag,    /* f or -long-flag */
           if(curlinfo->features & feats[i].bitmask)
             printf("%s ", feats[i].name);
         }
+#ifdef USE_METALINK
+        printf("Metalink ");
+#endif
         puts(""); /* newline */
       }
     }
@@ -1587,15 +1720,17 @@ ParameterError getparameter(char *flag,    /* f or -long-flag */
       break;
     case 'y':
       /* low speed time */
-      if(str2num(&config->low_speed_time, nextarg))
-        return PARAM_BAD_NUMERIC;
+      err = str2unum(&config->low_speed_time, nextarg);
+      if(err)
+        return err;
       if(!config->low_speed_limit)
         config->low_speed_limit = 1;
       break;
     case 'Y':
       /* low speed limit */
-      if(str2num(&config->low_speed_limit, nextarg))
-        return PARAM_BAD_NUMERIC;
+      err = str2unum(&config->low_speed_limit, nextarg);
+      if(err)
+        return err;
       if(!config->low_speed_time)
         config->low_speed_time = 30;
       break;

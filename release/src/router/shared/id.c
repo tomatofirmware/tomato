@@ -26,6 +26,7 @@ WRT54GL 1.0, 1.1	BCM5352E              0x0467       42        0x10      0x2558
 WRT54GS 1.0         BCM4712               0x0101       42        0x10      0x0388
 WRT54GS 1.1, 2.x    BCM5325E              0x0708       42        0x10      0x0318
 WRT54GS 3.0, 4.0    BCM5352E              0x0467       42        0x10      0x2758
+WRT54G2             BCM5354               0x048e       42        0x10      0x20750
 WRT300N 1.0         BCM4704_BCM5325F_EWC  0x0472       42        0x10      0x10
 WRTSL54GS           BCM4704_BCM5325F      0x042f       42        0x10      0x0018
 WTR54GS v1, v2      BCM5350               0x456        56        0x10      0xb18       (source: BaoWeiQuan)

@@ -321,7 +321,7 @@ SendSSDPAnnounce2(int s, const struct sockaddr * addr,
                   const char * host, unsigned short port)
 {
 	int l, n;
-	char buf[512];
+	char buf[1024];
 	char addr_str[64];
 	socklen_t addrlen;
 	int st_is_uuid;
@@ -376,7 +376,7 @@ SendSSDPAnnounce2(int s, const struct sockaddr * addr,
 	}
 	else if((unsigned)l>=sizeof(buf))
 	{
-		syslog(LOG_WARNING, "SendSSDPAnnounce2(): truncated output");
+		//syslog(LOG_WARNING, "SendSSDPAnnounce2(): truncated output");
 		l = sizeof(buf) - 1;
 	}
 	addrlen = (addr->sa_family == AF_INET6)
@@ -430,7 +430,7 @@ SendSSDPNotify(int s, const struct sockaddr * dest,
                const char * usn1, const char * usn2, const char * usn3,
                unsigned int lifetime, int ipv6)
 {
-	char bufr[512];
+	char bufr[1024];
 	int n, l;
 
 	l = snprintf(bufr, sizeof(bufr),
@@ -461,7 +461,7 @@ SendSSDPNotify(int s, const struct sockaddr * dest,
 	}
 	else if((unsigned int)l >= sizeof(bufr))
 	{
-		syslog(LOG_WARNING, "SendSSDPNotify(): truncated output");
+		//syslog(LOG_WARNING, "SendSSDPNotify(): truncated output");
 		l = sizeof(bufr) - 1;
 	}
 	n = sendto(s, bufr, l, 0, dest,
@@ -790,7 +790,7 @@ SendSSDPbyebye(int s, const struct sockaddr * dest,
                int ipv6)
 {
 	int n, l;
-	char bufr[512];
+	char bufr[1024];
 
 	l = snprintf(bufr, sizeof(bufr),
 	             "NOTIFY * HTTP/1.1\r\n"
@@ -815,7 +815,7 @@ SendSSDPbyebye(int s, const struct sockaddr * dest,
 	}
 	else if((unsigned int)l >= sizeof(bufr))
 	{
-		syslog(LOG_WARNING, "SendSSDPbyebye(): truncated output");
+		//syslog(LOG_WARNING, "SendSSDPbyebye(): truncated output");
 		l = sizeof(bufr) - 1;
 	}
 	n = sendto(s, bufr, l, 0, dest,

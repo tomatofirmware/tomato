@@ -11,6 +11,9 @@ struct occupy
 	unsigned int nice;
 	unsigned int system;
 	unsigned int idle;
+	unsigned int io;
+	unsigned int irq;
+	unsigned int sirq;
 };
 
 void trim( char *str)
@@ -134,6 +137,7 @@ float get_cpupercent()
 		cal_occupy(&ocpu[i], &ncpu[i]);
 		//printf("%f \n", g_cpu_used);
 	}
+	if (g_cpu_used > 100.0) g_cpu_used = 100.0;
 	return g_cpu_used;	
 }
 
@@ -143,8 +147,8 @@ static void cal_occupy (struct occupy *o, struct occupy *n)
 	double id, sd;
 	double scale;
 
-	od = (double) (o->user + o->nice + o->system + o->idle);
-	nd = (double) (n->user + n->nice + n->system + n->idle);
+	od = (double) (o->user + o->nice + o->system + o->idle + o->io + o->irq + o->sirq);
+	nd = (double) (n->user + n->nice + n->system + n->idle + n->io + n->irq + n->sirq);
 	scale = 100.0 / (float)(nd-od);
 	id = (double) (n->user - o->user);
 	sd = (double) (n->system - o->system);
@@ -162,8 +166,9 @@ static void get_occupy (struct occupy *o)
 	for(n=0;n<cpu_num;n++)
 	{
 		fgets (buff, sizeof(buff),fd);
-		sscanf (buff, "%s %u %u %u %u", o[n].name, &o[n].user, &o[n].nice, &o[n].system, &o[n].idle);
-		//fprintf (stderr, "%s %u %u %u %u\n", o[n].name, o[n].user, o[n].nice, o[n].system, o[n].idle);
+		sscanf (buff, "%s %u %u %u %u %u %u %u", o[n].name, &o[n].user, &o[n].nice, &o[n].system, &o[n].idle, &o[n].io, &o[n].irq, &o[n].sirq);
+		//fprintf (stderr, "%s %u %u %u %u %u %u %u\n", o[n].name, o[n].user, o[n].nice, o[n].system, o[n].idle, o[n].io, o[n].irq, o[n].sirq);
 	}
 	fclose(fd);
 }
+

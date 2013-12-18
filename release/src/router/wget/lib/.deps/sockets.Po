@@ -1,0 +1,5 @@
+sockets.o sockets.o: sockets.c ../src/config.h sockets.h
+
+../src/config.h:
+
+sockets.h:

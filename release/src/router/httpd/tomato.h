@@ -35,6 +35,9 @@
 extern int rboot;
 
 extern void exec_service(const char *action);
+extern float get_cpupercent();
+extern char* get_wl_tempsense(char *);
+extern int get_cpuinfo();
 extern void wi_generic(char *url, int len, char *boundary);
 extern void common_redirect(void);
 

@@ -1,0 +1,36 @@
+#!/bin/sh
+TOP=/raid1/tomato/tomato.git/release.ar.wp.chs/src-rt/router
+CONFIGURE="$TOP/python/configure"
+CC=gcc
+CXX=g++
+DATE=$(date +%Y.%m.%d.%H.%M.%S)
+
+CC=$CC CXX=$CXX \
+	CFLAGS="-O2 -Wall -fno-delete-null-pointer-checks -funit-at-a-time \
+	--param large-function-growth=800 --param max-inline-insns-single=3000 \
+	-ffunction-sections -fdata-sections -DREADLINE_LIBRARY" \
+	LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC" \
+	LIBS="-lbz2 -lcurl -lsqlite3 -lz -lcares -lssl -lcrypto -lev -lreadline -lncurses -lform -lmenu -lpanel -ldb-4.8 -lexpat -lrt -lcrypt" \
+	CPPFLAGS="-I/usr/include/readline" \
+	$CONFIGURE --prefix=/usr --disable-ipv6 --enable-shared --includedir=/usr/include
+
+sed -i pyconfig.h -e "s/\/\* #undef HAVE_DB_185_H \*\//#define HAVE_DB_185_H 1/g"
+
+#make distclean
+rm -rf $TOP/python/hostpy/*
+make
+make install DESTDIR=$TOP/python/hostpy
+cp -f $TOP/python/Parser/pgen $TOP/python/hostpy/usr/bin
+ln -sf $TOP/python/hostpy/usr/bin/pgen Parser/hostpgen
+ln -sf $TOP/python/hostpy/usr/bin/python hostpython
+echo
+echo Backup all host python files to .hostpython.tgz ... ...
+tar cvfz .hostpython.tgz hostpy hostpython Parser/hostpgen >/dev/null 2>&1
+echo Backup done.
+echo =============================================================
+echo
+echo Testing ....................
+PYTHONHOME=$TOP/python/hostpy/usr && $PYTHONHOME/bin/python $PYTHONHOME/lib/python2.7/test/test___all__.py
+echo
+echo All done.
+echo

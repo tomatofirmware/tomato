@@ -443,6 +443,24 @@ extern void start_bittorrent();
 extern void stop_bittorrent();
 #endif
 
+// aria2.c
+#ifdef TCONFIG_ARIA2
+extern void start_aria2();
+extern void stop_aria2();
+#endif
+
+// proxy.c
+#ifdef TCONFIG_SIMPROXY
+extern void start_proxy();
+extern void stop_proxy();
+#endif
+
+// gaeproxy.c
+#ifdef TCONFIG_GAEPROXY
+extern void start_gaeproxy();
+extern void stop_gaeproxy();
+#endif
+
 // nfs.c
 #ifdef TCONFIG_NFS
 extern void start_nfs();

@@ -64,7 +64,7 @@ daemonize(void)
 		}
 
 		/* close all descriptors */
-		for (i=getdtablesize();i>=0;--i) close(i);
+		for (i=getdtablesize();i>=0;--i) close(i);		
 
 		i = open("/dev/null",O_RDWR); /* open stdin */
 		dup(i); /* stdout */
@@ -87,48 +87,13 @@ daemonize(void)
 }
 
 int
-writepidfile(const char * fname, int pid)
-{
-	char pidstring[16];
-	int pidstringlen;
-	int pidfile;
-
-	if(!fname || (strlen(fname) == 0))
-		return -1;
-	
-	if( (pidfile = open(fname, O_WRONLY|O_CREAT|O_TRUNC, 0644)) < 0)
-	{
-		DPRINTF(E_INFO, L_GENERAL, "Unable to open pidfile for writing %s: %s\n", fname, strerror(errno));
-		return -1;
-	}
-
-	pidstringlen = snprintf(pidstring, sizeof(pidstring), "%d\n", pid);
-	if(pidstringlen <= 0)
-	{
-		DPRINTF(E_INFO, L_GENERAL,
-			"Unable to write to pidfile %s: snprintf(): FAILED\n", fname);
-		close(pidfile);
-		return -1;
-	}
-	else
-	{
-		if(write(pidfile, pidstring, pidstringlen) < 0)
-			DPRINTF(E_INFO, L_GENERAL, "Unable to write to pidfile %s: %s\n", fname, strerror(errno));
-	}
-
-	close(pidfile);
-
-	return 0;
-}
-
-int
 checkforrunning(const char * fname)
 {
 	char buffer[64];
 	int pidfile;
 	pid_t pid;
 
-	if(!fname || (strlen(fname) == 0))
+	if(!fname || *fname == '\0')
 		return -1;
 
 	if( (pidfile = open(fname, O_RDONLY)) < 0)

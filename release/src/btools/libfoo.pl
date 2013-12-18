@@ -25,7 +25,18 @@ sub basename
 	}
 	return $fn;
 }
-
+sub dirname
+{
+        my $dn;
+        my $lastc;
+        my $fn = shift;
+        $dn = substr($fn, 0, length($fn)-length(basename($fn)));
+        $lastc = substr($dn, length($dn)-1, length($dn)-1);
+        if ($lastc = "/") {
+                $dn = substr($dn, 0, length($dn)-1);
+        }
+        return $dn;
+}
 sub load
 {
     my $fname = shift;
@@ -158,15 +169,187 @@ sub fixDyn
 
 #shibby
 	fixDynDep("transmission-daemon", "libevent-2.0.so.5");
-	fixDynDep("transmission-daemon", "libcurl.so.4.2.0");
+	fixDynDep("transmission-daemon", "libcurl.so.4.3.0");
 #	fixDynDep("transmission-daemon", "libiconv.so.2");
 	fixDynDep("transmission-remote", "libevent-2.0.so.5");
-	fixDynDep("transmission-remote", "libcurl.so.4.2.0");
+	fixDynDep("transmission-remote", "libcurl.so.4.3.0");
 #	fixDynDep("transmission-remote", "libiconv.so.2");
 	fixDynDep("radvd", "libdaemon.so.0.5.0");
 	fixDynDep("miniupnpd", "libnfnetlink.so.0.2.0");
 	fixDynDep("dnscrypt-proxy", "libsodium.so.4.5.0");
 
+#aria2 module, bwq518
+	fixDynDep("aria2c", "libcares.so.2.0.0");
+	fixDynDep("aria2c", "libexpat.so.1.6.0");
+	fixDynDep("aria2c", "libiconv.so.2.4.0");
+	fixDynDep("aria2c", "libstdc.so.6");
+	fixDynDep("aria2c", "libssl.so.1.0.0");
+	fixDynDep("aria2c", "libz.so.1");
+	fixDynDep("aria2c", "libsqlite3.so.0");
+#wget module, bwq518
+	fixDynDep("wgetpro", "libz.so.1");
+	fixDynDep("wgetpro", "libstdc.so.6");
+	fixDynDep("wgetpro", "libiconv.so.2.4.0");
+	fixDynDep("wgetpro", "libssl.so.1.0.0");
+#minidlna module, bwq518
+	fixDynDep("minidlna", "libz.so.1");
+	fixDynDep("minidlna", "libstdc.so.6");
+	fixDynDep("minidlna", "libiconv.so.2.4.0");
+	fixDynDep("minidlna", "libssl.so.1.0.0");
+	fixDynDep("minidlna", "libjpeg.so");
+	fixDynDep("minidlna", "libogg.so.0");
+	fixDynDep("minidlna", "libvorbis.so.0");
+	fixDynDep("minidlna", "libid3tag.so.0");
+	fixDynDep("minidlna", "libexif.so.12");
+	fixDynDep("minidlna", "libFLAC.so.8");
+	fixDynDep("libjepg.so", "libc.so.0");
+	fixDynDep("libavcodec.so.52", "libpthread.so.0");
+#python module, bwq518
+	fixDynDep("python2.7", "libpython2.7.so.1.0");
+	fixDynDep("python2.7", "libreadline.so.6.2");
+	fixDynDep("python2.7", "libsqlite3.so.0");
+	fixDynDep("python2.7", "libncurses.so.5");
+	fixDynDep("python2.7", "libcurl.so.4.3.0");
+	fixDynDep("python2.7", "libbz2.so.1.0");
+	fixDynDep("python2.7", "libev.so.4.0.0");
+	fixDynDep("python2.7", "libcares.so.2.0.0");
+	fixDynDep("python2.7", "libexpat.so.1.6.0");
+	fixDynDep("python2.7", "libstdc.so.6");
+	fixDynDep("python2.7", "libssl.so.1.0.0");
+	fixDynDep("python2.7", "libz.so.1");
+	fixDynDep("libpython2.7.so.1.0", "libbz2.so.1.0");
+	fixDynDep("libpython2.7.so.1.0", "libdb-4.8.so");
+	fixDynDep("libpython2.7.so.1.0", "libpanel.so.5");
+	fixDynDep("_curses_panel.so", "libpanel.so.5");
+	fixDynDep("readline.so", "libreadline.so.6.2");
+	fixDynDep("_ctypes.so", "libdl.so.0");
+	fixDynDep("crypt.so", "libcrypt.so.0");
+	fixDynDep("_multiprocessing.so", "libpthread.so.0");
+	fixDynDep("_json.so", "libm.so.0");
+	fixDynDep("_ctypes_test.so", "libm.so.0");
+	fixDynDep("audioop.so", "libm.so.0");
+	fixDynDep("pyexpat.so", "libexpat.so.1.6.0");
+	fixDynDep("core.so", "libev.so.4.0.0");
+	fixDynDep("core.so", "libcares.so.2.0.0");
+	fixDynDep("ares.so", "libcares.so.2.0.0");
+
+	fixDynDep("arraymodule.so", "libpython2.7.so.1.0");
+	fixDynDep("audioop.so", "libpython2.7.so.1.0");
+	fixDynDep("binascii.so", "libpython2.7.so.1.0");
+	fixDynDep("_bisectmodule.so", "libpython2.7.so.1.0");
+	fixDynDep("bsddb185module.so", "libpython2.7.so.1.0");
+	fixDynDep("bsddb185module.so", "libdb-4.8.so");
+	fixDynDep("_bsddb.so", "libpython2.7.so.1.0");
+	fixDynDep("_bsddb.so", "libdb-4.8.so");
+	fixDynDep("bz2module.so", "libpython2.7.so.1.0");
+	fixDynDep("bz2module.so", "libbz2.so.1.0");
+	fixDynDep("cmathmodule.so", "libpython2.7.so.1.0");
+	fixDynDep("cmathmodule.so", "libm.so.0");
+	fixDynDep("_codecs_cn.so", "libpython2.7.so.1.0");
+	fixDynDep("_codecs_hk.so", "libpython2.7.so.1.0");
+	fixDynDep("_codecs_iso2022.so", "libpython2.7.so.1.0");
+	fixDynDep("_codecs_jp.so", "libpython2.7.so.1.0");
+	fixDynDep("_codecs_kr.so", "libpython2.7.so.1.0");
+	fixDynDep("_codecs_tw.so", "libpython2.7.so.1.0");
+	fixDynDep("_collectionsmodule.so", "libpython2.7.so.1.0");
+	fixDynDep("cPickle.so", "libpython2.7.so.1.0");
+	fixDynDep("cryptmodule.so", "libpython2.7.so.1.0");
+	fixDynDep("cryptmodule.so", "libcrypt.so.0");
+	fixDynDep("cStringIO.so", "libpython2.7.so.1.0");
+	fixDynDep("_csv.so", "libpython2.7.so.1.0");
+	fixDynDep("_ctypes.so", "libpython2.7.so.1.0");
+	fixDynDep("_ctypes_test.so", "libpython2.7.so.1.0");
+	fixDynDep("_cursesmodule.so", "libncurses.so.5");
+	fixDynDep("_cursesmodule.so", "libpython2.7.so.1.0");
+	fixDynDep("_curses_panel.so", "libpython2.7.so.1.0");
+	fixDynDep("datetimemodule.so", "libpython2.7.so.1.0");
+	fixDynDep("datetimemodule.so", "libc.so.0");
+	fixDynDep("datetimemodule.so", "libm.so.0");
+	fixDynDep("datetimemodule.so", "timemodule.so");
+	fixDynDep("dlmodule.so", "libpython2.7.so.1.0");
+	fixDynDep("dlmodule.so", "libdl.so.0");
+	fixDynDep("_elementtree.so", "libpython2.7.so.1.0");
+	fixDynDep("fcntlmodule.so", "libpython2.7.so.1.0");
+	fixDynDep("_functoolsmodule.so", "libpython2.7.so.1.0");
+	fixDynDep("future_builtins.so", "libpython2.7.so.1.0");
+	fixDynDep("grpmodule.so", "libpython2.7.so.1.0");
+	fixDynDep("_heapq.so", "libpython2.7.so.1.0");
+	fixDynDep("_hotshot.so", "libpython2.7.so.1.0");
+	fixDynDep("imageop.so", "libpython2.7.so.1.0");
+	fixDynDep("_io.so", "libpython2.7.so.1.0");
+	fixDynDep("itertoolsmodule.so", "libpython2.7.so.1.0");
+	fixDynDep("_json.so", "libpython2.7.so.1.0");
+	fixDynDep("linuxaudiodev.so", "libpython2.7.so.1.0");
+	fixDynDep("_localemodule.so", "libpython2.7.so.1.0");
+	fixDynDep("_lsprof.so", "libpython2.7.so.1.0");
+	fixDynDep("mathmodule.so", "libpython2.7.so.1.0");
+	fixDynDep("mathmodule.so", "libm.so.0");
+	fixDynDep("_md5module.so", "libpython2.7.so.1.0");
+	fixDynDep("mmapmodule.so", "libpython2.7.so.1.0");
+	fixDynDep("_multibytecodecmodule.so", "libpython2.7.so.1.0");
+	fixDynDep("_multiprocessing.so", "libpython2.7.so.1.0");
+	fixDynDep("operator.so", "libpython2.7.so.1.0");
+	fixDynDep("ossaudiodev.so", "libpython2.7.so.1.0");
+	fixDynDep("parsermodule.so", "libpython2.7.so.1.0");
+	fixDynDep("pyexpat.so", "libpython2.7.so.1.0");
+	fixDynDep("pyexpat.so", "libexpat.so.1.6.0");
+	fixDynDep("_randommodule.so", "libpython2.7.so.1.0");
+	fixDynDep("readline.so", "libpython2.7.so.1.0");
+	fixDynDep("resource.so", "libpython2.7.so.1.0");
+	fixDynDep("selectmodule.so", "libpython2.7.so.1.0");
+	fixDynDep("_sha256module.so", "libpython2.7.so.1.0");
+	fixDynDep("_sha512module.so", "libpython2.7.so.1.0");
+	fixDynDep("_shamodule.so", "libpython2.7.so.1.0");
+	fixDynDep("_socketmodule.so", "libpython2.7.so.1.0");
+	fixDynDep("spwdmodule.so", "libpython2.7.so.1.0");
+	fixDynDep("_sqlite3.so", "libpython2.7.so.1.0");
+	fixDynDep("_sqlite3.so", "libsqlite3.so.0");
+	fixDynDep("_ssl.so", "libpython2.7.so.1.0");
+	fixDynDep("_ssl.so", "libssl.so.1.0.0");
+	fixDynDep("_ssl.so", "libcrypto.so.1.0.0");
+	fixDynDep("stropmodule.so", "libpython2.7.so.1.0");
+	fixDynDep("_struct.so", "libpython2.7.so.1.0");
+	fixDynDep("syslogmodule.so", "libpython2.7.so.1.0");
+	fixDynDep("termios.so", "libpython2.7.so.1.0");
+	fixDynDep("_testcapi.so", "libpython2.7.so.1.0");
+	fixDynDep("timemodule.so", "libpython2.7.so.1.0");
+	fixDynDep("timemodule.so", "libc.so.0");
+	fixDynDep("timemodule.so", "libm.so.0");
+	fixDynDep("unicodedata.so", "libpython2.7.so.1.0");
+	fixDynDep("xxsubtype.so", "libpython2.7.so.1.0");
+	fixDynDep("zlibmodule.so", "libpython2.7.so.1.0");
+	fixDynDep("zlibmodule.so", "libz.so.1");
+#iptables, bwq518
+	fixDynDep("xtables-multi", "libxtables.so.10.0.0");
+	fixDynDep("xtables-multi", "libiptc.so.0.0.0");
+	fixDynDep("xtables-multi", "libip4tc.so.0.1.0");
+	fixDynDep("xtables-multi", "libip6tc.so.0.1.0");
+	fixDynDep("nfnl_osf", "libnfnetlink.so.0.2.0");
+	foreach (@elfs) {
+		if (/^libipt_.\.so$/) {
+			fixDynDep("xtables-multi", $_);
+			fixDynDep("libxtables.so.10.0.0", $_);
+			fixDynDep("libiptc.so.0.0.0", $_);
+			fixDynDep("libip4tc.so.0.1.0", $_);
+			fixDynDep("libip6tc.so.0.1.0", $_);
+		}
+		elsif (/^libip6t_.\.so$/) {
+			fixDynDep("xtables-multi", $_);
+			fixDynDep("libxtables.so.10.0.0", $_);
+			fixDynDep("libiptc.so.0.0.0", $_);
+			fixDynDep("libip4tc.so.0.1.0", $_);
+			fixDynDep("libip6tc.so.0.1.0", $_);
+		}
+		elsif (/^libxt_.\.so$/) {
+			fixDynDep("xtables-multi", $_);
+			fixDynDep("libxtables.so.10.0.0", $_);
+			fixDynDep("libiptc.so.0.0.0", $_);
+			fixDynDep("libip4tc.so.0.1.0", $_);
+			fixDynDep("libip6tc.so.0.1.0", $_);
+		}
+	}
+	fixDynDep("miniupnpd", "libip4tc.so.0.1.0");
+ 
 #ipset modules
 	fixDynDep("libipset_iphash.so", "ipset");
 	fixDynDep("libipset_iptree.so", "ipset");
@@ -189,6 +372,13 @@ sub fixDyn
 
 #	fixDynDep("libbcm.so", "libshared.so");
 #	fixDynDep("libbcm.so", "libc.so.0");
+#for get_ifname_by_wlmac,wl_wlif_is_psta
+	fixDynDep("eapd", "libshared.so");
+#for nvram_default_get
+	fixDynDep("wlconf", "libshared.so");
+	fixDynDep("libusb-1.0.so", "libc.so.0");
+	fixDynDep("libusb-1.0.so", "libutil.so.0");
+	fixDynDep("pptpctrl", "libutil.so.0");
 
 #!!TB - Updated Broadcom WL driver
 	fixDynDep("libbcmcrypto.so", "libc.so.0");
@@ -245,7 +435,7 @@ sub fillGaps
 	my $t;
 	my $found;
 
-#	print "Resolving implicit links...\n";
+	print "Resolving implicit links...\n";
 	
 	foreach $name (@elfs) {
 		foreach $sym (keys %{$elf_ext{$name}}) {
@@ -276,7 +466,7 @@ sub fillGaps
 				
 				if ($found == 0) {
 					print "Unable to resolve $sym used by $name\n", @users;
-					exit 1;
+#					exit 1;
 				}
 			}
 		}
@@ -360,6 +550,8 @@ sub genSO
 	my @unused;
 	my $cmd;
 	my $before, $after;
+	my @so_fname;
+	my $so_symlinks;
 
 	if (!-f $so) {
 		print "$name: not found, skipping...\n";
@@ -399,6 +591,10 @@ sub genSO
 	if (scalar(@used) == 0) {
 		print "$name: WARNING: Library is not used by anything, deleting...\n";
 		unlink $so;
+		@so_fname=split(/\./,$name);
+		$so_symlinks=dirname($so)."\/".@so_fname[0]."\.so\*";
+		print "$so_symlinks: WARNING: Symbol links is invalid, deleting...\n";
+		unlink glob $so_symlinks;
 #		<>;
 		return 0;
 	}
@@ -477,9 +673,9 @@ genSO("${root}/usr/lib/libvorbis.so.0", "${router}/libvorbis/lib/.libs/libvorbis
 genSO("${root}/usr/lib/libid3tag.so.0", "${router}/libid3tag/.libs/libid3tag.a", "", "-L${router}/zlib");
 genSO("${root}/usr/lib/libexif.so.12", "${router}/libexif/libexif/.libs/libexif.a");
 genSO("${root}/usr/lib/libFLAC.so.8", "${router}/flac/src/libFLAC/.libs/libFLAC.a", "", "-L${router}/libogg/src/.libs");
-genSO("${root}/usr/lib/libavcodec.so.52", "${router}/ffmpeg/libavcodec/libavcodec.a", "", "-L${router}/ffmpeg/libavutil");
-genSO("${root}/usr/lib/libavutil.so.50", "${router}/ffmpeg/libavutil/libavutil.a");
-genSO("${root}/usr/lib/libavformat.so.52", "${router}/ffmpeg/libavformat/libavformat.a", "", "-L${router}/ffmpeg/libavutil -L${router}/ffmpeg/libavcodec");
+genSO("${root}/usr/lib/libavcodec.so.52", "${router}/ffmpeg/libavcodec/libavcodec.a", "", "-L${router}/ffmpeg/libavutil -L${router}/zlib");
+genSO("${root}/usr/lib/libavutil.so.50", "${router}/ffmpeg/libavutil/libavutil.a", "-L${router}/zlib");
+genSO("${root}/usr/lib/libavformat.so.52", "${router}/ffmpeg/libavformat/libavformat.a", "", "-L${router}/ffmpeg/libavutil -L${router}/ffmpeg/libavcodec -L${router}/zlib");
 genSO("${root}/usr/lib/libsmb.so", "${router}/samba/source/bin/libsmb.a");
 genSO("${root}/usr/lib/libbigballofmud.so", "${router}/samba3/source/bin/libbigballofmud.a");
 
@@ -494,12 +690,20 @@ genSO("${root}/usr/lib/liblzo2.so.2", "${router}/lzo/src/.libs/liblzo2.a");
 genSO("${root}/usr/lib/libbcmcrypto.so", "${router}/libbcmcrypto/libbcmcrypto.a");
 
 #shibby
-genSO("${root}/usr/lib/libcurl.so.4.2.0", "${router}/libcurl/lib/.libs/libcurl.a", "", "-L${router}/zlib");
+genSO("${root}/usr/lib/libcurl.so.4.3.0", "${router}/libcurl/lib/.libs/libcurl.a", "", "-L${router}/zlib");
 genSO("${root}/usr/lib/libevent-2.0.so.5", "${router}/libevent/.libs/libevent.a");
 genSO("${root}/usr/lib/libdaemon.so.0.5.0", "${router}/libdaemon/libdaemon/.libs/libdaemon.a");
 #genSO("${root}/usr/lib/libiconv.so.2", "${router}/libiconv/lib/.libs/libiconv.a");
+genSO("${root}/usr/lib/libiconv.so.2.4.0", "${router}/libiconv/lib/.libs/libiconv.a");
 genSO("${root}/usr/lib/libnfnetlink.so.0.2.0", "${router}/libnfnetlink/src/.libs/libnfnetlink.a");
 genSO("${root}/usr/lib/libsodium.so.4.5.0", "${router}/libsodium/src/libsodium/.libs/libsodium.a");
+#bwq
+#genSO("${root}/usr/lib/libexpat.so.1.6.0", "${router}/libexpat/.libs/libexpat.a");
+#genSO("${root}/usr/lib/libcares.so.2.0.0", "${router}/libcares/.libs/libcares.a");
+#genSO("${root}/usr/lib/libpython2.7.so.1.0", "${router}/python/libpython2.7.a");
+#genSO("${root}/usr/lib/libncurses.so.5", "${router}/libncurses/lib/libncurses.a");
+#genSO("${root}/usr/lib/libdb-4.8.so", "${router}/libdb/build_unix/.libs/libdb-4.8.a");
+#genSO("${root}/usr/lib/libpanel.so.5", "${router}/libncurses/lib/libpanel.a");
 
 print "\n";
 

@@ -1,0 +1,12 @@
+*.so
+*.pyd
+*.pyc
+*.pyo
+build/
+dist/
+.tox/
+greenlet.egg-info/
+/doc/_build
+__pycache__/
+/.ropeproject/
+/MANIFEST

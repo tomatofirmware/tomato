@@ -51,6 +51,18 @@ ifeq ($(TCONFIG_BT),y)
 OBJS += transmission.o
 endif
 
+ifeq ($(TCONFIG_ARIA2),y)
+OBJS += aria2.o
+endif
+
+ifeq ($(TCONFIG_SIMPROXY),y)
+OBJS += proxy.o
+endif
+
+ifeq ($(TCONFIG_GAEPROXY),y)
+OBJS += gaeproxy.o
+endif
+
 ifeq ($(TCONFIG_NFS),y)
 OBJS += nfs.o
 endif
