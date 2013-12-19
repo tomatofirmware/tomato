@@ -1161,6 +1161,12 @@ w1800rz:
 	@$(MAKE) z MIPS32=r2 NVRAM_64K=y ASUS_TRX="W1800R"
 endif
 
+#Netgear WNDR series with 64K NVRAM Builds
+wndr64:
+	@$(MAKE) bin MIPS32=r2 NVRAM_SIZE=64 OPENVPN=n NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y IPV6SUPP=y B=W BUILD_DESC="WNDR" USB="USB" SNMP=y DNSCRYPT=y PPTPD=y	
+wndr64-sm:
+	@$(MAKE) bin MIPS32=r2 NVRAM_SIZE=64 OPENVPN=n NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y IPV6SUPP=n B=W BUILD_DESC="WNDRsm" USB="USB" SNMP=y DNSCRYPT=y PPTPD=n
+
 # end ofCONFIG_LINUX26
 endif
 
@@ -1290,6 +1296,10 @@ ifeq ($(CONFIG_LINUX26),y)
 	@echo "r64t         RT-N66u build BT-VPN"
 	@echo "r64o         RT-N66u build Mega-VPN"
 	@echo "r64z         RT-N66u build AIO"
+	@echo "       Netgear WNDR series with 64k Nvram/8MB Flash(WNDR4000/3400/3700v3)"
+	@echo "wndr64       Netgear WNDR series(64k Nvram) build, no VPN"
+	@echo "wndr64-sm    Netgear WNDR series(64k Nvram) build, Small"
+
 endif
 	@echo ""
 	@echo "..etc..      other build configs"
