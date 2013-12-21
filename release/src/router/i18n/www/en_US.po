@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TomatoEgg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-06 10:57-0500\n"
-"PO-Revision-Date: 2013-11-06 10:59-0500\n"
+"POT-Creation-Date: 2013-12-21 15:39-0500\n"
+"PO-Revision-Date: 2013-12-21 15:42-0500\n"
 "Last-Translator: Zhiqiang <Wang.9264@gmail.com>\n"
 "Language-Team: TomatoEgg Translators <translate@tomatoegg.net>\n"
 "MIME-Version: 1.0\n"
@@ -27,13 +27,178 @@ msgstr "English"
 msgid "Chinese"
 msgstr "Chinese"
 
-#: ../www/advanced-ctnf.asp:14 ../www/advanced-dhcpdns.asp:14
-#: ../www/advanced-firewall.asp:18 ../www/advanced-mac.asp:14
-#: ../www/advanced-misc.asp:14 ../www/advanced-routing.asp:14
-#: ../www/advanced-tor.asp:13 ../www/advanced-vlan.asp:22
+#: ../www/advanced-access.asp:14 ../www/advanced-ctnf.asp:14
+#: ../www/advanced-dhcpdns.asp:14 ../www/advanced-firewall.asp:18
+#: ../www/advanced-mac.asp:14 ../www/advanced-misc.asp:14
+#: ../www/advanced-routing.asp:14 ../www/advanced-tor.asp:13
+#: ../www/advanced-vlan.asp:22 ../www/advanced-wireless.asp:14
 #: ../www/advanced-wlanvifs.asp:21 ../www/tomato.js:2386
 msgid "Advanced"
 msgstr "Advanced"
+
+#: ../www/advanced-access.asp:14 ../www/advanced-access.asp:237
+#: ../www/tomato.js:2397
+msgid "LAN Access"
+msgstr "LAN Access"
+
+#: ../www/advanced-access.asp:56 ../www/advanced-vlan.asp:685
+#: ../www/advanced-vlan.asp:687 ../www/advanced-vlan.asp:689
+#: ../www/advanced-vlan.asp:691 ../www/advanced-vlan.asp:693
+#: ../www/advanced-wireless.asp:175 ../www/forward-basic.asp:142
+msgid "On"
+msgstr "On"
+
+#: ../www/advanced-access.asp:56 ../www/advanced-access.asp:246
+msgid "Src"
+msgstr "Src"
+
+#: ../www/advanced-access.asp:56 ../www/basic-ipv6.asp:351
+#: ../www/basic-ipv6.asp:352 ../www/status-overview.asp:374
+#: ../www/status-overview.asp:376 ../www/status-overview.asp:381
+#: ../www/tools-ping.asp:49 ../www/tools-ping.asp:206
+msgid "Address"
+msgstr "Address"
+
+#: ../www/advanced-access.asp:56 ../www/advanced-access.asp:248
+msgid "Dst"
+msgstr "Dst"
+
+#: ../www/advanced-access.asp:56 ../www/advanced-routing.asp:83
+#: ../www/basic-wfilter.asp:81 ../www/forward-basic-ipv6.asp:117
+#: ../www/forward-basic.asp:142 ../www/forward-triggered.asp:102
+#: ../www/forward-upnp.asp:77 ../www/restrict.asp:47
+msgid "Description"
+msgstr "Description"
+
+#: ../www/advanced-access.asp:134
+msgid "Source and Destination interfaces must be different"
+msgstr "Source and Destination interfaces must be different"
+
+#: ../www/advanced-access.asp:226 ../www/advanced-ctnf.asp:175
+#: ../www/advanced-dhcpdns.asp:126 ../www/advanced-firewall.asp:97
+#: ../www/advanced-mac.asp:141 ../www/advanced-misc.asp:63
+#: ../www/advanced-routing.asp:199 ../www/advanced-vlan.asp:878
+#: ../www/advanced-wireless.asp:99 ../www/advanced-wlanvifs.asp:1333
+#: ../www/basic-ddns.asp:349 ../www/basic-ident.asp:45
+#: ../www/basic-ipv6.asp:305 ../www/basic-static.asp:344
+#: ../www/basic-time.asp:146 ../www/basic-wfilter.asp:157
+#: ../www/bwm-24.asp:153 ../www/bwm-daily.asp:134 ../www/bwm-monthly.asp:107
+#: ../www/bwm-realtime.asp:144 ../www/bwm-weekly.asp:234
+#: ../www/forward-basic-ipv6.asp:166 ../www/forward-basic.asp:201
+#: ../www/forward-dmz.asp:106 ../www/forward-triggered.asp:146
+#: ../www/forward-upnp.asp:216 ../www/ipt-24.asp:313 ../www/ipt-daily.asp:441
+#: ../www/ipt-details.asp:448 ../www/ipt-graphs.asp:299
+#: ../www/ipt-monthly.asp:443 ../www/ipt-realtime.asp:268
+#: ../www/nas-aria2.asp:71 ../www/nas-shairport.asp:62
+#: ../www/qos-settings.asp:180 ../www/restrict.asp:113
+#: ../www/status-devices.asp:340 ../www/status-log.asp:47
+#: ../www/status-overview.asp:328 ../www/status-webmon.asp:360
+#: ../www/tools-ping.asp:193 ../www/tools-shell.asp:106
+#: ../www/tools-survey.asp:309 ../www/tools-wol.asp:188
+msgid "Tomato"
+msgstr "Tomato"
+
+#: ../www/advanced-access.asp:227 ../www/advanced-ctnf.asp:176
+#: ../www/advanced-dhcpdns.asp:127 ../www/advanced-firewall.asp:98
+#: ../www/advanced-mac.asp:142 ../www/advanced-misc.asp:64
+#: ../www/advanced-routing.asp:200 ../www/advanced-vlan.asp:879
+#: ../www/advanced-wireless.asp:100 ../www/advanced-wlanvifs.asp:1334
+#: ../www/basic-ddns.asp:350 ../www/basic-ident.asp:46
+#: ../www/basic-static.asp:345 ../www/basic-time.asp:147
+#: ../www/basic-wfilter.asp:158 ../www/bwm-24.asp:154 ../www/bwm-daily.asp:135
+#: ../www/bwm-monthly.asp:108 ../www/bwm-realtime.asp:145
+#: ../www/bwm-weekly.asp:235 ../www/forward-basic-ipv6.asp:167
+#: ../www/forward-basic.asp:202 ../www/forward-dmz.asp:107
+#: ../www/forward-triggered.asp:147 ../www/forward-upnp.asp:217
+#: ../www/ipt-24.asp:314 ../www/ipt-daily.asp:442 ../www/ipt-details.asp:449
+#: ../www/ipt-graphs.asp:300 ../www/ipt-monthly.asp:444
+#: ../www/ipt-realtime.asp:269 ../www/nas-aria2.asp:72
+#: ../www/nas-shairport.asp:63 ../www/qos-settings.asp:181
+#: ../www/restrict.asp:114 ../www/status-devices.asp:341
+#: ../www/status-log.asp:48 ../www/status-overview.asp:329
+#: ../www/status-webmon.asp:361 ../www/tools-ping.asp:194
+#: ../www/tools-shell.asp:107 ../www/tools-survey.asp:310
+#: ../www/tools-wol.asp:189
+msgid "Version"
+msgstr "Version"
+
+#: ../www/advanced-access.asp:243 ../www/advanced-dhcpdns.asp:187
+#: ../www/advanced-tor.asp:157 ../www/advanced-vlan.asp:991
+#: ../www/advanced-wlanvifs.asp:1405 ../www/basic-static.asp:375
+msgid "Notes"
+msgstr "Notes"
+
+#: ../www/advanced-access.asp:246
+msgid "Source LAN bridge"
+msgstr "Source LAN bridge"
+
+#: ../www/advanced-access.asp:247 ../www/forward-basic-ipv6.asp:117
+#: ../www/forward-basic-ipv6.asp:189 ../www/forward-basic.asp:142
+#: ../www/forward-basic.asp:223
+msgid "Src Address"
+msgstr "Src Address"
+
+#: ../www/advanced-access.asp:247 ../www/advanced-access.asp:249
+#: ../www/basic-network.asp:1672 ../www/forward-basic-ipv6.asp:189
+#: ../www/forward-basic-ipv6.asp:190 ../www/forward-basic.asp:223
+#: ../www/forward-basic.asp:225 ../www/forward-dmz.asp:133
+msgid "optional"
+msgstr "optional"
+
+#: ../www/advanced-access.asp:247
+msgid "Source address allowed"
+msgstr "Source address allowed"
+
+#: ../www/advanced-access.asp:247 ../www/forward-basic-ipv6.asp:189
+#: ../www/forward-basic-ipv6.asp:191 ../www/forward-basic.asp:223
+#: ../www/forward-basic.asp:224
+msgid "Ex"
+msgstr "Ex"
+
+#: ../www/advanced-access.asp:248
+msgid "Destination LAN bridge"
+msgstr "Destination LAN bridge"
+
+#: ../www/advanced-access.asp:249
+msgid "Dst Address"
+msgstr "Dst Address"
+
+#: ../www/advanced-access.asp:249
+msgid "Destination address inside the LAN"
+msgstr "Destination address inside the LAN"
+
+#: ../www/advanced-access.asp:256 ../www/advanced-ctnf.asp:303
+#: ../www/advanced-dhcpdns.asp:221 ../www/advanced-firewall.asp:172
+#: ../www/advanced-mac.asp:199 ../www/advanced-misc.asp:110
+#: ../www/advanced-routing.asp:262 ../www/advanced-tor.asp:172
+#: ../www/advanced-vlan.asp:1051 ../www/advanced-wireless.asp:214
+#: ../www/advanced-wlanvifs.asp:561 ../www/advanced-wlanvifs.asp:1013
+#: ../www/advanced-wlanvifs.asp:1609 ../www/basic-ddns.asp:464
+#: ../www/basic-ident.asp:74 ../www/basic-ipv6.asp:373
+#: ../www/basic-network.asp:1796 ../www/basic-static.asp:403
+#: ../www/basic-time.asp:292 ../www/basic-wfilter.asp:197
+#: ../www/forward-basic-ipv6.asp:203 ../www/forward-basic.asp:239
+#: ../www/forward-dmz.asp:148 ../www/forward-triggered.asp:180
+#: ../www/forward-upnp.asp:281 ../www/nas-aria2.asp:124
+#: ../www/nas-shairport.asp:100 ../www/qos-settings.asp:347
+msgid "Save"
+msgstr "Save"
+
+#: ../www/advanced-access.asp:257 ../www/advanced-ctnf.asp:304
+#: ../www/advanced-dhcpdns.asp:222 ../www/advanced-firewall.asp:173
+#: ../www/advanced-mac.asp:200 ../www/advanced-misc.asp:111
+#: ../www/advanced-routing.asp:263 ../www/advanced-tor.asp:173
+#: ../www/advanced-vlan.asp:1052 ../www/advanced-wireless.asp:215
+#: ../www/advanced-wlanvifs.asp:1610 ../www/basic-ddns.asp:465
+#: ../www/basic-ident.asp:75 ../www/basic-ipv6.asp:374
+#: ../www/basic-network.asp:1797 ../www/basic-static.asp:404
+#: ../www/basic-time.asp:293 ../www/basic-wfilter.asp:198
+#: ../www/forward-basic-ipv6.asp:204 ../www/forward-basic.asp:240
+#: ../www/forward-dmz.asp:149 ../www/forward-triggered.asp:181
+#: ../www/forward-upnp.asp:282 ../www/nas-aria2.asp:125
+#: ../www/nas-shairport.asp:101 ../www/qos-settings.asp:348
+msgid "Cancel"
+msgstr "Cancel"
 
 #: ../www/advanced-ctnf.asp:14
 msgid "Conntrack"
@@ -42,35 +207,6 @@ msgstr "Conntrack"
 #: ../www/advanced-ctnf.asp:14
 msgid "Netfilter"
 msgstr "Netfilter"
-
-#: ../www/advanced-ctnf.asp:175 ../www/advanced-dhcpdns.asp:126
-#: ../www/advanced-firewall.asp:97 ../www/advanced-mac.asp:141
-#: ../www/advanced-misc.asp:63 ../www/advanced-vlan.asp:870
-#: ../www/basic-ipv6.asp:305 ../www/bwm-24.asp:153 ../www/bwm-daily.asp:134
-#: ../www/bwm-monthly.asp:107 ../www/bwm-realtime.asp:144
-#: ../www/bwm-weekly.asp:234 ../www/ipt-24.asp:313 ../www/ipt-daily.asp:441
-#: ../www/ipt-details.asp:448 ../www/ipt-graphs.asp:299
-#: ../www/ipt-monthly.asp:443 ../www/ipt-realtime.asp:268
-#: ../www/nas-aria2.asp:71 ../www/nas-shairport.asp:62
-#: ../www/status-devices.asp:340 ../www/status-log.asp:47
-#: ../www/status-overview.asp:341 ../www/status-webmon.asp:360
-#: ../www/tools-ping.asp:193
-msgid "Tomato"
-msgstr "Tomato"
-
-#: ../www/advanced-ctnf.asp:176 ../www/advanced-dhcpdns.asp:127
-#: ../www/advanced-firewall.asp:98 ../www/advanced-mac.asp:142
-#: ../www/advanced-misc.asp:64 ../www/advanced-vlan.asp:871
-#: ../www/bwm-24.asp:154 ../www/bwm-daily.asp:135 ../www/bwm-monthly.asp:108
-#: ../www/bwm-realtime.asp:145 ../www/bwm-weekly.asp:235 ../www/ipt-24.asp:314
-#: ../www/ipt-daily.asp:442 ../www/ipt-details.asp:449
-#: ../www/ipt-graphs.asp:300 ../www/ipt-monthly.asp:444
-#: ../www/ipt-realtime.asp:269 ../www/nas-aria2.asp:72
-#: ../www/nas-shairport.asp:63 ../www/status-devices.asp:341
-#: ../www/status-log.asp:48 ../www/status-overview.asp:342
-#: ../www/status-webmon.asp:361 ../www/tools-ping.asp:194
-msgid "Version"
-msgstr "Version"
 
 #: ../www/advanced-ctnf.asp:200
 msgid "Connections"
@@ -96,7 +232,8 @@ msgstr "Drop Idle"
 msgid "TCP Timeout"
 msgstr "TCP Timeout"
 
-#: ../www/advanced-ctnf.asp:224
+#: ../www/advanced-ctnf.asp:224 ../www/advanced-wireless.asp:192
+#: ../www/qos-settings.asp:242
 msgid "None"
 msgstr "None"
 
@@ -137,7 +274,7 @@ msgid "Listen"
 msgstr "Listen"
 
 #: ../www/advanced-ctnf.asp:225 ../www/advanced-ctnf.asp:243
-#: ../www/advanced-ctnf.asp:257
+#: ../www/advanced-ctnf.asp:257 ../www/forward-upnp.asp:257
 msgid "seconds"
 msgstr "seconds"
 
@@ -182,7 +319,7 @@ msgid "GRE"
 msgstr "GRE"
 
 #: ../www/advanced-ctnf.asp:269 ../www/basic-network.asp:1605
-#: ../www/status-overview.asp:388
+#: ../www/status-overview.asp:375
 msgid "PPTP"
 msgstr "PPTP"
 
@@ -217,38 +354,15 @@ msgstr "TTL Adjust"
 msgid "Inbound Layer 7"
 msgstr "Inbound Layer 7"
 
-#: ../www/advanced-ctnf.asp:303 ../www/advanced-dhcpdns.asp:221
-#: ../www/advanced-firewall.asp:172 ../www/advanced-mac.asp:199
-#: ../www/advanced-misc.asp:110 ../www/advanced-routing.asp:262
-#: ../www/advanced-tor.asp:172 ../www/advanced-vlan.asp:1043
-#: ../www/advanced-wlanvifs.asp:561 ../www/advanced-wlanvifs.asp:1013
-#: ../www/advanced-wlanvifs.asp:1609 ../www/basic-ident.asp:74
-#: ../www/basic-ipv6.asp:373 ../www/basic-network.asp:1796
-#: ../www/basic-time.asp:292 ../www/nas-aria2.asp:124
-#: ../www/nas-shairport.asp:100
-msgid "Save"
-msgstr "Save"
-
-#: ../www/advanced-ctnf.asp:304 ../www/advanced-dhcpdns.asp:222
-#: ../www/advanced-firewall.asp:173 ../www/advanced-mac.asp:200
-#: ../www/advanced-misc.asp:111 ../www/advanced-routing.asp:263
-#: ../www/advanced-tor.asp:173 ../www/advanced-vlan.asp:1044
-#: ../www/advanced-wlanvifs.asp:1610 ../www/basic-ident.asp:75
-#: ../www/basic-ipv6.asp:374 ../www/basic-network.asp:1797
-#: ../www/basic-time.asp:293 ../www/nas-aria2.asp:125
-#: ../www/nas-shairport.asp:101
-msgid "Cancel"
-msgstr "Cancel"
-
 #: ../www/advanced-dhcpdns.asp:14 ../www/advanced-dhcpdns.asp:149
 #: ../www/advanced-dhcpdns.asp:190 ../www/basic-network.asp:1605
-#: ../www/status-overview.asp:388 ../www/status-overview.asp:474
+#: ../www/status-overview.asp:375 ../www/status-overview.asp:461
 msgid "DHCP"
 msgstr "DHCP"
 
 #: ../www/advanced-dhcpdns.asp:14 ../www/advanced-dhcpdns.asp:149
-#: ../www/advanced-dhcpdns.asp:190 ../www/status-overview.asp:396
-#: ../www/status-overview.asp:473
+#: ../www/advanced-dhcpdns.asp:190 ../www/status-overview.asp:383
+#: ../www/status-overview.asp:460
 msgid "DNS"
 msgstr "DNS"
 
@@ -276,7 +390,7 @@ msgstr "Intercept DNS port<br>(UDP 53)"
 msgid "Use user-entered gateway if WAN is disabled"
 msgstr "Use user-entered gateway if WAN is disabled"
 
-#: ../www/advanced-dhcpdns.asp:158
+#: ../www/advanced-dhcpdns.asp:158 ../www/basic-static.asp:371
 msgid "Ignore DHCP requests from unknown devices"
 msgstr "Ignore DHCP requests from unknown devices"
 
@@ -321,7 +435,7 @@ msgid "Dnsmasq"
 msgstr "Dnsmasq"
 
 #: ../www/advanced-dhcpdns.asp:169 ../www/advanced-dhcpdns.asp:200
-#: ../www/nas-aria2.asp:106
+#: ../www/forward-upnp.asp:270 ../www/nas-aria2.asp:106
 msgid "Custom configuration"
 msgstr "Custom configuration"
 
@@ -337,13 +451,8 @@ msgstr "DHCPC Options"
 msgid "Reduce packet size"
 msgstr "Reduce packet size"
 
-#: ../www/advanced-dhcpdns.asp:187 ../www/advanced-tor.asp:157
-#: ../www/advanced-vlan.asp:983 ../www/advanced-wlanvifs.asp:1405
-msgid "Notes"
-msgstr "Notes"
-
-#: ../www/advanced-dhcpdns.asp:187 ../www/advanced-vlan.asp:847
-#: ../www/advanced-vlan.asp:983 ../www/advanced-wlanvifs.asp:532
+#: ../www/advanced-dhcpdns.asp:187 ../www/advanced-vlan.asp:855
+#: ../www/advanced-vlan.asp:991 ../www/advanced-wlanvifs.asp:532
 #: ../www/advanced-wlanvifs.asp:1374 ../www/advanced-wlanvifs.asp:1393
 #: ../www/advanced-wlanvifs.asp:1405 ../www/ipt-details.asp:467
 #: ../www/ipt-monthly.asp:366 ../www/ipt-monthly.asp:458
@@ -429,8 +538,8 @@ msgstr "Extra options to be added to the Dnsmasq configuration file."
 msgid "Extra options for the DHCP client."
 msgstr "Extra options for the DHCP client."
 
-#: ../www/advanced-dhcpdns.asp:209 ../www/advanced-vlan.asp:1009
-#: ../www/advanced-wlanvifs.asp:1424
+#: ../www/advanced-dhcpdns.asp:209 ../www/advanced-vlan.asp:1017
+#: ../www/advanced-wlanvifs.asp:1424 ../www/basic-static.asp:386
 msgid "Other relevant notes/hints"
 msgstr "Other relevant notes/hints"
 
@@ -458,6 +567,10 @@ msgstr "Respond to ICMP ping"
 #: ../www/advanced-firewall.asp:129
 msgid "Limits per second"
 msgstr "Limits per second"
+
+#: ../www/advanced-firewall.asp:130 ../www/advanced-firewall.asp:131
+msgid "request per second"
+msgstr "request per second"
 
 #: ../www/advanced-firewall.asp:131
 msgid "Traceroute"
@@ -495,7 +608,7 @@ msgstr "Multicast"
 msgid "Enable IGMPproxy"
 msgstr "Enable IGMPproxy"
 
-#: ../www/advanced-firewall.asp:153 ../www/status-overview.asp:413
+#: ../www/advanced-firewall.asp:153 ../www/status-overview.asp:400
 msgid "LAN"
 msgstr "LAN"
 
@@ -529,7 +642,9 @@ msgstr "Udpxy port"
 
 #: ../www/advanced-mac.asp:14 ../www/advanced-mac.asp:163
 #: ../www/basic-network.asp:1726 ../www/basic-network.asp:1779
-#: ../www/status-devices.asp:320 ../www/status-overview.asp:499
+#: ../www/basic-static.asp:261 ../www/basic-static.asp:378
+#: ../www/basic-wfilter.asp:81 ../www/status-devices.asp:320
+#: ../www/status-overview.asp:486 ../www/tools-wol.asp:53
 #: ../www/tomato.js:2390
 msgid "MAC Address"
 msgstr "MAC Address"
@@ -546,12 +661,13 @@ msgstr ""
 "Warning: Changing the MAC address may require that you reboot all devices, "
 "computers or modem connected to this router. Continue anyway?"
 
-#: ../www/advanced-mac.asp:168
+#: ../www/advanced-mac.asp:168 ../www/advanced-vlan.asp:440
 msgid "WAN Port"
 msgstr "WAN Port"
 
 #: ../www/advanced-mac.asp:169 ../www/advanced-mac.asp:177
-#: ../www/advanced-vlan.asp:995 ../www/basic-ipv6.asp:340
+#: ../www/advanced-vlan.asp:440 ../www/advanced-vlan.asp:1003
+#: ../www/advanced-wireless.asp:138 ../www/basic-ipv6.asp:340
 #: ../www/basic-network.asp:1638 ../www/basic-time.asp:30
 msgid "Default"
 msgstr "Default"
@@ -597,11 +713,18 @@ msgstr "Jumbo Frame Size"
 msgid "Bytes"
 msgstr "Bytes"
 
-#: ../www/advanced-misc.asp:95
+#: ../www/advanced-misc.asp:95 ../www/advanced-wireless.asp:141
+#: ../www/advanced-wireless.asp:153 ../www/advanced-wireless.asp:156
+#: ../www/advanced-wireless.asp:158 ../www/advanced-wireless.asp:167
+#: ../www/advanced-wireless.asp:178 ../www/advanced-wireless.asp:185
+#: ../www/advanced-wireless.asp:186
 msgid "range"
 msgstr "range"
 
-#: ../www/advanced-misc.asp:95
+#: ../www/advanced-misc.asp:95 ../www/advanced-wireless.asp:141
+#: ../www/advanced-wireless.asp:156 ../www/advanced-wireless.asp:158
+#: ../www/advanced-wireless.asp:167 ../www/advanced-wireless.asp:178
+#: ../www/advanced-wireless.asp:185
 msgid "default"
 msgstr "default"
 
@@ -623,6 +746,35 @@ msgstr ""
 msgid "Routing"
 msgstr "Routing"
 
+#: ../www/advanced-routing.asp:57 ../www/advanced-routing.asp:83
+msgid "Destination"
+msgstr "Destination"
+
+#: ../www/advanced-routing.asp:57 ../www/advanced-routing.asp:83
+#: ../www/advanced-routing.asp:239 ../www/basic-network.asp:1624
+#: ../www/status-overview.asp:379 ../www/status-overview.asp:455
+msgid "Gateway"
+msgstr "Gateway"
+
+#: ../www/advanced-routing.asp:57
+msgid "Next Hop"
+msgstr "Next Hop"
+
+#: ../www/advanced-routing.asp:57 ../www/advanced-routing.asp:83
+#: ../www/basic-network.asp:1623 ../www/status-overview.asp:378
+msgid "Subnet Mask"
+msgstr "Subnet Mask"
+
+#: ../www/advanced-routing.asp:57 ../www/advanced-routing.asp:83
+msgid "Metric"
+msgstr "Metric"
+
+#: ../www/advanced-routing.asp:57 ../www/advanced-routing.asp:83
+#: ../www/advanced-wlanvifs.asp:1381 ../www/advanced-wlanvifs.asp:1409
+#: ../www/status-devices.asp:320
+msgid "Interface"
+msgstr "Interface"
+
 #: ../www/advanced-routing.asp:225
 msgid "Current Routing Table"
 msgstr "Current Routing Table"
@@ -634,6 +786,10 @@ msgstr "Static Routing Table"
 #: ../www/advanced-routing.asp:239 ../www/advanced-wlanvifs.asp:1412
 msgid "Mode"
 msgstr "Mode"
+
+#: ../www/advanced-routing.asp:239
+msgid "Router"
+msgstr "Router"
 
 #: ../www/advanced-routing.asp:249
 msgid "Efficient Multicast Forwarding"
@@ -730,124 +886,211 @@ msgstr "you'll have to use swap"
 msgid "VLAN"
 msgstr "VLAN"
 
-#: ../www/advanced-vlan.asp:404
+#: ../www/advanced-vlan.asp:380
+msgid "Cannot proceed: one VID must be assigned to WAN"
+msgstr "Cannot proceed: one VID must be assigned to WAN"
+
+#: ../www/advanced-vlan.asp:391
+msgid ""
+"Cannot proceed: one and only one VID must be assigned to the primary LAN "
+"(br0)"
+msgstr ""
+"Cannot proceed: one and only one VID must be assigned to the primary LAN "
+"(br0)"
+
+#: ../www/advanced-vlan.asp:402
+msgid "Cannot proceed without setting a default VID"
+msgstr "Cannot proceed without setting a default VID"
+
+#: ../www/advanced-vlan.asp:412
 msgid "Router must be rebooted to proceed"
 msgstr "Router must be rebooted to proceed"
 
-#: ../www/advanced-vlan.asp:404
+#: ../www/advanced-vlan.asp:412
 msgid "Commit changes to NVRAM and reboot now"
 msgstr "Commit changes to NVRAM and reboot now"
 
-#: ../www/advanced-vlan.asp:432
+#: ../www/advanced-vlan.asp:440
+msgid "Port 1"
+msgstr "Port 1"
+
+#: ../www/advanced-vlan.asp:440
 msgid "Tagged"
 msgstr "Tagged"
 
-#: ../www/advanced-vlan.asp:620
-msgid ""
-"Port 4 cannot be assigned to more than one VLAN unless frames are tagged on "
-"all VLANs Port 4 is member"
-msgstr ""
-"Port 4 cannot be assigned to more than one VLAN unless frames are tagged on "
-"all VLANs Port 4 is member"
+#: ../www/advanced-vlan.asp:440
+msgid "Port 2"
+msgstr "Port 2"
 
-#: ../www/advanced-vlan.asp:628
-msgid ""
-"WAN port cannot be assigned to more than one VLAN unless frames are tagged "
-"on all VLANs WAN port is member"
-msgstr ""
-"WAN port cannot be assigned to more than one VLAN unless frames are tagged "
-"on all VLANs WAN port is member"
+#: ../www/advanced-vlan.asp:440
+msgid "Port 3"
+msgstr "Port 3"
 
-#: ../www/advanced-vlan.asp:641
-msgid "Only one VID can be selected as the default VID"
-msgstr "Only one VID can be selected as the default VID"
+#: ../www/advanced-vlan.asp:440
+msgid "Port 4"
+msgstr "Port 4"
 
-#: ../www/advanced-vlan.asp:648
-msgid "Cannot add more than one entry with VID"
-msgstr "Cannot add more than one entry with VID"
-
-#: ../www/advanced-vlan.asp:655
-msgid "Only one VID can be used as WAN at any time"
-msgstr "Only one VID can be used as WAN at any time"
-
-#: ../www/advanced-vlan.asp:663
-msgid ""
-"One and only one VID can be used for LAN' + ((i==0) ? '' : i ) + ' (br'+i+') "
-"at any time"
-msgstr ""
-"One and only one VID can be used for LAN' + ((i==0) ? '' : i ) + ' (br'+i+') "
-"at any time"
-
-#: ../www/advanced-vlan.asp:945
-msgid "VID Offset"
-msgstr "VID Offset"
-
-#: ../www/advanced-vlan.asp:958 ../www/advanced-vlan.asp:1004
-#: ../www/tomato.js:2399
-msgid "Wireless"
-msgstr "Wireless"
-
-#: ../www/advanced-vlan.asp:974
-msgid "Trunk VLAN support override (experimental)"
-msgstr "Trunk VLAN support override (experimental)"
-
-#: ../www/advanced-vlan.asp:978 ../www/bwm-24.asp:231 ../www/ipt-24.asp:409
-#: ../www/ipt-realtime.asp:354 ../www/status-log.asp:72
-#: ../www/status-overview.asp:519 ../www/status-webmon.asp:415
-msgid "Enable"
-msgstr "Enable"
-
-#: ../www/advanced-vlan.asp:986
-msgid "Unique identifier of a VLAN"
-msgstr "Unique identifier of a VLAN"
-
-#: ../www/advanced-vlan.asp:987 ../www/advanced-vlan.asp:1000
-msgid "EXPERIMENTAL"
-msgstr "EXPERIMENTAL"
-
-#: ../www/advanced-vlan.asp:987
-msgid ""
-"Allows overriding 'traditional' VLAN/VID mapping with arbitrary VIDs for "
-"each VLAN (set to '0' to use 'regular' VLAN/VID mappings instead)"
-msgstr ""
-"Allows overriding 'traditional' VLAN/VID mapping with arbitrary VIDs for "
-"each VLAN (set to '0' to use 'regular' VLAN/VID mappings instead)"
-
-#: ../www/advanced-vlan.asp:987 ../www/bwm-realtime.asp:218
-#: ../www/ipt-realtime.asp:365
-msgid "Warning"
-msgstr "Warning"
-
-#: ../www/advanced-vlan.asp:987
-msgid ""
-"this hasn't been verified/tested on anything but a Cisco/Linksys E3000 and "
-"may not be supported by your particular device/model"
-msgstr ""
-"this hasn't been verified/tested on anything but a Cisco/Linksys E3000 and "
-"may not be supported by your particular device/model"
-
-#: ../www/advanced-vlan.asp:987
-msgid "see notes on "
-msgstr "see notes on "
-
-#: ../www/advanced-vlan.asp:988
-msgid "Which ethernet ports on the router should be members of this VLAN"
-msgstr "Which ethernet ports on the router should be members of this VLAN"
-
-#: ../www/advanced-vlan.asp:989
-msgid "Enable 802.1Q tagging of ethernet frames on a particular port/VLAN"
-msgstr "Enable 802.1Q tagging of ethernet frames on a particular port/VLAN"
-
-#: ../www/advanced-vlan.asp:995
-msgid "VLAN ID assigned to untagged frames received by the router"
-msgstr "VLAN ID assigned to untagged frames received by the router"
-
-#: ../www/advanced-vlan.asp:996 ../www/advanced-wlanvifs.asp:1413
+#: ../www/advanced-vlan.asp:440 ../www/advanced-vlan.asp:973
+#: ../www/advanced-vlan.asp:1004 ../www/advanced-wlanvifs.asp:1413
 #: ../www/basic-network.asp:60
 msgid "Bridge"
 msgstr "Bridge"
 
+#: ../www/advanced-vlan.asp:604
+msgid ""
+"Port 1 cannot be assigned to more than one VLAN unless frames are tagged on "
+"all VLANs Port 1 is member"
+msgstr ""
+"Port 1 cannot be assigned to more than one VLAN unless frames are tagged on "
+"all VLANs Port 1 is member"
+
+#: ../www/advanced-vlan.asp:612
+msgid ""
+"Port 2 cannot be assigned to more than one VLAN unless frames are tagged on "
+"all VLANs Port 2 is member"
+msgstr ""
+"Port 2 cannot be assigned to more than one VLAN unless frames are tagged on "
+"all VLANs Port 2 is member"
+
+#: ../www/advanced-vlan.asp:620
+msgid ""
+"Port 3 cannot be assigned to more than one VLAN unless frames are tagged on "
+"all VLANs Port 3 is member"
+msgstr ""
+"Port 3 cannot be assigned to more than one VLAN unless frames are tagged on "
+"all VLANs Port 3 is member"
+
+#: ../www/advanced-vlan.asp:628
+msgid ""
+"Port 4 cannot be assigned to more than one VLAN unless frames are tagged on "
+"all VLANs Port 4 is member"
+msgstr ""
+"Port 4 cannot be assigned to more than one VLAN unless frames are tagged on "
+"all VLANs Port 4 is member"
+
+#: ../www/advanced-vlan.asp:636
+msgid ""
+"WAN port cannot be assigned to more than one VLAN unless frames are tagged "
+"on all VLANs WAN port is member"
+msgstr ""
+"WAN port cannot be assigned to more than one VLAN unless frames are tagged "
+"on all VLANs WAN port is member"
+
+#: ../www/advanced-vlan.asp:649
+msgid "Only one VID can be selected as the default VID"
+msgstr "Only one VID can be selected as the default VID"
+
+#: ../www/advanced-vlan.asp:656
+msgid "Cannot add more than one entry with VID"
+msgstr "Cannot add more than one entry with VID"
+
+#: ../www/advanced-vlan.asp:663
+msgid "Only one VID can be used as WAN at any time"
+msgstr "Only one VID can be used as WAN at any time"
+
+#: ../www/advanced-vlan.asp:671
+msgid ""
+"One and only one VID can be used for LAN' + ((i==0) ? '' : i ) + ' (br'+i+') "
+"at any time"
+msgstr ""
+"One and only one VID can be used for LAN' + ((i==0) ? '' : i ) + ' (br'+i+') "
+"at any time"
+
+#: ../www/advanced-vlan.asp:684 ../www/advanced-vlan.asp:686
+#: ../www/advanced-vlan.asp:688 ../www/advanced-vlan.asp:690
+#: ../www/advanced-vlan.asp:692
+msgid "Yes"
+msgstr "Yes"
+
+#: ../www/advanced-vlan.asp:953 ../www/advanced-vlan.asp:1008
+msgid "VID Offset"
+msgstr "VID Offset"
+
+#: ../www/advanced-vlan.asp:957
+msgid "First 802.1Q VLAN tag"
+msgstr "First 802.1Q VLAN tag"
+
+#: ../www/advanced-vlan.asp:959
+msgid "range: 0 - 4080"
+msgstr "range: 0 - 4080"
+
+#: ../www/advanced-vlan.asp:959
+msgid "must be a multiple of 16"
+msgstr "must be a multiple of 16"
+
+#: ../www/advanced-vlan.asp:959
+msgid "set to 0 to disable"
+msgstr "set to 0 to disable"
+
+#: ../www/advanced-vlan.asp:966 ../www/advanced-vlan.asp:1012
+#: ../www/advanced-wireless.asp:14 ../www/tomato.js:2399
+msgid "Wireless"
+msgstr "Wireless"
+
+#: ../www/advanced-vlan.asp:973
+msgid "to"
+msgstr "to"
+
+#: ../www/advanced-vlan.asp:982
+msgid "Trunk VLAN support override (experimental)"
+msgstr "Trunk VLAN support override (experimental)"
+
+#: ../www/advanced-vlan.asp:986 ../www/advanced-wireless.asp:150
+#: ../www/advanced-wireless.asp:159 ../www/advanced-wireless.asp:162
+#: ../www/advanced-wireless.asp:164 ../www/advanced-wireless.asp:194
+#: ../www/advanced-wireless.asp:195 ../www/advanced-wireless.asp:197
+#: ../www/advanced-wireless.asp:199 ../www/bwm-24.asp:231
+#: ../www/ipt-24.asp:409 ../www/ipt-realtime.asp:354 ../www/status-log.asp:72
+#: ../www/status-overview.asp:506 ../www/status-webmon.asp:415
+msgid "Enable"
+msgstr "Enable"
+
+#: ../www/advanced-vlan.asp:994
+msgid "Unique identifier of a VLAN"
+msgstr "Unique identifier of a VLAN"
+
+#: ../www/advanced-vlan.asp:995 ../www/advanced-vlan.asp:1008
+msgid "EXPERIMENTAL"
+msgstr "EXPERIMENTAL"
+
+#: ../www/advanced-vlan.asp:995
+msgid ""
+"Allows overriding 'traditional' VLAN/VID mapping with arbitrary VIDs for "
+"each VLAN (set to '0' to use 'regular' VLAN/VID mappings instead)"
+msgstr ""
+"Allows overriding 'traditional' VLAN/VID mapping with arbitrary VIDs for "
+"each VLAN (set to '0' to use 'regular' VLAN/VID mappings instead)"
+
+#: ../www/advanced-vlan.asp:995 ../www/bwm-realtime.asp:218
+#: ../www/ipt-realtime.asp:365 ../www/tools-survey.asp:334
+msgid "Warning"
+msgstr "Warning"
+
+#: ../www/advanced-vlan.asp:995
+msgid ""
+"this hasn't been verified/tested on anything but a Cisco/Linksys E3000 and "
+"may not be supported by your particular device/model"
+msgstr ""
+"this hasn't been verified/tested on anything but a Cisco/Linksys E3000 and "
+"may not be supported by your particular device/model"
+
+#: ../www/advanced-vlan.asp:995
+msgid "see notes on "
+msgstr "see notes on "
+
 #: ../www/advanced-vlan.asp:996
+msgid "Which ethernet ports on the router should be members of this VLAN"
+msgstr "Which ethernet ports on the router should be members of this VLAN"
+
+#: ../www/advanced-vlan.asp:997
+msgid "Enable 802.1Q tagging of ethernet frames on a particular port/VLAN"
+msgstr "Enable 802.1Q tagging of ethernet frames on a particular port/VLAN"
+
+#: ../www/advanced-vlan.asp:1003
+msgid "VLAN ID assigned to untagged frames received by the router"
+msgstr "VLAN ID assigned to untagged frames received by the router"
+
+#: ../www/advanced-vlan.asp:1004
 msgid ""
 "Determines if this VLAN ID should be treated as WAN, part of a LAN bridge or "
 "just left alone"
@@ -855,40 +1098,301 @@ msgstr ""
 "Determines if this VLAN ID should be treated as WAN, part of a LAN bridge or "
 "just left alone"
 
-#: ../www/advanced-vlan.asp:996
+#: ../www/advanced-vlan.asp:1004
 msgid ""
 "i.e. member of a 802.1Q trunk, being managed manually via scripts, etc..."
 msgstr ""
 "i.e. member of a 802.1Q trunk, being managed manually via scripts, etc..."
 
-#: ../www/advanced-vlan.asp:1011 ../www/advanced-vlan.asp:1012
+#: ../www/advanced-vlan.asp:1008
+msgid ""
+"First 802.1Q VLAN tag to be used as <i>base/initial tag/VID</i> for VLAN and "
+"VID assignments. This allows using VIDs larger than 15 on (older) devices "
+"such as the Linksys WRT54GL v1.1 (in contiguous blocks/ranges with up to 16 "
+"VLANs/VIDs). Set to '0' (zero) to disable this feature and VLANs will have "
+"the very same/identical value for its VID, as usual (from 0 to 15)"
+msgstr ""
+"First 802.1Q VLAN tag to be used as <i>base/initial tag/VID</i> for VLAN and "
+"VID assignments. This allows using VIDs larger than 15 on (older) devices "
+"such as the Linksys WRT54GL v1.1 (in contiguous blocks/ranges with up to 16 "
+"VLANs/VIDs). Set to '0' (zero) to disable this feature and VLANs will have "
+"the very same/identical value for its VID, as usual (from 0 to 15)"
+
+#: ../www/advanced-vlan.asp:1012
+msgid ""
+"Assignments of wireless interfaces to different LAN briges. You should "
+"probably be using and/or check things on <a href=advanced-wlanvifs."
+"asp>Advanced/Virtual Wireless</a> and <a href=basic-network.asp>Basic/"
+"Network</a>"
+msgstr ""
+"Assignments of wireless interfaces to different LAN briges. You should "
+"probably be using and/or check things on <a href=advanced-wlanvifs."
+"asp>Advanced/Virtual Wireless</a> and <a href=basic-network.asp>Basic/"
+"Network</a>"
+
+#: ../www/advanced-vlan.asp:1019 ../www/advanced-vlan.asp:1020
+msgid "One VID"
+msgstr "One VID"
+
+#: ../www/advanced-vlan.asp:1019 ../www/advanced-vlan.asp:1020
 msgid "must"
 msgstr "must"
 
-#: ../www/advanced-vlan.asp:1022
+#: ../www/advanced-vlan.asp:1019
+msgid "be assigned to"
+msgstr "be assigned to"
+
+#: ../www/advanced-vlan.asp:1020
+msgid "be selected as the default"
+msgstr "be selected as the default"
+
+#: ../www/advanced-vlan.asp:1030
 msgid "experimental"
 msgstr "experimental"
 
-#: ../www/advanced-vlan.asp:1033
+#: ../www/advanced-vlan.asp:1041 ../www/advanced-wlanvifs.asp:505
 msgid "This feature is not supported on this router"
 msgstr "This feature is not supported on this router"
+
+#: ../www/advanced-wireless.asp:131
+msgid "Afterburner"
+msgstr "Afterburner"
+
+#: ../www/advanced-wireless.asp:133
+msgid "AP Isolation"
+msgstr "AP Isolation"
+
+#: ../www/advanced-wireless.asp:135
+msgid "Authentication Type"
+msgstr "Authentication Type"
+
+#: ../www/advanced-wireless.asp:136 ../www/advanced-wireless.asp:142
+#: ../www/advanced-wireless.asp:169 ../www/advanced-wireless.asp:173
+#: ../www/advanced-wireless.asp:179 ../www/advanced-wireless.asp:181
+#: ../www/advanced-wireless.asp:189 ../www/advanced-wireless.asp:194
+#: ../www/basic-network.asp:423 ../www/basic-network.asp:497
+msgid "Auto"
+msgstr "Auto"
+
+#: ../www/advanced-wireless.asp:136 ../www/basic-network.asp:1749
+#: ../www/basic-network.asp:1752
+msgid "Shared Key"
+msgstr "Shared Key"
+
+#: ../www/advanced-wireless.asp:138
+msgid "Basic Rate"
+msgstr "Basic Rate"
+
+#: ../www/advanced-wireless.asp:140
+msgid "Beacon Interval"
+msgstr "Beacon Interval"
+
+#: ../www/advanced-wireless.asp:142
+msgid "CTS Protection Mode"
+msgstr "CTS Protection Mode"
+
+#: ../www/advanced-wireless.asp:142 ../www/advanced-wireless.asp:150
+#: ../www/advanced-wireless.asp:159 ../www/advanced-wireless.asp:162
+#: ../www/advanced-wireless.asp:164 ../www/advanced-wireless.asp:194
+#: ../www/advanced-wireless.asp:195 ../www/advanced-wireless.asp:197
+#: ../www/advanced-wireless.asp:199 ../www/status-overview.asp:507
+msgid "Disable"
+msgstr "Disable"
+
+#: ../www/advanced-wireless.asp:144
+msgid "Regulatory Mode"
+msgstr "Regulatory Mode"
+
+#: ../www/advanced-wireless.asp:145 ../www/advanced-wireless.asp:175
+#: ../www/bwm-24.asp:184 ../www/bwm-realtime.asp:167 ../www/ipt-24.asp:344
+#: ../www/ipt-realtime.asp:290
+msgid "Off"
+msgstr "Off"
+
+#: ../www/advanced-wireless.asp:147
+msgid "Country"
+msgstr "Country"
+
+#: ../www/advanced-wireless.asp:147
+msgid "Region"
+msgstr "Region"
+
+#: ../www/advanced-wireless.asp:149
+msgid "Bluetooth Coexistence"
+msgstr "Bluetooth Coexistence"
+
+#: ../www/advanced-wireless.asp:150
+msgid "Preemption"
+msgstr "Preemption"
+
+#: ../www/advanced-wireless.asp:152
+msgid "Distance"
+msgstr "Distance"
+
+#: ../www/advanced-wireless.asp:152
+msgid "ACK"
+msgstr "ACK"
+
+#: ../www/advanced-wireless.asp:152
+msgid "Timing"
+msgstr "Timing"
+
+#: ../www/advanced-wireless.asp:153
+msgid "meters"
+msgstr "meters"
+
+#: ../www/advanced-wireless.asp:153
+msgid "use default"
+msgstr "use default"
+
+#: ../www/advanced-wireless.asp:155
+msgid "DTIM Interval"
+msgstr "DTIM Interval"
+
+#: ../www/advanced-wireless.asp:157
+msgid "Fragmentation Threshold"
+msgstr "Fragmentation Threshold"
+
+#: ../www/advanced-wireless.asp:159
+msgid "Frame Burst"
+msgstr "Frame Burst"
+
+#: ../www/advanced-wireless.asp:161
+msgid "HP"
+msgstr "HP"
+
+#: ../www/advanced-wireless.asp:162
+msgid "Amplifier"
+msgstr "Amplifier"
+
+#: ../www/advanced-wireless.asp:164
+msgid "Enhanced RX Sensitivity"
+msgstr "Enhanced RX Sensitivity"
+
+#: ../www/advanced-wireless.asp:166
+msgid "Maximum Clients"
+msgstr "Maximum Clients"
+
+#: ../www/advanced-wireless.asp:168
+msgid "Multicast Rate"
+msgstr "Multicast Rate"
+
+#: ../www/advanced-wireless.asp:171
+msgid "Preamble"
+msgstr "Preamble"
+
+#: ../www/advanced-wireless.asp:173
+msgid "802.11n Preamble"
+msgstr "802.11n Preamble"
+
+#: ../www/advanced-wireless.asp:173
+msgid "Mixed Mode"
+msgstr "Mixed Mode"
+
+#: ../www/advanced-wireless.asp:173
+msgid "Green Field"
+msgstr "Green Field"
+
+#: ../www/advanced-wireless.asp:173
+msgid "GF-BRCM"
+msgstr "GF-BRCM"
+
+#: ../www/advanced-wireless.asp:175
+msgid "Overlapping BSS Coexistence"
+msgstr "Overlapping BSS Coexistence"
+
+#: ../www/advanced-wireless.asp:177
+msgid "RTS Threshold"
+msgstr "RTS Threshold"
+
+#: ../www/advanced-wireless.asp:179
+msgid "Receive Antenna"
+msgstr "Receive Antenna"
+
+#: ../www/advanced-wireless.asp:181
+msgid "Transmit Antenna"
+msgstr "Transmit Antenna"
+
+#: ../www/advanced-wireless.asp:183
+msgid "Transmit Power"
+msgstr "Transmit Power"
+
+#: ../www/advanced-wireless.asp:185
+msgid "before amplification"
+msgstr "before amplification"
+
+#: ../www/advanced-wireless.asp:186
+msgid "actual max depends on Country selected"
+msgstr "actual max depends on Country selected"
+
+#: ../www/advanced-wireless.asp:186
+msgid "use 0 for hardware default"
+msgstr "use 0 for hardware default"
+
+#: ../www/advanced-wireless.asp:188
+msgid "Transmission Rate"
+msgstr "Transmission Rate"
+
+#: ../www/advanced-wireless.asp:191
+msgid "Interference Mitigation"
+msgstr "Interference Mitigation"
+
+#: ../www/advanced-wireless.asp:192
+msgid "Non-WLAN"
+msgstr "Non-WLAN"
+
+#: ../www/advanced-wireless.asp:192
+msgid "WLAN Manual"
+msgstr "WLAN Manual"
+
+#: ../www/advanced-wireless.asp:192
+msgid "WLAN Auto"
+msgstr "WLAN Auto"
+
+#: ../www/advanced-wireless.asp:192
+msgid "WLAN Auto with Noise Reduction"
+msgstr "WLAN Auto with Noise Reduction"
+
+#: ../www/advanced-wireless.asp:194
+msgid "WMM"
+msgstr "WMM"
+
+#: ../www/advanced-wireless.asp:195
+msgid "No ACK"
+msgstr "No ACK"
+
+#: ../www/advanced-wireless.asp:197
+msgid "APSD Mode"
+msgstr "APSD Mode"
+
+#: ../www/advanced-wireless.asp:199
+msgid "Wireless Multicast Forwarding"
+msgstr "Wireless Multicast Forwarding"
+
+#: ../www/advanced-wireless.asp:207
+msgid ""
+"The default settings are indicated with an asterisk <b style='font-size: "
+"1.5em'>*</b> symbol"
+msgstr ""
+"The default settings are indicated with an asterisk <b style='font-size: "
+"1.5em'>*</b> symbol"
 
 #: ../www/advanced-wlanvifs.asp:21 ../www/advanced-wlanvifs.asp:1360
 msgid "Virtual Wireless Interfaces"
 msgstr "Virtual Wireless Interfaces"
 
 #: ../www/advanced-wlanvifs.asp:62 ../www/advanced-wlanvifs.asp:1412
-#: ../www/basic-network.asp:1728 ../www/status-overview.asp:42
+#: ../www/basic-network.asp:1728 ../www/status-overview.asp:41
 msgid "Access Point"
 msgstr "Access Point"
 
 #: ../www/advanced-wlanvifs.asp:62 ../www/advanced-wlanvifs.asp:1412
-#: ../www/basic-network.asp:1728 ../www/status-overview.asp:42
+#: ../www/basic-network.asp:1728 ../www/status-overview.asp:41
 msgid "Wireless Client"
 msgstr "Wireless Client"
 
 #: ../www/advanced-wlanvifs.asp:62 ../www/basic-network.asp:1728
-#: ../www/status-overview.asp:42
+#: ../www/status-overview.asp:41
 msgid "Wireless Ethernet Bridge"
 msgstr "Wireless Ethernet Bridge"
 
@@ -897,35 +1401,72 @@ msgstr "Wireless Ethernet Bridge"
 msgid "Overview"
 msgstr "Overview"
 
+#: ../www/advanced-wlanvifs.asp:338
+msgid ""
+"After configuring this VIF, review and save your settings on the Overview tab"
+msgstr ""
+"After configuring this VIF, review and save your settings on the Overview tab"
+
 #: ../www/advanced-wlanvifs.asp:536 ../www/ipt-monthly.asp:370
 msgid "Click here to hide"
 msgstr "Click here to hide"
 
+#: ../www/advanced-wlanvifs.asp:883
+msgid "TKIP encryption is not supported with WPA / WPA2 in N mode"
+msgstr "TKIP encryption is not supported with WPA / WPA2 in N mode"
+
+#: ../www/advanced-wlanvifs.asp:900
+msgid "Only one wireless interface can be configured in client mode"
+msgstr "Only one wireless interface can be configured in client mode"
+
+#: ../www/advanced-wlanvifs.asp:904
+msgid "N-only is not supported in wireless client modes, use Auto"
+msgstr "N-only is not supported in wireless client modes, use Auto"
+
+#: ../www/advanced-wlanvifs.asp:913
+msgid "Invalid pre-shared key"
+msgstr "Invalid pre-shared key"
+
+#: ../www/advanced-wlanvifs.asp:913
+msgid "Please enter at least 8 characters or 64 hexadecimal digits"
+msgstr "Please enter at least 8 characters or 64 hexadecimal digits"
+
+#: ../www/advanced-wlanvifs.asp:921
+msgid "Fixed wireless channel required in WDS mode"
+msgstr "Fixed wireless channel required in WDS mode"
+
+#: ../www/advanced-wlanvifs.asp:983
+msgid "WDS MAC address required"
+msgstr "WDS MAC address required"
+
+#: ../www/advanced-wlanvifs.asp:1218
+msgid "Saving"
+msgstr "Saving"
+
 #: ../www/advanced-wlanvifs.asp:1374
 msgid "Wireless Interfaces Details"
 msgstr "Wireless Interfaces Details"
-
-#: ../www/advanced-wlanvifs.asp:1381 ../www/advanced-wlanvifs.asp:1409
-#: ../www/status-devices.asp:320
-msgid "Interface"
-msgstr "Interface"
 
 #: ../www/advanced-wlanvifs.asp:1382
 msgid "Virtual Interfaces"
 msgstr "Virtual Interfaces"
 
 #: ../www/advanced-wlanvifs.asp:1393 ../www/basic-network.asp:1626
-#: ../www/ipt-daily.asp:456 ../www/ipt-details.asp:467
-#: ../www/ipt-monthly.asp:458
+#: ../www/basic-static.asp:367 ../www/ipt-daily.asp:456
+#: ../www/ipt-details.asp:467 ../www/ipt-monthly.asp:458
 msgid "Options"
 msgstr "Options"
+
+#: ../www/advanced-wlanvifs.asp:1397
+msgid "Use alternate NAS startup sequence"
+msgstr "Use alternate NAS startup sequence"
 
 #: ../www/advanced-wlanvifs.asp:1409
 msgid "Wireless VIF name"
 msgstr "Wireless VIF name"
 
 #: ../www/advanced-wlanvifs.asp:1410 ../www/basic-network.asp:95
-#: ../www/basic-network.asp:98 ../www/status-overview.asp:503
+#: ../www/basic-network.asp:98 ../www/status-overview.asp:490
 msgid "Enabled"
 msgstr "Enabled"
 
@@ -949,21 +1490,168 @@ msgstr "etc"
 msgid "Which LAN bridge this VIF should be assigned"
 msgstr "Which LAN bridge this VIF should be assigned"
 
-#: ../www/basic-ident.asp:14 ../www/tomato.js:2376 ../www/tomato.js:2401
+#: ../www/basic-ddns.asp:14 ../www/basic-ident.asp:14
+#: ../www/basic-static.asp:18 ../www/basic-time.asp:14
+#: ../www/basic-wfilter.asp:18 ../www/forward-basic.asp:14
+#: ../www/tomato.js:2376 ../www/tomato.js:2401
 msgid "Basic"
 msgstr "Basic"
+
+#: ../www/basic-ddns.asp:14 ../www/tomato.js:2383
+msgid "DDNS"
+msgstr "DDNS"
+
+#: ../www/basic-ddns.asp:89
+msgid "Automatically retrying in ' + min + ' minutes"
+msgstr "Automatically retrying in ' + min + ' minutes"
+
+#: ../www/basic-ddns.asp:168
+msgid "Expecting a URL"
+msgstr "Expecting a URL"
+
+#: ../www/basic-ddns.asp:338
+msgid "DDNS update is running"
+msgstr "DDNS update is running"
+
+#: ../www/basic-ddns.asp:338
+msgid "Please refresh after a few seconds"
+msgstr "Please refresh after a few seconds"
+
+#: ../www/basic-ddns.asp:371 ../www/basic-ddns.asp:431
+msgid "Dynamic DNS"
+msgstr "Dynamic DNS"
+
+#: ../www/basic-ddns.asp:377
+msgid "IP address"
+msgstr "IP address"
+
+#: ../www/basic-ddns.asp:379
+msgid "Use WAN IP Address"
+msgstr "Use WAN IP Address"
+
+#: ../www/basic-ddns.asp:379
+msgid "recommended"
+msgstr "recommended"
+
+#: ../www/basic-ddns.asp:380
+msgid "Use External IP Address Checker"
+msgstr "Use External IP Address Checker"
+
+#: ../www/basic-ddns.asp:380
+msgid "every 10 minutes"
+msgstr "every 10 minutes"
+
+#: ../www/basic-ddns.asp:381 ../www/basic-ddns.asp:382
+#: ../www/basic-ddns.asp:383
+msgid "Offline"
+msgstr "Offline"
+
+#: ../www/basic-ddns.asp:384
+msgid "Custom IP Address"
+msgstr "Custom IP Address"
+
+#: ../www/basic-ddns.asp:387
+msgid "Custom IP address"
+msgstr "Custom IP address"
+
+#: ../www/basic-ddns.asp:389
+msgid "Auto refresh every"
+msgstr "Auto refresh every"
+
+#: ../www/basic-ddns.asp:389
+msgid "days"
+msgstr "days"
+
+#: ../www/basic-ddns.asp:389
+msgid "disable"
+msgstr "disable"
+
+#: ../www/basic-ddns.asp:433
+msgid "Service"
+msgstr "Service"
+
+#: ../www/basic-ddns.asp:434 ../www/basic-ddns.asp:440
+#: ../www/basic-ddns.asp:447
+msgid "URL"
+msgstr "URL"
+
+#: ../www/basic-ddns.asp:435
+msgid "This service determines the IP address using its own method"
+msgstr "This service determines the IP address using its own method"
+
+#: ../www/basic-ddns.asp:436 ../www/basic-ddns.asp:439
+#: ../www/basic-ident.asp:63 ../www/basic-static.asp:261
+#: ../www/basic-static.asp:382
+msgid "Hostname"
+msgstr "Hostname"
+
+#: ../www/basic-ddns.asp:437 ../www/basic-network.asp:1617
+msgid "Username"
+msgstr "Username"
+
+#: ../www/basic-ddns.asp:438 ../www/basic-network.asp:1618
+msgid "Password"
+msgstr "Password"
+
+#: ../www/basic-ddns.asp:441
+msgid "Use @IP for the current IP address"
+msgstr "Use @IP for the current IP address"
+
+#: ../www/basic-ddns.asp:442
+msgid "Wildcard"
+msgstr "Wildcard"
+
+#: ../www/basic-ddns.asp:443
+msgid "MX"
+msgstr "MX"
+
+#: ../www/basic-ddns.asp:444
+msgid "Backup MX"
+msgstr "Backup MX"
+
+#: ../www/basic-ddns.asp:445
+msgid "Use as DNS"
+msgstr "Use as DNS"
+
+#: ../www/basic-ddns.asp:446
+msgid "Current DNS"
+msgstr "Current DNS"
+
+#: ../www/basic-ddns.asp:447
+msgid "Token"
+msgstr "Token"
+
+#: ../www/basic-ddns.asp:448
+msgid "Save state when IP changes"
+msgstr "Save state when IP changes"
+
+#: ../www/basic-ddns.asp:448
+msgid "nvram commit"
+msgstr "nvram commit"
+
+#: ../www/basic-ddns.asp:449
+msgid "Force next update"
+msgstr "Force next update"
+
+#: ../www/basic-ddns.asp:451
+msgid "Last IP Address"
+msgstr "Last IP Address"
+
+#: ../www/basic-ddns.asp:452
+msgid "Last Result"
+msgstr "Last Result"
 
 #: ../www/basic-ident.asp:14 ../www/tomato.js:2381
 msgid "Identification"
 msgstr "Identification"
 
+#: ../www/basic-ident.asp:58
+msgid "Router Identification"
+msgstr "Router Identification"
+
 #: ../www/basic-ident.asp:62
 msgid "Router Name"
 msgstr "Router Name"
-
-#: ../www/basic-ident.asp:63
-msgid "Hostname"
-msgstr "Hostname"
 
 #: ../www/basic-ident.asp:64
 msgid "Domain Name"
@@ -979,7 +1667,8 @@ msgstr "IPv6 Service Type"
 
 #: ../www/basic-ipv6.asp:331 ../www/basic-network.asp:95
 #: ../www/basic-network.asp:98 ../www/basic-network.asp:1611
-#: ../www/basic-network.asp:1745 ../www/status-overview.asp:503
+#: ../www/basic-network.asp:1745 ../www/restrict.asp:81
+#: ../www/status-overview.asp:490
 msgid "Disabled"
 msgstr "Disabled"
 
@@ -1039,7 +1728,7 @@ msgstr "Usually 32"
 msgid "Prefix Length"
 msgstr "Prefix Length"
 
-#: ../www/basic-ipv6.asp:339 ../www/status-overview.asp:470
+#: ../www/basic-ipv6.asp:339 ../www/status-overview.asp:457
 msgid "Router IPv6 Address"
 msgstr "Router IPv6 Address"
 
@@ -1058,13 +1747,6 @@ msgstr "Accept RA from"
 #: ../www/basic-ipv6.asp:351
 msgid "Tunnel Remote Endpoint"
 msgstr "Tunnel Remote Endpoint"
-
-#: ../www/basic-ipv6.asp:351 ../www/basic-ipv6.asp:352
-#: ../www/status-overview.asp:387 ../www/status-overview.asp:389
-#: ../www/status-overview.asp:394 ../www/tools-ping.asp:49
-#: ../www/tools-ping.asp:206
-msgid "Address"
-msgstr "Address"
 
 #: ../www/basic-ipv6.asp:352
 msgid "6RD Tunnel Border Relay"
@@ -1099,7 +1781,8 @@ msgid "Tunnel TTL"
 msgstr "Tunnel TTL"
 
 #: ../www/basic-network.asp:60 ../www/basic-network.asp:1622
-#: ../www/status-devices.asp:320
+#: ../www/basic-static.asp:261 ../www/basic-static.asp:380
+#: ../www/status-devices.asp:320 ../www/tools-wol.asp:53
 msgid "IP Address"
 msgstr "IP Address"
 
@@ -1119,7 +1802,7 @@ msgstr "(first/last)"
 msgid "Lease&nbsp;Time&nbsp;"
 msgstr "Lease&nbsp;Time&nbsp;"
 
-#: ../www/basic-network.asp:60 ../www/status-overview.asp:372
+#: ../www/basic-network.asp:60 ../www/status-overview.asp:359
 msgid "mins"
 msgstr "mins"
 
@@ -1162,10 +1845,6 @@ msgstr "Invalid first IP address or subnet mask"
 #: ../www/basic-network.asp:338
 msgid "Invalid last IP address or subnet mask"
 msgstr "Invalid last IP address or subnet mask"
-
-#: ../www/basic-network.asp:423 ../www/basic-network.asp:497
-msgid "Auto"
-msgstr "Auto"
 
 #: ../www/basic-network.asp:425
 msgid "A Only"
@@ -1239,7 +1918,7 @@ msgstr "Bridge br0 must be always defined and have a valid IP address set."
 msgid "Type"
 msgstr "Type"
 
-#: ../www/basic-network.asp:1605 ../www/status-overview.asp:388
+#: ../www/basic-network.asp:1605 ../www/status-overview.asp:375
 msgid "PPPoE"
 msgstr "PPPoE"
 
@@ -1247,11 +1926,11 @@ msgstr "PPPoE"
 msgid "Static"
 msgstr "Static"
 
-#: ../www/basic-network.asp:1605 ../www/status-overview.asp:388
+#: ../www/basic-network.asp:1605 ../www/status-overview.asp:375
 msgid "L2TP"
 msgstr "L2TP"
 
-#: ../www/basic-network.asp:1608 ../www/status-overview.asp:388
+#: ../www/basic-network.asp:1608 ../www/status-overview.asp:375
 msgid "3G Modem"
 msgstr "3G Modem"
 
@@ -1263,6 +1942,10 @@ msgstr "Modem device"
 msgid "PIN Code"
 msgstr "PIN Code"
 
+#: ../www/basic-network.asp:1614
+msgid "Advised to turn off PIN Code"
+msgstr "Advised to turn off PIN Code"
+
 #: ../www/basic-network.asp:1615
 msgid "Modem init string"
 msgstr "Modem init string"
@@ -1270,14 +1953,6 @@ msgstr "Modem init string"
 #: ../www/basic-network.asp:1616
 msgid "APN"
 msgstr "APN"
-
-#: ../www/basic-network.asp:1617
-msgid "Username"
-msgstr "Username"
-
-#: ../www/basic-network.asp:1618
-msgid "Password"
-msgstr "Password"
 
 #: ../www/basic-network.asp:1619
 msgid "Service Name"
@@ -1290,15 +1965,6 @@ msgstr "L2TP Server"
 #: ../www/basic-network.asp:1621
 msgid "Use DHCP"
 msgstr "Use DHCP"
-
-#: ../www/basic-network.asp:1623 ../www/status-overview.asp:391
-msgid "Subnet Mask"
-msgstr "Subnet Mask"
-
-#: ../www/basic-network.asp:1624 ../www/status-overview.asp:392
-#: ../www/status-overview.asp:468
-msgid "Gateway"
-msgstr "Gateway"
 
 #: ../www/basic-network.asp:1625
 msgid "PPTP Gateway"
@@ -1324,7 +1990,7 @@ msgstr "LCP Echo Interval"
 msgid "LCP Echo Link fail limit"
 msgstr "LCP Echo Link fail limit"
 
-#: ../www/basic-network.asp:1637 ../www/status-overview.asp:397
+#: ../www/basic-network.asp:1637 ../www/status-overview.asp:384
 msgid "MTU"
 msgstr "MTU"
 
@@ -1370,10 +2036,6 @@ msgstr "Local Port"
 msgid "Startup Parameters"
 msgstr "Startup Parameters"
 
-#: ../www/basic-network.asp:1672
-msgid "optional"
-msgstr "optional"
-
 #: ../www/basic-network.asp:1683
 msgid "Enable Ports State"
 msgstr "Enable Ports State"
@@ -1390,12 +2052,12 @@ msgstr "Invert Ports Order"
 msgid "Enable Wireless"
 msgstr "Enable Wireless"
 
-#: ../www/basic-network.asp:1727 ../www/status-overview.asp:500
+#: ../www/basic-network.asp:1727 ../www/status-overview.asp:487
 msgid "Wireless Mode"
 msgstr "Wireless Mode"
 
 #: ../www/basic-network.asp:1728 ../www/basic-network.asp:1775
-#: ../www/status-overview.asp:42
+#: ../www/status-overview.asp:41
 msgid "WDS"
 msgstr "WDS"
 
@@ -1403,19 +2065,19 @@ msgstr "WDS"
 msgid "Radio Band"
 msgstr "Radio Band"
 
-#: ../www/basic-network.asp:1732 ../www/status-overview.asp:501
+#: ../www/basic-network.asp:1732 ../www/status-overview.asp:488
 msgid "Wireless Network Mode"
 msgstr "Wireless Network Mode"
 
-#: ../www/basic-network.asp:1735 ../www/status-overview.asp:507
+#: ../www/basic-network.asp:1735 ../www/status-overview.asp:494
 msgid "SSID"
 msgstr "SSID"
 
-#: ../www/basic-network.asp:1736 ../www/status-overview.asp:508
+#: ../www/basic-network.asp:1736 ../www/status-overview.asp:495
 msgid "Broadcast"
 msgstr "Broadcast"
 
-#: ../www/basic-network.asp:1737 ../www/status-overview.asp:510
+#: ../www/basic-network.asp:1737 ../www/status-overview.asp:497
 msgid "Channel"
 msgstr "Channel"
 
@@ -1423,7 +2085,7 @@ msgstr "Channel"
 msgid "Scan"
 msgstr "Scan"
 
-#: ../www/basic-network.asp:1739 ../www/status-overview.asp:511
+#: ../www/basic-network.asp:1739 ../www/status-overview.asp:498
 msgid "Channel Width"
 msgstr "Channel Width"
 
@@ -1439,7 +2101,7 @@ msgstr "Lower"
 msgid "Upper"
 msgstr "Upper"
 
-#: ../www/basic-network.asp:1744 ../www/status-overview.asp:509
+#: ../www/basic-network.asp:1744 ../www/status-overview.asp:496
 msgid "Security"
 msgstr "Security"
 
@@ -1451,7 +2113,7 @@ msgstr "WEP"
 msgid "WPA Personal"
 msgstr "WPA Personal"
 
-#: ../www/basic-network.asp:1745 ../www/status-overview.asp:43
+#: ../www/basic-network.asp:1745 ../www/status-overview.asp:42
 msgid "WPA Enterprise"
 msgstr "WPA Enterprise"
 
@@ -1459,19 +2121,19 @@ msgstr "WPA Enterprise"
 msgid "WPA2 Personal"
 msgstr "WPA2 Personal"
 
-#: ../www/basic-network.asp:1745 ../www/status-overview.asp:43
+#: ../www/basic-network.asp:1745 ../www/status-overview.asp:42
 msgid "WPA2 Enterprise"
 msgstr "WPA2 Enterprise"
 
-#: ../www/basic-network.asp:1745 ../www/status-overview.asp:43
+#: ../www/basic-network.asp:1745 ../www/status-overview.asp:42
 msgid "WPA / WPA2 Personal"
 msgstr "WPA / WPA2 Personal"
 
-#: ../www/basic-network.asp:1745 ../www/status-overview.asp:43
+#: ../www/basic-network.asp:1745 ../www/status-overview.asp:42
 msgid "WPA / WPA2 Enterprise"
 msgstr "WPA / WPA2 Enterprise"
 
-#: ../www/basic-network.asp:1745 ../www/status-overview.asp:43
+#: ../www/basic-network.asp:1745 ../www/status-overview.asp:42
 msgid "Radius"
 msgstr "Radius"
 
@@ -1490,10 +2152,6 @@ msgstr "AES"
 #: ../www/basic-network.asp:1748
 msgid "TKIP / AES"
 msgstr "TKIP / AES"
-
-#: ../www/basic-network.asp:1749 ../www/basic-network.asp:1752
-msgid "Shared Key"
-msgstr "Shared Key"
 
 #: ../www/basic-network.asp:1755
 msgid "Group Key Renewal"
@@ -1514,6 +2172,117 @@ msgstr "Generate"
 #: ../www/basic-network.asp:1769
 msgid "Key"
 msgstr "Key"
+
+#: ../www/basic-static.asp:18 ../www/basic-static.asp:360
+msgid "Static DHCP"
+msgstr "Static DHCP"
+
+#: ../www/basic-static.asp:18 ../www/basic-static.asp:360
+msgid "ARP"
+msgstr "ARP"
+
+#: ../www/basic-static.asp:18 ../www/basic-static.asp:360
+msgid "IPT"
+msgstr "IPT"
+
+#: ../www/basic-static.asp:157
+msgid "Duplicate MAC address"
+msgstr "Duplicate MAC address"
+
+#: ../www/basic-static.asp:165
+msgid "Invalid IP address"
+msgstr "Invalid IP address"
+
+#: ../www/basic-static.asp:172
+msgid "Duplicate IP address"
+msgstr "Duplicate IP address"
+
+#: ../www/basic-static.asp:184
+msgid "Invalid hostname"
+msgstr "Invalid hostname"
+
+#: ../www/basic-static.asp:184
+msgid "Only characters"
+msgstr "Only characters"
+
+#: ../www/basic-static.asp:184
+msgid "are allowed"
+msgstr "are allowed"
+
+#: ../www/basic-static.asp:188
+msgid "Duplicate hostname"
+msgstr "Duplicate hostname"
+
+#: ../www/basic-static.asp:196
+msgid "Both MAC address and name fields must not be empty"
+msgstr "Both MAC address and name fields must not be empty"
+
+#: ../www/basic-static.asp:261 ../www/basic-static.asp:379
+msgid "Bound to"
+msgstr "Bound to"
+
+#: ../www/basic-static.asp:261 ../www/basic-static.asp:381
+msgid "IPTraffic"
+msgstr "IPTraffic"
+
+#: ../www/basic-static.asp:378
+msgid ""
+"Unique identifier associated to a network interface on this particular device"
+msgstr ""
+"Unique identifier associated to a network interface on this particular device"
+
+#: ../www/basic-static.asp:379
+msgid "Enforce static ARP binding of this particular IP/MAC address pair"
+msgstr "Enforce static ARP binding of this particular IP/MAC address pair"
+
+#: ../www/basic-static.asp:380
+msgid "Network address assigned to this device on the local network"
+msgstr "Network address assigned to this device on the local network"
+
+#: ../www/basic-static.asp:381
+msgid "Keep track of bandwidth usage for this IP address"
+msgstr "Keep track of bandwidth usage for this IP address"
+
+#: ../www/basic-static.asp:382
+msgid "Human-readable nickname/label assigned to this device on the network"
+msgstr "Human-readable nickname/label assigned to this device on the network"
+
+#: ../www/basic-static.asp:388
+msgid "To specify multiple hostnames for a device, separate them with spaces"
+msgstr "To specify multiple hostnames for a device, separate them with spaces"
+
+#: ../www/basic-static.asp:389
+msgid ""
+"To enable/enforce static ARP binding for a particular device, it must have "
+"only one MAC associated with that particular IP address (i.e. you can't have "
+"two MAC addresses linked to the same hostname/device in the table above)"
+msgstr ""
+"To enable/enforce static ARP binding for a particular device, it must have "
+"only one MAC associated with that particular IP address (i.e. you can't have "
+"two MAC addresses linked to the same hostname/device in the table above)"
+
+#: ../www/basic-static.asp:390
+msgid ""
+"When ARP binding is enabled for a particular MAC/IP address pair, that "
+"device will always be shown as 'active' in the <a href='tools-wol.asp'>Wake "
+"On LAN</a> table"
+msgstr ""
+"When ARP binding is enabled for a particular MAC/IP address pair, that "
+"device will always be shown as 'active' in the <a href='tools-wol.asp'>Wake "
+"On LAN</a> table"
+
+#: ../www/basic-static.asp:391
+msgid ""
+"See also the <a href='advanced-dhcpdns.asp'>Advanced DHCP/DNS</a> settings "
+"page for more DHCP-related configuration options"
+msgstr ""
+"See also the <a href='advanced-dhcpdns.asp'>Advanced DHCP/DNS</a> settings "
+"page for more DHCP-related configuration options"
+
+#: ../www/basic-time.asp:14 ../www/basic-time.asp:167
+#: ../www/status-overview.asp:357 ../www/tomato.js:2382
+msgid "Time"
+msgstr "Time"
 
 #: ../www/basic-time.asp:31
 msgid "Africa"
@@ -1918,6 +2687,10 @@ msgid "Every 2 hours"
 msgstr "Every 2 hours"
 
 #: ../www/basic-time.asp:266
+msgid "Every 4 hours"
+msgstr "Every 4 hours"
+
+#: ../www/basic-time.asp:266
 msgid "Every 6 hours"
 msgstr "Every 6 hours"
 
@@ -1954,10 +2727,6 @@ msgstr ""
 msgid "Clear"
 msgstr "Clear"
 
-#: ../www/basic-time.asp:266
-msgid "Every 4 hours"
-msgstr "Every 4 hours"
-
 #: ../www/basic-time.asp:254
 msgid "South Australia"
 msgstr "South Australia"
@@ -1970,6 +2739,26 @@ msgstr "Irkutsk"
 msgid "Krasnoyarsk"
 msgstr "Krasnoyarsk"
 
+#: ../www/basic-wfilter.asp:18 ../www/tomato.js:2385
+msgid "Wireless Filter"
+msgstr "Wireless Filter"
+
+#: ../www/basic-wfilter.asp:182
+msgid "Wireless Client Filter"
+msgstr "Wireless Client Filter"
+
+#: ../www/basic-wfilter.asp:184
+msgid "Disable filter"
+msgstr "Disable filter"
+
+#: ../www/basic-wfilter.asp:185
+msgid "Permit only the following clients"
+msgstr "Permit only the following clients"
+
+#: ../www/basic-wfilter.asp:186
+msgid "Block the following clients"
+msgstr "Block the following clients"
+
 #: ../www/bwm-24.asp:14 ../www/bwm-daily.asp:14 ../www/bwm-monthly.asp:14
 #: ../www/bwm-realtime.asp:14 ../www/bwm-weekly.asp:14
 #: ../www/ipt-realtime.asp:14 ../www/tomato.js:2354
@@ -1981,7 +2770,7 @@ msgstr "Bandwidth"
 msgid "Last 24 Hours"
 msgstr "Last 24 Hours"
 
-#: ../www/bwm-24.asp:101 ../www/ipt-24.asp:144
+#: ../www/bwm-24.asp:101 ../www/ipt-24.asp:144 ../www/tools-wol.asp:172
 msgid "Stop"
 msgstr "Stop"
 
@@ -1992,11 +2781,6 @@ msgstr "Start"
 #: ../www/bwm-24.asp:173 ../www/ipt-24.asp:333
 msgid "2 minute interval"
 msgstr "2 minute interval"
-
-#: ../www/bwm-24.asp:184 ../www/bwm-realtime.asp:167 ../www/ipt-24.asp:344
-#: ../www/ipt-realtime.asp:290
-msgid "Off"
-msgstr "Off"
 
 #: ../www/bwm-24.asp:190 ../www/bwm-realtime.asp:173 ../www/ipt-24.asp:350
 #: ../www/ipt-realtime.asp:296
@@ -2134,7 +2918,9 @@ msgstr "Download"
 msgid "Upload"
 msgstr "Upload"
 
-#: ../www/bwm-monthly.asp:135 ../www/ipt-monthly.asp:489
+#: ../www/bwm-monthly.asp:135 ../www/forward-upnp.asp:243
+#: ../www/ipt-monthly.asp:489 ../www/tools-wol.asp:172
+#: ../www/tools-wol.asp:204
 msgid "Refresh"
 msgstr "Refresh"
 
@@ -2216,6 +3002,224 @@ msgstr "Summary"
 #: ../www/bwm-weekly.asp:246
 msgid "Full"
 msgstr "Full"
+
+#: ../www/forward-basic-ipv6.asp:14 ../www/forward-basic.asp:14
+#: ../www/forward-dmz.asp:14 ../www/forward-triggered.asp:14
+#: ../www/forward-upnp.asp:14
+msgid "Forwarding"
+msgstr "Forwarding"
+
+#: ../www/forward-basic-ipv6.asp:14 ../www/tomato.js:2403
+msgid "Basic IPv6"
+msgstr "Basic IPv6"
+
+#: ../www/forward-basic-ipv6.asp:72 ../www/forward-basic.asp:81
+#: ../www/forward-triggered.asp:98
+msgid "Both"
+msgstr "Both"
+
+#: ../www/forward-basic-ipv6.asp:117 ../www/forward-basic.asp:142
+msgid "Proto"
+msgstr "Proto"
+
+#: ../www/forward-basic-ipv6.asp:117 ../www/forward-basic-ipv6.asp:190
+msgid "Dest Address"
+msgstr "Dest Address"
+
+#: ../www/forward-basic-ipv6.asp:117 ../www/forward-basic-ipv6.asp:191
+msgid "Dest Ports"
+msgstr "Dest Ports"
+
+#: ../www/forward-basic-ipv6.asp:180
+msgid "IPv6 Port Forwarding"
+msgstr "IPv6 Port Forwarding"
+
+#: ../www/forward-basic-ipv6.asp:187
+msgid ""
+"Opens access to ports on machines inside the LAN, but does <b>not</b> re-map "
+"ports"
+msgstr ""
+"Opens access to ports on machines inside the LAN, but does <b>not</b> re-map "
+"ports"
+
+#: ../www/forward-basic-ipv6.asp:189 ../www/forward-basic.asp:223
+msgid "Forward only if from this address"
+msgstr "Forward only if from this address"
+
+#: ../www/forward-basic-ipv6.asp:190 ../www/forward-basic.asp:227
+msgid "The destination address inside the LAN"
+msgstr "The destination address inside the LAN"
+
+#: ../www/forward-basic-ipv6.asp:191
+msgid "The ports to be opened for forwarding"
+msgstr "The ports to be opened for forwarding"
+
+#: ../www/forward-basic.asp:142 ../www/forward-basic.asp:224
+msgid "Ext Ports"
+msgstr "Ext Ports"
+
+#: ../www/forward-basic.asp:142 ../www/forward-basic.asp:225
+msgid "Int Port"
+msgstr "Int Port"
+
+#: ../www/forward-basic.asp:142 ../www/forward-basic.asp:227
+msgid "Int Address"
+msgstr "Int Address"
+
+#: ../www/forward-basic.asp:215 ../www/tomato.js:2400
+msgid "Port Forwarding"
+msgstr "Port Forwarding"
+
+#: ../www/forward-basic.asp:224
+msgid "The ports to be forwarded, as seen from the WAN"
+msgstr "The ports to be forwarded, as seen from the WAN"
+
+#: ../www/forward-basic.asp:225
+msgid ""
+"The destination port inside the LAN. If blank, the destination port is the "
+"same as <i>Ext Ports</i>. Only one port per entry is supported when "
+"forwarding to a different internal"
+msgstr ""
+"The destination port inside the LAN. If blank, the destination port is the "
+"same as <i>Ext Ports</i>. Only one port per entry is supported when "
+"forwarding to a different internal"
+
+#: ../www/forward-dmz.asp:14 ../www/forward-dmz.asp:123 ../www/tomato.js:2405
+msgid "DMZ"
+msgstr "DMZ"
+
+#: ../www/forward-dmz.asp:127
+msgid "Enable DMZ"
+msgstr "Enable DMZ"
+
+#: ../www/forward-dmz.asp:128
+msgid "Destination Address"
+msgstr "Destination Address"
+
+#: ../www/forward-dmz.asp:130
+msgid "Destination Interface"
+msgstr "Destination Interface"
+
+#: ../www/forward-dmz.asp:132
+msgid "Source Address<br>Restriction"
+msgstr "Source Address<br>Restriction"
+
+#: ../www/forward-dmz.asp:133
+msgid "ex"
+msgstr "ex"
+
+#: ../www/forward-dmz.asp:135
+msgid "Leave Remote Access"
+msgstr "Leave Remote Access"
+
+#: ../www/forward-dmz.asp:135
+msgid "Redirect remote access ports for SSH and HTTP(s) to router"
+msgstr "Redirect remote access ports for SSH and HTTP(s) to router"
+
+#: ../www/forward-triggered.asp:14 ../www/tomato.js:2406
+msgid "Triggered"
+msgstr "Triggered"
+
+#: ../www/forward-triggered.asp:102 ../www/forward-upnp.asp:77
+msgid "Protocol"
+msgstr "Protocol"
+
+#: ../www/forward-triggered.asp:102
+msgid "Trigger Ports"
+msgstr "Trigger Ports"
+
+#: ../www/forward-triggered.asp:102 ../www/forward-upnp.asp:240
+msgid "Forwarded Ports"
+msgstr "Forwarded Ports"
+
+#: ../www/forward-triggered.asp:160
+msgid "Triggered Port Forwarding"
+msgstr "Triggered Port Forwarding"
+
+#: ../www/forward-triggered.asp:168
+msgid "Use "
+msgstr "Use "
+
+#: ../www/forward-triggered.asp:169
+msgid "Trigger Ports are the initial LAN to WAN 'trigger'"
+msgstr "Trigger Ports are the initial LAN to WAN 'trigger'"
+
+#: ../www/forward-triggered.asp:170
+msgid ""
+"Forwarded Ports are the WAN to LAN ports that are opened if the 'trigger' is "
+"activated"
+msgstr ""
+"Forwarded Ports are the WAN to LAN ports that are opened if the 'trigger' is "
+"activated"
+
+#: ../www/forward-triggered.asp:171
+msgid "These ports are automatically closed after a few minutes of inactivity"
+msgstr "These ports are automatically closed after a few minutes of inactivity"
+
+#: ../www/forward-upnp.asp:14
+msgid "UPnP"
+msgstr "UPnP"
+
+#: ../www/forward-upnp.asp:14
+msgid "NAT-PMP"
+msgstr "NAT-PMP"
+
+#: ../www/forward-upnp.asp:77
+msgid "External"
+msgstr "External"
+
+#: ../www/forward-upnp.asp:77
+msgid "Internal"
+msgstr "Internal"
+
+#: ../www/forward-upnp.asp:77
+msgid "nternal Address"
+msgstr "nternal Address"
+
+#: ../www/forward-upnp.asp:97
+msgid "Click to delete"
+msgstr "Click to delete"
+
+#: ../www/forward-upnp.asp:107
+msgid "Delete all entries"
+msgstr "Delete all entries"
+
+#: ../www/forward-upnp.asp:151
+msgid "NAT-PMP or UPnP must be enabled in least one LAN bridge"
+msgstr "NAT-PMP or UPnP must be enabled in least one LAN bridge"
+
+#: ../www/forward-upnp.asp:255
+msgid "Inactive Rules Cleaning"
+msgstr "Inactive Rules Cleaning"
+
+#: ../www/forward-upnp.asp:256
+msgid "Cleaning Interval"
+msgstr "Cleaning Interval"
+
+#: ../www/forward-upnp.asp:258
+msgid "Cleaning Threshold"
+msgstr "Cleaning Threshold"
+
+#: ../www/forward-upnp.asp:259
+msgid "redirections"
+msgstr "redirections"
+
+#: ../www/forward-upnp.asp:260
+msgid "Secure Mode"
+msgstr "Secure Mode"
+
+#: ../www/forward-upnp.asp:261
+msgid "when enabled, UPnP clients are allowed to add mappings only to their IP"
+msgstr ""
+"when enabled, UPnP clients are allowed to add mappings only to their IP"
+
+#: ../www/forward-upnp.asp:263
+msgid "Listen on"
+msgstr "Listen on"
+
+#: ../www/forward-upnp.asp:268
+msgid "Show In My Network Places"
+msgstr "Show In My Network Places"
 
 #: ../www/ipt-24.asp:18 ../www/ipt-daily.asp:18 ../www/ipt-details.asp:18
 #: ../www/ipt-graphs.asp:14 ../www/ipt-monthly.asp:18 ../www/tomato.js:2361
@@ -2335,8 +3339,8 @@ msgid "Filter out this address"
 msgstr "Filter out this address"
 
 #: ../www/ipt-details.asp:209 ../www/ipt-monthly.asp:186
-#: ../www/status-overview.asp:359 ../www/status-overview.asp:383
-#: ../www/status-overview.asp:413
+#: ../www/status-overview.asp:346 ../www/status-overview.asp:370
+#: ../www/status-overview.asp:400
 msgid "hide"
 msgstr "hide"
 
@@ -2436,7 +3440,8 @@ msgstr "second interval"
 msgid " Aria2 Client"
 msgstr " Aria2 Client"
 
-#: ../www/nas-aria2.asp:77 ../www/tomato.js:2410
+#: ../www/nas-aria2.asp:77 ../www/qos-settings.asp:14
+#: ../www/qos-settings.asp:208 ../www/tomato.js:2410
 msgid "Basic Settings"
 msgstr "Basic Settings"
 
@@ -2556,9 +3561,133 @@ msgstr "DMA Buffer"
 msgid "Audio Device"
 msgstr "Audio Device"
 
+#: ../www/qos-settings.asp:14 ../www/tomato.js:2409
+msgid "QoS"
+msgstr "QoS"
+
+#: ../www/qos-settings.asp:31 ../www/qos-settings.asp:34
+msgid "No Limit"
+msgstr "No Limit"
+
+#: ../www/qos-settings.asp:69
+msgid "Ceiling must be greater than or equal to rate"
+msgstr "Ceiling must be greater than or equal to rate"
+
+#: ../www/qos-settings.asp:217
+msgid "Enable QoS"
+msgstr "Enable QoS"
+
+#: ../www/qos-settings.asp:218
+msgid "Prioritize small packets with these control flags"
+msgstr "Prioritize small packets with these control flags"
+
+#: ../www/qos-settings.asp:224
+msgid "Prioritize ICMP"
+msgstr "Prioritize ICMP"
+
+#: ../www/qos-settings.asp:225
+msgid "No Ingress QOS for UDP"
+msgstr "No Ingress QOS for UDP"
+
+#: ../www/qos-settings.asp:226
+msgid "Reset class when changing settings"
+msgstr "Reset class when changing settings"
+
+#: ../www/qos-settings.asp:227
+msgid "Default class"
+msgstr "Default class"
+
+#: ../www/qos-settings.asp:231
+msgid "Qdisc Scheduler"
+msgstr "Qdisc Scheduler"
+
+#: ../www/qos-settings.asp:236
+msgid "Settings for DSL only"
+msgstr "Settings for DSL only"
+
+#: ../www/qos-settings.asp:241
+msgid "DSL Overhead Value"
+msgstr "DSL Overhead Value"
+
+#: ../www/qos-settings.asp:241
+msgid "ATM Encapsulation Type"
+msgstr "ATM Encapsulation Type"
+
+#: ../www/qos-settings.asp:252
+msgid "Outbound Rates / Limits"
+msgstr "Outbound Rates / Limits"
+
+#: ../www/qos-settings.asp:257 ../www/qos-settings.asp:280
+msgid "Max Bandwidth Limit"
+msgstr "Max Bandwidth Limit"
+
+#: ../www/qos-settings.asp:257 ../www/qos-settings.asp:280
+msgid "Set to measured bandwidth less 15-30%"
+msgstr "Set to measured bandwidth less 15-30%"
+
+#: ../www/qos-settings.asp:275
+msgid "Inbound Rates / Limits"
+msgstr "Inbound Rates / Limits"
+
+#: ../www/qos-settings.asp:310
+msgid "QOS Class Names"
+msgstr "QOS Class Names"
+
+#: ../www/qos-settings.asp:310
+msgid "Toggle Visibility"
+msgstr "Toggle Visibility"
+
+#: ../www/qos-settings.asp:317
+msgid "Priority Class"
+msgstr "Priority Class"
+
+#: ../www/qos-settings.asp:318
+msgid "Maximum 10 characters, no spaces"
+msgstr "Maximum 10 characters, no spaces"
+
+#: ../www/qos-settings.asp:330
+msgid "TCP Vegas"
+msgstr "TCP Vegas"
+
+#: ../www/qos-settings.asp:330
+msgid "Network Congestion Control"
+msgstr "Network Congestion Control"
+
+#: ../www/qos-settings.asp:334
+msgid "Enable TCP Vegas"
+msgstr "Enable TCP Vegas"
+
+#: ../www/qos-settings.asp:335
+msgid "Alpha"
+msgstr "Alpha"
+
+#: ../www/qos-settings.asp:336
+msgid "Beta"
+msgstr "Beta"
+
+#: ../www/qos-settings.asp:337
+msgid "Gamma"
+msgstr "Gamma"
+
+#: ../www/restrict.asp:14
+msgid "Access Restrictions"
+msgstr "Access Restrictions"
+
+#: ../www/restrict.asp:48
+msgid "Add"
+msgstr "Add"
+
+#: ../www/restrict.asp:79
+msgid "the following day"
+msgstr "the following day"
+
+#: ../www/restrict.asp:126
+msgid "Access Restriction Overview"
+msgstr "Access Restriction Overview"
+
 #: ../www/status-devices.asp:18 ../www/status-log.asp:14
-#: ../www/status-overview.asp:399 ../www/status-webmon.asp:12
-#: ../www/tomato.js:2349
+#: ../www/status-overview.asp:386 ../www/status-webmon.asp:12
+#: ../www/tools-wol.asp:53 ../www/tomato.js:2349
 msgid "Status"
 msgstr "Status"
 
@@ -2567,15 +3696,16 @@ msgstr "Status"
 msgid "Device List"
 msgstr "Device List"
 
-#: ../www/status-devices.asp:320 ../www/status-overview.asp:364
+#: ../www/status-devices.asp:320 ../www/status-overview.asp:351
+#: ../www/tools-wol.asp:53
 msgid "Name"
 msgstr "Name"
 
-#: ../www/status-devices.asp:320 ../www/status-overview.asp:514
+#: ../www/status-devices.asp:320 ../www/status-overview.asp:501
 msgid "RSSI"
 msgstr "RSSI"
 
-#: ../www/status-devices.asp:320
+#: ../www/status-devices.asp:320 ../www/tools-survey.asp:265
 msgid "Quality"
 msgstr "Quality"
 
@@ -2623,179 +3753,160 @@ msgstr "Logging Configuration"
 msgid "Internal logging disabled"
 msgstr "Internal logging disabled"
 
-#: ../www/status-overview.asp:43
+#: ../www/status-overview.asp:42
 msgid "WPA Personal (PSK)"
 msgstr "WPA Personal (PSK)"
 
-#: ../www/status-overview.asp:43
+#: ../www/status-overview.asp:42
 msgid "WPA2 Personal (PSK)"
 msgstr "WPA2 Personal (PSK)"
 
-#: ../www/status-overview.asp:117
+#: ../www/status-overview.asp:116
 msgid "Ethernet Ports State"
 msgstr "Ethernet Ports State"
 
-#: ../www/status-overview.asp:226 ../www/status-overview.asp:353
+#: ../www/status-overview.asp:340
 msgid "Attention"
 msgstr "Attention"
 
-#: ../www/status-overview.asp:227
-msgid "Tomato by Shibby "
-msgstr "Tomato by Shibby "
-
-#: ../www/status-overview.asp:227
-msgid "is now available"
-msgstr "is now available"
-
-#: ../www/status-overview.asp:227
-msgid "Click here to read more"
-msgstr "Click here to read more"
-
-#: ../www/status-overview.asp:354
+#: ../www/status-overview.asp:341
 msgid "You did not configure language setting."
 msgstr "You did not configure language setting."
 
-#: ../www/status-overview.asp:355
+#: ../www/status-overview.asp:342
 msgid "Please go to"
 msgstr "Please go to"
 
-#: ../www/status-overview.asp:355 ../www/tomato.js:2470
+#: ../www/status-overview.asp:342 ../www/tomato.js:2470
 msgid "Administration"
 msgstr "Administration"
 
-#: ../www/status-overview.asp:355
+#: ../www/status-overview.asp:342
 msgid "and make a choice."
 msgstr "and make a choice."
 
-#: ../www/status-overview.asp:359 ../www/tomato.js:2372
+#: ../www/status-overview.asp:346
 msgid "System"
 msgstr "System"
 
-#: ../www/status-overview.asp:365
+#: ../www/status-overview.asp:352
 msgid "Model"
 msgstr "Model"
 
-#: ../www/status-overview.asp:366
+#: ../www/status-overview.asp:353
 msgid "Chipset"
 msgstr "Chipset"
 
-#: ../www/status-overview.asp:367
+#: ../www/status-overview.asp:354
 msgid "CPU Freq"
 msgstr "CPU Freq"
 
-#: ../www/status-overview.asp:368
+#: ../www/status-overview.asp:355
 msgid "Flash Size"
 msgstr "Flash Size"
 
-#: ../www/status-overview.asp:370 ../www/tomato.js:2382
-msgid "Time"
-msgstr "Time"
-
-#: ../www/status-overview.asp:371
+#: ../www/status-overview.asp:358
 msgid "Uptime"
 msgstr "Uptime"
 
-#: ../www/status-overview.asp:372
+#: ../www/status-overview.asp:359
 msgid "CPU Load"
 msgstr "CPU Load"
 
-#: ../www/status-overview.asp:373
+#: ../www/status-overview.asp:360
 msgid "Total / Free Memory"
 msgstr "Total / Free Memory"
 
-#: ../www/status-overview.asp:374
+#: ../www/status-overview.asp:361
 msgid "Total / Free Swap"
 msgstr "Total / Free Swap"
 
-#: ../www/status-overview.asp:375
+#: ../www/status-overview.asp:362
 msgid "Total / Free NVRAM"
 msgstr "Total / Free NVRAM"
 
-#: ../www/status-overview.asp:383
+#: ../www/status-overview.asp:370
 msgid "WAN"
 msgstr "WAN"
 
-#: ../www/status-overview.asp:388
+#: ../www/status-overview.asp:375
 msgid "Connection Type"
 msgstr "Connection Type"
 
-#: ../www/status-overview.asp:388
+#: ../www/status-overview.asp:375
 msgid "Static IP"
 msgstr "Static IP"
 
-#: ../www/status-overview.asp:390
+#: ../www/status-overview.asp:377
 msgid "Previous WAN IP"
 msgstr "Previous WAN IP"
 
-#: ../www/status-overview.asp:400
+#: ../www/status-overview.asp:387
 msgid "Connection Uptime"
 msgstr "Connection Uptime"
 
-#: ../www/status-overview.asp:401
+#: ../www/status-overview.asp:388
 msgid "Remaining Lease Time"
 msgstr "Remaining Lease Time"
 
-#: ../www/status-overview.asp:405
+#: ../www/status-overview.asp:392
 msgid "Renew"
 msgstr "Renew"
 
-#: ../www/status-overview.asp:406
+#: ../www/status-overview.asp:393
 msgid "Release"
 msgstr "Release"
 
-#: ../www/status-overview.asp:408
+#: ../www/status-overview.asp:395
 msgid "Connect"
 msgstr "Connect"
 
-#: ../www/status-overview.asp:409
+#: ../www/status-overview.asp:396
 msgid "Disconnect"
 msgstr "Disconnect"
 
-#: ../www/status-overview.asp:466
+#: ../www/status-overview.asp:453
 msgid "Router MAC Address"
 msgstr "Router MAC Address"
 
-#: ../www/status-overview.asp:467
+#: ../www/status-overview.asp:454
 msgid "Router IP Addresses"
 msgstr "Router IP Addresses"
 
-#: ../www/status-overview.asp:471
+#: ../www/status-overview.asp:458
 msgid "IPv6 Link-local Address"
 msgstr "IPv6 Link-local Address"
 
-#: ../www/status-overview.asp:502
+#: ../www/status-overview.asp:489
 msgid "Interface Status"
 msgstr "Interface Status"
 
-#: ../www/status-overview.asp:503
+#: ../www/status-overview.asp:490
 msgid "Radio"
 msgstr "Radio"
 
-#: ../www/status-overview.asp:512
+#: ../www/status-overview.asp:499
 msgid "Interference Level"
 msgstr "Interference Level"
 
-#: ../www/status-overview.asp:513
+#: ../www/status-overview.asp:500
 msgid "Rate"
 msgstr "Rate"
 
-#: ../www/status-overview.asp:515
+#: ../www/status-overview.asp:502 ../www/tools-survey.asp:265
 msgid "Noise"
 msgstr "Noise"
 
-#: ../www/status-overview.asp:516
+#: ../www/status-overview.asp:503
 msgid "Signal Quality"
 msgstr "Signal Quality"
-
-#: ../www/status-overview.asp:520
-msgid "Disable"
-msgstr "Disable"
 
 #: ../www/status-webmon.asp:12 ../www/tomato.js:2352
 msgid "Web Usage"
 msgstr "Web Usage"
 
 #: ../www/status-webmon.asp:70 ../www/tools-ping.asp:214
+#: ../www/tools-shell.asp:126
 msgid "Please wait"
 msgstr "Please wait"
 
@@ -2827,7 +3938,8 @@ msgstr "Web Monitor Configuration"
 msgid "Web Monitoring disabled"
 msgstr "Web Monitoring disabled"
 
-#: ../www/tools-ping.asp:14 ../www/tomato.js:2369
+#: ../www/tools-ping.asp:14 ../www/tools-survey.asp:14 ../www/tools-wol.asp:14
+#: ../www/tomato.js:2369
 msgid "Tools"
 msgstr "Tools"
 
@@ -2855,6 +3967,88 @@ msgstr "Ping Count"
 msgid "Packet Size"
 msgstr "Packet Size"
 
+#: ../www/tools-shell.asp:12
+msgid "Tools: System Commands"
+msgstr "Tools: System Commands"
+
+#: ../www/tools-shell.asp:115
+msgid "Execute System Commands"
+msgstr "Execute System Commands"
+
+#: ../www/tools-shell.asp:119
+msgid "Command"
+msgstr "Command"
+
+#: ../www/tools-shell.asp:122
+msgid "Execute"
+msgstr "Execute"
+
+#: ../www/tools-survey.asp:14 ../www/tomato.js:2373
+msgid "Wireless Survey"
+msgstr "Wireless Survey"
+
+#: ../www/tools-survey.asp:139
+msgid "MHz"
+msgstr "MHz"
+
+#: ../www/tools-survey.asp:239
+msgid "search"
+msgstr "search"
+
+#: ../www/tools-survey.asp:254
+msgid "added"
+msgstr "added"
+
+#: ../www/tools-survey.asp:254
+msgid "removed"
+msgstr "removed"
+
+#: ../www/tools-survey.asp:255
+msgid "total"
+msgstr "total"
+
+#: ../www/tools-survey.asp:257
+msgid "Last updated"
+msgstr "Last updated"
+
+#: ../www/tools-survey.asp:265
+msgid "Last Seen"
+msgstr "Last Seen"
+
+#: ../www/tools-survey.asp:265
+msgid "Capabilities"
+msgstr "Capabilities"
+
+#: ../www/tools-survey.asp:265
+msgid "Rates"
+msgstr "Rates"
+
+#: ../www/tools-survey.asp:318
+msgid "Wireless Site Survey"
+msgstr "Wireless Site Survey"
+
+#: ../www/tools-survey.asp:334
+msgid ""
+"Wireless connections to this router may be disrupted while using this tool"
+msgstr ""
+"Wireless connections to this router may be disrupted while using this tool"
+
+#: ../www/tools-wol.asp:14 ../www/tomato.js:2374
+msgid "WOL"
+msgstr "WOL"
+
+#: ../www/tools-wol.asp:201
+msgid "Wake On LAN"
+msgstr "Wake On LAN"
+
+#: ../www/tools-wol.asp:211
+msgid "MAC Address List"
+msgstr "MAC Address List"
+
+#: ../www/tools-wol.asp:214
+msgid "Wake Up"
+msgstr "Wake Up"
+
 #: ../www/tomato.js:2365 ../www/tomato.js:2414
 msgid "Transfer Rates"
 msgstr "Transfer Rates"
@@ -2863,29 +4057,17 @@ msgstr "Transfer Rates"
 msgid "Trace"
 msgstr "Trace"
 
-#: ../www/tomato.js:2373
-msgid "Wireless Survey"
-msgstr "Wireless Survey"
-
-#: ../www/tomato.js:2374
-msgid "WOL"
-msgstr "WOL"
+#: ../www/tomato.js:2372
+msgid "System Commands"
+msgstr "System Commands"
 
 #: ../www/tomato.js:2379
 msgid "IPv6"
 msgstr "IPv6"
 
-#: ../www/tomato.js:2383
-msgid "DDNS"
-msgstr "DDNS"
-
 #: ../www/tomato.js:2384
 msgid "Static DHCP/ARP/IPT"
 msgstr "Static DHCP/ARP/IPT"
-
-#: ../www/tomato.js:2385
-msgid "Wireless Filter"
-msgstr "Wireless Filter"
 
 #: ../www/tomato.js:2387
 msgid "Conntrack/Netfilter"
@@ -2895,29 +4077,9 @@ msgstr "Conntrack/Netfilter"
 msgid "DHCP/DNS"
 msgstr "DHCP/DNS"
 
-#: ../www/tomato.js:2397
-msgid "LAN Access"
-msgstr "LAN Access"
-
 #: ../www/tomato.js:2398
 msgid "Virtual Wireless"
 msgstr "Virtual Wireless"
-
-#: ../www/tomato.js:2400
-msgid "Port Forwarding"
-msgstr "Port Forwarding"
-
-#: ../www/tomato.js:2403
-msgid "Basic IPv6"
-msgstr "Basic IPv6"
-
-#: ../www/tomato.js:2405
-msgid "DMZ"
-msgstr "DMZ"
-
-#: ../www/tomato.js:2406
-msgid "Triggered"
-msgstr "Triggered"
 
 #: ../www/tomato.js:2407
 msgid "UPnP/NAT-PMP"
@@ -2926,10 +4088,6 @@ msgstr "UPnP/NAT-PMP"
 #: ../www/tomato.js:2408
 msgid "Access Restriction"
 msgstr "Access Restriction"
-
-#: ../www/tomato.js:2409
-msgid "QoS"
-msgstr "QoS"
 
 #: ../www/tomato.js:2411
 msgid "Classification"
@@ -3086,6 +4244,15 @@ msgstr "Shutdown"
 #: ../www/tomato.js:2501
 msgid "Logout"
 msgstr "Logout"
+
+#~ msgid "Tomato by Shibby "
+#~ msgstr "Tomato by Shibby "
+
+#~ msgid "is now available"
+#~ msgstr "is now available"
+
+#~ msgid "Click here to read more"
+#~ msgstr "Click here to read more"
 
 #~ msgid "You did not configure <b>TomatoAnon project</b> setting."
 #~ msgstr "You did not configure <b>TomatoAnon project</b> setting."
