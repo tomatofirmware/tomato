@@ -253,6 +253,23 @@ ifneq ($(NVRAM_SIZE),60)
 		| tee -a fpkg.log
 endif
 endif
+ifeq ($(WNDR),y)
+	@echo "Creating Firmware for Netgear WNDR Routers ..."
+	@btools/fpkg -i lzma-loader/loader.gz -i $(LINUXDIR)/arch/mips/brcm-boards/bcm947xx/compressed/vmlinuz -a 1024 -i router/mipsel-uclibc/target.image \
+		-t image/tomato-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).trx \
+		| tee -a fpkg.log
+	# For mkchkimg, have to redirect stderr to stdout ... for some reason mkchkimg outputs to stderr (confirmed in source code!), 
+	# and tee only reads from stdout (not stderr)
+	@echo "*********************** Convert TRX to CHK (add Netgear Checksum) ************************" >>fpkg.log
+	@$(SRCBASE)/wnrtool/mkchkimg -o image/tomato-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).chk \
+	-k image/tomato-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).trx \
+	-b U12H181T00_NETGEAR -r 2 2>&1 | tee -a fpkg.log
+	
+	@echo "Cleanup ...."
+	@cp fpkg.log image/fpkg-$(V1)$(mips_rev)$(beta)$(V2).log
+	@rm -f image/tomato-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).trx
+	@rm -f fpkg.log
+else
 	# Create generic TRX image
 	@btools/fpkg -i lzma-loader/loader.gz -i $(LINUXDIR)/arch/mips/brcm-boards/bcm947xx/compressed/vmlinuz -a 1024 -i router/mipsel-uclibc/target.image \
 		-t image/tomato-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).trx \
@@ -266,6 +283,7 @@ endif
 ifneq ($(NOVERSION),1)	
 	@cp router/shared/tomato_version router/shared/tomato_version_last
 	@btools/uversion.pl --bump
+endif
 endif
 endif
 
@@ -1163,9 +1181,11 @@ endif
 
 #Netgear WNDR series with 64K NVRAM Builds
 wndr64:
-	@$(MAKE) bin MIPS32=r2 NVRAM_SIZE=64 OPENVPN=n NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y IPV6SUPP=y B=W BUILD_DESC="WNDR" USB="USB" SNMP=y DNSCRYPT=y PPTPD=y	
+	@$(MAKE) bin MIPS32=r2 NVRAM_SIZE=64 WNDR=y OPENVPN=n NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y IPV6SUPP=y B=W BUILD_DESC="WNDR" USB="USB" SNMP=y DNSCRYPT=y PPTPD=y	
 wndr64-sm:
-	@$(MAKE) bin MIPS32=r2 NVRAM_SIZE=64 OPENVPN=n NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y IPV6SUPP=n B=W BUILD_DESC="WNDRsm" USB="USB" SNMP=y DNSCRYPT=y PPTPD=n NO_HTTPS=y
+	@$(MAKE) bin MIPS32=r2 NVRAM_SIZE=64 WNDR=y OPENVPN=n NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y IPV6SUPP=n B=W BUILD_DESC="WNDRsm" USB="USB" SNMP=y DNSCRYPT=y PPTPD=n NO_HTTPS=y
+wndr64-nousb:
+	@$(MAKE) bin MIPS32=r2 NVRAM_SIZE=64 WNDR=y OPENVPN=n NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y IPV6SUPP=n B=W BUILD_DESC="WNDRnousb" USB="" SNMP=y DNSCRYPT=y PPTPD=n NO_HTTPS=y
 
 # end ofCONFIG_LINUX26
 endif
@@ -1299,6 +1319,7 @@ ifeq ($(CONFIG_LINUX26),y)
 	@echo "       Netgear WNDR series with 64k Nvram/8MB Flash(WNDR4000/3400/3700v3)"
 	@echo "wndr64       Netgear WNDR series(64k Nvram) build, no VPN"
 	@echo "wndr64-sm    Netgear WNDR series(64k Nvram) build, Small"
+	@echo "wndr64-nousb Netgear WNDR series(64k Nvram) build, Small, No USB"
 
 endif
 	@echo ""
