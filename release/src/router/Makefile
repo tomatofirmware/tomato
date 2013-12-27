@@ -427,6 +427,10 @@ ifeq ($(TCONFIG_OPTIMIZE_SHARED_LIBS),y)
 else
 	@$(SRCBASE)/btools/libfoo.pl --noopt
 endif
+# remove invalid symbol links in lib. dir. bwq518
+	-@find -L $(TARGETDIR)/lib -type l | xargs rm -f
+	-@find -L $(TARGETDIR)/usr/lib -type l | xargs rm -f
+
 	@chmod 0555 $(TARGETDIR)/lib/*.so*
 	@chmod 0555 $(TARGETDIR)/usr/lib/*.so*
 
