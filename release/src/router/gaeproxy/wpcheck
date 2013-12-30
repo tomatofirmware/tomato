@@ -32,7 +32,7 @@ case "$1" in
    if [ "$WPON" == "1" ]; then
     WPCHK=`nvram get gaeproxy_check`
     if [ "$WPCHK" == "1" ]; then
-     ON=`ps w | grep python | grep startup.py | wc -l`
+     ON=`ps w | grep python | grep startup.py | grep -v grep | wc -l`
      if [ "$ON" == "0" ]; then
       logger gaeproxy stopped? Starting...
       service gaeproxy restart
