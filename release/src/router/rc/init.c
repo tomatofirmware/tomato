@@ -1595,7 +1595,9 @@ static int init_nvram(void)
         mfr = "Netgear";
         name = "WNDR4000";
         features = SUP_SES | SUP_80211N | SUP_1000ET;
-        nvram_set("blink_wl", "1");
+        // Don't auto-start blink, as shift register causes other LED's to blink slightly because of this.
+        // Rather, turn on in startup script if desired ... so disable the line below.
+        // nvram_set("blink_wl", "1");
 #ifdef TCONFIG_USB
         nvram_set("usb_uhci", "-1");
 #endif
