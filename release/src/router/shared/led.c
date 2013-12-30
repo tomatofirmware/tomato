@@ -441,11 +441,9 @@ int do_led(int which, int mode)
 					fclose(fileExtGPIOstatus);
 				}
 			}
-			// Return GPIO "pin" (shift register) ... OK for ON/OFF, not for PROBE
-			return b;
-		} else
-			// Cannot Probe LED for WNDR3400 (shift register), so return value appropriately (to indicate this)
-			return 255;
+		}
+		// Return GPIO "pin" (shift register location)
+		return b;
 		break;
 	case MODEL_F7D3301:
 	case MODEL_F7D3302:
