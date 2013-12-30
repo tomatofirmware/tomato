@@ -32,7 +32,7 @@ case "$1" in
    if [ "$BTON" == "1" ]; then
     BTCH=`nvram get aria2_check`
     if [ "$BTCH" == "1" ]; then
-     ON=`ps w | grep aria2c | wc -l`
+     ON=`ps w | grep aria2c | grep -v grep | wc -l`
      if [ "$ON" == "0" ]; then
       logger aria2c stopped? Starting...
       service aria2 restart
