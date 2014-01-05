@@ -296,7 +296,7 @@ var m = [
 	{ title: 'Allow Wireless Access', name: 'f_http_wireless', type: 'checkbox', value:  nvram.web_wl_filter == 0 },
 	null,
 	{ title: 'Color Scheme', name: 'web_css', type: 'select',
-		options: [['openlinksys','USB Blue - OpenLinksys'],['red','Tomato'],['ext/custom','Custom (ext/custom.css)'], ['online', 'On-line from TTB']], value: nvram.web_css },
+		options: [['openlinksys','USB Blue - OpenLinksys'],['red','Tomato'],['hyzoom',' Hyzoom Black'],['ext/custom','Custom (ext/custom.css)'], ['online', 'On-line from TTB']], value: nvram.web_css },
 	{ title: 'TTB ID#', indent: 2, name: 'ttb_css', type: 'text', maxlen: 25, size: 30, value: nvram.ttb_css, suffix: ' Theme name from <a href="http://www.tomatothemebase.eu" target="_blanc"><u><i>TTB themes gallery</i></u></a>' },
 	null,
 	{ title: 'Open Menus' }
