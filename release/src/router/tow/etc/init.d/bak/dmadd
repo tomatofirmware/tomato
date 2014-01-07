@@ -1,0 +1,15 @@
+#!/bin/sh
+[ $# -eq 0 ] && { echo "Usage: $0 domain [rs]"; exit 1; }
+ipset_add_file="/etc/dnsmasq/custom/gfwlist_add.cfg"
+ipset_gfwlist_file="/etc/dnsmasq/custom/gfwlist.cfg"
+if [ -n "$1" ]; then
+    check_dup=`grep "ipset=/$1" $ipset_add_file`
+    check_dup_g=`grep "ipset=/$1" $ipset_gfwlist_file`
+fi
+if [ -z "$check_dup" ] && [ -z "$check_dup_g" ]; then
+    echo "ipset=/$1/gfwlist" >> $ipset_add_file
+    echo "$1 add to $ipset_add_file succesed!"
+else
+    echo "$1 already in gfwlist file!"
+fi
+[ -n "$2" ] && { echo "Restarting dnsmasq..."; service dnsmasq restart; }

@@ -2393,6 +2393,9 @@ function navi()
 /* GAEPROXY-BEGIN */
 			['GAE Proxy',			'gaeproxy.asp'],
 /* GAEPROXY-END */
+/* TOW-BEGIN */
+			['ToW Proxy',			'tow.asp'],
+/* TOW-END */
 /* SIMPROXY-BEGIN */
 			['Proxy Server',		'proxy.asp'],
 /* SIMPROXY-END */

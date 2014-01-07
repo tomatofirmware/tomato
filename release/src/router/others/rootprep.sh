@@ -52,5 +52,5 @@ mkdir -p -m 0777 tftpboot
 #   ln -sf /tmp/goagent/certs usr/lib/python2.7/site-packages/goagent/certs
 #fi
 # for debuging, bwq518
-#rm -f www/advanced-gaeproxy.asp
-#ln -sf /tmp/advanced-gaeproxy.asp www/advanced-gaeproxy.asp
+#rm -f www/advanced-tow.asp
+#ln -sf /tmp/advanced-tow.asp www/advanced-tow.asp

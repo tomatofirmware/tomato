@@ -1,0 +1,46 @@
+#!/bin/sh
+BIN=pdnsd
+BINPATH="/usr/sbin/"
+CONF="-c /etc/pdnsd.conf"
+CACHEPATH="/var/cache/pdnsd"
+CACHEFILE="${CACHEPATH}/pdnsd.cache"
+alias elog="logger -t $BIN -s"
+COND=$1
+[ $# -eq 0 ] && COND="start"
+
+case $COND in
+stop)
+    elog "Stopping $BIN... "
+    [ -n "`pidof $BIN`" ] && kill -15 `pidof $BIN`
+    elog "$BIN Stopped. "
+    ;;
+start)
+    elog "Starting $BIN... "
+    if [ -n "`pidof $BIN`" ]
+    then
+        elog "$BIN already running."
+    else
+        [ ! -d $CACHEPATH ] && { mkdir -p $CACHEPATH; chmod 777 $CACHEPATH; }
+        ${BINPATH}${BIN} ${CONF}
+        elog "$BIN started."
+    fi
+  ;;
+restart)
+    elog "Restarting $BIN... "
+    ct=0
+    while [ $ct -ne 2 ]
+    do
+        [ -n "`pidof $BIN`" ] && kill -15 `pidof $BIN`
+        [ ! -d $CACHEPATH ] && { mkdir -p $CACHEPATH; chmod 777 $CACHEPATH; }
+        sleep 1
+        ${BINPATH}${BIN} ${CONF}
+        sleep 1
+        ct=`netstat -ln | grep "5454" | wc -l`
+    done
+    [ -n "`pidof $BIN`" ] && { elog "$BIN Restart Success. "; echo \
+    "$BIN Restart Success. "; } || elog "$BIN Restart failed"
+    ;;
+*)
+    elog "Usage: $0 (start|stop|restart)"
+    exit 1
+esac

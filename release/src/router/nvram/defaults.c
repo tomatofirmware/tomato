@@ -1134,6 +1134,51 @@ const defaults_t defaults[] = {
 
 #endif // TCONFIG_GAEPROXY
 
+#ifdef TCONFIG_TOW
+// advanced-tow
+	{ "tow_enable",				"0"			},
+	{ "tow_check",				"1"			},
+	{ "tow_check_time",			"3"			},
+	{ "tow_sleep",				"10"			}, //sleep for dnsmasq done
+	{ "tow_mode",				"ss"			}, //ss, redir, ssh, gae, wp
+	{ "tow_iprange_all",			"1"			},
+	{ "tow_iprange_start",			"8"			},
+	{ "tow_iprange_end",			"50"			},
+	{ "tow_pdnsd_localdns_useisp",		"1"		},
+	{ "tow_pdnsd_localdns_ip",		"114.114.114.114,114.114.115.115"		}, //local ISP
+	{ "tow_pdnsd_localdns_port",		"53"		},
+	{ "tow_pdnsd_opendns_ip",		"208.67.222.222,208.67.220.220"		}, // OpenDNS
+	{ "tow_pdnsd_opendns_port",		"5353"		},
+	{ "tow_pdnsd_reject_ip_add",		""		},
+	{ "tow_pdnsd_exclude_domain",		"\".google.com\",\".youtube.com\",\".googlevideo.com\",\".twitter.com\",\".facebook.com\",\".gmail.com\""		},
+	{ "tow_gfwlist_enable",			"1"		},
+//	{ "tow_gfwlist_url",			"https://autoproxy-gfwlist.googlecode.com/svn/trunk/gfwlist.txt"		},
+	{ "tow_gfwlist_url",			"http://www.hyzoom.com/tomato/gfwlist.txt"		},
+	{ "tow_gfwlist_add",			""		},
+//	{ "tow_lanternlist_url",		"https://raw.github.com/getlantern/lantern-proxied-sites-lists/master/china/autoproxy/list.txt"		},
+	{ "tow_tunlr_url",			"http://tunlr.net/tunapi.php?action=getdns&version=1&format=json"		},
+	{ "tow_whitelist_enable",		"1"		},
+	{ "tow_whitelist_url",			"https://github.com/n0wa11/gfw_whitelist/raw/master/whitelist.pac"		},
+	{ "tow_whitelist_add",			""		},
+	{ "tow_pandalist_url",			"https://www.pandafan.org/pac/domain_list.txt"		},
+	{ "tow_tunlr_domains_add",		""		},
+	{ "tow_ssh_server",			"your.ssh.server.or.ip"		},
+	{ "tow_ssh_port",			"1234"		},
+	{ "tow_ssh_username",			"xxx@gmail.com"		},
+	{ "tow_ssh_passwd",			"your.ssh.passwd"		},
+	{ "tow_ssh_obfcode",			"your.obf.code"		},
+	{ "tow_ssh_listen_port",		"7171"		},
+	{ "tow_ssh_argv",			"-o ServerAliveInterval=30 -o ServerAliveCountMax=2 -o StrictHostKeyChecking=no -NfTC"		},
+	{ "tow_ss_server",			"your.shadowsocks.server.or.ip"		},
+	{ "tow_ss_server_port",			"5678"		},
+	{ "tow_ss_crypt_method",		"table"		},
+	{ "tow_ss_passwd",			"your.shadowsocks.passwd"		},
+	{ "tow_ss_local_port",			"7070"		},
+	{ "tow_ss_redir_local_port",		"7272"		},
+	{ "tow_redsocks_gae_port",		"8086"		},
+	{ "tow_redsocks_wp_port",		"8087"		},
+#endif // TCONFIG_TOW
+
 #ifdef TCONFIG_SIMPROXY
 // advanced-proxy
 	{ "proxy_tiny_enable",				"0"			},

@@ -1,0 +1,8 @@
+{
+"server":"p4.5bird.com",
+"server_port":14335,
+"local_port":7070,
+"password":"a2224487",
+"timeout":600,
+"method":""
+}

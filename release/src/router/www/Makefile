@@ -149,6 +149,13 @@ ifneq ($(TCONFIG_ARIA2),y)
 	sed -i $(INSTALLDIR)/www/about.asp -e "/ARIA2-BEGIN/,/ARIA2-END/d"
 endif
 
+# Only include the tow pages if aria2 is configured in.
+ifneq ($(TCONFIG_TOW),y)
+	rm -f $(INSTALLDIR)/www/advanced-tow.asp
+	sed -i $(INSTALLDIR)/www/tomato.js -e "/TOW-BEGIN/,/TOW-END/d"
+	sed -i $(INSTALLDIR)/www/about.asp -e "/TOW-BEGIN/,/TOW-END/d"
+endif
+
 # Only include the Proxy pages if Proxy is configured in.
 ifneq ($(TCONFIG_SIMPROXY),y)
 	rm -f $(INSTALLDIR)/www/advanced-proxy.asp
@@ -303,6 +310,7 @@ endif
 		-e "/BBT-BEGIN/d"	-e "/BBT-END/d" \
 		-e "/BT-BEGIN/d"	-e "/BT-END/d" \
 		-e "/ARIA2-BEGIN/d"	-e "/ARIA2-END/d" \
+		-e "/TOW-BEGIN/d"	-e "/TOW-END/d" \
 		-e "/SIMPROXY-BEGIN/d"	-e "/SIMPROXY-END/d" \
 		-e "/GAEPROXY-BEGIN/d"	-e "/GAEPROXY-END/d" \
 		-e "/NFS-BEGIN/d"	-e "/NFS-END/d" \

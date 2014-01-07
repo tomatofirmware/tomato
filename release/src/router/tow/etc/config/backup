@@ -1,0 +1,16 @@
+#!/bin/sh
+
+PWD=`pwd`
+
+if [ $# -ne 1 ];then
+  echo
+  echo "Pls. input one argument: digital number"
+  echo
+  exit
+fi
+cd /tmp/etc
+tar cvf ../tow_etc_$1.tar config dnsmasq init.d ipset pdnsd.conf redsocks.conf shadowsocks*.json
+echo
+echo "A backup file: /tmp/tow_etc_$1.tar has been created"
+echo
+cd ${PWD}

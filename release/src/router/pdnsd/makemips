@@ -1,0 +1,18 @@
+#!/bin/sh
+TOP=/raid1/tomato/tomato.git/release.ar.wp/src-rt/router
+CONFIGURE="./configure"
+CC=mipsel-linux-gcc
+CXX=mipsel-linux-g++
+AR=mipsel-linux-ar
+RANLIB=mipsel-linux-ranlib
+
+CC=$CC CXX=$CXX AR=$AR RANLIB=$RANLIB STRIP='mipsel-uclibc-strip' HOST=mipsel-linux \
+	CFLAGS="-O2 -Wall -fno-delete-null-pointer-checks -funit-at-a-time \
+	--param large-function-growth=800 --param max-inline-insns-single=3000 \
+	-ffunction-sections -fdata-sections" \
+	LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC" \
+	CPPFLAGS="" \
+	LIBS="" \
+	$CONFIGURE --prefix=/root/misc/pdnsd/staged --host=mipsel-linux --build=x86_64-linux-gnu  --host=mipsel-linux
+
+make

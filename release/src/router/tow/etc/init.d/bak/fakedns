@@ -1,0 +1,30 @@
+#!/bin/sh
+
+POSIONEDDOMAIN="www.twitter.com twitter.com www.facebook.com facebook.com www.youtube.com youtube.com encrypted.google.com plus.google.com www.appspot.com appspot.com www.openvpn.net openvpn.net forums.openvpn.net svn.openvpn.net shell.cjb.net"
+LOOPTIMES=100
+RULEFILENAME=/tmp/badip
+
+# wait tail has internet connection
+#while ! ping -W 1 -c 1 8.8.8.8 >&/dev/null; do sleep 30; done
+
+badip=""
+
+querydomain=""
+matchregex="^${POSIONEDDOMAIN//\ /|^}"
+for i in $(seq $LOOPTIMES) ; do
+        querydomain="$querydomain $POSIONEDDOMAIN"
+done
+
+for DOMAIN in $POSIONEDDOMAIN ; do
+        for IP in $(dig +time=1 +tries=1 +retry=0 @$DOMAIN $querydomain | grep -E "$matchregex" | grep -o -E "([0-9]+\.){3}[0-9]+") ; do
+                if [ -z "$(echo $badip | grep $IP)" ] ; then
+                        badip="$badip   $IP"
+                fi
+        done
+done
+
+for IP in $badip ; do
+        echo "$IP" >> $RULEFILENAME
+done
+
+sort $RULEFILENAME | uniq > ${RULEFILENAME}.cfg

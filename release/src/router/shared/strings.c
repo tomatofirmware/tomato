@@ -217,6 +217,7 @@ int splitport(char *in_ports, char out_port[MAX_PORTS][PORT_SIZE])
 /*  Check a string whether all of number or not
     return 1: all number
            0: NOT all numer
+    bwq518
 */
 int is_number(char *a)
 {
@@ -231,4 +232,54 @@ int is_number(char *a)
 	//数字总数和字符串长度一样，则全是数字，总数为0，则都不是数字，在0~len之间则有部分是数字
 	if (j==len) return 1;
 	else return 0;
+}
+int isspacex(char ch)
+{
+	int result;
+	switch(ch)
+	{
+	case '\t':
+		result = 0;
+		break;
+	case '\r':
+		result = 0;
+		break;
+	case '\n':
+		result = 0;
+		break;
+	case ' ':
+		result = 0;
+		break;
+	default:
+		result = 1;
+	}
+	return result;
+}
+
+/*  Shrink multiple space to n space 
+    return char *resule
+    input: n - size of src
+*/
+char *shrink_space(char *dest, const char *src, int n)
+{
+	int i = 0;
+	char *tmp = dest;
+	while(i < n && *src != '\0')
+	{
+		if(isspacex(*src))
+			*tmp++ = *src++;
+		else
+		{
+			if(!isspacex(*(src - 1)))
+				src++;
+			else
+			{
+				*tmp++ = ' ';
+				src++;
+			}
+		}
+		i++;
+	}
+	*tmp = '\0';
+	return dest;
 }

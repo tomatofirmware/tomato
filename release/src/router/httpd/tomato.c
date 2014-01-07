@@ -1379,6 +1379,50 @@ static const nvset_t nvset_list[] = {
 	{ "gaeproxy_urlfetch_redirects",	V_TEXT(0,512)		},
 #endif // TCONFIG_GAEPROXY
 
+#ifdef TCONFIG_TOW
+// advanced-tow
+	{ "tow_enable",				V_01			},
+	{ "tow_check",				V_01			},
+	{ "tow_check_time",			V_RANGE(1, 55)		},
+	{ "tow_sleep",				V_RANGE(1, 60)		},
+	{ "tow_mode",				V_TEXT(0, 8)		}, //ss, redir, ssh, gae, wp
+	{ "tow_iprange_all",			V_01			},
+	{ "tow_iprange_start",			V_TEXT(0, 4)		},
+	{ "tow_iprange_end",			V_TEXT(0, 4)		},
+	{ "tow_pdnsd_localdns_useisp",		V_01			},
+	{ "tow_pdnsd_localdns_ip",		V_TEXT(0, 64)		}, //local ISP
+	{ "tow_pdnsd_localdns_port",		V_PORT			},
+	{ "tow_pdnsd_opendns_ip",		V_TEXT(0, 64)		}, // OpenDNS
+	{ "tow_pdnsd_opendns_port",		V_PORT			},
+	{ "tow_pdnsd_reject_ip_add",		V_TEXT(0, 1024)		},
+	{ "tow_pdnsd_exclude_domain",		V_TEXT(0, 1024)		},
+	{ "tow_gfwlist_enable",			V_01			},
+	{ "tow_gfwlist_url",			V_TEXT(0, 1024)		},
+	{ "tow_gfwlist_add",			V_TEXT(0, 4096)		},
+//	{ "tow_lanternlist_url",		V_TEXT(0, 1024)		},
+	{ "tow_tunlr_url",			V_TEXT(0, 1024)		},
+	{ "tow_whitelist_enable",		V_01			},
+	{ "tow_whitelist_url",			V_TEXT(0, 1024)		},
+	{ "tow_whitelist_add",			V_TEXT(0, 4096)		},
+	{ "tow_pandalist_url",			V_TEXT(0, 1024)		},
+	{ "tow_tunlr_domains_add",		V_TEXT(0, 4096)		},
+	{ "tow_ssh_server",			V_TEXT(0, 64)		},
+	{ "tow_ssh_port",			V_PORT			},
+	{ "tow_ssh_username",			V_TEXT(0, 64)		},
+	{ "tow_ssh_passwd",			V_TEXT(0, 50)		},
+	{ "tow_ssh_obfcode",			V_TEXT(0, 64)		},
+	{ "tow_ssh_listen_port",		V_PORT			},
+	{ "tow_ssh_argv",			V_TEXT(0, 256)		},
+	{ "tow_ss_server",			V_TEXT(0, 64)		},
+	{ "tow_ss_server_port",			V_PORT			},
+	{ "tow_ss_crypt_method",		V_TEXT(0, 32)		},
+	{ "tow_ss_passwd",			V_TEXT(0, 50)		},
+	{ "tow_ss_local_port",			V_PORT			},
+	{ "tow_ss_redir_local_port",		V_PORT			},
+	{ "tow_redsocks_gae_port",		V_PORT			},
+	{ "tow_redsocks_wp_port",		V_PORT			},
+#endif // TCONFIG_TOW
+
 #ifdef TCONFIG_NFS
 	{ "nfs_enable",			V_01				},
 	{ "nfs_exports",		V_LENGTH(0, 4096)		},

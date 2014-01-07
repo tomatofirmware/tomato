@@ -371,4 +371,6 @@ extern char* trimstr(char *str);
 extern char* splitpath( char *str, char *pathname, char *filename);
 extern int splitport(char *in_ports, char out_port[MAX_PORTS][PORT_SIZE]);
 extern int is_number(char *a);
+extern int isspacex(char c);
+extern char *shrink_space(char *dest, const char *src, int n);
 #endif

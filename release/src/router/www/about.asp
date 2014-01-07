@@ -238,6 +238,9 @@ Copyright (C) 2009 Tomasz Słodkowicz<br>
 <!-- GAEPROXY-BEGIN -->
 - GoAgent/Wallproxy integration<br>
 <!-- GAEPROXY-END -->
+<!-- TOW-BEGIN -->
+- Transparent over Wall integration and GUI (credit by Jun Lee, PunkDM)<br>
+<!-- TOW-END -->
 Copyright (C) 2013 Bao Weiquan, Hyzoom<br>
 <a href='mailto:bwq518@gmail.com'>bwq518@gmail.com</a><br>
 <br>

@@ -308,6 +308,8 @@ sub fixDyn
 	fixDynDep("xxsubtype.so", "libpython2.7.so.1.0");
 	fixDynDep("zlibmodule.so", "libpython2.7.so.1.0");
 	fixDynDep("zlibmodule.so", "libz.so.1");
+#tow, bwq518
+	fixDynDep("ssh_ofc", "libresolv.so.0");
 #iptables, bwq518
 	fixDynDep("xtables-multi", "libxtables.so.10.0.0");
 	fixDynDep("xtables-multi", "libiptc.so.0.0.0");
@@ -575,8 +577,11 @@ sub genSO
 	}
 #	print "$cmd -u... ${arc}\n";	
 	if (scalar(@used) == 0) {
-		print "$name: WARNING: Library is not used by anything, deleting...\n";
-		unlink $so;
+		if (($name ne 'libresolv.so.0') && ($name ne 'libnsl.so.0'))
+		{
+			print "$name: WARNING: Library is not used by anything, deleting...\n";
+			unlink $so;
+		}
 #		<>;
 		return 0;
 	}

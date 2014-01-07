@@ -1,0 +1,12 @@
+#!/bin/sh
+TOP=/raid1/tomato/tomato.git/release.ar.wp/src-rt/router
+CC=mipsel-linux-gcc
+PARALLEL_BUILD="-j`grep -c '^processor' /proc/cpuinfo`"
+make CC=$CC $PARALLEL_BUILD \
+     LDFLAGS="-L$TOP/libevent/.libs -ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC" \
+     LIBS="-levent" \
+     CPPFLAGS="-I$TOP/libevent -I$TOP/libevent/include" \
+     CFLAGS="-O2 -Wall -fno-delete-null-pointer-checks -funit-at-a-time \
+        --param large-function-growth=800 --param max-inline-insns-single=3000 \
+        -ffunction-sections -fdata-sections"
+

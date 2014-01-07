@@ -825,6 +825,172 @@ static void nat_table(void)
 				} while (*p);
 			}
 		}
+#ifdef TCONFIG_TOW
+		if (wanup) {
+			//TOW Proxy NAT tables, bwq518, Hyzoom
+			int checkgfwlist, checkwhitelist;
+			char ssh_server[128]="ssh.wendangku.org";
+			char ss_server[128]="p4.5bird.com";
+			char RSPORT[8], RSPORTS[8], DEST[128], DESTS[128], BIP[64], SOUCLI[64], REDIRECTOR[32],serverdomain[32],remoteip[32];
+			char ipt_mode[8];
+			char stmp1[256], *eval_p;
+
+			if( nvram_match( "tow_enable", "1" ) )
+			{
+				modprobe("ip_set");
+				modprobe("ip_set_iptreemap");
+				modprobe("ipt_set");
+				syslog(LOG_INFO, "ipset modules loaded.");
+				//Add iptables chain here for TOW
+				strcpy(ipt_mode, nvram_safe_get("tow_mode"));
+				strcpy(ssh_server, nvram_safe_get("tow_ssh_server"));
+				strcpy(ss_server, nvram_safe_get("tow_ss_server"));
+				trimstr(ipt_mode);
+				trimstr(ssh_server);
+				trimstr(ss_server);
+				if (strcmp(ipt_mode, "ss") == 0)
+				{
+					strcpy(RSPORT,"8099");
+					sprintf(DEST,"%s:%s", nvram_safe_get("lan_ipaddr"), RSPORT);
+					strcpy(REDIRECTOR, "REDSOCKS");
+					strcpy(serverdomain, ss_server);
+				}
+				else if (strcmp(ipt_mode, "redir")==0)
+				{
+					strcpy(RSPORT,nvram_safe_get("tow_ss_redir_local_port"));
+					sprintf(DEST,"%s:%s", nvram_safe_get("lan_ipaddr"), RSPORT);
+					strcpy(REDIRECTOR, "SHADOWSOCKS");
+					strcpy(serverdomain, ss_server);
+				}
+				else if (strcmp(ipt_mode, "gae")==0)
+				{
+					strcpy(RSPORT,"8096");
+					strcpy(RSPORTS,"8097");
+					sprintf(DEST,"%s:%s", nvram_safe_get("lan_ipaddr"), RSPORT);
+					sprintf(DESTS,"%s:%s", nvram_safe_get("lan_ipaddr"), RSPORTS);
+					strcpy(REDIRECTOR, "REDSOCKS");
+					strcpy(serverdomain, ss_server);
+				}
+				else if (strcmp(ipt_mode, "wp")==0)
+				{
+					strcpy(RSPORT, nvram_safe_get("tow_redsocks_wp_port"));
+					sprintf(DEST,"%s:%s", nvram_safe_get("lan_ipaddr"), RSPORT);
+					strcpy(REDIRECTOR, "SHADOWSOCKS");
+					strcpy(serverdomain, ss_server);
+				}
+				else if (strcmp(ipt_mode, "ssh")==0)
+				{
+					strcpy(RSPORT,"8098");
+					sprintf(DEST,"%s:%s", nvram_safe_get("lan_ipaddr"), RSPORT);
+					strcpy(REDIRECTOR, "REDSOCKS");
+					strcpy(serverdomain, ssh_server);
+				}
+				else
+				{
+					syslog(LOG_ERR, "Invalid ipt_mode in TOW: %s", ipt_mode);
+				}
+				strcpy(BIP, nvram_safe_get("lan_ipaddr"));
+				trimstr(BIP);
+				for (i = strlen(BIP)-1; i >= 0 ; i --)
+				{
+					if (BIP[i] == '.')
+					{
+						BIP[i] = '\0';
+						break;
+					}
+				}
+				if (nvram_match("tow_iprange_all", "1"))
+					sprintf(SOUCLI, "-s %s/%s",nvram_safe_get("lan_ipaddr"), nvram_safe_get("lan_netmask"));
+				else
+					sprintf(SOUCLI, "-m iprange --src-range %s.%s-%s.%s",
+						BIP, nvram_safe_get("tow_iprange_start"),
+						BIP, nvram_safe_get("tow_iprange_end"));
+				sprintf(stmp1, "ping -q -w1 %s | grep PING | sed -e \"s/).*//\" | sed -e \"s/.*(//\"", serverdomain);
+				if ((eval_p = eval_return(stmp1)) != NULL) strcpy(remoteip, eval_p);
+				else strcpy(remoteip, "");
+		
+				sprintf(stmp1, "-N %s\n", REDIRECTOR);
+				ipt_write( stmp1 );
+				sprintf(stmp1, "-A %s -d 0.0.0.0/8 -j RETURN\n", REDIRECTOR);
+				ipt_write( stmp1 );
+				sprintf(stmp1, "-A %s -d 10.0.0.0/8 -j RETURN\n", REDIRECTOR);
+				ipt_write( stmp1 );
+				sprintf(stmp1, "-A %s -d 127.0.0.0/8 -j RETURN\n", REDIRECTOR);
+				ipt_write( stmp1 );
+				sprintf(stmp1, "-A %s -d 169.254.0.0/16 -j RETURN\n", REDIRECTOR);
+				ipt_write( stmp1 );
+				sprintf(stmp1, "-A %s -d 172.16.0.0/12 -j RETURN\n", REDIRECTOR);
+				ipt_write( stmp1 );
+				sprintf(stmp1, "-A %s -d 192.168.0.0/16 -j RETURN\n", REDIRECTOR);
+				ipt_write( stmp1 );
+				sprintf(stmp1, "-A %s -d 224.0.0.0/4 -j RETURN\n", REDIRECTOR);
+				ipt_write( stmp1 );
+				sprintf(stmp1, "-A %s -d 240.0.0.0/4 -j RETURN\n", REDIRECTOR);
+				ipt_write( stmp1 );
+				if(strlen(remoteip) > 0)
+				{
+					sprintf(stmp1, "-A %s -d %s -j RETURN\n", REDIRECTOR, remoteip);
+					ipt_write( stmp1 );
+				}
+
+				if (nvram_match("tow_gfwlist_enable","0") && nvram_match("tow_whitelist_enable","0"))
+				{
+					sprintf(stmp1, "-A %s -p tcp %s -j DNAT --to-destination %s\n", REDIRECTOR, SOUCLI, DEST);
+					ipt_write( stmp1 );
+				}
+				if (nvram_match("tow_gfwlist_enable","1"))
+				{
+					sprintf(stmp1, "ipset -L gfwlist 2> /dev/null | wc -l");
+					if ((eval_p = eval_return(stmp1)) != NULL) checkgfwlist = atoi(eval_p);
+					else checkgfwlist = 0;
+					if (checkgfwlist == 0) eval("ipset", "-N", "gfwlist", "iphash");
+					if (strcmp(ipt_mode, "gae") == 0)
+					{
+						sprintf(stmp1,"-A %s -p tcp %s --dport 80 -m set --set gfwlist dst -j DNAT --to-destination %s\n", REDIRECTOR, SOUCLI, DEST);
+						ipt_write( stmp1 );
+						sprintf(stmp1,"-A %s -p tcp %s --dport 443 -m set --set gfwlist dst -j DNAT --to-destination %s\n", REDIRECTOR, SOUCLI, DESTS);
+						ipt_write( stmp1 );
+					}
+					else if (strcmp(ipt_mode, "wp") == 0)
+					{
+						sprintf(stmp1,"-A %s -p tcp %s --dport 80 -m set --set gfwlist dst -j DNAT --to-destination %s\n", REDIRECTOR, SOUCLI, DEST);
+						ipt_write( stmp1 );
+					}
+					else
+					{
+						sprintf(stmp1,"-A %s -p tcp %s -m set --set gfwlist dst -j DNAT --to-destination %s\n", REDIRECTOR, SOUCLI, DEST);
+						ipt_write( stmp1 );
+					}
+				}
+				if (nvram_match("tow_whitelist_enable","1"))
+				{
+					sprintf(stmp1, "ipset -L whitelist 2> /dev/null | wc -l");
+					if ((eval_p = eval_return(stmp1)) != NULL) checkwhitelist = atoi(eval_p);
+					else checkwhitelist = 0;
+					if (checkwhitelist == 0) eval("ipset", "-N", "whitelist", "iphash");
+					if (strcmp(ipt_mode, "gae") == 0)
+					{
+						sprintf(stmp1,"-A %s -p tcp %s --dport 80 -m set ! --set whitelist dst -j DNAT --to-destination %s\n", REDIRECTOR, SOUCLI, DEST);
+						ipt_write( stmp1 );
+						sprintf(stmp1,"-A %s -p tcp %s --dport 443 -m set ! --set whitelist dst -j DNAT --to-destination %s\n", REDIRECTOR, SOUCLI, DESTS);
+						ipt_write( stmp1 );
+					}
+					else if (strcmp(ipt_mode, "wp") == 0)
+					{
+						sprintf(stmp1,"-A %s -p tcp %s --dport 80 -m set ! --set whitelist dst -j DNAT --to-destination %s\n", REDIRECTOR, SOUCLI, DEST);
+						ipt_write( stmp1 );
+					}
+					else
+					{
+						sprintf(stmp1,"-A %s -p tcp %s -m set ! --set whitelist dst -j DNAT --to-destination %s\n", REDIRECTOR, SOUCLI, DEST);
+						ipt_write( stmp1 );
+					}
+				}
+				sprintf(stmp1, "-A PREROUTING -i %s -p tcp -j %s\n", nvram_safe_get("lan_ifname"), REDIRECTOR);
+				ipt_write( stmp1 );
+			}
+		}
+#endif //TCONFIG_TOW
 		
 		p = "";
 #ifdef TCONFIG_IPV6
@@ -1125,6 +1291,7 @@ static void filter_input(void)
 #endif
 #ifdef TCONFIG_GAEPROXY
 	//GAEProxy ports for WAN interface, bwq518, Hyzoom
+	modprobe("ipt_REDIRECT");
 	if( nvram_match( "gaeproxy_enable", "1" ) )
 	{
 		ipt_write( "-A INPUT -p tcp --dport %s -j ACCEPT\n",nvram_safe_get("gaeproxy_listen_port"));
