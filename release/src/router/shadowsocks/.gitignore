@@ -1,0 +1,52 @@
+.deps/
+/Makefile
+src/Makefile
+libev/Makefile
+libasyncns/Makefile
+autom4te.cache/
+config.h
+config.log
+config.status
+libtool
+pid
+ss*
+stamp-h1
+.libs
+.pc
+debian/shadowsocks/
+debian/patches/
+debian/files
+debian/shadowsocks.substvars
+debian/*.debhelper*
+
+# Ignore garbage of OS X
+*.DS_Store
+
+# Ignore vim cache
+*.swp
+
+#	Do not edit the following section
+# 	Edit Compile Debug Document Distribute
+*~
+*.bak
+*.bin
+core
+*.dll
+*.exe
+*-ISO*.bdf
+*-JIS*.bdf
+*-KOI8*.bdf
+*.kld
+*.ko
+*.ko.cmd
+*.lai
+*.l[oa]
+*.[oa]
+*.obj
+*.patch
+*.so
+*.pcf.gz
+*.pdb
+*.tar.bz2
+*.tar.gz
+#

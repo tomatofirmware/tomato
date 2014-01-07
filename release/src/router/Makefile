@@ -189,6 +189,18 @@ obj-$(TCONFIG_ARIA2) += libexpat
 obj-$(TCONFIG_ARIA2) += sqlite
 obj-$(TCONFIG_ARIA2) += aria2
 
+obj-$(TCONFIG_TOW) += openssl
+obj-$(TCONFIG_TOW) += zlib
+obj-$(TCONFIG_TOW) += wget
+obj-$(TCONFIG_TOW) += libev
+obj-$(TCONFIG_TOW) += libevent
+obj-$(TCONFIG_TOW) += pdnsd
+obj-$(TCONFIG_TOW) += shadowsocks
+obj-$(TCONFIG_TOW) += redsocks2
+obj-$(TCONFIG_TOW) += sshpass
+obj-$(TCONFIG_TOW) += sshofc
+obj-$(TCONFIG_TOW) += tow
+
 obj-$(TCONFIG_SIMPROXY) += tinyproxy
 obj-$(TCONFIG_SIMPROXY) += srelay
 
@@ -231,7 +243,11 @@ else
           ifeq ($(TCONFIG_PYTHON),y)
             export FULL_OPENSSL := y
           else
-            FULL_OPENSSL :=
+            ifeq ($(TCONFIG_TOW),y)
+              export FULL_OPENSSL := y
+            else
+              FULL_OPENSSL :=
+            endif
           endif
         endif
       endif
@@ -407,6 +423,13 @@ ifeq ($(TCONFIG_ARIA2),y)
 	install $(LIBDIR)/libstdc++.so.6 $(TARGETDIR)/lib/libstdc++.so.6
 	cd $(TARGETDIR)/lib && ln -sf libstdc++.so.6 libstdc++.so
 	$(STRIP) $(TARGETDIR)/lib/libstdc++.so.6
+endif
+ifeq ($(TCONFIG_TOW),y)
+	install $(LIBDIR)/libstdc++.so.6 $(TARGETDIR)/lib/libstdc++.so.6
+	install $(LIBDIR)/libresolv.so.0 $(TARGETDIR)/lib/
+	cd $(TARGETDIR)/lib && ln -sf libstdc++.so.6 libstdc++.so
+	$(STRIP) $(TARGETDIR)/lib/libstdc++.so.6
+	$(STRIP) $(TARGETDIR)/lib/libresolv.so.0
 endif
 ifeq ($(TCONFIG_PYTHON),y)
 	install $(LIBDIR)/libstdc++.so.6 $(TARGETDIR)/lib/libstdc++.so.6
@@ -765,10 +788,10 @@ openssl/stamp-h1:
 	./Configure linux-mipsel --openssldir=/etc --cross-compile-prefix=' ' \
 	-ffunction-sections -fdata-sections -Wl,--gc-sections \
 	shared $(OPENSSL_CIPHERS) \
-	no-sha0 no-smime no-camellia no-krb5 no-rmd160 no-ripemd \
+	no-sha0 no-smime no-camellia no-krb5 enable-rmd160 enable-ripemd \
 	no-seed no-capieng no-cms no-gms no-gmp no-rfc3779 \
 	no-ec no-ecdh no-ecdsa no-err no-hw no-jpake no-threads \
-	no-zlib no-engines no-sse2 \
+	no-zlib enable-engines no-sse2 \
 	no-dtls1 no-store no-psk no-md2 no-mdc2 no-ts
 	
 	@$(MAKE) -C openssl clean $(PARALLEL_BUILD)
@@ -1306,6 +1329,11 @@ ifeq ($(TCONFIG_ARIA2),y)
 	$(STRIP) $(INSTALLDIR)/sqlite/usr/lib/libsqlite3.so.0
 	cd $(INSTALLDIR)/sqlite/usr/lib/ && \
 		ln -sf libsqlite3.so.0 libsqlite3.so
+endif
+ifeq ($(TCONFIG_TOW),y)
+	install -d $(INSTALLDIR)/zlib/usr/lib
+	install -D zlib/libz.so.1 $(INSTALLDIR)/zlib/usr/lib/
+	$(STRIP) $(INSTALLDIR)/zlib/usr/lib/libz.so.1
 endif
 ifeq ($(TCONFIG_PYTHON),y)
 	install -D sqlite/.libs/libsqlite3.so.0 $(INSTALLDIR)/sqlite/usr/lib/libsqlite3.so.0
@@ -2099,6 +2127,173 @@ goagent-install: goagent
 	-rm -f .goagent.tgz && tar cvfz .goagent.tgz goagent/* --exclude=goagent/stamp-h1 && \
 	install -m 0644 .goagent.tgz $(INSTALLDIR)/goagent/usr/lib/python2.7/site-packages/goagent.tgz 
 
+tow/stamp-h1: openssl zlib wget pdnsd shadowsocks redsocks2 sshpass sshofc
+	touch tow/stamp-h1
+
+tow: tow/stamp-h1
+	@$(SEP)
+	$(MAKE) -C tow $(PARALLEL_BUILD)
+
+tow-clean:
+	-@rm -f tow/stamp-h1
+
+tow-install: tow
+	install -d $(INSTALLDIR)/tow/bin
+	install -d $(INSTALLDIR)/tow/usr/bin
+	install -d $(INSTALLDIR)/tow/usr/local/tow
+	install tow/towcheck $(INSTALLDIR)/tow/usr/bin/towcheck
+	install tow/base64 $(INSTALLDIR)/tow/bin/base64
+	install -m 0644 tow/gfwlist.cfg.gz $(INSTALLDIR)/tow/usr/local/tow/gfwlist.cfg.gz
+	install -m 0644 tow/whitelist.cfg.gz $(INSTALLDIR)/tow/usr/local/tow/whitelist.cfg.gz
+	install -m 0644 tow/tunlr.cfg.gz $(INSTALLDIR)/tow/usr/local/tow/tunlr.cfg.gz
+	$(STRIP) $(INSTALLDIR)/tow/bin/base64
+
+pdnsd/stamp-h1: 
+	cd pdnsd && CC=$(CC) AR=$(AR) RANLIB=$(RANLIB) HOST=mipsel-linux \
+	CFLAGS="-O2 -Wall -fno-delete-null-pointer-checks -funit-at-a-time \
+	--param large-function-growth=800 --param max-inline-insns-single=3000 \
+	-ffunction-sections -fdata-sections" \
+	LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC" \
+	$(CONFIGURE) --prefix=/usr --host=mipsel-linux --build=x86_64-linux-gnu
+	touch pdnsd/stamp-h1
+
+pdnsd: pdnsd/stamp-h1
+	@$(SEP)
+	$(MAKE) -C pdnsd $(PARALLEL_BUILD)
+
+pdnsd-install: pdnsd
+	install -d $(INSTALLDIR)/pdnsd/usr/sbin
+	install pdnsd/src/pdnsd $(INSTALLDIR)/pdnsd/usr/sbin/pdnsd
+	install pdnsd/src/pdnsd-ctl/pdnsd-ctl $(INSTALLDIR)/pdnsd/usr/sbin/pdnsd-ctl
+	$(STRIP) $(INSTALLDIR)/pdnsd/usr/sbin/pdnsd
+	$(STRIP) $(INSTALLDIR)/pdnsd/usr/sbin/pdnsd-ctl
+
+pdnsd-clean:
+	-@$(MAKE) -C pdnsd clean
+	@rm -f pdnsd/stamp-h1 pdnsd/Makefile
+
+shadowsocks/stamp-h1: 
+	cd shadowsocks && CC=$(CC) AR=$(AR) RANLIB=$(RANLIB) HOST=mipsel-linux \
+	CFLAGS="-O2 -Wall -fno-delete-null-pointer-checks -funit-at-a-time \
+	--param large-function-growth=800 --param max-inline-insns-single=3000 \
+	-ffunction-sections -fdata-sections" \
+	LDFLAGS="-L$(TOP)/openssl -ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC" \
+	CPPFLAGS="-I$(TOP)/openssl/include" \
+	LIBS="-lssl -lcrypto" \
+	$(CONFIGURE) --host=mipsel-linux --build=x86_64-linux-gnu
+	touch shadowsocks/stamp-h1
+
+shadowsocks: shadowsocks/stamp-h1
+	@$(SEP)
+	$(MAKE) -C shadowsocks $(PARALLEL_BUILD)
+
+shadowsocks-install: shadowsocks
+	install -d $(INSTALLDIR)/shadowsocks/usr/bin
+	install shadowsocks/src/ss-local $(INSTALLDIR)/shadowsocks/usr/bin/ss-local
+	install shadowsocks/src/ss-redir $(INSTALLDIR)/shadowsocks/usr/bin/ss-redir
+	install shadowsocks/src/ss-server $(INSTALLDIR)/shadowsocks/usr/bin/ss-server
+	$(STRIP) $(INSTALLDIR)/shadowsocks/usr/bin/ss-local
+	$(STRIP) $(INSTALLDIR)/shadowsocks/usr/bin/ss-redir
+	$(STRIP) $(INSTALLDIR)/shadowsocks/usr/bin/ss-server
+
+shadowsocks-clean:
+	-@$(MAKE) -C shadowsocks clean
+	@rm -f shadowsocks/stamp-h1 shadowsocks/Makefile
+
+redsocks2/stamp-h1: libevent
+	touch redsocks2/stamp-h1
+
+redsocks2: redsocks2/stamp-h1
+	$(MAKE) CC=$(CC) -C redsocks2 $(PARALLEL_BUILD) \
+		LDFLAGS="-L$(TOP)/libevent/.libs -ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC" \
+		LIBS="-levent" \
+		CPPFLAGS="-I$(TOP)/libevent -I$(TOP)/libevent/include" \
+		CFLAGS="-O2 -Wall -fno-delete-null-pointer-checks -funit-at-a-time \
+		--param large-function-growth=800 --param max-inline-insns-single=3000 \
+		-ffunction-sections -fdata-sections"
+
+redsocks2-install: redsocks2
+	install -d $(INSTALLDIR)/redsocks2/usr/bin
+	install redsocks2/redsocks2 $(INSTALLDIR)/redsocks2/usr/bin/redsocks2
+	$(STRIP) $(INSTALLDIR)/redsocks2/usr/bin/redsocks2
+
+redsocks2-clean:
+	-@$(MAKE) -C redsocks2 clean
+	@rm -f redsocks2/stamp-h1
+
+sshpass/stamp-h1: 
+	cd sshpass && CC=$(CC) AR=$(AR) RANLIB=$(RANLIB) HOST=mipsel-linux \
+	CFLAGS="-O2 -Wall -fno-delete-null-pointer-checks -funit-at-a-time \
+	--param large-function-growth=800 --param max-inline-insns-single=3000 \
+	-ffunction-sections -fdata-sections" \
+	LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC" \
+	$(CONFIGURE) --host=mipsel-linux --build=x86_64-linux-gnu --prefix=/usr --libexecdir=/usr/bin --sysconfdir=/etc --sharedstatedir=/var/sshpass/com --localstatedir=/var/sshpass
+	touch sshpass/stamp-h1
+
+sshpass: sshpass/stamp-h1
+	@$(SEP)
+	$(MAKE) -C sshpass $(PARALLEL_BUILD)
+
+sshpass-install: sshpass
+	install -d $(INSTALLDIR)/sshpass/usr/bin
+	install sshpass/sshpass $(INSTALLDIR)/sshpass/usr/bin/sshpass
+	$(STRIP) $(INSTALLDIR)/sshpass/usr/bin/sshpass
+
+sshpass-clean:
+	-@$(MAKE) -C sshpass clean
+	@rm -f sshpass/stamp-h1 sshpass/Makefile
+
+sshofc/stamp-h1: zlib openssl
+	cd sshofc && CC=$(CC) LD=$(CC) CXX=$(CXX) AR=$(AR) RANLIB=$(RANLIB) HOST=mipsel-linux \
+	CFLAGS="-O2 -Wall -fno-delete-null-pointer-checks -funit-at-a-time \
+	--param large-function-growth=800 --param max-inline-insns-single=3000 \
+	-ffunction-sections -fdata-sections -EL" \
+	LDFLAGS="-L$(TOP)/zlib -L$(TOP)/openssl" \
+	CPPFLAGS="-I$(TOP)/zlib -I$(TOP)/openssl/include" \
+	$(CONFIGURE) --host=mipsel-linux --build=x86_64-linux-gnu  --enable-shared \
+	--disable-etc-default-login --disable-lastlog --disable-utmp \
+	--disable-utmpx --disable-wtmp --disable-wtmpx --disable-strip \
+	--with-ssl-engine --prefix=/usr --libexecdir=/usr/libexec --sysconfdir=/etc \
+	--sharedstatedir=/var/sshofc/com --localstatedir=/var/sshofc
+	touch sshofc/stamp-h1
+
+sshofc: sshofc/stamp-h1
+	@$(SEP)
+	$(MAKE) -C sshofc $(PARALLEL_BUILD)
+
+sshofc-install: sshofc
+	install -d $(INSTALLDIR)/sshofc/usr/bin
+	install -d $(INSTALLDIR)/sshofc/usr/sbin
+	install sshofc/ssh $(INSTALLDIR)/sshofc/usr/bin/ssh_ofc
+	$(STRIP) $(INSTALLDIR)/sshofc/usr/bin/ssh_ofc
+#	install -d $(INSTALLDIR)/sshofc/usr/libexec
+#	install sshofc/sftp-server $(INSTALLDIR)/sshofc/usr/libexec
+#	$(STRIP) $(INSTALLDIR)/sshofc/usr/libexec/sftp-server
+#	install sshofc/sshd $(INSTALLDIR)/sshofc/usr/sbin
+#	install sshofc/ssh-add $(INSTALLDIR)/sshofc/usr/bin
+#	install sshofc/ssh-agent $(INSTALLDIR)/sshofc/usr/bin
+#	install sshofc/ssh-keygen $(INSTALLDIR)/sshofc/usr/bin
+#	install sshofc/ssh-keyscan $(INSTALLDIR)/sshofc/usr/bin
+#	install sshofc/ssh-rand-helper $(INSTALLDIR)/sshofc/usr/bin
+#	install sshofc/scp $(INSTALLDIR)/sshofc/usr/bin
+#	install sshofc/sftp $(INSTALLDIR)/sshofc/usr/bin
+#	install -d $(INSTALLDIR)/sshofc/etc
+#	install sshofc/ssh_config $(INSTALLDIR)/sshofc/etc/ssh_config
+#	install sshofc/sshd_config $(INSTALLDIR)/sshofc/etc/sshd_config
+#	$(STRIP) $(INSTALLDIR)/sshofc/usr/sbin/sshd
+#	$(STRIP) $(INSTALLDIR)/sshofc/usr/bin/ssh-add
+#	$(STRIP) $(INSTALLDIR)/sshofc/usr/bin/ssh-agent
+#	$(STRIP) $(INSTALLDIR)/sshofc/usr/bin/ssh-keygen
+#	$(STRIP) $(INSTALLDIR)/sshofc/usr/bin/ssh-keyscan
+#	$(STRIP) $(INSTALLDIR)/sshofc/usr/bin/ssh-rand-helper
+#	$(STRIP) $(INSTALLDIR)/sshofc/usr/bin/scp
+#	$(STRIP) $(INSTALLDIR)/sshofc/usr/bin/sftp
+#	cd $(INSTALLDIR)/sshofc/usr/bin && ln -sf ssh_ofc slogin
+
+sshofc-clean:
+	-@$(MAKE) -C sshofc clean
+	@rm -f sshofc/stamp-h1 sshofc/Makefile
+
 gaeproxy/stamp-h1: python
 	touch gaeproxy/stamp-h1
 
@@ -2115,8 +2310,6 @@ gaeproxy-install: gaeproxy
 	install -d $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages
 	install -d $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy
 	install -d $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/server
-	install -d $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/server/php
-	install -d $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/server/python
 	install -d $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local
 	install -d $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/src.zip
 	install -d $(INSTALLDIR)/gaeproxy/usr/lib/python2.7/site-packages/gaeproxy/local/src.zip/web

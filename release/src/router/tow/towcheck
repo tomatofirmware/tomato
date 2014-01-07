@@ -1,0 +1,114 @@
+#!/bin/sh
+
+case "$1" in
+  delcru)
+    ISCRU=`cru l | grep tow_inside_$2 | wc -l`
+    if [ "$ISCRU" == "1" ]; then
+      cru d tow_inside_$2
+    fi
+  ;;
+  addcru)
+    ISCRU=`cru l | grep tow_inside_$2 | wc -l`
+
+    INTERVAL=`nvram get tow_check_time`
+
+    TOWON=`nvram get tow_enable`
+    if [ "$TOWON" == "1" ]; then
+      TOWCHK=`nvram get tow_check`
+      if [ "$TOWCHK" == "1" ]; then
+        case "$2" in
+          dnsmasqc)
+            FLAG="d"
+          ;;
+          pdnsd)
+            FLAG="p"
+          ;;
+          shadowsocks)
+            FLAG="s"
+          ;;
+          redir)
+            FLAG="e"
+          ;;
+          redsocks2)
+            FLAG="r"
+          ;;
+          ssh_ofc)
+            FLAG="o"
+          ;;
+        esac
+        if [ "$ISCRU" == "0" ]; then
+          cru a tow_inside_$2 "*/$INTERVAL * * * * /usr/bin/towcheck check $FLAG"
+        else
+          cru d tow_inside_$2
+          cru a tow_inside_$2 "*/$INTERVAL * * * * /usr/bin/towcheck check $FLAG"
+        fi
+      else
+        if [ "$ISCRU" == "1" ]; then
+          cru d tow_inside_$2
+        fi
+      fi
+    else
+      if [ "$ISCRU" == "1" ]; then
+        cru d tow_inside_$2
+      fi
+    fi
+  ;;
+  check)
+    TOWON=`nvram get tow_enable`
+    if [ "$TOWON" == "1" ]; then
+      TOWCHK=`nvram get tow_check`
+      if [ "$TOWCHK" == "1" ]; then
+        case "$2" in
+          d)
+            #check dnsmasqc
+            if [ ! -f "/etc/dnsmasq/custom/gfwlist.cfg" ] || [ ! -f "/etc/dnsmasq/custom/my.cfg" ];then
+              logger dnsmasq custom config NOT exits? Starting...
+              service dnsmasqc start
+            fi
+          ;;
+          p)
+            #check pdnsd
+            ON=`ps w | grep pdnsd | grep -v grep | wc -l`
+            if [ "$ON" == "0" ]; then
+              logger pdnsd stopped? Starting...
+              service pdnsd restart
+            fi
+          ;;
+          s)
+            #check shadowsocks
+            ON=`ps w | grep ss-local | grep -v grep | wc -l`
+            if [ "$ON" == "0" ]; then
+              logger shadowsocks-local stopped? Starting...
+              service shadowsocks restart
+            fi
+          ;;
+          e)
+            #check shadowsocks
+            ON=`ps w | grep ss-redir | grep -v grep | wc -l`
+            if [ "$ON" == "0" ]; then
+              logger shadowsocks-redir stopped? Starting...
+              service redir restart
+            fi
+          ;;
+          r)
+            #check redsocks2
+            ON=`ps w | grep redsocks2 | grep -v grep | wc -l`
+            if [ "$ON" == "0" ]; then
+              logger redsocks2 stopped? Starting...
+              service redsocks2 restart
+            fi
+          ;;
+          o)
+            #check ssh_ofc
+            ON=`ps w | grep ssh_ofc | grep -v grep | wc -l`
+            if [ "$ON" == "0" ]; then
+              logger ssh_ofc stopped? Starting...
+              service ssh_ofc restart
+            fi
+          ;;
+        esac
+      fi
+    fi
+  ;;
+esac
+exit 0

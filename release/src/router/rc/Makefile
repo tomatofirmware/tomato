@@ -63,6 +63,10 @@ ifeq ($(TCONFIG_GAEPROXY),y)
 OBJS += gaeproxy.o
 endif
 
+ifeq ($(TCONFIG_TOW),y)
+OBJS += tow.o
+endif
+
 ifeq ($(TCONFIG_NFS),y)
 OBJS += nfs.o
 endif

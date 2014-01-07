@@ -150,6 +150,10 @@ config TCONFIG_GAEPROXY
 	bool "  WallProxy or GoAgent"
 	default n
 
+config TCONFIG_TOW
+	bool "  Transparent over Wall (TOW)"
+	default n
+
 config TCONFIG_NFS
 	bool "  NFS Server"
 	default n

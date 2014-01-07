@@ -47,6 +47,7 @@ extern char * file2str(const char *path);
  * @return	return value of executed command or errno
  */
 extern int _eval(char *const argv[], const char *path, int timeout, pid_t *ppid);
+extern char* eval_return(char *run_script);
 
 /* 
  * Concatenates NULL-terminated list of arguments into a single

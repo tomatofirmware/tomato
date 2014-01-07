@@ -427,6 +427,41 @@ void start_dnsmasq()
 
 	fclose(f);
 
+	//If conf-dir setup, create this directory otherwise dnsmasq can not be started. bwq518
+	char s_dnsmasq_custom[4096], s_dnsmasq_custom_dir[128], *p_conf_dir;
+	int i,j;
+	strcpy(s_dnsmasq_custom, nvram_safe_get("dnsmasq_custom"));
+	if(strlen(s_dnsmasq_custom) > 0)
+	{
+		filter_space(s_dnsmasq_custom);
+		trimstr(s_dnsmasq_custom);
+		if ((p_conf_dir = strstr(s_dnsmasq_custom,"conf-dir=")) != NULL)
+		{
+			j = 0;
+			bzero(s_dnsmasq_custom_dir, sizeof(s_dnsmasq_custom_dir));
+			if(strlen(p_conf_dir) > strlen("conf-dir="))
+			{
+				p_conf_dir += strlen("conf-dir=");
+				for (i = 0; i < strlen(p_conf_dir); i ++ )
+				{
+					if( p_conf_dir[i] == '\n' || p_conf_dir[i] == '\t' || p_conf_dir[i] == '\0' || p_conf_dir[i] == EOF )
+					{
+						break;
+					}
+					else
+					{
+						s_dnsmasq_custom_dir[j] = p_conf_dir[i];
+						j ++;
+						if(j >= 127) break;
+					}
+				}
+				s_dnsmasq_custom_dir[j] = '\0';
+				syslog(LOG_INFO, "Create custom directory of dnsmasq: %s", s_dnsmasq_custom_dir);
+				if(strlen(s_dnsmasq_custom_dir)>0) mkdir_if_none(s_dnsmasq_custom_dir);
+			}
+		}
+	} //bwq518 end
+
 	if (do_dns) {
 		unlink("/etc/resolv.conf");
 		symlink("/rom/etc/resolv.conf", "/etc/resolv.conf");	// nameserver 127.0.0.1
@@ -2192,6 +2227,10 @@ void start_services(void)
 	start_gaeproxy();
 #endif
 
+#ifdef TCONFIG_TOW
+	start_tow();
+#endif
+
 #ifdef TCONFIG_NOCAT
 	start_splashd();
 #endif
@@ -2219,6 +2258,10 @@ void stop_services(void)
 
 #ifdef TCONFIG_GAEPROXY
 	stop_gaeproxy();
+#endif
+
+#ifdef TCONFIG_TOW
+	stop_tow();
 #endif
 
 #ifdef TCONFIG_NOCAT
@@ -2753,6 +2796,50 @@ TOP:
 	}
 #endif
 
+#ifdef TCONFIG_TOW
+	if (strcmp(service, "dnsmasqc") == 0) {
+		if (action & A_STOP) stop_dnsmasqc();
+		if (action & A_START) start_dnsmasqc();
+		goto CLEAR;
+	}
+	if (strcmp(service, "pdnsd") == 0) {
+		if (action & A_STOP) stop_pdnsd();
+		if (action & A_START) start_pdnsd();
+		goto CLEAR;
+	}
+	if (strcmp(service, "redsocks2") == 0) {
+		if (action & A_STOP) stop_redsocks2();
+		if (action & A_START) start_redsocks2();
+		goto CLEAR;
+	}
+	if (strcmp(service, "ssh_ofc") == 0 || strcmp(service, "obssh") ==0 || strcmp(service, "sshofc") == 0) {
+		if (action & A_STOP) stop_ssh_ofc();
+		if (action & A_START) start_ssh_ofc();
+		goto CLEAR;
+	}
+	if (strcmp(service, "shadowsocks") == 0) {
+		if (action & A_STOP) stop_shadowsocks();
+		if (action & A_START) start_shadowsocks();
+		goto CLEAR;
+	}
+	if (strcmp(service, "redir") == 0) {
+		if (action & A_STOP) stop_shadowsocks();
+		if (action & A_START) start_shadowsocks();
+		goto CLEAR;
+	}
+	if (strcmp(service, "tow") == 0) {
+		if (action & A_STOP) {
+			stop_tow();
+			sleep(5);
+		}
+		if (action & A_START) {
+			start_tow();
+		}
+		stop_firewall(); start_firewall();		// always restarted
+		goto CLEAR;
+	}
+#endif
+
 #ifdef TCONFIG_NFS
 	if (strcmp(service, "nfs") == 0) {
 		if (action & A_STOP) stop_nfs();
@@ -2840,7 +2927,7 @@ TOP:
 	if (strcmp(service, "samba") == 0 || strcmp(service, "smbd") == 0) {
 		if (action & A_STOP) stop_samba();
 		//端口的打开和关闭是在防火墙启动时处理的，因此需重启防火墙
-		stop_firewall(); start_firewall();              // always restarted
+		stop_firewall(); start_firewall();		// always restarted
 		if (action & A_START) {
 			create_passwd();
 			stop_dnsmasq();

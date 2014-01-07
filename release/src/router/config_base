@@ -41,6 +41,7 @@ TCONFIG_SAMBASRV=y
 # TCONFIG_TOR is not set
 # TCONFIG_CTF is not set
 # TCONFIG_ARIA2 is not set
+# TCONFIG_TOW is not set
 # TCONFIG_SIMPROXY is not set
 # TCONFIG_PYTHON is not set
 # TCONFIG_GAEPROXY is not set

@@ -449,6 +449,24 @@ extern void start_aria2();
 extern void stop_aria2();
 #endif
 
+// tow.c
+#ifdef TCONFIG_TOW
+extern void start_dnsmasqc();
+extern void stop_dnsmasqc();
+extern void start_pdnsd();
+extern void stop_pdnsd();
+extern void start_redsocks2();
+extern void stop_redsocks2();
+extern void start_ssh_ofc();
+extern void stop_ssh_ofc();
+extern void start_shadowsocks();
+extern void stop_shadowsocks();
+extern void start_redir();
+extern void stop_redir();
+extern void start_tow();
+extern void stop_tow();
+#endif
+
 // proxy.c
 #ifdef TCONFIG_SIMPROXY
 extern void start_proxy();
