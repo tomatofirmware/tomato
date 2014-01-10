@@ -1156,6 +1156,8 @@ const defaults_t defaults[] = {
 	{ "tow_gfwlist_url",			"http://www.hyzoom.com/tomato/gfwlist.txt"		},
 	{ "tow_gfwlist_add",			""		},
 //	{ "tow_lanternlist_url",		"https://raw.github.com/getlantern/lantern-proxied-sites-lists/master/china/autoproxy/list.txt"		},
+	{ "tow_tunlr_custom_enable",		"1"		},
+	{ "tow_tunlr_custom",			"69.197.169.9 192.95.16.109"		},
 	{ "tow_tunlr_url",			"http://tunlr.net/tunapi.php?action=getdns&version=1&format=json"		},
 	{ "tow_whitelist_enable",		"1"		},
 	{ "tow_whitelist_url",			"https://github.com/n0wa11/gfw_whitelist/raw/master/whitelist.pac"		},

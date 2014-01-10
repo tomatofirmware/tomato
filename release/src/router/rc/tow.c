@@ -342,15 +342,28 @@ void start_dnsmasqc(void)
 	fprintf(fps, "    touch \"/etc/dnsmasq/tunlr/domains.txt\"\n");
 	fprintf(fps, "    local DNSMASQ_CONF='/etc/dnsmasq/custom/tunlr.cfg'\n");
 	fprintf(fps, "    local DOMAINS=$(cat /etc/dnsmasq/tunlr/domains.txt)\n");
-	fprintf(fps, "    local IPS=$(wget -O - \\\n");
-	strcpy(url, nvram_safe_get("tow_tunlr_url"));
-	trimstr(url);
-	fprintf(fps, "        \"%s\" \\\n", url);
-	fprintf(fps, "        | sed \"s/\\\"dns.\\\"://g\" | sed \"s/[{}]//g\" | sed \"s/,/\\ /g\" |sed \"s/\\\"//g\")\n");
-	fprintf(fps, "    if [ -z \"$IPS\" ] || [ -n \"$(echo $IPS | sed 's/[0-9\\.\\ ]//g')\" ] ; then\n");
-	fprintf(fps, "        echo \"Tunlr DNS addresses not retrieved, exiting.\"\n");
-	fprintf(fps, "        exit\n");
-	fprintf(fps, "    fi\n");
+	if (nvram_match("tow_tunlr_custom_enable","1"))
+	{
+		strcpy(s1, nvram_safe_get("tow_tunlr_custom"));
+		for (i = 0; i < strlen(s1) ; i ++)
+			if ( s1[i] == ';' || s1[i] == ',') s1[i] = ' ';
+		trimstr(s1);
+		shrink_space(s2, s1, sizeof(s1));
+		nvram_set("tow_tunlr_custom",s2);
+		fprintf(fps, "    local IPS=\"%s\"", s2);
+	}
+	else
+	{
+		fprintf(fps, "    local IPS=$(wget -O - \\\n");
+		strcpy(url, nvram_safe_get("tow_tunlr_url"));
+		trimstr(url);
+		fprintf(fps, "        \"%s\" \\\n", url);
+		fprintf(fps, "        | sed \"s/\\\"dns.\\\"://g\" | sed \"s/[{}]//g\" | sed \"s/,/\\ /g\" |sed \"s/\\\"//g\")\n");
+		fprintf(fps, "    if [ -z \"$IPS\" ] || [ -n \"$(echo $IPS | sed 's/[0-9\\.\\ ]//g')\" ] ; then\n");
+		fprintf(fps, "        echo \"Tunlr DNS addresses not retrieved, exiting.\"\n");
+		fprintf(fps, "        exit\n");
+		fprintf(fps, "    fi\n");
+	}
 	fprintf(fps, "    echo -n > $DNSMASQ_CONF\n");
 	fprintf(fps, "    echo \"# Tunlr DNS updater for dnsmasq\" >> $DNSMASQ_CONF\n");
 	fprintf(fps, "    for domain in $DOMAINS\n");
