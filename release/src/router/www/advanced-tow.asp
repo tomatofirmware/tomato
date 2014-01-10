@@ -27,7 +27,7 @@ textarea {
 
 <script type='text/javascript'>
 
-//	<% nvram("tow_enable,tow_check,tow_check_time,tow_sleep,tow_mode,tow_iprange_all,tow_iprange_start,tow_iprange_end,tow_pdnsd_localdns_useisp,tow_pdnsd_localdns_ip,tow_pdnsd_localdns_port,tow_pdnsd_opendns_ip,tow_pdnsd_opendns_port,tow_pdnsd_reject_ip_add,tow_pdnsd_exclude_domain,tow_gfwlist_enable,tow_gfwlist_url,tow_gfwlist_add,tow_tunlr_url,tow_whitelist_enable,tow_whitelist_url,tow_whitelist_add,tow_pandalist_url,tow_tunlr_domains_add,tow_ssh_server,tow_ssh_port,tow_ssh_username,tow_ssh_passwd,tow_ssh_obfcode,tow_ssh_listen_port,tow_ssh_argv,tow_ss_server,tow_ss_server_port,tow_ss_crypt_method,tow_ss_passwd,tow_ss_local_port,tow_ss_redir_local_port,tow_redsocks_gae_port,tow_redsocks_wp_port"); %>
+//	<% nvram("tow_enable,tow_check,tow_check_time,tow_sleep,tow_mode,tow_iprange_all,tow_iprange_start,tow_iprange_end,tow_pdnsd_localdns_useisp,tow_pdnsd_localdns_ip,tow_pdnsd_localdns_port,tow_pdnsd_opendns_ip,tow_pdnsd_opendns_port,tow_pdnsd_reject_ip_add,tow_pdnsd_exclude_domain,tow_gfwlist_enable,tow_gfwlist_url,tow_gfwlist_add,tow_tunlr_custom_enable,tow_tunlr_custom,tow_tunlr_url,tow_whitelist_enable,tow_whitelist_url,tow_whitelist_add,tow_pandalist_url,tow_tunlr_domains_add,tow_ssh_server,tow_ssh_port,tow_ssh_username,tow_ssh_passwd,tow_ssh_obfcode,tow_ssh_listen_port,tow_ssh_argv,tow_ss_server,tow_ss_server_port,tow_ss_crypt_method,tow_ss_passwd,tow_ss_local_port,tow_ss_redir_local_port,tow_redsocks_gae_port,tow_redsocks_wp_port"); %>
 
 function verifyFields(focused, quiet)
 {
@@ -39,6 +39,7 @@ function verifyFields(focused, quiet)
 	var d = E('_f_tow_pdnsd_localdns_useisp').checked;
 	var e = E('_f_tow_gfwlist_enable').checked;
 	var f = E('_f_tow_whitelist_enable').checked;
+	var l = E('_f_tow_tunlr_custom_enable').checked;
 	var s = (E('_tow_mode').value == 'ss');
 	var r = (E('_tow_mode').value == 'redir');
 	var o = (E('_tow_mode').value == 'ssh');
@@ -63,7 +64,9 @@ function verifyFields(focused, quiet)
 	E('_tow_gfwlist_url').disabled = !a || !e;
 	E('_tow_gfwlist_add').disabled = !a || !e;
 //	E('_tow_lanternlist_url').disabled = !a || !e;
-	E('_tow_tunlr_url').disabled = !a || !e;
+	E('_f_tow_tunlr_custom_enable').disabled = !a;
+	E('_tow_tunlr_custom').disabled = !a || !l;
+	E('_tow_tunlr_url').disabled = !a || l;
 	E('_f_tow_whitelist_enable').disabled = !a;
 	E('_tow_whitelist_url').disabled = !a || !f;
 	E('_tow_whitelist_add').disabled = !a || !f;
@@ -139,6 +142,7 @@ function save()
   fom.tow_iprange_all.value		= E('_f_tow_iprange_all').checked ? 1 : 0;
   fom.tow_pdnsd_localdns_useisp.value	= E('_f_tow_pdnsd_localdns_useisp').checked ? 1 : 0;
   fom.tow_gfwlist_enable.value		= E('_f_tow_gfwlist_enable').checked ? 1 : 0;
+  fom.tow_tunlr_custom_enable.value	= E('_f_tow_tunlr_custom_enable').checked ? 1 : 0;
   fom.tow_whitelist_enable.value	= E('_f_tow_whitelist_enable').checked ? 1 : 0;
 	
   if (fom.tow_enable.value == 0) {
@@ -174,6 +178,7 @@ function save()
 <input type='hidden' name='tow_pdnsd_localdns_useisp'>
 <input type='hidden' name='tow_gfwlist_enable'>
 <input type='hidden' name='tow_whitelist_enable'>
+<input type='hidden' name='tow_tunlr_custom_enable'>
 
 <div class='section-title'>Basic Settings</div>
 <div class='section' id='config-section'>
@@ -235,7 +240,9 @@ createFieldTable('', [
 	{ title: 'URL of whitelist 1', indent: 2, name: 'tow_whitelist_url', type: 'text', maxlen: 512, size: 80, value: nvram.tow_whitelist_url },
 	{ title: 'URL of whitelist 2', indent: 2, name: 'tow_pandalist_url', type: 'text', maxlen: 512, size: 80, value: nvram.tow_pandalist_url },
 	{ title: 'Add domains to whitelist<br>(Each line consists of one domain)',indent: 2,  name: 'tow_whitelist_add', type: 'textarea', suffix: '<input type="button" id="btn_whitelist" value="Current White List for IPSet" onclick="javascript:window.open(\'/ext/whitelist.cfg.txt\')">', value: nvram.tow_whitelist_add },
-	{ title: 'URL of Tunlr DNS', name: 'tow_tunlr_url', type: 'text', maxlen: 512, size: 60, value: nvram.tow_tunlr_url, suffix: ' <small>Breakthrough websites with area limitation</small>' },
+	{ title: 'Enable custom Tunlr DNS', name: 'f_tow_tunlr_custom_enable', type: 'checkbox', value: nvram.tow_tunlr_custom_enable == 1, suffix: ' <small>*</small>' },
+	{ title: 'Custom Tunlr DNS IPs', indent: 2, name: 'tow_tunlr_custom', type: 'text', maxlen: 128, size: 80, value: nvram.tow_tunlr_custom },
+	{ title: 'URL of Tunlr DNS', indent: 2, name: 'tow_tunlr_url', type: 'text', maxlen: 512, size: 60, value: nvram.tow_tunlr_url, suffix: ' <small>Breakthrough websites with area limitation</small>' },
 	{ title: 'Add domains to Tunlr DNS list<br>(Each line consists of one domain)', name: 'tow_tunlr_domains_add', type: 'textarea', suffix: '<input type="button" id="btn_tunlr_domains" value="List of exist tunlr domains" onclick="javascript:window.open(\'/ext/tunlr_domains.htm\')">', value: nvram.tow_tunlr_domains_add }
 ]);
 </script>

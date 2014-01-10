@@ -1400,6 +1400,8 @@ static const nvset_t nvset_list[] = {
 	{ "tow_gfwlist_url",			V_TEXT(0, 1024)		},
 	{ "tow_gfwlist_add",			V_TEXT(0, 4096)		},
 //	{ "tow_lanternlist_url",		V_TEXT(0, 1024)		},
+	{ "tow_tunlr_custom_enable",		V_01			},      
+	{ "tow_tunlr_custom",                   V_TEXT(0,128)		},
 	{ "tow_tunlr_url",			V_TEXT(0, 1024)		},
 	{ "tow_whitelist_enable",		V_01			},
 	{ "tow_whitelist_url",			V_TEXT(0, 1024)		},
