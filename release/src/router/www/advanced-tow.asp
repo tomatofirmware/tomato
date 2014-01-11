@@ -89,7 +89,7 @@ function verifyFields(focused, quiet)
 	E('_tow_redsocks_wp_port').disabled = !a;	
 	
 	var x;
-	if ((s  || r) && a) x = '';
+	if ( s  || r ) x = '';
 	else x = 'none';
 	PR(E('_tow_ss_server')).style.display = x;
 	PR(E('_tow_ss_server')).style.display = x;
@@ -99,7 +99,7 @@ function verifyFields(focused, quiet)
 //	PR(E('_tow_ss_local_port')).style.display = x;
 //	PR(E('_tow_ss_redir_local_port')).style.display = x;
 
-	if (o && a) x = '';
+	if ( o ) x = '';
 	else x = 'none';
 	PR(E('_tow_ssh_server')).style.display = x;
 	PR(E('_tow_ssh_port')).style.display = x;
@@ -109,10 +109,10 @@ function verifyFields(focused, quiet)
 //	PR(E('_tow_ssh_listen_port')).style.display = x;
 	PR(E('_tow_ssh_argv')).style.display = x;
 
-	if (g && a) x = '';
+	if ( g ) x = '';
 	else x = 'none';
 	PR(E('_tow_redsocks_gae_port')).style.display = x;
-	if (w && a) x = '';
+	if ( w ) x = '';
 	else x = 'none';
 	PR(E('_tow_redsocks_wp_port')).style.display = x;
 
