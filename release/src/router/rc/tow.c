@@ -350,7 +350,7 @@ void start_dnsmasqc(void)
 		trimstr(s1);
 		shrink_space(s2, s1, sizeof(s1));
 		nvram_set("tow_tunlr_custom",s2);
-		fprintf(fps, "    local IPS=\"%s\"", s2);
+		fprintf(fps, "    local IPS=\"%s\"\n", s2);
 	}
 	else
 	{
