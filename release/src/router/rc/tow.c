@@ -360,10 +360,19 @@ void start_dnsmasqc(void)
 		fprintf(fps, "        \"%s\" \\\n", url);
 		fprintf(fps, "        | sed \"s/\\\"dns.\\\"://g\" | sed \"s/[{}]//g\" | sed \"s/,/\\ /g\" |sed \"s/\\\"//g\")\n");
 		fprintf(fps, "    if [ -z \"$IPS\" ] || [ -n \"$(echo $IPS | sed 's/[0-9\\.\\ ]//g')\" ] ; then\n");
-		fprintf(fps, "        echo \"Tunlr DNS addresses not retrieved, exiting.\"\n");
-		fprintf(fps, "        exit\n");
+		fprintf(fps, "        echo \"Tunlr DNS addresses not retrieved. default will be used.\"\n");
+		strcpy(s1, nvram_safe_get("tow_tunlr_custom"));
+		for (i = 0; i < strlen(s1) ; i ++)
+			if ( s1[i] == ';' || s1[i] == ',') s1[i] = ' ';
+		trimstr(s1);
+		shrink_space(s2, s1, sizeof(s1));
+		nvram_set("tow_tunlr_custom",s2);
+		fprintf(fps, "        local IPS=\"%s\"\n", s2);
 		fprintf(fps, "    fi\n");
 	}
+	fprintf(fps, "    if [ X\"$IPS\" = X ]; then\n");
+	fprintf(fps, "        return\n");
+	fprintf(fps, "    fi\n");
 	fprintf(fps, "    echo -n > $DNSMASQ_CONF\n");
 	fprintf(fps, "    echo \"# Tunlr DNS updater for dnsmasq\" >> $DNSMASQ_CONF\n");
 	fprintf(fps, "    for domain in $DOMAINS\n");
