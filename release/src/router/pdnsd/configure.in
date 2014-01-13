@@ -250,10 +250,6 @@ AC_ARG_WITH(par-queries,
 [  --with-par-queries=num      Specify default parallel query number (default=2)],
   AC_DEFINE_UNQUOTED(PAR_QUERIES, $withval))
 
-AC_ARG_WITH(max-nameserver-ips,
-[  --with-max-nameserver-ips=num      Specify maximum number of IP addresses used per nameserver obtained from NS records (default=3)],
-  AC_DEFINE_UNQUOTED(MAXNAMESERVIPS, $withval))
-
 AC_ARG_ENABLE(specbuild,
 [  --enable-specbuild          Only used when building pdnsd from spec files],
   specbuild=$enableval)
@@ -340,58 +336,22 @@ test "$adisc" = "yes" && AC_DEFINE(SRC_ADDR_DISC)
 
 dnl Checks for libraries.
 if test "$target" = "Linux"; then
-AC_MSG_CHECKING([if we can compile and link with -pthread])
-old_CFLAGS="$CFLAGS"
-CFLAGS="$CFLAGS -pthread"
-AC_LINK_IFELSE([
-#include <pthread.h>
-
-void *thread_func(void *data)
-{
-	*((int *)data)=1;
-	return data;
-}
-
-int main()
-{
-	pthread_t thread;
-	void *retval;
-	int val;
-
-	if(pthread_create(&thread, NULL, thread_func, &val))
-		return 1;
-
-	if(pthread_join(thread,&retval))
-		return 1;
-
-	return (*((int *)retval)!=1);
-}
-],
-  gcc_pthread_flag="yes", gcc_pthread_flag="no")
-CFLAGS="$old_CFLAGS"
-AC_MSG_RESULT([$gcc_pthread_flag])
-
-  if test "$gcc_pthread_flag" = yes ; then
-    thread_CFLAGS="-pthread"
-    AC_SUBST(thread_CFLAGS)
-  else
-    AC_CHECK_LIB(pthread, pthread_create)
-  fi
+  AC_CHECK_LIB(pthread, pthread_kill)
 fi
 if test "$target" = "BSD" -a `uname` != Darwin ; then
 #  if test $freebsd_pthread = 4 ; then
     thread_CFLAGS="-pthread"
     AC_SUBST(thread_CFLAGS)
 #  else
-#    AC_CHECK_LIB(c_r, pthread_create, , 
+#    AC_CHECK_LIB(c_r, pthread_kill, , 
 #      AC_MSG_ERROR([You must have libc_r installed to build/run pdnsd!]))
 #  fi;
 fi
 
 if test "$target" = "Linux" -a "$threadlib" = default; then
 AC_MSG_CHECKING([if this is an NPTL-based system])
-old_CFLAGS="$CFLAGS"
-CFLAGS="$CFLAGS $thread_CFLAGS"
+old_LIBS="$LIBS"
+LIBS="$LIBS -lpthread"
 AC_RUN_IFELSE([
 #include <stdio.h>
 #include <errno.h>
@@ -442,7 +402,7 @@ int main()
   AC_MSG_RESULT([couldn't run test program])
   threadlib=linuxthreads
 ])
-CFLAGS="$old_CFLAGS"
+LIBS="$old_LIBS"
 fi
 
 if test "$threadlib" = nptl -o "$threadlib" = NPTL; then

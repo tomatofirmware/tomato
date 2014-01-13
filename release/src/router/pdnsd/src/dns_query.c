@@ -1,7 +1,7 @@
 /* dns_query.c - Execute outgoing dns queries and write entries to cache
 
    Copyright (C) 2000, 2001 Thomas Moestl
-   Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2011, 2012 Paul A. Rombouts
+   Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2011 Paul A. Rombouts
 
   This file is part of the pdnsd package.
 
@@ -86,9 +86,9 @@ typedef struct {
 #endif
 	time_t              timeout;
 	unsigned short      flags;
+	short               nocache;
 	short               state;
 	short               qm;
-	char                nocache;
         char                auth_serv;
 	char                lean_query;
 	char                edns_query;
@@ -96,7 +96,6 @@ typedef struct {
 	char                trusted;
 	char                aa;
 	char                tc;
-	char                ra;
 	char                failed;
 	const unsigned char *nsdomain;
 	rejectlist_t        *rejectlist;
@@ -1413,8 +1412,7 @@ static int p_exec_query(dns_cent_t **entp, const unsigned char *name, int thint,
 		lcnt-=4;
 
 		st->aa= (st->recvbuf->aa && !st->failed);
-		st->tc= st->recvbuf->tc;
-		st->ra= (rd && st->recvbuf->ra);
+		st->tc=st->recvbuf->tc;
 
 		/* Don't flag cache entries from a truncated reply as authoritative. */
 		aa= (st->aa && !st->tc);
@@ -1620,7 +1618,7 @@ static int p_exec_query(dns_cent_t **entp, const unsigned char *name, int thint,
 				/* We did not get what we wanted. Cache according to policy */
 				dns_cent_t *ent=&DA_INDEX(ans_sec,0);
 				int neg_domain_pol=global.neg_domain_pol;
-				if (neg_domain_pol==C_ON || (neg_domain_pol==C_AUTH && st->aa)) {
+				if (neg_domain_pol==C_ON || (neg_domain_pol==C_AUTH && st->recvbuf->aa)) {
 					time_t ttl=global.neg_ttl;
 
 					/* Try to find a SOA record that came with the reply.
@@ -1741,7 +1739,7 @@ static int p_exec_query(dns_cent_t **entp, const unsigned char *name, int thint,
 				/* We did not get what we wanted. Cache according to policy */
 				int neg_rrs_pol=global.neg_rrs_pol;
 				if (neg_rrs_pol==C_ON || (neg_rrs_pol==C_AUTH && aa) ||
-				    (neg_rrs_pol==C_DEFAULT && (aa || st->ra)))
+				    (neg_rrs_pol==C_DEFAULT && (aa || (rd && st->recvbuf->ra))))
 				{
 					time_t ttl=global.neg_ttl;
 					rr_set_t *rrset=getrrset_SOA(ent);
@@ -1958,7 +1956,7 @@ inline static void init_qserv(query_stat_array *q)
  * Be sure to free the q-list before freeing the name.
  */
 static int add_qserv(query_stat_array *q, pdnsd_a2 *a, int port, time_t timeout, unsigned flags,
-		     char nocache, char lean_query, char edns_query, char auth_s, char needs_testing, char trusted,
+		     int nocache, char lean_query, char edns_query, char auth_s, char needs_testing, char trusted,
 		     const unsigned char *nsdomain, rejectlist_t *rejectlist)
 {
 	query_stat_t *qs;
@@ -2000,7 +1998,6 @@ static int add_qserv(query_stat_array *q, pdnsd_a2 *a, int port, time_t timeout,
 	qs->trusted=trusted;
 	qs->aa=0;
 	qs->tc=0;
-	qs->ra=0;
 	qs->failed=0;
 	qs->nsdomain=nsdomain; /* Note: only a reference is copied, not the name itself! */
 	qs->rejectlist=rejectlist;
@@ -2009,15 +2006,6 @@ static int add_qserv(query_stat_array *q, pdnsd_a2 *a, int port, time_t timeout,
 	qs->qm=global.query_method;
 	qs->s_errno=0;
 	return 1;
-}
-
-/* Test whether two pdnsd_a2 addresses are the same. */
-inline __attribute__((always_inline))
-static int same_inaddr2_2(pdnsd_a2 *a, pdnsd_a2 *b)
-{
-  return SEL_IPVER(  a->ipv4.s_addr==b->ipv4.s_addr,
-		     IN6_ARE_ADDR_EQUAL(&a->ipv6,&b->ipv6) &&
-		      a->ipv4.s_addr==b->ipv4.s_addr );
 }
 
 /* This can be used to check whether a server address was already used in a
@@ -2078,9 +2066,6 @@ static int simple_dns_cached_resolve(atup_array atup_a, int port, char edns_quer
  * take the original values for the record, but flags=0 and ttl=0 (but only if we do not already have
  * a cached record for that set). These settings cause the record be purged on the next cache addition.
  * It will also not be used again.
- *
- * The return value of p_recursive_query() has the same meaning as that of p_dns_cached_resolve()
- * (see below).
  */
 static int p_recursive_query(query_stat_array q, const unsigned char *name, int thint, dns_cent_t **entp,
 			     int *nocache, int hops, qstatnode_t *qslist, qhintnode_t *qhlist,
@@ -2522,9 +2507,7 @@ static int p_recursive_query(query_stat_array q, const unsigned char *name, int 
 			DEBUG_MSG("Unrecoverable error encountered while processing query.\n");
 			rv=RC_SERVFAIL;
 		}
-		DEBUG_MSG("%sReturning error code \"%s\"\n",
-			  rv!=RC_NAMEERR? "No query succeeded. ": "",
-			  get_ename(rv));
+		DEBUG_MSG("No query succeeded. Returning error code \"%s\"\n",get_ename(rv));
 		goto clean_up_return;
 	}
 
@@ -2534,47 +2517,20 @@ static int p_recursive_query(query_stat_array q, const unsigned char *name, int 
 		/* Authority records present. Ask them, because the answer was non-authoritative. */
 		qstatnode_t qsn={q,qslist};
 		unsigned char save_ns=ent->c_ns,save_soa=ent->c_soa;
-		
-		if(qse->aa || qse->ra) {
-			/* The server claimed to be authoritative or have recursion available,
-			   yet we did not completely trust the answer for some reason.
-			   We will try to ask the servers in the authority records,
-			   but in case we fail, we will save a copy of the answer. */
-			entsave=ent;
-		}
-		else {
-			free_cent(ent  DBG1);
-			pdnsd_free(ent);
-			entsave=NULL;
-		}
+		free_cent(ent  DBG1);
+		pdnsd_free(ent);
 		rv=p_dns_cached_resolve(serv, name, thint,&ent,hops-1,&qsn,qhlist,time(NULL),c_soa);
-		if(rv==RC_OK || rv==RC_CACHED || (rv==RC_STALE && !entsave)) {
+		if(rv==RC_OK) {
 			if(save_ns!=cundef && (ent->c_ns==cundef || ent->c_ns<save_ns))
 				ent->c_ns=save_ns;
 			if(save_soa!=cundef && (ent->c_soa==cundef || ent->c_soa<save_soa))
 				ent->c_soa=save_soa;
-			goto free_entsave;
 		}
-		else if(rv==RC_NAMEERR) {
-			if(c_soa && save_soa!=cundef && (*c_soa==cundef || *c_soa<save_soa))
+		else if(rv==RC_NAMEERR && c_soa) {
+			if(save_soa!=cundef && (*c_soa==cundef || *c_soa<save_soa))
 				*c_soa=save_soa;
-		free_entsave:
-			if(entsave) {
-				free_cent(entsave  DBG1);
-				pdnsd_free(entsave);
-			}
 		}
-		else if(entsave) {
-			if(rv==RC_STALE) {
-				free_cent(ent  DBG1);
-				pdnsd_free(ent);
-			}
-			DEBUG_PDNSDA_MSG("Using saved reply from %s that claims to %s.\n",
-					 PDNSDA2STR(PDNSD_A(qse)),
-					 qse->aa? "be authoritative": "have recursion available");
-			ent=entsave;
-			rv=RC_OK;
-		}
+		/* return the answer in any case. */
 	}
 
  clean_up_return:
@@ -2583,7 +2539,7 @@ static int p_recursive_query(query_stat_array q, const unsigned char *name, int 
 	del_qserv(serv);
 	dlist_free(ns);
 
-	if(rv==RC_OK || rv==RC_CACHED || rv==RC_STALE) *entp=ent;
+	if(rv==RC_OK) *entp=ent;
 	return rv;
 #	undef save_query_result
 }
@@ -2676,8 +2632,7 @@ static int auth_ok(query_stat_array q, const unsigned char *name, int thint, dns
 		rr_bucket_t *localrr=NULL;
 		for (nsdomp=dlist_first(ns);;) {
 			unsigned char *nsname=NULL;  /* Initialize to inhibit compiler warning. */
-			int nserva, ia, n;
-			pdnsd_a2 serva[MAXNAMESERVIPS];
+			pdnsd_a2 serva;
 
 			/* Get next name server. */
 			if(localrr) {
@@ -2743,8 +2698,11 @@ static int auth_ok(query_stat_array q, const unsigned char *name, int thint, dns
 			/* look it up in the cache or resolve it if needed.
 			   The records received should be in the cache now, so it's ok.
 			*/
-			nserva=0;
-
+#ifdef ENABLE_IPV6
+			if(!run_ipv4)
+				serva.ipv6=in6addr_any;
+#endif
+			serva.ipv4.s_addr=INADDR_ANY;
 			{
 				const unsigned char *nm=name;
 				int tp=thint;
@@ -2768,40 +2726,23 @@ static int auth_ok(query_stat_array q, const unsigned char *name, int thint, dns
 #ifdef ENABLE_IPV4
 						if (run_ipv4) {
 							rr_set_t *rrset=getrrset_A(servent);
-							rr_bucket_t *rrs;
-							if (rrset)
-								for(rrs=rrset->rrs; rrs && nserva<MAXNAMESERVIPS; rrs=rrs->next)
-									serva[nserva++].ipv4 = *((struct in_addr *)rrs->data);
+							if (rrset && rrset->rrs)
+								serva.ipv4 = *((struct in_addr *)rrset->rrs->data);
 						}
 #endif
 #ifdef ENABLE_IPV6
 						ELSE_IPV6 {
-							rr_set_t *rrset6=getrrset_AAAA(servent);
-							rr_bucket_t *rrs6= (rrset6? rrset6->rrs: NULL);
-							rr_set_t *rrset4=getrrset_A(servent);
-							rr_bucket_t *rrs4= (rrset4? rrset4->rrs: NULL);
-							while(nserva<MAXNAMESERVIPS) {
-								if(rrs6) {
-									serva[nserva].ipv6 = *((struct in6_addr *)rrs6->data);
-									rrs6=rrs6->next;
-									if (rrs4) {
-										/* Store IPv4 address as fallback. */
-										serva[nserva].ipv4 = *((struct in_addr *)rrs4->data);
-										rrs4=rrs4->next;
-									}
-									else
-										serva[nserva].ipv4.s_addr=INADDR_ANY;
+							rr_set_t *rrset;
+							if ((rrset=getrrset_AAAA(servent)) && rrset->rrs) {
+								serva.ipv6 = *((struct in6_addr *)rrset->rrs->data);
+								if ((rrset=getrrset_A(servent)) && rrset->rrs) {
+									/* Store IPv4 address as fallback. */
+									serva.ipv4 = *((struct in_addr *)rrset->rrs->data);
 								}
-								else if (rrs4) {
-									struct in_addr *ina = (struct in_addr *)rrs4->data;
-									struct in6_addr *in6a = &serva[nserva].ipv6;
-									IPV6_MAPIPV4(ina,in6a);
-									serva[nserva].ipv4.s_addr=INADDR_ANY;
-									rrs4=rrs4->next;
-								}
-								else
-									break;
-								++nserva;
+							}
+							else if ((rrset=getrrset_A(servent)) && rrset->rrs) {
+								struct in_addr *ina = (struct in_addr *)rrset->rrs->data;
+								IPV6_MAPIPV4(ina,&serva.ipv6);
 							}
 						}
 #endif
@@ -2811,57 +2752,50 @@ static int auth_ok(query_stat_array q, const unsigned char *name, int thint, dns
 				}
 			}
 
-#if DEBUG>0
-			if(nserva==0) {
-				DEBUG_RHN_MSG("Looking up address for name server \"%s\" failed.\n",RHN2STR(nsname));
-			}
-#endif
-			n=DA_NEL(*serv);
-			for(ia=0; ia<nserva; ++ia) {
-				pdnsd_a2 *pserva= &serva[ia];
-				int i;
+			if(is_inaddr2_any(&serva))
+				continue;  /* address resolution failed. */
 
-				if(is_local_addr(PDNSD_A2_TO_A(pserva)))
-					continue;  /* Do not use local address (as defined in netdev.c). */
+			if(is_local_addr(PDNSD_A2_TO_A(&serva)))
+				continue;  /* Do not use local address (as defined in netdev.c). */
 
-				/* Skip duplicate addresses. */
+			{       /* Skip duplicate addresses. */
+				int i,n=DA_NEL(*serv);
 				for (i=0; i<n; ++i) {
 					query_stat_t *qs=&DA_INDEX(*serv,i);
-					if (query_stat_same_inaddr2(qs,pserva))
-						goto skip_server_addr;
+					if (query_stat_same_inaddr2(qs,&serva))
+						goto skip_server;
 				}
-
-				{       /* We've got an address. Add it to the list if it wasn't one of the servers we queried. */
-					query_stat_array qa=q;
-					qstatnode_t *ql=qslist;
-					for(;;) {
-						int i,n=DA_NEL(qa);
-						for (i=0; i<n; ++i) {
-							/* If qa[i].state == QS_DONE, then p_exec_query() has been called,
-							   and we should not query this server again */
-							query_stat_t *qs=&DA_INDEX(qa,i);
-							if (qs->state==QS_DONE && equiv_inaddr2(PDNSD_A(qs),pserva)) {
-								DEBUG_PDNSDA_MSG("Not trying name server %s, already queried.\n", PDNSDA2STR(PDNSD_A2_TO_A(pserva)));
-								goto skip_server_addr;
-							}
-						}
-						if(!ql) break;
-						qa=ql->qa;
-						ql=ql->next;
-					}
-				}
-
-				/* lean query mode is inherited. CF_AUTH and CF_ADDITIONAL are not (as specified
-				 * in CFF_NOINHERIT). */
-				if (!add_qserv(serv, pserva, 53, qse->timeout, qse->flags&~CFF_NOINHERIT, 0,
-					       qse->lean_query,qse->edns_query,2,0,!global.paranoid,nsdomain,
-					       inherit_rejectlist(qse)?qse->rejectlist:NULL))
-				{
-					return -1;
-				}
-				retval=1;
-			skip_server_addr:;
 			}
+
+			{       /* We've got an address. Add it to the list if it wasn't one of the servers we queried. */
+				query_stat_array qa=q;
+				qstatnode_t *ql=qslist;
+				for(;;) {
+					int i,n=DA_NEL(qa);
+					for (i=0; i<n; ++i) {
+						/* If qa[i].state == QS_DONE, then p_exec_query() has been called,
+						   and we should not query this server again */
+						query_stat_t *qs=&DA_INDEX(qa,i);
+						if (qs->state==QS_DONE && equiv_inaddr2(PDNSD_A(qs),&serva)) {
+							DEBUG_PDNSDA_MSG("Not trying name server %s, already queried.\n", PDNSDA2STR(PDNSD_A2_TO_A(&serva)));
+							goto skip_server;
+						}
+					}
+					if(!ql) break;
+					qa=ql->qa;
+					ql=ql->next;
+				}
+			}
+
+			/* lean query mode is inherited. CF_AUTH and CF_ADDITIONAL are not (as specified
+			 * in CFF_NOINHERIT). */
+			if (!add_qserv(serv, &serva, 53, qse->timeout, qse->flags&~CFF_NOINHERIT, 0,
+				       qse->lean_query,qse->edns_query,2,0,!global.paranoid,nsdomain,
+				       inherit_rejectlist(qse)?qse->rejectlist:NULL))
+			{
+				return -1;
+			}
+			retval=1;
 		skip_server:;
 		}
 #if DEBUG>0
@@ -2951,9 +2885,6 @@ static rejectlist_t *add_rejectlist(rejectlist_t *rl, servparm_t *sp)
 		rlist->inherit = sp->rejectrecursively;
 		rlist->next = rl;
 	}
-	else {
-		DEBUG_MSG("Out of memory in add_rejectlist()\n");
-	}
 
 	return rlist;
 }
@@ -2980,91 +2911,58 @@ static addr2_array lookup_ns(const unsigned char *domain)
 		if(rrset && (rrset->flags&CF_ROOTSERV) && !timedout(rrset)) {
 			rr_bucket_t *rr;
 			for(rr=rrset->rrs; rr; rr=rr->next) {
-				dns_cent_t *servent=lookup_cache((unsigned char*)(rr->data),NULL);
-				int nserva=0;
-				pdnsd_a2 serva[MAXNAMESERVIPS];
+				pdnsd_a2 *serva;
+				dns_cent_t *servent;
+				if(!(res=DA_GROW1(res))) {
+					DEBUG_MSG("Out of memory in lookup_ns()\n");
+					break;
+				}
+				serva=&DA_LAST(res);
+#ifdef ENABLE_IPV6
+				if(!run_ipv4)
+					serva->ipv6=in6addr_any;
+#endif
+				serva->ipv4.s_addr=INADDR_ANY;
+
+				servent=lookup_cache((unsigned char*)(rr->data),NULL);
 				if(servent) {
 #ifdef ENABLE_IPV4
 					if (run_ipv4) {
 						rr_set_t *rrset=getrrset_A(servent);
-						rr_bucket_t *rrs;
-						if (rrset && !timedout(rrset))
-							for(rrs=rrset->rrs; rrs && nserva<MAXNAMESERVIPS; rrs=rrs->next)
-								serva[nserva++].ipv4 = *((struct in_addr *)rrs->data);
+						if (rrset && !timedout(rrset) && rrset->rrs)
+							serva->ipv4 = *((struct in_addr *)rrset->rrs->data);
 					}
 #endif
 #ifdef ENABLE_IPV6
 					ELSE_IPV6 {
-						rr_set_t *rrset6=getrrset_AAAA(servent);
-						rr_set_t *rrset4=getrrset_A(servent);
-						rr_bucket_t *rrs6=NULL, *rrs4=NULL;
-						if (rrset6 && !(rrset6->flags&CF_NEGATIVE)) {
-							if(!timedout(rrset6)) {
-								rrs6= rrset6->rrs;
-								if (rrs6 && rrset4 && !(rrset4->flags&CF_NEGATIVE)) {
-									if(timedout(rrset4) || !(rrs4=rrset4->rrs))
-										/* Treat this as a failure. */
-										rrs6=NULL;
+						rr_set_t *rrset;
+						if ((rrset=getrrset_AAAA(servent)) && !(rrset->flags&CF_NEGATIVE)) {
+							if(!timedout(rrset) && rrset->rrs) {
+								serva->ipv6 = *((struct in6_addr *)rrset->rrs->data);
+								if ((rrset=getrrset_A(servent)) && !(rrset->flags&CF_NEGATIVE)) {
+									if(!timedout(rrset) && rrset->rrs)
+										serva->ipv4 = *((struct in_addr *)rrset->rrs->data);
+									else /* Treat this as a failure. */
+										serva->ipv6=in6addr_any;
 								}
 							}
 						}
-						else if (rrset4 && !timedout(rrset4))
-							rrs4= rrset4->rrs;
-
-						while(nserva<MAXNAMESERVIPS) {
-							if(rrs6) {
-								serva[nserva].ipv6 = *((struct in6_addr *)rrs6->data);
-								rrs6=rrs6->next;
-								if (rrs4) {
-									/* Store IPv4 address as fallback. */
-									serva[nserva].ipv4 = *((struct in_addr *)rrs4->data);
-									rrs4=rrs4->next;
-								}
-								else
-									serva[nserva].ipv4.s_addr=INADDR_ANY;
-							}
-							else if (rrs4) {
-								struct in_addr *ina = (struct in_addr *)rrs4->data;
-								struct in6_addr *in6a = &serva[nserva].ipv6;
-								IPV6_MAPIPV4(ina,in6a);
-								serva[nserva].ipv4.s_addr=INADDR_ANY;
-								rrs4=rrs4->next;
-							}
-							else
-								break;
-							++nserva;
+						else if ((rrset=getrrset_A(servent)) && !timedout(rrset) && rrset->rrs) {
+							struct in_addr *ina = (struct in_addr *)rrset->rrs->data;
+							IPV6_MAPIPV4(ina,&serva->ipv6);
 						}
 					}
 #endif
 					free_cent(servent  DBG1);
 					pdnsd_free(servent);
 				}
-				if(nserva==0) {
+				if(is_inaddr2_any(serva)) {
 					/* Address lookup failed. */
 					da_free(res); res=NULL;
 					break;
 				}
-				else {
-					int i, j, n=DA_NEL(res);
-					for(i=0; i<nserva; ++i) {
-						pdnsd_a2 *pserva= &serva[i];
-						/* Skip duplicates */
-						for (j=0; j<n; ++j) {
-							pdnsd_a2 *pa= &DA_INDEX(res,j);
-							if (same_inaddr2_2(pa,pserva))
-								goto skip_address;
-						}
-						if(!(res=DA_GROW1(res))) {
-							DEBUG_MSG("Out of memory in lookup_ns()\n");
-							goto free_cent_return;
-						}
-						DA_LAST(res)= *pserva;
-					skip_address:;
-					}
-				}
 			}
 		}
-	free_cent_return:
 		free_cent(cent  DBG1);
 		pdnsd_free(cent);
 	}
@@ -3091,9 +2989,13 @@ addr2_array dns_rootserver_resolv(atup_array atup_a, int port, char edns_query, 
 			rr_bucket_t *rr;
 			unsigned nfail=0;
 			for(rr=rrset->rrs; rr; rr=rr->next) {
+				pdnsd_a2 serva;
 				dns_cent_t *servent;
-				int nserva=0;
-				pdnsd_a2 serva[MAXNAMESERVIPS];
+#ifdef ENABLE_IPV6
+				if(!run_ipv4)
+					serva.ipv6=in6addr_any;
+#endif
+				serva.ipv4.s_addr=INADDR_ANY;
 
 				rc=simple_dns_cached_resolve(atup_a,port,edns_query,timeout,
 							     (const unsigned char *)(rr->data),T_A,&servent);
@@ -3101,40 +3003,23 @@ addr2_array dns_rootserver_resolv(atup_array atup_a, int port, char edns_query, 
 #ifdef ENABLE_IPV4
 					if (run_ipv4) {
 						rr_set_t *rrset=getrrset_A(servent);
-						rr_bucket_t *rrs;
-						if (rrset)
-							for(rrs=rrset->rrs; rrs && nserva<MAXNAMESERVIPS; rrs=rrs->next)
-								serva[nserva++].ipv4 = *((struct in_addr *)rrs->data);
+						if (rrset && rrset->rrs)
+							serva.ipv4 = *((struct in_addr *)rrset->rrs->data);
 					}
 #endif
 #ifdef ENABLE_IPV6
 					ELSE_IPV6 {
-						rr_set_t *rrset6=getrrset_AAAA(servent);
-						rr_bucket_t *rrs6= (rrset6? rrset6->rrs: NULL);
-						rr_set_t *rrset4=getrrset_A(servent);
-						rr_bucket_t *rrs4= (rrset4? rrset4->rrs: NULL);
-						while(nserva<MAXNAMESERVIPS) {
-							if(rrs6) {
-								serva[nserva].ipv6 = *((struct in6_addr *)rrs6->data);
-								rrs6=rrs6->next;
-								if (rrs4) {
-									/* Store IPv4 address as fallback. */
-									serva[nserva].ipv4 = *((struct in_addr *)rrs4->data);
-									rrs4=rrs4->next;
-								}
-								else
-									serva[nserva].ipv4.s_addr=INADDR_ANY;
+						rr_set_t *rrset;
+						if ((rrset=getrrset_AAAA(servent)) && rrset->rrs) {
+							serva.ipv6 = *((struct in6_addr *)rrset->rrs->data);
+							if ((rrset=getrrset_A(servent)) && rrset->rrs) {
+								/* Store IPv4 address as fallback. */
+								serva.ipv4 = *((struct in_addr *)rrset->rrs->data);
 							}
-							else if (rrs4) {
-								struct in_addr *ina = (struct in_addr *)rrs4->data;
-								struct in6_addr *in6a = &serva[nserva].ipv6;
-								IPV6_MAPIPV4(ina,in6a);
-								serva[nserva].ipv4.s_addr=INADDR_ANY;
-								rrs4=rrs4->next;
-							}
-							else
-								break;
-							++nserva;
+						}
+						else if ((rrset=getrrset_A(servent)) && rrset->rrs) {
+							struct in_addr *ina = (struct in_addr *)rrset->rrs->data;
+							IPV6_MAPIPV4(ina,&serva.ipv6);
 						}
 					}
 #endif
@@ -3146,30 +3031,18 @@ addr2_array dns_rootserver_resolv(atup_array atup_a, int port, char edns_query, 
 						      RHN2STR((const unsigned char *)(rr->data)),get_ename(rc));
 				}
 
-				if(nserva==0) {
+				if(is_inaddr2_any(&serva)) {
 					/* Address lookup failed. */
 					DEBUG_RHN_MSG("Failed to obtain address of root server %s in dns_rootserver_resolv()\n",
 						      RHN2STR((const unsigned char *)(rr->data)));
 					++nfail;
+					continue;
 				}
-				else {
-					int i, j, n=DA_NEL(res);
-					for(i=0; i<nserva; ++i) {
-						pdnsd_a2 *pserva= &serva[i];
-						/* Skip duplicates */
-						for (j=0; j<n; ++j) {
-							pdnsd_a2 *pa= &DA_INDEX(res,j);
-							if (same_inaddr2_2(pa,pserva))
-								goto skip_address;
-						}
-						if(!(res=DA_GROW1(res))) {
-							DEBUG_MSG("Out of memory in dns_rootserver_resolv()\n");
-							goto free_cent_return;
-						}
-						DA_LAST(res)= *pserva;
-					skip_address:;
-					}
+				if(!(res=DA_GROW1(res))) {
+					DEBUG_MSG("Out of memory in dns_rootserver_resolv()\n");
+					goto free_cent_return;
 				}
+				DA_LAST(res)= serva;
 			}
 			/* At least half of the names should resolve, otherwise we reject the result. */
 			if(nfail>DA_NEL(res)) {
@@ -3250,8 +3123,8 @@ static int p_dns_resolve(const unsigned char *name, int thint, dns_cent_t **cach
 									do {
 										one_up=add_qserv(&serv, &DA_INDEX(adrs,k), 53, sp->timeout,
 												 mk_flag_val(sp)&~CFF_NOINHERIT, sp->nocache,
-												 sp->lean_query, sp->edns_query, 2, 0,
-												 !global.paranoid, topdomain, rjl);
+												 sp->lean_query,sp->edns_query,2,0,
+												 !global.paranoid,topdomain, rjl);
 										if(!one_up) {
 											da_free(adrs);
 											goto done;
@@ -3273,10 +3146,12 @@ static int p_dns_resolve(const unsigned char *name, int thint, dns_cent_t **cach
 							if(!rjl) {one_up=0; goto done;}
 							rejectlist=rjl;
 						}
-						one_up=add_qserv(&serv, &at->a, sp->port, sp->timeout,
-								 mk_flag_val(sp), sp->nocache, sp->lean_query, sp->edns_query,
-								 sp->rootserver?3:(!sp->is_proxy),
-								 needs_testing(sp), 1, NULL, rjl);
+						{
+							one_up=add_qserv(&serv, &at->a, sp->port, sp->timeout,
+									 mk_flag_val(sp), sp->nocache, sp->lean_query,sp->edns_query,
+									 sp->rootserver?3:(!sp->is_proxy),
+									 needs_testing(sp), 1, NULL, rjl);
+						}
 						if(!one_up)
 							goto done;
 					}
@@ -3301,7 +3176,6 @@ static int p_dns_resolve(const unsigned char *name, int thint, dns_cent_t **cach
 					free_cent(cached  DBG1);
 					pdnsd_free(cached);
 					cached=tc;
-					/* rc=RC_CACHED; */
 				} else
 					DEBUG_MSG("p_dns_resolve: merging answer with cache failed, using local cent copy.\n");
 			} else
@@ -3309,8 +3183,6 @@ static int p_dns_resolve(const unsigned char *name, int thint, dns_cent_t **cach
 
 			*cachedp=cached;
 		}
-		else if(rc==RC_CACHED || rc==RC_STALE)
-			*cachedp=cached;
 	}
 	else {
 		DEBUG_MSG("No server is marked up and allowed for this domain.\n");
@@ -3461,13 +3333,9 @@ return_rc:
 
 
 /*
- * Resolve records for name into dns_cent_t, type thint.
+ * Resolve records for name into dns_cent_t, type thint
  * q is the set of servers to query from. Set q to NULL if you want to ask the servers registered with pdnsd.
  * qslist should refer to a list of server arrays already used higher up the calling chain (may be NULL).
- * p_dns_cached_resolve() returns one of the following values:
- *   RC_OK  means that the name was successfully resolved by querying other servers.
- *   RC_CACHED or RC_STALE means that the name was found in the cache.
- *   RC_NAMEERR or RC_SERVFAIL indicates a resolve error.
  */
 static int p_dns_cached_resolve(query_stat_array q, const unsigned char *name, int thint, dns_cent_t **cachedp,
 				int hops, qstatnode_t *qslist, qhintnode_t *qhlist, time_t queryts,
@@ -3482,7 +3350,7 @@ static int p_dns_cached_resolve(query_stat_array q, const unsigned char *name, i
 	if(rc==RC_OK) {
 		/* Locally defined record. */
 		*cachedp=cached;
-		return RC_CACHED;
+		return RC_OK;
 	}
 	else if(rc==RC_NAMEERR)  /* Locally negated name. */
 		return RC_NAMEERR;
@@ -3520,28 +3388,27 @@ static int p_dns_cached_resolve(query_stat_array q, const unsigned char *name, i
 			rc=p_recursive_query(q,name,thint, &ent,NULL,hops,qslist,qhlist,c_soa);
 		else
 			rc=p_dns_resolve(name,thint, &ent,hops,qhlist,c_soa);
-
-		if(rc==RC_OK || rc==RC_CACHED || rc==RC_STALE) {
+		if (rc!=RC_OK) {
+			if (rc==RC_SERVFAIL && cached && (flags&CF_NOPURGE)) {
+				/* We could not get a new record, but we have a timed-out cached one
+				   with the nopurge flag set. This means that we shall use it even
+				   if timed out when no new one is available*/
+				DEBUG_MSG("Falling back to cached record.\n");
+			} else {
+				goto cleanup_return;
+			}
+		} else {
 			if (cached) {
 				free_cent(cached  DBG1);
 				pdnsd_free(cached);
 			}
 			cached=ent;
 		}
-		else if (rc==RC_SERVFAIL && cached && (flags&CF_NOPURGE)) {
-			/* We could not get a new record, but we have a timed-out cached one
-			   with the nopurge flag set. This means that we shall use it even
-			   if timed out when no new one is available*/
-			DEBUG_MSG("Falling back to cached record.\n");
-			rc=RC_STALE;
-		}
-		else
-			goto cleanup_return;
 	} else {
 		DEBUG_MSG("Using cached record.\n");
 	}
 	*cachedp=cached;
-	return rc;
+	return RC_OK;
 
  cleanup_return:
 	if(cached) {
@@ -3553,8 +3420,7 @@ static int p_dns_cached_resolve(query_stat_array q, const unsigned char *name, i
 
 
 /* r_dns_cached_resolve() is like p_dns_cached_resolve(), except that r_dns_cached_resolve()
-   will not return negatively cached entries, but returns RC_NAMEERR instead.
-   It also does not return RC_CACHED or RC_STALE, but RC_OK instead.
+   will not return negatively cached entries, but return RC_NAMEERR instead.
 */
 int r_dns_cached_resolve(unsigned char *name, int thint, dns_cent_t **cachedp,
 			 int hops, qhintnode_t *qhlist, time_t queryts,
@@ -3562,18 +3428,16 @@ int r_dns_cached_resolve(unsigned char *name, int thint, dns_cent_t **cachedp,
 {
 	dns_cent_t *cached;
 	int rc=p_dns_cached_resolve(NULL,name,thint,&cached,hops,NULL,qhlist,queryts,c_soa);
-	if(rc==RC_OK || rc==RC_CACHED || rc==RC_STALE) {
+	if(rc==RC_OK) {
 		if(cached->flags&DF_NEGATIVE) {
 			if(c_soa)
 				*c_soa=cached->c_soa;
 			free_cent(cached  DBG1);
 			pdnsd_free(cached);
-			return RC_NAMEERR;
+			rc=RC_NAMEERR;
 		}
-		else {
+		else
 			*cachedp=cached;
-			return RC_OK;
-		}
 	}
 	return rc;
 }
@@ -3626,7 +3490,7 @@ static int simple_dns_cached_resolve(atup_array atup_a, int port, char edns_quer
 			} else
 				DEBUG_MSG("simple_dns_cached_resolve: merging answer with cache failed, using local cent copy.\n");
 		}
-		else if(!(rc==RC_CACHED || rc==RC_STALE))  /* RC_CACHED and RC_STALE should not be possible. */
+		else
 			return rc;
 	} else {
 		DEBUG_MSG("Using cached record.\n");
@@ -3682,8 +3546,6 @@ int query_uptest(pdnsd_a *addr, int port, const unsigned char *name, time_t time
 	qs.trusted=1;
 	qs.aa=0;
 	qs.tc=0;
-	qs.ra=0;
-	qs.failed=0;
 	qs.nsdomain=NULL;
 	qs.rejectlist=NULL;
 

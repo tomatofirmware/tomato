@@ -118,6 +118,14 @@ inline static int is_inaddr_any(pdnsd_a *a)
 		    IN6_IS_ADDR_UNSPECIFIED(&a->ipv6) );
 }
 
+/* Same as is_inaddr_any(), but for the pdnsd_a2 type. */
+inline static int is_inaddr2_any(pdnsd_a2 *a)  __attribute__((always_inline));
+inline static int is_inaddr2_any(pdnsd_a2 *a)
+{
+  return SEL_IPVER( a->ipv4.s_addr==INADDR_ANY,
+		    IN6_IS_ADDR_UNSPECIFIED(&a->ipv6) );
+}
+
 
 inline static int same_inaddr(pdnsd_a *a, pdnsd_a *b)
   __attribute__((always_inline));

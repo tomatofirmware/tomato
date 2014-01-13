@@ -221,10 +221,6 @@ int if_up(char *devname)
 }
 
 # if (TARGET==TARGET_LINUX)
-#  ifdef ENABLE_IPV6
-#define MAX_IF_INET6_OPEN_ERRS 10
-static volatile unsigned long if_inet6_open_errs=0;
-#  endif
 
 int is_local_addr(pdnsd_a *a)
 {
@@ -268,12 +264,8 @@ int is_local_addr(pdnsd_a *a)
 		 * Linux kernel (there seem to be some major changes for 2.4).
 		 * Right now, I just analyze the /proc/net/if_inet6 entry. This may not be the fastest, but
 		 * should work and is easy to adapt should the format change. */
-		if (!(f=fopen("/proc/net/if_inet6","r"))) {
-			if(++if_inet6_open_errs<=MAX_IF_INET6_OPEN_ERRS) {
-				log_warn("Could not open /proc/net/if_inet6 in is_local_addr(): %s",strerror(errno));
-			}
+		if (!(f=fopen("/proc/net/if_inet6","r")))
 			return 0;
-		}
 		/* The address is at the start of the line. We just read 32 characters and insert a ':' 7
 		 * times. Such, we can use inet_pton conveniently. More portable, that. */
 		for(;;) {

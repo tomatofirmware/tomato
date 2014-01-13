@@ -155,9 +155,6 @@
 /* Default value for parallel query number */
 #define PAR_QUERIES   2
 
-/* Maximum number of IP addresses used per nameserver obtained from NS records. */
-#define MAXNAMESERVIPS 3
-
 /* These are the possible targets. Normally no need to touch these
  * definitions. */
 #define TARGET_LINUX  0
