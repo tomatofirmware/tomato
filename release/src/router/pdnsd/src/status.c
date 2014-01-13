@@ -193,7 +193,7 @@ static void *status_thread (void *p)
 			DEBUG_MSG("Status socket query pending.\n");
 			if (read_short(rs,&cmd)) {
 			    /* Check magic number in command */
-			    if((cmd & 0xff00) == CTL_CMDVERNR) {
+				if((cmd & 0xff00) == CTL_CMDVERNR) {
 				const char *errmsg;
 				cmd &= 0xff;
 				switch(cmd) {

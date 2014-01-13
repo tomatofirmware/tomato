@@ -2368,19 +2368,13 @@ int add_cache_rr_add(const unsigned char *name, int tp, time_t ttl, time_t ts, u
 /* Report the cache status to the file descriptor f, for the status fifo (see status.c) */
 int report_cache_stat(int f)
 {
-	/* Cache size and entry counters are volatile (and even the entries
-	   in the global struct can change), so make copies to get consistent data.
-	   Even better would be to use locks, but that could be rather costly. */
-	long csz= cache_size, en= ent_num;
-	long pc= global.perm_cache;
-	long mc= pc*1024+MCSZ;
-
+	long mc=(long)global.perm_cache*1024+MCSZ;
 	fsprintf_or_return(f,"\nCache status:\n=============\n");
-	fsprintf_or_return(f,"%ld kB maximum disk cache size.\n",pc);
+	fsprintf_or_return(f,"%ld kB maximum disk cache size.\n",global.perm_cache);
 	fsprintf_or_return(f,"%ld of %ld bytes (%.3g%%) memory cache used in %ld entries"
 			   " (avg %.5g bytes/entry).\n",
-			   csz, mc, (((double)csz)/mc)*100, en,
-			   ((double)csz)/en);
+			   cache_size, mc, (((double)cache_size)/mc)*100, ent_num,
+			   ((double)cache_size)/ent_num);
 	return 0;
 }
 

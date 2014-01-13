@@ -760,7 +760,6 @@ enable_rcsids
 with_tcp_qtimeout
 enable_tcp_subseq
 with_par_queries
-with_max_nameserver_ips
 enable_specbuild
 with_thread_lib
 '
@@ -1448,7 +1447,6 @@ Optional Packages:
                               greater or equal to the number specified here.
   --with-tcp-qtimeout=secs    Specify default tcp query timeout (default=30)
   --with-par-queries=num      Specify default parallel query number (default=2)
-  --with-max-nameserver-ips=num      Specify maximum number of IP addresses used per nameserver obtained from NS records (default=3)
   --with-thread-lib=lib       Specify thread library, overriding automatic detection (for Linux only).
                               Possible values: LinuxThreads,
                               LinuxThreads2 (implements a fix for newer glibcs)
@@ -4783,16 +4781,6 @@ _ACEOF
 fi
 
 
-
-# Check whether --with-max-nameserver-ips was given.
-if test "${with_max_nameserver_ips+set}" = set; then
-  withval=$with_max_nameserver_ips; cat >>confdefs.h <<_ACEOF
-#define MAXNAMESERVIPS $withval
-_ACEOF
-
-fi
-
-
 # Check whether --enable-specbuild was given.
 if test "${enable_specbuild+set}" = set; then
   enableval=$enable_specbuild; specbuild=$enableval
@@ -6835,80 +6823,10 @@ _ACEOF
 
 
 if test "$target" = "Linux"; then
-{ $as_echo "$as_me:$LINENO: checking if we can compile and link with -pthread" >&5
-$as_echo_n "checking if we can compile and link with -pthread... " >&6; }
-old_CFLAGS="$CFLAGS"
-CFLAGS="$CFLAGS -pthread"
-cat >conftest.$ac_ext <<_ACEOF
 
-#include <pthread.h>
-
-void *thread_func(void *data)
-{
-	*((int *)data)=1;
-	return data;
-}
-
-int main()
-{
-	pthread_t thread;
-	void *retval;
-	int val;
-
-	if(pthread_create(&thread, NULL, thread_func, &val))
-		return 1;
-
-	if(pthread_join(thread,&retval))
-		return 1;
-
-	return (*((int *)retval)!=1);
-}
-
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
-$as_echo "$ac_try_echo") >&5
-  (eval "$ac_link") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_c_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest$ac_exeext && {
-	 test "$cross_compiling" = yes ||
-	 $as_test_x conftest$ac_exeext
-       }; then
-  gcc_pthread_flag="yes"
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	gcc_pthread_flag="no"
-fi
-
-rm -rf conftest.dSYM
-rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
-      conftest$ac_exeext conftest.$ac_ext
-CFLAGS="$old_CFLAGS"
-{ $as_echo "$as_me:$LINENO: result: $gcc_pthread_flag" >&5
-$as_echo "$gcc_pthread_flag" >&6; }
-
-  if test "$gcc_pthread_flag" = yes ; then
-    thread_CFLAGS="-pthread"
-
-  else
-
-{ $as_echo "$as_me:$LINENO: checking for pthread_create in -lpthread" >&5
-$as_echo_n "checking for pthread_create in -lpthread... " >&6; }
-if test "${ac_cv_lib_pthread_pthread_create+set}" = set; then
+{ $as_echo "$as_me:$LINENO: checking for pthread_kill in -lpthread" >&5
+$as_echo_n "checking for pthread_kill in -lpthread... " >&6; }
+if test "${ac_cv_lib_pthread_pthread_kill+set}" = set; then
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
@@ -6926,11 +6844,11 @@ cat >>conftest.$ac_ext <<_ACEOF
 #ifdef __cplusplus
 extern "C"
 #endif
-char pthread_create ();
+char pthread_kill ();
 int
 main ()
 {
-return pthread_create ();
+return pthread_kill ();
   ;
   return 0;
 }
@@ -6956,12 +6874,12 @@ $as_echo "$ac_try_echo") >&5
 	 test "$cross_compiling" = yes ||
 	 $as_test_x conftest$ac_exeext
        }; then
-  ac_cv_lib_pthread_pthread_create=yes
+  ac_cv_lib_pthread_pthread_kill=yes
 else
   $as_echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-	ac_cv_lib_pthread_pthread_create=no
+	ac_cv_lib_pthread_pthread_kill=no
 fi
 
 rm -rf conftest.dSYM
@@ -6969,9 +6887,9 @@ rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
       conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-{ $as_echo "$as_me:$LINENO: result: $ac_cv_lib_pthread_pthread_create" >&5
-$as_echo "$ac_cv_lib_pthread_pthread_create" >&6; }
-if test "x$ac_cv_lib_pthread_pthread_create" = x""yes; then
+{ $as_echo "$as_me:$LINENO: result: $ac_cv_lib_pthread_pthread_kill" >&5
+$as_echo "$ac_cv_lib_pthread_pthread_kill" >&6; }
+if test "x$ac_cv_lib_pthread_pthread_kill" = x""yes; then
   cat >>confdefs.h <<_ACEOF
 #define HAVE_LIBPTHREAD 1
 _ACEOF
@@ -6980,14 +6898,13 @@ _ACEOF
 
 fi
 
-  fi
 fi
 if test "$target" = "BSD" -a `uname` != Darwin ; then
 #  if test $freebsd_pthread = 4 ; then
     thread_CFLAGS="-pthread"
 
 #  else
-#    AC_CHECK_LIB(c_r, pthread_create, ,
+#    AC_CHECK_LIB(c_r, pthread_kill, ,
 #      AC_MSG_ERROR([You must have libc_r installed to build/run pdnsd!]))
 #  fi;
 fi
@@ -6995,8 +6912,8 @@ fi
 if test "$target" = "Linux" -a "$threadlib" = default; then
 { $as_echo "$as_me:$LINENO: checking if this is an NPTL-based system" >&5
 $as_echo_n "checking if this is an NPTL-based system... " >&6; }
-old_CFLAGS="$CFLAGS"
-CFLAGS="$CFLAGS $thread_CFLAGS"
+old_LIBS="$LIBS"
+LIBS="$LIBS -lpthread"
 if test "$cross_compiling" = yes; then
 
   { $as_echo "$as_me:$LINENO: result: couldn't run test program" >&5
@@ -7088,7 +7005,7 @@ rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext conftest.$a
 fi
 
 
-CFLAGS="$old_CFLAGS"
+LIBS="$old_LIBS"
 fi
 
 if test "$threadlib" = nptl -o "$threadlib" = NPTL; then

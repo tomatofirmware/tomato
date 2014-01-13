@@ -136,7 +136,7 @@ __cmsg_nxthdr (struct msghdr *__mhdr, struct cmsghdr *__cmsg) __THROW
 
 #if defined(ENABLE_IPV6) && (TARGET==TARGET_LINUX)
 
-/* Some glibc versions (I know of 2.1.2) get this wrong, so we define our own. To be exact, this is fixed
+/* Some glibc versions (I know of 2.1.2) get this wrong, so we define out own. To be exact, this is fixed
  * glibc code. */
 #ifdef IN6_ARE_ADDR_EQUAL
 # undef IN6_ARE_ADDR_EQUAL

@@ -43,7 +43,7 @@
     License,  as  published by the Free Software Foundation; either version
     3, or (at your option) any later version.<br>
     You can find a copy of the GNU GPL in the file <code>COPYING</code> in the source or documentation directory.<br>
-    This manual is up-to-date for version 1.2.9b. For older documentation, please refer to the doc
+    This manual is up-to-date for version 1.2.9. For older documentation, please refer to the doc
     directory of the respective pdnsd package.<br>
     If you want a quicker introduction to pdnsd, you can try some of the
     <a href="http://www.google.com/search?q=pdnsd+howto">HOWTOs available on the web</a>.
@@ -518,22 +518,6 @@
 	  config file option. See the description of that option for an explanation
 	  of what it really does.<br>
 	  The default for this option is 2.
-	</td>
-      </tr>
-      <tr>
-	<td class="nowrap">
-	  <code>--with-max-nameserver-ips=<i>num</i></code>
-	</td>
-	<td>
-	  <em>New in version 1.2.9b:</em>
-	  Specify the maximum number of IP addresses that can be used per nameserver obtained
-	  from NS records (when resolving names recursively).
-	  Just one IP address per nameserver is sufficient in the vast majority of cases
-	  (and this was the strategy used by pdnsd in previous versions),
-	  but in rare cases this will cause unnecessary resolve failures if the address chosen
-	  for each nameserver happens to be unreachable while the other addresses would lead to
-	  successful resolution.<br>
-	  The default for this option is 3.
 	</td>
       </tr>
       <tr>
@@ -2624,7 +2608,7 @@
     Copyright&nbsp;(C)&nbsp;2003,&nbsp;2004,&nbsp;2005,&nbsp;2006,&nbsp;2007,&nbsp;2008,&nbsp;2012&nbsp;<a href="mailto:p.a.rombouts@home.nl">Paul&nbsp;A.&nbsp;Rombouts</a>
     </address>
     <p>
-      <i>Last revised: 19 April 2012 by Paul A. Rombouts</i>
+      <i>Last revised: 27 February 2012 by Paul A. Rombouts</i>
     </p>
   </body>
 </html>

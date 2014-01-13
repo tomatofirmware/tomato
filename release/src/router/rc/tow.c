@@ -813,9 +813,15 @@ void start_pdnsd(void)
 	s1[j] = '\0';
 	if (strlen(s1) >= 7) fprintf(fps, ",\n              %s",s1);
 	fprintf(fps, ";\n");
-
 	fprintf(fps, "	reject_policy = fail;\n");
-	fprintf(fps, "	caching = off;\n");
+	fprintf(fps, "  timeout = 3;\n");
+	fprintf(fps, "  uptest=query;\n");
+	fprintf(fps, "  interval=10m;\n");
+	fprintf(fps, "  purge_cache=on;\n");
+	fprintf(fps, "  edns_query=yes;\n");
+	fprintf(fps, "  caching=on;\n");
+	fprintf(fps, "  proxy_only=on;\n");
+	fprintf(fps, "  lean_query=on;\n");
 	strcpy(s2, nvram_safe_get("tow_pdnsd_exclude_domain"));
 	filter_space(s2);
 	trimstr(s2);
@@ -830,8 +836,14 @@ void start_pdnsd(void)
 	strcpy(s2, nvram_safe_get("tow_pdnsd_opendns_port"));
 	trimstr(s2);
 	fprintf(fps, "	port = %s;\n",s2);
-	fprintf(fps, "	proxy_only = on;\n");
-	fprintf(fps, "	timeout = 5;\n");
+	fprintf(fps, "  timeout = 5;\n");
+	fprintf(fps, "  uptest=query;\n");
+	fprintf(fps, "  interval=10m;\n");
+	fprintf(fps, "  purge_cache=on;\n");
+	fprintf(fps, "  edns_query=yes;\n");
+	fprintf(fps, "  caching=on;\n");
+	fprintf(fps, "  proxy_only=on;\n");
+	fprintf(fps, "  lean_query=on;\n");
 	fprintf(fps, "}\n\n");
 	fprintf(fps, "source {\n");
 	fprintf(fps, "	owner=localhost;\n");
