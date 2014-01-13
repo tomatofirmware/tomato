@@ -33,6 +33,5 @@ html txt:
 	@cd $@ && $(MAKE) -f doc_makefile
 
 clean:
-	@rm -fv pdnsd.conf.5.in
 	@cd html && $(MAKE) -f doc_makefile clean
 	@cd txt && $(MAKE) -f doc_makefile clean
