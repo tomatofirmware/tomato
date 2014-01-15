@@ -118,7 +118,7 @@ Copyright (C) 2010 Keith Moyer,<br>
 <!-- AIRPLAY-END -->
 <b>"Shibby" features:</b><br>
 <!-- BBT-BEGIN -->
-- Transmission 2.81 integration<br>
+- Transmission 2.82 integration<br>
 <!-- BBT-END -->
 <!-- BT-BEGIN -->
 - GUI for Transmission<br>
