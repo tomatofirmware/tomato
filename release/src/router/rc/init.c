@@ -475,8 +475,15 @@ static int init_vlan_ports(void)
 	case MODEL_E3200:
 	case MODEL_E4200:
 	case MODEL_WNDR4000:
+	case MODEL_WNDR3700v3:
 		dirty |= check_nv("vlan1ports", "0 1 2 3 8*");
 		dirty |= check_nv("vlan2ports", "4 8");
+		break;
+	case MODEL_WNDR3400:
+		// Note port order is important (or reversed display, if "0 1 2 3 5*" used for vlan1ports) -> doesn't work, invert in Web GUI
+		dirty |= check_nv("vlan1ports", "0 1 2 3 5*");
+		// And change "4 5u" to "4 5" to make WAN port work
+		dirty |= check_nv("vlan2ports", "4 5");
 		break;
 	case MODEL_WRT160Nv3:
 		if (nvram_match("vlan1ports", "1 2 3 4 5*")) {
@@ -632,17 +639,30 @@ static void check_bootnv(void)
 		}
 		break;
     case MODEL_WNDR4000:
+    case MODEL_WNDR3700v3:
 		// Have to check MAC addresses, specific configuration needed: 
 		// Part of MAC information is in CFE, the rest in board_data (which easily gets broken when playing with firmware ... :-))
 		// Note that after a clean (30/30/30) reset, addresses are "broken" ... but the code below fixes them, tied to et0macaddr!
 		// Also, CFE will update what it sees based on NVRAM ... 
 		//    so after 30/30/30 reset it sees different values than after a full Tomato boot (that fixes these, updating NVRAM)
+		// Use this approach for all WNDR routers (here, and below)
         dirty |= check_nv("vlan2hwname", "et0");
         strcpy(mac, nvram_safe_get("et0macaddr"));
         // inc_mac(mac, 2);
         dirty |= check_nv("sb/1/macaddr", mac);
         inc_mac(mac, -1);
         dirty |= check_nv("pci/1/1/macaddr", mac);
+        break;
+    case MODEL_WNDR3400:
+        dirty |= check_nv("vlan2hwname", "et0");
+        strcpy(mac, nvram_safe_get("et0macaddr"));
+        // inc_mac(mac, 2);
+        dirty |= check_nv("sb/1/macaddr", mac);
+        inc_mac(mac, -1);
+        dirty |= check_nv("pci/1/1/macaddr", mac);
+		// Have to check wl ifname(s) ... if not set before eth config, 5 GHz radio does not come up properly
+        //dirty |= check_nv("wl0_ifname", "eth1");
+        dirty |= check_nv("wl1_ifname", "eth2");        
         break;
 	case MODEL_E900:
 	case MODEL_E1000v2:
@@ -1697,6 +1717,418 @@ static int init_nvram(void)
 			extra_params++;
 		}
         break;
+    case MODEL_WNDR3700v3:
+        mfr = "Netgear";
+        name = "WNDR3700v3";
+        features = SUP_SES | SUP_80211N | SUP_1000ET;
+        // Don't auto-start blink, as shift register causes other LED's to blink slightly because of this.
+        // Rather, turn on in startup script if desired ... so disable the line below.
+        // nvram_set("blink_wl", "1");
+#ifdef TCONFIG_USB
+        nvram_set("usb_uhci", "-1");
+#endif
+        if (!nvram_match("t_fix1", (char *)name)) {
+                nvram_set("lan_ifnames", "vlan1 eth1 eth2");
+                nvram_set("wan_ifnameX", "vlan2");
+                nvram_set("wl_ifname", "eth1");
+        }
+        
+        // Set Key Parameters for Wireless Interfaces: SB (Southbridge) and PCI, to configure HW (as Netgear intends)
+        // Credit for the nvram_tuple approach below goes to DD-WRT (borrowed here for simplicity)!
+        // Parameters optimized based on clean Netgear build (NVRAM extracted and checked vs. Tomato 30/30/30 Reset version of NVRAM)
+		struct nvram_tuple wndr3700v3_sb_1_params[] = {
+
+			{"cck2gpo", "0x1111", 0},
+			//{"ccode", "EU", 0},
+			{"cddpo", "0x1111", 0},
+			{"extpagain2g", "3", 0},
+			{"maxp2ga0", "0x56", 0},
+			{"maxp2ga1", "0x56", 0},
+			{"mcs2gpo0", "0x1000", 0},
+			{"mcs2gpo1", "0x7531", 0},
+			{"mcs2gpo2", "0x2111", 0},
+			{"mcs2gpo3", "0xA864", 0},
+			{"mcs2gpo4", "0x3333", 0},
+			{"mcs2gpo5", "0x9864", 0},
+			{"mcs2gpo6", "0x3333", 0},
+			{"mcs2gpo7", "0xB975", 0},
+			{"ofdm2gpo", "0x75331111", 0},
+			{"pa2gw0a0", "0xFEA6", 0},
+			{"pa2gw0a1", "0xFE9E", 0},
+			{"pa2gw1a0", "0x191D", 0},
+			{"pa2gw1a1", "0x1809", 0},
+			{"pa2gw2a0", "0xFA18", 0},
+			{"pa2gw2a1", "0xFA4B", 0},
+			{"regrev", "15", 0},
+			{"stbcpo", "0x1111", 0},
+
+			{0, 0, 0}
+		};
+
+		/*
+		 * set router's extra parameters 
+		 */
+		extra_params = wndr3700v3_sb_1_params;
+		while (extra_params->name) {
+			sprintf(s, "sb/1/%s", extra_params->name);
+			nvram_set(s, extra_params->value);
+			extra_params++;
+		}
+
+		struct nvram_tuple wndr3700v3_pci_1_1_params[] = {
+
+			{"boardflags2", "0x04000000", 0},
+			{"ccode", "EU", 0},
+			{"extpagain2g", "0", 0},
+			{"extpagain5g", "0", 0},
+			{"legofdm40duppo", "0x2222", 0},
+			{"legofdmbw205ghpo", "0x88642100", 0},
+			{"legofdmbw205gmpo", "0x33221100", 0},
+			{"legofdmbw20ul5ghpo", "0x88642100", 0},
+			{"legofdmbw20ul5gmpo", "0x33221100", 0},
+			{"maxp5ga0", "0x4E", 0},
+			{"maxp5ga1", "0x4E", 0},
+			{"maxp5ga2", "0x4E", 0},
+			{"maxp5gha0", "0x4E", 0},
+			{"maxp5gha1", "0x4E", 0},
+			{"maxp5gha2", "0x4E", 0},
+			{"maxp5gla0", "0x48", 0},
+			{"maxp5gla1", "0x48", 0},
+			{"maxp5gla2", "0x48", 0},
+			{"mcs32po", "0x2222", 0},
+			{"mcsbw205ghpo", "0x88642100", 0},
+			{"mcsbw205glpo", "0x11000000", 0},
+			{"mcsbw205gmpo", "0x44221100", 0},
+			{"mcsbw20ul5ghpo", "0x88642100", 0},
+			{"mcsbw20ul5glpo", "0x11000000", 0},
+			{"mcsbw20ul5gmpo", "0x44221100", 0},
+			{"mcsbw405ghpo", "0x99875310", 0},
+			{"mcsbw405glpo", "0x33222222", 0},
+			{"mcsbw405gmpo", "0x66443322", 0},
+			{"pa5ghw1a1", "0x155F", 0},
+			{"pa5ghw2a1", "0xFAB0", 0},
+			{"regrev", "15", 0},
+
+			{0, 0, 0}
+		};
+		/*
+		 * set router's extra parameters 
+		 */
+		extra_params = wndr3700v3_pci_1_1_params;
+		while (extra_params->name) {
+			sprintf(s, "pci/1/1/%s", extra_params->name);
+			nvram_set(s, extra_params->value);
+			extra_params++;
+		}
+        break;
+    case MODEL_WNDR3400:
+        mfr = "Netgear";
+        name = "WNDR3400";
+        features = SUP_SES | SUP_80211N;
+        // Don't auto-start blink, as shift register causes other LED's to blink slightly because of this.
+        // Rather, turn on in startup script if desired ... so disable the line below.
+        // nvram_set("blink_wl", "1");
+#ifdef TCONFIG_USB
+        nvram_set("usb_uhci", "-1");
+#endif
+        if (!nvram_match("t_fix1", (char *)name)) {
+                nvram_set("lan_ifnames", "vlan1 eth1 eth2");
+                nvram_set("wan_ifnameX", "vlan2");
+                nvram_set("wl_ifname", "eth1");
+        }
+
+        // Set Key Parameters for Wireless Interfaces: SB (Southbridge) and PCI, to configure HW (as Netgear intends)
+        // Credit for the nvram_tuple approach below goes to DD-WRT (borrowed here for simplicity)!
+        // Parameters optimized based on clean Netgear build (NVRAM extracted and checked vs. Tomato 30/30/30 Reset version of NVRAM)
+		struct nvram_tuple wndr3400_sb_1_params[] = {
+
+			{"aa2g", "3", 0},
+			{"ag0", "2", 0},
+			{"ag1", "2", 0},
+			{"antswctl2g", "2", 0},
+			{"antswitch", "0", 0},
+			{"bw40po", "0", 0},
+			{"bwduppo", "0", 0},
+			{"cck2gpo", "0x0000", 0},
+			{"ccode", "US", 0},
+			{"cddpo", "0", 0},
+			{"extpagain2g", "2", 0},
+			{"itt2ga0", "0x20", 0},
+			{"itt2ga1", "0x20", 0},
+			{"ledbh0", "2", 0},
+			{"ledbh1", "11", 0},
+			{"ledbh2", "11", 0},
+			{"ledbh3", "11", 0},
+			{"leddc", "0xffff", 0},
+			{"maxp2ga0", "0x56", 0},
+			{"maxp2ga1", "0x56", 0},
+			{"mcs2gpo0", "0x2222", 0},
+			{"mcs2gpo1", "0xa642", 0},
+			{"mcs2gpo2", "0x6666", 0},
+			{"mcs2gpo3", "0xa866", 0},
+			{"mcs2gpo4", "0x8888", 0},
+			{"mcs2gpo5", "0xa888", 0},
+			{"mcs2gpo6", "0x8888", 0},
+			{"mcs2gpo7", "0xcc88", 0},
+			{"ofdm2gpo", "0x54400000", 0},
+			{"pa2gw0a0", "0xfeca", 0},
+			{"pa2gw0a1", "0xfebd", 0},
+			{"pa2gw1a0", "0x17dd", 0},
+			{"pa2gw1a1", "0x16ba", 0},
+			{"pa2gw2a0", "0xfa8e", 0},
+			{"pa2gw2a1", "0xfab1", 0},
+			{"pdetrange2g", "2", 0},
+			{"regrev", "39", 0},
+			{"rxchain", "3", 0},
+			{"sromrev", "8", 0},
+			{"stbcpo", "0", 0},
+			{"triso2g", "3", 0},
+			{"tssipos2g", "1", 0},
+			{"txchain", "3", 0},
+
+/*			{"sromrev", "8", 0},
+			{"ccode", "ALL", 0},
+			{"regrev", "0", 0},
+			{"ledbh0", "11", 0},
+			{"ledbh1", "11", 0},
+			{"ledbh2", "11", 0},
+			{"ledbh3", "11", 0},
+			{"ledbh9", "8", 0},
+			{"leddc", "0xffff", 0},
+			{"txchain", "3", 0},
+			{"rxchain", "3", 0},
+			{"antswitch", "0", 0},
+			{"aa2g", "3", 0},
+			{"ag0", "2", 0},
+			{"ag1", "2", 0},
+			{"itt2ga0", "0x20", 0},
+			{"maxp2ga0", "0x48", 0},
+			{"pa2gw0a0", "0xFEA5", 0},
+			{"pa2gw1a0", "0x17B2", 0},
+			{"pa2gw2a0", "0xFA73", 0},
+			{"itt2ga1", "0x20", 0},
+			{"maxp2ga1", "0x48", 0},
+			{"pa2gw0a1", "0xfeba", 0},
+			{"pa2gw1a1", "0x173c", 0},
+			{"pa2gw2a1", "0xfa9b", 0},
+			{"tssipos2g", "1", 0},
+			{"extpagain2g", "2", 0},
+			{"pdetrange2g", "2", 0},
+			{"triso2g", "3", 0},
+			{"antswctl2g", "2", 0},
+			{"cck2gpo", "0x0000", 0},
+			{"ofdm2gpo", "0x66666666", 0},
+			{"mcs2gpo0", "0x6666", 0},
+			{"mcs2gpo1", "0x6666", 0},
+			{"mcs2gpo2", "0x6666", 0},
+			{"mcs2gpo3", "0x6666", 0},
+			{"mcs2gpo4", "0x6666", 0},
+			{"mcs2gpo5", "0x6666", 0},
+			{"mcs2gpo6", "0x6666", 0},
+			{"mcs2gpo7", "0x6666", 0},
+			{"cddpo", "0", 0},
+			{"stbcpo", "0", 0},
+			{"bw40po", "0", 0},
+			{"bwduppo", "0", 0},
+*/
+			{0, 0, 0}
+		};
+		/*
+		 * set router's extra parameters 
+		 */
+		extra_params = wndr3400_sb_1_params;
+		while (extra_params->name) {
+			sprintf(s, "sb/1/%s", extra_params->name);
+			nvram_set(s, extra_params->value);
+			extra_params++;
+		}
+
+		struct nvram_tuple wndr3400_pci_1_1_params[] = {
+
+			{"aa5g", "3", 0},
+			{"ag0", "2", 0},
+			{"ag1", "2", 0},
+			{"antswctl2g", "0", 0},
+			{"antswctl5g", "0", 0},
+			{"antswitch", "0", 0},
+			{"bw405ghpo/bw405glpo/bw405gpo/bw402gpo", "0x2", 0},
+			{"bw40po", "0", 0},
+			{"bwduppo", "0", 0},
+			{"ccode", "US", 0},
+			{"cdd5ghpo/cdd5glpo/cdd5gpo/cdd2gpo", "0x0", 0},
+			{"cddpo", "0", 0},
+			{"extpagain5g", "2", 0},
+			{"itt5ga0", "0x3e", 0},
+			{"itt5ga1", "0x3e", 0},
+			{"ledbh0", "0", 0},
+			{"ledbh1", "0xffff", 0},
+			{"ledbh2", "0xffff", 0},
+			{"ledbh3", "0xffff", 0},
+			{"leddc", "0xffff", 0},
+			{"maxp5ga0", "0x4E", 0},
+			{"maxp5ga1", "0x4E", 0},
+			{"maxp5gha0", "0x4A", 0},
+			{"maxp5gha1", "0x4A", 0},
+			{"maxp5gla0", "0x3E", 0},
+			{"maxp5gla1", "0x3E", 0},
+			{"mcs5ghpo0", "0x4200", 0},
+			{"mcs5ghpo1", "0x6664", 0},
+			{"mcs5ghpo2", "0x4200", 0},
+			{"mcs5ghpo3", "0x6664", 0},
+			{"mcs5ghpo4", "0x4200", 0},
+			{"mcs5ghpo5", "0x6664", 0},
+			{"mcs5ghpo6", "0x4200", 0},
+			{"mcs5ghpo7", "0x6664", 0},
+			{"mcs5glpo0", "0x0000", 0},
+			{"mcs5glpo1", "0x2200", 0},
+			{"mcs5glpo2", "0x0000", 0},
+			{"mcs5glpo3", "0x2200", 0},
+			{"mcs5glpo4", "0x0000", 0},
+			{"mcs5glpo5", "0x2200", 0},
+			{"mcs5glpo6", "0x0000", 0},
+			{"mcs5glpo7", "0x2200", 0},
+			{"mcs5gpo0", "0x4200", 0},
+			{"mcs5gpo1", "0x6664", 0},
+			{"mcs5gpo2", "0x4200", 0},
+			{"mcs5gpo3", "0x6664", 0},
+			{"mcs5gpo4", "0x4200", 0},
+			{"mcs5gpo5", "0x6664", 0},
+			{"mcs5gpo6", "0x4200", 0},
+			{"mcs5gpo7", "0x6664", 0},
+			{"ofdm5ghpo0", "0x0000", 0},
+			{"ofdm5ghpo1", "0x2000", 0},
+			{"ofdm5glpo0", "0x0000", 0},
+			{"ofdm5glpo1", "0x0000", 0},
+			{"ofdm5gpo0", "0x0000", 0},
+			{"ofdm5gpo1", "0x2000", 0},
+			{"pa5ghw0a0", "0xfe98", 0},
+			{"pa5ghw0a1", "0xfead", 0},
+			{"pa5ghw1a0", "0x15c0", 0},
+			{"pa5ghw1a1", "0x1539", 0},
+			{"pa5ghw2a0", "0xfa9c", 0},
+			{"pa5ghw2a1", "0xfab9", 0},
+			{"pa5glw0a0", "0xfe87", 0},
+			{"pa5glw0a1", "0xfe9a", 0},
+			{"pa5glw1a0", "0x1637", 0},
+			{"pa5glw1a1", "0x1591", 0},
+			{"pa5glw2a0", "0xfa8e", 0},
+			{"pa5glw2a1", "0xfabc", 0},
+			{"pa5gw0a0", "0xfe9b", 0},
+			{"pa5gw0a1", "0xfe9b", 0},
+			{"pa5gw1a0", "0x153f", 0},
+			{"pa5gw1a1", "0x1576", 0},
+			{"pa5gw2a0", "0xfaae", 0},
+			{"pa5gw2a1", "0xfaa5", 0},
+			{"pdetrange5g", "4", 0},
+			{"regrev", "39", 0},
+			{"rxchain", "3", 0},
+			{"sromrev", "8", 0},
+			{"stbc5ghpo/stbc5glpo/stbc5gpo/stbc2gpo", "0x0", 0},
+			{"stbcpo", "0", 0},
+			{"triso5g", "3", 0},
+			{"tssipos5g", "1", 0},
+			{"txchain", "3", 0},
+			{"wdup405ghpo/wdup405glpo/wdup405gpo/wdup402gpo", "0x0", 0},
+			
+/*			{"sromrev", "8", 0},
+			{"ccode", "ALL", 0},
+			{"regrev", "0", 0},
+			{"ledbh0", "8", 0},
+			{"ledbh1", "0x11", 0},
+			{"ledbh2", "0x11", 0},
+			{"ledbh3", "0x11", 0},
+			{"leddc", "0xffff", 0},
+			{"txchain", "3", 0},
+			{"rxchain", "3", 0},
+			{"antswitch", "0", 0},
+			{"cddpo", "0", 0},
+			{"stbcpo", "0", 0},
+			{"bw40po", "0", 0},
+			{"bwduppo", "0", 0},
+			{"aa5g", "3", 0},
+			{"ag0", "2", 0},
+			{"ag1", "2", 0},
+			{"itt5ga0", "0x3e", 0},
+			{"maxp5ga0", "0x4A", 0},
+			{"maxp5gha0", "0x4A", 0},
+			{"maxp5gla0", "0x4A", 0},
+			{"pa5gw0a0", "0xFEF9", 0},
+			{"pa5gw1a0", "0x164B", 0},
+			{"pa5gw2a0", "0xFADD", 0},
+			{"pa5glw0a0", "0xFEF9", 0},
+			{"pa5glw1a0", "0x154B", 0},
+			{"pa5glw2a0", "0xFAFD", 0},
+			{"pa5ghw0a0", "0xfeda", 0},
+			{"pa5ghw1a0", "0x1612", 0},
+			{"pa5ghw2a0", "0xfabe", 0},
+			{"tssipos5g", "1", 0},
+			{"extpagain5g", "2", 0},
+			{"pdetrange5g", "4", 0},
+			{"triso5g", "3", 0},
+			{"antswctl2g", "0", 0},
+			{"antswctl5g", "0", 0},
+			{"itt5ga1", "0x3e", 0},
+			{"maxp5ga1", "0x4A", 0},
+			{"maxp5gha1", "0x4A", 0},
+			{"maxp5gla1", "0x4A", 0},
+			{"pa5gw0a1", "0xff31", 0},
+			{"pa5gw1a1", "0x1697", 0},
+			{"pa5gw2a1", "0xfb08", 0},
+			{"pa5glw0a1", "0xFF31", 0},
+			{"pa5glw1a1", "0x1517", 0},
+			{"pa5glw2a1", "0xFB2F", 0},
+			{"pa5ghw0a1", "0xff18", 0},
+			{"pa5ghw1a1", "0x1661", 0},
+			{"pa5ghw2a1", "0xfafe", 0},
+			{"ofdm5gpo0", "0x0000", 0},
+			{"ofdm5gpo1", "0x2000", 0},
+			{"ofdm5glpo0", "0x0000", 0},
+			{"ofdm5glpo1", "0x2000", 0},
+			{"ofdm5ghpo0", "0x0000", 0},
+			{"ofdm5ghpo1", "0x2000", 0},
+			{"mcs5gpo0", "0x4200", 0},
+			{"mcs5gpo1", "0x6664", 0},
+			{"mcs5gpo2", "0x4200", 0},
+			{"mcs5gpo3", "0x6664", 0},
+			{"mcs5gpo4", "0x4200", 0},
+			{"mcs5gpo5", "0x6664", 0},
+			{"mcs5gpo6", "0x4200", 0},
+			{"mcs5gpo7", "0x6664", 0},
+			{"mcs5glpo0", "0x4200", 0},
+			{"mcs5glpo1", "0x6664", 0},
+			{"mcs5glpo2", "0x4200", 0},
+			{"mcs5glpo3", "0x6664", 0},
+			{"mcs5glpo4", "0x4200", 0},
+			{"mcs5glpo5", "0x6664", 0},
+			{"mcs5glpo6", "0x4200", 0},
+			{"mcs5glpo7", "0x6664", 0},
+			{"mcs5ghpo0", "0x4200", 0},
+			{"mcs5ghpo1", "0x6664", 0},
+			{"mcs5ghpo2", "0x4200", 0},
+			{"mcs5ghpo3", "0x6664", 0},
+			{"mcs5ghpo4", "0x4200", 0},
+			{"mcs5ghpo5", "0x6664", 0},
+			{"mcs5ghpo6", "0x4200", 0},
+			{"mcs5ghpo7", "0x6664", 0},
+			{"cdd5ghpo/cdd5glpo/cdd5gpo/cdd2gpo", "0x0", 0},
+			{"stbc5ghpo/stbc5glpo/stbc5gpo/stbc2gpo", "0x0", 0},
+			{"bw405ghpo/bw405glpo/bw405gpo/bw402gpo", "0x2", 0},
+			{"wdup405ghpo/wdup405glpo/wdup405gpo/wdup402gpo", "0x0",
+			 0},
+*/
+			{0, 0, 0}
+		};
+		/*
+		 * set router's extra parameters 
+		 */
+		extra_params = wndr3400_pci_1_1_params;
+		while (extra_params->name) {
+			sprintf(s, "pci/1/1/%s", extra_params->name);
+			nvram_set(s, extra_params->value);
+			extra_params++;
+		}
+
+		break;
 #endif	// CONFIG_BCMWL5
 
 	case MODEL_WL330GE:

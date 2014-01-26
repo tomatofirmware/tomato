@@ -247,6 +247,7 @@ int do_led(int which, int mode)
 	static int wnr3500[]	= { 255, 255,     2,  255,  255,   -1,  255,  255,    255};
 	static int wnr2000v2[]	= { 255, 255,   255,  255,  255,   -7,  255,  255,    255};
 	static int wndr4000[]	= { 3, 1,   0,  1,  255,   7,  255,  5,    4};
+	static int wndr3400[]	= { -9, -7,   -3,  -7,  255,   255, 255,  2,    -99}; // Note: 5 = Switch, 4 = Reset button, 8 = SES button
 	static int f7d[]	= { 255, 255,   255,  255,   12,   13,  255,   14,    255};
 	static int wrt160nv3[]	= { 255,   1,     4,    2,  255,  255,  255,  255,    255};
 	static int e900[]	= { 255,  -6,     8,  255,  255,  255,  255,  255,    255};
@@ -266,7 +267,7 @@ int do_led(int which, int mode)
 	static int w1800r[]     = { 255, -13,   255,  255,  255,  255,  255,  -12,     -5};
 
 	FILE *fileExtGPIOstatus;			// For WNDR4000, keep track of extended bit status (shift register), as cannot read from HW!
-	unsigned int intExtendedLEDStatus;	// Status of Extended LED's (shift register on WNDR4000)
+	unsigned int intExtendedLEDStatus;	// Status of Extended LED's (shift register on WNDR4000) ... and WNDR3700v3, it's the same!
 #endif
 
 	char s[16];
@@ -405,6 +406,7 @@ int do_led(int which, int mode)
 			b = wnr2000v2[which];
 		break;
 	case MODEL_WNDR4000:
+	case MODEL_WNDR3700v3:
 		// Special Case, shift register control ... so write accordingly. Syslog below for debugging, turn back on if needed.
 		b = wndr4000[which];
 		//syslog(LOG_INFO, "WNDR4000 Shift Register (do_led): Bit Name = %s, which = %d, b = %d, Mode = %s\n", led_names[which], which, b, led_modes[mode]);
@@ -444,6 +446,9 @@ int do_led(int which, int mode)
 		}
 		// Return GPIO "pin" (shift register location)
 		return b;
+		break;
+	case MODEL_WNDR3400:
+		b = wndr3400[which];
 		break;
 	case MODEL_F7D3301:
 	case MODEL_F7D3302:
