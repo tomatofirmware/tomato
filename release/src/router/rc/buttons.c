@@ -193,6 +193,7 @@ int buttons_main(int argc, char *argv[])
 		ses_led = LED_AOSS;
 		break;
 	case MODEL_WNDR4000:
+	case MODEL_WNDR3700v3:
 		reset_mask = 1 << 3;
 		ses_mask = 1 << 2;
 		ses_led = LED_AOSS;
