@@ -55,12 +55,8 @@ ifeq ($(NVRAM_SIZE),)
 NVRAM_SIZE = 0
 endif
 
-ifeq ($(AC66U),)
-AC66U = 0
-endif
-
-ifeq ($(W1800R),)
-W1800R = 0
+ifeq ($(ASUS_TRX),)
+ASUS_TRX = 0
 endif
 
 ifeq ($(WNR3500LV2),)
@@ -983,7 +979,6 @@ i:
 ## MiniVPN - for 4MB routers
 j:
 	@$(MAKE) bin NO_JFFS=y NO_CIFS=y NO_ZEBRA=y B=V BUILD_DESC="MiniVPN" USB="" PPTPD=y OPENVPN=y
-endif
 
 ## VPN with no USB support (IPv6 in K26 build)
 v:

@@ -413,6 +413,8 @@ int get_model(void)
 		}
 		break;
 #ifdef CONFIG_BCMWL5
+	case 18:
+	case 21:
 	case 60:
 		switch (hw) {
 		case HW_BCM47186:
@@ -524,14 +526,6 @@ int get_model(void)
 		break;
 	case 56:
 		if (hw == HW_BCM5350) return MODEL_WTR54GS;
-		break;
-	case 18:
-	case 21:
-	case 60:
-		switch (hw) {
-		case HW_BCM4706:
-			if (nvram_match("boardrev", "0x1200")) return MODEL_W1800R;
-		}
 		break;
 	}
 

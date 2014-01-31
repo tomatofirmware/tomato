@@ -791,7 +791,7 @@ bridge-install:
 
 dnsmasq:
 	@$(SEP)
-	@$(MAKE) -C dnsmasq $(PARALLEL_BUILD) \
+	@$(MAKE) -C dnsmasq \
 	COPTS="$(if $(TCONFIG_IPV6),-DUSE_IPV6,-DNO_IPV6) $(if $(CONFIG_LINUX26),-DUSE_IPSET,-DNO_IPSET) -DHAVE_BROKEN_RTC -DHAVE_TOMATO $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
 	LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC"
 
@@ -1699,8 +1699,7 @@ libcurl/stamp-h1: zlib openssl
 	cd libcurl && CC=$(CC) STRIP='mipsel-uclibc-strip' \
 		CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
 		CPPFLAGS="-I$(TOP)/zlib" \
-		LDFLAGS="-L$(TOP)/zlib -L$(TOP)/openssl -ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC" \
-		CURL_LIBS="-lssl -lcrypto" \
+		LDFLAGS="-L$(TOP)/zlib -L$(TOP)/openssl -ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC -lssl -lcrypto" \
 		$(CONFIGURE) --prefix=/usr --disable-thread --enable-shared --enable-static \
 		--enable-ares --enable-cookies --enable-crypto-auth --enable-nonblocking \
 		--enable-file --enable-ftp --enable-http --enable-ipv6 --enable-tftp \

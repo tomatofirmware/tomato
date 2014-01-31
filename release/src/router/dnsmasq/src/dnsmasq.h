@@ -992,6 +992,7 @@ unsigned char *skip_questions(struct dns_header *header, size_t plen);
 int extract_name(struct dns_header *header, size_t plen, unsigned char **pp, 
 		 char *name, int isExtract, int extrabytes);
 int in_arpa_name_2_addr(char *namein, struct all_addr *addrp);
+int private_net(struct in_addr addr, int ban_localhost);
 
 /* auth.c */
 #ifdef HAVE_AUTH

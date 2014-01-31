@@ -1309,53 +1309,48 @@ static int init_nvram(void)
 		break;
 	case MODEL_RTN66U:
 		mfr = "Asus";
-#ifdef CONFIG_BCMWL6
-		name = "RT-AC66U"; //id, board, rev same as N66
-#else
-		name = "RT-N66U";
-#endif
-#ifdef CONFIG_BCMWL6
+#ifdef TCONFIG_AC66U
+		name = "RT-AC66U";
 		features = SUP_SES | SUP_80211N | SUP_1000ET | SUP_80211AC;
 #else
+		name = "RT-N66U";
 		features = SUP_SES | SUP_80211N | SUP_1000ET;
-#endif
-#ifdef TCONFIG_USB
-		nvram_set("usb_uhci", "-1");
-#ifndef CONFIG_BCMWL6
 #if defined(LINUX26) && defined(TCONFIG_MICROSD)
 		if (nvram_get_int("usb_mmc") == -1) nvram_set("usb_mmc", "1");
 #endif
 #endif
+
+#ifdef TCONFIG_USB
+		nvram_set("usb_uhci", "-1");
 #endif
 		if (!nvram_match("t_fix1", (char *)name)) {
 			nvram_set("lan_ifnames", "vlan1 eth1 eth2");
 			nvram_set("wan_ifnameX", "vlan2");
 			nvram_set("wl_ifnames", "eth1 eth2");
-#ifdef CONFIG_BCMWL6
+#ifdef TCONFIG_AC66U
 			nvram_set("wl_ifname", "eth1");
 			nvram_set("wl0_ifname", "eth1");
 			nvram_set("wl1_ifname", "eth2");
 #endif
 			nvram_set("landevs", "vlan1 wl0 wl1");
 			nvram_set("wandevs", "vlan2");
-#ifndef CONFIG_BCMWL6
+#ifndef TCONFIG_AC66U
 #if defined(LINUX26) && defined(TCONFIG_USB)
 			nvram_set("usb_noled", "1-1.4"); /* SD/MMC Card */
 #endif
 #else
+			nvram_set("wl1_bw_cap","7");
+			nvram_set("wl1_chanspec","36/80");
+			nvram_set("wl0_bw_cap","3");
+			nvram_set("wl0_chanspec","1l");
+			nvram_set("blink_5g_interface","eth2");
+
 			// fix WL mac`s
 			strcpy(s, nvram_safe_get("et0macaddr"));
 			inc_mac(s, +2);
 			nvram_set("wl0_hwaddr", s);
 			inc_mac(s, +1);
 			nvram_set("wl1_hwaddr", s);
-
-//			nvram_set("wl0_phytype", "h");
-//			nvram_set("wl0_phytypes", "h");
-//			nvram_set("wl1_phytype", "h"); // "h" for now. For 80Mhz should be "v"
-//			nvram_set("wl1_phytypes", "h"); // "h" for now. For 80Mhz should be "v"
-//			nvram_set("wl1_unit" ,"1");
-
 
 			// bcm4360ac_defaults
 			nvram_set("pci/2/1/aa2g", "0");
@@ -1444,8 +1439,10 @@ static int init_nvram(void)
 
 			//force EU country for eth2
 			nvram_set("pci/2/1/ccode", "EU");
+#endif // TCONFIG_AC66U
 		}
 		break;
+#ifdef CONFIG_BCMWL6
 	case MODEL_W1800R:
 		mfr = "Tenda";
 		name = "W1800R"; //id, board, rev same as N66
@@ -1603,6 +1600,7 @@ static int init_nvram(void)
 			nvram_set("regulation_domain_5G", nvram_safe_get("ccode"));
 		}
 		break;
+#endif // CONFIG_BCMWL6
 	case MODEL_WNR3500L:
 		mfr = "Netgear";
 		name = "WNR3500L/U/v2";
