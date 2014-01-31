@@ -1484,11 +1484,11 @@ for (var i = 1; i < tabs.length; ++i) {
 
 	var f = [];
 	f.push (
-		{ title: 'Enable Interface', name: 'f_wl'+u+'_radio', type: 'checkbox',
+		{ title: '<% _("Enable Interface"); %>', name: 'f_wl'+u+'_radio', type: 'checkbox',
 			value: (eval('nvram["wl'+u+'_radio"]') == '1') && (eval('nvram["wl'+u+'_net_mode"]') != 'disabled') },
-		{ title: 'MAC Address', text: '<a href="advanced-mac.asp">' + (eval('nvram["wl'+u+'_hwaddr"]') || '00:00:00:00:00:00') + '</a>' +
-			' &nbsp; <b id="wl'+u+'_hwaddr_msg" style="visibility:hidden"><small>(warning: WL driver reports BSSID <a href=advanced-mac.asp>' + ((typeof(wl_ifaces[wl_ifidxx(u)]) != 'undefined')? wl_ifaces[wl_ifidxx(u)][9] : '') + '</a>)</small></b>' },
-		{ title: 'Wireless Mode', name: 'f_wl'+u+'_mode', type: 'select',
+		{ title: '<% _("MAC Address"); %>', text: '<a href="advanced-mac.asp">' + (eval('nvram["wl'+u+'_hwaddr"]') || '00:00:00:00:00:00') + '</a>' +
+			' &nbsp; <b id="wl'+u+'_hwaddr_msg" style="visibility:hidden"><small>(<% _("warning"); %>: WL driver reports BSSID <a href=advanced-mac.asp>' + ((typeof(wl_ifaces[wl_ifidxx(u)]) != 'undefined')? wl_ifaces[wl_ifidxx(u)][9] : '') + '</a>)</small></b>' },
+		{ title: '<% _("Wireless Mode"); %>', name: 'f_wl'+u+'_mode', type: 'select',
 			options: wl_modes_available,
 			value: ((eval('nvram["wl'+u+'_mode"]') == 'ap') && (eval('nvram["wl'+u+'_wds_enable"]') == '1')) ? 'apwds' : eval('nvram["wl'+u+'_mode"]'),
 			suffix: ' &nbsp; <b id="wl'+u+'_mode_msg" style="visibility:hidden"><small>(note: you might wish to cross-check settings later on <a href=basic-network.asp>Basic/Network</a>)</small></b>' }
@@ -1497,9 +1497,9 @@ for (var i = 1; i < tabs.length; ++i) {
 // only if primary VIF
 	if (u.toString().indexOf('.') < 0) {
 		f.push (
-			{ title: 'Radio Band', name: 'f_wl'+u+'_nband', type: 'select', options: bands[uidx],
+			{ title: '<% _("Radio Band"); %>', name: 'f_wl'+u+'_nband', type: 'select', options: bands[uidx],
 				value: eval('nvram["wl'+u+'_nband"]') || '0' == '0' ? bands[uidx][0][0] : eval('nvram["wl'+u+'_nband"]') },
-			{ title: 'Wireless Network Mode', name: 'wl'+u+'_net_mode', type: 'select',
+			{ title: '<% _("Wireless Network Mode"); %>', name: 'wl'+u+'_net_mode', type: 'select',
 				value: (eval('nvram["wl'+u+'_net_mode"]') == 'disabled') ? 'mixed' : eval('nvram["wl'+u+'_net_mode"]'),
 				options: [], prefix: '<span id="__wl'+u+'_net_mode">', suffix: '</span>' }
 		);
@@ -1510,17 +1510,17 @@ for (var i = 1; i < tabs.length; ++i) {
 
 	f.push (
 		{ title: 'SSID', name: 'wl'+u+'_ssid', type: 'text', maxlen: 32, size: 34, value: eval('nvram["wl'+u+'_ssid"]') },
-		{ title: 'Broadcast', indent: 2, name: 'f_wl'+u+'_bcast', type: 'checkbox', value: (eval('nvram["wl'+u+'_closed"]') == '0') }
+		{ title: '<% _("Broadcast"); %>', indent: 2, name: 'f_wl'+u+'_bcast', type: 'checkbox', value: (eval('nvram["wl'+u+'_closed"]') == '0') }
 	);
 
 // only if primary VIF
 	if (u.toString().indexOf('.') < 0) {
 		f.push (
-			{ title: 'Channel', name: 'wl'+u+'_channel', type: 'select', options: ghz[uidx], prefix: '<span id="__wl'+u+'_channel">', suffix: '</span> <input type="button" id="_f_wl'+u+'_scan" value="Scan" onclick="scanButton('+u+')"> <img src="spin.gif" id="spin'+u+'">',
+			{ title: '<% _("Channel"); %>', name: 'wl'+u+'_channel', type: 'select', options: ghz[uidx], prefix: '<span id="__wl'+u+'_channel">', suffix: '</span> <input type="button" id="_f_wl'+u+'_scan" value="Scan" onclick="scanButton('+u+')"> <img src="spin.gif" id="spin'+u+'">',
 				value: eval('nvram["wl'+u+'_channel"]') },
-			{ title: 'Channel Width', name: 'wl'+u+'_nbw_cap', type: 'select', options: [['0','20 MHz'],['1','40 MHz']],
+			{ title: '<% _("Channel Width"); %>', name: 'wl'+u+'_nbw_cap', type: 'select', options: [['0','20 MHz'],['1','40 MHz']],
 				value: eval('nvram["wl'+u+'_nbw_cap"]') },
-			{ title: 'Control Sideband', name: 'f_wl'+u+'_nctrlsb', type: 'select', options: [['lower','Lower'],['upper','Upper']],
+			{ title: '<% _("Control Sideband"); %>', name: 'f_wl'+u+'_nctrlsb', type: 'select', options: [['lower','Lower'],['upper','Upper']],
 				value: eval('nvram["wl'+u+'_nctrlsb"]') == 'none' ? 'lower' : eval('nvram["wl'+u+'_nctrlsb"]') }
 		);
 	}
@@ -1530,15 +1530,15 @@ for (var i = 1; i < tabs.length; ++i) {
 
 	f.push (
 		null,
-		{ title: 'Security', name: 'wl'+u+'_security_mode', type: 'select',
-			options: [['disabled','Disabled'],['wep','WEP'],['wpa_personal','WPA Personal'],['wpa_enterprise','WPA Enterprise'],['wpa2_personal','WPA2 Personal'],['wpa2_enterprise','WPA2 Enterprise'],['wpaX_personal','WPA / WPA2 Personal'],['wpaX_enterprise','WPA / WPA2 Enterprise'],['radius','Radius']],
+		{ title: '<% _("Security"); %>', name: 'wl'+u+'_security_mode', type: 'select',
+			options: [['disabled','<% _("Disabled"); %>'],['wep','<% _("WEP"); %>'],['wpa_personal','<% _("WPA Personal"); %>'],['wpa_enterprise','<% _("WPA Enterprise"); %>'],['wpa2_personal','<% _("WPA2 Personal"); %>'],['wpa2_enterprise','<% _("WPA2 Enterprise"); %>'],['wpaX_personal','<% _("WPA / WPA2 Personal"); %>'],['wpaX_enterprise','<% _("WPA / WPA2 Enterprise"); %>'],['radius','<% _("Radius"); %>']],
 			value: eval('nvram["wl'+u+'_security_mode"]') },
-		{ title: 'Encryption', indent: 2, name: 'wl'+u+'_crypto', type: 'select',
-			options: [['tkip','TKIP'],['aes','AES'],['tkip+aes','TKIP / AES']], value: eval('nvram["wl'+u+'_crypto"]') },
-		{ title: 'Shared Key', indent: 2, name: 'wl'+u+'_wpa_psk', type: 'password', maxlen: 64, size: 66, peekaboo: 1,
-			suffix: ' <input type="button" id="_f_wl'+u+'_psk_random1" value="Random" onclick="random_psk(\'_wl'+u+'_wpa_psk\')">',
+		{ title: '<% _("Encryption"); %>', indent: 2, name: 'wl'+u+'_crypto', type: 'select',
+			options: [['tkip','<% _("TKIP"); %>'],['aes','<% _("AES"); %>'],['tkip+aes','<% _("TKIP / AES"); %>']], value: eval('nvram["wl'+u+'_crypto"]') },
+		{ title: '<% _("Shared Key"); %>', indent: 2, name: 'wl'+u+'_wpa_psk', type: 'password', maxlen: 64, size: 66, peekaboo: 1,
+			suffix: ' <input type="button" id="_f_wl'+u+'_psk_random1" value="<% _("Random"); %>" onclick="random_psk(\'_wl'+u+'_wpa_psk\')">',
 			value: eval('nvram["wl'+u+'_wpa_psk"]') },
-		{ title: 'Shared Key', indent: 2, name: 'wl'+u+'_radius_key', type: 'password', maxlen: 80, size: 32, peekaboo: 1,
+		{ title: '<% _("Shared Key"); %>', indent: 2, name: 'wl'+u+'_radius_key', type: 'password', maxlen: 80, size: 32, peekaboo: 1,
 			suffix: ' <input type="button" id="_f_wl'+u+'_psk_random2" value="Random" onclick="random_psk(\'_wl'+u+'_radius_key\')">',
 			value: eval('nvram["wl'+u+'_radius_key"]') },
 		{ title: 'Group Key Renewal', indent: 2, name: 'wl'+u+'_wpa_gtk_rekey', type: 'text', maxlen: 4, size: 6, suffix: ' <i>(seconds)</i>',

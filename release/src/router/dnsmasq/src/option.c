@@ -2455,6 +2455,8 @@ static int one_opt(int option, char *arg, char *errstr, char *gen_err, int comma
 		  new->flags |= CONTEXT_RA_ONLY | CONTEXT_RA;
 		else if (strcmp(a[leasepos], "ra-names") == 0)
 		  new->flags |= CONTEXT_RA_NAME | CONTEXT_RA;
+		else if (strcmp(a[leasepos], "ra-stateful") == 0)
+		 new->flags |= CONTEXT_DHCP | CONTEXT_RA;
 		else if (strcmp(a[leasepos], "ra-stateless") == 0)
 		  new->flags |= CONTEXT_RA_STATELESS | CONTEXT_DHCP | CONTEXT_RA;
 		else if (leasepos == 1 && inet_pton(AF_INET6, a[leasepos], &new->end6))
