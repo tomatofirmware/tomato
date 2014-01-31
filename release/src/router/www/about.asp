@@ -114,7 +114,7 @@ Copyright (C) 2010 Keith Moyer,<br>
 
 <b>"Shibby" features:</b><br>
 <!-- BBT-BEGIN -->
-- Transmission 2.81 integration<br>
+- Transmission 2.82 integration<br>
 <!-- BBT-END -->
 <!-- BT-BEGIN -->
 - GUI for Transmission<br>
@@ -136,7 +136,7 @@ Copyright (C) 2010 Keith Moyer,<br>
 - APCUPSD integration and GUI (implemented by @arrmo)<br>
 <!-- UPS-END -->
 <!-- DNSCRYPT-BEGIN -->
-- DNScrypt-proxy 1.0 integration and GUI<br>
+- DNScrypt-proxy 1.3.4 integration and GUI<br>
 <!-- DNSCRYPT-END -->
 <!-- TOR-BEGIN -->
 - TOR Project integration and GUI<br>
