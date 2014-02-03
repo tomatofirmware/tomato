@@ -268,15 +268,24 @@ ifeq ($(WNDR),y)
 	# and tee only reads from stdout (not stderr)
 	@echo "*********************** Convert TRX to CHK (add Netgear Checksum) ************************" >>fpkg.log
 	#Make multiple versions / files, as file is HW specific (HW information is captured in the .chk file itself!)
+
+	# Make WNDR4000, Checksum starts at 0x6FFFF8 => Max size (to not touch the last 64kB block) = 7274496
 	@$(SRCBASE)/wnrtool/mkchkimg -o image/tomato-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC)-WNDR4000.chk \
 	-k image/tomato-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).trx \
 	-b U12H181T00_NETGEAR -r 2 2>&1 | tee -a fpkg.log
+	@$(MAKE) netgear-check MAXFSIZE=7274496 NG_FNAME=image/tomato-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC)-WNDR4000.chk
+
+	# Make WNDR3700v3, Checksum starts at 0x6FFFF8 => Max size (to not touch the last 64kB block) = 7274496
 	@$(SRCBASE)/wnrtool/mkchkimg -o image/tomato-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC)-WNDR3700v3.chk \
 	-k image/tomato-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).trx \
 	-b U12H194T00_NETGEAR -r 2 2>&1 | tee -a fpkg.log
+	@$(MAKE) netgear-check MAXFSIZE=7274496 NG_FNAME=image/tomato-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC)-WNDR3700v3.chk
+
+	# Make WNDR3400, Checksum starts at 0x6CFFF8 => Max size (to not touch the last 64kB block) = 7077888
 	@$(SRCBASE)/wnrtool/mkchkimg -o image/tomato-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC)-WNDR3400.chk \
 	-k image/tomato-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).trx \
 	-b U12H155T00_NETGEAR -r 2 2>&1 | tee -a fpkg.log
+	@$(MAKE) netgear-check MAXFSIZE=7077888 NG_FNAME=image/tomato-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC)-WNDR3400.chk
 	
 	@echo "Cleanup ...."
 	@cp fpkg.log image/fpkg-$(V1)$(mips_rev)$(beta)$(V2).log
@@ -300,7 +309,17 @@ endif
 endif
 endif
 
-
+netgear-check:
+	$(eval FSIZE = $(shell stat -c %s $(NG_FNAME)))
+	@if [ ${FSIZE} -gt ${MAXFSIZE} ] ; then \
+		echo "Router Filesize exceeds Netgear Hardware limits - file will be deleted!"; \
+		echo "   -> File to be deleted: " $(NG_FNAME); \
+		rm $(NG_FNAME); \
+		echo; \
+	else \
+		echo "Router Filesize meets Netgear Hardware limits - no action required."; \
+		echo; \
+	fi
 
 clean:
 	@touch router/.config
@@ -1211,7 +1230,7 @@ endif
 
 #Netgear WNDR series with 64K NVRAM Builds
 wndr64:
-	@$(MAKE) bin MIPS32=r2 NVRAM_SIZE=64 WNDR=y OPENVPN=n NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y IPV6SUPP=y B=W BUILD_DESC="WNDR" USB="USB" SNMP=y DNSCRYPT=y PPTPD=y	USBAP=y
+	@$(MAKE) bin MIPS32=r2 NVRAM_SIZE=64 WNDR=y OPENVPN=n NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y IPV6SUPP=y B=W BUILD_DESC="WNDR" USB="USB" SNMP=y DNSCRYPT=y PPTPD=y NO_HTTPS=y USBAP=y
 wndr64-sm:
 	@$(MAKE) bin MIPS32=r2 NVRAM_SIZE=64 WNDR=y OPENVPN=n NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y IPV6SUPP=n B=W BUILD_DESC="WNDRsm" USB="USB" SNMP=y DNSCRYPT=y PPTPD=n NO_HTTPS=y USBAP=y
 wndr64-nousb:
