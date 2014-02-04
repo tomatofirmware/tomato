@@ -493,6 +493,7 @@ void start_dhcp6c(void)
 		fprintf(f,
 			"interface %s {\n"
 			" send ia-pd 0;\n"
+			" send ia-na 0;\n"
 			" send rapid-commit;\n"
 			" request domain-name-servers;\n"
 			" script \"/sbin/dhcp6c-state\";\n"
@@ -501,6 +502,7 @@ void start_dhcp6c(void)
 			" prefix-interface %s {\n"
 			"  sla-id 0;\n"
 			"  sla-len %d;\n"
+			"  ifid 1;\n"
 			" };\n"
 			"};\n"
 			"id-assoc na 0 { };\n",
