@@ -102,7 +102,7 @@ static void cleanup_cflist __P((struct cf_list *));
 %}
 
 %token INTERFACE IFNAME
-%token PREFIX_INTERFACE SLA_ID SLA_LEN DUID_ID
+%token PREFIX_INTERFACE SLA_ID SLA_LEN IFID DUID_ID
 %token ID_ASSOC IA_PD IAID IA_NA
 %token ADDRESS
 %token REQUEST SEND ALLOW PREFERENCE
@@ -1039,6 +1039,14 @@ ifparam:
 
 			MAKE_CFLIST(l, IFPARAM_SLA_LEN, NULL, NULL);
 			l->num = $2;
+			$$ = l;
+		}
+	|	IFID NUMBER EOS
+		{
+			struct cf_list *l;
+
+			MAKE_CFLIST(l, IFPARAM_IFID, NULL, NULL);
+			l->num = (u_int64_t)$2;
 			$$ = l;
 		}
 	;

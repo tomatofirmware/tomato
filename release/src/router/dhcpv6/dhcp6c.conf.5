@@ -436,6 +436,16 @@ This statement specifies the length of the SLA ID in bits.
 must be a decimal number between 0 and 128.
 If the length is not specified by this statement,
 the default value 16 will be used.
+.It Xo
+.Ic ifid Ar ID
+;
+.Xc
+This statement specifies the interface id.
+.Ar ID
+must be a decimal integer.  It will be combined with the delegated
+prefix and the sla-id to form a complete interface address.  The
+default is to use the EUI-64 address of the
+.Ar interface .
 .El
 .El
 .\"

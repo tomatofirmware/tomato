@@ -231,6 +231,7 @@ ecl		\}
 <S_CNF>prefix-interface { DECHO; BEGIN S_IFACE; return (PREFIX_INTERFACE); }
 <S_CNF>sla-id { DECHO; return (SLA_ID); }
 <S_CNF>sla-len { DECHO; return (SLA_LEN); }
+<S_CNF>ifid { DECHO; return (IFID); }
 
 	/* duration */
 <S_CNF>infinity { DECHO; return (INFINITY); }
