@@ -287,6 +287,12 @@ ifeq ($(WNDR),y)
 	-b U12H155T00_NETGEAR -r 2 2>&1 | tee -a fpkg.log
 	@$(MAKE) netgear-check MAXFSIZE=7077888 NG_FNAME=image/tomato-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC)-WNDR3400.chk
 	
+	# Make WNDR3400v2, Checksum starts at 0x6FFFF8 => Max size (to not touch the last 64kB block) = 7274496
+	@$(SRCBASE)/wnrtool/mkchkimg -o image/tomato-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC)-WNDR3400v2.chk \
+	-k image/tomato-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).trx \
+	-b U12H187T00_NETGEAR -r 2 2>&1 | tee -a fpkg.log
+	@$(MAKE) netgear-check MAXFSIZE=7274496 NG_FNAME=image/tomato-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC)-WNDR3400v2.chk
+
 	@echo "Cleanup ...."
 	@cp fpkg.log image/fpkg-$(V1)$(mips_rev)$(beta)$(V2).log
 	@rm -f image/tomato-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).trx
@@ -1005,7 +1011,11 @@ i:
 
 ## MiniVPN - for 4MB routers
 j:
-	@$(MAKE) bin NO_JFFS=y NO_CIFS=y NO_ZEBRA=y B=V BUILD_DESC="MiniVPN" USB="" PPTPD=y OPENVPN=y
+	@$(MAKE) bin NO_JFFS=y NO_CIFS=y NO_ZEBRA=y B=J BUILD_DESC="MiniVPN" USB="" PPTPD=y OPENVPN=y
+
+## MiniCIFS - for 4MB routers
+k:
+	@$(MAKE) bin NO_JFFS=y NO_CIFS=n NO_ZEBRA=y B=K BUILD_DESC="MiniCIFS" USB="" NO_HTTPS=y
 endif
 
 ## VPN with no USB support (IPv6 in K26 build)
@@ -1068,6 +1078,9 @@ r2i:
 
 r2j:
 	@$(MAKE) j MIPS32=r2
+
+r2k:
+	@$(MAKE) k MIPS32=r2
 
 r2v:
 	@$(MAKE) v MIPS32=r2
@@ -1303,6 +1316,7 @@ ifeq ($(CONFIG_LINUX26),y)
 	@echo "z            MIPS Release 15F AIO (for routers +8MB flash)"
 	@echo "i            MiniIPv6 - (IPv6 with no USB support minus CIFS and RIPv1/2)"
 	@echo "j            MiniVPN - (VPN with no USB support minus CIFS and RIPv1/2)"
+	@echo "k            MiniCIFS - (CIFS with no USB support and no VPN)"
 endif
 	@echo "f            Mini - (no USB support minus CIFS and RIPv1/2)"
 	@echo "v            VPN (no usb) - (VPN with no USB support)" / in K26 + IPv6 support
@@ -1321,6 +1335,7 @@ ifeq ($(CONFIG_LINUX26),y)
 	@echo "r2m          MIPS Release 2 Max (no usb)"
 	@echo "r2i          MIPS Release 2 MiniIPv6 (for 4MB flash)"
 	@echo "r2j          MIPS Release 2 MiniVPN (for 4MB flash)"
+	@echo "r2k          MIPS Release 2 MiniCIFS (for 4MB flash)"
 	@echo "r2f          MIPS Release 2 Mini (for netgear)"
 	@echo "       Linksys E-Series with 4MB Flash(E1000v2/v2.1/E1200v1)"
 	@echo "e1000v2f     Linksys E1000v2-v2.1/Cisco M10v2 Mini"
