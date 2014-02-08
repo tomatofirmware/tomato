@@ -571,7 +571,7 @@ int mtd_write_main(int argc, char *argv[])
 	}
 
 	// Netgear WNR3500L: write fake len and checksum at the end of mtd
-	// Add Netgear WNDR4000, WNDR3700v3, WNDR3400 - write real len and checksum (arrmo, Dec 21/13)
+	// Add Netgear WNDR4000, WNDR3700v3, WNDR3400, WNDR3400v2 - write real len and checksum (arrmo, Dec 21/13)
 	char *tmp;
 	char imageInfo[8];
 
@@ -581,6 +581,7 @@ int mtd_write_main(int argc, char *argv[])
 	case MODEL_WNDR4000:
 	case MODEL_WNDR3700v3:
 	case MODEL_WNDR3400:
+	case MODEL_WNDR3400v2:
 		error = "Error writing Netgear CRC";
 
 		// Netgear CFE has the offset of the checksum hardcoded as
@@ -589,9 +590,9 @@ int mtd_write_main(int argc, char *argv[])
 		// We rely on linux partition to be sized correctly by the kernel,
 		// so the checksum area doesn't fall outside of the linux partition,
 		// and doesn't override the rootfs.
-		// Note: For WNDR4000/WNDR3700v3, the target address (offset) inside Linux is 0x6FFFF8 (displayed by CFE when programmed via tftp)
+		// Note: For WNDR4000/WNDR3700v3/WNDR3400v2, the target address (offset) inside Linux is 0x6FFFF8 (displayed by CFE when programmed via tftp)
 		// Note: For WNDR3400, the target address (offset) inside Linux is 0x6CFFF8 (displayed by CFE when programmed via tftp)
-		if ((model == MODEL_WNDR4000) || (model == MODEL_WNDR3700v3) || (model == MODEL_WNDR3400)) {
+		if ((model == MODEL_WNDR4000) || (model == MODEL_WNDR3700v3) || (model == MODEL_WNDR3400) || (model == MODEL_WNDR3400v2)) {
 			if (model == MODEL_WNDR3400)
 				ofs = 0x6CFFF8;
 			else 

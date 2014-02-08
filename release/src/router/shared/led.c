@@ -459,6 +459,7 @@ int do_led(int which, int mode)
 		return b;
 		break;
 	case MODEL_WNDR3400:
+	case MODEL_WNDR3400v2:
 		b = wndr3400[which];
 		break;
 	case MODEL_F7D3301:

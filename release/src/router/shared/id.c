@@ -45,6 +45,7 @@ EA6500v1            BCM4706               0xC617       ${serno}  0x1103    0x000
 WNDR4000            BCM4718               0xf52c       01        0x1101    0x00001301 
 WNDR3700v3          BCM4718               0xf52c       01        0x1101    0x00001301 
 WNDR3400            BCM4718               0xb4cf       01        0x1100    0x0310 
+WNDR3400v2          BCM5358U              0x0550       01        0x1400    0x0710 
 
 WHR-G54S            BCM5352E              0x467        00        0x13      0x2758      melco_id=30182
 WHR-HP-G54S         BCM5352E              0x467        00        0x13      0x2758      melco_id=30189
@@ -195,7 +196,7 @@ int check_hw_type(void)
 	case 0xf53a:
 	case 0xf53b:
 	case 0x0550: //RT-N10U and RT-N53 and CW-5358U
-		if (nvram_match("boardrev", "0x1400")) return HW_BCM5358U; //L600N
+		if (nvram_match("boardrev", "0x1400")) return HW_BCM5358U; //L600N, WNDR3400v2
 		if (nvram_match("boardrev", "0x1446")) return HW_BCM5358U; //DIR-620C1
 		if (nvram_match("boardrev", "0x1444")) return HW_BCM5357; //Tenda N6
 	case 0x054d:
@@ -530,6 +531,12 @@ int get_model(void)
 		case HW_BCM4716:
 			//if (nvram_match("boardrev", "0x1700"))
 			return MODEL_WNR2000v2;
+			break;
+		case HW_BCM5358U:
+			if (nvram_match("boardrev", "0x1400")) {
+				nvram_set("netgear_model", "wndr3400v2");
+				return MODEL_WNDR3400v2;
+			}
 			break;
 		}
 		/* fall through */

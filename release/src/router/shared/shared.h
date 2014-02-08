@@ -247,7 +247,8 @@ enum {
 	MODEL_EA6500V1,
 	MODEL_WNDR4000,
 	MODEL_WNDR3700v3,
-	MODEL_WNDR3400
+	MODEL_WNDR3400,
+	MODEL_WNDR3400v2
 };
 
 /* NOTE: Do not insert new entries in the middle of this enum,

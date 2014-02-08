@@ -280,7 +280,7 @@ enum {
 	RT_DIR320,	// D-Link DIR-320
 	RT_WNR3500L,	// Netgear WNR3500v2/U/L
 	RT_WNR2000V2,	// Netgear WNR2000v2
-	RT_WNDR,		// Netgear WNDR4000, WNDR3700v3, WNDR3400
+	RT_WNDR,		// Netgear WNDR4000, WNDR3700v3, WNDR3400, WNDR3400v2
 	RT_BELKIN_F7D   // Belkin F7D3301, F7D3302, F7D4302, F7D8235V3
 };
 
@@ -302,6 +302,10 @@ static int get_router(void)
 	}
 	else if (boardtype == 0xB4CF && boardrev == 0x1100 && boardnum == 01) {
 		// Netgear WNDR3400
+		return RT_WNDR;
+	}
+	else if (boardtype == 0x0550 && boardrev == 0x1400 && boardnum == 01) {
+		// Netgear WNDR3400v2
 		return RT_WNDR;
 	}
 #ifdef DIR320_BOARD

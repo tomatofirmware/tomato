@@ -497,6 +497,7 @@ static int init_vlan_ports(void)
 		dirty |= check_nv("vlan2ports", "4 8");
 		break;
 	case MODEL_WNDR3400:
+	case MODEL_WNDR3400v2:
 		// Note port order is important (or reversed display, if "0 1 2 3 5*" used for vlan1ports) -> doesn't work, invert in Web GUI
 		dirty |= check_nv("vlan1ports", "0 1 2 3 5*");
 		// And change "4 5u" to "4 5" to make WAN port work
@@ -698,12 +699,16 @@ static void check_bootnv(void)
         dirty |= check_nv("pci/1/1/macaddr", mac);
         break;
     case MODEL_WNDR3400:
+    case MODEL_WNDR3400v2:
         dirty |= check_nv("vlan2hwname", "et0");
         strcpy(mac, nvram_safe_get("et0macaddr"));
         // inc_mac(mac, 2);
         dirty |= check_nv("sb/1/macaddr", mac);
         inc_mac(mac, -1);
-        dirty |= check_nv("pci/1/1/macaddr", mac);
+        if (model == MODEL_WNDR3400)
+	        dirty |= check_nv("pci/1/1/macaddr", mac);
+	    else
+	        dirty |= check_nv("wl1_hwaddr", mac);	    
 		// Have to check wl ifname(s) ... if not set before eth config, 5 GHz radio does not come up properly
         //dirty |= check_nv("wl0_ifname", "eth1");
         dirty |= check_nv("wl1_ifname", "eth2");        
@@ -2359,6 +2364,24 @@ static int init_nvram(void)
 		}
 
 		break;
+
+    case MODEL_WNDR3400v2:
+        mfr = "Netgear";
+        name = "WNDR3400v2";
+        features = SUP_SES | SUP_80211N;
+        // Don't auto-start blink, as shift register causes other LED's to blink slightly because of this.
+        // Rather, turn on in startup script if desired ... so disable the line below.
+        // nvram_set("blink_wl", "1");
+#ifdef TCONFIG_USB
+        nvram_set("usb_uhci", "-1");
+#endif
+        if (!nvram_match("t_fix1", (char *)name)) {
+                nvram_set("lan_ifnames", "vlan1 eth1 eth2");
+                nvram_set("wan_ifnameX", "vlan2");
+                nvram_set("wl_ifname", "eth1");
+        }
+		break;
+		
 #endif	// CONFIG_BCMWL5
 
 	case MODEL_WL330GE:
