@@ -1628,6 +1628,8 @@ static int nv_wl_bwcap_chanspec(int idx, int unit, int subunit, void *param){
 	char		*ch,*nbw_cap,*nctrlsb;
 	int 		write = *((int *)param);
 	ch	= webcgi_get(wl_nvname("channel",unit,0));
+	if(ch && atoi(ch) < 15) //do nothing @2.4g channels
+		return 1;
 	nbw_cap = webcgi_get(wl_nvname("nbw_cap",unit,0));
 	nctrlsb = webcgi_get(wl_nvname("nctrlsb",unit,0));
 	if(!ch && !nbw_cap && !nctrlsb)
