@@ -533,6 +533,9 @@ extern void reset_nocat();
 extern void start_tomatoanon(); 
 extern void stop_tomatoanon(); 
 
+// remote_leases.c
+extern int remote_leases_main(int argc, char *argv[]);
+
 #endif
 
 

@@ -16,7 +16,7 @@ OBJS += listen.o redial.o led.o qos.o forward.o misc.o mtd.o
 OBJS += buttons.o restrict.o gpio.o sched.o
 OBJS += new_qoslimit.o arpbind.o
 OBJS += tomatoanon.o
-OBJS += blink.o
+OBJS += blink.o remote_leases.o
 
 ifeq ($(CONFIG_BCMWL6),y)
 OBJS += blink_5g.o
@@ -97,6 +97,7 @@ install: all
 	@cd $(INSTALLDIR)/sbin && ln -sf rc service
 	@cd $(INSTALLDIR)/sbin && ln -sf rc buttons
 	@cd $(INSTALLDIR)/sbin && ln -sf rc blink
+	@cd $(INSTALLDIR)/sbin && ln -sf rc remote-leases
 ifeq ($(CONFIG_BCMWL6),y)
 	@cd $(INSTALLDIR)/sbin && ln -sf rc blink_5g
 endif

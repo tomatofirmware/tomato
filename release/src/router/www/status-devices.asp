@@ -237,6 +237,8 @@ dg.populate = function()
 		e.ifname = a[0];
 		e.unit = a[6] * 1;
 		e.rssi = a[2];
+		e.ip = a[7];
+		e.name = a[8];
 
 		if ((a[3] > 1000) || (a[4] > 1000))
 			e.txrx = ((a[3] > 1000) ? Math.round(a[3] / 1000) : '-') + ' / ' + ((a[4] > 1000) ? Math.round(a[4] / 1000) : '-'); //+ '<br><small>Mbps</small>';
@@ -247,6 +249,7 @@ dg.populate = function()
 
 		if ((e = get(a[1], a[0])) != null) {
 			if (e.ifname == '') e.ifname = a[2];
+			e.name = a[3];
 		}
 	}
 
