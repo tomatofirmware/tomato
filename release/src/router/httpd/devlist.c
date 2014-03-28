@@ -36,13 +36,7 @@ int shellcmd(char * cmdstr, char * cmdoutput, int lenoutput)
 		cmdoutput[strlen(cmdoutput)-1] = 0;
 	
 	// And close pipe
-	if (pclose(mypipe) == -1) {
-		syslog(LOG_ERR, "shellcmd: Failed to close command stream. Command = %s\n", cmdstr);
-		return FALSE;
-	}
-
-	// Got to this point, so confirm valid execution
-	return TRUE;
+	return(pclose(mypipe));
 }
 
 void asp_arplist(int argc, char **argv)

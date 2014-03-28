@@ -151,6 +151,10 @@ ifeq ($(TCONFIG_OPENVPN),y)
 	@chmod 0755 $(INSTALLDIR)/rom/openvpn/updown.sh
 endif
 
+	@mkdir -p $(INSTALLDIR)/usr/sbin
+	@cp pidcheck.sh $(INSTALLDIR)/usr/sbin/pidcheck.sh
+	@chmod 0755 $(INSTALLDIR)/usr/sbin/pidcheck.sh
+
 clean:
 	rm -f rc *.o .*.depend
 

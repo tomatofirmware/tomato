@@ -59,7 +59,7 @@ int oper_check(char *server, char *filename, char *user, char *password, int mul
 	newstat = atol(cmdresult);
 
 	// And close pipe
-	if (pclose(mypipe) != (int)NULL) {
+	if (pclose(mypipe) == (int)-1) {
 		fprintf(stderr,"%s: Failed to close command stream.\n", operation);
 		return FALSE;
 	}
