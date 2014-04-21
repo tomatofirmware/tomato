@@ -2,7 +2,7 @@
    +----------------------------------------------------------------------+
    | PHP Version 5                                                        |
    +----------------------------------------------------------------------+
-   | Copyright (c) 1997-2013 The PHP Group                                |
+   | Copyright (c) 1997-2014 The PHP Group                                |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
@@ -468,11 +468,6 @@ fprintf(stderr, "stream_free: %s:%p[%s] preserve_handle=%d release_cast=%d remov
 		 * In any case, let's always completely delete it from the resource list,
 		 * not only when PHP_STREAM_FREE_RELEASE_STREAM is set */
 		while (zend_list_delete(stream->rsrc_id) == SUCCESS) {}
-	}
-
-	/* Remove stream from any context link list */
-	if (context && context->links) {
-		php_stream_context_del_link(context, stream);
 	}
 
 	if (close_options & PHP_STREAM_FREE_CALL_DTOR) {
@@ -1494,7 +1489,7 @@ PHPAPI int _php_stream_copy_to_stream_ex(php_stream *src, php_stream *dest, size
 	char buf[CHUNK_SIZE];
 	size_t readchunk;
 	size_t haveread = 0;
-	size_t didread;
+	size_t didread, didwrite, towrite;
 	size_t dummy;
 	php_stream_statbuf ssbuf;
 
@@ -1529,16 +1524,16 @@ PHPAPI int _php_stream_copy_to_stream_ex(php_stream *src, php_stream *dest, size
 		p = php_stream_mmap_range(src, php_stream_tell(src), maxlen, PHP_STREAM_MAP_MODE_SHARED_READONLY, &mapped);
 
 		if (p) {
-			mapped = php_stream_write(dest, p, mapped);
+			didwrite = php_stream_write(dest, p, mapped);
 
 			php_stream_mmap_unmap_ex(src, mapped);
 
-			*len = mapped;
+			*len = didwrite;
 
-			/* we've got at least 1 byte to read.
-			 * less than 1 is an error */
-
-			if (mapped > 0) {
+			/* we've got at least 1 byte to read
+			 * less than 1 is an error
+			 * AND read bytes match written */
+			if (mapped > 0 && mapped == didwrite) {
 				return SUCCESS;
 			}
 			return FAILURE;
@@ -1556,7 +1551,6 @@ PHPAPI int _php_stream_copy_to_stream_ex(php_stream *src, php_stream *dest, size
 
 		if (didread) {
 			/* extra paranoid */
-			size_t didwrite, towrite;
 			char *writeptr;
 
 			towrite = didread;
@@ -2188,10 +2182,6 @@ PHPAPI void php_stream_context_free(php_stream_context *context)
 		php_stream_notification_free(context->notifier);
 		context->notifier = NULL;
 	}
-	if (context->links) {
-		zval_ptr_dtor(&context->links);
-		context->links = NULL;
-	}
 	efree(context);
 }
 
@@ -2254,66 +2244,6 @@ PHPAPI int php_stream_context_set_option(php_stream_context *context,
 	}
 	return zend_hash_update(Z_ARRVAL_PP(wrapperhash), (char*)optionname, strlen(optionname)+1, (void**)&copied_val, sizeof(zval *), NULL);
 }
-
-PHPAPI int php_stream_context_get_link(php_stream_context *context,
-        const char *hostent, php_stream **stream)
-{
-	php_stream **pstream;
-
-	if (!stream || !hostent || !context || !(context->links)) {
-		return FAILURE;
-	}
-	if (SUCCESS == zend_hash_find(Z_ARRVAL_P(context->links), (char*)hostent, strlen(hostent)+1, (void**)&pstream)) {
-		*stream = *pstream;
-		return SUCCESS;
-	}
-	return FAILURE;
-}
-
-PHPAPI int php_stream_context_set_link(php_stream_context *context,
-        const char *hostent, php_stream *stream)
-{
-	if (!context) {
-		return FAILURE;
-	}
-	if (!context->links) {
-		ALLOC_INIT_ZVAL(context->links);
-		array_init(context->links);
-	}
-	if (!stream) {
-		/* Delete any entry for <hostent> */
-		return zend_hash_del(Z_ARRVAL_P(context->links), (char*)hostent, strlen(hostent)+1);
-	}
-	return zend_hash_update(Z_ARRVAL_P(context->links), (char*)hostent, strlen(hostent)+1, (void**)&stream, sizeof(php_stream *), NULL);
-}
-
-PHPAPI int php_stream_context_del_link(php_stream_context *context,
-        php_stream *stream)
-{
-	php_stream **pstream;
-	char *hostent;
-	int ret = SUCCESS;
-
-	if (!context || !context->links || !stream) {
-		return FAILURE;
-	}
-
-	for(zend_hash_internal_pointer_reset(Z_ARRVAL_P(context->links));
-		SUCCESS == zend_hash_get_current_data(Z_ARRVAL_P(context->links), (void**)&pstream);
-		zend_hash_move_forward(Z_ARRVAL_P(context->links))) {
-		if (*pstream == stream) {
-			if (SUCCESS == zend_hash_get_current_key(Z_ARRVAL_P(context->links), &hostent, NULL, 0)) {
-				if (FAILURE == zend_hash_del(Z_ARRVAL_P(context->links), (char*)hostent, strlen(hostent)+1)) {
-					ret = FAILURE;
-				}
-			} else {
-				ret = FAILURE;
-			}
-		}
-	}
-
-	return ret;
-}
 /* }}} */
 
 /* {{{ php_stream_dirent_alphasort
@@ -2359,6 +2289,7 @@ PHPAPI int _php_stream_scandir(char *dirname, char **namelist[], int flags, php_
 			} else {
 				if(vector_size*2 < vector_size) {
 					/* overflow */
+					php_stream_closedir(stream);
 					efree(vector);
 					return FAILURE;
 				}
@@ -2372,6 +2303,7 @@ PHPAPI int _php_stream_scandir(char *dirname, char **namelist[], int flags, php_
 		nfiles++;
 		if(vector_size < 10 || nfiles == 0) {
 			/* overflow */
+			php_stream_closedir(stream);
 			efree(vector);
 			return FAILURE;
 		}
@@ -2380,7 +2312,7 @@ PHPAPI int _php_stream_scandir(char *dirname, char **namelist[], int flags, php_
 
 	*namelist = vector;
 
-	if (compare) {
+	if (nfiles > 0 && compare) {
 		qsort(*namelist, nfiles, sizeof(char *), (int(*)(const void *, const void *))compare);
 	}
 	return nfiles;

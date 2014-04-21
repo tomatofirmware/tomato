@@ -2,7 +2,7 @@
    +----------------------------------------------------------------------+
    | PHP Version 5                                                        |
    +----------------------------------------------------------------------+
-   | Copyright (c) 1997-2013 The PHP Group                                |
+   | Copyright (c) 1997-2014 The PHP Group                                |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
@@ -1050,6 +1050,10 @@ PHPAPI char *php_pcre_replace_impl(pcre_cache_entry *pce, char *subject, int sub
 		replace = Z_STRVAL_P(replace_val);
 		replace_len = Z_STRLEN_P(replace_val);
 		replace_end = replace + replace_len;
+	}
+
+	if (eval) {
+		php_error_docref(NULL TSRMLS_CC, E_DEPRECATED, "The /e modifier is deprecated, use preg_replace_callback instead");
 	}
 
 	/* Calculate the size of the offsets array, and allocate memory for it. */

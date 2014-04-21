@@ -2,7 +2,7 @@
   +----------------------------------------------------------------------+
   | PHP Version 5                                                        |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2006-2013 The PHP Group                                |
+  | Copyright (c) 2006-2014 The PHP Group                                |
   +----------------------------------------------------------------------+
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
@@ -307,6 +307,7 @@ mysqlnd_stmt_read_prepare_response(MYSQLND_STMT * s TSRMLS_DC)
 	stmt->warning_count = stmt->conn->upsert_status->warning_count = prepare_resp->warning_count;
 	stmt->field_count = stmt->conn->field_count = prepare_resp->field_count;
 	stmt->param_count = prepare_resp->param_count;
+	stmt->upsert_status->affected_rows = 0; /* be like libmysql */
 done:
 	PACKET_FREE(prepare_resp);
 
@@ -485,6 +486,7 @@ mysqlnd_stmt_execute_parse_response(MYSQLND_STMT * const s TSRMLS_DC)
 	ret = mysqlnd_query_read_result_set_header(stmt->conn, s TSRMLS_CC);
 	if (ret == FAIL) {
 		COPY_CLIENT_ERROR(*stmt->error_info, *conn->error_info);
+		memset(stmt->upsert_status, 0, sizeof(*stmt->upsert_status));
 		stmt->upsert_status->affected_rows = conn->upsert_status->affected_rows;
 		if (CONN_GET_STATE(conn) == CONN_QUIT_SENT) {
 			/* close the statement here, the connection has been closed */
@@ -734,7 +736,6 @@ mysqlnd_stmt_fetch_row_buffered(MYSQLND_RES *result, void *param, unsigned int f
 												current_row,
 												meta->field_count,
 												meta->fields,
-												result->conn->options->numeric_and_datetime_as_unicode,
 												result->conn->options->int_and_float_native,
 												result->conn->stats TSRMLS_CC);
 				if (PASS != rc) {
@@ -853,7 +854,6 @@ mysqlnd_stmt_fetch_row_unbuffered(MYSQLND_RES *result, void *param, unsigned int
 									result->unbuf->last_row_data,
 									row_packet->field_count,
 									row_packet->fields_metadata,
-									result->conn->options->numeric_and_datetime_as_unicode,
 									result->conn->options->int_and_float_native,
 									result->conn->stats TSRMLS_CC))
 			{
@@ -871,14 +871,7 @@ mysqlnd_stmt_fetch_row_unbuffered(MYSQLND_RES *result, void *param, unsigned int
 					zval_dtor(stmt->result_bind[i].zv);
 #endif
 					if (IS_NULL != (Z_TYPE_P(stmt->result_bind[i].zv) = Z_TYPE_P(data)) ) {
-						if (
-							(Z_TYPE_P(data) == IS_STRING
-#if MYSQLND_UNICODE
-							|| Z_TYPE_P(data) == IS_UNICODE
-#endif
-							)
-							 && (result->meta->fields[i].max_length < (unsigned long) Z_STRLEN_P(data)))
-						{
+						if ((Z_TYPE_P(data) == IS_STRING) && (result->meta->fields[i].max_length < (unsigned long) Z_STRLEN_P(data))) {
 							result->meta->fields[i].max_length = Z_STRLEN_P(data);
 						}
 						stmt->result_bind[i].zv->value = data->value;
@@ -913,6 +906,7 @@ mysqlnd_stmt_fetch_row_unbuffered(MYSQLND_RES *result, void *param, unsigned int
 		DBG_INF("EOF");
 		/* Mark the connection as usable again */
 		result->unbuf->eof_reached = TRUE;
+		memset(result->conn->upsert_status, 0, sizeof(*result->conn->upsert_status));
 		result->conn->upsert_status->warning_count = row_packet->warning_count;
 		result->conn->upsert_status->server_status = row_packet->server_status;
 		/*
@@ -1022,6 +1016,7 @@ mysqlnd_fetch_stmt_row_cursor(MYSQLND_RES *result, void *param, unsigned int fla
 
 	row_packet->skip_extraction = stmt->result_bind? FALSE:TRUE;
 
+	memset(stmt->upsert_status, 0, sizeof(*stmt->upsert_status));
 	if (PASS == (ret = PACKET_READ(row_packet, result->conn)) && !row_packet->eof) {
 		unsigned int i, field_count = result->field_count;
 
@@ -1037,7 +1032,6 @@ mysqlnd_fetch_stmt_row_cursor(MYSQLND_RES *result, void *param, unsigned int fla
 									  result->unbuf->last_row_data,
 									  row_packet->field_count,
 									  row_packet->fields_metadata,
-									  result->conn->options->numeric_and_datetime_as_unicode,
 									  result->conn->options->int_and_float_native,
 									  result->conn->stats TSRMLS_CC))
 			{
@@ -1058,13 +1052,7 @@ mysqlnd_fetch_stmt_row_cursor(MYSQLND_RES *result, void *param, unsigned int fla
 					DBG_INF_FMT("i=%u bound_var=%p type=%u refc=%u", i, stmt->result_bind[i].zv,
 								Z_TYPE_P(data), Z_REFCOUNT_P(stmt->result_bind[i].zv));
 					if (IS_NULL != (Z_TYPE_P(stmt->result_bind[i].zv) = Z_TYPE_P(data))) {
-						if ((Z_TYPE_P(data) == IS_STRING
-#if MYSQLND_UNICODE
-							|| Z_TYPE_P(data) == IS_UNICODE
-#endif
-							)
-							 && (result->meta->fields[i].max_length < (unsigned long) Z_STRLEN_P(data)))
-						{
+						if ((Z_TYPE_P(data) == IS_STRING) && (result->meta->fields[i].max_length < (unsigned long) Z_STRLEN_P(data))) {
 							result->meta->fields[i].max_length = Z_STRLEN_P(data);
 						}
 						stmt->result_bind[i].zv->value = data->value;

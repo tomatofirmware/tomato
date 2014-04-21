@@ -2,7 +2,7 @@
   +----------------------------------------------------------------------+
   | PHP Version 5                                                        |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2006-2013 The PHP Group                                |
+  | Copyright (c) 2006-2014 The PHP Group                                |
   +----------------------------------------------------------------------+
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
@@ -55,7 +55,6 @@ MYSQLND_METHOD(mysqlnd_res, initialize_result_set_rest)(MYSQLND_RES * const resu
 									data_cursor,
 									result->meta->field_count,
 									result->meta->fields,
-									result->conn->options->numeric_and_datetime_as_unicode,
 									result->conn->options->int_and_float_native,
 									result->conn->stats TSRMLS_CC);
 			if (rc != PASS) {
@@ -106,16 +105,6 @@ mysqlnd_rset_zval_ptr_dtor(zval **zv, enum_mysqlnd_res_type type, zend_bool * co
 		/*
 		  Not a prepared statement, then we have to
 		  call copy_ctor and then zval_ptr_dtor()
-
-		  In Unicode mode the destruction  of the zvals should not call
-		  zval_copy_ctor() because then we will leak.
-		  I suppose we can use UG(unicode) in mysqlnd.c when freeing a result set
-		  to check if we need to call copy_ctor().
-
-		  If the type is IS_UNICODE, which can happen with PHP6, then we don't
-		  need to copy_ctor, as the data doesn't point to our internal buffers.
-		  If it's string (in PHP5 always) and in PHP6 if data is binary, then
-		  it still points to internal buffers and has to be copied.
 		*/
 		if (Z_TYPE_PP(zv) == IS_STRING) {
 			zval_copy_ctor(*zv);
@@ -198,9 +187,11 @@ MYSQLND_METHOD(mysqlnd_res, free_buffered_data)(MYSQLND_RES * result TSRMLS_DC)
 	if (set->data) {
 		unsigned int copy_on_write_performed = 0;
 		unsigned int copy_on_write_saved = 0;
+		zval **data = set->data;
+		set->data = NULL; /* prevent double free if following loop is interrupted */
 
 		for (row = set->row_count - 1; row >= 0; row--) {
-			zval **current_row = set->data + row * field_count;
+			zval **current_row = data + row * field_count;
 			MYSQLND_MEMORY_POOL_CHUNK *current_buffer = set->row_buffers[row];
 			int64_t col;
 
@@ -222,8 +213,7 @@ MYSQLND_METHOD(mysqlnd_res, free_buffered_data)(MYSQLND_RES * result TSRMLS_DC)
 
 		MYSQLND_INC_GLOBAL_STATISTIC_W_VALUE2(STAT_COPY_ON_WRITE_PERFORMED, copy_on_write_performed,
 											  STAT_COPY_ON_WRITE_SAVED, copy_on_write_saved);
-		mnd_efree(set->data);
-		set->data = NULL;
+		mnd_efree(data);
 	}
 
 	if (set->row_buffers) {
@@ -426,6 +416,7 @@ mysqlnd_query_read_result_set_header(MYSQLND_CONN_DATA * conn, MYSQLND_STMT * s 
 				DBG_INF("UPSERT");
 				conn->last_query_type = QUERY_UPSERT;
 				conn->field_count = rset_header->field_count;
+				memset(conn->upsert_status, 0, sizeof(*conn->upsert_status));
 				conn->upsert_status->warning_count = rset_header->warning_count;
 				conn->upsert_status->server_status = rset_header->server_status;
 				conn->upsert_status->affected_rows = rset_header->affected_rows;
@@ -497,7 +488,7 @@ mysqlnd_query_read_result_set_header(MYSQLND_CONN_DATA * conn, MYSQLND_STMT * s 
 						mnd_efree(conn->current_result);
 						conn->current_result = NULL;
 					}
-					DBG_ERR("Error ocurred while reading metadata");
+					DBG_ERR("Error occurred while reading metadata");
 					break;
 				}
 
@@ -509,7 +500,7 @@ mysqlnd_query_read_result_set_header(MYSQLND_CONN_DATA * conn, MYSQLND_STMT * s 
 					break;
 				}
 				if (FAIL == (ret = PACKET_READ(fields_eof, conn))) {
-					DBG_ERR("Error ocurred while reading the EOF packet");
+					DBG_ERR("Error occurred while reading the EOF packet");
 					result->m.free_result_contents(result TSRMLS_CC);
 					mnd_efree(result);
 					if (!stmt) {
@@ -669,7 +660,6 @@ mysqlnd_fetch_row_unbuffered_c(MYSQLND_RES * result TSRMLS_DC)
 										  result->unbuf->last_row_data,
 										  row_packet->field_count,
 										  row_packet->fields_metadata,
-										  result->conn->options->numeric_and_datetime_as_unicode,
 										  result->conn->options->int_and_float_native,
 										  result->conn->stats TSRMLS_CC);
 			if (PASS != rc) {
@@ -714,6 +704,7 @@ mysqlnd_fetch_row_unbuffered_c(MYSQLND_RES * result TSRMLS_DC)
 		/* Mark the connection as usable again */
 		DBG_INF_FMT("warnings=%u server_status=%u", row_packet->warning_count, row_packet->server_status);
 		result->unbuf->eof_reached = TRUE;
+		memset(result->conn->upsert_status, 0, sizeof(*result->conn->upsert_status));
 		result->conn->upsert_status->warning_count = row_packet->warning_count;
 		result->conn->upsert_status->server_status = row_packet->server_status;
 		/*
@@ -784,7 +775,6 @@ mysqlnd_fetch_row_unbuffered(MYSQLND_RES * result, void *param, unsigned int fla
 											result->unbuf->last_row_data,
 											field_count,
 											row_packet->fields_metadata,
-											result->conn->options->numeric_and_datetime_as_unicode,
 											result->conn->options->int_and_float_native,
 											result->conn->stats TSRMLS_CC);
 			if (PASS != rc) {
@@ -812,19 +802,11 @@ mysqlnd_fetch_row_unbuffered(MYSQLND_RES * result, void *param, unsigned int fla
 					*/
 					Z_ADDREF_P(data);
 					if (hash_key->is_numeric == FALSE) {
-#if MYSQLND_UNICODE
-						zend_u_hash_quick_update(Z_ARRVAL_P(row), IS_UNICODE,
-												 hash_key->ustr,
-												 hash_key->ulen + 1,
-												 hash_key->key,
-												 (void *) &data, sizeof(zval *), NULL);
-#else
 						zend_hash_quick_update(Z_ARRVAL_P(row),
 											   field->name,
 											   field->name_length + 1,
 											   hash_key->key,
 											   (void *) &data, sizeof(zval *), NULL);
-#endif
 					} else {
 						zend_hash_index_update(Z_ARRVAL_P(row),
 											   hash_key->key,
@@ -849,6 +831,7 @@ mysqlnd_fetch_row_unbuffered(MYSQLND_RES * result, void *param, unsigned int fla
 		/* Mark the connection as usable again */
 		DBG_INF_FMT("warnings=%u server_status=%u", row_packet->warning_count, row_packet->server_status);
 		result->unbuf->eof_reached = TRUE;
+		memset(result->conn->upsert_status, 0, sizeof(*result->conn->upsert_status));
 		result->conn->upsert_status->warning_count = row_packet->warning_count;
 		result->conn->upsert_status->server_status = row_packet->server_status;
 		/*
@@ -950,7 +933,6 @@ mysqlnd_fetch_row_buffered_c(MYSQLND_RES * result TSRMLS_DC)
 											current_row,
 											result->meta->field_count,
 											result->meta->fields,
-											result->conn->options->numeric_and_datetime_as_unicode,
 											result->conn->options->int_and_float_native,
 											result->conn->stats TSRMLS_CC);
 			if (rc != PASS) {
@@ -1023,7 +1005,6 @@ mysqlnd_fetch_row_buffered(MYSQLND_RES * result, void *param, unsigned int flags
 											current_row,
 											result->meta->field_count,
 											result->meta->fields,
-											result->conn->options->numeric_and_datetime_as_unicode,
 											result->conn->options->int_and_float_native,
 											result->conn->stats TSRMLS_CC);
 			if (rc != PASS) {
@@ -1062,19 +1043,11 @@ mysqlnd_fetch_row_buffered(MYSQLND_RES * result, void *param, unsigned int flags
 				*/
 				Z_ADDREF_P(data);
 				if (hash_key->is_numeric == FALSE) {
-#if MYSQLND_UNICODE
-					zend_u_hash_quick_update(Z_ARRVAL_P(row), IS_UNICODE,
-											 hash_key->ustr,
-											 hash_key->ulen + 1,
-											 hash_key->key,
-											 (void *) &data, sizeof(zval *), NULL);
-#else
 					zend_hash_quick_update(Z_ARRVAL_P(row),
 										   field->name,
 										   field->name_length + 1,
 										   hash_key->key,
 										   (void *) &data, sizeof(zval *), NULL);
-#endif
 				} else {
 					zend_hash_index_update(Z_ARRVAL_P(row),
 										   hash_key->key,
@@ -1206,6 +1179,7 @@ MYSQLND_METHOD(mysqlnd_res, store_result_fetch_data)(MYSQLND_CONN_DATA * const c
 
 	/* Finally clean */
 	if (row_packet->eof) { 
+		memset(conn->upsert_status, 0, sizeof(*conn->upsert_status));
 		conn->upsert_status->warning_count = row_packet->warning_count;
 		conn->upsert_status->server_status = row_packet->server_status;
 	}
@@ -1510,6 +1484,7 @@ MYSQLND_METHOD(mysqlnd_res, fetch_into)(MYSQLND_RES * result, unsigned int flags
 	mysqlnd_array_init(return_value, mysqlnd_num_fields(result) * 2);
 	if (FAIL == result->m.fetch_row(result, (void *)return_value, flags, &fetched_anything TSRMLS_CC)) {
 		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Error while reading a row");
+		zval_dtor(return_value);
 		RETVAL_FALSE;
 	} else if (fetched_anything == FALSE) {
 		zval_dtor(return_value);

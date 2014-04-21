@@ -2,7 +2,7 @@
    +----------------------------------------------------------------------+
    | PHP Version 5                                                        |
    +----------------------------------------------------------------------+
-   | Copyright (c) 1997-2013 The PHP Group                                |
+   | Copyright (c) 1997-2014 The PHP Group                                |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
@@ -1409,7 +1409,7 @@ static int register_bound_parameter_to_sqlite(struct php_sqlite3_bound_param *pa
 /* }}} */
 
 /* {{{ proto bool SQLite3Stmt::bindParam(int parameter_number, mixed parameter [, int type])
-   Bind Paramater to a stmt variable. */
+   Bind Parameter to a stmt variable. */
 PHP_METHOD(sqlite3stmt, bindParam)
 {
 	php_sqlite3_stmt *stmt_obj;

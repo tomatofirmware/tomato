@@ -2,7 +2,7 @@
    +----------------------------------------------------------------------+
    | PHP Version 5                                                        |
    +----------------------------------------------------------------------+
-   | Copyright (c) 1997-2013 The PHP Group                                |
+   | Copyright (c) 1997-2014 The PHP Group                                |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
@@ -86,7 +86,6 @@
 
 #include "php_content_types.h"
 #include "php_ticks.h"
-#include "php_logos.h"
 #include "php_streams.h"
 #include "php_open_temporary_file.h"
 
@@ -114,6 +113,10 @@
 # endif
 #endif
 /* }}} */
+
+#ifndef S_ISREG
+#define S_ISREG(mode) (((mode) & S_IFMT) == S_IFREG)
+#endif
 
 PHPAPI int (*php_register_internal_extensions_func)(TSRMLS_D) = php_register_internal_extensions;
 
@@ -276,13 +279,14 @@ static void php_binary_init(TSRMLS_D)
 			if ((envpath = getenv("PATH")) != NULL) {
 				char *search_dir, search_path[MAXPATHLEN];
 				char *last = NULL;
+				struct stat s;
 
 				path = estrdup(envpath);
 				search_dir = php_strtok_r(path, ":", &last);
 
 				while (search_dir) {
 					snprintf(search_path, MAXPATHLEN, "%s/%s", search_dir, sapi_module.executable_location);
-					if (VCWD_REALPATH(search_path, binary_location) && !VCWD_ACCESS(binary_location, X_OK)) {
+					if (VCWD_REALPATH(search_path, binary_location) && !VCWD_ACCESS(binary_location, X_OK) && VCWD_STAT(binary_location, &s) == 0 && S_ISREG(s.st_mode)) {
 						found = 1;
 						break;
 					}
@@ -522,6 +526,7 @@ PHP_INI_BEGIN()
 	STD_PHP_INI_ENTRY("default_mimetype",		SAPI_DEFAULT_MIMETYPE,	PHP_INI_ALL,	OnUpdateString,			default_mimetype,		sapi_globals_struct,sapi_globals)
 	STD_PHP_INI_ENTRY("error_log",				NULL,		PHP_INI_ALL,		OnUpdateErrorLog,			error_log,				php_core_globals,	core_globals)
 	STD_PHP_INI_ENTRY("extension_dir",			PHP_EXTENSION_DIR,		PHP_INI_SYSTEM,		OnUpdateStringUnempty,	extension_dir,			php_core_globals,	core_globals)
+	STD_PHP_INI_ENTRY("sys_temp_dir",			NULL,		PHP_INI_SYSTEM,		OnUpdateStringUnempty,	sys_temp_dir,			php_core_globals,	core_globals)
 	STD_PHP_INI_ENTRY("include_path",			PHP_INCLUDE_PATH,		PHP_INI_ALL,		OnUpdateStringUnempty,	include_path,			php_core_globals,	core_globals)
 	PHP_INI_ENTRY("max_execution_time",			"30",		PHP_INI_ALL,			OnUpdateTimeout)
 	STD_PHP_INI_ENTRY("open_basedir",			NULL,		PHP_INI_ALL,		OnUpdateBaseDir,			open_basedir,			php_core_globals,	core_globals)
@@ -552,7 +557,7 @@ PHP_INI_BEGIN()
 	PHP_INI_ENTRY("mail.force_extra_parameters",NULL,		PHP_INI_SYSTEM|PHP_INI_PERDIR,		OnChangeMailForceExtra)
 	PHP_INI_ENTRY("disable_functions",			"",			PHP_INI_SYSTEM,		NULL)
 	PHP_INI_ENTRY("disable_classes",			"",			PHP_INI_SYSTEM,		NULL)
-	PHP_INI_ENTRY("max_file_uploads",			"20",		PHP_INI_SYSTEM|PHP_INI_PERDIR,		NULL)
+	PHP_INI_ENTRY("max_file_uploads",			"20",			PHP_INI_SYSTEM|PHP_INI_PERDIR,		NULL)
 
 	STD_PHP_INI_BOOLEAN("allow_url_fopen",		"1",		PHP_INI_SYSTEM,		OnUpdateBool,		allow_url_fopen,		php_core_globals,		core_globals)
 	STD_PHP_INI_BOOLEAN("allow_url_include",	"0",		PHP_INI_SYSTEM,		OnUpdateBool,		allow_url_include,		php_core_globals,		core_globals)
@@ -784,6 +789,9 @@ PHPAPI void php_verror(const char *docref, const char *params, int type, const c
 	/* no docref given but function is known (the default) */
 	if (!docref && is_function) {
 		int doclen;
+		while (*function == '_') {
+			function++;
+		}
 		if (space[0] == '\0') {
 			doclen = spprintf(&docref_buf, 0, "function.%s", function);
 		} else {
@@ -1523,7 +1531,7 @@ int php_request_startup(TSRMLS_D)
 	int retval = SUCCESS;
 
 #ifdef HAVE_DTRACE
-	DTRACE_REQUEST_STARTUP(SAFE_FILENAME(SG(request_info).path_translated), SAFE_FILENAME(SG(request_info).request_uri), SAFE_FILENAME(SG(request_info).request_method));
+	DTRACE_REQUEST_STARTUP(SAFE_FILENAME(SG(request_info).path_translated), SAFE_FILENAME(SG(request_info).request_uri), (char *)SAFE_FILENAME(SG(request_info).request_method));
 #endif /* HAVE_DTRACE */
 
 #ifdef PHP_WIN32
@@ -1833,7 +1841,7 @@ void php_request_shutdown(void *dummy)
 #endif
 
 #ifdef HAVE_DTRACE
-	DTRACE_REQUEST_SHUTDOWN(SAFE_FILENAME(SG(request_info).path_translated), SAFE_FILENAME(SG(request_info).request_uri), SAFE_FILENAME(SG(request_info).request_method));
+	DTRACE_REQUEST_SHUTDOWN(SAFE_FILENAME(SG(request_info).path_translated), SAFE_FILENAME(SG(request_info).request_uri), (char *)SAFE_FILENAME(SG(request_info).request_method));
 #endif /* HAVE_DTRACE */
 }
 /* }}} */
@@ -1918,6 +1926,23 @@ int php_register_extensions(zend_module_entry **ptr, int count TSRMLS_DC)
 			}
 		}
 		ptr++;
+	}
+	return SUCCESS;
+}
+
+/* A very long time ago php_module_startup() was refactored in a way
+ * which broke calling it with more than one additional module.
+ * This alternative to php_register_extensions() works around that
+ * by walking the shallower structure.
+ *
+ * See algo: https://bugs.php.net/bug.php?id=63159
+ */
+static int php_register_extensions_bc(zend_module_entry *ptr, int count TSRMLS_DC)
+{
+	while (count--) {
+		if (zend_register_internal_module(ptr++ TSRMLS_CC) == NULL) {
+			return FAILURE;
+ 		}
 	}
 	return SUCCESS;
 }
@@ -2070,6 +2095,8 @@ int php_module_startup(sapi_module_struct *sf, zend_module_entry *additional_mod
 	EG(exception_class) = NULL;
 	PG(disable_functions) = NULL;
 	PG(disable_classes) = NULL;
+	EG(exception) = NULL;
+	EG(objects_store).object_buckets = NULL;
 
 #if HAVE_SETLOCALE
 	setlocale(LC_CTYPE, "");
@@ -2176,14 +2203,6 @@ int php_module_startup(sapi_module_struct *sf, zend_module_entry *additional_mod
 		return FAILURE;
 	}
 
-	/* initialize registry for images to be used in phpinfo()
-	   (this uses configuration parameters from php.ini)
-	 */
-	if (php_init_info_logos() == FAILURE) {
-		php_printf("PHP:  Unable to initialize info phpinfo logos.\n");
-		return FAILURE;
-	}
-
 	zuv.html_errors = 1;
 	zuv.import_use_extension = ".php";
 	php_startup_auto_globals(TSRMLS_C);
@@ -2197,7 +2216,7 @@ int php_module_startup(sapi_module_struct *sf, zend_module_entry *additional_mod
 	}
 
 	/* start additional PHP extensions */
-	php_register_extensions(&additional_modules, num_additional_modules TSRMLS_CC);
+	php_register_extensions_bc(additional_modules, num_additional_modules TSRMLS_CC);
 
 	/* load and startup extensions compiled as shared objects (aka DLLs)
 	   as requested by php.ini entries
@@ -2367,7 +2386,6 @@ void php_module_shutdown(TSRMLS_D)
 	/* Destroys filter & transport registries too */
 	php_shutdown_stream_wrappers(module_number TSRMLS_CC);
 
-	php_shutdown_info_logos();
 	UNREGISTER_INI_ENTRIES();
 
 	/* close down the ini config */
@@ -2406,8 +2424,8 @@ PHPAPI int php_execute_script(zend_file_handle *primary_file TSRMLS_DC)
 {
 	zend_file_handle *prepend_file_p, *append_file_p;
 	zend_file_handle prepend_file = {0}, append_file = {0};
-#if HAVE_BROKEN_GETCWD
-	int old_cwd_fd = -1;
+#if HAVE_BROKEN_GETCWD 
+	volatile int old_cwd_fd = -1;
 #else
 	char *old_cwd;
 	ALLOCA_FLAG(use_heap)
@@ -2415,10 +2433,6 @@ PHPAPI int php_execute_script(zend_file_handle *primary_file TSRMLS_DC)
 	int retval = 0;
 
 	EG(exit_status) = 0;
-	if (php_handle_special_queries(TSRMLS_C)) {
-		zend_file_handle_dtor(primary_file TSRMLS_CC);
-		return 0;
-	}
 #ifndef HAVE_BROKEN_GETCWD
 # define OLD_CWD_SIZE 4096
 	old_cwd = do_alloca(OLD_CWD_SIZE, use_heap);

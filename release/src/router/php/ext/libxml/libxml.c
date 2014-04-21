@@ -2,7 +2,7 @@
    +----------------------------------------------------------------------+
    | PHP Version 5                                                        |
    +----------------------------------------------------------------------+
-   | Copyright (c) 1997-2013 The PHP Group                                |
+   | Copyright (c) 1997-2014 The PHP Group                                |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
@@ -44,6 +44,7 @@
 #include <libxml/xmlsave.h>
 #ifdef LIBXML_SCHEMAS_ENABLED
 #include <libxml/relaxng.h>
+#include <libxml/xmlschemas.h>
 #endif
 
 #include "php_libxml.h"
@@ -87,7 +88,7 @@ static PHP_MINIT_FUNCTION(libxml);
 static PHP_RINIT_FUNCTION(libxml);
 static PHP_MSHUTDOWN_FUNCTION(libxml);
 static PHP_MINFO_FUNCTION(libxml);
-static int php_libxml_post_deactivate();
+static int php_libxml_post_deactivate(void);
 
 /* }}} */
 
@@ -798,6 +799,11 @@ static PHP_MINIT_FUNCTION(libxml)
 #endif
 	REGISTER_LONG_CONSTANT("LIBXML_NOEMPTYTAG",	LIBXML_SAVE_NOEMPTYTAG,	CONST_CS | CONST_PERSISTENT);
 
+	/* Schema validation options */
+#if defined(LIBXML_SCHEMAS_ENABLED) && LIBXML_VERSION >= 20614
+	REGISTER_LONG_CONSTANT("LIBXML_SCHEMA_CREATE",	XML_SCHEMA_VAL_VC_I_CREATE,	CONST_CS | CONST_PERSISTENT);
+#endif
+
 	/* Additional constants for use with loading html */
 #if LIBXML_VERSION >= 20707
 	REGISTER_LONG_CONSTANT("LIBXML_HTML_NOIMPLIED",	HTML_PARSE_NOIMPLIED,		CONST_CS | CONST_PERSISTENT);
@@ -869,7 +875,7 @@ static PHP_MSHUTDOWN_FUNCTION(libxml)
 	return SUCCESS;
 }
 
-static int php_libxml_post_deactivate()
+static int php_libxml_post_deactivate(void)
 {
 	TSRMLS_FETCH();
 	/* reset libxml generic error handling */

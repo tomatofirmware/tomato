@@ -41,7 +41,7 @@ zend_module_entry extname_module_entry = {
 	PHP_RSHUTDOWN(extname),	/* Replace with NULL if there's nothing to do at request end */
 	PHP_MINFO(extname),
 #if ZEND_MODULE_API_NO >= 20010901
-	"0.1", /* Replace with version number for your extension */
+	PHP_EXTNAME_VERSION,
 #endif
 	STANDARD_MODULE_PROPERTIES
 };
@@ -127,7 +127,7 @@ PHP_MINFO_FUNCTION(extname)
 /* }}} */
 
 
-/* Remove the following function when you have succesfully modified config.m4
+/* Remove the following function when you have successfully modified config.m4
    so that your module can be compiled into PHP, it exists only for testing
    purposes. */
 

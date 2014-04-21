@@ -2,7 +2,7 @@
   +----------------------------------------------------------------------+
   | PHP Version 5                                                        |
   +----------------------------------------------------------------------+
-  | Copyright (c) 1997-2013 The PHP Group                                |
+  | Copyright (c) 1997-2014 The PHP Group                                |
   +----------------------------------------------------------------------+
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
@@ -761,8 +761,11 @@ static char *type_to_name_native(int type) /* {{{ */
     switch (type) {
         PDO_MYSQL_NATIVE_TYPE_NAME(STRING)
         PDO_MYSQL_NATIVE_TYPE_NAME(VAR_STRING)
-#ifdef MYSQL_HAS_TINY
+#ifdef FIELD_TYPE_TINY
         PDO_MYSQL_NATIVE_TYPE_NAME(TINY)
+#endif
+#ifdef FIELD_TYPE_BIT
+        PDO_MYSQL_NATIVE_TYPE_NAME(BIT)
 #endif
         PDO_MYSQL_NATIVE_TYPE_NAME(SHORT)
         PDO_MYSQL_NATIVE_TYPE_NAME(LONG)
@@ -778,7 +781,7 @@ static char *type_to_name_native(int type) /* {{{ */
         PDO_MYSQL_NATIVE_TYPE_NAME(GEOMETRY)
 #endif
         PDO_MYSQL_NATIVE_TYPE_NAME(TIMESTAMP)
-#ifdef MYSQL_HAS_YEAR
+#ifdef FIELD_TYPE_YEAR
         PDO_MYSQL_NATIVE_TYPE_NAME(YEAR)
 #endif
         PDO_MYSQL_NATIVE_TYPE_NAME(SET)

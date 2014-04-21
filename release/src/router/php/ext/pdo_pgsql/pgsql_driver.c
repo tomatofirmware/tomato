@@ -2,7 +2,7 @@
   +----------------------------------------------------------------------+
   | PHP Version 5                                                        |
   +----------------------------------------------------------------------+
-  | Copyright (c) 1997-2013 The PHP Group                                |
+  | Copyright (c) 1997-2014 The PHP Group                                |
   +----------------------------------------------------------------------+
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
@@ -76,7 +76,7 @@ int _pdo_pgsql_error(pdo_dbh_t *dbh, pdo_stmt_t *stmt, int errcode, const char *
 		einfo->errmsg = NULL;
 	}
 
-	if (sqlstate == NULL) {
+	if (sqlstate == NULL || strlen(sqlstate) >= sizeof(pdo_error_type)) {
 		strcpy(*pdo_err, "HY000");
 	}
 	else {
@@ -315,9 +315,9 @@ static int pgsql_handle_quoter(pdo_dbh_t *dbh, const char *unquoted, int unquote
 		case PDO_PARAM_LOB:
 			/* escapedlen returned by PQescapeBytea() accounts for trailing 0 */
 #ifdef HAVE_PQESCAPE_BYTEA_CONN
-			escaped = PQescapeByteaConn(H->server, unquoted, unquotedlen, &tmp_len);
+			escaped = PQescapeByteaConn(H->server, (unsigned char *)unquoted, (size_t)unquotedlen, &tmp_len);
 #else
-			escaped = PQescapeBytea(unquoted, unquotedlen, &tmp_len);
+			escaped = PQescapeBytea((unsigned char *)unquoted, (size_t)unquotedlen, &tmp_len);
 #endif
 			*quotedlen = (int)tmp_len + 1;
 			*quoted = emalloc(*quotedlen + 1);
@@ -331,9 +331,9 @@ static int pgsql_handle_quoter(pdo_dbh_t *dbh, const char *unquoted, int unquote
 			*quoted = safe_emalloc(2, unquotedlen, 3);
 			(*quoted)[0] = '\'';
 #ifndef HAVE_PQESCAPE_CONN
-			*quotedlen = PQescapeString(*quoted + 1, unquoted, unquotedlen);
+			*quotedlen = PQescapeString(*quoted + 1, unquoted, (size_t)unquotedlen);
 #else
-			*quotedlen = PQescapeStringConn(H->server, *quoted + 1, unquoted, unquotedlen, NULL);
+			*quotedlen = PQescapeStringConn(H->server, *quoted + 1, unquoted, (size_t)unquotedlen, NULL);
 #endif
 			(*quoted)[*quotedlen + 1] = '\'';
 			(*quoted)[*quotedlen + 2] = '\0';
@@ -1039,6 +1039,7 @@ static int pdo_pgsql_handle_factory(pdo_dbh_t *dbh, zval *driver_options TSRMLS_
 	pdo_pgsql_db_handle *H;
 	int ret = 0;
 	char *conn_str, *p, *e;
+	char *tmp_pass;
 	long connect_timeout = 30;
 
 	H = pecalloc(1, sizeof(pdo_pgsql_db_handle), dbh->is_persistent);
@@ -1060,18 +1061,44 @@ static int pdo_pgsql_handle_factory(pdo_dbh_t *dbh, zval *driver_options TSRMLS_
 		connect_timeout = pdo_attr_lval(driver_options, PDO_ATTR_TIMEOUT, 30 TSRMLS_CC);
 	}
 
+	if (dbh->password) {
+		if (dbh->password[0] != '\'' && dbh->password[strlen(dbh->password) - 1] != '\'') {
+			char *pwd = dbh->password;
+			int pos = 1;
+
+			tmp_pass = safe_emalloc(2, strlen(dbh->password), 3);
+			tmp_pass[0] = '\'';
+
+			while (*pwd != '\0') {
+				if (*pwd == '\\' || *pwd == '\'') {
+					tmp_pass[pos++] = '\\';
+				}
+
+				tmp_pass[pos++] = *pwd++;
+			}
+
+			tmp_pass[pos++] = '\'';
+			tmp_pass[pos] = '\0';
+		} else {
+			tmp_pass = dbh->password;
+		}
+	}
+
 	/* support both full connection string & connection string + login and/or password */
 	if (dbh->username && dbh->password) {
-		spprintf(&conn_str, 0, "%s user=%s password=%s connect_timeout=%ld", dbh->data_source, dbh->username, dbh->password, connect_timeout);
+		spprintf(&conn_str, 0, "%s user=%s password=%s connect_timeout=%ld", dbh->data_source, dbh->username, tmp_pass, connect_timeout);
 	} else if (dbh->username) {
 		spprintf(&conn_str, 0, "%s user=%s connect_timeout=%ld", dbh->data_source, dbh->username, connect_timeout);
 	} else if (dbh->password) {
-		spprintf(&conn_str, 0, "%s password=%s connect_timeout=%ld", dbh->data_source, dbh->password, connect_timeout);
+		spprintf(&conn_str, 0, "%s password=%s connect_timeout=%ld", dbh->data_source, tmp_pass, connect_timeout);
 	} else {
 		spprintf(&conn_str, 0, "%s connect_timeout=%ld", (char *) dbh->data_source, connect_timeout);
 	}
 
 	H->server = PQconnectdb(conn_str);
+	if (dbh->password && tmp_pass != dbh->password) {
+		efree(tmp_pass);
+	}
 
 	efree(conn_str);
 

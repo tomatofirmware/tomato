@@ -2,7 +2,7 @@
    +----------------------------------------------------------------------+
    | Zend Engine                                                          |
    +----------------------------------------------------------------------+
-   | Copyright (c) 1998-2013 Zend Technologies Ltd. (http://www.zend.com) |
+   | Copyright (c) 1998-2014 Zend Technologies Ltd. (http://www.zend.com) |
    +----------------------------------------------------------------------+
    | This source file is subject to version 2.00 of the Zend license,     |
    | that is bundled with this package in the file LICENSE, and is        |
@@ -363,9 +363,10 @@ ZEND_API int zend_check_property_access(zend_object *zobj, const char *prop_info
 	zend_property_info *property_info;
 	const char *class_name, *prop_name;
 	zval member;
+	int prop_name_len;
 
-	zend_unmangle_property_name(prop_info_name, prop_info_name_len, &class_name, &prop_name);
-	ZVAL_STRING(&member, prop_name, 0);
+	zend_unmangle_property_name_ex(prop_info_name, prop_info_name_len, &class_name, &prop_name, &prop_name_len);
+	ZVAL_STRINGL(&member, prop_name, prop_name_len, 0);
 	property_info = zend_get_property_info_quick(zobj->ce, &member, 1, NULL TSRMLS_CC);
 	if (!property_info) {
 		return FAILURE;
@@ -713,7 +714,7 @@ static int zend_std_has_dimension(zval *object, zval *offset, int check_empty TS
 }
 /* }}} */
 
-static zval **zend_std_get_property_ptr_ptr(zval *object, zval *member, const zend_literal *key TSRMLS_DC) /* {{{ */
+static zval **zend_std_get_property_ptr_ptr(zval *object, zval *member, int type, const zend_literal *key TSRMLS_DC) /* {{{ */
 {
 	zend_object *zobj;
 	zval tmp_member;
@@ -753,7 +754,9 @@ static zval **zend_std_get_property_ptr_ptr(zval *object, zval *member, const ze
 			/* we don't have access controls - will just add it */
 			new_zval = &EG(uninitialized_zval);
 
-/* 			zend_error(E_NOTICE, "Undefined property: %s", Z_STRVAL_P(member)); */
+			if(UNEXPECTED(type == BP_VAR_RW || type == BP_VAR_R)) {
+				zend_error(E_NOTICE, "Undefined property: %s::$%s", zobj->ce->name, Z_STRVAL_P(member));
+			}
 			Z_ADDREF_P(new_zval);
 			if (EXPECTED((property_info->flags & ZEND_ACC_STATIC) == 0) &&
 			    property_info->offset >= 0) {
@@ -1278,6 +1281,14 @@ ZEND_API zval **zend_std_get_static_property(zend_class_entry *ce, const char *p
 		}
 	}
 
+	if (UNEXPECTED(CE_STATIC_MEMBERS(ce) == NULL) ||
+	    UNEXPECTED(CE_STATIC_MEMBERS(ce)[property_info->offset] == NULL)) {
+		if (!silent) {
+			zend_error_noreturn(E_ERROR, "Access to undeclared static property: %s::$%s", ce->name, property_name);
+		}
+		return NULL;
+	}
+	
 	return &CE_STATIC_MEMBERS(ce)[property_info->offset];
 }
 /* }}} */
@@ -1368,10 +1379,6 @@ static int zend_std_compare_objects(zval *o1, zval *o2 TSRMLS_DC) /* {{{ */
 					Z_OBJ_UNPROTECT_RECURSION(o1);
 					Z_OBJ_UNPROTECT_RECURSION(o2);
 					return 1;
-				} else {
-					Z_OBJ_UNPROTECT_RECURSION(o1);
-					Z_OBJ_UNPROTECT_RECURSION(o2);
-					return 0;
 				}
 			}
 		}

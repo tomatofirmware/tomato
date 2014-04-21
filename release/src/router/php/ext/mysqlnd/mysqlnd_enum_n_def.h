@@ -2,7 +2,7 @@
   +----------------------------------------------------------------------+
   | PHP Version 5                                                        |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2006-2013 The PHP Group                                |
+  | Copyright (c) 2006-2014 The PHP Group                                |
   +----------------------------------------------------------------------+
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
@@ -37,11 +37,13 @@
 
 #define MYSQLND_ASSEMBLED_PACKET_MAX_SIZE 3UL*1024UL*1024UL*1024UL
 
+#define MYSQLND_DEFAULT_AUTH_PROTOCOL "mysql_native_password"
+
 #define MYSQLND_ERRMSG_SIZE			512
 #define MYSQLND_SQLSTATE_LENGTH		5
 #define MYSQLND_SQLSTATE_NULL		"00000"
 
-#define MYSQLND_MAX_ALLOWED_USER_LEN	256		/* 64 char * 4byte . MySQL supports now only 16 char, but let it be forward compatible */
+#define MYSQLND_MAX_ALLOWED_USER_LEN	252		/* 63 char * 4byte . MySQL supports now only 16 char, but let it be forward compatible */
 #define MYSQLND_MAX_ALLOWED_DB_LEN		1024	/* 256 char * 4byte. MySQL supports now only 64 char in the tables, but on the FS could be different. Forward compatible. */
 
 #define MYSQLND_NET_CMD_BUFFER_MIN_SIZE			4096
@@ -106,6 +108,18 @@
 
 #define MYSQLND_NET_FLAG_USE_COMPRESSION 1
 
+
+#define TRANS_START_NO_OPT						0
+#define TRANS_START_WITH_CONSISTENT_SNAPSHOT	1
+#define TRANS_START_READ_WRITE					2
+#define TRANS_START_READ_ONLY					4
+
+#define TRANS_COR_NO_OPT		0
+#define TRANS_COR_AND_CHAIN		1
+#define TRANS_COR_AND_NO_CHAIN	2
+#define TRANS_COR_RELEASE		4
+#define TRANS_COR_NO_RELEASE	8
+
 typedef enum mysqlnd_extension
 {
 	MYSQLND_MYSQL = 0,
@@ -166,12 +180,13 @@ typedef enum mysqlnd_option
 	MYSQL_OPT_SSL_VERIFY_SERVER_CERT,
 	MYSQL_PLUGIN_DIR,
 	MYSQL_DEFAULT_AUTH,
+	MYSQL_OPT_CONNECT_ATTR_RESET,
+	MYSQL_OPT_CONNECT_ATTR_ADD,
+	MYSQL_OPT_CONNECT_ATTR_DELETE,
 	MYSQL_SERVER_PUBLIC_KEY,
 	MYSQL_ENABLE_CLEARTEXT_PLUGIN,
 	MYSQL_OPT_CAN_HANDLE_EXPIRED_PASSWORDS,
-#if MYSQLND_UNICODE
-	MYSQLND_OPT_NUMERIC_AND_DATETIME_AS_UNICODE = 200,
-#endif
+	MYSQLND_DEPRECATED_ENUM1 = 200,
 #ifdef MYSQLND_STRING_TO_INT_CONVERSION
 	MYSQLND_OPT_INT_AND_FLOAT_NATIVE = 201,
 #endif
@@ -540,10 +555,16 @@ enum mysqlnd_packet_type
 	PROT_STATS_PACKET,
 	PROT_PREPARE_RESP_PACKET,
 	PROT_CHG_USER_RESP_PACKET,
+	PROT_SHA256_PK_REQUEST_PACKET,
+	PROT_SHA256_PK_REQUEST_RESPONSE_PACKET,
 	PROT_LAST /* should always be last */
 };
 
 
+/*
+  After adding new elements please update
+  `mysqlnd_command_to_text` in mysqlnd_wireprotocol.c
+*/
 enum php_mysqlnd_server_command
 {
 	COM_SLEEP = 0,
@@ -576,6 +597,8 @@ enum php_mysqlnd_server_command
 	COM_SET_OPTION = 27,
 	COM_STMT_FETCH = 28,
 	COM_DAEMON,
+	COM_BINLOG_DUMP_GTID,
+	COM_RESET_CONNECTION,
 	COM_END
 };
 

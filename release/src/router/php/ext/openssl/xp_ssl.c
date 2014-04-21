@@ -2,7 +2,7 @@
   +----------------------------------------------------------------------+
   | PHP Version 5                                                        |
   +----------------------------------------------------------------------+
-  | Copyright (c) 1997-2013 The PHP Group                                |
+  | Copyright (c) 1997-2014 The PHP Group                                |
   +----------------------------------------------------------------------+
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
@@ -274,7 +274,7 @@ static int php_openssl_sockop_close(php_stream *stream, int close_handle TSRMLS_
 			 * Essentially, we are waiting for the socket to become writeable, which means
 			 * that all pending data has been sent.
 			 * We use a small timeout which should encourage the OS to send the data,
-			 * but at the same time avoid hanging indefintely.
+			 * but at the same time avoid hanging indefinitely.
 			 * */
 			do {
 				n = php_pollfd_for_ms(sslsock->s.socket, POLLOUT, 500);
@@ -422,8 +422,8 @@ static inline int php_openssl_setup_crypto(php_stream *stream,
 	if (cparam->inputs.session) {
 		if (cparam->inputs.session->ops != &php_openssl_socket_ops) {
 			php_error_docref(NULL TSRMLS_CC, E_WARNING, "supplied session stream must be an SSL enabled stream");
- 		} else if (((php_openssl_netstream_data_t*)cparam->inputs.session->abstract)->ssl_handle == NULL) {
- 			php_error_docref(NULL TSRMLS_CC, E_WARNING, "supplied SSL session stream is not initialized");
+		} else if (((php_openssl_netstream_data_t*)cparam->inputs.session->abstract)->ssl_handle == NULL) {
+			php_error_docref(NULL TSRMLS_CC, E_WARNING, "supplied SSL session stream is not initialized");
 		} else {
 			SSL_copy_session_id(sslsock->ssl_handle, ((php_openssl_netstream_data_t*)cparam->inputs.session->abstract)->ssl_handle);
 		}
@@ -472,7 +472,7 @@ static inline int php_openssl_enable_crypto(php_stream *stream,
 		
 		do {
 			struct timeval	cur_time,
-							elapsed_time;
+							elapsed_time = {0};
 			
 			if (sslsock->is_client) {
 				n = SSL_connect(sslsock->ssl_handle);
@@ -825,7 +825,7 @@ static int php_openssl_sockop_cast(php_stream *stream, int castas, void **ret TS
 
 		case PHP_STREAM_AS_FD_FOR_SELECT:
 			if (ret) {
-				*(int *)ret = sslsock->s.socket;
+				*(php_socket_t *)ret = sslsock->s.socket;
 			}
 			return SUCCESS;
 
@@ -835,7 +835,7 @@ static int php_openssl_sockop_cast(php_stream *stream, int castas, void **ret TS
 				return FAILURE;
 			}
 			if (ret) {
-				*(int *)ret = sslsock->s.socket;
+				*(php_socket_t *)ret = sslsock->s.socket;
 			}
 			return SUCCESS;
 		default:

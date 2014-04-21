@@ -2,7 +2,7 @@
   +----------------------------------------------------------------------+
   | PHP Version 5                                                        |
   +----------------------------------------------------------------------+
-  | Copyright (c) 1997-2013 The PHP Group                                |
+  | Copyright (c) 1997-2014 The PHP Group                                |
   +----------------------------------------------------------------------+
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
@@ -604,6 +604,38 @@ SPL_METHOD(SplFixedArray, __construct)
 }
 /* }}} */
 
+/* {{{ proto void SplFixedArray::__wakeup()
+*/
+SPL_METHOD(SplFixedArray, __wakeup)
+{
+	spl_fixedarray_object *intern = (spl_fixedarray_object *) zend_object_store_get_object(getThis() TSRMLS_CC);
+	HashPosition ptr;
+	HashTable *intern_ht = zend_std_get_properties(getThis() TSRMLS_CC);
+	zval **data;
+
+	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "")) {
+		return;
+	}
+
+	if (!intern->array) {
+		int index = 0;
+		int size = zend_hash_num_elements(intern_ht);
+
+		intern->array = emalloc(sizeof(spl_fixedarray));
+		spl_fixedarray_init(intern->array, size TSRMLS_CC);
+
+		for (zend_hash_internal_pointer_reset_ex(intern_ht, &ptr); zend_hash_get_current_data_ex(intern_ht, (void **) &data, &ptr) == SUCCESS; zend_hash_move_forward_ex(intern_ht, &ptr)) {
+			Z_ADDREF_PP(data);
+			intern->array->elements[index++] = *data;
+		}
+
+		/* Remove the unserialised properties, since we now have the elements
+		 * within the spl_fixedarray_object structure. */
+		zend_hash_clean(intern_ht);
+	}
+}
+/* }}} */
+
 /* {{{ proto int SplFixedArray::count(void)
 */
 SPL_METHOD(SplFixedArray, count)
@@ -916,18 +948,16 @@ static void spl_fixedarray_it_get_current_data(zend_object_iterator *iter, zval 
 }
 /* }}} */
 
-static int spl_fixedarray_it_get_current_key(zend_object_iterator *iter, char **str_key, uint *str_key_len, ulong *int_key TSRMLS_DC) /* {{{ */
+static void spl_fixedarray_it_get_current_key(zend_object_iterator *iter, zval *key TSRMLS_DC) /* {{{ */
 {
 	spl_fixedarray_it     *iterator = (spl_fixedarray_it *)iter;
 	spl_fixedarray_object *intern   = iterator->object;
 
 	if (intern->flags & SPL_FIXEDARRAY_OVERLOADED_KEY) {
-		return zend_user_it_get_current_key(iter, str_key, str_key_len, int_key TSRMLS_CC);
+		zend_user_it_get_current_key(iter, key TSRMLS_CC);
 	} else {
-		*int_key = (ulong) iterator->object->current;
-		return HASH_KEY_IS_LONG;
+		ZVAL_LONG(key, iterator->object->current);
 	}
-
 }
 /* }}} */
 
@@ -1086,6 +1116,7 @@ ZEND_END_ARG_INFO()
 
 static zend_function_entry spl_funcs_SplFixedArray[] = { /* {{{ */
 	SPL_ME(SplFixedArray, __construct,     arginfo_splfixedarray_construct,ZEND_ACC_PUBLIC)
+	SPL_ME(SplFixedArray, __wakeup,        arginfo_splfixedarray_void,     ZEND_ACC_PUBLIC)
 	SPL_ME(SplFixedArray, count,           arginfo_splfixedarray_void,     ZEND_ACC_PUBLIC)
 	SPL_ME(SplFixedArray, toArray,         arginfo_splfixedarray_void,     ZEND_ACC_PUBLIC)
 	SPL_ME(SplFixedArray, fromArray,       arginfo_fixedarray_fromArray,   ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)

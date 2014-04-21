@@ -2,7 +2,7 @@
    +----------------------------------------------------------------------+
    | PHP Version 5                                                        |
    +----------------------------------------------------------------------+
-   | Copyright (c) 1997-2013 The PHP Group                                |
+   | Copyright (c) 1997-2014 The PHP Group                                |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
@@ -1105,29 +1105,26 @@ static void _extension_string(string *str, zend_module_entry *module, char *inde
 		string_free(&str_constants);
 	}
 
-	if (module->functions && module->functions->fname) {
+	{
+		HashPosition iterator;
 		zend_function *fptr;
-		const zend_function_entry *func = module->functions;
+		int first = 1;
 
-		string_printf(str, "\n  - Functions {\n");
-
-		/* Is there a better way of doing this? */
-		while (func->fname) {
-			int fname_len = strlen(func->fname);
-			char *lc_name = zend_str_tolower_dup(func->fname, fname_len);
-		
-			if (zend_hash_find(EG(function_table), lc_name, fname_len + 1, (void**) &fptr) == FAILURE) {
-				php_error_docref(NULL TSRMLS_CC, E_WARNING, "Internal error: Cannot find extension function %s in global function table", func->fname);
-				func++;
-				efree(lc_name);
-				continue;
+		zend_hash_internal_pointer_reset_ex(CG(function_table), &iterator);
+		while (zend_hash_get_current_data_ex(CG(function_table), (void **) &fptr, &iterator) == SUCCESS) {
+			if (fptr->common.type==ZEND_INTERNAL_FUNCTION
+				&& fptr->internal_function.module == module) {
+				if (first) {
+					string_printf(str, "\n  - Functions {\n");
+					first = 0;
+				}
+				_function_string(str, fptr, NULL, "    " TSRMLS_CC);
 			}
-
-			_function_string(str, fptr, NULL, "    " TSRMLS_CC);
-			efree(lc_name);
-			func++;
+			zend_hash_move_forward_ex(CG(function_table), &iterator);
 		}
-		string_printf(str, "%s  }\n", indent);
+		if (!first) {
+			string_printf(str, "%s  }\n", indent);
+		}
 	}
 
 	{
@@ -3087,6 +3084,14 @@ ZEND_METHOD(reflection_function, isDeprecated)
 }
 /* }}} */
 
+/* {{{ proto public bool ReflectionFunction::isGenerator()
+   Returns whether this function is a generator */
+ZEND_METHOD(reflection_function, isGenerator)
+{
+	_function_check_flag(INTERNAL_FUNCTION_PARAM_PASSTHRU, ZEND_ACC_GENERATOR);
+}
+/* }}} */
+
 /* {{{ proto public bool ReflectionFunction::inNamespace()
    Returns whether this function is defined in namespace */
 ZEND_METHOD(reflection_function, inNamespace)
@@ -4185,31 +4190,39 @@ ZEND_METHOD(reflection_class, newInstance)
 {
 	zval *retval_ptr = NULL;
 	reflection_object *intern;
-	zend_class_entry *ce;
+	zend_class_entry *ce, *old_scope;
+	zend_function *constructor;
 
 	METHOD_NOTSTATIC(reflection_class_ptr);
 	GET_REFLECTION_OBJECT_PTR(ce);
 
+	object_init_ex(return_value, ce);
+
+	old_scope = EG(scope);
+	EG(scope) = ce;
+	constructor = Z_OBJ_HT_P(return_value)->get_constructor(return_value TSRMLS_CC);
+	EG(scope) = old_scope;
+
 	/* Run the constructor if there is one */
-	if (ce->constructor) {
+	if (constructor) {
 		zval ***params = NULL;
 		int num_args = 0;
 		zend_fcall_info fci;
 		zend_fcall_info_cache fcc;
 
-		if (!(ce->constructor->common.fn_flags & ZEND_ACC_PUBLIC)) {
+		if (!(constructor->common.fn_flags & ZEND_ACC_PUBLIC)) {
 			zend_throw_exception_ex(reflection_exception_ptr, 0 TSRMLS_CC, "Access to non-public constructor of class %s", ce->name);
-			return;
+			zval_dtor(return_value);
+			RETURN_NULL();
 		}
 
 		if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "*", &params, &num_args) == FAILURE) {
 			if (params) {
 				efree(params);
 			}
+			zval_dtor(return_value);
 			RETURN_FALSE;
 		}
-
-		object_init_ex(return_value, ce);
 
 		fci.size = sizeof(fci);
 		fci.function_table = EG(function_table);
@@ -4222,7 +4235,7 @@ ZEND_METHOD(reflection_class, newInstance)
 		fci.no_separation = 1;
 
 		fcc.initialized = 1;
-		fcc.function_handler = ce->constructor;
+		fcc.function_handler = constructor;
 		fcc.calling_scope = EG(scope);
 		fcc.called_scope = Z_OBJCE_P(return_value);
 		fcc.object_ptr = return_value;
@@ -4235,6 +4248,7 @@ ZEND_METHOD(reflection_class, newInstance)
 				zval_ptr_dtor(&retval_ptr);
 			}
 			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Invocation of %s's constructor failed", ce->name);
+			zval_dtor(return_value);
 			RETURN_NULL();
 		}
 		if (retval_ptr) {
@@ -4243,9 +4257,7 @@ ZEND_METHOD(reflection_class, newInstance)
 		if (params) {
 			efree(params);
 		}
-	} else if (!ZEND_NUM_ARGS()) {
-		object_init_ex(return_value, ce);
-	} else {
+	} else if (ZEND_NUM_ARGS()) {
 		zend_throw_exception_ex(reflection_exception_ptr, 0 TSRMLS_CC, "Class %s does not have a constructor, so you cannot pass any constructor arguments", ce->name);
 	}
 }
@@ -4275,9 +4287,10 @@ ZEND_METHOD(reflection_class, newInstanceArgs)
 {
 	zval *retval_ptr = NULL;
 	reflection_object *intern;
-	zend_class_entry *ce;
+	zend_class_entry *ce, *old_scope;
 	int argc = 0;
 	HashTable *args;
+	zend_function *constructor;
 
 
 	METHOD_NOTSTATIC(reflection_class_ptr);
@@ -4286,19 +4299,28 @@ ZEND_METHOD(reflection_class, newInstanceArgs)
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "|h", &args) == FAILURE) {
 		return;
 	}
+
 	if (ZEND_NUM_ARGS() > 0) {
 		argc = args->nNumOfElements;
 	}
 
+	object_init_ex(return_value, ce);
+
+	old_scope = EG(scope);
+	EG(scope) = ce;
+	constructor = Z_OBJ_HT_P(return_value)->get_constructor(return_value TSRMLS_CC);
+	EG(scope) = old_scope;
+
 	/* Run the constructor if there is one */
-	if (ce->constructor) {
+	if (constructor) {
 		zval ***params = NULL;
 		zend_fcall_info fci;
 		zend_fcall_info_cache fcc;
 
-		if (!(ce->constructor->common.fn_flags & ZEND_ACC_PUBLIC)) {
+		if (!(constructor->common.fn_flags & ZEND_ACC_PUBLIC)) {
 			zend_throw_exception_ex(reflection_exception_ptr, 0 TSRMLS_CC, "Access to non-public constructor of class %s", ce->name);
-			return;
+			zval_dtor(return_value);
+			RETURN_NULL();
 		}
 
 		if (argc) {
@@ -4306,8 +4328,6 @@ ZEND_METHOD(reflection_class, newInstanceArgs)
 			zend_hash_apply_with_argument(args, (apply_func_arg_t)_zval_array_to_c_array, &params TSRMLS_CC);
 			params -= argc;
 		}
-
-		object_init_ex(return_value, ce);
 
 		fci.size = sizeof(fci);
 		fci.function_table = EG(function_table);
@@ -4320,7 +4340,7 @@ ZEND_METHOD(reflection_class, newInstanceArgs)
 		fci.no_separation = 1;
 
 		fcc.initialized = 1;
-		fcc.function_handler = ce->constructor;
+		fcc.function_handler = constructor;
 		fcc.calling_scope = EG(scope);
 		fcc.called_scope = Z_OBJCE_P(return_value);
 		fcc.object_ptr = return_value;
@@ -4333,6 +4353,7 @@ ZEND_METHOD(reflection_class, newInstanceArgs)
 				zval_ptr_dtor(&retval_ptr);
 			}
 			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Invocation of %s's constructor failed", ce->name);
+			zval_dtor(return_value);
 			RETURN_NULL();
 		}
 		if (retval_ptr) {
@@ -4341,9 +4362,7 @@ ZEND_METHOD(reflection_class, newInstanceArgs)
 		if (params) {
 			efree(params);
 		}
-	} else if (!ZEND_NUM_ARGS() || !argc) {
-		object_init_ex(return_value, ce);
-	} else {
+	} else if (argc) {
 		zend_throw_exception_ex(reflection_exception_ptr, 0 TSRMLS_CC, "Class %s does not have a constructor, so you cannot pass any constructor arguments", ce->name);
 	}
 }
@@ -5237,11 +5256,14 @@ ZEND_METHOD(reflection_extension, getVersion)
 /* }}} */
 
 /* {{{ proto public ReflectionFunction[] ReflectionExtension::getFunctions()
-   Returns an array of this extension's fuctions */
+   Returns an array of this extension's functions */
 ZEND_METHOD(reflection_extension, getFunctions)
 {
 	reflection_object *intern;
 	zend_module_entry *module;
+	HashPosition iterator;
+	zval *function;
+	zend_function *fptr;
 
 	if (zend_parse_parameters_none() == FAILURE) {
 		return;
@@ -5249,29 +5271,15 @@ ZEND_METHOD(reflection_extension, getFunctions)
 	GET_REFLECTION_OBJECT_PTR(module);
 
 	array_init(return_value);
-	if (module->functions) {
-		zval *function;
-		zend_function *fptr;
-		const zend_function_entry *func = module->functions;
-
-		/* Is there a better way of doing this? */
-		while (func->fname) {
-			int fname_len = strlen(func->fname);
-			char *lc_name = zend_str_tolower_dup(func->fname, fname_len);
-			
-			if (zend_hash_find(EG(function_table), lc_name, fname_len + 1, (void**) &fptr) == FAILURE) {
-				php_error_docref(NULL TSRMLS_CC, E_WARNING, "Internal error: Cannot find extension function %s in global function table", func->fname);
-				func++;
-				efree(lc_name);
-				continue;
-			}
-
+	zend_hash_internal_pointer_reset_ex(CG(function_table), &iterator);
+	while (zend_hash_get_current_data_ex(CG(function_table), (void **) &fptr, &iterator) == SUCCESS) {
+		if (fptr->common.type==ZEND_INTERNAL_FUNCTION
+			&& fptr->internal_function.module == module) {
 			ALLOC_ZVAL(function);
 			reflection_function_factory(fptr, NULL, function TSRMLS_CC);
-			add_assoc_zval_ex(return_value, func->fname, fname_len+1, function);
-			func++;
-			efree(lc_name);
+			add_assoc_zval(return_value, fptr->common.function_name, function);
 		}
+		zend_hash_move_forward_ex(CG(function_table), &iterator);
 	}
 }
 /* }}} */
@@ -5697,6 +5705,7 @@ static const zend_function_entry reflection_function_abstract_functions[] = {
 	ZEND_ME(reflection_function, isDeprecated, arginfo_reflection__void, 0)
 	ZEND_ME(reflection_function, isInternal, arginfo_reflection__void, 0)
 	ZEND_ME(reflection_function, isUserDefined, arginfo_reflection__void, 0)
+	ZEND_ME(reflection_function, isGenerator, arginfo_reflection__void, 0)
 	ZEND_ME(reflection_function, getClosureThis, arginfo_reflection__void, 0)
 	ZEND_ME(reflection_function, getClosureScopeClass, arginfo_reflection__void, 0)
 	ZEND_ME(reflection_function, getDocComment, arginfo_reflection__void, 0)

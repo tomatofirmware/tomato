@@ -2,7 +2,7 @@
    +----------------------------------------------------------------------+
    | PHP Version 5                                                        |
    +----------------------------------------------------------------------+
-   | Copyright (c) 1997-2013 The PHP Group                                |
+   | Copyright (c) 1997-2014 The PHP Group                                |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
@@ -473,7 +473,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_mb_ereg_replace_callback, 0, 0, 3)
 	ZEND_ARG_INFO(0, string)
 	ZEND_ARG_INFO(0, option)
 ZEND_END_ARG_INFO()
- 
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_mb_split, 0, 0, 2)
 	ZEND_ARG_INFO(0, pattern)
 	ZEND_ARG_INFO(0, string)
@@ -1688,12 +1688,12 @@ PHP_MINFO_FUNCTION(mbstring)
 	php_info_print_table_start();
 	php_info_print_table_row(2, "Multibyte Support", "enabled");
 	php_info_print_table_row(2, "Multibyte string engine", "libmbfl");
-	php_info_print_table_row(2, "HTTP input encoding translation", MBSTRG(encoding_translation) ? "enabled": "disabled");
- 	{
- 		char tmp[256];
- 		snprintf(tmp, sizeof(tmp), "%d.%d.%d", MBFL_VERSION_MAJOR, MBFL_VERSION_MINOR, MBFL_VERSION_TEENY);
- 		php_info_print_table_row(2, "libmbfl version", tmp);
- 	}	
+	php_info_print_table_row(2, "HTTP input encoding translation", MBSTRG(encoding_translation) ? "enabled": "disabled");	
+	{
+		char tmp[256];
+		snprintf(tmp, sizeof(tmp), "%d.%d.%d", MBFL_VERSION_MAJOR, MBFL_VERSION_MINOR, MBFL_VERSION_TEENY);
+		php_info_print_table_row(2, "libmbfl version", tmp);
+	}
 	php_info_print_table_end();
 
 	php_info_print_table_start();

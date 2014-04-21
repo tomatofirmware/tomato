@@ -2,7 +2,7 @@
    +----------------------------------------------------------------------+
    | PHP Version 5                                                        |
    +----------------------------------------------------------------------+
-   | Copyright (c) 1997-2013 The PHP Group                                |
+   | Copyright (c) 1997-2014 The PHP Group                                |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
@@ -280,6 +280,7 @@ PHP_FUNCTION(hex2bin)
 	result = php_hex2bin((unsigned char *)data, datalen, &newlen);
 
 	if (!result) {
+		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Input string must be hexadecimal string");
 		RETURN_FALSE;
 	}
 
@@ -1441,6 +1442,19 @@ PHPAPI void php_basename(const char *s, size_t len, char *suffix, size_t sufflen
 						state = 0;
 						cend = c;
 					}
+#if defined(PHP_WIN32) || defined(NETWARE)
+				/* Catch relative paths in c:file.txt style. They're not to confuse
+				   with the NTFS streams. This part ensures also, that no drive 
+				   letter traversing happens. */
+				} else if ((*c == ':' && (c - comp == 1))) {
+					if (state == 0) {
+						comp = c;
+						state = 1;
+					} else {
+						cend = c;
+						state = 0;
+					}
+#endif
 				} else {
 					if (state == 0) {
 						comp = c;
@@ -1581,7 +1595,7 @@ PHP_FUNCTION(pathinfo)
 		const char *p;
 		int idx;
 
-		/* Have we alrady looked up the basename? */
+		/* Have we already looked up the basename? */
 		if (!have_basename && !ret) {
 			php_basename(path, path_len, NULL, 0, &ret, &ret_len TSRMLS_CC);
 		}
@@ -2851,7 +2865,7 @@ static inline void php_strtr_populate_shift(PATNREPL *patterns, int patnum, int 
 }
 /* }}} */
 /* {{{ php_strtr_compare_hash_suffix */
-static int php_strtr_compare_hash_suffix(const void *a, const void *b, void *ctx_g)
+static int php_strtr_compare_hash_suffix(const void *a, const void *b TSRMLS_DC, void *ctx_g)
 {
 	const PPRES		*res = ctx_g;
 	const PATNREPL	*pnr_a = a,
@@ -2874,62 +2888,6 @@ static int php_strtr_compare_hash_suffix(const void *a, const void *b, void *ctx
 		} else {
 			return 0;
 		}
-	}
-}
-/* }}} */
-/* {{{ Sorting (no zend_qsort_r in this PHP version) */
-#define HS_LEFT(i)		((i) * 2 + 1)
-#define HS_RIGHT(i) 	((i) * 2 + 2)
-#define HS_PARENT(i)	(((i) - 1) / 2);
-#define HS_OFF(data, i)	((void *)(&((data)->arr)[i]))
-#define HS_CMP_CALL(data, i1, i2) \
-		(php_strtr_compare_hash_suffix(HS_OFF((data), (i1)), HS_OFF((data), (i2)), (data)->res))
-struct hs_data {
-	PATNREPL	*arr;
-	size_t		nel;
-	size_t		heapel;
-	PPRES		*res;
-};
-static inline void php_strtr_swap(PATNREPL *a, PATNREPL *b)
-{
-	PATNREPL tmp = *a;
-	*a = *b;
-	*b = tmp;
-}
-static inline void php_strtr_fix_heap(struct hs_data *data, size_t i)
-{
-	size_t	li =	HS_LEFT(i),
-			ri =	HS_RIGHT(i),
-			largei;
-	if (li < data->heapel && HS_CMP_CALL(data, li, i) > 0) {
-		largei = li;
-	} else {
-		largei = i;
-	}
-	if (ri < data->heapel && HS_CMP_CALL(data, ri, largei) > 0) {
-		largei = ri;
-	}
-	if (largei != i) {
-		php_strtr_swap(HS_OFF(data, i), HS_OFF(data, largei));
-		php_strtr_fix_heap(data, largei);
-	}
-}
-static inline void php_strtr_build_heap(struct hs_data *data)
-{
-	size_t i;
-	for (i = data->nel / 2; i > 0; i--) {
-		php_strtr_fix_heap(data, i - 1);
-	}
-}
-static inline void php_strtr_heapsort(PATNREPL *arr, size_t nel, PPRES *res)
-{
-	struct hs_data data = { arr, nel, nel, res };
-	size_t i;
-	php_strtr_build_heap(&data);
-	for (i = nel; i > 1; i--) {
-		php_strtr_swap(arr, HS_OFF(&data, i - 1));
-		data.heapel--;
-		php_strtr_fix_heap(&data, 0);
 	}
 }
 /* }}} */
@@ -3030,7 +2988,13 @@ static PPRES *php_strtr_array_prepare(STR *text, PATNREPL *patterns, int patnum,
 
 	res->patterns = safe_emalloc(patnum, sizeof(*res->patterns), 0);
 	memcpy(res->patterns, patterns, sizeof(*patterns) * patnum);
-	php_strtr_heapsort(res->patterns, patnum, res);
+#ifdef ZTS
+	zend_qsort_r(res->patterns, patnum, sizeof(*res->patterns),
+			php_strtr_compare_hash_suffix, res, NULL); /* tsrmls not needed */
+#else
+	zend_qsort_r(res->patterns, patnum, sizeof(*res->patterns),
+			php_strtr_compare_hash_suffix, res);
+#endif
 
 	res->prefix = safe_emalloc(patnum, sizeof(*res->prefix), 0);
 	for (i = 0; i < patnum; i++) {
@@ -3253,7 +3217,7 @@ static void php_similar_str(const char *txt1, int len1, const char *txt2, int le
 static int php_similar_char(const char *txt1, int len1, const char *txt2, int len2)
 {
 	int sum;
-	int pos1, pos2, max;
+	int pos1 = 0, pos2 = 0, max;
 
 	php_similar_str(txt1, len1, txt2, len2, &pos1, &pos2, &max);
 	if ((sum = max)) {
@@ -4613,7 +4577,7 @@ PHPAPI size_t php_strip_tags_ex(char *rbuf, int len, int *stateptr, char *allow,
 	char *tbuf, *buf, *p, *tp, *rp, c, lc;
 	int br, i=0, depth=0, in_q = 0;
 	int state = 0, pos;
-	char *allow_free;
+	char *allow_free = NULL;
 
 	if (stateptr)
 		state = *stateptr;
@@ -5652,7 +5616,7 @@ PHP_FUNCTION(substr_compare)
 	if (!cs) {
 		RETURN_LONG(zend_binary_strncmp(s1 + offset, (s1_len - offset), s2, s2_len, cmp_len));
 	} else {
-		RETURN_LONG(zend_binary_strncasecmp(s1 + offset, (s1_len - offset), s2, s2_len, cmp_len));
+		RETURN_LONG(zend_binary_strncasecmp_l(s1 + offset, (s1_len - offset), s2, s2_len, cmp_len));
 	}
 }
 /* }}} */

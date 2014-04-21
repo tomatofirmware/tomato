@@ -2,7 +2,7 @@
   +----------------------------------------------------------------------+
   | ZIP archive support for Phar                                         |
   +----------------------------------------------------------------------+
-  | Copyright (c) 2007-2013 The PHP Group                                |
+  | Copyright (c) 2007-2014 The PHP Group                                |
   +----------------------------------------------------------------------+
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
@@ -578,10 +578,6 @@ foundit:
 			/* construct actual offset to file start - local extra_len can be different from central extra_len */
 			entry.offset = entry.offset_abs =
 				sizeof(local) + entry.header_offset + PHAR_GET_16(local.filename_len) + PHAR_GET_16(local.extra_len);
-#if PHP_VERSION_ID < 50207
-			/* work around Bug #46147 */
-			fp->writepos = fp->readpos = 0;
-#endif
 			php_stream_seek(fp, entry.offset, SEEK_SET);
 			/* these next lines should be for php < 5.2.6 after 5.3 filters are fixed */
 			fp->writepos = 0;
@@ -605,9 +601,6 @@ foundit:
 
 				if (!(entry.uncompressed_filesize = php_stream_copy_to_mem(fp, &actual_alias, entry.uncompressed_filesize, 0)) || !actual_alias) {
 					pefree(entry.filename, entry.is_persistent);
-#if PHP_VERSION_ID < 50207
-					PHAR_ZIP_FAIL("unable to read in alias, truncated (PHP 5.2.7 and newer has a potential fix for this problem)");
-#endif
 					PHAR_ZIP_FAIL("unable to read in alias, truncated");
 				}
 
@@ -626,9 +619,6 @@ foundit:
 
 				if (!(entry.uncompressed_filesize = php_stream_copy_to_mem(fp, &actual_alias, entry.uncompressed_filesize, 0)) || !actual_alias) {
 					pefree(entry.filename, entry.is_persistent);
-#if PHP_VERSION_ID < 50207
-					PHAR_ZIP_FAIL("unable to read in alias, truncated (PHP 5.2.7 and newer has a potential fix for this problem)");
-#endif
 					PHAR_ZIP_FAIL("unable to read in alias, truncated");
 				}
 
@@ -937,10 +927,11 @@ is_compressed:
 		PHAR_SET_32(local.uncompsize, entry->uncompressed_filesize);
 		PHAR_SET_32(central.compsize, entry->compressed_filesize);
 		PHAR_SET_32(local.compsize, entry->compressed_filesize);
-
-		if (-1 == php_stream_seek(p->old, entry->offset_abs, SEEK_SET)) {
-			spprintf(p->error, 0, "unable to seek to start of file \"%s\" while creating zip-based phar \"%s\"", entry->filename, entry->phar->fname);
-			return ZEND_HASH_APPLY_STOP;
+		if (p->old) {
+			if (-1 == php_stream_seek(p->old, entry->offset_abs, SEEK_SET)) {
+				spprintf(p->error, 0, "unable to seek to start of file \"%s\" while creating zip-based phar \"%s\"", entry->filename, entry->phar->fname);
+				return ZEND_HASH_APPLY_STOP;
+			}
 		}
 	}
 not_compressed:
@@ -1095,6 +1086,10 @@ static int phar_zip_applysignature(phar_archive_data *phar, struct _phar_zip_pas
 		off_t tell, st;
 
 		newfile = php_stream_fopen_tmpfile();
+		if (newfile == NULL) {
+			spprintf(pass->error, 0, "phar error: unable to create temporary file for the signature file");
+			return FAILURE;
+		}
 		st = tell = php_stream_tell(pass->filefp);
 		/* copy the local files, central directory, and the zip comment to generate the hash */
 		php_stream_seek(pass->filefp, 0, SEEK_SET);
@@ -1122,6 +1117,10 @@ static int phar_zip_applysignature(phar_archive_data *phar, struct _phar_zip_pas
 		entry.fp = php_stream_fopen_tmpfile();
 		entry.fp_type = PHAR_MOD;
 		entry.is_modified = 1;
+		if (entry.fp == NULL) {
+			spprintf(pass->error, 0, "phar error: unable to create temporary file for signature");
+			return FAILURE;
+		}
 
 		PHAR_SET_32(sigbuf, phar->sig_flags);
 		PHAR_SET_32(sigbuf + 4, signature_length);
@@ -1192,7 +1191,10 @@ int phar_zip_flush(phar_archive_data *phar, char *user_stub, long len, int defau
 	/* set alias */
 	if (!phar->is_temporary_alias && phar->alias_len) {
 		entry.fp = php_stream_fopen_tmpfile();
-
+		if (entry.fp == NULL) {
+			spprintf(error, 0, "phar error: unable to create temporary file");
+			return EOF;
+		}
 		if (phar->alias_len != (int)php_stream_write(entry.fp, phar->alias, phar->alias_len)) {
 			if (error) {
 				spprintf(error, 0, "unable to set alias in zip-based phar \"%s\"", phar->fname);
@@ -1267,6 +1269,10 @@ int phar_zip_flush(phar_archive_data *phar, char *user_stub, long len, int defau
 
 		len = pos - user_stub + 18;
 		entry.fp = php_stream_fopen_tmpfile();
+		if (entry.fp == NULL) {
+			spprintf(error, 0, "phar error: unable to create temporary file");
+			return EOF;
+		}
 		entry.uncompressed_filesize = len + 5;
 
 		if ((size_t)len != php_stream_write(entry.fp, user_stub, len)
@@ -1300,7 +1306,10 @@ int phar_zip_flush(phar_archive_data *phar, char *user_stub, long len, int defau
 	} else {
 		/* Either this is a brand new phar (add the stub), or the default stub is required (overwrite the stub) */
 		entry.fp = php_stream_fopen_tmpfile();
-
+		if (entry.fp == NULL) {
+			spprintf(error, 0, "phar error: unable to create temporary file");
+			return EOF;
+		}
 		if (sizeof(newstub)-1 != php_stream_write(entry.fp, newstub, sizeof(newstub)-1)) {
 			php_stream_close(entry.fp);
 			if (error) {

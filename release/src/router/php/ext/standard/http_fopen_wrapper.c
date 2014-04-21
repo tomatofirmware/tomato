@@ -2,7 +2,7 @@
    +----------------------------------------------------------------------+
    | PHP Version 5                                                        |
    +----------------------------------------------------------------------+
-   | Copyright (c) 1997-2013 The PHP Group                                |
+   | Copyright (c) 1997-2014 The PHP Group                                |
    +----------------------------------------------------------------------+
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
@@ -83,6 +83,30 @@
 
 #define HTTP_WRAPPER_HEADER_INIT    1
 #define HTTP_WRAPPER_REDIRECTED     2
+
+static inline void strip_header(char *header_bag, char *lc_header_bag,
+		const char *lc_header_name)
+{
+	char *lc_header_start = strstr(lc_header_bag, lc_header_name);
+	char *header_start = header_bag + (lc_header_start - lc_header_bag);
+
+	if (lc_header_start
+	&& (lc_header_start == lc_header_bag || *(lc_header_start-1) == '\n')
+	) {
+		char *lc_eol = strchr(lc_header_start, '\n');
+		char *eol = header_start + (lc_eol - lc_header_start);
+
+		if (lc_eol) {
+			size_t eollen = strlen(lc_eol);
+
+			memmove(lc_header_start, lc_eol+1, eollen);
+			memmove(header_start, eol+1, eollen);
+		} else {
+			*lc_header_start = '\0';
+			*header_start = '\0';
+		}
+	}
+}
 
 php_stream *php_stream_url_wrap_http_ex(php_stream_wrapper *wrapper, char *path, char *mode, int options, char **opened_path, php_stream_context *context, int redirect_max, int flags STREAMS_DC TSRMLS_DC) /* {{{ */
 {
@@ -425,40 +449,17 @@ finish:
 		if (tmp && strlen(tmp) > 0) {
 			char *s;
 
-			if (!header_init) { /* Remove post headers for redirects */
-				int l = strlen(tmp);
-				char *s2, *tmp_c = estrdup(tmp);
-				
-				php_strtolower(tmp_c, l);
-				if ((s = strstr(tmp_c, "content-length:"))) {
-					if ((s2 = memchr(s, '\n', tmp_c + l - s))) {
-						int b = tmp_c + l - 1 - s2;
-						memmove(tmp, tmp + (s2 + 1 - tmp_c), b);
-						memmove(tmp_c, s2 + 1, b);
-						
-					} else {
-						tmp[s - tmp_c] = *s = '\0';
-					}
-					l = strlen(tmp_c);
-				}
-				if ((s = strstr(tmp_c, "content-type:"))) {
-					if ((s2 = memchr(s, '\n', tmp_c + l - s))) {
-						memmove(tmp, tmp + (s2 + 1 - tmp_c), tmp_c + l - 1 - s2);
-					} else {
-						tmp[s - tmp_c] = '\0';
-					}
-				}
-
-				efree(tmp_c);
-				tmp_c = php_trim(tmp, strlen(tmp), NULL, 0, NULL, 3 TSRMLS_CC);
-				efree(tmp);
-				tmp = tmp_c;
-			}
-
 			user_headers = estrdup(tmp);
 
 			/* Make lowercase for easy comparison against 'standard' headers */
 			php_strtolower(tmp, strlen(tmp));
+
+			if (!header_init) {
+				/* strip POST headers on redirect */
+				strip_header(user_headers, tmp, "content-length:");
+				strip_header(user_headers, tmp, "content-type:");
+			}
+
 			if ((s = strstr(tmp, "user-agent:")) && 
 			    (s == tmp || *(s-1) == '\r' || *(s-1) == '\n' || 
 			                 *(s-1) == '\t' || *(s-1) == ' ')) {
@@ -731,12 +732,15 @@ finish:
 			http_header_line[http_header_line_length] = '\0';
 
 			if (!strncasecmp(http_header_line, "Location: ", 10)) {
-				/* we only care about Location for 300, 301, 302, 303 and 307 */
-				/* see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3.1 */
-				if ((response_code >= 300 && response_code < 304 || 307 == response_code) && context && php_stream_context_get_option(context, "http", "follow_location", &tmpzval) == SUCCESS) {
+				if (context && php_stream_context_get_option(context, "http", "follow_location", &tmpzval) == SUCCESS) {
 					SEPARATE_ZVAL(tmpzval);
 					convert_to_long_ex(tmpzval);
 					follow_location = Z_LVAL_PP(tmpzval);
+				} else if (!(response_code >= 300 && response_code < 304 || 307 == response_code)) { 
+					/* we shouldn't redirect automatically
+					if follow_location isn't set and response_code not in (300, 301, 302, 303 and 307) 
+					see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3.1 */
+					follow_location = 0;
 				}
 				strlcpy(location, http_header_line + 10, sizeof(location));
 			} else if (!strncasecmp(http_header_line, "Content-Type: ", 14)) {

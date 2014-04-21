@@ -185,6 +185,10 @@ SOURCE=.\zend_extensions.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\zend_generators.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\zend_hash.c
 # End Source File
 # Begin Source File
@@ -286,6 +290,10 @@ SOURCE=.\zend_ts_hash.c
 # Begin Source File
 
 SOURCE=.\zend_variables.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\zend_vm_opcodes.c
 # End Source File
 # End Group
 # Begin Group "Header Files"
