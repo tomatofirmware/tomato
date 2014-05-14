@@ -1,0 +1,1105 @@
+--------------------
+./configure --shared --prefix=/usr
+mar abr 22 18:46:48 CEST 2014
+=== ztest29612.c ===
+extern int getchar();
+int hello() {return getchar();}
+===
+mipsel-uclibc-gcc -c ztest29612.c
+... using gcc
+
+Checking for obsessive-compulsive compiler options...
+=== ztest29612.c ===
+int foo() { return 0; }
+===
+mipsel-uclibc-gcc -c -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 ztest29612.c
+
+Checking for shared library support...
+=== ztest29612.c ===
+extern int getchar();
+int hello() {return getchar();}
+===
+mipsel-uclibc-gcc -w -c -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -fPIC ztest29612.c
+mipsel-uclibc-gcc -shared -Wl,-soname,libz.so.1,--version-script,zlib.map -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -fPIC -o ztest29612.so ztest29612.o
+Building shared library libz.so.1.2.8 with mipsel-uclibc-gcc.
+
+=== ztest29612.c ===
+#include <sys/types.h>
+off64_t dummy = 0;
+===
+mipsel-uclibc-gcc -c -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 ztest29612.c
+Checking for off64_t... Yes.
+Checking for fseeko... Yes.
+
+=== ztest29612.c ===
+#include <string.h>
+#include <errno.h>
+int main() { return strlen(strerror(errno)); }
+===
+mipsel-uclibc-gcc -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 -o ztest29612 ztest29612.c
+Checking for strerror... Yes.
+
+=== ztest29612.c ===
+#include <unistd.h>
+int main() { return 0; }
+===
+mipsel-uclibc-gcc -c -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 ztest29612.c
+Checking for unistd.h... Yes.
+
+=== ztest29612.c ===
+#include <stdarg.h>
+int main() { return 0; }
+===
+mipsel-uclibc-gcc -c -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 ztest29612.c
+Checking for stdarg.h... Yes.
+
+=== ztest29612.c ===
+#include <stdio.h>
+#include <stdarg.h>
+#include "zconf.h"
+int main()
+{
+#ifndef STDC
+  choke me
+#endif
+  return 0;
+}
+===
+mipsel-uclibc-gcc -c -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 ztest29612.c
+Checking whether to use vs[n]printf() or s[n]printf()... using vs[n]printf().
+
+=== ztest29612.c ===
+#include <stdio.h>
+#include <stdarg.h>
+int mytest(const char *fmt, ...)
+{
+  char buf[20];
+  va_list ap;
+  va_start(ap, fmt);
+  vsnprintf(buf, sizeof(buf), fmt, ap);
+  va_end(ap);
+  return 0;
+}
+int main()
+{
+  return (mytest("Hello%d\n", 1));
+}
+===
+mipsel-uclibc-gcc -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 -o ztest29612 ztest29612.c
+Checking for vsnprintf() in stdio.h... Yes.
+
+=== ztest29612.c ===
+#include <stdio.h>
+#include <stdarg.h>
+int mytest(const char *fmt, ...)
+{
+  int n;
+  char buf[20];
+  va_list ap;
+  va_start(ap, fmt);
+  n = vsnprintf(buf, sizeof(buf), fmt, ap);
+  va_end(ap);
+  return n;
+}
+int main()
+{
+  return (mytest("Hello%d\n", 1));
+}
+===
+mipsel-uclibc-gcc -c -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 ztest29612.c
+Checking for return value of vsnprintf()... Yes.
+
+=== ztest29612.c ===
+#define ZLIB_INTERNAL __attribute__((visibility ("hidden")))
+int ZLIB_INTERNAL foo;
+int main()
+{
+  return 0;
+}
+===
+mipsel-uclibc-gcc -c -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 ztest29612.c
+Checking for attribute(visibility) support... Yes.
+
+ALL = static shared all64
+AR = ar rc
+ARFLAGS = rc
+CC = mipsel-uclibc-gcc
+CFLAGS = -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 -DHAVE_HIDDEN
+CPP = mipsel-uclibc-gcc -E
+EXE =
+LDCONFIG = ldconfig
+LDFLAGS =
+LDSHARED = mipsel-uclibc-gcc -shared -Wl,-soname,libz.so.1,--version-script,zlib.map
+LDSHAREDLIBC = -lc
+OBJC = $(OBJZ) $(OBJG)
+PIC_OBJC = $(PIC_OBJZ) $(PIC_OBJG)
+RANLIB = mipsel-uclibc-ranlib
+SFLAGS = -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -fPIC -D_LARGEFILE64_SOURCE=1 -DHAVE_HIDDEN
+SHAREDLIB = libz.so
+SHAREDLIBM = libz.so.1
+SHAREDLIBV = libz.so.1.2.8
+STATICLIB = libz.a
+TEST = all teststatic testshared test64
+VER = 1.2.8
+Z_U4 =
+exec_prefix = ${prefix}
+includedir = ${prefix}/include
+libdir = ${exec_prefix}/lib
+mandir = ${prefix}/share/man
+prefix = /usr
+sharedlibdir = ${libdir}
+uname = Linux
+--------------------
+
+
+--------------------
+./configure
+mar abr 22 18:49:14 CEST 2014
+=== ztest29908.c ===
+extern int getchar();
+int hello() {return getchar();}
+===
+mipsel-linux-gcc -c ztest29908.c
+... using gcc
+
+Checking for obsessive-compulsive compiler options...
+=== ztest29908.c ===
+int foo() { return 0; }
+===
+mipsel-linux-gcc -c -O3 ztest29908.c
+
+Checking for shared library support...
+=== ztest29908.c ===
+extern int getchar();
+int hello() {return getchar();}
+===
+mipsel-linux-gcc -w -c -O3 -fPIC ztest29908.c
+mipsel-linux-gcc -shared -Wl,-soname,libz.so.1,--version-script,zlib.map -O3 -fPIC -o ztest29908.so ztest29908.o
+Building shared library libz.so.1.2.8 with mipsel-linux-gcc.
+
+=== ztest29908.c ===
+#include <sys/types.h>
+off64_t dummy = 0;
+===
+mipsel-linux-gcc -c -O3 -D_LARGEFILE64_SOURCE=1 ztest29908.c
+Checking for off64_t... Yes.
+Checking for fseeko... Yes.
+
+=== ztest29908.c ===
+#include <string.h>
+#include <errno.h>
+int main() { return strlen(strerror(errno)); }
+===
+mipsel-linux-gcc -O3 -D_LARGEFILE64_SOURCE=1 -o ztest29908 ztest29908.c
+Checking for strerror... Yes.
+
+=== ztest29908.c ===
+#include <unistd.h>
+int main() { return 0; }
+===
+mipsel-linux-gcc -c -O3 -D_LARGEFILE64_SOURCE=1 ztest29908.c
+Checking for unistd.h... Yes.
+
+=== ztest29908.c ===
+#include <stdarg.h>
+int main() { return 0; }
+===
+mipsel-linux-gcc -c -O3 -D_LARGEFILE64_SOURCE=1 ztest29908.c
+Checking for stdarg.h... Yes.
+
+=== ztest29908.c ===
+#include <stdio.h>
+#include <stdarg.h>
+#include "zconf.h"
+int main()
+{
+#ifndef STDC
+  choke me
+#endif
+  return 0;
+}
+===
+mipsel-linux-gcc -c -O3 -D_LARGEFILE64_SOURCE=1 ztest29908.c
+Checking whether to use vs[n]printf() or s[n]printf()... using vs[n]printf().
+
+=== ztest29908.c ===
+#include <stdio.h>
+#include <stdarg.h>
+int mytest(const char *fmt, ...)
+{
+  char buf[20];
+  va_list ap;
+  va_start(ap, fmt);
+  vsnprintf(buf, sizeof(buf), fmt, ap);
+  va_end(ap);
+  return 0;
+}
+int main()
+{
+  return (mytest("Hello%d\n", 1));
+}
+===
+mipsel-linux-gcc -O3 -D_LARGEFILE64_SOURCE=1 -o ztest29908 ztest29908.c
+Checking for vsnprintf() in stdio.h... Yes.
+
+=== ztest29908.c ===
+#include <stdio.h>
+#include <stdarg.h>
+int mytest(const char *fmt, ...)
+{
+  int n;
+  char buf[20];
+  va_list ap;
+  va_start(ap, fmt);
+  n = vsnprintf(buf, sizeof(buf), fmt, ap);
+  va_end(ap);
+  return n;
+}
+int main()
+{
+  return (mytest("Hello%d\n", 1));
+}
+===
+mipsel-linux-gcc -c -O3 -D_LARGEFILE64_SOURCE=1 ztest29908.c
+Checking for return value of vsnprintf()... Yes.
+
+=== ztest29908.c ===
+#define ZLIB_INTERNAL __attribute__((visibility ("hidden")))
+int ZLIB_INTERNAL foo;
+int main()
+{
+  return 0;
+}
+===
+mipsel-linux-gcc -c -O3 -D_LARGEFILE64_SOURCE=1 ztest29908.c
+Checking for attribute(visibility) support... Yes.
+
+ALL = static shared all64
+AR = ar
+ARFLAGS = rc
+CC = mipsel-linux-gcc
+CFLAGS = -O3 -D_LARGEFILE64_SOURCE=1 -DHAVE_HIDDEN
+CPP = mipsel-linux-gcc -E
+EXE =
+LDCONFIG = ldconfig
+LDFLAGS =
+LDSHARED = mipsel-linux-gcc -shared -Wl,-soname,libz.so.1,--version-script,zlib.map
+LDSHAREDLIBC = -lc
+OBJC = $(OBJZ) $(OBJG)
+PIC_OBJC = $(PIC_OBJZ) $(PIC_OBJG)
+RANLIB = ranlib
+SFLAGS = -O3 -fPIC -D_LARGEFILE64_SOURCE=1 -DHAVE_HIDDEN
+SHAREDLIB = libz.so
+SHAREDLIBM = libz.so.1
+SHAREDLIBV = libz.so.1.2.8
+STATICLIB = libz.a
+TEST = all teststatic testshared test64
+VER = 1.2.8
+Z_U4 =
+exec_prefix = ${prefix}
+includedir = ${prefix}/include
+libdir = ${exec_prefix}/lib
+mandir = ${prefix}/share/man
+prefix = /usr/local
+sharedlibdir = ${libdir}
+uname = Linux
+--------------------
+
+
+--------------------
+./configure --shared --prefix=/usr
+mar abr 22 19:28:05 CEST 2014
+=== ztest26004.c ===
+extern int getchar();
+int hello() {return getchar();}
+===
+mipsel-uclibc-gcc -c ztest26004.c
+... using gcc
+
+Checking for obsessive-compulsive compiler options...
+=== ztest26004.c ===
+int foo() { return 0; }
+===
+mipsel-uclibc-gcc -c -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 ztest26004.c
+
+Checking for shared library support...
+=== ztest26004.c ===
+extern int getchar();
+int hello() {return getchar();}
+===
+mipsel-uclibc-gcc -w -c -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -fPIC ztest26004.c
+mipsel-uclibc-gcc -shared -Wl,-soname,libz.so.1,--version-script,zlib.map -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -fPIC -o ztest26004.so ztest26004.o
+Building shared library libz.so.1.2.8 with mipsel-uclibc-gcc.
+
+=== ztest26004.c ===
+#include <sys/types.h>
+off64_t dummy = 0;
+===
+mipsel-uclibc-gcc -c -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 ztest26004.c
+Checking for off64_t... Yes.
+Checking for fseeko... Yes.
+
+=== ztest26004.c ===
+#include <string.h>
+#include <errno.h>
+int main() { return strlen(strerror(errno)); }
+===
+mipsel-uclibc-gcc -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 -o ztest26004 ztest26004.c
+Checking for strerror... Yes.
+
+=== ztest26004.c ===
+#include <unistd.h>
+int main() { return 0; }
+===
+mipsel-uclibc-gcc -c -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 ztest26004.c
+Checking for unistd.h... Yes.
+
+=== ztest26004.c ===
+#include <stdarg.h>
+int main() { return 0; }
+===
+mipsel-uclibc-gcc -c -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 ztest26004.c
+Checking for stdarg.h... Yes.
+
+=== ztest26004.c ===
+#include <stdio.h>
+#include <stdarg.h>
+#include "zconf.h"
+int main()
+{
+#ifndef STDC
+  choke me
+#endif
+  return 0;
+}
+===
+mipsel-uclibc-gcc -c -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 ztest26004.c
+Checking whether to use vs[n]printf() or s[n]printf()... using vs[n]printf().
+
+=== ztest26004.c ===
+#include <stdio.h>
+#include <stdarg.h>
+int mytest(const char *fmt, ...)
+{
+  char buf[20];
+  va_list ap;
+  va_start(ap, fmt);
+  vsnprintf(buf, sizeof(buf), fmt, ap);
+  va_end(ap);
+  return 0;
+}
+int main()
+{
+  return (mytest("Hello%d\n", 1));
+}
+===
+mipsel-uclibc-gcc -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 -o ztest26004 ztest26004.c
+Checking for vsnprintf() in stdio.h... Yes.
+
+=== ztest26004.c ===
+#include <stdio.h>
+#include <stdarg.h>
+int mytest(const char *fmt, ...)
+{
+  int n;
+  char buf[20];
+  va_list ap;
+  va_start(ap, fmt);
+  n = vsnprintf(buf, sizeof(buf), fmt, ap);
+  va_end(ap);
+  return n;
+}
+int main()
+{
+  return (mytest("Hello%d\n", 1));
+}
+===
+mipsel-uclibc-gcc -c -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 ztest26004.c
+Checking for return value of vsnprintf()... Yes.
+
+=== ztest26004.c ===
+#define ZLIB_INTERNAL __attribute__((visibility ("hidden")))
+int ZLIB_INTERNAL foo;
+int main()
+{
+  return 0;
+}
+===
+mipsel-uclibc-gcc -c -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 ztest26004.c
+Checking for attribute(visibility) support... Yes.
+
+ALL = static shared all64
+AR = ar rc
+ARFLAGS = rc
+CC = mipsel-uclibc-gcc
+CFLAGS = -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 -DHAVE_HIDDEN
+CPP = mipsel-uclibc-gcc -E
+EXE =
+LDCONFIG = ldconfig
+LDFLAGS =
+LDSHARED = mipsel-uclibc-gcc -shared -Wl,-soname,libz.so.1,--version-script,zlib.map
+LDSHAREDLIBC = -lc
+OBJC = $(OBJZ) $(OBJG)
+PIC_OBJC = $(PIC_OBJZ) $(PIC_OBJG)
+RANLIB = mipsel-uclibc-ranlib
+SFLAGS = -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -fPIC -D_LARGEFILE64_SOURCE=1 -DHAVE_HIDDEN
+SHAREDLIB = libz.so
+SHAREDLIBM = libz.so.1
+SHAREDLIBV = libz.so.1.2.8
+STATICLIB = libz.a
+TEST = all teststatic testshared test64
+VER = 1.2.8
+Z_U4 =
+exec_prefix = ${prefix}
+includedir = ${prefix}/include
+libdir = ${exec_prefix}/lib
+mandir = ${prefix}/share/man
+prefix = /usr
+sharedlibdir = ${libdir}
+uname = Linux
+--------------------
+
+
+--------------------
+./configure --host=mipsel-linux --build=x86_64-linux-gnu --shared --prefix=/usr
+mar abr 22 20:03:52 CEST 2014
+unknown option: --host=mipsel-linux
+./configure --help for help
+** ./configure aborting.
+--------------------
+
+
+--------------------
+./configure --host=mipsel-linux --build=x86_64-linux-gnu --shared --prefix=
+mar abr 22 22:20:58 CEST 2014
+unknown option: --host=mipsel-linux
+./configure --help for help
+** ./configure aborting.
+--------------------
+
+
+--------------------
+./configure --host=mipsel-linux --build=x86_64-linux-gnu+gcc --shared --prefix=
+mar abr 22 22:30:55 CEST 2014
+unknown option: --host=mipsel-linux
+./configure --help for help
+** ./configure aborting.
+--------------------
+
+
+--------------------
+./configure
+mar abr 22 22:32:38 CEST 2014
+=== ztest24866.c ===
+extern int getchar();
+int hello() {return getchar();}
+===
+mipsel-linux-gcc -c ztest24866.c
+... using gcc
+
+Checking for obsessive-compulsive compiler options...
+=== ztest24866.c ===
+int foo() { return 0; }
+===
+mipsel-linux-gcc -c -O3 ztest24866.c
+
+Checking for shared library support...
+=== ztest24866.c ===
+extern int getchar();
+int hello() {return getchar();}
+===
+mipsel-linux-gcc -w -c -O3 -fPIC ztest24866.c
+mipsel-linux-gcc -shared -Wl,-soname,libz.so.1,--version-script,zlib.map -O3 -fPIC -o ztest24866.so ztest24866.o
+Building shared library libz.so.1.2.8 with mipsel-linux-gcc.
+
+=== ztest24866.c ===
+#include <sys/types.h>
+off64_t dummy = 0;
+===
+mipsel-linux-gcc -c -O3 -D_LARGEFILE64_SOURCE=1 ztest24866.c
+Checking for off64_t... Yes.
+Checking for fseeko... Yes.
+
+=== ztest24866.c ===
+#include <string.h>
+#include <errno.h>
+int main() { return strlen(strerror(errno)); }
+===
+mipsel-linux-gcc -O3 -D_LARGEFILE64_SOURCE=1 -o ztest24866 ztest24866.c
+Checking for strerror... Yes.
+
+=== ztest24866.c ===
+#include <unistd.h>
+int main() { return 0; }
+===
+mipsel-linux-gcc -c -O3 -D_LARGEFILE64_SOURCE=1 ztest24866.c
+Checking for unistd.h... Yes.
+
+=== ztest24866.c ===
+#include <stdarg.h>
+int main() { return 0; }
+===
+mipsel-linux-gcc -c -O3 -D_LARGEFILE64_SOURCE=1 ztest24866.c
+Checking for stdarg.h... Yes.
+
+=== ztest24866.c ===
+#include <stdio.h>
+#include <stdarg.h>
+#include "zconf.h"
+int main()
+{
+#ifndef STDC
+  choke me
+#endif
+  return 0;
+}
+===
+mipsel-linux-gcc -c -O3 -D_LARGEFILE64_SOURCE=1 ztest24866.c
+Checking whether to use vs[n]printf() or s[n]printf()... using vs[n]printf().
+
+=== ztest24866.c ===
+#include <stdio.h>
+#include <stdarg.h>
+int mytest(const char *fmt, ...)
+{
+  char buf[20];
+  va_list ap;
+  va_start(ap, fmt);
+  vsnprintf(buf, sizeof(buf), fmt, ap);
+  va_end(ap);
+  return 0;
+}
+int main()
+{
+  return (mytest("Hello%d\n", 1));
+}
+===
+mipsel-linux-gcc -O3 -D_LARGEFILE64_SOURCE=1 -o ztest24866 ztest24866.c
+Checking for vsnprintf() in stdio.h... Yes.
+
+=== ztest24866.c ===
+#include <stdio.h>
+#include <stdarg.h>
+int mytest(const char *fmt, ...)
+{
+  int n;
+  char buf[20];
+  va_list ap;
+  va_start(ap, fmt);
+  n = vsnprintf(buf, sizeof(buf), fmt, ap);
+  va_end(ap);
+  return n;
+}
+int main()
+{
+  return (mytest("Hello%d\n", 1));
+}
+===
+mipsel-linux-gcc -c -O3 -D_LARGEFILE64_SOURCE=1 ztest24866.c
+Checking for return value of vsnprintf()... Yes.
+
+=== ztest24866.c ===
+#define ZLIB_INTERNAL __attribute__((visibility ("hidden")))
+int ZLIB_INTERNAL foo;
+int main()
+{
+  return 0;
+}
+===
+mipsel-linux-gcc -c -O3 -D_LARGEFILE64_SOURCE=1 ztest24866.c
+Checking for attribute(visibility) support... Yes.
+
+ALL = static shared all64
+AR = ar
+ARFLAGS = rc
+CC = mipsel-linux-gcc
+CFLAGS = -O3 -D_LARGEFILE64_SOURCE=1 -DHAVE_HIDDEN
+CPP = mipsel-linux-gcc -E
+EXE =
+LDCONFIG = ldconfig
+LDFLAGS =
+LDSHARED = mipsel-linux-gcc -shared -Wl,-soname,libz.so.1,--version-script,zlib.map
+LDSHAREDLIBC = -lc
+OBJC = $(OBJZ) $(OBJG)
+PIC_OBJC = $(PIC_OBJZ) $(PIC_OBJG)
+RANLIB = ranlib
+SFLAGS = -O3 -fPIC -D_LARGEFILE64_SOURCE=1 -DHAVE_HIDDEN
+SHAREDLIB = libz.so
+SHAREDLIBM = libz.so.1
+SHAREDLIBV = libz.so.1.2.8
+STATICLIB = libz.a
+TEST = all teststatic testshared test64
+VER = 1.2.8
+Z_U4 =
+exec_prefix = ${prefix}
+includedir = ${prefix}/include
+libdir = ${exec_prefix}/lib
+mandir = ${prefix}/share/man
+prefix = /usr/local
+sharedlibdir = ${libdir}
+uname = Linux
+--------------------
+
+
+--------------------
+./configure
+mar abr 22 22:36:00 CEST 2014
+=== ztest24997.c ===
+extern int getchar();
+int hello() {return getchar();}
+===
+mipsel-uclibc-gcc -c ztest24997.c
+... using gcc
+
+Checking for obsessive-compulsive compiler options...
+=== ztest24997.c ===
+int foo() { return 0; }
+===
+mipsel-uclibc-gcc -c -O3 ztest24997.c
+
+Checking for shared library support...
+=== ztest24997.c ===
+extern int getchar();
+int hello() {return getchar();}
+===
+mipsel-uclibc-gcc -w -c -O3 -fPIC ztest24997.c
+mipsel-uclibc-gcc -shared -Wl,-soname,libz.so.1,--version-script,zlib.map -O3 -fPIC -o ztest24997.so ztest24997.o
+Building shared library libz.so.1.2.8 with mipsel-uclibc-gcc.
+
+=== ztest24997.c ===
+#include <sys/types.h>
+off64_t dummy = 0;
+===
+mipsel-uclibc-gcc -c -O3 -D_LARGEFILE64_SOURCE=1 ztest24997.c
+Checking for off64_t... Yes.
+Checking for fseeko... Yes.
+
+=== ztest24997.c ===
+#include <string.h>
+#include <errno.h>
+int main() { return strlen(strerror(errno)); }
+===
+mipsel-uclibc-gcc -O3 -D_LARGEFILE64_SOURCE=1 -o ztest24997 ztest24997.c
+Checking for strerror... Yes.
+
+=== ztest24997.c ===
+#include <unistd.h>
+int main() { return 0; }
+===
+mipsel-uclibc-gcc -c -O3 -D_LARGEFILE64_SOURCE=1 ztest24997.c
+Checking for unistd.h... Yes.
+
+=== ztest24997.c ===
+#include <stdarg.h>
+int main() { return 0; }
+===
+mipsel-uclibc-gcc -c -O3 -D_LARGEFILE64_SOURCE=1 ztest24997.c
+Checking for stdarg.h... Yes.
+
+=== ztest24997.c ===
+#include <stdio.h>
+#include <stdarg.h>
+#include "zconf.h"
+int main()
+{
+#ifndef STDC
+  choke me
+#endif
+  return 0;
+}
+===
+mipsel-uclibc-gcc -c -O3 -D_LARGEFILE64_SOURCE=1 ztest24997.c
+Checking whether to use vs[n]printf() or s[n]printf()... using vs[n]printf().
+
+=== ztest24997.c ===
+#include <stdio.h>
+#include <stdarg.h>
+int mytest(const char *fmt, ...)
+{
+  char buf[20];
+  va_list ap;
+  va_start(ap, fmt);
+  vsnprintf(buf, sizeof(buf), fmt, ap);
+  va_end(ap);
+  return 0;
+}
+int main()
+{
+  return (mytest("Hello%d\n", 1));
+}
+===
+mipsel-uclibc-gcc -O3 -D_LARGEFILE64_SOURCE=1 -o ztest24997 ztest24997.c
+Checking for vsnprintf() in stdio.h... Yes.
+
+=== ztest24997.c ===
+#include <stdio.h>
+#include <stdarg.h>
+int mytest(const char *fmt, ...)
+{
+  int n;
+  char buf[20];
+  va_list ap;
+  va_start(ap, fmt);
+  n = vsnprintf(buf, sizeof(buf), fmt, ap);
+  va_end(ap);
+  return n;
+}
+int main()
+{
+  return (mytest("Hello%d\n", 1));
+}
+===
+mipsel-uclibc-gcc -c -O3 -D_LARGEFILE64_SOURCE=1 ztest24997.c
+Checking for return value of vsnprintf()... Yes.
+
+=== ztest24997.c ===
+#define ZLIB_INTERNAL __attribute__((visibility ("hidden")))
+int ZLIB_INTERNAL foo;
+int main()
+{
+  return 0;
+}
+===
+mipsel-uclibc-gcc -c -O3 -D_LARGEFILE64_SOURCE=1 ztest24997.c
+Checking for attribute(visibility) support... Yes.
+
+ALL = static shared all64
+AR = ar
+ARFLAGS = rc
+CC = mipsel-uclibc-gcc
+CFLAGS = -O3 -D_LARGEFILE64_SOURCE=1 -DHAVE_HIDDEN
+CPP = mipsel-uclibc-gcc -E
+EXE =
+LDCONFIG = ldconfig
+LDFLAGS =
+LDSHARED = mipsel-uclibc-gcc -shared -Wl,-soname,libz.so.1,--version-script,zlib.map
+LDSHAREDLIBC = -lc
+OBJC = $(OBJZ) $(OBJG)
+PIC_OBJC = $(PIC_OBJZ) $(PIC_OBJG)
+RANLIB = ranlib
+SFLAGS = -O3 -fPIC -D_LARGEFILE64_SOURCE=1 -DHAVE_HIDDEN
+SHAREDLIB = libz.so
+SHAREDLIBM = libz.so.1
+SHAREDLIBV = libz.so.1.2.8
+STATICLIB = libz.a
+TEST = all teststatic testshared test64
+VER = 1.2.8
+Z_U4 =
+exec_prefix = ${prefix}
+includedir = ${prefix}/include
+libdir = ${exec_prefix}/lib
+mandir = ${prefix}/share/man
+prefix = /usr/local
+sharedlibdir = ${libdir}
+uname = Linux
+--------------------
+
+
+--------------------
+./configure
+mar abr 22 22:38:16 CEST 2014
+=== ztest32034.c ===
+extern int getchar();
+int hello() {return getchar();}
+===
+mipsel-uclibc-gcc -c ztest32034.c
+... using gcc
+
+Checking for obsessive-compulsive compiler options...
+=== ztest32034.c ===
+int foo() { return 0; }
+===
+mipsel-uclibc-gcc -c -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 ztest32034.c
+
+Checking for shared library support...
+=== ztest32034.c ===
+extern int getchar();
+int hello() {return getchar();}
+===
+mipsel-uclibc-gcc -w -c -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -fPIC ztest32034.c
+mipsel-uclibc-gcc -shared -Wl,-soname,libz.so.1,--version-script,zlib.map -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -fPIC -o ztest32034.so ztest32034.o
+Building shared library libz.so.1.2.8 with mipsel-uclibc-gcc.
+
+=== ztest32034.c ===
+#include <sys/types.h>
+off64_t dummy = 0;
+===
+mipsel-uclibc-gcc -c -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 ztest32034.c
+Checking for off64_t... Yes.
+Checking for fseeko... Yes.
+
+=== ztest32034.c ===
+#include <string.h>
+#include <errno.h>
+int main() { return strlen(strerror(errno)); }
+===
+mipsel-uclibc-gcc -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 -o ztest32034 ztest32034.c
+Checking for strerror... Yes.
+
+=== ztest32034.c ===
+#include <unistd.h>
+int main() { return 0; }
+===
+mipsel-uclibc-gcc -c -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 ztest32034.c
+Checking for unistd.h... Yes.
+
+=== ztest32034.c ===
+#include <stdarg.h>
+int main() { return 0; }
+===
+mipsel-uclibc-gcc -c -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 ztest32034.c
+Checking for stdarg.h... Yes.
+
+=== ztest32034.c ===
+#include <stdio.h>
+#include <stdarg.h>
+#include "zconf.h"
+int main()
+{
+#ifndef STDC
+  choke me
+#endif
+  return 0;
+}
+===
+mipsel-uclibc-gcc -c -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 ztest32034.c
+Checking whether to use vs[n]printf() or s[n]printf()... using vs[n]printf().
+
+=== ztest32034.c ===
+#include <stdio.h>
+#include <stdarg.h>
+int mytest(const char *fmt, ...)
+{
+  char buf[20];
+  va_list ap;
+  va_start(ap, fmt);
+  vsnprintf(buf, sizeof(buf), fmt, ap);
+  va_end(ap);
+  return 0;
+}
+int main()
+{
+  return (mytest("Hello%d\n", 1));
+}
+===
+mipsel-uclibc-gcc -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 -o ztest32034 ztest32034.c
+Checking for vsnprintf() in stdio.h... Yes.
+
+=== ztest32034.c ===
+#include <stdio.h>
+#include <stdarg.h>
+int mytest(const char *fmt, ...)
+{
+  int n;
+  char buf[20];
+  va_list ap;
+  va_start(ap, fmt);
+  n = vsnprintf(buf, sizeof(buf), fmt, ap);
+  va_end(ap);
+  return n;
+}
+int main()
+{
+  return (mytest("Hello%d\n", 1));
+}
+===
+mipsel-uclibc-gcc -c -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 ztest32034.c
+Checking for return value of vsnprintf()... Yes.
+
+=== ztest32034.c ===
+#define ZLIB_INTERNAL __attribute__((visibility ("hidden")))
+int ZLIB_INTERNAL foo;
+int main()
+{
+  return 0;
+}
+===
+mipsel-uclibc-gcc -c -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 ztest32034.c
+Checking for attribute(visibility) support... Yes.
+
+ALL = static shared all64
+AR = mipsel-uclibc-ar
+ARFLAGS = rc
+CC = mipsel-uclibc-gcc
+CFLAGS = -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 -DHAVE_HIDDEN
+CPP = mipsel-uclibc-gcc -E
+EXE =
+LDCONFIG = ldconfig
+LDFLAGS =
+LDSHARED = mipsel-uclibc-gcc -shared -Wl,-soname,libz.so.1,--version-script,zlib.map
+LDSHAREDLIBC = -lc
+OBJC = $(OBJZ) $(OBJG)
+PIC_OBJC = $(PIC_OBJZ) $(PIC_OBJG)
+RANLIB = mipsel-uclibc-ranlib
+SFLAGS = -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -fPIC -D_LARGEFILE64_SOURCE=1 -DHAVE_HIDDEN
+SHAREDLIB = libz.so
+SHAREDLIBM = libz.so.1
+SHAREDLIBV = libz.so.1.2.8
+STATICLIB = libz.a
+TEST = all teststatic testshared test64
+VER = 1.2.8
+Z_U4 =
+exec_prefix = ${prefix}
+includedir = ${prefix}/include
+libdir = ${exec_prefix}/lib
+mandir = ${prefix}/share/man
+prefix = /usr/local
+sharedlibdir = ${libdir}
+uname = Linux
+--------------------
+
+
+--------------------
+./configure
+mar abr 22 23:04:06 CEST 2014
+=== ztest22251.c ===
+extern int getchar();
+int hello() {return getchar();}
+===
+mipsel-uclibc-gcc -c ztest22251.c
+... using gcc
+
+Checking for obsessive-compulsive compiler options...
+=== ztest22251.c ===
+int foo() { return 0; }
+===
+mipsel-uclibc-gcc -c -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 ztest22251.c
+
+Checking for shared library support...
+=== ztest22251.c ===
+extern int getchar();
+int hello() {return getchar();}
+===
+mipsel-uclibc-gcc -w -c -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -fPIC ztest22251.c
+mipsel-uclibc-gcc -shared -Wl,-soname,libz.so.1,--version-script,zlib.map -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -fPIC -o ztest22251.so ztest22251.o
+Building shared library libz.so.1.2.8 with mipsel-uclibc-gcc.
+
+=== ztest22251.c ===
+#include <sys/types.h>
+off64_t dummy = 0;
+===
+mipsel-uclibc-gcc -c -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 ztest22251.c
+Checking for off64_t... Yes.
+Checking for fseeko... Yes.
+
+=== ztest22251.c ===
+#include <string.h>
+#include <errno.h>
+int main() { return strlen(strerror(errno)); }
+===
+mipsel-uclibc-gcc -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 -o ztest22251 ztest22251.c
+Checking for strerror... Yes.
+
+=== ztest22251.c ===
+#include <unistd.h>
+int main() { return 0; }
+===
+mipsel-uclibc-gcc -c -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 ztest22251.c
+Checking for unistd.h... Yes.
+
+=== ztest22251.c ===
+#include <stdarg.h>
+int main() { return 0; }
+===
+mipsel-uclibc-gcc -c -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 ztest22251.c
+Checking for stdarg.h... Yes.
+
+=== ztest22251.c ===
+#include <stdio.h>
+#include <stdarg.h>
+#include "zconf.h"
+int main()
+{
+#ifndef STDC
+  choke me
+#endif
+  return 0;
+}
+===
+mipsel-uclibc-gcc -c -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 ztest22251.c
+Checking whether to use vs[n]printf() or s[n]printf()... using vs[n]printf().
+
+=== ztest22251.c ===
+#include <stdio.h>
+#include <stdarg.h>
+int mytest(const char *fmt, ...)
+{
+  char buf[20];
+  va_list ap;
+  va_start(ap, fmt);
+  vsnprintf(buf, sizeof(buf), fmt, ap);
+  va_end(ap);
+  return 0;
+}
+int main()
+{
+  return (mytest("Hello%d\n", 1));
+}
+===
+mipsel-uclibc-gcc -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 -o ztest22251 ztest22251.c
+Checking for vsnprintf() in stdio.h... Yes.
+
+=== ztest22251.c ===
+#include <stdio.h>
+#include <stdarg.h>
+int mytest(const char *fmt, ...)
+{
+  int n;
+  char buf[20];
+  va_list ap;
+  va_start(ap, fmt);
+  n = vsnprintf(buf, sizeof(buf), fmt, ap);
+  va_end(ap);
+  return n;
+}
+int main()
+{
+  return (mytest("Hello%d\n", 1));
+}
+===
+mipsel-uclibc-gcc -c -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 ztest22251.c
+Checking for return value of vsnprintf()... Yes.
+
+=== ztest22251.c ===
+#define ZLIB_INTERNAL __attribute__((visibility ("hidden")))
+int ZLIB_INTERNAL foo;
+int main()
+{
+  return 0;
+}
+===
+mipsel-uclibc-gcc -c -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 ztest22251.c
+Checking for attribute(visibility) support... Yes.
+
+ALL = static shared all64
+AR = mipsel-uclibc-ar
+ARFLAGS = rc
+CC = mipsel-uclibc-gcc
+CFLAGS = -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -D_LARGEFILE64_SOURCE=1 -DHAVE_HIDDEN
+CPP = mipsel-uclibc-gcc -E
+EXE =
+LDCONFIG = ldconfig
+LDFLAGS =
+LDSHARED = mipsel-uclibc-gcc -shared -Wl,-soname,libz.so.1,--version-script,zlib.map
+LDSHAREDLIBC = -lc
+OBJC = $(OBJZ) $(OBJG)
+PIC_OBJC = $(PIC_OBJZ) $(PIC_OBJG)
+RANLIB = mipsel-uclibc-ranlib
+SFLAGS = -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2 -fPIC -D_LARGEFILE64_SOURCE=1 -DHAVE_HIDDEN
+SHAREDLIB = libz.so
+SHAREDLIBM = libz.so.1
+SHAREDLIBV = libz.so.1.2.8
+STATICLIB = libz.a
+TEST = all teststatic testshared test64
+VER = 1.2.8
+Z_U4 =
+exec_prefix = ${prefix}
+includedir = ${prefix}/include
+libdir = ${exec_prefix}/lib
+mandir = ${prefix}/share/man
+prefix = /usr/local
+sharedlibdir = ${libdir}
+uname = Linux
+--------------------
+
+
