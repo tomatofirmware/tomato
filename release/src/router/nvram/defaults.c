@@ -934,6 +934,38 @@ const defaults_t defaults[] = {
 	{ "pptp_client_dfltroute","0"             },
 #endif
 
+
+#ifdef TCONFIG_SIPROXD
+// Tomato RAF. siproxd
+	{ "siproxd_enable",	 		"0"	 },
+ 	{ "siproxd_reboot",			"0"	 },
+ 	{ "siproxd_if_inbound",			"vlan2"	 },
+	{ "siproxd_if_outbound",		"br0"	 },
+	{ "siproxd_intcpt",			"0"	 },
+	{ "siproxd_listen_port",		"5060"	 },
+	{ "siproxd_daemonize",			"1"	 },
+ 	{ "siproxd_silence_log",		"1"	 },
+	{ "siproxd_autosave_registrations",	"90"	 },
+ 	{ "siproxd_rtp_proxy",			"1"	 },
+	{ "siproxd_rtp_port_low",		"10000"	 },
+ 	{ "siproxd_rtp_port_high",		"10100"	 },
+	{ "siproxd_rtp_timeout",		"300"	 },
+	{ "siproxd_rtp_dscp",			"46"	 },
+ 	{ "siproxd_sip_dscp",			"0"	 },
+ 	{ "siproxd_default_expires",		"600"	 },
+ 	{ "siproxd_debug_level",		"0"	 },
+ 	{ "siproxd_debug_port",			"0"	 },
+ 	{ "siproxd_logcall",			"1"	 },
+ 	{ "siproxd_shortdial",			"1"	 },
+ 	{ "siproxd_pi_shortdial_akey",		"*00"	 },
+ 	{ "siproxd_pi_shortdial1",		""	 },
+ 	{ "siproxd_pi_shortdial2",		""	 },
+ 	{ "siproxd_pi_shortdial3",		""	 },
+ 	{ "siproxd_pi_shortdial4",		""	 },
+ 	{ "siproxd_pi_shortdial5",		""	 },
+#endif
+// siproxd
+
 #if 0
 // safe to remove?
 	{ "QoS",					"0"			},
