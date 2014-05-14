@@ -14,10 +14,11 @@ OBJS := rc.o init.o interface.o network.o wan.o services.o dhcp.o
 OBJS += firewall.o ppp.o telssh.o wnas.o
 OBJS += listen.o redial.o led.o qos.o forward.o misc.o mtd.o
 OBJS += buttons.o restrict.o gpio.o sched.o
-OBJS += arpbind.o
-OBJS += new_qoslimit.o
-OBJS += blink_5g.o 
+OBJS += new_qoslimit.o arpbind.o
 
+ifdef CONFIG_BCMWL6
+OBJS += blink_5g.o
+endif
 ifeq ($(TCONFIG_USB),y)
 OBJS += usb.o
 endif
@@ -38,6 +39,9 @@ OBJS += nocat.o
 endif
 ifeq ($(TCONFIG_PPTPD),y)
 OBJS += pptpd.o
+endif
+ifeq ($(TCONFIG_NOCAT),y)
+OBJS += nocat.o
 endif
 ifeq ($(TCONFIG_NGINX),y)
 OBJS += nginx.o
@@ -76,7 +80,9 @@ install: all
 	@cd $(INSTALLDIR)/sbin && ln -sf rc hotplug
 	@cd $(INSTALLDIR)/sbin && ln -sf rc service
 	@cd $(INSTALLDIR)/sbin && ln -sf rc buttons
+ifdef CONFIG_BCMWL6
 	@cd $(INSTALLDIR)/sbin && ln -sf rc blink_5g
+endif
 	@cd $(INSTALLDIR)/sbin && ln -sf rc rcheck
 	@cd $(INSTALLDIR)/sbin && ln -sf rc radio
 	@cd $(INSTALLDIR)/sbin && ln -sf rc led

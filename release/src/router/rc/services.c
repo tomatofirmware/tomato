@@ -44,6 +44,8 @@
 #include <sys/mount.h>
 #include <mntent.h>
 #include <dirent.h>
+#include <sys/stat.h>
+#include <sys/statfs.h>
 
 // Pop an alarm to recheck pids in 500 msec.
 static const struct itimerval pop_tv = { {0,0}, {0, 500 * 1000} };
@@ -86,7 +88,11 @@ void start_dnsmasq()
 	int do_dns;
 	int do_dhcpd_hosts;
 
-
+#ifdef TCONFIG_IPV6
+	char *prefix, *ipv6, *mtu;
+	int do_6to4, do_6rd;
+	int service;
+#endif
 
 	TRACE_PT("begin\n");
 
@@ -366,15 +372,17 @@ void start_dnsmasq()
 		"dhcp-lease-max=%d\n",
 		(n > 0) ? n : 255);
 	if (nvram_get_int("dhcpd_auth") >= 0) {
-		fprintf(f, "dhcp-authoritative\n");
+		fprintf(f, "dhcp-option=lan,252,\"\\n\"\n"
+			   "dhcp-authoritative\n");
 	}
 
+/*
 #ifdef TCONFIG_DNSCRYPT
 	if (nvram_match("dnscrypt_proxy", "1")) {
 		fprintf(f, "strict-order\n");
 	}
 #endif
-
+*/
 	//
 
 #ifdef TCONFIG_OPENVPN
@@ -386,18 +394,43 @@ void start_dnsmasq()
 #endif
 
 #ifdef TCONFIG_IPV6
-//			if (!(*prefix)) prefix = "::";
-//			ipv6 = (char *)ipv6_router_address(NULL);
-//			fprintf(f, "enable-ra\ndhcp-range=tag:br0,%s, slaac, ra-names, 64\n", prefix);
-//			fprintf(fp, "dhcp-range=lan,::,constructor:%s,ra-stateless,ra-names,%d,%d\n",
-//			fprintf(f, "enable-ra\ndhcp-range=lan,::1, ::FFFF:FFFF, constructor:%s, ra-names, %d, %s\n",
-
 	if (ipv6_enabled() && nvram_get_int("ipv6_radvd")) {
-		fprintf(f, "enable-ra\n"
-			"ra-param=%s,%d,%d\n"
-			"dhcp-range=::1, ::FFFF:FFFF,constructor:%s,ra-stateless,ra-names, %d, %s\n",
-			nvram_safe_get("lan_ifname"), 10, 600*3,
-                        nvram_safe_get("lan_ifname"), 64, "12h");
+ 				service = get_ipv6_service();
+                do_6to4 = (service == IPV6_ANYCAST_6TO4);
+                do_6rd = (service == IPV6_6RD || service == IPV6_6RD_DHCP);
+                mtu = NULL;
+
+                switch (service) {
+                case IPV6_NATIVE_DHCP:
+                case IPV6_ANYCAST_6TO4:
+                case IPV6_6IN4:
+                case IPV6_6RD:
+                case IPV6_6RD_DHCP:
+                        mtu = (nvram_get_int("ipv6_tun_mtu") > 0) ? nvram_safe_get("ipv6_tun_mtu") : "1480";
+                        // fall through
+                default:
+                        prefix = do_6to4 ? "0:0:0:1::" : nvram_safe_get("ipv6_prefix");
+                        break;
+                }
+                if (!(*prefix)) prefix = "::";
+/*              ipv6 = (char *)ipv6_router_address(NULL);
+
+ original tomato		fprintf(f, "enable-ra\ndhcp-range=tag:br0,%s, slaac, ra-names, 64\n", prefix);
+ version 'r'			fprintf(fp, "dhcp-range=lan,::,constructor:%s,ra-stateless,ra-names,%d,%d\n",
+			fprintf(f, "ra-param=%s,%d,%d\n"
+              		"dhcp-range=lan,::,constructor:%s,ra-stateless,ra-names,%d,%s\n",
+            		nvram_safe_get("lan_ifname"), 10, 600*3,
+            		nvram_safe_get("lan_ifname"), 64, "12h");
+ version v 		fprintf(f, "dhcp-option=lan,option6:23,");
+        		if (nvram_invmatch("ipv6_dns", ""))
+            		fprintf(f, "%s,", nvram_safe_get("ipv6_dns"));
+        		fprintf(f, "[::]\n");
+        		if (nvram_invmatch("lan_domain", ""))
+            		fprintf(f, "dhcp-option=lan,option6:24,%s\n", nvram_safe_get("lan_domain"));
+*/
+// Version t,u,v,w----->
+			fprintf(f, "enable-ra\ndhcp-range=::1, ::FFFF:FFFF, constructor:%s, ra-names, %d, %s\n",
+			nvram_safe_get("lan_ifname"), 64, "12h");
 	}
 #endif
 
@@ -428,19 +461,18 @@ void start_dnsmasq()
 #ifdef TCONFIG_DNSCRYPT
 	//start dnscrypt-proxy
 	if (nvram_match("dnscrypt_proxy", "1")) {
-		
 		char dnscrypt_local[30];
 		sprintf(dnscrypt_local, "127.0.0.1:%s", nvram_safe_get("dnscrypt_port") );
-		
-		eval("ntp2ip");		
+
+		eval("ntp2ip");
 		eval("dnscrypt-proxy", "-d", "-a", dnscrypt_local, nvram_safe_get("dnscrypt_cmd") );
 
 #ifdef TCONFIG_IPV6
 		char dnscrypt_local_ipv6[30];
 		sprintf(dnscrypt_local_ipv6, "::1:%s", nvram_safe_get("dnscrypt_port") );
-		
+
 		if (get_ipv6_service() != NULL) //if ipv6 enabled
-		eval("dnscrypt-proxy", "-d", "-a", dnscrypt_local_ipv6, nvram_safe_get("dnscrypt_cmd") );
+			eval("dnscrypt-proxy", "-d", "-a", dnscrypt_local_ipv6, nvram_safe_get("dnscrypt_cmd") );
 #endif
 	}
 #endif
@@ -2019,6 +2051,8 @@ static void start_media_server(void)
 					"inotify=yes\n"
 					"notify_interval=600\n"
 					"album_art_names=Cover.jpg/cover.jpg/AlbumArtSmall.jpg/albumartsmall.jpg/AlbumArt.jpg/albumart.jpg/Album.jpg/album.jpg/Folder.jpg/folder.jpg/Thumb.jpg/thumb.jpg\n"
+					"log_dir=/var/log\n"
+					"log_level=general,artwork,database,inotify,scanner,metadata,http,ssdp,tivo=warn\n"
 					"\n",
 					nvram_safe_get("lan_ifname"),
 					(port < 0) || (port >= 0xffff) ? 0 : port,
@@ -2194,15 +2228,6 @@ void start_services(void)
 	start_pptpd();
 #endif
 
-#ifdef TCONFIG_IPV6
-	/* note: starting radvd here might be too early in case of
-	 * DHCPv6 or 6to4 because we won't have received a prefix and
-	 * so it will disable advertisements. To restart them, we have
-	 * to send radvd a SIGHUP, or restart it.
-	 */
-	start_dnsmasq();
-#endif
-
 	restart_nas_services(1, 1);	// !!TB - Samba, FTP and Media Server
 
 #ifdef TCONFIG_SNMP
@@ -2213,6 +2238,24 @@ void start_services(void)
 	start_splashd();
 #endif
 
+#ifdef TCONFIG_SIPROXD
+	start_siproxdengine();
+#endif
+
+#ifdef TCONFIG_NGINX
+	start_enginex();
+#endif
+
+#ifdef TCONFIG_IPV6
+	/* note: starting radvd here might be too early in case of
+	 * DHCPv6 or 6to4 because we won't have received a prefix and
+	 * so it will disable advertisements. To restart them, we have
+	 * to send radvd a SIGHUP, or restart it.
+	 */
+	start_dnsmasq();
+#endif
+
+#endif
 }
 
 void stop_services(void)
@@ -2227,9 +2270,6 @@ void stop_services(void)
 	stop_snmp();
 #endif
 
-#ifdef TCONFIG_NFS
-	stop_nfs();
-#endif
 	restart_nas_services(1, 0);	// stop Samba, FTP and Media Server
 #ifdef TCONFIG_PPTPD
 	stop_pptpd();
@@ -2401,19 +2441,6 @@ TOP:
 		if (action & A_START) start_httpd();
 		goto CLEAR;
 	}
-
-#ifdef TCONFIG_NGINX
-	if (strcmp(service, "enginex") == 0) {
-		if (action & A_STOP) stop_enginex();
-		if (action & A_START) start_enginex();
-		goto CLEAR;
-	}
-	if (strcmp(service, "nginxfp") == 0) {
-		if (action & A_STOP) stop_nginxfastpath();
-		if (action & A_START) start_nginxfastpath();
-		goto CLEAR;
-	}
-#endif
 	
 #ifdef TCONFIG_IPV6
 	if (strcmp(service, "ipv6") == 0) {
@@ -2788,6 +2815,20 @@ TOP:
 		goto CLEAR;
 	}
 #endif
+
+#ifdef TCONFIG_NGINX
+	if (strcmp(service, "enginex") == 0) {
+		if (action & A_STOP) stop_enginex();
+		if (action & A_START) start_enginex();
+		goto CLEAR;
+	}
+	if (strcmp(service, "nginxfp") == 0) {
+		if (action & A_STOP) stop_nginxfastpath();
+		if (action & A_START) start_nginxfastpath();
+		goto CLEAR;
+	}
+#endif
+
 
 #ifdef TCONFIG_PPTPD
 	if (strcmp(service, "pptpd") == 0) {

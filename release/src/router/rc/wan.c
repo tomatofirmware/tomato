@@ -753,6 +753,8 @@ void start_wan(int mode)
 		mtu = max;
 	}
 	else {
+// KDB If we've big fat frames enabled then we *CAN* break the 
+// max MTU on PPP link
 		mtu = nvram_get_int("wan_mtu");
 		if (!(nvram_get_int("jumbo_frame_enable")) && (mtu > max)) mtu = max;
 			else if (mtu < 576) mtu = 576;
@@ -862,11 +864,11 @@ void start_wan6_done(const char *wan_ifname)
 		eval("ip", "route", "add", "::/0", "dev", (char *)wan_ifname, "metric", "2048");
 		break;
 	case IPV6_NATIVE_DHCP:
-//		eval("ip", "route", "add", "::/0", "dev", (char *)wan_ifname);  //removed by Toastman
-//      see discussion at http://www.linksysinfo.org/index.php?threads/ipv6-and-comcast.38006/
-//		post #24 refers. 
-		stop_dhcp6c();
-		start_dhcp6c();
+		if (nvram_get_int("ipv6_isp_opt") == 1) {
+			eval("ip", "route", "add", "::/0", "dev", (char *)wan_ifname);
+		}
+			stop_dhcp6c();
+			start_dhcp6c();
 		break;
 	case IPV6_ANYCAST_6TO4:
 	case IPV6_6IN4:

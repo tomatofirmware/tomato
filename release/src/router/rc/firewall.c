@@ -624,6 +624,15 @@ static void mangle_table(void)
 	#endif
 #endif
 		}
+	// Reset Incoming DSCP to 0x00
+if (nvram_match("DSCP_fix_enable", "1")) {
+#ifdef LINUX26
+			modprobe("xt_DSCP");
+#else
+			modprobe("ipt_DSCP");
+#endif
+			ipt_write("-I PREROUTING -i %s -j DSCP --set-dscp 0\n", wanface);
+}
 	}
 
 	ip46t_write("COMMIT\n");
@@ -794,7 +803,7 @@ static void nat_table(void)
 		switch (get_ipv6_service()) {
 		case IPV6_6IN4:
 			// avoid NATing proto-41 packets when using 6in4 tunnel
-			p = "-p ! 41";
+			p = "! -p 41";
 			break;
 		}
 #endif
@@ -1076,6 +1085,9 @@ static void filter_input(void)
 static void clampmss(void)
 {
 	ipt_write("-A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu\n");
+/* It's not working....
+{
+	ipt_write("-A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu\n");
 #ifdef TCONFIG_IPV6
 	switch (get_ipv6_service()) {
 	case IPV6_ANYCAST_6TO4:
@@ -1085,7 +1097,18 @@ static void clampmss(void)
 	}
 #endif
 }
+*/
 
+#ifdef TCONFIG_IPV6 //victek 05.12.13 adding when ppp dialing is also used.
+	if (nvram_match("ipv6_ifname", "v6to4") ||
+            nvram_match("ipv6_ifname", "v6in4") ||
+	    	(!nvram_get_int("ipv6_service") &&
+		(nvram_match("wan_proto", "pppoe") ||
+		nvram_match("wan_proto", "pptp") || nvram_match("wan_proto", "l2tp")))) {
+		ip6t_write("-A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu\n");
+	        }
+#endif
+}
 static void filter_forward(void)
 {
 	char dst[64];

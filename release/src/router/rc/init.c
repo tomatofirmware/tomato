@@ -391,6 +391,7 @@ static int init_vlan_ports(void)
 	case MODEL_H618B:
 		dirty |= (nvram_get("vlan2ports") != NULL);
 		nvram_unset("vlan2ports");
+		dirty |= check_nv("vlan0ports", "1 2 3 4 5*");
 		dirty |= check_nv("vlan1ports", "0 5");
 		break;
 	case MODEL_WRT310Nv1:
@@ -413,10 +414,27 @@ static int init_vlan_ports(void)
 	case MODEL_W1800R:
 		dirty |= check_nv("vlan1ports", "1 2 3 4 8*");
 		dirty |= check_nv("vlan2ports", "0 8");
+		dirty |= check_nv("boot_wait", "on");
+		dirty |= check_nv("wait_time", "5");
+		break;
+	case MODEL_D1800H:
+		dirty |= check_nv("vlan1ports", "1 2 3 4 8*");
+		dirty |= check_nv("vlan2ports", "0 8");
+		dirty |= check_nv("ledbh0", "11");
+		dirty |= check_nv("ledbh1", "11");
+		dirty |= check_nv("ledbh2", "11");
+		dirty |= check_nv("ledbh11", "136");
+		// must flash tt through tftp.
+		dirty |= check_nv("boot_wait", "on");
+		dirty |= check_nv("wait_time", "5");
 		break;
 	case MODEL_RTN53:
 		dirty |= check_nv("vlan2ports", "0 1 2 3 5*");
 		dirty |= check_nv("vlan1ports", "4 5");
+		break;
+	case MODEL_RTN53A1:
+		dirty |= check_nv("vlan1ports", "4 5");
+		dirty |= check_nv("vlan2ports", "3 2 1 0 5*");
 		break;
 	case MODEL_WNR2000v2:
 		dirty |= check_nv("vlan1ports", "4 3 2 1 5*");
@@ -424,8 +442,10 @@ static int init_vlan_ports(void)
 		break;
 	case MODEL_HG320:
 	case MODEL_H218N:
-	case MODEL_RG200E_CA:
 		dirty |= check_nv("vlan1ports", "1 2 3 4 5*");
+		dirty |= check_nv("vlan2ports", "0 5");
+		break;
+	case MODEL_RG200E_CA:
 		dirty |= check_nv("vlan2ports", "0 5");
 		break;
 	case MODEL_RTN10:
@@ -436,6 +456,7 @@ static int init_vlan_ports(void)
 		dirty |= check_nv("vlan0ports", "1 2 3 4 5*");
 		dirty |= check_nv("vlan1ports", "0 5");
 		break;
+	case MODEL_RTN10P:
 	case MODEL_RTN12:
 	case MODEL_RTN12B1:
 		dirty |= check_nv("vlan0ports", "3 2 1 0 5*");
@@ -472,6 +493,18 @@ static int init_vlan_ports(void)
 	case MODEL_WNDR3700v3:
 		dirty |= check_nv("vlan1ports", "0 1 2 3 8*");
 		dirty |= check_nv("vlan2ports", "4 8");
+		break;
+	case MODEL_TDN60:
+		dirty |= check_nv("vlan1ports", "4 3 2 1 8*");
+		dirty |= check_nv("vlan2ports", "0 8");
+		dirty |= check_nv("boot_wait", "on");
+		dirty |= check_nv("wait_time", "5");
+		break;
+	case MODEL_TDN6: //bwq518
+		dirty |= check_nv("vlan1ports", "1 2 3 4 5*");
+		dirty |= check_nv("vlan2ports", "0 5");
+		dirty |= check_nv("boot_wait", "on");
+		dirty |= check_nv("wait_time", "5");
 		break;
 	case MODEL_WRT160Nv3:
 		if (nvram_match("vlan1ports", "1 2 3 4 5*")) {
@@ -556,6 +589,12 @@ static void check_bootnv(void)
 		dirty |= check_nv("wl0gpio1", "0");
 		dirty |= check_nv("wl0gpio2", "0");
 		dirty |= check_nv("wl0gpio3", "0");
+		break;
+	case MODEL_H618B:
+		dirty |= check_nv("wandevs", "vlan1");
+		dirty |= check_nv("vlan0hwname", "et0");
+		dirty |= check_nv("vlan1hwname", "et0");
+		break;
 	case MODEL_WL1600GL:
 		if (invalid_mac(nvram_get("et0macaddr"))) {
 			dirty |= find_sercom_mac_addr();
@@ -596,6 +635,7 @@ static void check_bootnv(void)
 	case MODEL_H218N:
 		dirty |= check_nv("vlan1hwname", "et0");
 		dirty |= check_nv("vlan2hwname", "et0");
+		dirty |= check_nv("boardflags", "0x710"); // set BFL_ENETVLAN, enable VLAN
 		dirty |= check_nv("reset_gpio", "30");
 		break;
 	case MODEL_WRT610Nv2:
@@ -620,6 +660,14 @@ static void check_bootnv(void)
 			inc_mac(mac, 1);
 			dirty |= check_nv("pci/1/1/macaddr", mac);
 		}
+	case MODEL_EA6500V1:
+		dirty |= check_nv("vlan2hwname", "et0");
+		if (strncasecmp(nvram_safe_get("pci/2/1/macaddr"), "00:90:4c", 8) == 0) {
+			strcpy(mac, nvram_safe_get("et0macaddr"));
+			inc_mac(mac, 3);
+			dirty |= check_nv("pci/2/1/macaddr", mac);
+		}
+		break;
 	case MODEL_E4200:
 		dirty |= check_nv("vlan2hwname", "et0");
 		if (strncasecmp(nvram_safe_get("pci/1/1/macaddr"), "00:90:4c", 8) == 0 ||
@@ -832,7 +880,7 @@ static int init_nvram(void)
 		case 0x1758:
 		case 0x2758:
 		case 0x3758:
-			if (nvram_match("wlx_hpamp", "")) {
+			if ( nvram_is_empty("wlx_hpamp") || nvram_match("wlx_hpamp", "")) {
 				if (nvram_get_int("wl_txpwr") > 10) nvram_set("wl_txpwr", "10");
 				nvram_set("wlx_hpamp", "1");
 				nvram_set("wlx_hperx", "0");
@@ -1030,14 +1078,15 @@ static int init_nvram(void)
 #ifdef TCONFIG_USBAP
 		nvram_set("lan_ifnames", "vlan1 eth1 eth2");
 		nvram_set("landevs", "vlan1 wl0 wl1");
-		nvram_set("wl_ifname", "eth1");
-		nvram_set("wl_ifname", "eth2");
+		nvram_set("wl0_ifname", "eth1");
+		nvram_set("wl1_ifname", "eth2");
 #else
 		nvram_set("lan_ifnames", "vlan1 eth1");
 		nvram_set("landevs", "vlan1 wl0");
 #endif
-		nvram_set("wl_ifnameX", "vlan2");
+		nvram_set("wan_ifnameX", "vlan2");
 		nvram_set("wl_ifname", "eth1");
+
 		}
 		break;
 	case MODEL_CW5358U:
@@ -1048,8 +1097,10 @@ static int init_nvram(void)
 		nvram_set("usb_uhci", "-1");
 #endif
 		if (!nvram_match("t_fix1", (char *)name)) {
-			nvram_set("lan_ifnames", "vlan0 eth1");
-			nvram_set("wan_ifnameX", "vlan1");
+			nvram_set("lan_ifnames", "vlan1 eth1");
+			nvram_set("wan_ifname", "vlan2");
+			nvram_set("wan_ifnames", "vlan2");
+			nvram_set("wan_ifnameX", "vlan2");
 			nvram_set("wl_ifname", "eth1");
 		}
 		break;
@@ -1098,9 +1149,66 @@ static int init_nvram(void)
 			nvram_set("wl_ifname", "eth1");
 		}
 		break;
+	case MODEL_TDN60:
+		mfr = "Tenda";
+		name = "N60";
+		features = SUP_SES | SUP_80211N;
+#ifdef TCONFIG_USB
+		nvram_set("usb_uhci", "-1");
+#endif
+		if (!nvram_match("t_fix1", (char *)name)) {
+			nvram_set("lan_ifnames", "vlan1 eth1 eth2");
+			nvram_set("wan_ifnameX", "vlan2");
+			nvram_set("wan_ifnames", "vlan2");
+			nvram_set("wan_ifnameX", "vlan2");
+			nvram_set("wl_ifnames", "eth1 eth2");
+			nvram_set("wl_ifname", "eth1");
+			nvram_set("wl0_ifname", "eth1");
+			nvram_set("wl1_ifname", "eth2");
+			nvram_set("wl0_bw_cap","3");
+			nvram_set("wl0_chanspec","1l");
+			nvram_set("wl1_bw_cap","7");
+			nvram_set("wl1_chanspec","36/80");
+			nvram_set("blink_5g_interface","eth2");
+			//nvram_set("landevs", "vlan1 wl0 wl1");
+			//nvram_set("wandevs", "vlan2");
+
+			// fix WL mac`s
+			nvram_set("wl0_hwaddr", nvram_safe_get("sb/1/macaddr"));
+			nvram_set("wl1_hwaddr", nvram_safe_get("0:macaddr"));
+		}
+		break;
+	case MODEL_TDN6:
+		mfr = "Tenda";
+		name = "N6";
+		features = SUP_SES | SUP_80211N;
+#ifdef TCONFIG_USB
+		nvram_set("usb_uhci", "-1");
+#endif
+		if (!nvram_match("t_fix1", (char *)name)) {
+			nvram_set("lan_ifnames", "vlan1 eth1 eth2");
+			nvram_set("wan_ifnameX", "vlan2");
+			nvram_set("wan_ifnames", "vlan2");
+			nvram_set("wan_ifnameX", "vlan2");
+			nvram_set("wl_ifnames", "eth1 eth2");
+			nvram_set("wl_ifname", "eth1");
+			nvram_set("wl0_ifname", "eth1");
+			nvram_set("wl1_ifname", "eth2");
+			nvram_set("wl0_bw_cap","3");
+			nvram_set("wl0_chanspec","1l");
+			nvram_set("wl1_bw_cap","7");
+			nvram_set("wl1_chanspec","36/80");
+			nvram_set("blink_5g_interface","eth2");
+
+		// fix WL mac`s
+		nvram_set("wl0_hwaddr", nvram_safe_get("sb/1/macaddr"));
+		nvram_set("wl1_hwaddr", nvram_safe_get("0:macaddr"));
+		}
+		break;
 	case MODEL_RTN10:
+	case MODEL_RTN10P:
 		mfr = "Asus";
-		name = "RT-N10";
+		name = nvram_match("boardrev", "0x1153") ? "RT-N10P" : "RT-N10";
 		features = SUP_SES | SUP_80211N;
 		if (!nvram_match("t_fix1", (char *)name)) {
 			nvram_set("lan_ifnames", "vlan0 eth1");
@@ -1172,14 +1280,23 @@ static int init_nvram(void)
 		}
 		break;
 	case MODEL_RTN53:
+	case MODEL_RTN53A1:
 		mfr = "Asus";
-		name = "RT-N53";
+		name = nvram_match("boardrev", "0x1446") ? "RT-N53 A1" : "RT-N53";
 		features = SUP_SES | SUP_80211N;
 #if defined(LINUX26) && defined(TCONFIG_USBAP)
 		if (nvram_get_int("usb_storage") == 1) nvram_set("usb_storage", "-1");
 #endif
 		if (!nvram_match("t_fix1", (char *)name)) {
 #ifdef TCONFIG_USBAP
+			nvram_set("wl1_hwaddr", nvram_safe_get("0:macaddr"));
+			nvram_set("ehciirqt", "3");
+			nvram_set("qtdc_pid", "48407");
+			nvram_set("qtdc_vid", "2652");
+			nvram_set("qtdc0_ep", "4");
+			nvram_set("qtdc0_sz", "0");
+			nvram_set("qtdc1_ep", "18");
+			nvram_set("qtdc1_sz", "10");
 			nvram_set("lan_ifnames", "vlan2 eth1 eth2");
 			nvram_set("landevs", "vlan2 wl0 wl1");
 			nvram_set("wl1_ifname", "eth2");
@@ -1187,6 +1304,7 @@ static int init_nvram(void)
 			nvram_set("lan_ifnames", "vlan2 eth1");
 			nvram_set("landevs", "vlan2 wl0");
 #endif
+			nvram_set("lan_ifname", "br0");
 			nvram_set("wl_ifname", "eth1");
 			nvram_set("wl0_ifname", "eth1");
 			nvram_set("wan_ifnameX", "vlan1");
@@ -1199,79 +1317,101 @@ static int init_nvram(void)
 		mfr = "Asus";
 		name = "RT-AC56U";
 		features = SUP_SES | SUP_80211N | SUP_1000ET | SUP_80211AC;
-		nvram_set("vlan1hwname", "et0");
-		nvram_set("vlan2hwname", "et0");
-		nvram_set("lan_ifname", "br0");
-		nvram_set("0:ledbh3", "0x87");	  // since 163.42 //
-		nvram_set("1:ledbh10", "0x87");
-		nvram_set("landevs", "vlan1 wl0 wl1");
-		nvram_set("wl_ifnames", "eth1 eth2");
-		nvram_set("wl0_vifnames", "wl0.1 wl0.2 wl0.3");
-		nvram_set("wl1_vifnames", "wl1.1 wl1.2 wl1.3");
-		nvram_set_int("pwr_usb_gpio", 9|GPIO_ACTIVE_LOW);
-		nvram_set_int("pwr_usb_gpio2", 10|GPIO_ACTIVE_LOW);	// Use at the first shipment of RT-AC56U.
-		nvram_set_int("led_usb_gpio", 14|GPIO_ACTIVE_LOW);	// change led gpio(usb2/usb3) to sync the outer case
-		nvram_set_int("led_wan_gpio", 1|GPIO_ACTIVE_LOW);
-		nvram_set_int("led_lan_gpio", 2|GPIO_ACTIVE_LOW);
-		nvram_set_int("led_pwr_gpio", 3|GPIO_ACTIVE_LOW);
-		nvram_set_int("led_wps_gpio", 3|GPIO_ACTIVE_LOW);
-		nvram_set_int("led_all_gpio", 4|GPIO_ACTIVE_LOW);	// actually, this is high active, and will power off all led when active; to fake LOW_ACTIVE to sync boardapi
-		nvram_set_int("led_5g_gpio", 6|GPIO_ACTIVE_LOW);	// 4352's fake led 5g
-		nvram_set_int("led_usb3_gpio", 0|GPIO_ACTIVE_LOW);	// change led gpio(usb2/usb3) to sync the outer case
-		nvram_set_int("btn_wps_gpio", 15|GPIO_ACTIVE_LOW);
-		nvram_set_int("btn_rst_gpio", 11|GPIO_ACTIVE_LOW);
-#ifdef RTCONFIG_WIFI_TOG_BTN
-		nvram_set_int("btn_wltog_gpio", 7|GPIO_ACTIVE_LOW);
+#ifdef TCONFIG_USB
+		nvram_set("usb_uhci", "-1");
 #endif
-#ifdef RTCONFIG_TURBO
-		nvram_set_int("btn_turbo_gpio", 5);
-#endif
+		if (!nvram_match("t_fix1", (char *)name)) {
+			nvram_set("vlan1hwname", "et0");
+			nvram_set("vlan2hwname", "et0");
+			nvram_set("lan_ifname", "br0");
+			nvram_set("landevs", "vlan1 wl0 wl1");
+			nvram_set("lan_ifnames", "vlan1 eth1 eth2");
+			nvram_set("wan_ifnames", "vlan2");
+			nvram_set("wan_ifnameX", "vlan2");
+			nvram_set("wandevs", "vlan2");
+			nvram_set("wl_ifnames", "eth1 eth2");
+			nvram_set("wl_ifname", "eth1");
+			nvram_set("wl0_ifname", "eth1");
+			nvram_set("wl1_ifname", "eth2");
 
-#ifdef RTCONFIG_XHCIMODE
-		nvram_set("xhci_ports", "1-1");
-		nvram_set("ehci_ports", "2-1 2-2");
-		nvram_set("ohci_ports", "3-1 3-2");
-#else
-		if(nvram_get_int("usb_usb3") == 1){
+			// fix WL mac`s
+			nvram_set("wl0_hwaddr", nvram_safe_get("0:macaddr"));
+			nvram_set("wl1_hwaddr", nvram_safe_get("1:macaddr"));
+
+			// usb3.0 settings
+			nvram_set("usb_usb3", "1");
 			nvram_set("xhci_ports", "1-1");
 			nvram_set("ehci_ports", "2-1 2-2");
 			nvram_set("ohci_ports", "3-1 3-2");
-		}
-		else{
-			nvram_unset("xhci_ports");
-			nvram_set("ehci_ports", "1-1 1-2");
-			nvram_set("ohci_ports", "2-1 2-2");
-		}
-#endif
 
-		if(!nvram_get("ct_max"))
-			nvram_set("ct_max", "300000");
-		add_rc_support("mssid 2.4G 5G update usbX2");
-		add_rc_support("switchctrl"); // broadcom: for jumbo frame only
-		add_rc_support("manual_stb");
-		add_rc_support("pwrctrl");
-		add_rc_support("WIFI_LOGO");
-		add_rc_support("nandflash");
+			// force wl1 settings
+			nvram_set("wl1_bw", "3");
+			nvram_set("wl1_bw_cap", "7");
+			nvram_set("wl1_chanspec", "149/80");
+			nvram_set("wl1_nctrlsb", "lower");
+			nvram_set("0:ccode", "SG");
+			nvram_set("1:ccode", "SG");
+			nvram_set("wl_country", "SG");
+			nvram_set("wl_country_code", "SG");
+		}
+		break;
+	case MODEL_RTAC68U:
+		mfr = "Asus";
+		name = "RT-AC68R/U";
+		features = SUP_SES | SUP_80211N | SUP_1000ET | SUP_80211AC;
+#ifdef TCONFIG_USB
+		nvram_set("usb_uhci", "-1");
+#endif
+		if (!nvram_match("t_fix1", (char *)name)) {
+			nvram_set("vlan1hwname", "et0");
+			nvram_set("vlan2hwname", "et0");
+			nvram_set("lan_ifname", "br0");
+			nvram_set("landevs", "vlan1 wl0 wl1");
+			nvram_set("lan_ifnames", "vlan1 eth1 eth2");
+			nvram_set("wan_ifnames", "vlan2");
+			nvram_set("wan_ifnameX", "vlan2");
+			nvram_set("wandevs", "vlan2");
+			nvram_set("wl_ifnames", "eth1 eth2");
+			nvram_set("wl_ifname", "eth1");
+			nvram_set("wl0_ifname", "eth1");
+			nvram_set("wl1_ifname", "eth2");
+
+			// fix WL mac`s
+			nvram_set("wl0_hwaddr", nvram_safe_get("0:macaddr"));
+			nvram_set("wl1_hwaddr", nvram_safe_get("1:macaddr"));
+
+			// usb3.0 settings
+			nvram_set("usb_usb3", "1");
+			nvram_set("xhci_ports", "1-1");
+			nvram_set("ehci_ports", "2-1 2-2");
+			nvram_set("ohci_ports", "3-1 3-2");
+
+			// force wl1 settings
+			nvram_set("wl1_bw", "3");
+			nvram_set("wl1_bw_cap", "7");
+			nvram_set("wl1_chanspec", "149/80");
+			nvram_set("wl1_nctrlsb", "lower");
+			nvram_set("0:ccode", "SG");
+			nvram_set("1:ccode", "SG");
+			nvram_set("wl_country", "SG");
+			nvram_set("wl_country_code", "SG");
+		}
 		break;
 */
+
 	case MODEL_RTN66U:
 		mfr = "Asus";
 #ifdef CONFIG_BCMWL6
-		name = "RT-AC66U"; //id, board, rev same as N66
-#else
-		name = "RT-N66U";
-#endif
-#ifdef CONFIG_BCMWL6
+		name = "RT-AC66U";
 		features = SUP_SES | SUP_80211N | SUP_1000ET | SUP_80211AC;
 #else
+		name = "RT-N66U";
 		features = SUP_SES | SUP_80211N | SUP_1000ET;
 #endif
-#ifdef TCONFIG_USB
 		nvram_set("usb_uhci", "-1");
 #ifndef CONFIG_BCMWL6
-#if defined(LINUX26) && defined(TCONFIG_USB_EXTRAS)
+#if defined(LINUX26)
 		if (nvram_get_int("usb_mmc") == -1) nvram_set("usb_mmc", "0");
-#endif
 #endif
 #endif
 		if (!nvram_match("t_fix1", (char *)name)) {
@@ -1282,6 +1422,11 @@ static int init_nvram(void)
 			nvram_set("wl_ifname", "eth1");
 			nvram_set("wl0_ifname", "eth1");
 			nvram_set("wl1_ifname", "eth2");
+			nvram_set("wl1_bw_cap","7");
+			nvram_set("wl1_chanspec","36/80");
+			nvram_set("wl0_bw_cap","3");
+			nvram_set("wl0_chanspec","1l");
+			nvram_set("blink_5g_interface","eth2");
 #endif
 			nvram_set("landevs", "vlan1 wl0 wl1");
 			nvram_set("wandevs", "vlan2");
@@ -1382,8 +1527,8 @@ static int init_nvram(void)
 			nvram_set("pci/2/1/ledbh3", "11");
 			nvram_set("pci/2/1/ledbh10", "7");
 
-			//force USA country for eth2
-			nvram_set("pci/2/1/ccode", "US");
+			//force EU country for eth2
+			nvram_set("pci/2/1/ccode", "EU");
 		}
 		break;
 
@@ -1414,101 +1559,137 @@ static int init_nvram(void)
 			nvram_set("wl0_hwaddr", nvram_safe_get("0:macaddr"));
 			nvram_set("wl1_hwaddr", nvram_safe_get("1:macaddr"));
 
-//			nvram_set("wl0_phytype", "h");
-//			nvram_set("wl0_phytypes", "h");
-//			nvram_set("wl1_phytype", "h"); // "h" for now. For 80Mhz should be "v"
-//			nvram_set("wl1_phytypes", "h"); // "h" for now. For 80Mhz should be "v"
-//			nvram_set("wl1_unit" ,"1");
-
-
-			// bcm4360ac_defaults
-/*
-			nvram_set("pci/2/1/aa2g", "0");
-			nvram_set("pci/2/1/aa5g", "7");
-			nvram_set("pci/2/1/aga0", "71");
-			nvram_set("pci/2/1/aga1", "71");
-			nvram_set("pci/2/1/aga2", "71");
-			nvram_set("pci/2/1/agbg0", "133");
-			nvram_set("pci/2/1/agbg1", "133");
-			nvram_set("pci/2/1/agbg2", "133");
-			nvram_set("pci/2/1/antswitch", "0");
-			nvram_set("pci/2/1/cckbw202gpo", "0");
-			nvram_set("pci/2/1/cckbw20ul2gpo", "0");
-			nvram_set("pci/2/1/dot11agofdmhrbw202gpo", "0");
-			nvram_set("pci/2/1/femctrl", "3");
-			nvram_set("pci/2/1/papdcap2g", "0");
-			nvram_set("pci/2/1/tworangetssi2g", "0");
-			nvram_set("pci/2/1/pdgain2g", "4");
-			nvram_set("pci/2/1/epagain2g", "0");
-			nvram_set("pci/2/1/tssiposslope2g", "1");
-			nvram_set("pci/2/1/gainctrlsph", "0");
-			nvram_set("pci/2/1/papdcap5g", "0");
-			nvram_set("pci/2/1/tworangetssi5g", "0");
-			nvram_set("pci/2/1/pdgain5g", "4");
-			nvram_set("pci/2/1/epagain5g", "0");
-			nvram_set("pci/2/1/tssiposslope5g", "1");
-			nvram_set("pci/2/1/maxp2ga0", "76");
-			nvram_set("pci/2/1/maxp2ga1", "76");
-			nvram_set("pci/2/1/maxp2ga2", "76");
-			nvram_set("pci/2/1/mcsbw202gpo", "0");
-			nvram_set("pci/2/1/mcsbw402gpo", "0");
-			nvram_set("pci/2/1/measpower", "0x7f");
-			nvram_set("pci/2/1/measpower1", "0x7f");
-			nvram_set("pci/2/1/measpower2", "0x7f");
-			nvram_set("pci/2/1/noiselvl2ga0", "31");
-			nvram_set("pci/2/1/noiselvl2ga1", "31");
-			nvram_set("pci/2/1/noiselvl2ga2", "31");
-			nvram_set("pci/2/1/noiselvl5gha0", "31");
-			nvram_set("pci/2/1/noiselvl5gha1", "31");
-			nvram_set("pci/2/1/noiselvl5gha2", "31");
-			nvram_set("pci/2/1/noiselvl5gla0", "31");
-			nvram_set("pci/2/1/noiselvl5gla1", "31");
-			nvram_set("pci/2/1/noiselvl5gla2", "31");
-			nvram_set("pci/2/1/noiselvl5gma0", "31");
-			nvram_set("pci/2/1/noiselvl5gma1", "31");
-			nvram_set("pci/2/1/noiselvl5gma2", "31");
-			nvram_set("pci/2/1/noiselvl5gua0", "31");
-			nvram_set("pci/2/1/noiselvl5gua1", "31");
-			nvram_set("pci/2/1/noiselvl5gua2", "31");
-			nvram_set("pci/2/1/ofdmlrbw202gpo", "0");
-			nvram_set("pci/2/1/pa2ga0", "0xfe72,0x14c0,0xfac7");
-			nvram_set("pci/2/1/pa2ga1", "0xfe80,0x1472,0xfabc");
-			nvram_set("pci/2/1/pa2ga2", "0xfe82,0x14bf,0xfad9");
-			nvram_set("pci/2/1/pcieingress_war", "15");
-			nvram_set("pci/2/1/phycal_tempdelta", "255");
-			nvram_set("pci/2/1/rawtempsense", "0x1ff");
-			nvram_set("pci/2/1/rxchain", "7");
-			nvram_set("pci/2/1/rxgainerr2g", "0xffff");
-			nvram_set("pci/2/1/rxgainerr5g", "0xffff,0xffff,0xffff,0xffff");
-			nvram_set("pci/2/1/rxgains2gelnagaina0", "0");
-			nvram_set("pci/2/1/rxgains2gelnagaina1", "0");
-			nvram_set("pci/2/1/rxgains2gelnagaina2", "0");
-			nvram_set("pci/2/1/rxgains2gtrelnabypa0", "0");
-			nvram_set("pci/2/1/rxgains2gtrelnabypa1", "0");
-			nvram_set("pci/2/1/rxgains2gtrelnabypa2", "0");
-			nvram_set("pci/2/1/rxgains2gtrisoa0", "0");
-			nvram_set("pci/2/1/rxgains2gtrisoa1", "0");
-			nvram_set("pci/2/1/rxgains2gtrisoa2", "0");
-			nvram_set("pci/2/1/sar2g", "18");
-			nvram_set("pci/2/1/sar5g", "15");
-			nvram_set("pci/2/1/sromrev", "11");
-			nvram_set("pci/2/1/subband5gver", "0x4");
-			nvram_set("pci/2/1/tempcorrx", "0x3f");
-			nvram_set("pci/2/1/tempoffset", "255");
-			nvram_set("pci/2/1/temps_hysteresis", "15");
-			nvram_set("pci/2/1/temps_period", "15");
-			nvram_set("pci/2/1/tempsense_option", "0x3");
-			nvram_set("pci/2/1/tempsense_slope", "0xff");
-			nvram_set("pci/2/1/tempthresh", "255");
-			nvram_set("pci/2/1/txchain", "7");
-			nvram_set("pci/2/1/ledbh0", "2");
-			nvram_set("pci/2/1/ledbh1", "5");
-			nvram_set("pci/2/1/ledbh2", "4");
-			nvram_set("pci/2/1/ledbh3", "11");
-			nvram_set("pci/2/1/ledbh10", "7");*/
-#endif
+			// fix ssid according to 5G(eth2) and 2.4G(eth1) 
+			nvram_set("wl_ssid","TomatoRAF50");
+			nvram_set("wl0_ssid","TomatoRAF50");
+			nvram_set("wl1_ssid","TomatoRAF24");
 		}
 		break;
+	case MODEL_D1800H:
+		mfr = "Buffalo";
+		if (nvram_match("product", "WLI-H4-D1300")) {
+			name = "WLI-H4-D1300";
+		}
+		else if (nvram_match("product", "WZR-D1100H")) {
+			name = "WZR-D1100H";
+		}
+		else {
+			name = "WZR-D1800H";
+		}
+		features = SUP_SES | SUP_AOSS_LED | SUP_80211N | SUP_1000ET | SUP_80211AC;
+#ifdef TCONFIG_USB
+		nvram_set("usb_uhci", "-1");
+#endif
+		if (!nvram_match("t_fix1", (char *)name)) {
+			nvram_set("lan_ifnames", "vlan1 eth1 eth2");
+			nvram_set("wan_ifnameX", "vlan2");
+			nvram_set("wl_ifnames", "eth1 eth2");
+			nvram_set("wl_ifname", "eth1");
+			nvram_set("wl0_ifname", "eth2");
+			nvram_set("wl1_ifname", "eth1");
+			nvram_set("wl0_bw_cap","7");
+			nvram_set("wl0_chanspec","36/80");
+			nvram_set("wl1_bw_cap","3");
+			nvram_set("wl1_chanspec","1l");
+			nvram_set("blink_5g_interface","eth1");
+
+			// fix WL mac`s
+			strcpy(s, nvram_safe_get("et0macaddr"));
+			trimstr(s);
+			int i;
+			for (i = 0; i < strlen(s); i ++) if ( s[i] == '-') s[i] = ':';
+			nvram_set("et0macaddr",s);
+			inc_mac(s, +2);
+			nvram_set("wl0_hwaddr", s);
+			inc_mac(s, +1);
+			nvram_set("wl1_hwaddr", s);
+
+			// fix ssid according to 5G(eth2) and 2.4G(eth1) 
+			nvram_set("wl_ssid","TomatoRAF50");
+			nvram_set("wl0_ssid","TomatoRAF50");
+			nvram_set("wl1_ssid","TomatoRAF24");
+
+			nvram_set("pci/2/1/maxp2ga0", "0x70");
+			nvram_set("pci/2/1/maxp2ga1", "0x70");
+			nvram_set("pci/2/1/maxp2ga2", "0x70");
+			nvram_set("pci/2/1/maxp5ga0", "0x6A");
+			nvram_set("pci/2/1/maxp5ga1", "0x6A");
+			nvram_set("pci/2/1/maxp5ga2", "0x6A");
+			nvram_set("pci/2/1/cckbw202gpo", "0x5555");
+			nvram_set("pci/2/1/cckbw20ul2gpo", "0x5555");
+			nvram_set("pci/2/1/legofdmbw202gpo", "0x97555555");
+			nvram_set("pci/2/1/legofdmbw20ul2gpo", "0x97555555");
+			nvram_set("pci/2/1/mcsbw202gpo", "0xDA755555");
+			nvram_set("pci/2/1/mcsbw20ul2gpo", "0xDA755555");
+			nvram_set("pci/2/1/mcsbw402gpo", "0xFC965555");
+			nvram_set("pci/2/1/cckbw205gpo", "0x5555");
+			nvram_set("pci/2/1/cckbw20ul5gpo", "0x5555");
+			nvram_set("pci/2/1/legofdmbw205gpo", "0x97555555");
+			nvram_set("pci/2/1/legofdmbw20ul5gpo", "0x97555555");
+			nvram_set("pci/2/1/legofdmbw205gmpo", "0x77777777");
+			nvram_set("pci/2/1/legofdmbw20ul5gmpo", "0x77777777");
+			nvram_set("pci/2/1/legofdmbw205ghpo", "0x77777777");
+			nvram_set("pci/2/1/legofdmbw20ul5ghpo", "0x77777777");
+			nvram_set("pci/2/1/mcsbw205ghpo", "0x77777777");
+			nvram_set("pci/2/1/mcsbw20ul5ghpo", "0x77777777");
+			nvram_set("pci/2/1/mcsbw205gpo", "0xDA755555");
+			nvram_set("pci/2/1/mcsbw20ul5gpo", "0xDA755555");
+			nvram_set("pci/2/1/mcsbw405gpo", "0xFC965555");
+			nvram_set("pci/2/1/mcsbw405ghpo", "0x77777777");
+			nvram_set("pci/2/1/mcsbw405ghpo", "0x77777777");
+			nvram_set("pci/2/1/mcs32po", "0x7777");
+			nvram_set("pci/2/1/legofdm40duppo", "0x0000");
+			nvram_set("pci/1/1/maxp5ga0", "104,104,104,104");
+			nvram_set("pci/1/1/maxp5ga1", "104,104,104,104");
+			nvram_set("pci/1/1/maxp5ga2", "104,104,104,104");
+			nvram_set("pci/1/1/mcsbw205glpo", "0xBB975311");
+			nvram_set("pci/1/1/mcsbw405glpo", "0xBB975311");
+			nvram_set("pci/1/1/mcsbw805glpo", "0xBB975311");
+			nvram_set("pci/1/1/mcsbw205gmpo", "0xBB975311");
+			nvram_set("pci/1/1/mcsbw405gmpo", "0xBB975311");
+			nvram_set("pci/1/1/mcsbw805gmpo", "0xBB975311");
+			nvram_set("pci/1/1/mcsbw205ghpo", "0xBB975311");
+			nvram_set("pci/1/1/mcsbw405ghpo", "0xBB975311");
+			nvram_set("pci/1/1/mcsbw805ghpo", "0xBB975311");
+
+			//force US country for 5G eth1, modified by bwq518
+			nvram_set("pci/1/1/ccode", "US");
+			nvram_set("wl1_country_code", "US");
+			nvram_set("regulation_domain_5G", "US");
+		}
+		break;
+	case MODEL_EA6500V1:
+		mfr = "Linksys";
+		name = "EA6500v1";
+		features = SUP_SES | SUP_80211N | SUP_1000ET | SUP_80211AC;
+#ifdef TCONFIG_USB
+		nvram_set("usb_uhci", "-1");
+#endif
+		if (!nvram_match("t_fix1", (char *)name)) {
+			nvram_set("lan_ifnames", "vlan1 eth1 eth2");
+			nvram_set("wan_ifnameX", "vlan2");
+			nvram_set("wl_ifnames", "eth1 eth2");
+			nvram_set("wl_ifname", "eth1");
+			nvram_set("wl0_ifname", "eth1");
+			nvram_set("wl1_ifname", "eth2");
+			nvram_set("wl0_bw_cap","7");
+			nvram_set("wl0_chanspec","36/80");
+			nvram_set("wl1_bw_cap","3");
+			nvram_set("wl1_chanspec","1l");
+			nvram_set("blink_5g_interface","eth1");
+
+			// fix ssid according to 5G(eth1) and 2.4G(eth2) 
+			nvram_set("wl_ssid","TomatoRAF50");
+			nvram_set("wl0_ssid","TomatoRAF50");
+			nvram_set("wl1_ssid","TomatoRAF24");
+
+			//force US country for 5G eth1, modified by bwq518
+			nvram_set("pci/1/1/ccode", nvram_safe_get("ccode"));
+			nvram_set("regulation_domain_5G", nvram_safe_get("ccode"));
+#endif // CONFIG_BCMWL6
+		}
+		break;
+
 	case MODEL_WNR3500L:
 		mfr = "Netgear";
 		name = "WNR3500L/U/v2";
@@ -1629,6 +1810,14 @@ static int init_nvram(void)
 #endif
 		if (!nvram_match("t_fix1", (char *)name)) {
 #ifdef TCONFIG_USBAP
+			nvram_set("wl1_hwaddr", nvram_safe_get("0:macaddr"));
+			nvram_set("ehciirqt", "3");
+			nvram_set("qtdc_pid", "48407");
+			nvram_set("qtdc_vid", "2652");
+			nvram_set("qtdc0_ep", "4");
+			nvram_set("qtdc0_sz", "0");
+			nvram_set("qtdc1_ep", "18");
+			nvram_set("qtdc1_sz", "10");
 			nvram_set("lan_ifnames", "vlan1 eth1 eth2");
 			nvram_set("landevs", "vlan1 wl0 wl1");
 			nvram_set("wl0_ifname", "eth1");
@@ -1652,6 +1841,14 @@ static int init_nvram(void)
 #endif
 		if (!nvram_match("t_fix1", (char *)name)) {
 #ifdef TCONFIG_USBAP
+			nvram_set("wl1_hwaddr", nvram_safe_get("usb/0xBD17/macaddr"));
+			nvram_set("ehciirqt", "3");
+			nvram_set("qtdc_pid", "48407");
+			nvram_set("qtdc_vid", "2652");
+			nvram_set("qtdc0_ep", "4");
+			nvram_set("qtdc0_sz", "0");
+			nvram_set("qtdc1_ep", "18");
+			nvram_set("qtdc1_sz", "10");
 			nvram_set("lan_ifnames", "vlan1 eth1 eth2");
 			nvram_set("landevs", "vlan1 wl0 wl1");
 			nvram_set("wl0_ifname", "eth1");
@@ -1778,6 +1975,16 @@ static int init_nvram(void)
 		mfr = "ZTE";
 		name = "ZXV10 H618B";
 		features = SUP_SES | SUP_AOSS_LED;
+#ifdef TCONFIG_USB
+		nvram_set("usb_uhci", "-1");
+#endif
+		if (!nvram_match("t_fix1", (char *)name)) {
+			nvram_set("lan_ifnames", "vlan0 eth1");
+			nvram_set("wan_ifname", "vlan1");
+			nvram_set("wan_ifnames", "vlan1");
+			nvram_set("wan_ifnameX", "vlan1");
+			nvram_set("wl_ifname", "eth1");
+		}
 		break;
 	case MODEL_WL1600GL:
 		mfr = "Ovislink";
@@ -2108,7 +2315,10 @@ static void sysinit(void)
 	set_tz();
 
 	eval("buttons");
+
+#ifdef CONFIG_BCMWL6
 	eval("blink_5g");
+#endif
 
 	if (!noconsole) xstart("console");
 

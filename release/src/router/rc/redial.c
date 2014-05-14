@@ -73,7 +73,7 @@ int redial_main(int argc, char **argv)
 
 #if 0
 		long ut;
-		if ((count < 3) && ((get_wan_proto() == WP_PPPOE) || (get_wan_proto() == WP_PPP3G)) {
+		if ((count < 3) && (get_wan_proto() == WP_PPPOE) || (get_wan_proto() == WP_PPP3G)) {
 			if (f_read("/var/lib/misc/pppoe-disc", &ut, sizeof(ut)) == sizeof(ut)) {
 				ut = (get_uptime() - ut);
 				if (ut <= 15) {

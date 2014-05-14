@@ -335,6 +335,7 @@ int mtd_write_main(int argc, char *argv[])
 //	case 0x32435745: // EWC2	WRT300N?
 	case 0x3035314E: // N150	WRT150N
 	case 0x58353245: // E25X	E2500
+	case 0x33563532: // E25V3	E2500 v3
 	case 0x30303233: // 3200	E3200
 	case 0x30303234: // 4200	E4200
 		if (safe_fread(((char *)&cth) + 4, 1, sizeof(cth) - 4, f) != (sizeof(cth) - 4)) {
@@ -373,6 +374,7 @@ int mtd_write_main(int argc, char *argv[])
 	case TRX_MAGIC:
 		break;
 #ifdef CONFIG_BCMWL5
+#ifndef CONFIG_BCMWL6
 	case TRX_MAGIC_F7D3301:
 	case TRX_MAGIC_F7D3302:
 	case TRX_MAGIC_F7D4302:
@@ -380,6 +382,7 @@ int mtd_write_main(int argc, char *argv[])
 	case TRX_MAGIC_QA:
 		sig = TRX_MAGIC;
 		break;
+#endif
 #endif
 	default:
 		// moto
@@ -410,6 +413,7 @@ int mtd_write_main(int argc, char *argv[])
 
 	switch (model) {
 #ifdef CONFIG_BCMWL5
+#ifndef CONFIG_BCMWL6
 	case MODEL_F7D3301:
 		trx.magic = TRX_MAGIC_F7D3301;
 		break;
@@ -422,6 +426,7 @@ int mtd_write_main(int argc, char *argv[])
 	case MODEL_F5D8235v3:
 		trx.magic = TRX_MAGIC_F5D8235V3;
 		break;
+#endif
 #endif
 	default:
 		trx.magic = sig;

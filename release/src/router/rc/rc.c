@@ -81,43 +81,51 @@ typedef struct {
 } applets_t;
 
 static const applets_t applets[] = {
-	{ "init",				init_main				},
-	{ "console",				console_main				},
-	{ "rc",					rc_main					},
-	{ "ip-up",				ipup_main				},
-	{ "ip-down",			ipdown_main				},
-	{ "ppp_event",			pppevent_main  			},
-	{ "hotplug",			hotplug_main			},
-	{ "redial",				redial_main				},
-	{ "listen",				listen_main				},
-	{ "service",			service_main			},
-	{ "sched",				sched_main				},
-	{ "mtd-write",			mtd_write_main			},
-	{ "mtd-erase",			mtd_unlock_erase_main	},
-	{ "mtd-unlock",			mtd_unlock_erase_main	},
-	{ "buttons",			buttons_main			},
-	{ "blink_5g",			blink_5g_main			},
-	{ "rcheck",				rcheck_main				},
-	{ "dhcpc-event",		dhcpc_event_main		},
-	{ "dhcpc-release",		dhcpc_release_main		},
-	{ "dhcpc-renew",		dhcpc_renew_main		},
+	{ "init",			init_main		},
+	{ "console",		console_main	},
+	{ "rc",				rc_main			},
+	{ "ip-up",			ipup_main		},
+	{ "ip-down",		ipdown_main		},
+/*  KDB - these functions do nothing why are they here?
 #ifdef TCONFIG_IPV6
-	{ "dhcp6c-state",		dhcp6c_state_main		},
+	{ "ipv6-up",		ip6up_main		},
+	{ "ipv6-down",		ip6down_main	},
 #endif
-	{ "radio",				radio_main				},
-	{ "led",				led_main				},
-	{ "halt",				reboothalt_main			},
-	{ "reboot",				reboothalt_main			},
-	{ "gpio",				gpio_main				},
-	{ "wldist",				wldist_main				},
+*/
+	{ "ppp_event",		pppevent_main		  	},
+	{ "hotplug",		hotplug_main			},
+	{ "redial",			redial_main				},
+	{ "listen",			listen_main				},
+	{ "service",		service_main			},
+	{ "sched",			sched_main				},
+	{ "mtd-write",		mtd_write_main			},
+	{ "mtd-erase",		mtd_unlock_erase_main	},
+	{ "mtd-unlock",		mtd_unlock_erase_main	},
+	{ "buttons",		buttons_main			},
+#ifdef CONFIG_BCMWL6
+	{ "blink_5g",		blink_5g_main			},
+#endif
+	{ "rcheck",				rcheck_main			},
+	{ "dhcpc-event",		dhcpc_event_main	},
+	{ "dhcpc-release",		dhcpc_release_main	},
+	{ "dhcpc-renew",		dhcpc_renew_main	},
+#ifdef TCONFIG_IPV6
+	{ "dhcp6c-state",		dhcp6c_state_main	},
+#endif
+	{ "radio",			radio_main				},
+	{ "led",			led_main				},
+	{ "halt",			reboothalt_main			},
+	{ "reboot",			reboothalt_main			},
+	{ "gpio",			gpio_main				},
+	{ "wldist",			wldist_main				},
 #ifdef TCONFIG_CIFS
-	{ "mount-cifs",			mount_cifs_main			},
+	{ "mount-cifs",		mount_cifs_main			},
 #endif
 #ifdef TCONFIG_DDNS
-	{ "ddns-update",		ddns_update_main		},
+	{ "ddns-update",	ddns_update_main		},
 #endif
 #ifdef DEBUG_RCTEST
-	{ "rctest",				rctest_main				},
+	{ "rctest",			rctest_main				},
 #endif
 	{NULL, NULL}
 };
