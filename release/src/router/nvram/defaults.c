@@ -185,7 +185,8 @@ const defaults_t defaults[] = {
 	{ "ipv6_6rd_prefix",	"2602:100::"	},	// 6RD prefix (Charter)
 	{ "ipv6_6rd_prefix_length",	"32"		},	// 6RD prefix length (32-62) checkme
 	{ "ipv6_6rd_borderrelay",	"68.113.165.1"	},	// 6RD border relay address
-	{ "ipv6_6rd_ipv4masklen",	"0"				},	// 6RD IPv4 mask length 0-30) checkme
+	{ "ipv6_6rd_ipv4masklen",	"0"		},	// 6RD IPv4 mask length 0-30) checkme
+	{ "ipv6_isp_opt",		"0"		},	// add wan.c dhcpd eval option.
 #endif
 
 	// Wireless parameters
@@ -458,6 +459,7 @@ const defaults_t defaults[] = {
 	{ "udpxy_clients",		"3"				},
 	{ "udpxy_port",			"4022"			},
 	{ "ne_syncookies",		"0"				},	// tcp_syncookies
+	{ "DSCP_fix_enable",		"1"				},      // Comacst DSCP fix
 	{ "ne_snat",			"0"				},	// use SNAT instead of MASQUERADE
 	{ "dhcp_pass",			"1"				},	// allow DHCP responses
 	{ "ne_shlimit",			"0,3,60"		},
