@@ -478,9 +478,15 @@ const char *get_address(int required)
 						error(M_ERROR_GET_IP);
 					}
 				}
+				else if (strcmp(c, "pairnic") == 0) {
+					if (wget(0, 1, "myip.pairnic.com", "/", NULL, 0, &body) != 200) {
+						// Current IP Address: 1.2.3.4
+						error(M_ERROR_GET_IP);
+					}
+				}
 
 				if ((p = strstr(body, "Address:")) != NULL) {
-					// dyndns, zoneedit, tzo
+					// dyndns, zoneedit, tzo, pairnic
 					p += 8;	// note: tzo doesn't have a space
 				}
 				else {
@@ -1474,16 +1480,16 @@ static void update_editdns(void)
 ...
 
 Good responses:
-	+OK: Tunnel endpoint updated to: X.X.X.X
-
+	+OK: Tunnel endpoint updated to: XXX.XXX.XXX.XXX
+	-ERROR: This tunnel is already associated with this IP address. Please try and limit your updates to IP changes.
 Bad responses:
-	-ERROR: This tunnel is already associated with this IP address.  Please try and limit your updates to IP changes.
-	-ERROR: Invalid API key or password
 	-ERROR: Tunnel not found
+	-ERROR: Invalid API key or password
 	-ERROR: IP is not in a valid format
-	-ERROR: IP is blocked. (RFC1918 Private Address Space)
-	-ERROR: IP is not ICMP pingable. Please make sure ICMP is not blocked. If you are blocking ICMP, please allow 66.220.2.74 through your firewall.
 	-ERROR: Missing parameter(s).
+	-ERROR: IP is not ICMP pingable. Please make sure ICMP is not blocked. If you are blocking ICMP, please allow 66.220.2.74 through your firewall.
+	-ERROR: IP is blocked. (RFC1918 Private Address Space)
+
 */
 static void update_heipv6tb(void)
 {
@@ -1503,19 +1509,17 @@ static void update_heipv6tb(void)
 
 	r = wget(1, 0, "ipv4.tunnelbroker.net", query, NULL, 0, &body);
 	if (r == 200) {
-		if (strstr(body, "+OK:") != NULL) {
+		if ((strstr(body, "endpoint updated to") != NULL) || (strstr(body, "is already associated") != NULL)) {
 			success();
 		}
-
-		p = strstr(body, serr);
-		if (p != NULL) {
-			p += strlen(serr);
-			if (p != NULL) {
-				if (strstr(p, "already associated with this IP") != NULL)
-					success_msg(p);
-				else
-					error(p);
-			}
+		if (strstr(body, "Invalid API key or password") != NULL) {
+			error(M_INVALID_AUTH);
+		}
+		if (strstr(body, "Tunnel not found") != NULL) {
+			error(M_INVALID_PARAM__S, "Tunnel ID");
+		}
+		if (strstr(body, "IP is not in a valid format") != NULL) {
+			error(M_INVALID_PARAM__S, "IPv4 endpoint");
 		}
 
 		error(M_UNKNOWN_RESPONSE__D, -1);
@@ -1819,6 +1823,14 @@ int main(int argc, char *argv[])
 	}
 	else if (strcmp(p, "heipv6tb") == 0) {
 		update_heipv6tb();
+	}
+	else if (strcmp(p, "pairnic") == 0) {
+		// pairNIC uses the same API as DynDNS
+		update_dua("pairnic", 0, "dynamic.pairnic.com", "/nic/update", 1);
+	}
+	else if (strcmp(p, "spairnic") == 0) {
+		// pairNIC uses the same API as DynDNS
+		update_dua("pairnic", 1, "dynamic.pairnic.com", "/nic/update", 1);
 	}
 	else if ((strcmp(p, "wget") == 0) || (strcmp(p, "custom") == 0)) {
 		// test ok 9/15 -- zzz

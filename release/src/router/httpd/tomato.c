@@ -701,6 +701,7 @@ static const nvset_t nvset_list[] = {
 	{ "ipv6_6rd_prefix_length",	V_RANGE(3, 127)		},	// 6rd prefix length
 	{ "ipv6_6rd_borderrelay",	V_IP			},	// 6rd ipv4 border relay addr
 	{ "ipv6_6rd_ipv4masklen",	V_RANGE(0, 255)		},	// 6rd ipv4 mask
+	{ "ipv6_isp_opt",		V_01			},	// wan.c add eval option for dhcpd
 #endif
 
 // basic-wfilter
@@ -757,6 +758,7 @@ static const nvset_t nvset_list[] = {
 	{ "block_loopback",		V_01			},
 	{ "nf_loopback",		V_NUM			},
 	{ "ne_syncookies",		V_01			},
+	{ "DSCP_fix_enable",		V_01			},
 	{ "ne_snat",			V_01			},
 	{ "dhcp_pass",			V_01			},
 #ifdef TCONFIG_EMF
@@ -969,6 +971,7 @@ static const nvset_t nvset_list[] = {
 	{ "sshd_authkeys",		V_TEXT(0, 4096)		},
 	{ "rmgt_sip",			V_LENGTH(0, 512)	},
 	{ "ne_shlimit",			V_TEXT(1, 50)		},
+	{ "http_username",      V_LENGTH(0, 64)    	},
 
 // admin-bwm
 	{ "rstats_enable",		V_01			},
