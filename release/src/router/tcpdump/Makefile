@@ -42,12 +42,12 @@ srcdir = .
 
 CC = mipsel-uclibc-gcc
 PROG = tcpdump
-CCOPT = -O2 -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32 -mips32   -I/home/vicente/tomato/release/src-rt/router/openssl/include
+CCOPT = -O2 -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2   -I/home/vicente/tomato/release/src-rt/router/openssl/include
 INCLS = -I. -I./../libpcap  -I./missing
 DEFS = -DHAVE_CONFIG_H  -I./missing  -D_U_="__attribute__((unused))"
 
 # Standard CFLAGS
-CFLAGS = -DINET6 -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32 -mips32   -I/home/vicente/tomato/release/src-rt/router/openssl/include
+CFLAGS = -DINET6 -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2   -I/home/vicente/tomato/release/src-rt/router/openssl/include
 FULL_CFLAGS = $(CCOPT) $(DEFS) $(INCLS) $(CFLAGS)
 
 # Standard LDFLAGS
