@@ -1,0 +1,62 @@
+#!/bin/sh
+
+# This is a short-cut to execute tests on the parser.
+# ./conf/torture_msgs{,2} contain various kind of messages.
+
+#echo "=="
+#echo "== Testing the parser contained in libosip."
+#echo "== You can use the verbose mode (-v) to see the full message."
+#echo "=="
+
+ok=0
+nok=0
+
+i=0
+while [ $i -lt 89 ]
+do
+set +x
+   #mpatrol -C -S -L -d --list -p --use-debug ./torture_test $1/sip$i 0 $2
+   ./torture_test $1/sip$i 0 $2
+
+   code=$?
+   if [ "$code" -eq 0 ]; then
+       echo "checking sip$i : passed";
+       ok=`expr $ok + 1`;
+   else
+       echo "checking sip$i : failed ($code)";
+       nok=`expr $nok + 1`
+   fi;
+
+   i=`expr $i + 1`
+
+done
+
+echo "checked well formed messages:   $i"
+echo "errors                      :   $nok"
+
+#ok=0
+#nok=0
+#
+#i=0
+#while [ $i -lt 9 ]
+#do
+#set +x
+#   #mpatrol -C -S -L -d --list -p --use-debug ./torture_test ./res/sip-malformed$i 0 $1
+#   ./torture_test $1/sip-malformed$i 0 $2
+#   if [ "$?" -eq 0 ]; then
+#       echo "checking sip$i : passed";
+#       ok=`expr $ok + 1`;
+#   else
+#       echo "checking sip$i : failed";
+#       nok=`expr $nok + 1`
+#   fi;
+#
+#   i=`expr $i + 1`
+#
+#done
+#
+#echo "checked malformed messages:   $i"
+#echo "errors                    :   $ok"
+
+
+
