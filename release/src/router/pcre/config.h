@@ -6,20 +6,28 @@
 can cope with, allowing it to run on SunOS4 and other "close to standard"
 systems.
 
-In environments that support the facilities, config.h.in is converted by
-"configure", or config-cmake.h.in is converted by CMake, into config.h. If you
-are going to build PCRE "by hand" without using "configure" or CMake, you
-should copy the distributed config.h.generic to config.h, and then edit the
-macro definitions to be the way you need them. You must then add
--DHAVE_CONFIG_H to all of your compile commands, so that config.h is included
-at the start of every source.
+In environments that support the GNU autotools, config.h.in is converted into
+config.h by the "configure" script. In environments that use CMake,
+config-cmake.in is converted into config.h. If you are going to build PCRE "by
+hand" without using "configure" or CMake, you should copy the distributed
+config.h.generic to config.h, and edit the macro definitions to be the way you
+need them. You must then add -DHAVE_CONFIG_H to all of your compile commands,
+so that config.h is included at the start of every source.
 
 Alternatively, you can avoid editing by using -D on the compiler command line
-to set the macro values. In this case, you do not have to set -DHAVE_CONFIG_H.
+to set the macro values. In this case, you do not have to set -DHAVE_CONFIG_H,
+but if you do, default values will be taken from config.h for non-boolean
+macros that are not defined on the command line.
 
-PCRE uses memmove() if HAVE_MEMMOVE is set to 1; otherwise it uses bcopy() if
-HAVE_BCOPY is set to 1. If your system has neither bcopy() nor memmove(), set
-them both to 0; an emulation function will be used. */
+Boolean macros such as HAVE_STDLIB_H and SUPPORT_PCRE8 should either be defined
+(conventionally to 1) for TRUE, and not defined at all for FALSE. All such
+macros are listed as a commented #undef in config.h.generic. Macros such as
+MATCH_LIMIT, whose actual value is relevant, have defaults defined, but are
+surrounded by #ifndef/#endif lines so that the value can be overridden by -D.
+
+PCRE uses memmove() if HAVE_MEMMOVE is defined; otherwise it uses bcopy() if
+HAVE_BCOPY is defined. If your system has neither bcopy() nor memmove(), make
+sure both macros are undefined; an emulation function will then be used. */
 
 /* By default, the \R escape sequence matches any Unicode line ending
    character or sequence of characters. If BSR_ANYCRLF is defined (to any
@@ -134,8 +142,7 @@ them both to 0; an emulation function will be used. */
 /* Define to 1 if the system has the type `unsigned long long'. */
 /* #undef HAVE_UNSIGNED_LONG_LONG */
 
-/* Define to 1 or 0, depending whether the compiler supports simple visibility
-   declarations. */
+/* Define to 1 if the compiler supports simple visibility declarations. */
 #define HAVE_VISIBILITY 1
 
 /* Define to 1 if you have the <windows.h> header file. */
@@ -196,9 +203,6 @@ them both to 0; an emulation function will be used. */
    or -2 (ANYCRLF). */
 #define NEWLINE 10
 
-/* Define to 1 if your C compiler doesn't accept -c and -o together. */
-/* #undef NO_MINUS_C_MINUS_O */
-
 /* PCRE uses recursive function calls to handle backtracking while matching.
    This can sometimes be a problem on systems that have stacks of limited
    size. Define NO_RECURSE to any value to get a version that doesn't use
@@ -218,7 +222,7 @@ them both to 0; an emulation function will be used. */
 #define PACKAGE_NAME "PCRE"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "PCRE 8.32"
+#define PACKAGE_STRING "PCRE 8.35"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "pcre"
@@ -227,7 +231,12 @@ them both to 0; an emulation function will be used. */
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "8.32"
+#define PACKAGE_VERSION "8.35"
+
+/* The value of PARENS_NEST_LIMIT specifies the maximum depth of nested
+   parentheses (of any kind) in a pattern. This limits the amount of system
+   stack that is used while compiling a pattern. */
+#define PARENS_NEST_LIMIT 250
 
 /* to make a symbol visible */
 #define PCRECPP_EXP_DECL extern __attribute__ ((visibility ("default")))
@@ -285,10 +294,6 @@ them both to 0; an emulation function will be used. */
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
 
-/* Define to allow pcretest and pcregrep to be linked with gcov, so that they
-   are able to generate code coverage reports. */
-/* #undef SUPPORT_GCOV */
-
 /* Define to any value to enable support for Just-In-Time compiling. */
 /* #undef SUPPORT_JIT */
 
@@ -327,11 +332,11 @@ them both to 0; an emulation function will be used. */
    ASCII/UTF-8/16/32, but not both at once. */
 #define SUPPORT_UTF /**/
 
-/* Valgrind support to find invalid memory reads. */
+/* Define to any value for valgrind support to find invalid memory reads. */
 /* #undef SUPPORT_VALGRIND */
 
 /* Version number of package */
-#define VERSION "8.32"
+#define VERSION "8.35"
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */
