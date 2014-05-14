@@ -46,7 +46,9 @@ endif
 ifeq ($(TCONFIG_NGINX),y)
 OBJS += nginx.o
 endif
-
+ifeq ($(TCONFIG_SIPROXD),y)
+OBJS += siproxd.o
+endif
 ifeq ($(TOMATO_SL),1)
 #OBJS += usb.o
 OBJS += samba.o
@@ -113,6 +115,13 @@ endif
 ifeq ($(TCONFIG_DDNS),y)
 	@cd $(INSTALLDIR)/sbin && ln -sf rc ddns-update
 endif
+
+#!!Roadkill - for debugging purposes only
+#ifeq ($(TCONFIG_SIPROXD),y)
+#	@cd $(INSTALLDIR)/sbin && ln -sf rc build_siproxd_conf
+#	@cd $(INSTALLDIR)/sbin && ln -sf rc start_siproxd
+#	@cd $(INSTALLDIR)/sbin && ln -sf rc stop_siproxd
+#endif
 
 ifeq ($(TCONFIG_CIFS),y)
 	@cd $(INSTALLDIR)/sbin && ln -sf rc mount-cifs

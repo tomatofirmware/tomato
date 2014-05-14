@@ -516,6 +516,14 @@ extern void start_nginxfp();
 extern void stop_nginxfp();
 #endif
 
+// siproxd.c
+#ifdef TCONFIG_SIPROXD
+extern void start_siproxd();
+extern void stop_siproxd();
+extern void start_siproxdfp();
+extern void stop_siproxdfp();
+#endif
+
 //ntpd.c
 extern void ntpd_write(const char *format, ...);
 extern void start_ntpd(); 

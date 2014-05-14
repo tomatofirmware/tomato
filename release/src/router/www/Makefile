@@ -111,9 +111,15 @@ ifneq ($(TCONFIG_NOCAT),y)
 	sed -i $(INSTALLDIR)/www/tomato.js -e "/NOCAT-BEGIN/,/NOCAT-END/d"
 	sed -i $(INSTALLDIR)/www/about.asp -e "/NOCAT-BEGIN/,/NOCAT-END/d"
 endif
-# Tomato RAF feature
-# Only include NGinX menu option and pages when configured
-ifneq ($(TCONFIG_NGINX),y)	
+# Tomato RAF features
+#Cleanup Siproxd files if not needed
+ifneq ($(TCONFIG_SIPROXD),y)
+	rm -f $(INSTALLDIR)/www/siproxd.asp
+	sed -i $(INSTALLDIR)/www/tomato.js -e "/SIPROXD-BEGIN/,/SIPROXD-END/d"
+	sed -i $(INSTALLDIR)/www/about.asp -e "/SIPROXD-BEGIN/,/SIPROXD-END/d"
+endif
+# Clean up NGinX files if not needed
+ifneq ($(TCONFIG_NGINX),y)
 	rm -f $(INSTALLDIR)/www/nginx.asp
 	rm -f $(INSTALLDIR)/www/index.html
 	rm -f $(INSTALLDIR)/www/index.php

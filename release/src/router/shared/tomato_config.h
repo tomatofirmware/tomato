@@ -82,6 +82,12 @@
 #define TCONFIG_NGINX 1
   #define IF_TCONFIG_NGINX(...) __VA_ARGS__
   #define IF_NOT_TCONFIG_NGINX(...)
+#define TCONFIG_SIPROXD 1
+  #define IF_TCONFIG_SIPROXD(...) __VA_ARGS__
+  #define IF_NOT_TCONFIG_SIPROXD(...)
+#define TCONFIG_LIBOSIP2 1
+  #define IF_TCONFIG_LIBOSIP2(...) __VA_ARGS__
+  #define IF_NOT_TCONFIG_LIBOSIP2(...)
 #define TCONFIG_ZLIB 1
   #define IF_TCONFIG_ZLIB(...) __VA_ARGS__
   #define IF_NOT_TCONFIG_ZLIB(...)

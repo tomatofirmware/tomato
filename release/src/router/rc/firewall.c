@@ -735,6 +735,22 @@ static void nat_table(void)
 						lan3addr);
 #endif
 			}
+#ifdef TCONFIG_SIPROXD
+		if (wanup) {
+			if (nvram_match("siproxd_intcpt", "1") && (nvram_match("siproxd_enabled", "1"))) {
+				ipt_write("-A PREROUTING -p udp -s %s/%s ! -d %s/%s --dport %s -j DNAT --to-destination %s\n",
+					lanaddr, lanmask,
+					lanaddr, lanmask,
+					nvram_safe_get("siproxd_listen_port"),
+					lanaddr);
+				ipt_write("-A PREROUTING -p tcp -s %s/%s ! -d %s/%s --dport %s -j DNAT --to-destination %s\n",
+					lanaddr, lanmask,
+					lanaddr, lanmask,
+					nvram_safe_get("siproxd_listen_port"),
+					lanaddr);
+			}
+		}
+#endif
 
 			// ICMP packets are always redirected to INPUT chains
 			ipt_write("-A %s -p icmp -j DNAT --to-destination %s\n", chain_wan_prerouting, lanaddr);
@@ -1017,7 +1033,20 @@ static void filter_input(void)
 			}
 		}
 
-#ifdef TCONFIG_NGINX //!!Victek - Web Server
+#ifdef TCONFIG_SIPROXD
+//enable incoming to siproxd listen port
+		if (nvram_get_int("siproxd_enable")) {
+			ipt_write("-A INPUT -p udp %s -m udp -d %s --dport %s -j %s\n",
+			s, nvram_safe_get("lan_ipaddr"), nvram_safe_get("siproxd_listen_port"), chain_in_accept);
+		}
+//if rtp proxy is enabled, allow incoming traffic
+		if (nvram_get_int("siproxd_rtp_proxy")) {
+			ipt_write("-A INPUT -p udp %s -m udp -d %s --dport %s:%s -j %s\n",
+			s, nvram_safe_get("lan_ipaddr"), nvram_safe_get("siproxd_rtp_port_low"), nvram_safe_get("siproxd_rtp_port_high"), chain_in_accept);
+		}
+#endif
+
+#ifdef TCONFIG_NGINX //Tomato RAF - Web Server
 		if (nvram_match("nginx_enable", "1")) {
 			ipt_write("-A INPUT -p tcp --dport %s -j ACCEPT\n", nvram_safe_get( "nginx_port" ));
 		}
@@ -1081,7 +1110,7 @@ static void filter_input(void)
 	// default policy: DROP
 }
 
-// clamp TCP MSS to PMTU of WAN interface (IPv4 only?)
+// clamp TCP MSS to PMTU of WAN interface (IPv4 and IPv6)
 static void clampmss(void)
 {
 	ipt_write("-A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu\n");

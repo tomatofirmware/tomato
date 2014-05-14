@@ -1403,6 +1403,39 @@ void stop_splashd(void)
 #endif
 
 // -----------------------------------------------------------------------------
+#ifdef TCONFIG_SIPROXD
+static pid_t pid_siproxd = -1;
+void start_siproxdengine(void)
+{
+	pid_siproxd =-1;
+	start_siproxd();
+	if (!nvram_contains_word("debug_norestart","siproxdengine")) { //TODO .. check debugnorestart .. copied from nginx deal.
+		pid_siproxd = -2;
+	}
+}
+
+void stop_siproxdengine(void)
+{
+	pid_siproxd = -1;
+	stop_siproxd();
+}
+
+void start_siproxd_fastpath(void)
+{
+	pid_siproxd =-1;
+	start_siproxdfp();
+	if (!nvram_contains_word("debug_norestart","siproxdengine")) { //TODO .. check this line also.
+		pid_siproxd = -2;
+	}
+}
+void stop_siproxd_fastpath(void)
+{
+	pid_siproxd = -1;
+	stop_siproxdfp();
+}
+
+#endif
+// -----------------------------------------------------------------------------
 #ifdef TCONFIG_NGINX
 
 static pid_t pid_nginx = -1;
@@ -1434,9 +1467,10 @@ void stop_nginxfastpath(void)
 	pid_nginx = -1;
 	stop_nginxfp();
 }
-
 #endif
+
 // -----------------------------------------------------------------------------
+
 void set_tz(void)
 {
 	f_write_string("/etc/TZ", nvram_safe_get("tm_tz"), FW_CREATE|FW_NEWLINE, 0644);
@@ -2283,6 +2317,9 @@ void stop_services(void)
 #ifdef TCONFIG_NGINX
 	stop_enginex();
 #endif
+#ifdef TCONFIG_SIPROXD
+	stop_siproxdengine();
+#endif
 	stop_cifs();
 	stop_dnsmasq();
 	stop_zebra();
@@ -2540,6 +2577,9 @@ TOP:
 			restart_nas_services(1, 0);	// stop Samba, FTP and Media Server
 			stop_jffs2();
 //			stop_cifs();
+#ifdef TCONFIG_SIPROXD
+			stop_siproxdengine();
+#endif
 #ifdef TCONFIG_NGINX
 			stop_enginex();
 #endif
@@ -2829,6 +2869,18 @@ TOP:
 	}
 #endif
 
+#ifdef TCONFIG_SIPROXD
+	if (strcmp(service, "siproxd") == 0) {
+		if (action & A_STOP) stop_siproxdengine();
+		if (action & A_START) start_siproxdengine();
+		goto CLEAR;
+	}
+	if (strcmp(service, "siproxdfp") == 0) {
+		if (action & A_STOP) stop_siproxd_fastpath();
+		if (action & A_START) start_siproxd_fastpath();
+		goto CLEAR;
+	}
+#endif
 
 #ifdef TCONFIG_PPTPD
 	if (strcmp(service, "pptpd") == 0) {

@@ -127,6 +127,12 @@ static const applets_t applets[] = {
 #ifdef DEBUG_RCTEST
 	{ "rctest",			rctest_main				},
 #endif
+/*!!Roadkill - Only for debugging purposes
+#ifdef TCONFIG_SIPROXD
+	{ "build_siproxd_conf",			build_siproxd_conf			},
+	{ "start_siproxd",				start_siproxd				},
+	{ "stop_siproxd",				stop_siproxd				},
+#endif*/
 	{NULL, NULL}
 };
 
