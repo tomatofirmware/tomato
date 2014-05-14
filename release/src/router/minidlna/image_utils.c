@@ -26,13 +26,18 @@
  * The resize functions come from the resize_image project, at http://www.golac.fr/Image-Resizer
  */
 
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <setjmp.h>
 #include <jpeglib.h>
+#ifdef HAVE_MACHINE_ENDIAN_H
+#include <machine/endian.h>
+#else
 #include <endian.h>
+#endif
 
 #include "upnpreplyparse.h"
 #include "image_utils.h"
@@ -367,7 +372,7 @@ image_get_jpeg_date_xmp(const char * path, char ** date)
 			if( nread < 1 )
 				break;
 
-			ParseNameValue(data, offset, &xml);
+			ParseNameValue(data, offset, &xml, 0);
 			exif = GetValueFromNameValueList(&xml, "DateTimeOriginal");
 			if( !exif )
 			{
@@ -393,8 +398,7 @@ image_get_jpeg_date_xmp(const char * path, char ** date)
 		}
 	}
 	fclose(img);
-	if( data )
-		free(data);
+	free(data);
 	return ret;
 }
 
@@ -475,8 +479,7 @@ image_new_from_jpeg(const char * path, int is_file, const char * buf, int size, 
 			fclose(file);
 		if( vimage )
 		{
-			if( vimage->buf )
-				free(vimage->buf);
+			free(vimage->buf);
 			free(vimage);
 		}
 		return NULL;
@@ -835,8 +838,8 @@ image_save_to_jpeg_buf(image_s * pimage, int * size)
 	return dst.buf;
 }
 
-int
-image_save_to_jpeg_file(image_s * pimage, const char * path)
+char *
+image_save_to_jpeg_file(image_s * pimage, char * path)
 {
 	int nwritten, size = 0;
 	unsigned char * buf;
@@ -844,16 +847,16 @@ image_save_to_jpeg_file(image_s * pimage, const char * path)
 
 	buf = image_save_to_jpeg_buf(pimage, &size);
 	if( !buf )
-		return -1;
+		return NULL;
  	dst_file = fopen(path, "w");
 	if( !dst_file )
 	{
 		free(buf);
-		return -1;
+		return NULL;
 	}
 	nwritten = fwrite(buf, 1, size, dst_file);
 	fclose(dst_file);
 	free(buf);
 
-	return (nwritten==size ? 0 : 1);
+	return (nwritten == size) ? path : NULL;
 }

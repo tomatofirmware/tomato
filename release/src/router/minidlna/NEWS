@@ -1,3 +1,49 @@
+1.1.2 - Released 06-Mar-2014
+--------------------------------
+- Show client status on our basic presentation page.
+- Add a new force_sort_criteria option, to globally override the SortCriteria value sent by the client.
+- Fix a couple resource leaks.
+- Add configuration include file support.
+- Support DLNA/UPnP-AV searches issued by clients using the Grilo framework.
+- Fix some clients playing artwork instead of movie.
+- Fix bookmarks on Samsung Series E clients.
+- Add an extra folder level if there are multiple media locations.
+- Fix some multicast membership issues with changing network settings.
+- Make max number of children (connections) configurable.
+- Fix choppy playback with some file types on Panasonic clients by increasing the max connection limit.
+
+1.1.1 - Released 01-Nov-2013
+--------------------------------
+- Add network interface monitoring support on Linux.
+- Don't require a configured network interface to start up.
+- Fix some minor spec compliance issues.
+
+1.1.0 - Released 04-April-2013
+--------------------------------
+- Add support for other operating systems.
+- Switch to autoconf from our handcrafted genconfig.sh.
+- Add configuration option for UUID.
+- Add configuration option to specify the user to run as.
+- Add support for limiting a media dir to multiple media types.
+- Force a rescan if we detect a new or missing media_dir entry.
+- Fix crash caused by certain TiVo clients.
+- Fix crash bug on video files with some ffmpeg library versions.
+- Add support for TiVo MPEG-TS files.
+- Add some logging and forking tweaks to work better with systemd.
+- Validate or escape user input to prevent SQL injection.
+- Add forced sorting support for Panasonic devices.
+
+1.0.25 - Released 13-July-2012
+--------------------------------
+- Fix a couple crash bugs on malformed WAV files.
+- Forcibly tweak the model number for Xbox360 clients, or they might ignore us.
+- Enable all network interfaces by default if none were specified.
+- Add flag to force downscaled thumbnails rather than using embedded ones.
+- Add DirecTV client detection, and fix image resolution issue.
+- Add support for the latest ffmpeg/libav library versions.
+- Fix a potential crash on requests for a resize of a non-existent image.
+- Make DeviceID checking more permissive for Sagem Radio.
+
 1.0.24 - Released 14-Feb-2012
 --------------------------------
 - Fix playlist browsing with no SortOrder specified.
