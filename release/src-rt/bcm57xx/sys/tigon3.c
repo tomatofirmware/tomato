@@ -11,8 +11,9 @@
 /* History:                                                                   */
 /******************************************************************************/
 
-/* $Id: tigon3.c,v 1.15 2008-02-22 22:46:19 Exp $ */
+/* $Id: tigon3.c 286395 2011-09-27 18:49:01Z $ */
 
+#include <bcm57xx_cfg.h>
 #include "mm.h"
 #include "bcmdevs.h"
 #include "bcmutils.h"

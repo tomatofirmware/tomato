@@ -10,7 +10,7 @@
 /*                                                                            */
 /******************************************************************************/
 
-/* $Id: b57um.c,v 1.34.10.1 2010-10-09 01:46:48 Exp $ */
+/* $Id: b57um.c 329791 2012-04-26 22:36:58Z $ */
 
 char bcm5700_driver[] = "bcm5700";
 char bcm5700_version[] = "8.3.14";
@@ -1208,7 +1208,7 @@ robo_fail:
 	pUmDevice->cih = ctf_attach(pUmDevice->osh, dev->name, &b57_msg_level, NULL, NULL);
 
 	ctf_dev_register(pUmDevice->cih, dev, FALSE);
-	ctf_enable(pUmDevice->cih, dev, TRUE);
+	ctf_enable(pUmDevice->cih, dev, TRUE, NULL);
 #endif /* HNDCTF */
 
 	return 0;
@@ -2271,7 +2271,7 @@ bcm5700_vlan_rx_kill_vid(struct net_device *dev, uint16_t vid)
 #endif
 
 STATIC int
-bcm5700_start_xmit(struct sk_buff *skb, struct net_device *dev)
+_bcm5700_start_xmit(struct sk_buff *skb, struct net_device *dev)
 {
 	PUM_DEVICE_BLOCK pUmDevice = (PUM_DEVICE_BLOCK)dev->priv;
 	PLM_DEVICE_BLOCK pDevice = (PLM_DEVICE_BLOCK) pUmDevice;
@@ -2487,6 +2487,16 @@ bcm5700_start_xmit(struct sk_buff *skb, struct net_device *dev)
 
 
 	return 0;
+}
+
+STATIC int
+bcm5700_start_xmit(struct sk_buff *skb, struct net_device *dev)
+{
+	void *n;
+
+	FOREACH_CHAINED_PKT(skb, n) {
+		_bcm5700_start_xmit(skb, dev);
+	}
 }
 
 #ifdef BCM_NAPI_RXPOLL
