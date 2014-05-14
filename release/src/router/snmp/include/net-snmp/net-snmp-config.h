@@ -1245,7 +1245,7 @@
 /* printing system */
 #define HAVE_LPSTAT 1
 #define LPSTAT_PATH "/usr/bin/lpstat"
-#define HAVE_PRINTCAP 1
+/* #undef HAVE_PRINTCAP */
 
 /*  Pluggable transports.  */
 

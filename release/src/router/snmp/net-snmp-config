@@ -27,10 +27,10 @@ else
       echo  mibII/snmp_mib mibII/system_mib mibII/sysORTable mibII/vacm_vars mibII/ip mibII/tcp mibII/udp mibII/icmp mibII/var_route mibII/kernel_linux qos util_funcs mibII/vacm_context host/hr_system host/hr_storage host/hr_device host/hr_other host/hr_proc host/hr_network host/hr_print host/hr_disk host/hr_partition host/hr_filesys host/hr_swrun host/hr_swinst mibII/interfaces mibII/ipAddr mibII/at mibII/route_write mibII/tcpTable mibII/udpTable qos_access qos_checkfns ucd-snmp/memory ucd-snmp/vmstat ucd-snmp/proc ucd-snmp/versioninfo ucd-snmp/pass ucd-snmp/pass_persist ucd-snmp/disk ucd-snmp/loadave ucd-snmp/extensible ucd-snmp/errormib ucd-snmp/file ucd-snmp/dlmod ucd-snmp/proxy qos_checkfns_local
       ;;
     --base-cflags)
-      echo -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32 -mips32   -Dlinux  -I${prefix}/include
+      echo -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2   -Dlinux  -I${prefix}/include
       ;;
     --cflags)
-      echo -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32 -mips32   -Dlinux   -I. -I${prefix}/include
+      echo -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2   -Dlinux   -I. -I${prefix}/include
       ;;
     --agent-libs)
       # use this one == --netsnmp-agent-libs + --external-libs
@@ -265,7 +265,7 @@ EOF
 	exit 1
       fi
       prefix=/usr
-      cmd="mipsel-uclibc-gcc $cflags -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32 -mips32   -Dlinux  -I. -I${prefix}/include -o $outname $tmpfile $cfiles  -L/usr/lib -lnetsnmpagent -lnetsnmphelpers -lnetsnmpmibs -lnetsnmp -ldl -lm  $ldflags"
+      cmd="mipsel-uclibc-gcc $cflags -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2   -Dlinux  -I. -I${prefix}/include -o $outname $tmpfile $cfiles  -L/usr/lib -lnetsnmpagent -lnetsnmphelpers -lnetsnmpmibs -lnetsnmp -ldl -lm  $ldflags"
       echo "running: $cmd"
       `$cmd`
       if test "x$norm" != "x1" ; then

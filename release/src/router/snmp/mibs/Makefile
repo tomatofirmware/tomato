@@ -42,7 +42,7 @@ AUTOHEADER	= :
 #
 # Compiler arguments
 #
-CFLAGS		= -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32 -mips32   -Dlinux 
+CFLAGS		= -Os -Wall -DLINUX26 -DCONFIG_BCMWL5 -pipe -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32r2 -mips32r2   -Dlinux 
 EXTRACPPFLAGS	= -x c
 LDFLAGS		=  
 LIBTOOL		= $(SHELL) $(top_builddir)/libtool 
