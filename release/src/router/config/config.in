@@ -120,8 +120,20 @@ config TCONFIG_NGINX
 	bool "NGinX Web Server"
 	default n
 
+config TCONFIG_SIPROXD
+	bool "Siproxd Telephony Service"
+	default n
+
+config TCONFIG_LIBOSIP2
+	bool "Siproxd parser service"
+	default n
+
 config TCONFIG_ZLIB
 	bool "Compressor"
+	default n
+
+config TCONFIG_CTF
+	bool "CTF (Cut-Through Forwarding)"
 	default n
 
 config TCONFIG_SNMP
@@ -162,4 +174,8 @@ config TCONFIG_REMOVE_USBAPP
 
 config TCONFIG_TCPDUMP
 	bool "TCPDUMP and LIBPCAP utilities"
+	default n
+
+config TCONFIG_ARIA2
+	bool " Aria2 download"
 	default n

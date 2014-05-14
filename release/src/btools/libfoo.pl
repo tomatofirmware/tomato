@@ -153,25 +153,58 @@ sub fixDyn
 	fixDynDep("pppd", "pppol2tp.so");
 	fixDynDep("pppd", "pptp.so");
 	fixDynDep("pppd", "rp-pppoe.so");
-
+#tomatoegg
+	fixDynDep("aria2c", "libstdc++.so.6.0.9");
+	fixDynDep("aria2c", "libexpat.so.1.6.0");
 	fixDynDep("libcrypto.so.1.0.0", "libssl.so.1.0.0");
 #shibby
 	fixDynDep("miniupnpd", "libnfnetlink.so.0.2.0");
-
-#	fixDynDep("libbcm.so", "libshared.so");
-#	fixDynDep("libbcm.so", "libc.so.0");
-
+	fixDynDep("dnscrypt-proxy", "libsodium.so.4.5.0");
+#minidlna module, bwq518
+	fixDynDep("minidlna", "libz.so.1");
+	fixDynDep("minidlna", "libstdc.so.6");
+	fixDynDep("minidlna", "libiconv.so.2.4.0");
+	fixDynDep("minidlna", "libssl.so.1.0.0");
+	fixDynDep("minidlna", "libjpeg.so");
+	fixDynDep("minidlna", "libogg.so.0");
+	fixDynDep("minidlna", "libvorbis.so.0");
+	fixDynDep("minidlna", "libid3tag.so.0");
+	fixDynDep("minidlna", "libexif.so.12");
+	fixDynDep("minidlna", "libFLAC.so.8");
+	fixDynDep("libjepg.so", "libc.so.0");
+	fixDynDep("libavcodec.so.52", "libpthread.so.0");
+#Tomato RAF - Siproxd
+	fixDynDep("httpd", "libosipparser2.so.10.0.0");
+	fixDynDep("siproxd", "libosipparser2.so.10.0.0");
+	fixDynDep("siproxd", "libosip2.so.10.0.0");
+	fixDynDep("siproxd", "libresolv.so.0");
+#Tomato RAF - Siproxd fix plugins deletion by libfoo
+	fixDynDep("siproxd", "plugin_defaulttarget.so");
+	fixDynDep("siproxd", "plugin_demo.so");
+	fixDynDep("siproxd", "plugin_fix_bogus_via.so");
+	fixDynDep("siproxd", "plugin_logcall.so");
+	fixDynDep("siproxd", "plugin_shortdial.so");
+	fixDynDep("siproxd", "plugin_stun.so");
+	fixDynDep("siproxd", "plugin_prefix.so");
+	fixDynDep("siproxd", "plugin_regex.so");
+#Tomato RAF - NocatSplash
+	fixDynDep("splashd","libglib-1.2.so.0.0.10");
+#Tomato RAF - php
+	fixDynDep("php-cli","libpcreposix.so.0");
+	fixDynDep("php-cli","libz.so.1.2.8");
+	fixDynDep("php-cli","libz.so.1");
+	fixDynDep("php-cgi","libpcreposix.so.0");
+	fixDynDep("php-cgi","libz.so.1.2.8");
+	fixDynDep("php-cgi","libz.so.1");
+#Tomato RAF - nginx
+	fixDynDep("nginx","libz.so.1.2.8");
+	fixDynDep("nginx","libz.so.1");
 #!!TB - Updated Broadcom WL driver
 	fixDynDep("libbcmcrypto.so", "libc.so.0");
 	fixDynDep("nas", "libbcmcrypto.so");
 	fixDynDep("wl", "libbcmcrypto.so");
 	fixDynDep("nas", "libc.so.0");
 	fixDynDep("wl", "libc.so.0");
-#Roadkill for NocatSplash
-	fixDynDep("splashd","libglib-1.2.so.0.0.10");
-#Roadkill for php
-	fixDynDep("php-cli","libz.so.1.2.5");
-	fixDynDep("php-cgi","libz.so.1.2.5");
 }
 
 sub usersOf
@@ -435,12 +468,8 @@ genSO("${root}/lib/libcrypt.so.0", "${uclibc}/lib/libcrypt.a", "${stripshared}")
 genSO("${root}/lib/libm.so.0", "${uclibc}/lib/libm.a");
 genSO("${root}/lib/libpthread.so.0", "${uclibc}/lib/libpthread.a", "${stripshared}", "-u pthread_mutexattr_init -Wl,-init=__pthread_initialize_minimal_internal");
 genSO("${root}/lib/libutil.so.0", "${uclibc}/lib/libutil.a", "${stripshared}");
-#  genSO("${root}/lib/libdl.so.0", "${uclibc}/lib/libdl.a", "${stripshared}");
-#  genSO("${root}/lib/libnsl.so.0", "${uclibc}/lib/libnsl.a", "${stripshared}");
-
 genSO("${root}/usr/lib/libcrypto.so.1.0.0", "${router}/openssl/libcrypto.a");
 genSO("${root}/usr/lib/libssl.so.1.0.0", "${router}/openssl/libssl.a", "${stripshared}", "-L${router}/openssl");
-
 genSO("${root}/usr/lib/libzebra.so", "${router}/zebra/lib/libzebra.a");
 genSO("${root}/usr/lib/libz.so.1", "${router}/zlib/libz.a");
 genSO("${root}/usr/lib/libjpeg.so", "${router}/jpeg/libjpeg.a");
@@ -450,22 +479,19 @@ genSO("${root}/usr/lib/libvorbis.so.0", "${router}/libvorbis/lib/.libs/libvorbis
 genSO("${root}/usr/lib/libid3tag.so.0", "${router}/libid3tag/.libs/libid3tag.a", "", "-L${router}/zlib");
 genSO("${root}/usr/lib/libexif.so.12", "${router}/libexif/libexif/.libs/libexif.a");
 genSO("${root}/usr/lib/libFLAC.so.8", "${router}/flac/src/libFLAC/.libs/libFLAC.a", "", "-L${router}/libogg/src/.libs");
-genSO("${root}/usr/lib/libavcodec.so.52", "${router}/ffmpeg/libavcodec/libavcodec.a", "", "-L${router}/ffmpeg/libavutil");
-genSO("${root}/usr/lib/libavutil.so.50", "${router}/ffmpeg/libavutil/libavutil.a");
-genSO("${root}/usr/lib/libavformat.so.52", "${router}/ffmpeg/libavformat/libavformat.a", "", "-L${router}/ffmpeg/libavutil -L${router}/ffmpeg/libavcodec");
+genSO("${root}/usr/lib/libavcodec.so.52", "${router}/ffmpeg/libavcodec/libavcodec.a", "", "-L${router}/ffmpeg/libavutil -L${router}/zlib");
+genSO("${root}/usr/lib/libavutil.so.50", "${router}/ffmpeg/libavutil/libavutil.a", "-L${router}/zlib");
+genSO("${root}/usr/lib/libavformat.so.52", "${router}/ffmpeg/libavformat/libavformat.a", "", "-L${router}/ffmpeg/libavutil -L${router}/ffmpeg/libavcodec -L${router}/zlib");
 genSO("${root}/usr/lib/libsmb.so", "${router}/samba/source/bin/libsmb.a");
 genSO("${root}/usr/lib/libbigballofmud.so", "${router}/samba3/source/bin/libbigballofmud.a");
-
 genSO("${root}/usr/lib/liblzo2.so.2", "${router}/lzo/src/.libs/liblzo2.a");
-#	genSO("${root}/usr/lib/libtamba.so", "${router}/samba3/source/bin/libtamba.a");
-#	genSO("${root}/usr/lib/libiptc.so", "${router}/iptables/libiptc/libiptc.a");
-#	genSO("${root}/usr/lib/libshared.so", "${router}/shared/libshared.a");
-#	genSO("${root}/usr/lib/libnvram.so", "${router}/nvram/libnvram.a");
-#	genSO("${root}/usr/lib/libusb-1.0.so.0", "${router}/libusb10/libusb/.libs/libusb-1.0.a");
-#	genSO("${root}/usr/lib/libusb-0.1.so.4", "${router}/libusb/libusb/.libs/libusb.a", "", "-L${router}/libusb10/libusb/.libs");
-
+#Tomato RAF - Siproxd
 genSO("${root}/usr/lib/libbcmcrypto.so", "${router}/libbcmcrypto/libbcmcrypto.a");
+genSO("${root}/usr/lib/libosipparser2.so.10.0.0", "${router}/libosip2/src/osipparser2/.libs/libosipparser2.a");
+#Shibby
 genSO("${root}/usr/lib/libnfnetlink.so.0.2.0", "${router}/libnfnetlink/src/.libs/libnfnetlink.a");
+genSO("${root}/usr/lib/libsodium.so.4.5.0", "${router}/libsodium/src/libsodium/.libs/libsodium.a");
+genSO("${root}/usr/lib/libiconv.so.2.4.0", "${router}/libiconv/lib/.libs/libiconv.a");
 
 print "\n";
 

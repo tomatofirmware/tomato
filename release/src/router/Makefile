@@ -48,28 +48,29 @@ obj-y += rp-pppoe
 obj-y += utils
 obj-y += ntpc
 obj-y += rstats
-obj-$(TCONFIG_SNMP) += snmp
 obj-y += cstats
 obj-y += udpxy
-obj-$(TCONFIG_DNSCRYPT) += dnscrypt
+obj-y += cyassl
+obj-y += mssl
+obj-y += mdu
+obj-$(TCONFIG_SNMP) += snmp
+
+ifeq ($(TCONFIG_DNSCRYPT),y)
+obj-y += dnscrypt
+obj-y += libsodium
+endif
 
 # !!TB - updated Broadcom Wireless driver
 obj-y += et
 obj-y += libbcmcrypto
 obj-y += wlconf
 
-obj-y += cyassl
-obj-y += mssl
-obj-y += mdu
-
-#Roadkill
-obj-$(TCONFIG_NOCAT) += nocat
-
-# !!TB
-obj-$(TCONFIG_USB) += p910nd
-
-# RAF
-obj-y += bcmgpio
+ifeq ($(TCONFIG_USB),y)
+obj-y += p910nd
+obj-y += libusb10
+obj-y += usbmodeswitch
+#obj-y += libusb
+endif
 
 ifeq ($(CONFIG_LINUX26),y)
 obj-$(TCONFIG_USB) += sd-idle
@@ -77,9 +78,6 @@ else
 obj-$(TCONFIG_USB) += scsi-idle
 endif
 
-obj-y += libusb10
-#obj-y += libusb
-obj-y += usbmodeswitch
 obj-$(TCONFIG_FTP) += vsftpd
 
 ifeq ($(CONFIG_LINUX26),y)
@@ -111,21 +109,25 @@ obj-$(TCONFIG_NTFS) += ntfs-3g
 obj-$(TCONFIG_EBTABLES) += ebtables
 obj-$(TCONFIG_IPV6) += dhcpv6
 
-obj-$(TCONFIG_MEDIA_SERVER) += zlib
-obj-$(TCONFIG_MEDIA_SERVER) += sqlite
-obj-$(TCONFIG_MEDIA_SERVER) += ffmpeg
-obj-$(TCONFIG_MEDIA_SERVER) += libogg
-obj-$(TCONFIG_MEDIA_SERVER) += flac
-obj-$(TCONFIG_MEDIA_SERVER) += jpeg
-obj-$(TCONFIG_MEDIA_SERVER) += libexif
-obj-$(TCONFIG_MEDIA_SERVER) += libid3tag
-obj-$(TCONFIG_MEDIA_SERVER) += libvorbis
-obj-$(TCONFIG_MEDIA_SERVER) += minidlna
-MEDIA_SERVER_STATIC=y
+ifeq ($(TCONFIG_MEDIA_SERVER),y)
+obj-y += zlib
+obj-y += sqlite
+obj-y += ffmpeg
+obj-y += libiconv
+obj-y += libogg
+obj-y += flac
+obj-y += jpeg
+obj-y += libexif
+obj-y += libid3tag
+obj-y += libvorbis
+obj-y += minidlna
+MEDIA_SERVER_STATIC :=
+endif
 
 obj-y += libnfnetlink
 obj-y += miniupnpd
-#	obj-y += upnp
+obj-y += wanuptime
+
 #
 # configurable packages
 #
@@ -135,17 +137,38 @@ obj-$(TCONFIG_PPTPD) += pptpd
 obj-$(TCONFIG_HTTPS) += openssl
 obj-$(TCONFIG_SSH) += dropbear
 obj-$(TCONFIG_ZEBRA) += zebra
-#	obj-$(TCONFIG_IPP2P) += ipp2p
 obj-$(TCONFIG_LZO) += lzo
 obj-$(TCONFIG_OPENVPN) += openvpn
 obj-$(TCONFIG_EMF) += emf
 obj-$(TCONFIG_EMF) += igs
 
-#Roadkill - NGinX
-obj-$(TCONFIG_NGINX) += openssl
-obj-$(TCONFIG_NGINX) += pcre
-obj-$(TCONFIG_NGINX) += php
-obj-$(TCONFIG_NGINX) += nginx
+# Tomato RAF
+# additional modules for nginx
+ifeq ($(TCONFIG_NGINX),y)
+ifndef ($(ADDITIONAL_MODULES))
+ADDITIONAL_MODULES:=
+else
+ifeq ($(TCONFIG_IPV6),y)
+ADDITIONAL_MODULES += --with-ipv6
+endif
+endif
+endif
+ifeq ($(TCONFIG_NGINX),y)
+obj-y += openssl
+obj-y += pcre
+obj-y += php
+obj-y += nginx
+endif
+
+obj-$(TCONFIG_NOCAT) += nocat
+obj-$(TCONFIG_SIPROXD) += siproxd
+obj-$(TCONFIG_LIBOSIP2) += libosip2
+
+ifeq ($(TCONFIG_ARIA2),y)
+obj-y += expat
+obj-y += aria2
+endif
+
 
 obj-$(CONFIG_LINUX26) += hotplug2
 obj-$(CONFIG_LINUX26) += udevtrigger
@@ -159,8 +182,6 @@ else
     FULL_OPENSSL :=
   endif
 endif
-
-obj-y += wanuptime
 
 obj-$(TCONFIG_TCPDUMP) += lpcap tcpdump
 
@@ -293,6 +314,7 @@ endif
 	cd $(TARGETDIR)/lib/modules/*/kernel/drivers/net && mv emf/* . && rm -rf emf || true
 	cd $(TARGETDIR)/lib/modules/*/kernel/drivers/net && mv igs/* . && rm -rf igs || true
 	cd $(TARGETDIR)/lib/modules/*/kernel/drivers/net && mv ctf/* . && rm -rf ctf || true
+	cd $(TARGETDIR)/lib/modules/*/kernel/drivers/net && mv usb/* . && rm -rf usb || true
 	cd $(TARGETDIR)/lib/modules && rm -f */source || true
 
 # misc
@@ -306,6 +328,10 @@ endif
 
 # uClibc
 	install $(LIBDIR)/ld-uClibc.so.0 $(TARGETDIR)/lib/
+ifeq ($(TCONFIG_ARIA2),y)
+	install $(LIBDIR)/libstdc++.so.6.0.9 $(TARGETDIR)/lib/
+	install $(LIBDIR)/libstdc++.so.6 $(TARGETDIR)/lib/
+endif
 	install $(LIBDIR)/libcrypt.so.0 $(TARGETDIR)/lib/
 	install $(LIBDIR)/libpthread.so.0 $(TARGETDIR)/lib/
 	install $(LIBDIR)/libgcc_s.so.1 $(TARGETDIR)/lib/
@@ -317,6 +343,12 @@ endif
 ifeq ($(TCONFIG_SSH),y)
 	install $(LIBDIR)/libutil.so.0 $(TARGETDIR)/lib/
 endif
+
+ifeq ($(TCONFIG_SIPROXD),y)
+	install $(LIBDIR)/libpthread.so.0 $(TARGETDIR)/lib/
+	install $(LIBDIR)/libresolv.so.0 $(TARGETDIR)/lib/
+endif
+
 ifneq ($(TCONFIG_OPTIMIZE_SHARED_LIBS),y)
 	install $(LIBDIR)/libresolv.so.0 $(TARGETDIR)/lib/
 	$(STRIP) $(TARGETDIR)/lib/*.so.0
@@ -349,11 +381,11 @@ endif
 	@mv $(TARGETDIR)/lib/modules/*/kernel/fs/smbfs.*o $(PLATFORMDIR)/extras/ || true
 	@mv $(TARGETDIR)/lib/modules/*/kernel/fs/reiserfs.*o $(PLATFORMDIR)/extras/ || true
 	@mv $(TARGETDIR)/lib/modules/*/kernel/fs/jfs.*o $(PLATFORMDIR)/extras/ || true
-	@mv $(TARGETDIR)/lib/modules/*/kernel/fs/nfs.*o $(PLATFORMDIR)/extras/ || true
-	@mv $(TARGETDIR)/lib/modules/*/kernel/fs/nfsd.*o $(PLATFORMDIR)/extras/ || true
-	@mv $(TARGETDIR)/lib/modules/*/kernel/fs/lockd.*o $(PLATFORMDIR)/extras/ || true
-	@mv $(TARGETDIR)/lib/modules/*/kernel/fs/exportfs.*o $(PLATFORMDIR)/extras/ || true
-	@mv $(TARGETDIR)/lib/modules/*/kernel/net/sunrpc.*o $(PLATFORMDIR)/extras/ || true
+	$(if $(TCONFIG_NFS),@cp -f,@mv) $(TARGETDIR)/lib/modules/*/kernel/fs/nfs.*o $(PLATFORMDIR)/extras/ || true
+	$(if $(TCONFIG_NFS),@cp -f,@mv) $(TARGETDIR)/lib/modules/*/kernel/fs/nfsd.*o $(PLATFORMDIR)/extras/ || true
+	$(if $(TCONFIG_NFS),@cp -f,@mv) $(TARGETDIR)/lib/modules/*/kernel/fs/lockd.*o $(PLATFORMDIR)/extras/ || true
+	$(if $(TCONFIG_NFS),@cp -f,@mv) $(TARGETDIR)/lib/modules/*/kernel/fs/exportfs.*o $(PLATFORMDIR)/extras/ || true
+	$(if $(TCONFIG_NFS),@cp -f,@mv) $(TARGETDIR)/lib/modules/*/kernel/net/sunrpc.*o $(PLATFORMDIR)/extras/ || true
 	@mv $(TARGETDIR)/lib/modules/*/kernel/net/auth_rpcgss.*o $(PLATFORMDIR)/extras/ || true
 	@mv $(TARGETDIR)/lib/modules/*/kernel/net/rpcsec_gss_krb5.*o $(PLATFORMDIR)/extras/ || true
 	@mv $(TARGETDIR)/lib/modules/*/kernel/fs/xfs.*o $(PLATFORMDIR)/extras/ || true
@@ -394,7 +426,7 @@ endif
 	@mv $(TARGETDIR)/lib/modules/*/kernel/drivers/hid/* $(PLATFORMDIR)/extras/ || true
 	@rm -rf $(TARGETDIR)/lib/modules/*/kernel/drivers/hid || true
 	@cp -f $(TARGETDIR)/lib/modules/*/kernel/drivers/net/bcm57*.*o $(PLATFORMDIR)/extras/ || true
-	@mv $(TARGETDIR)/lib/modules/*/kernel/drivers/net/ctf*.*o $(PLATFORMDIR)/extras/ || true
+	$(if $(TCONFIG_CTF),@cp -f,@mv) $(TARGETDIR)/lib/modules/*/kernel/drivers/net/ctf*.*o $(PLATFORMDIR)/extras/ || true
 	$(if $(TCONFIG_PPTP),@cp -f,@mv) $(TARGETDIR)/lib/modules/*/kernel/drivers/net/pptp.*o $(PLATFORMDIR)/extras/ || true
 	$(if $(TCONFIG_L2TP),@cp -f,@mv) $(TARGETDIR)/lib/modules/*/kernel/drivers/net/pppol2tp.*o $(PLATFORMDIR)/extras/ || true
 	@mv $(TARGETDIR)/lib/modules/*/kernel/drivers/net/ppp_deflate.*o  $(PLATFORMDIR)/extras/ || true
@@ -597,7 +629,7 @@ busybox-config:
 	$(MAKE) -C busybox menuconfig
 
 
-httpd: shared nvram mssl
+httpd: shared nvram mssl libosip2
 	@$(SEP)
 	@$(MAKE) -C httpd
 
@@ -616,7 +648,7 @@ matrixssl-clean:
 
 cyassl/stamp-h1:
 	@cd cyassl && CC=$(CC) AR=$(AR) RANLIB=$(RANLIB) LD=$(LD) \
-	CFLAGS="-Os -Wall $(EXTRACFLAGS) -fPIC -ffunction-sections -fdata-sections \
+	CFLAGS="-Os -Wall -fPIC $(EXTRACFLAGS) -ffunction-sections -fdata-sections \
 	-DNO_MD4 -DNO_AES -DNO_ERROR_STRINGS -DNO_HC128 -DNO_RABBIT -DNO_PSK -DNO_DSA -DNO_DH -DNO_PWDBASED" \
 	LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC" \
 	PTHREAD_LIBS="-lpthread" \
@@ -647,7 +679,7 @@ openssl/stamp-h1:
 	shared $(OPENSSL_CIPHERS) \
 	no-sha0 no-smime no-camellia no-krb5 no-rmd160 no-ripemd \
 	no-seed no-capieng no-cms no-gms no-gmp no-rfc3779 \
-	no-ec no-ecdh no-ecdsa no-err no-hw no-jpake no-threads \
+	no-ec no-ecdh no-err no-hw no-jpake no-threads \
 	no-zlib no-engines no-sse2 \
 	no-dtls1 no-store no-psk no-md2 no-mdc2 no-ts
 
@@ -776,10 +808,10 @@ rp-pppoe-install: rp-pppoe
 upnp: nvram shared iptables
 
 libnfnetlink/stamp-h1:
-	cd $(TOP)/libnfnetlink && CC=$(CC) STRIP='mipsel-uclibc-strip' \
-		CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
-		LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections" \
-		$(CONFIGURE) --prefix=/usr --enable-shared --enable-static
+	cd $(TOP)/libnfnetlink && CC=$(CC) \
+	CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
+	LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections" \
+	$(CONFIGURE) --prefix=/usr --enable-shared --enable-static
 	touch libnfnetlink/stamp-h1
 
 libnfnetlink: libnfnetlink/stamp-h1
@@ -794,11 +826,7 @@ libnfnetlink-install:
 		ln -sf libnfnetlink.so.0.2.0 libnfnetlink.so
 
 miniupnpd-config:
-#ifeq ($(TCONFIG_IPV6),y)
-#	@cd miniupnpd && ./genconfig.sh --leasefile --ipv6
-#else
 	@cd miniupnpd && ./genconfig.sh --leasefile
-#endif
 
 miniupnpd: iptables miniupnpd-config libnfnetlink
 	@$(SEP)
@@ -813,6 +841,54 @@ miniupnpd-clean:
 miniupnpd-install:
 	install -D miniupnpd/miniupnpd $(INSTALLDIR)/miniupnpd/usr/sbin/miniupnpd
 	$(STRIP) $(INSTALLDIR)/miniupnpd/usr/sbin/miniupnpd
+
+##Tomato RAF - Siproxd&libosip2 
+libosip2/stamp-h1:
+	@$(SEP)
+	cd libosip2 && $(CONFIGURE) --enable-shared --disable-debug --disable-trace --enable-pthread --enable-semaphore --enable-nTime
+	$(MAKE) -C libosip2
+
+libosip2: libosip2/stamp-h1
+
+libosip2-clean:
+	@$(MAKE) -C libosip2 clean
+	@rm -f libosip2/stamp-h1
+
+libosip2-install:
+	install -D libosip2/src/osip2/.libs/libosip2.so.10.0.0 $(INSTALLDIR)/libosip2/usr/lib/libosip2.so.10.0.0
+	$(STRIP) $(INSTALLDIR)/libosip2/usr/lib/libosip2.so.10.0.0
+	install -D libosip2/src/osipparser2/.libs/libosipparser2.so.10.0.0 $(INSTALLDIR)/libosip2/usr/lib/libosipparser2.so.10.0.0
+	$(STRIP) $(INSTALLDIR)/libosip2/usr/lib/libosipparser2.so.10.0.0
+	cd $(INSTALLDIR)/libosip2/usr/lib && \
+	ln -s libosipparser2.so.10.0.0 libosipparser2.so && \
+	ln -s libosipparser2.so.10.0.0 libosipparser2.so.10 && \
+	ln -s libosip2.so.10.0.0 libosip2.so && \
+	ln -s libosip2.so.10.0.0 libosip2.so.10
+
+siproxd/stamp-h1: libosip2
+	@$(SEP)
+	cd siproxd && \
+	CC=$(CC) CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
+	CPPFLAGS="-I$(TOP)/libosip2/include -I$(TOP)/siproxd/libltdl" \
+	LDFLAGS="-L$(TOP)/libosip2/src/osipparser2/.libs -L$(TOP)/libosip2/src/osip2/.libs -L$(TOP)/siproxd/libltdl/.libs" \
+	$(CONFIGURE) --target=$(TARGET) --enable-static=no --disable-debug --disable-trace --enable-pthread --enable-semaphore --enable-ntime --disable-doc
+	$(MAKE) -C siproxd
+	@touch siproxd/stamp-h1
+
+siproxd: siproxd/stamp-h1
+
+siproxd-clean:
+	$(MAKE) -C siproxd clean
+	@rm -f siproxd/stamp-h1
+
+siproxd-install:
+	install -D siproxd/src/.libs/siproxd $(INSTALLDIR)/siproxd/usr/bin/siproxd
+	$(STRIP) $(INSTALLDIR)/siproxd/usr/bin/siproxd
+	chmod 0500 $(INSTALLDIR)/siproxd/usr/bin/siproxd
+	install -d $(INSTALLDIR)/siproxd/usr/lib/siproxd/
+	install -D siproxd/src/.libs/plugin_*.so* $(INSTALLDIR)/siproxd/usr/lib/siproxd/
+	install -D siproxd/src/plugin_*.la* $(INSTALLDIR)/siproxd/usr/lib/siproxd/
+##Roadkill - Siproxd&libosip2
 
 # !!TB
 shared: busybox
@@ -1124,6 +1200,8 @@ sqlite-install: sqlite
 ifneq ($(MEDIA_SERVER_STATIC),y)
 	install -D sqlite/.libs/libsqlite3.so.0 $(INSTALLDIR)/sqlite/usr/lib/libsqlite3.so.0
 	$(STRIP) $(INSTALLDIR)/sqlite/usr/lib/libsqlite3.so.0
+	cd $(INSTALLDIR)/sqlite/usr/lib/ && \
+		ln -sf libsqlite3.so.0 libsqlite3.so
 endif
 
 FFMPEG_FILTER_CONFIG= $(foreach c, $(2), --$(1)="$(c)")
@@ -1263,13 +1341,12 @@ endif
 
 zlib/stamp-h1:
 	cd zlib && \
-	CC=$(CC) AR="ar rc" RANLIB=$(RANLIB) LD=$(LD) CFLAGS="-Os -Wall $(EXTRACFLAGS)" \
-	./configure --shared --prefix='/usr'
+	AR="$(AR)" RANLIB=$(RANLIB) LD=$(LD) CFLAGS="-Os -Wall $(EXTRACFLAGS)" \
+	CC=$(CC) ./configure --shared --prefix=''
 	@touch zlib/stamp-h1
 
 zlib: zlib/stamp-h1
-	@$(SEP)
-	@$(MAKE) -C zlib CC=$(CC) AR="ar rc" RANLIB=$(RANLIB) LD=$(LD) all
+	@$(MAKE) -C zlib CC=$(CC) AR="$(AR)" RANLIB=$(RANLIB) LD=$(LD) all $(PARALLEL_BUILD)
 
 zlib-clean:
 	-@$(MAKE) -C zlib clean
@@ -1278,9 +1355,9 @@ zlib-clean:
 zlib-install: zlib
 	@$(SEP)
 ifneq ($(MEDIA_SERVER_STATIC),y)
-	install -D zlib/libz.so.1.2.5 $(INSTALLDIR)/zlib/usr/lib/libz.so.1.2.5
-	$(STRIP) $(INSTALLDIR)/zlib/usr/lib/libz.so.1.2.5
-	cd $(INSTALLDIR)/zlib/usr/lib && ln -s libz.so.1.2.5 libz.so.1 && ln -s libz.so.1.2.5 libz.so
+	install -d $(INSTALLDIR)/zlib/usr/lib
+	install -D zlib/libz.so.1 $(INSTALLDIR)/zlib/usr/lib/
+	$(STRIP) $(INSTALLDIR)/zlib/usr/lib/libz.so.1
 endif
 
 libid3tag/stamp-h1: zlib
@@ -1295,7 +1372,7 @@ libid3tag: libid3tag/stamp-h1 zlib
 	@$(MAKE) -C libid3tag all $(PARALLEL_BUILD)
 
 libid3tag-clean:
-	-@$(MAKE) -C libid3tag distclean
+	-@$(MAKE) -C libid3tag clean
 	@rm -f libid3tag/stamp-h1
 
 libid3tag-install: libid3tag
@@ -1329,9 +1406,49 @@ ifneq ($(MEDIA_SERVER_STATIC),y)
 	$(STRIP) $(INSTALLDIR)/libvorbis/usr/lib/libvorbis.so.0
 endif
 
-minidlna: zlib sqlite ffmpeg libogg flac jpeg libexif libid3tag libvorbis
+minidlna/stamp-h1: zlib sqlite ffmpeg libogg flac jpeg libexif libid3tag libvorbis libiconv
+	cd minidlna && CC=$(CC) CXX=$(CXX) AR=$(AR) RANLIB=$(RANLIB) STRIP='mipsel-uclibc-strip' HOST=mipsel-linux \
+	CFLAGS="-Wall -Os -D_GNU_SOURCE $(EXTRACFLAGS) -D_FILE_OFFSET_BITS=64 \
+		-ffunction-sections -fdata-sections \
+		-I$(TOP)/ffmpeg/libavutil -I$(TOP)/ffmpeg/libavcodec -I$(TOP)/ffmpeg/libavformat \
+		-I$(TOP)/ffmpeg/libswscale -I$(TOP)/ffmpeg \
+		-I$(TOP)/flac/include -I$(TOP)/sqlite -I$(TOP)/jpeg \
+		-I$(TOP)/libexif -I$(TOP)/libid3tag -I$(TOP)/libogg/include \
+		-I$(TOP)/libvorbis/include \
+		-I$(TOP)/libiconv/include \
+		-I$(TOP)/sqlite \
+		-I$(TOP)/zlib" \
+	LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC \
+		-L$(TOP)/zlib -L$(TOP)/sqlite/.libs -L$(TOP)/jpeg -L$(TOP)/libvorbis/lib/.libs \
+		-L$(TOP)/libogg/src/.libs -L$(TOP)/libexif/libexif/.libs -L$(TOP)/flac/src/libFLAC/.libs \
+		-L$(TOP)/ffmpeg/libavutil -L$(TOP)/ffmpeg/libavcodec -L$(TOP)/ffmpeg/libavformat \
+		-L$(TOP)/libid3tag/.libs -L$(TOP)/libiconv/lib/.libs" \
+	CPPFLAGS="-Wall -Os -D_GNU_SOURCE $(EXTRACFLAGS) -D_FILE_OFFSET_BITS=64 \
+		-ffunction-sections -fdata-sections \
+		-I$(TOP)/ffmpeg/libavutil -I$(TOP)/ffmpeg/libavcodec -I$(TOP)/ffmpeg/libavformat \
+		-I$(TOP)/ffmpeg/libswscale -I$(TOP)/ffmpeg \
+		-I$(TOP)/flac/include -I$(TOP)/sqlite -I$(TOP)/jpeg \
+		-I$(TOP)/libexif -I$(TOP)/libid3tag -I$(TOP)/libogg/include \
+		-I$(TOP)/libvorbis/include \
+		-I$(TOP)/libiconv/include \
+		-I$(TOP)/sqlite \
+		-I$(TOP)/zlib" \
+	LIBS="-lpthread -lexif -ljpeg -lsqlite3 -lavformat -lavutil -lavcodec -lid3tag -lFLAC -logg -lvorbis -lm -ldl -lz" \
+	$(CONFIGURE) --host=mipsel-linux --build=x86_64-linux-gnu
+	touch minidlna/stamp-h1
+
+minidlna: minidlna/stamp-h1
 	@$(SEP)
-	@$(MAKE) -C minidlna CC=$(CC) $(if $(MEDIA_SERVER_STATIC),STATIC=1,) minidlna $(PARALLEL_BUILD)
+	@$(MAKE) -C minidlna all $(PARALLEL_BUILD)
+
+minidlna-clean:
+	-@$(MAKE) -C minidlna clean
+	@rm -f minidlna/stamp-h1
+
+minidlna-install: minidlan
+	@$(SEP)
+	install -D minidlna/minidlnad $(INSTALLDIR)/minidlna/usr/sbin/minidlna
+	$(STRIP) $(INSTALLDIR)/minidlna/usr/sbin/minidlna
 
 igmpproxy/stamp-h1:
 	cd igmpproxy && CFLAGS="-O2 -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
@@ -1416,7 +1533,7 @@ ebtables-install: ebtables
 ebtables-clean:
 	-@$(MAKE) -C ebtables clean
 
-#Roadkill
+#Tomato RAF
 glib/stamp-h1:
 	@$(SEP)
 	@cd glib && $(CONFIGURE) --prefix=/usr glib_cv_prog_cc_ansi_proto=no glib_cv_has__inline=yes glib_cv_has__inline__=yes glib_cv_hasinline=yes \
@@ -1432,12 +1549,12 @@ glib: glib/stamp-h1
 
 glib-clean:
 	-@$(MAKE) -C glib clean
-	rm -f glib/stamp-h1
+	-@rm -f glib/stamp-h1
 
 glib-install: glib
 	@$(MAKE) -C glib DESTDIR=$(INSTALLDIR)/glib install
 
-#Roadkill
+#Tomato RAF
 nocat/stamp-h1: glib-install
 	@$(SEP)
 	@cd nocat && \
@@ -1457,7 +1574,7 @@ nocat: nocat/stamp-h1
 
 nocat-clean:
 	-@$(MAKE) -C nocat clean
-	rm -f nocat/stamp-h1
+	-@rm -f nocat/stamp-h1
 
 nocat-install:
 	install -D nocat/src/splashd $(INSTALLDIR)/nocat/usr/sbin/splashd
@@ -1475,7 +1592,7 @@ lzo: lzo/stamp-h1
 
 lzo-clean:
 	-@$(MAKE) -C lzo clean
-	@rm -f lzo/stamp-h1
+	-@rm -f lzo/stamp-h1
 
 lzo-install: lzo
 	install -D lzo/src/.libs/liblzo2.so $(INSTALLDIR)/lzo/usr/lib/liblzo2.so.2
@@ -1492,7 +1609,7 @@ openvpn/.conf:
 	--with-crypto-library=openssl \
 	--with-iproute-path="/usr/sbin/ip" \
 	--disable-debug --disable-plugins --enable-management --enable-small \
-	--disable-selinux --disable-socks --enable-password-save \
+	--disable-selinux --disable-socks --enable-password-save --disable-dependency-tracking \
 	OPENSSL_SSL_CFLAGS="-I$(TOP)/openssl/include" \
 	OPENSSL_SSL_LIBS="-L$(TOP)/openssl -lssl" \
 	ac_cv_lib_resolv_gethostbyname=no
@@ -1509,6 +1626,49 @@ openvpn-install: openvpn
 	install -D openvpn/src/openvpn/.libs/openvpn $(INSTALLDIR)/openvpn/usr/sbin/openvpn
 	$(STRIP) -s $(INSTALLDIR)/openvpn/usr/sbin/openvpn
 	chmod 0500 $(INSTALLDIR)/openvpn/usr/sbin/openvpn
+
+expat/stamp-h1:
+	cd expat && CC=$(CC) CFLAGS="-Os -Wall $(EXTRACFLAGS)" \
+		$(CONFIGURE) --prefix=/ --enable-shared --disable-static
+	touch $@
+expat: expat/stamp-h1
+	@$(SEP)
+	$(MAKE) -C expat $(PARALLEL_BUILD)
+expat-install:
+	install -d $(INSTALLDIR)/expat/usr/lib
+	install expat/.libs/libexpat.so.1.6.0 $(INSTALLDIR)/expat/usr/lib/libexpat.so.1.6.0
+	install expat/.libs/libexpat.so.1 $(INSTALLDIR)/expat/usr/lib/libexpat.so.1
+	$(STRIP)-s $(INSTALLDIR)/expat/usr/lib/libexpat.so.1.6.0
+aria2/stamp-h1: openssl zlib expat
+	cd aria2 && CC=$(CC) \
+	CFLAGS="-Os -Wall -mno-branch-likely -fno-caller-saves -fhonour-copts -fno-delete-null-pointer-checks -funit-at-a-time -mips32 -mtune=mips32 \
+			--param large-function-growth=800 --param max-inline-insns-single=3000 \
+			-ffunction-sections -fdata-sections $(EXTRACFLAGS) -I$(TOP)/expat/lib" \
+	CXXFLAGS="-Os -Wall -fno-delete-null-pointer-checks -funit-at-a-time \
+			--param large-function-growth=800 --param max-inline-insns-single=3000 \
+			-ffunction-sections -fdata-sections -I$(TOP)/expat/lib" \
+	LDFLAGS="-L$(TOP)/expat/.libs -ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC" \
+	OPENSSL_CFLAGS="-I$(TOP)/openssl/include" \
+	OPENSSL_LIBS="-L$(TOP)/openssl -lcrypto -lssl" \
+	ZLIB_CFLAGS="-I$(TOP)/zlib" \
+	ZLIB_LIBS="-L$(TOP)/zlib -lz" \
+	$(CONFIGURE) --prefix=/usr --enable-target-optspace --disable-epoll --enable-largefile --disable-nls --disable-rpath --disable-shared --disable-static \
+		--without-libuv --without-appletls --without-gnutls --without-libnettle --without-libgcrypt \
+		--with-openssl --without-sqlite3 --without-libxml2 --with-libexpat --without-libcares \
+		--with-libz --without-included-gettext --without-libintl-prefix
+	touch aria2/stamp-h1
+aria2: aria2/stamp-h1
+	@$(SEP)
+	$(MAKE) -C aria2 $(PARALLEL_BUILD)
+aria2-clean:
+	-@$(MAKE) -C aria2 clean
+	@rm -f aria2/stamp-h1 aria2/Makefile
+aria2-install: aria2
+	install -d $(INSTALLDIR)/aria2/usr/bin
+	install aria2/src/aria2c $(INSTALLDIR)/aria2/usr/bin
+	$(STRIP) -s $(INSTALLDIR)/aria2/usr/bin/aria2c
+	install -D zlib/libz.so.1 $(INSTALLDIR)/zlib/usr/lib/libz.so.1
+	$(STRIP) $(INSTALLDIR)/zlib/usr/lib/libz.so.1
 
 sd-idle/stamp-h1:
 	cd sd-idle \
@@ -1575,8 +1735,26 @@ libsodium/stamp-h1:
 	$(CONFIGURE) --prefix=/usr --disable-ssp
 	touch libsodium/stamp-h1
 
-dnscrypt/stamp-h1: libsodium/stamp-h1
+libsodium: libsodium/stamp-h1
+	$(MAKE) -C libsodium $(PARALLEL_BUILD)
+
+libsodium-install: libsodium
+	install -d $(INSTALLDIR)/libsodium/usr/lib
+	install -D libsodium/src/libsodium/.libs/libsodium.so.4.5.0 $(INSTALLDIR)/libsodium/usr/lib/libsodium.so.4.5.0
+	$(STRIP) -s $(INSTALLDIR)/libsodium/usr/lib/libsodium.so.4.5.0
+	cd $(INSTALLDIR)/libsodium/usr/lib/ && \
+		ln -sf libsodium.so.4.5.0 libsodium.so.4 && \
+		ln -sf libsodium.so.4.5.0 libsodium.so
+
+libsodium-clean:
+	-$(MAKE) -C libsodium clean
+	@rm -rf libsodium/stamp-h1
+
+dnscrypt/stamp-h1: libsodium
 	cd $(TOP)/dnscrypt && CC=$(CC) STRIP='mipsel-uclibc-strip' \
+	CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
+	CPPFLAGS="-I$(TOP)/libsodium/src/libsodium/include" \
+	LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections -L$(TOP)/libsodium/src/libsodium/.libs" \
 	$(CONFIGURE) --prefix=/usr --disable-ssp
 	touch dnscrypt/stamp-h1
 
@@ -1584,15 +1762,14 @@ dnscrypt: dnscrypt/stamp-h1
 	$(MAKE) -C dnscrypt $(PARALLEL_BUILD)
 
 dnscrypt-install: dnscrypt
-	install -D dnscrypt/src/proxy/dnscrypt-proxy $(INSTALLDIR)/dnscrypt/usr/sbin/dnscrypt-proxy
-	install -D dnscrypt/src/hostip/hostip $(INSTALLDIR)/dnscrypt/usr/sbin/hostip
+	install -D dnscrypt/src/proxy/.libs/dnscrypt-proxy $(INSTALLDIR)/dnscrypt/usr/sbin/dnscrypt-proxy
+	install -D dnscrypt/src/hostip/.libs/hostip $(INSTALLDIR)/dnscrypt/usr/sbin/hostip
 	$(STRIP) -s $(INSTALLDIR)/dnscrypt/usr/sbin/dnscrypt-proxy
 	$(STRIP) -s $(INSTALLDIR)/dnscrypt/usr/sbin/hostip
 
 dnscrypt-clean:
 	-@$(MAKE) -C dnscrypt clean
-	-@$(MAKE) -C libsodium clean
-	@rm -rf dnscrypt/stamp-h1 dnscrypt/src/dnscrypt-proxy/.deps dnscrypt/Makefile libsodium/stamp-h1
+	@rm -rf dnscrypt/stamp-h1 dnscrypt/src/dnscrypt-proxy/.deps dnscrypt/Makefile
 
 tcpdump/stamp-h1: openssl libpcap
 	cd tcpdump && \
@@ -1616,7 +1793,7 @@ tcpdump-install: tcpdump
 	install -D tcpdump/tcpdump $(INSTALLDIR)/tcpdump/usr/sbin/tcpdump
 	$(STRIP) $(INSTALLDIR)/tcpdump/usr/sbin/tcpdump
 
-#Libpcre
+#Tomato RAF
 pcre/stamp-h1:
 	$(SEP)
 	cd pcre && \
@@ -1631,27 +1808,30 @@ pcre-install: pcre
 	@$(SEP)
 	install -D pcre/.libs/libpcre.so.1 $(INSTALLDIR)/pcre/usr/lib/libpcre.so.1
 	$(STRIP) -s $(INSTALLDIR)/pcre/usr/lib/libpcre.so.1
-	install -D pcre/.libs/libpcreposix.so.0.0.1 $(INSTALLDIR)/pcre/usr/lib/libpcreposix.so.0.0.1
-	$(STRIP) -s $(INSTALLDIR)/pcre/usr/lib/libpcreposix.so.0.0.1
+	install -D pcre/.libs/libpcreposix.so.0.0.2 $(INSTALLDIR)/pcre/usr/lib/libpcreposix.so.0.0.2
+	$(STRIP) -s $(INSTALLDIR)/pcre/usr/lib/libpcreposix.so.0.0.2
 
 pcre-clean:
 	( if [ -f pcre/Makefile ]; then \
 		$(MAKE) -C pcre clean; \
 		rm -rf pcre/stamp-h1; \
 	fi )
-#PHP
+#Tomato RAF
 php/stamp-h1: pcre zlib-install
 	@$(SEP)
-#install pcre-nginx
-	@$(MAKE) -C pcre DESTDIR=$(TOP)/pcre-nginx install
-#install zlib libs
-	install -D zlib/libz.so.1.2.5 $(INSTALLDIR)/zlib/usr/lib/libz.so.1.2.5
-	$(STRIP) $(INSTALLDIR)/zlib/usr/lib/libz.so.1.2.5
-	cd $(INSTALLDIR)/zlib/usr/lib && ln -sf libz.so.1.2.5 libz.so.1 && ln -sf libz.so.1.2.5 libz.so
+#install zlib libs && pcre libs
+	install -D zlib/libz.so.1.2.8 $(INSTALLDIR)/zlib/usr/lib/libz.so.1.2.8
+	$(STRIP) $(INSTALLDIR)/zlib/usr/lib/libz.so.1.2.8
+	install -D zlib/libz.so.1 $(INSTALLDIR)/zlib/usr/lib/libz.so.1
+	$(STRIP) $(INSTALLDIR)/zlib/usr/lib/libz.so.1
+	cd $(INSTALLDIR)/zlib/usr/lib && ln -sf libz.so.1.2.8 libz.so
+	install -D pcre/.libs/libpcreposix.so.0 $(INSTALLDIR)/pcre/usr/lib/libpcreposix.so.0
+	$(STRIP) $(INSTALLDIR)/pcre/usr/lib/libpcreposix.so.0
 	install -D zlib/zlib.h $(INSTALLDIR)/zlib/usr/include/zlib.h
-#
-	@cd php && autoreconf -v -f -i
-	cd php && CC=$(CC) CXX=mipsel-uclibc-g++ AR=$(AR) RANLIB=$(RANLIB) LD=$(LD) CFLAGS="-Os -Wall -I$(TOP)/zlib $(EXTRACFLAGS)" \
+#When updating php remember to run aclocal, libtoolize --force, autoheader, autoconf
+# and apply patches to configure.in mentioned in aclocal comments...
+#	@cd php && autoreconf -v -f -i
+	cd php && CC=$(CC) CXX=$(ARCH)-g++ AR=$(AR) RANLIB=$(RANLIB) LD=$(LD) CFLAGS="-Os -Wall -I $(TOP)/zlib -I $(TOP)/pcre -L $(TOP)/pcre/.libs/libpcre.so.1.2.3 -L $(TOP)/pcre/.libs/libpcreposix.so.0.0.2 $(EXTRACFLAGS)" \
 	$(CONFIGURE) --prefix=/usr \
 	--enable-shared \
 	--disable-static \
@@ -1663,10 +1843,10 @@ php/stamp-h1: pcre zlib-install
 	--disable-short-tags \
 	--with-zlib="$(INSTALLDIR)/zlib/usr" \
 	--with-zlib-dir="$(INSTALLDIR)/zlib/usr" \
-	--with-pcre-regex="$(TOP)/pcre-nginx/usr" \
 	--disable-phar \
 	--enable-cli \
 	--enable-cgi \
+	--enable-fastcgi \
 	--disable-calendar \
 	--disable-ctype \
 	--without-curl \
@@ -1709,6 +1889,7 @@ php/stamp-h1: pcre zlib-install
 	--disable-filter \
 	--disable-libxml \
 	--without-system-tzdata \
+	ac_cv_c_bigendian_php="no" \
 	php_cv_cc_rpath="no" \
 	iconv_impl_name="gnu_libiconv"
 	@touch php/stamp-h1
@@ -1719,7 +1900,6 @@ php: php/stamp-h1
 php-clean:
 	-@$(MAKE) -C php clean
 	-@rm php/stamp-h1
-	-@rm -vrf $(TOP)/pcre-nginx
 
 php-install: php
 	@$(SEP)
@@ -1727,36 +1907,32 @@ php-install: php
 	install -D php/sapi/cli/php $(INSTALLDIR)/php/usr/sbin/php-cli && chmod 0755 $(INSTALLDIR)/php/usr/sbin/php-cli
 	$(STRIP) $(INSTALLDIR)/php/usr/sbin/php-cli
 	install -D php/sapi/cgi/php-cgi $(INSTALLDIR)/php/usr/sbin/php-cgi && chmod 0755 $(INSTALLDIR)/php/usr/sbin/php-cgi
-	cd $(INSTALLDIR)/php/usr/sbin && ln -sf php-cgi php-fcgi
 	$(STRIP) $(INSTALLDIR)/php/usr/sbin/php-cgi
 
-#NGinx
-nginx/stamp-h1: zlib pcre
+
+#Tomato RAF
+nginx/stamp-h1: openssl zlib pcre
 	@$(SEP)
-	( if [ ! -f openssl-nginx/Makefile ]; then \
-		cp -rf $(TOP)/openssl $(TOP)/openssl-nginx; \
-		echo $(TOP)/openssl copied over to $(TOP)/openssl-nginx; \
-		$(MAKE) -C $(TOP)/openssl-nginx clean; \
-	fi )
-	cd nginx && ./configure --crossbuild=Linux::$(ARCH) \
-				--prefix=/usr \
-				--conf-path=/etc/nginx/nginx.conf \
-				--error-log-path=/tmp/var/log/nginx/error.log \
-				--http-log-path=/tmp/var/log/nginx/access.log \
-				--pid-path=/tmp/var/run/nginx.pid \
-				--lock-path=/tmp/var/run/nginx.lock.accept \
-				--with-http_ssl_module \
-				--http-client-body-temp-path=/tmp/var/lib/nginx/client \
-				--http-fastcgi-temp-path=/tmp/var/lib/nginx/fastcgi \
-				--http-uwsgi-temp-path=/tmp/var/lib/nginx/uwsgi \
-				--http-scgi-temp-path=/tmp/var/lib/nginx/scgi \
-				--http-proxy-temp-path=/tmp/var/lib/nginx/proxy \
-				--with-pcre=$(TOP)/pcre \
-				--with-zlib=$(TOP)/zlib \
-				--with-openssl=$(TOP)/openssl-nginx \
-				--with-cc="$(CC)" \
-				--with-ld-opt="$(LDFLAGS)" \
-				--with-cc-opt="$(EXTRACFLAGS) $(CPPFLAGS) $(CFLAGS) -I $(TOP)/openssl-nginx/include"
+	cd $(TOP)/nginx && ./configure --crossbuild=Linux::$(ARCH) \
+		--prefix=/usr \
+		--sbin-path=/usr/sbin \
+		--conf-path=/etc/nginx/nginx.conf \
+		--error-log-path=/tmp/var/log/nginx/error.log \
+		--http-log-path=/tmp/var/log/nginx/access.log \
+		--pid-path=/tmp/var/run/nginx.pid \
+		--lock-path=/tmp/var/run/nginx.lock.accept \
+		--http-client-body-temp-path=/tmp/var/lib/nginx/client \
+		--http-fastcgi-temp-path=/tmp/var/lib/nginx/fastcgi \
+		--with-http_flv_module \
+		--with-http_ssl_module \
+		--with-http_gzip_static_module \
+		--http-uwsgi-temp-path=/tmp/var/lib/nginx/uwsgi \
+		--http-scgi-temp-path=/tmp/var/lib/nginx/scgi \
+		--http-proxy-temp-path=/tmp/var/lib/nginx/proxy \
+		--with-cc="$(CC)" \
+		--with-ld-opt="$(LDFLAGS) -L $(TOP)/pcre/.libs -L $(TOP)/zlib -L $(TOP)/openssl" \
+		--with-cc-opt="$(EXTRACFLAGS) $(CPPFLAGS) $(CFLAGS) -I $(TOP)/openssl/include -I $(TOP)/openssl/include/openssl -I $(TOP)/pcre -I $(TOP)/zlib" \
+		$(ADDITIONAL_MODULES)
 
 nginx: nginx/stamp-h1
 	@$(SEP)
@@ -1764,13 +1940,37 @@ nginx: nginx/stamp-h1
 
 nginx-clean:
 	-@$(MAKE) -C nginx clean
-	-@rm -rf $(TOP)/openssl-nginx
 	-@rm -f nginx/stamp-h1
 
 nginx-install: nginx
 	install -d $(INSTALLDIR)/nginx/usr/sbin
 	install -D nginx/objs/nginx $(INSTALLDIR)/nginx/usr/sbin/nginx && chmod 755 $(INSTALLDIR)/nginx/usr/sbin/nginx
 	$(STRIP) $(INSTALLDIR)/nginx/usr/sbin/nginx
+
+#for new minidlna. BWQ518.
+libiconv/stamp-h1:
+	cd libiconv && CC=$(CC) \
+	CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
+	LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC" \
+	$(CONFIGURE) --prefix=/usr --disable-nls --enable-static --enable-shared
+	touch libiconv/stamp-h1
+
+libiconv: libiconv/stamp-h1
+	@$(SEP)
+	$(MAKE) -C libiconv $(PARALLEL_BUILD)
+
+libiconv-clean:
+	-@$(MAKE) -C libiconv clean
+	@rm -f libiconv/stamp-h1 libiconv/Makefile
+
+libiconv-install: libiconv
+	install -d $(INSTALLDIR)/libiconv/usr/lib
+	install libiconv/lib/.libs/libiconv.so.2.4.0 $(INSTALLDIR)/libiconv/usr/lib/libiconv.so.2.4.0
+	$(STRIP) -s $(INSTALLDIR)/libiconv/usr/lib/libiconv.so.2.4.0
+	cd $(INSTALLDIR)/libiconv/usr/lib/ && \
+		ln -sf libiconv.so.2.4.0 libiconv.so.2 && \
+		ln -sf libiconv.so.2.4.0 libiconv.so
+
 
 #
 # Generic rules
@@ -1796,4 +1996,4 @@ $(obj-y) $(obj-n) $(obj-clean) $(obj-install): dummy
 
 .PHONY: all clean distclean mrproper install package
 .PHONY: conf mconf oldconf kconf kmconf config menuconfig oldconfig
-.PHONY: dummy libnet
+.PHONY: dummy libnet libpcap

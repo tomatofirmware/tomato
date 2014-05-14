@@ -1,4 +1,3 @@
-
 #
 # Toplevel Makefile for the BCM947xx Linux Router release
 #
@@ -39,8 +38,6 @@ include ./target.mak
 # But if you don't give anything for "V1", it'll get a default from tomato_version.
 current_TOMATO_V1 ?= "--def"
 VPN ?= "VPN"
-NC ?="NOCAT"
-NG ?="NGINX"
 ifeq ($(CONFIG_LINUX26),y)
 ifeq ($(CONFIG_BCMWL6),y)
 ND = "K26AC"
@@ -56,6 +53,9 @@ USERPPTP ?= "n"
 PPTPD ?= "n"
 TCPDUMP ?= "n"
 DNSCRYPT ?= "n"
+SIPROXD ?= "n"
+NGINX ?= "n"
+NOCAT ?= "n"
 
 ifeq ($(NVRAM_SIZE),)
 NVRAM_SIZE = 0
@@ -246,8 +246,9 @@ ifeq ($(LINKSYS_E2500),y)
 		| tee -a fpkg.log
 endif
 ifeq ($(LINKSYS_E3200),y)
-	# Linksys E3200(60k Nvram) image
+	# Linksys E3200/E2500v3 (60k Nvram) image
 	@btools/fpkg -i lzma-loader/loader.gz -i $(LINUXDIR)/arch/mips/brcm-boards/bcm947xx/compressed/vmlinuz -a 1024 -i router/mipsel-uclibc/target.image \
+		-l 25v3,image/tomato-E2500v3$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).bin \
 		-l 3200,image/tomato-E3200$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).bin \
 		| tee -a fpkg.log
 endif
@@ -257,7 +258,7 @@ ifeq ($(LINKSYS_E_64k),y)
 		-l E800,image/tomato-E800$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).bin \
 		-l E900,image/tomato-E900$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).bin \
 		-l E122,image/tomato-E1200v2$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).bin \
-		-l E150,image/tomato-E1500$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).bin \
+		-l E1500,image/tomato-E1500$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).bin \
 		| tee -a fpkg.log
 endif
 ifeq ($(LINKSYS_E1000v2),y)
@@ -380,7 +381,7 @@ what:
 # JFFSv1 | NO_JFFS
 # NO_CIFS, NO_SSH, NO_ZEBRA, NO_SAMBA, NO_HTTPS, NO_XXTP, NO_LIBOPT, NO_FTP
 # SAMBA3, OPENVPN, IPV6SUPP, EBTABLES, NTFS, MEDIASRV, BBEXTRAS, USBEXTRAS, BCM57, SLIM
-# NOCAT, SNMP, USERPPTP, VLAN, USBAP, NO_USBAPP, NGINX, DNSCRYPT
+# NOCAT, SNMP, USERPPTP, VLAN, USBAP, NO_USBAPP, NGINX, DNSCRYPT, SIPROXD, ARIA2, CTF
 
 define RouterOptions
 	@( \
@@ -457,6 +458,10 @@ define RouterOptions
 		sed -i "/TCONFIG_HTTPS/d" $(1); \
 		echo "# TCONFIG_HTTPS is not set" >>$(1); \
 	fi; \
+	if [ "$(ARIA2)" = "y" ]; then \
+		sed -i "/TCONFIG_ARIA2/d" $(1); \
+		echo "TCONFIG_ARIA2=y" >>$(1); \
+	fi; \
 	if [ "$(NO_XXTP)" = "y" ]; then \
 		sed -i "/TCONFIG_L2TP/d" $(1); \
 		echo "# TCONFIG_L2TP is not set" >>$(1); \
@@ -484,6 +489,16 @@ define RouterOptions
 		sed -i "/TCONFIG_ZLIB/d" $(1); \
 		echo "TCONFIG_NGINX=y" >>$(1); \
 		echo "TCONFIG_ZLIB=y" >>$(1); \
+	fi; \
+	if [ "$(SIPROXD)" = "y" ]; then \
+		sed -i "/TCONFIG_SIPROXD/d" $(1); \
+		sed -i "/TCONFIG_LIBOSIP2/d" $(1); \
+		echo "TCONFIG_SIPROXD=y" >>$(1); \
+		echo "TCONFIG_LIBOSIP2=y" >>$(1); \
+	fi; \
+	if [ "$(CTF)" = "y" ]; then \
+		sed -i "/TCONFIG_CTF/d" $(1); \
+		echo "TCONFIG_CTF=y" >>$(1); \
 	fi; \
 	if [ "$(OPENVPN)" = "y" ]; then \
 		sed -i "/TCONFIG_LZO/d" $(1); \
@@ -522,8 +537,8 @@ define RouterOptions
 	if [ "$(TCPDUMP)" = "y" ]; then \
 		sed -i "/TCONFIG_TCPDUMP/d" $(1); \
 		echo "TCONFIG_TCPDUMP=y" >>$(1); \
-		fi; \
-if [ "$(USBAP)" = "y" ]; then \
+	fi; \
+	if [ "$(USBAP)" = "y" ]; then \
 		sed -i "/TCONFIG_USBAP/d" $(1); \
 		echo "TCONFIG_USBAP=y" >>$(1); \
 		if [ "$(NO_USBAPP)" = "y" ]; then \
@@ -689,7 +704,7 @@ define KernelConfig
 		echo "CONFIG_CPU_MIPS32_R2=y" >>$(1); \
 		sed -i "/CONFIG_CPU_MIPSR1/d" $(1); \
 		echo "CONFIG_CPU_MIPSR2=y" >>$(1); \
-if [ "$(NAND)" = "y" ]; then \
+	if [ "$(NAND)" = "y" ]; then \
 			sed -i "/CONFIG_MTD_NFLASH/d" $(1); \
 			echo "CONFIG_MTD_NFLASH=y" >>$(1); \
 			sed -i "/CONFIG_MTD_NAND/d" $(1); \
@@ -850,7 +865,7 @@ endif
 ## Make the "normal (with NTFS support) + VPN" build
 e:
 ifeq ($(CONFIG_LINUX26),y)
-	@$(MAKE) bin OPENVPN=y USERPPTP=y PPTPD=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="$(VPN)" NOCAT=y USB="USB" VLAN=y NGINX=y SNMP=y DNSCRYPT=y TCPDUMP="$(TCPDUMP)"
+	@$(MAKE) bin OPENVPN=y USERPPTP=y PPTPD=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=E BUILD_DESC="$(VPN)" NOCAT=y USB="USB" VLAN=y NGINX=y SIPROXD=y SNMP=y DNSCRYPT=y TCPDUMP="$(TCPDUMP)"
 else
 #	@$(MAKE) bin OPENVPN=y USERPPTP=y PPTPD=y NTFS=y B=E BUILD_DESC="$(VPN)" USB="USB" VLAN="$(VLAN)"
 	@$(MAKE) bin OPENVPN=y USERPPTP=y PPTPD=y BBEXTRAS=y USBEXTRAS=y NTFS=y B=E BUILD_DESC="$(VPN)" USB="USB" SNMP=y DNSCRYPT=y  VLAN="$(VLAN)" TCPDUMP="$(TCPDUMP)"
@@ -882,19 +897,22 @@ else
 	@$(MAKE) bin NTFS=y BBEXTRAS=y USBEXTRAS=y B=M BUILD_DESC="Ext" USB="USB" VLAN="$(VLAN)" SNMP=y USERPPTP=y PPTPD=y DNSCRYPT=y TCPDUMP="$(TCPDUMP)"
 endif
 
-## Roadkill
-## Make the "VLAN + VPN + NOCAT + USB (Change switch) + NGINX (add option)" build
+## Tomato RAF versions.
+## Make the "Communicator version for >8MB Routers.
 nc:
-ifeq ($(CONFIG_LINUX26),y)
-	@$(MAKE) bin OPENVPN=y USERPPTP=y PPTPD=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y DNSCRYPT=y B=NC USB="USB" SNMP=y VLAN=y NOCAT=y TCPDUMP="$(TCPDUMP)"
-else
-	@$(MAKE) bin OPENVPN=y USERPPTP=y PPTPD=y NTFS=y DNSCRYPT=y B=NC BUILD_DESC="$(VPN)" USB="USB" VLAN="$(VLAN)" NOCAT=y TCPDUMP="$(TCPDUMP)" BUILD_DESC+=" $(NC)"
-endif
+	@$(MAKE) bin OPENVPN=y USERPPTP=y PPTPD=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=n IPV6SUPP=y DNSCRYPT=y SIPROXD=y NGINX=y B=NC USB="USB" SNMP=y VLAN=y NOCAT=y TCPDUMP="$(TCPDUMP)"
 
-## Toastman
-## Make the "Mini: no USB, + NOCAT" build - for 4MB routers
-ncm:
-	@$(MAKE) bin JFFSv1=y NOCAT=y B=NCM BUILD_DESC="Mini-NOCAT" USB="" VLAN="$(VLAN)"
+## Make the "Communicator version for 8MB Routers. E3000
+ncl:
+	@$(MAKE) bin OPENVPN=y USERPPTP=y PPTPD=y NTFS=y BBEXTRAS=y USBEXTRAS=n EBTABLES=y NO_LIBOPT=y MEDIASRV=n IPV6SUPP=y DNSCRYPT=y SIPROXD=n NGINX=n B=NC USB=n SNMP=n VLAN=y NOCAT=n TCPDUMP="$(TCPDUMP)"
+
+## Make the "Full version".
+nf:
+	@$(MAKE) bin OPENVPN=y USERPPTP=y PPTPD=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y DNSCRYPT=y SIPROXD=y NGINX=y BIRD=n CTF=n B=NF USB="USB" SNMP=y VLAN=y NOCAT=y ARIA2=n TCPDUMP="$(TCPDUMP)"
+
+## Make the "Media Version".
+nm:
+	@$(MAKE) bin OPENVPN=y USERPPTP=y PPTPD=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y DNSCRYPT=y SIPROXD=n NGINX=n B=NM USB="USB" SNMP=y VLAN=y NOCAT=n TCPDUMP="$(TCPDUMP)"
 
 ## Toastman
 ## Make the "normal" build + NOCAT
@@ -978,6 +996,15 @@ r2n:
 r2nc:
 	@$(MAKE) nc MIPS32=r2
 
+r2ncl:
+	@$(MAKE) ncl MIPS32=r2
+
+r2nf:
+	@$(MAKE) nf MIPS32=r2
+
+r2nm:
+	@$(MAKE) nm MIPS32=r2
+
 r2r:
 	@$(MAKE) r MIPS32=r2
 
@@ -1019,6 +1046,15 @@ n60n:
 n60nc:
 	@$(MAKE) r2nc NVRAM_SIZE=60 LINKSYS_E=y
 
+n60ncl:
+	@$(MAKE) r2ncl NVRAM_SIZE=60 LINKSYS_E=y
+
+n60nf:
+	@$(MAKE) r2nf NVRAM_SIZE=60 LINKSYS_E=y
+
+n60nm:
+	@$(MAKE) r2nm NVRAM_SIZE=60 LINKSYS_E=y
+
 n60o:
 	@$(MAKE) r2o NVRAM_SIZE=60 LINKSYS_E=y
 
@@ -1055,6 +1091,15 @@ n64n:
 n64nc:
 	@$(MAKE) r2nc NVRAM_SIZE=64 LINKSYS_E_64=y
 
+n64ncl:
+	@$(MAKE) r2ncl NVRAM_SIZE=64 LINKSYS_E_64=y
+
+n64nf:
+	@$(MAKE) r2nf NVRAM_SIZE=64 LINKSYS_E_64=y
+
+n64nm:
+	@$(MAKE) r2nm NVRAM_SIZE=64 LINKSYS_E_64=y
+
 n64o:
 	@$(MAKE) r2o NVRAM_SIZE=64 LINKSYS_E_64=y
 
@@ -1070,18 +1115,20 @@ n64v:
 
 #Linksys E-Series with 4MB Flash
 
-e1000v2i:
-	@$(MAKE) r2i NVRAM_SIZE=32 LINKSYS_E1000v2=y
+eseries:
+	@$(MAKE) r2ncl NVRAM_SIZE=64 LINKSYS_E_64k=y
 
-e1000v2f:
-	@$(MAKE) r2f NVRAM_SIZE=32 LINKSYS_E1000v2=y
+e1000v2:
+	@$(MAKE) r2ncl NVRAM_SIZE=32 LINKSYS_E1000v2=y
 
-e1200v1i:
-	@$(MAKE) r2i NVRAM_SIZE=64 LINKSYS_E1200v1=y
+e1200:
+	@$(MAKE) r2ncl NVRAM_SIZE=64 LINKSYS_E1200v1=y
 
-e1200v1f:
-	@$(MAKE) r2f NVRAM_SIZE=64 LINKSYS_E1200v1=y
 
+#Build for Asus RT-N66u with 64k NVRAM support
+
+rtn66:
+	@$(MAKE) nf MIPS32=r2 NVRAM_64K=y
 
 #Builds for WNR3500L v2
 
@@ -1092,19 +1139,29 @@ rtn53:
 	@$(MAKE) bin MIPS32=r2 OPENVPN=y USERPPTP=y NTFS=y BBEXTRAS=y NO_LIBOPT=y EBTABLES=y IPV6SUPP=y BUILD_DESC="RT-N53" USB="USB" SNMP=y DNSCRYPT=y PPTPD=y VLAN=y NOCAT=y USBAP=y NO_USBAPP=y
 		
 e2500:
-	@$(MAKE) bin MIPS32=r2 OPENVPN=y USERPPTP=y PPTPD=y NTFS=y BBEXTRAS=y NO_LIBOPT=y VLAN=y EBTABLES=y IPV6SUPP=y SNMP=y NOCAT=y NGINX=n USBAP=y NO_USBAPP=y NVRAM_SIZE=60 BUILD_DESC+="-$(VLAN)" BUILD_DESC="$(VPN)" BUILD_DESC+="-$(NC)" LINKSYS_E2500=y
+	@$(MAKE) ncl MIPS32=r2 USBAP=y NVRAM_SIZE=60 LINKSYS_E2500=y
 	
 e3200:
-	@$(MAKE) r2nc USBAP=y NVRAM_SIZE=60 LINKSYS_E3200=y
+	@$(MAKE) nf MIPS32=r2 USBAP=y NVRAM_SIZE=60 LINKSYS_E3200=y
+
+tn6:
+	@$(MAKE) bin MIPS32=r2 OPENVPN=y USERPPTP=y NTFS=y BBEXTRAS=y NO_LIBOPT=y EBTABLES=y IPV6SUPP=y BUILD_DESC="TendaN6" USB="USB" SNMP=y DNSCRYPT=y PPTPD=y VLAN=y NOCAT=y USBAP=y NO_USBAPP=y
+
+tn60:
+	@$(MAKE) nf MIPS32=r2 USBAP=y BUILD_DESC="TendaN60"
 
 ac66e:
-	@$(MAKE) e MIPS32=r2 NVRAM_64K=y NAND=y AC66U=1 NO_JFFS=y
+	@$(MAKE) nf MIPS32=r2 NVRAM_64K=y NAND=y AC66U=1 NO_JFFS=y
 
 w1800rz:
 	@$(MAKE) z MIPS32=r2 NVRAM_64K=y W1800R=1
 
 l600n:
-	@$(MAKE) bin MIPS32=r2 OPENVPN=y USERPPTP=y PPTPD=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=y IPV6SUPP=y B=NC BUILD_DESC="$(VPN)" USB="USB" VLAN="$(VLAN)" SNMP=y NOCAT=y USBAP=y B=NC BUILD_DESC+="-$(NC)"  BUILD_DESC+="$(L600N)"
+	@$(MAKE) bin MIPS32=r2 OPENVPN=y USERPPTP=y PPTPD=y NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y NO_LIBOPT=y MEDIASRV=n IPV6SUPP=y  BUILD_DESC="$(VPN)" USB="USB" VLAN=y SNMP=y NOCAT=y USBAP=y B=NC BUILD_DESC+="-$(NC)" BUILD_DESC+="$(L600N)"
+
+belkin: 
+#F7D3301\F7D3302\F7D4302\F5D8235v3
+	@$(MAKE) r2ncl BELKIN=y
 	
 setprofile:
 	echo '#ifndef TOMATO_PROFILE' > router/shared/tomato_profile.h
@@ -1193,7 +1250,9 @@ ifeq ($(CONFIG_LINUX26),y)
 	@echo "r2fs         MIPS Release 2 FS build (no USB support minus JFFS, CIFS, RIPv1/2, Zebra)"
 	@echo "r2i          MIPS Release 2 I build (IPv6 with no USB support minus CIFS and RIPv1/2)"
 	@echo "r2m          MIPS Release 2 M build (standard plus extras)"
-	@echo "r2nc         MIPS Release 2 NC build (standard plus VPN, extras and NOCAT)"
+	@echo "r2nc         MIPS Release 2 build (Communicator RAF version)"
+	@echo "r2nf         MIPS Release 2 build (Full RAF version)"
+	@echo "r2nm         MIPS Release 2 build (Media RAF version)"
 	@echo "r2ncm        MIPS Release 2 NCM build (no USB support, plus NOCAT)"
 	@echo "r2ncs        MIPS Release 2 NCS build (standard plus NOCAT)"
 	@echo "r2s          MIPS Release 2 S build (no USB support)"
@@ -1205,14 +1264,18 @@ ifeq ($(CONFIG_LINUX26),y)
 	@echo "       Linksys E-Series with 60k Nvram"
 	@echo "n60m         Linksys E-series build (60KB NVRAM, standard plus extras)"
 	@echo "n60e         Linksys E-series build (60KB NVRAM, standard plus VPN and extras)"
-	@echo "n60nc        Linksys E-series build (60KB NVRAM, standard plus extras, plus VPN, plus NOCAT)"
+	@echo "n60nc        Linksys E-series build (60KB NVRAM, Communicator RAF version)"
+	@echo "n60nf        Linksys E-series build (60KB NVRAM, Full RAF version)"
+	@echo "n60nm        Linksys E-series build (60KB NVRAM, Media RAF version)"
 	@echo "n60s         Linksys E-series build (60KB NVRAM, no USB support)"
 	@echo "n60v         Linksys E-series build (60KB NVRAM, VPN with no USB support)"
 
 	@echo "       Linksys E-Series with 64k Nvram/8MB Flash(E800/E900/E1200v2/E1500)"
 	@echo "n64m         Linksys E-series build (64KB NVRAM, standard plus extras)"
 	@echo "n64e         Linksys E-series build (64KB NVRAM, standard plus VPN and extras)"
-	@echo "n64nc        Linksys E-series build (64KB NVRAM, standard plus extras, plus VPN, plus NOCAT)"
+	@echo "n64nc        Linksys E-series build (64KB NVRAM, Communicator RAF version)"
+	@echo "n64nf        Linksys E-series build (64KB NVRAM, Full RAF version)"
+	@echo "n64nm        Linksys E-series build (64KB NVRAM, Media RAF version)"
 	@echo "n64s         Linksys E-series build (64KB NVRAM, no USB support)"
 	@echo "n64v         Linksys E-series build (64KB NVRAM, VPN with no USB support)"
 
@@ -1225,12 +1288,15 @@ ifeq ($(CONFIG_LINUX26),y)
 	@echo "v2e          Netgear WNR3500Lv2 build"
 	@echo "       Routers with wl_high module"
 	@echo "rtn53	Asus RT-N53 with wl_high module (dualband support)"
+	@echo "rtn66	Asus RT-N66 build with full features"
 	@echo "e2500	Linksys E2500 with wl_high module (dualband support)"
-	@echo "e3200    Linksys E3200 with wl_high module (dualband support)"
+	@echo "E3200/E2500v3    Linksys E3200/E2500v3 with wl_high module (dualband support)"
+	@echo "tn6	Tenda N6 with wl_high module (dualband support)"
+	@echo "tn60	Tenda N60 with wl_high module (dualband support)"
 	@echo "l600n    Rosewill L600N Build with wl_high module (dualband support)"
 	@echo "       Routers with AC WIRELESS"	
 	@echo "ac66e	ASUS RT-AC66"
-	@ECHO "ac56	ASUS RT-AC56"
+	@echo "ac56	ASUS RT-AC56"
 	@echo "w1800rz	Tenda 1800"
 
 endif
