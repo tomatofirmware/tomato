@@ -143,7 +143,7 @@ function init()
 <input type='hidden' name='NC_ForcedRedirect'>
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: 'Enable Function', name: 'f_NC_enable', type: 'checkbox', value: nvram.NC_enable == '1' },
+	{ title: 'Enable Captive Portal', name: 'f_NC_enable', type: 'checkbox', value: nvram.NC_enable == '1' },
 	{ title: 'Captive Site Forwarding', name: 'f_NC_ForcedRedirect', type: 'checkbox', value: (nvram.NC_ForcedRedirect == '1') },
 /* VLAN-BEGIN */
 	{ title: 'Interface', multi: [
@@ -186,7 +186,7 @@ createFieldTable('', [
 <b>Captive Portal User Guide.</b><br>
 </span>
 <br>
-<li><b> Enable function:</b> When you tick and save the router will show a Welcome Banner when a computer access the Internet.<br>
+<li><b> Enable Captive Portal:</b> When you tick and save the router will show a Welcome Banner when a computer access the Internet.<br>
 /* VLAN-BEGIN */
 <li><b> Interface:</b> - Select one of the LAN bridges on which the Captive Portal will Pop-up.<br>
 /* VLAN-END */

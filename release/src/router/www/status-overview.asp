@@ -4,6 +4,10 @@
 	Copyright (C) 2006-2010 Jonathan Zarate
 	http://www.polarcloud.com/tomato/
 
+	Tomato VLAN GUI
+	Copyright (C) 2011 Augusto Bott
+	http://code.google.com/p/tomato-sdhc-vlan/
+
 	For use with Tomato Firmware only.
 	No part of this file may be used without permission.
 -->
@@ -373,15 +377,15 @@ createFieldTable('', [
 createFieldTable('', [
 	{ title: 'MAC Address', text: nvram.wan_hwaddr },
 	{ title: 'Connection Type', text: { 'dhcp':'DHCP', 'static':'Static IP', 'pppoe':'PPPoE', 'pptp':'PPTP', 'l2tp':'L2TP', 'ppp3g':'3G Modem' }[nvram.wan_proto] || '-' },
-	{ title: 'IP Address', rid: 'wanip', text: stats.wanip },
+	{ title: 'IPv4 Address', rid: 'wanip', text: stats.wanip },
 	{ title: 'Previous WAN IP', rid: 'wanprebuf', text: stats.wanprebuf, hidden: ((nvram.wan_proto != 'pppoe') && (nvram.wan_proto != 'pptp') && (nvram.wan_proto != 'l2tp') && (nvram.wan_proto != 'ppp3g')) }, //Victek
 	{ title: 'Subnet Mask', rid: 'wannetmask', text: stats.wannetmask },
 	{ title: 'Gateway', rid: 'wangateway', text: stats.wangateway },
+	{ title: 'DNS', rid: 'dns', text: stats.dns },
+	{ title: 'IPv4 MTU', text: nvram.wan_run_mtu },
 /* IPV6-BEGIN */
 	{ title: 'IPv6 Address', rid: 'ip6_wan', text: stats.ip6_wan, hidden: (stats.ip6_wan == '') },
 /* IPV6-END */
-	{ title: 'DNS', rid: 'dns', text: stats.dns },
-	{ title: 'MTU', text: nvram.wan_run_mtu },
 	null,
 	{ title: 'Status', rid: 'wanstatus', text: stats.wanstatus },
 	{ title: 'Connection Uptime', rid: 'wanuptime', text: stats.wanuptime },
@@ -451,14 +455,14 @@ for (var i = 0 ; i <= MAX_BRIDGE_ID ; i++) {
 
 createFieldTable('', [
 	{ title: 'Router MAC Address', text: nvram.et0macaddr },
-	{ title: 'Router IP Addresses', text: t },
+	{ title: 'Router IPv4 Addresses', text: t },
 	{ title: 'Gateway', text: nvram.lan_gateway, ignore: nvram.wan_proto != 'disabled' },
 /* IPV6-BEGIN */
 	{ title: 'Router IPv6 Address', rid: 'ip6_lan', text: stats.ip6_lan, hidden: (stats.ip6_lan == '') },
 	{ title: 'IPv6 Link-local Address', rid: 'ip6_lan_ll', text: stats.ip6_lan_ll, hidden: (stats.ip6_lan_ll == '') },
 /* IPV6-END */
-	{ title: 'DNS', rid: 'dns', text: stats.dns, ignore: nvram.wan_proto != 'disabled' },
-	{ title: 'DHCP', text: s }
+	{ title: 'DNS Adresses', rid: 'dns', text: stats.dns, ignore: nvram.wan_proto != 'disabled' },
+	{ title: 'IPv4 DHCP Range', text: s }
 ]);
 /* VLAN-END */
 
@@ -476,7 +480,7 @@ else {
 }
 createFieldTable('', [
 	{ title: 'Router MAC Address', text: nvram.et0macaddr },
-	{ title: 'Router IP Address', text: nvram.lan_ipaddr },
+	{ title: 'Router IPv4 Address', text: nvram.lan_ipaddr },
 	{ title: 'Subnet Mask', text: nvram.lan_netmask },
 	{ title: 'Gateway', text: nvram.lan_gateway, ignore: nvram.wan_proto != 'disabled' },
 /* IPV6-BEGIN */
@@ -484,7 +488,7 @@ createFieldTable('', [
 	{ title: 'IPv6 Link-local Address', rid: 'ip6_lan_ll', text: stats.ip6_lan_ll, hidden: (stats.ip6_lan_ll == '') },
 /* IPV6-END */
 	{ title: 'DNS', rid: 'dns', text: stats.dns, ignore: nvram.wan_proto != 'disabled' },
-	{ title: 'DHCP', text: s }
+	{ title: 'IPv4 DHCP Range', text: s }
 ]);
 /* NOVLAN-END */
 

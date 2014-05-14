@@ -2417,12 +2417,18 @@ REMOVE-END */
 		['Access Restriction',		'restrict.asp'],
 		null,
 		['Bandwidth Limiter',		'bwlimit.asp'], 
-		/* NOCAT-BEGIN */
+/* NOCAT-BEGIN */
 		['Captive Portal',		'splashd.asp'],
 /* NOCAT-END */
 /* NGINX-BEGIN */
 		['Web Server',			'nginx.asp'],
 /* NGINX-END */
+/* SIPROXD-BEGIN */
+		['SIP VoIP Telephony',		'siproxd.asp'],
+/* SIPROXD-END */
+/* ARIA2-BEGIN */
+		['Aria2 Multidownloader',	'aria2.asp'],
+/* ARIA2-END */
 /* USB-BEGIN */
 // ---- !!TB - USB, FTP, Samba, Media Server
 		['USB and NAS',			'nas', 0, [
@@ -2467,6 +2473,9 @@ REMOVE-END */
 /* JFFS2-BEGIN */
 			['JFFS',			'jffs2.asp'],
 /* JFFS2-END */
+/* NFS-BEGIN */
+			['NFS Server',			'nfs.asp'],
+/* NFS-END */
 			['Logging',			'log.asp'],
 			['Scheduler',		'sched.asp'],
 			['Scripts',			'scripts.asp'],

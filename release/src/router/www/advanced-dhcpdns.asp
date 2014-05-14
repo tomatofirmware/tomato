@@ -189,6 +189,7 @@ createFieldTable('', [
 
 <i>DHCP / DNS Server (LAN):</i><br>
 <ul>
+<li><b>Important:</b> You must enter IPv4 and IPv6 DNS's to reject the ones provided by your ISP.</li>
 <li><b>Use internal DNS</b> - Allow dnsmasq to be your DNS server on LAN.</li>
 <li><b>Use received DNS with user-entered DNS</b> - Add DNS servers received from your WAN connection to the static DNS server list (see <a href='basic-network.asp'>Network</a> configuration).</li>
 <li><b>Prevent DNS-rebind attacks</b> - Enable DNS rebinding protection on Dnsmasq.</li>

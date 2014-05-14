@@ -305,13 +305,13 @@ wlg.onAdd = function() {
 
 	vifs_defined.push([
 		u.toString(),						// fface == wl_ifaces[uidx][1]
-		(nvram['wl' + u + '_ifname']) || ('wl'+u),	// ifname =~ wl_ifaces[uidx][0]
-		u.substr(0, u.indexOf('.')),		// unit
-		u.substr(u.indexOf('.')+1) || '-1',	// subunit
+		(nvram['wl' + u + '_ifname']) || ('wl'+u),		// ifname =~ wl_ifaces[uidx][0]
+		u.substr(0, u.indexOf('.')),				// unit
+		u.substr(u.indexOf('.')+1) || '-1',			// subunit
 		data[1] || '1',						// radio
-		'0',								// iface up?
+		'0',							// iface up?
 		data[1] || '1',						// bss_enabled
-		data[3],							// WL net mode
+		data[3],						// WL net mode
 		data[2], 							// nvram['wl' + u + '_ssid'],
 		(eval('nvram["wl'+u+'_hwaddr"]')) || '00:00:00:00:00:00',		// MAC addr
 		'0',								// VIFs supported

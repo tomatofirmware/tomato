@@ -30,8 +30,6 @@
 	margin-bottom: 10px;
 }
 </style>
-
-<script type='text/javascript' src='debug.js'></script>
 <script type='text/javascript'>
 
 //	<% nvram("nginx_enable,nginx_keepconf,nginx_port,nginx_fqdn,nginx_docroot,nginx_priority,nginx_custom"); %>
@@ -58,27 +56,20 @@ function verifyFields(focused, quiet)
 	var a, b, c;
 	var i;
 	var vis = {
-			_f_nginx_keepconf : 1,
 			_f_nginx_port : 1,
+			_f_nginx_keepconf : 1,
 			_f_nginx_fqdn : 1,
 			_f_nginx_docroot : 1,
 			_f_nginx_priority : 1,
 			_f_nginx_custom : 1,
 	}
-
 	if (!E('_f_nginx_enable').checked) {
-		for (i in vis) {
-			vis[i] = 2;
+			for (i in vis) {
+					vis[i] = 2;
+			}
+			vis._f_nginx_enable = 1;
 		}
-	}
-	
-	for (a in vis) {
-		b = E(a);
-		c = vis[a];
-		b.disabled = (c != 1);
-		PR(b).style.display = c ? '' : 'none';
-	}
-	
+
 	if (!v_port('_f_nginx_port', quiet))
 	{
 		ok = 0;
@@ -100,30 +91,28 @@ function save()
   	var fom = E('_fom');
 	if (!verifyFields(null, false)) return;
 
-	var en = fom.f_nginx_enable.checked;
-	fom.nginx_enable.value = en ? 1 : 0;
-	
-	if (en) {
+	fom.nginx_enable.value = E('_f_nginx_enable').checked ? 1 : 0;
+	if (fom.nginx_enable.value) {
 	fom.nginx_keepconf.value = fom.f_nginx_keepconf.checked ? 1 : 0;
 	fom.nginx_port.value = fom.f_nginx_port.value;
 	fom.nginx_fqdn.value = fom.f_nginx_fqdn.value;
 	fom.nginx_docroot.value = fom.f_nginx_docroot.value;
 	fom.nginx_priority.value = fom.f_nginx_priority.value;
 	fom.nginx_custom.value = fom.f_nginx_custom.value;
-	}
-
-	if (!en) {
-	fom._service.value = 'enginex-stop';
+	fom._service.value = 'nginx-restart';
 	} else {
-	fom._service.value = 'enginex-restart';
-	}
-	
-	form.submit(fom, 1);
+		fom._service.value = 'nginx-stop';
+		}
+		form.submit(fom, 1);
+}
+
+function init()
+{
+	verifyFields(null, 1);
 }
 </script>
 </head>
-<body>
-<form id='_fom' method='post' action='tomato.cgi'>
+<body onLoad="init()">
 <table id='container' cellspacing=0>
 <tr><td colspan=2 id='header'>
 	<div class='title'>Tomato RAF</div>
@@ -162,8 +151,8 @@ function save()
 
 <script type='text/javascript'>
 createFieldTable('', [
-	{ title: 'Enable Server on Start', name: 'f_nginx_enable', type: 'checkbox', value: (nvram.nginx_enable != '0') },
-	{ title: 'Keep Config Files', name: 'f_nginx_keepconf', type: 'checkbox', value: (nvram.nginx_keepconf != '0') },
+	{ title: 'Enable Server on Start', name: 'f_nginx_enable', type: 'checkbox', value: nvram.nginx_enable == '1'},
+	{ title: 'Keep Config Files', name: 'f_nginx_keepconf', type: 'checkbox', value: (nvram.nginx_keepconf != '0') },	
 	{ title: 'Web Server Port', name: 'f_nginx_port', type: 'text', maxlen: 5, size: 7, value: fixPort(nvram.nginx_port, 85), suffix: '<small> default: 85</small>' },
 	{ title: 'Web Server Name', name: 'f_nginx_fqdn', type: 'text', maxlen: 255, size: 20, value: nvram.nginx_fqdn },
 	{ title: 'Server Root Path', name: 'f_nginx_docroot', type: 'text', maxlen: 255, size: 40, value: nvram.nginx_docroot, suffix: '<span>&nbsp;/index.html / index.htm / index.php</span>' },
@@ -182,7 +171,7 @@ createFieldTable('', [
 <br>
 <li><b> Status Button:</b> Quick Start-Stop Service. Enable Web Server must be checked to modify settings.<br>
 <li><b> Enable Server on Start:</b> To activate the Web Server tick and save this screen.<br>
-<li><b> Keep Config Files:</b> Have modified the configuration file manually? OK, check the box and changes will be maintained.<br> 
+<li><b> Keep Config Files:</b> Have you modified the configuration file manually? Tick this box and changes will be maintained.<br> 
 <li><b> Web Server Port:</b> The Port used by the Web Server to be accessed. Check conflict when the port is used by other services.<br>
 <li><b> Web Server Name:</b> Name that will appear on top of your Internet Browser.<br>
 <li><b> Document Root Path:</b> The path in your router where documents are stored.<br>

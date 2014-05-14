@@ -21,7 +21,7 @@
 <script type='text/javascript' src='debug.js'></script>
 
 <script type='text/javascript'>
-//	<% nvram("ipv6_6rd_prefix_length,ipv6_prefix,ipv6_prefix_length,ipv6_accept_ra,ipv6_rtr_addr,ipv6_service,ipv6_dns,ipv6_tun_addr,ipv6_tun_addrlen,ipv6_ifname,ipv6_tun_v4end,ipv6_relay,ipv6_tun_mtu,ipv6_tun_ttl,ipv6_6rd_ipv4masklen,ipv6_6rd_prefix,ipv6_6rd_borderrelay"); %>
+//	<% nvram("ipv6_6rd_prefix_length,ipv6_prefix,ipv6_prefix_length,ipv6_accept_ra,ipv6_isp_opt,ipv6_rtr_addr,ipv6_service,ipv6_dns,ipv6_tun_addr,ipv6_tun_addrlen,ipv6_ifname,ipv6_tun_v4end,ipv6_relay,ipv6_tun_mtu,ipv6_tun_ttl,ipv6_6rd_ipv4masklen,ipv6_6rd_prefix,ipv6_6rd_borderrelay"); %>
 
 nvram.ipv6_accept_ra = fixInt(nvram.ipv6_accept_ra, 0, 3, 0);
 
@@ -44,6 +44,7 @@ function verifyFields(focused, quiet)
 		_f_ipv6_dns_3: 1,
 		_f_ipv6_accept_ra_wan: 1,
 		_f_ipv6_accept_ra_lan: 1,
+		_f_ipv6_isp_opt: 1,
 		_ipv6_tun_v4end: 1,
 		_ipv6_relay: 1,
 		_ipv6_ifname: 1,
@@ -68,6 +69,7 @@ function verifyFields(focused, quiet)
 			vis._f_ipv6_dns_3 = 0;
 			vis._f_ipv6_accept_ra_wan = 0;
 			vis._f_ipv6_accept_ra_lan = 0;
+			vis._f_ipv6_isp_opt = 0;
 			// fall through
 		case 'other':
 			vis._ipv6_6rd_ipv4masklen = 0;
@@ -82,6 +84,7 @@ function verifyFields(focused, quiet)
 			vis._ipv6_tun_addrlen = 0;
 			vis._ipv6_tun_ttl = 0;
 			vis._ipv6_tun_mtu = 0;
+			vis._f_ipv6_isp_opt = 0;
 			if (c == 'other') {
 				E('_f_ipv6_rtr_addr_auto').value = 1;
 				vis._f_ipv6_rtr_addr_auto = 2;
@@ -100,6 +103,7 @@ function verifyFields(focused, quiet)
 			vis._f_ipv6_rtr_addr_auto = 0;
 			vis._f_ipv6_rtr_addr = 0;
 			vis._f_ipv6_prefix_length = 0;
+			vis._f_ipv6_isp_opt = 0;
                        break;
 		case 'native-pd':
 			_fom.f_ipv6_accept_ra_wan.checked = true;
@@ -111,6 +115,7 @@ function verifyFields(focused, quiet)
 				vis._f_ipv6_prefix_length = 0;
 				vis._f_ipv6_accept_ra_lan = 0;
 				vis._f_ipv6_accept_ra_wan = 0;
+				vis._f_ipv6_isp_opt = 0;
 			}
 			// fall through
 		case 'native':
@@ -124,7 +129,7 @@ function verifyFields(focused, quiet)
 			vis._ipv6_6rd_ipv4masklen = 0;
 			vis._ipv6_6rd_prefix_length = 0;
 			vis._ipv6_6rd_prefix = 0;
-			vis._ipv6_6rd_borderrelay = 0;
+			vis._ipv6_6rd_borderrelay = 0;			
 			break;
 		case '6to4':
 			vis._ipv6_ifname = 0;
@@ -136,6 +141,7 @@ function verifyFields(focused, quiet)
 			vis._ipv6_tun_addrlen = 0;
 			vis._f_ipv6_accept_ra_wan = 0;
 			vis._f_ipv6_accept_ra_lan = 0;
+			vis._f_ipv6_isp_opt = 0;
 			vis._ipv6_6rd_ipv4masklen = 0;
 			vis._ipv6_6rd_prefix_length = 0;
 			vis._ipv6_6rd_prefix = 0;
@@ -146,6 +152,7 @@ function verifyFields(focused, quiet)
 			vis._ipv6_relay = 0;
 			vis._f_ipv6_accept_ra_wan = 0;
 			vis._f_ipv6_accept_ra_lan = 0;
+			vis._f_ipv6_isp_opt = 0;
 			vis._ipv6_6rd_ipv4masklen = 0;
 			vis._ipv6_6rd_prefix_length = 0;
 			vis._ipv6_6rd_prefix = 0;
@@ -199,7 +206,7 @@ REMOVE-END */
 		if ((vis[b[0]]) && (!v_range(b[0], quiet || !ok, b[1], b[2]))) ok = 0;
 	}
 
-	// mtu
+	// tun_mtu
 	b = '_ipv6_tun_mtu';
 	if (vis[b]) {
 		if ((!v_range(b, 1, 0, 0)) && (!v_range(b, quiet || !ok, 1280, 1480))) ok = 0;
@@ -250,6 +257,18 @@ function joinIPv6Addr(a) {
 	return r.join(' ');
 }
 
+function toggleVisibility(whichone) {
+	if(E('sesdiv' + whichone).style.display=='') {
+		E('sesdiv' + whichone).style.display='none';
+		E('sesdiv' + whichone + 'showhide').innerHTML='(Click here to show)';
+		cookie.set('basic_ipv6_' + whichone + '_vis', 0);
+	} else {
+		E('sesdiv' + whichone).style.display='';
+		E('sesdiv' + whichone + 'showhide').innerHTML='(Click here to hide)';
+		cookie.set('basic_ipv6_' + whichone + '_vis', 1);
+	}
+}
+
 function save()
 {
 	var a, b, c;
@@ -260,7 +279,7 @@ function save()
 	var fom = E('_fom');
 
 	fom.ipv6_dns.value = joinIPv6Addr([fom.f_ipv6_dns_1.value, fom.f_ipv6_dns_2.value, fom.f_ipv6_dns_3.value]);
-
+	fom.ipv6_isp_opt.value = fom.f_ipv6_isp_opt.checked ? 1 : 0;
 	fom.ipv6_accept_ra.value = 0;
 	if (fom.f_ipv6_accept_ra_wan.checked && !fom.f_ipv6_accept_ra_wan.disabled)
 		fom.ipv6_accept_ra.value |= 1;
@@ -269,7 +288,7 @@ function save()
 
 	fom.ipv6_prefix_length.value = fom.f_ipv6_prefix_length.value;
 	fom.ipv6_prefix.value = fom.f_ipv6_prefix.value;
-
+	
 	switch(E('_ipv6_service').value) {
 		case 'other':
 			fom.ipv6_prefix_length.value = 64;
@@ -320,6 +339,7 @@ function save()
 <input type='hidden' name='ipv6_prefix_length'>
 <input type='hidden' name='ipv6_rtr_addr'>
 <input type='hidden' name='ipv6_accept_ra'>
+<input type='hidden' name='ipv6_isp_opt'>
 
 <div class='section-title'>IPv6 Configuration</div>
 <div class='section'>
@@ -347,6 +367,7 @@ createFieldTable('', [
 		{ suffix: '&nbsp; WAN &nbsp;&nbsp;&nbsp;', name: 'f_ipv6_accept_ra_wan', type: 'checkbox', value: (nvram.ipv6_accept_ra & 1) },
 		{ suffix: '&nbsp; LAN &nbsp;',	name: 'f_ipv6_accept_ra_lan', type: 'checkbox', value: (nvram.ipv6_accept_ra & 2) }
 	] },
+	{ title: 'Other ISP Config.', name: 'f_ipv6_isp_opt', type: 'checkbox', value: (nvram.ipv6_isp_opt != '0') },
 	null,
 	{ title: 'Tunnel Remote Endpoint (IPv4 Address)', name: 'ipv6_tun_v4end', type: 'text', maxlen: 15, size: 17, value: nvram.ipv6_tun_v4end },
 	{ title: '6RD Tunnel Border Relay (IPv4 Address)', name: 'ipv6_6rd_borderrelay', type: 'text', maxlen: 15, size: 17, value: nvram.ipv6_6rd_borderrelay },
@@ -364,6 +385,15 @@ createFieldTable('', [
 
 <br>
 <script type='text/javascript'>show_notice1('<% notice("ip6tables"); %>');</script>
+
+<!-- / / / -->
+
+<div class='section-title'>Notes <small><i><a href='javascript:toggleVisibility("notes");'><span id='sesdivnotesshowhide'>(Click here to show)</span></a></i></small></div>
+<div class='section' id='sesdivnotes' style='display:none'>
+<ul>
+<li><b>Other ISP Configuration</b> - Check it for some ISP's, Snap (NZ), Internode (AU).</li>
+</ul>
+</div>
 
 <!-- / / / -->
 

@@ -1780,7 +1780,7 @@ createFieldTable('', [
 	{ title: '', name: 'f_dns_2', type: 'text', maxlen: 21, size: 25, value: dns[1] || '0.0.0.0' },
 	{ title: '', name: 'f_dns_3', type: 'text', maxlen: 21, size: 25, value: dns[2] || '0.0.0.0' },
 /* DNSCRYPT-BEGIN */
-	{ title: 'Use dnscrypt-proxy', name: 'f_dnscrypt_proxy', type: 'checkbox', value: (nvram.dnscrypt_proxy == 1) },
+	{ title: 'DNSCrypt Service', name: 'f_dnscrypt_proxy', type: 'checkbox', value: (nvram.dnscrypt_proxy == 1) },
 	{ title: 'Local Port', indent: 2, name: 'dnscrypt_port', type: 'text', maxlen: 5, size: 7, value: nvram.dnscrypt_port },
 	{ title: 'Boot Parameters', indent: 2, name: 'dnscrypt_cmd', type: 'text', maxlen: 256, size: 64, value: nvram.dnscrypt_cmd, suffix: ' <i>(optional)</i>' },
 /* DNSCRYPT-END */
@@ -1846,7 +1846,7 @@ if (wl_sunit(uidx)<0) {
 		{ title: 'Wireless Network Mode', name: 'wl'+u+'_net_mode', type: 'select',
 			value: (eval('nvram.wl'+u+'_net_mode') == 'disabled') ? 'mixed' : eval('nvram.wl'+u+'_net_mode'),
 			options: [], prefix: '<span id="__wl'+u+'_net_mode">', suffix: '</span>' },
-		{ title: 'SSID', name: 'wl'+u+'_ssid', type: 'text', maxlen: 32, size: 34, suffix: ' <i>(for full compatibility use only ASCII characters, avoid symbols!)</i>', value: eval('nvram.wl'+u+'_ssid') },
+		{ title: 'SSID', name: 'wl'+u+'_ssid', type: 'text', maxlen: 32, size: 34, suffix: ' <i>(use only ASCII characters, avoid symbols!)</i>', value: eval('nvram.wl'+u+'_ssid') },
 		{ title: 'Broadcast', indent: 2, name: 'f_wl'+u+'_bcast', type: 'checkbox', value: (eval('nvram.wl'+u+'_closed') == '0') },
 		{ title: 'Channel', name: 'wl'+u+'_channel', type: 'select', options: ghz[uidx], prefix: '<span id="__wl'+u+'_channel">', suffix: '</span> <input type="button" id="_f_wl'+u+'_scan" value="Scan" onclick="scanButton('+u+')"> <img src="spin.gif" id="spin'+u+'">',
 			value: eval('nvram.wl'+u+'_channel') },

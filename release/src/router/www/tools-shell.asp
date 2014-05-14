@@ -33,15 +33,12 @@ var cmdresult = '';
 var cmd = null;
 
 
-
-
 var ref = new TomatoRefresh('update.cgi', '', 0, 'tools-shell_refresh');
 
 ref.refresh = function(text)
 {
 	execute();
 }
-
 
 
 function verifyFields(focused, quiet)

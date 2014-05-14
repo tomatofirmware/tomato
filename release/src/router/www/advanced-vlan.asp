@@ -50,7 +50,7 @@
 <script type='text/javascript' src='wireless.jsx?_http_id=<% nv(http_id); %>'></script>
 <script type='text/javascript' src='interfaces.js'></script>
 <script type='text/javascript'>
-<% nvram ("vlan0ports,vlan1ports,vlan2ports,vlan3ports,vlan4ports,vlan5ports,vlan6ports,vlan7ports,vlan8ports,vlan9ports,vlan10ports,vlan11ports,vlan12ports,vlan13ports,vlan14ports,vlan15ports,vlan0hwname,vlan1hwname,vlan2hwname,vlan3hwname,vlan4hwname,vlan5hwname,vlan6hwname,vlan7hwname,vlan8hwname,vlan9hwname,vlan10hwname,vlan11hwname,vlan12hwname,vlan13hwname,vlan14hwname,vlan15hwname,wan_ifnameX,manual_boot_nv,boardtype,boardflags,trunk_vlan_so,lan_ifname,lan_ifnames,lan1_ifname,lan1_ifnames,lan2_ifname,lan2_ifnames,lan3_ifname,lan3_ifnames,boardrev,vlan0tag,vlan0vid,vlan1vid,vlan2vid,vlan3vid,vlan4vid,vlan5vid,vlan6vid,vlan7vid,vlan8vid,vlan9vid,vlan10vid,vlan11vid,vlan12vid,vlan13vid,vlan14vid,vlan15vid");%>
+<% nvram ("vlan0ports,vlan1ports,vlan2ports,vlan3ports,vlan4ports,vlan5ports,vlan6ports,vlan7ports,vlan8ports,vlan9ports,vlan10ports,vlan11ports,vlan12ports,vlan13ports,vlan14ports,vlan15ports,vlan0hwname,vlan1hwname,vlan2hwname,vlan3hwname,vlan4hwname,vlan5hwname,vlan6hwname,vlan7hwname,vlan8hwname,vlan9hwname,vlan10hwname,vlan11hwname,vlan12hwname,vlan13hwname,vlan14hwname,vlan15hwname,wan_ifnameX,manual_boot_nv,boardtype,boardflags,trunk_vlan_so,lan_ifname,lan_ifnames,lan1_ifname,lan1_ifnames,lan2_ifname,lan2_ifnames,lan3_ifname,lan3_ifnames,boardrev,boardnum,vlan0tag,vlan0vid,vlan1vid,vlan2vid,vlan3vid,vlan4vid,vlan5vid,vlan6vid,vlan7vid,vlan8vid,vlan9vid,vlan10vid,vlan11vid,vlan12vid,vlan13vid,vlan14vid,vlan15vid,model");%>
 
 var port_vlan_supported = 0;
 var trunk_vlan_supported = 0;
@@ -75,6 +75,10 @@ switch(nvram['boardtype']) {
   case '0xf52c':  // E4200v1
   case '0xf52a':  // E3200v1
   case '0xf5b2':  // RT-N66
+  case '0x052b':  // WNR3500L v2
+  case '0x05d8':  // Tenda W1800R
+  case '0x058e':  // E900, E800
+  case '0x0646':  // RT-AC56U and RT-AC68U/RT-AC68R
     trunk_vlan_supported = 1;
     break;
   default:
@@ -87,6 +91,23 @@ switch(nvram['boardtype']) {
 // http://wiki.openwrt.org/toh/linksys/start
 // http://wiki.openwrt.org/toh/start
 switch(nvram['boardtype']) {
+	case '0x0646':  // RT-AC56 && RT-AC68
+		if ((nvram['boardrev'] == '0x1100') && (nvram['model'] == 'RT-AC56U')) { //RT-AC56U
+	COL_P0N = '0';
+	COL_P1N = '1';
+	COL_P2N = '2';
+	COL_P3N = '3';
+	COL_P4N = '4';
+		break;
+    	}
+		if (((nvram['boardrev'] == '0x1100') && (nvram['model'] == 'RT-AC68U')) || (nvram['model'] == 'RT-AC68R'))  { //RT-AC68U or RT-AC68R
+	COL_P0N = '4';
+	COL_P1N = '3';
+	COL_P2N = '2';
+	COL_P3N = '1';
+	COL_P4N = '0';
+		break;
+	}
 	case '0x0467':  // WRT54GL 1.x, WRT54GS 3.x/4.x
 		if (nvram['boardrev'] == '0x13') {  // WHR-G54S
 	COL_P0N = '1';
@@ -116,6 +137,14 @@ switch(nvram['boardtype']) {
 	COL_P4N = '0';
 		break;
 	}
+    	if ((nvram['boardrev'] == '0x1446') && (nvram['boardnum'] == '0015')) { //Dir-620 C1
+	COL_P0N = '0';
+	COL_P1N = '1';
+	COL_P2N = '2';
+	COL_P3N = '3';
+	COL_P4N = '4';
+		break;
+    	}
 		if (nvram['boardrev'] == '0x1100') { //CW-5358U
 	COL_P0N = '1';
 	COL_P1N = '2';
@@ -124,7 +153,7 @@ switch(nvram['boardtype']) {
 	COL_P4N = '0';
 		break;
 	}
-	COL_P0N = '3';
+    COL_P0N = '3';
 	COL_P1N = '2';
 	COL_P2N = '1';
 	COL_P3N = '0';
@@ -133,11 +162,18 @@ switch(nvram['boardtype']) {
 	case '0x04ef':  // WRT320N/E2000
 	case '0x04cf':  // WRT610Nv2/E3000, RT-N16, WNR3500L
 	case '0xf5b2':  // RT-N66
-	case '0x052b':  // WNR3500Lv2
+	case '0x052b':  // WNR3500Lv2, Tenda N60, Asus RT-N15 
 	COL_P0N = '4';
 	COL_P1N = '3';
 	COL_P2N = '2';
 	COL_P3N = '1';
+	COL_P4N = '0';
+		break;
+	case '0x05d8': //Tenda W1800
+	COL_P0N = '1';
+	COL_P1N = '2';
+	COL_P2N = '3';
+	COL_P3N = '4';
 	COL_P4N = '0';
 		break;
 	case '0xf53a':  // E1000v2.1/E1200v1
@@ -158,10 +194,18 @@ switch(nvram['boardtype']) {
 		break;
 	case '0xc550':  // E1550
 	case '0xf550':  // E2500
-	case '0x058e':  // E900
+	case '0x058e':  // E900, E800
 	case '0xf52a':  // E3200
 	case '0xf52c':  // E4200v1
 	case '0x1202':  // HG320 - not sure, need test
+		if ((nvram['boardrev'] == '0x1153') && (nvram['boardnum'] == '45')) { //RT-N10P
+	COL_P0N = '3';
+	COL_P1N = '2';
+	COL_P2N = '1';
+	COL_P3N = '0';
+	COL_P4N = '4';
+		break;
+	}
 		if (nvram['boardrev'] == '0x1153') { //RG200E-CA type 0x058e same as E900
 	COL_P0N = '4';
 	COL_P1N = '3';
@@ -169,31 +213,39 @@ switch(nvram['boardtype']) {
 	COL_P3N = '1';
 	COL_P4N = '0';
 		break;
-    }
+	}
 	COL_P0N = '0';
 	COL_P1N = '1';
 	COL_P2N = '2';
 	COL_P3N = '3';
 	COL_P4N = '4';
 		break;
-   		if (nvram['boardrev'] == '0x1204') { //rt-n15u
+	case '0x052b':
+		if (nvram['boardrev'] == '02') { //WNR3500Lv2
+	COL_P0N = '4';
+	COL_P1N = '3';
+	COL_P2N = '2';
+	COL_P3N = '1';
+	COL_P4N = '0';
+		break;
+	}
+		if (nvram['boardrev'] == '0x1204') { //rt-n15u
 	COL_P0N = '3';
 	COL_P1N = '2';
 	COL_P2N = '1';
 	COL_P3N = '0';
 	COL_P4N = '4';
 		break;
-   }
+	}
 // should work on WRT54G v2/v3, WRT54GS v1/v2 and others
-  default:
+	default:
 	COL_P0N = '1';
 	COL_P1N = '2';
 	COL_P2N = '3';
 	COL_P3N = '4';
 	COL_P4N = '0';
 		break;
-}
-
+	}
 var COL_VID = 0;
 var COL_MAP = 1;
 var COL_P0  = 2;
@@ -958,6 +1010,14 @@ if(port_vlan_supported) vlg.setup();
 </div>
 
 <!-- / / / -->
+<div class='section-title'>Trunk VLAN support override (experimental)</div>
+<div class='section'>
+<script type='text/javascript'>
+createFieldTable('', [
+  { title: 'Enable', name: 'f_trunk_vlan_so', type: 'checkbox', value: nvram.trunk_vlan_so == '1' },
+]);
+</script>
+</div>
 
 <div class='section-title'>Notes <small><i><a href='javascript:toggleVisibility("notes");'><span id='sesdiv_notes_showhide'>(Click here to show)</span></a></i></small></div>
 <div class='section' id='sesdiv_notes' style='display:none'>
@@ -1002,15 +1062,6 @@ if((trunk_vlan_supported) || (nvram.trunk_vlan_so == '1')) {
 <li>There's lots of things that could go wrong, please do think about what you're doing and take a backup before hitting the 'Save' button on this page!</li>
 </ul>
 </ul>
-<div id='trunk_vlan_override' style='display:none'>
-<div class='section-title'>Trunk VLAN support override (experimental)</div>
-<div class='section'>
-<script type='text/javascript'>
-createFieldTable('', [
-  { title: 'Enable', name: 'f_trunk_vlan_so', type: 'checkbox', value: nvram.trunk_vlan_so == '1' },
-]);
-</script>
-</div>
 </div>
 </div>
 </small>
