@@ -40,6 +40,7 @@ E3200               BCM47186              0xf52a       42        0x1100         
 WRT320N/E2000       BCM4717               0x04ef       42/66     0x1304/0x1305/0x1307  boardflags: 0x0040F10 / 0x00000602 (??)
 WRT610Nv2/E3000     BCM4718               0x04cf       42/??     ??                    boot_hw_model=WRT610N/E300
 E4200               BCM4718               0xf52c       42        0x1101                boot_hw_model=E4200
+EA6500v1            BCM4706               0xC617       ${serno}  0x1103    0x00000110  modelNumber=EA6500, serial_number=12N10C69224778
 
 WHR-G54S            BCM5352E              0x467        00        0x13      0x2758      melco_id=30182
 WHR-HP-G54S         BCM5352E              0x467        00        0x13      0x2758      melco_id=30189
@@ -68,6 +69,10 @@ WL-500G Premium v2	HW_BCM5354G           0x48E        45        0x10      0x0750
 WL-330GE			HW_BCM5354G           0x048e       45        0x10      0x0650      hardware_version=WL330GE-02-06-00-05 //MIPSR1, 4MB flash w/o USB
 WL-520GU			HW_BCM5354G           0x48E        45        0x10      0x0750      hardware_version=WL520GU-01-07-02-00
 ZTE H618B			HW_BCM5354G           0x048e     1105        0x35      0x0750
+Tenda N60			BCM47186              0x052B       60        0x1400    0x00000710 //8MB/64MB/2.4/5G/USB
+Tenda N6			BCM5357               0x0550       6         0x1444    0x710 //8MB/64MB/2.4/5G/USB
+TENDA W1800R		HW_BCM4706            0x05d8       18/21(EU)/60(CN)   0x1200  0x00000110
+Buffalo WZR-D1800H	HW_BCM4706            0xf52e       00        0x1204    0x110 //NAND/128M/128M/2.4-5G/USB
 Ovislink WL1600GL	HW_BCM5354G           0x048E        8        0x11
 
 RT-N16				BCM4718               0x04cf       45        0x1218    0x0310      hardware_version=RT-N16-00-07-01-00 regulation_domain=0X10US sdram_init=0x419
@@ -76,8 +81,12 @@ RT-N12				BCM4716               0x04cd       45        0x1201    0x????
 RT-N12B1			BCM5357               0x054d       45        0x1101    0x710
 RT-N10				BCM5356               0x04ec       45        0x1402    0x????
 RT-N10U				BCM5357               0x0550       45        0x1102    0x710
+RT-N10P				BCM53572              0x058e       45        0x1153    0x710
 RT-N53				BCM5357               0x0550       45        0x1442    0x710
+RT-N53A1			BCM5358U              0x0550       45        0x1446    0x710
 RT-N66U				BCM4706               0xf5b2       00        0x1100    0x0110
+RT-AC56U			BCM4708               0x0646	   00	     0x1100    0x00000110
+RT-AC68U			BCM4708               0x0646       <MAC>     0x1100    0x00001000
 
 WNR3500L			BCM4718               0x04cf       3500      0x1213|02 0x0710|0x1710
 WNR3500Lv2			BCM47186              0x052b       3500(L)   02        0x710|0x1000
@@ -86,15 +95,14 @@ WNDR3700v3			BCM4718 	          0xf52c	   01	     0x1101    0x00001310	//8MB FLA
 
 F7D4301 v1			BCM4718               0xd4cf       12345     0x1204
 F7D3301/F7D3302/F7D4302 v1	BCM4718               0xa4cf       12345     0x1102
-F5D8235-4 v3			BCM4718               0xa4cf       12345     0x1100    
-Dir-620C1			BCM5358U	      0x0550	   0015      0x1446	0x710 //530MHz/64MB	
+F5D8235-4 v3		BCM4718               0xa4cf       12345     0x1100
 
+Dir-620C1			BCM5358U              0x0550       0015      0x1446    0x710 //530MHz/8MB/64MB
+Rosewill L600N		BCM5358U              0x0550	   1015      0x1400    0x710 //500MHz/8MB/64MB/2.4-5GHz/USB
 CW-5358U			BCM5357               0x0550       1234      0x1100    0x710 //500MHz/8MB/32MB/2.4G/USB
 FiberHome HG320		BCM5357               0x053d       0527      0x1202    0x610 //16MB/64MB/2.4G/USB
 ChinaNet RG-200E	BCM5357               0x053d       0504      0x1202    0x610 //16MB/64MB/2.4G/USB/FE
 ZTE H218N			BCM5357               0x053d       1234      0x1202    0x710 //16MB/64MB/2.4G/USB
-
-Rosewill L600N		BCM5358U			  0x1015	   0x1400              0x710 //500MHz/8MB/64MB/2.4-5GHz/USB
 
 WL-550gE			BCM5352E			  0x0467       45        0x10      0x0758      hardware_version=WL550gE-01-05-01-00 sdram_init=0x2000
 *WL-700gE			BCM4704_BCM5325F      0x042f       44        0x10      0x0110      hardware_version=WL700g-01-10-01-00 regulation_domain=0X30DE
@@ -121,7 +129,7 @@ Viewsonic WR100		BCM4712               0x0101       44        0x10      0x0188  
 WLA2-G54L			BCM4712               0x0101       00        0x10      0x0188      buffalo_id=29129
 
 TrueMobile 2300		                      bcm94710ap   44                              "ModelId=WX-5565", Rev A00
-TENDA W1800R            HW_BCM4706      0x05d8          21(EU)/60(CN)   0x1200  0x00000110
+
 
 * not supported/not tested
 
@@ -174,13 +182,19 @@ int check_hw_type(void)
 		return HW_BCM4718;
 	case 0x05d8:
 	case 0xf5b2:
+	case 0xf52e: //WZR-D1800H,D1100H
+	case 0xc617: //Linksys EA6500v1
 		return HW_BCM4706;
 	case 0x052b:
 		if (nvram_match("boardrev", "0x1204")) return HW_BCM5357; //rt-n15u
 		if (nvram_match("boardrev", "02")) return HW_BCM47186; //WNR3500Lv2
+		if (nvram_match("boardrev", "0x1400")) return HW_BCM47186; //Tenda N60
 	case 0xf53a:
 	case 0xf53b:
 	case 0x0550: //RT-N10U and RT-N53 and CW-5358U
+		if (nvram_match("boardrev", "0x1400")) return HW_BCM5358U; //L600N
+		if (nvram_match("boardrev", "0x1446")) return HW_BCM5358U; //DIR-620C1
+		if (nvram_match("boardrev", "0x1444")) return HW_BCM5357; //Tenda N6
 	case 0x054d:
 	case 0x053d:
 		return HW_BCM5357;
@@ -193,9 +207,7 @@ int check_hw_type(void)
 	case 0x058e:
 		if (nvram_match("boardrev", "0x1153")) return HW_BCM5357; //RG100E-CA
 		if (nvram_match("boardrev", "0x1155")) return HW_BCM53572; //E900
-	case 0x1015:
-		if (nvram_match("boardrev", "0x1400")) return HW_BCM5358U; //L600N
-		if (nvram_match("boardrev", "0x1400")) return HW_BCM5358U; //DIR620C1
+
 #endif
 	}
 
@@ -280,6 +292,11 @@ int get_model(void)
 */
 
 #ifdef CONFIG_BCMWL5
+	//added by bwq518
+	if (hw == HW_BCM4706) {
+		if (nvram_match("modelNumber", "EA6500")) return MODEL_EA6500V1;
+	} //bwq518 end
+
 	if (hw == HW_BCM4718) {
 		if (nvram_match("boot_hw_model", "WRT610N") ||
 		    nvram_match("boot_hw_model", "E300"))
@@ -301,6 +318,7 @@ int get_model(void)
 					fread(&sig, sizeof(sig), 1, fp);
 					fclose(fp);
 				}
+#ifndef CONFIG_BCMWL6
 				switch (sig) {
 				case TRX_MAGIC_F7D3301:
 					return MODEL_F7D3301;
@@ -309,6 +327,7 @@ int get_model(void)
 				default:
 					return MODEL_F7D4302;
 				}
+#endif
 			}
 			break;
 		}
@@ -378,9 +397,13 @@ int get_model(void)
 			break;
 		case HW_BCM5357:
 			if (nvram_match("boardrev", "0x1102")) return MODEL_RTN10U;
+			if (nvram_match("boardrev", "0x1153")) return MODEL_RTN10P;
 			if (nvram_match("boardrev", "0x1101")) return MODEL_RTN12B1;
 			if (nvram_match("boardrev", "0x1204")) return MODEL_RTN15U;
 			if (nvram_match("boardrev", "0x1442")) return MODEL_RTN53;
+			break;
+		case HW_BCM5358U:
+			if (nvram_match("boardrev", "0x1446")) return MODEL_RTN53A1;
 			break;
 		case HW_BCM4716:
 			if (nvram_match("boardrev", "0x1201")) return MODEL_RTN12;
@@ -388,16 +411,28 @@ int get_model(void)
 		case HW_BCM4718:
 			if (nvram_match("boardrev", "0x1218")) return MODEL_RTN16;
 			break;
-		case HW_BCM5358U:
-			if (nvram_match("boardrev", "0x1400")) return MODEL_L600N;
 #endif
 		}
 		break;
 #ifdef CONFIG_BCMWL5
+	case 60:
+		switch (hw) {
+		case HW_BCM47186:
+			return MODEL_TDN60;
+		case HW_BCM4706:
+			if (nvram_match("boardrev", "0x1200")) return MODEL_W1800R;
+		}
+		break;
 	case 66:
 		switch (hw) {
 		case HW_BCM4717:
 			return MODEL_WRT320N;
+		}
+		break;
+	case 1015:
+		switch (hw) {
+		case HW_BCM5358U:
+			if (nvram_match("boardrev", "0x1400")) return MODEL_L600N;
 		}
 		break;
 	case 0015:
@@ -411,6 +446,12 @@ int get_model(void)
 		case HW_BCM5357:
 			if (nvram_match("boardrev", "0x1100")) return MODEL_CW5358U;
 			if (nvram_match("boardrev", "0x1202")) return MODEL_H218N;
+		}
+		break;
+	case 6:
+		switch (hw) {
+		case HW_BCM5357:
+			if (nvram_match("boardrev", "0x1444")) return MODEL_TDN6;
 		}
 		break;
 	case 0527:
@@ -461,6 +502,7 @@ int get_model(void)
 			break;
 		case HW_BCM4706:
 			if (nvram_match("boardrev", "0x1100")) return MODEL_RTN66U;
+			if (nvram_match("boardrev", "0x1204")) return MODEL_D1800H;
 			break;
 		}
 		break;
@@ -485,9 +527,13 @@ int get_model(void)
 	case 56:
 		if (hw == HW_BCM5350) return MODEL_WTR54GS;
 		break;
+	case 18:
 	case 21:
-	case 60:
-		if (hw == HW_BCM4706) return MODEL_W1800R;
+		switch (hw) {
+		case HW_BCM4706:
+			if (nvram_match("boardrev", "0x1200")) return MODEL_W1800R;
+		}
+		break;
 	}
 
 	return MODEL_UNKNOWN;

@@ -85,6 +85,9 @@
 #define TCONFIG_ZLIB 1
   #define IF_TCONFIG_ZLIB(...) __VA_ARGS__
   #define IF_NOT_TCONFIG_ZLIB(...)
+#undef TCONFIG_CTF
+  #define IF_TCONFIG_CTF(...)
+  #define IF_NOT_TCONFIG_CTF(...) __VA_ARGS__
 #define TCONFIG_SNMP 1
   #define IF_TCONFIG_SNMP(...) __VA_ARGS__
   #define IF_NOT_TCONFIG_SNMP(...)

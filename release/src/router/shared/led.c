@@ -204,16 +204,20 @@ int do_led(int which, int mode)
 	static int e3200[]	= { 255,  -3,   255,  255,  255,  255,  255,  255,    255};
 	static int wrt320n[]	= { 255,   2,     3,    4,  255,  255,  255,  255,    255};
 	static int wrt610nv2[]	= { 255,   5,     3,    0,  255,  255,  255,   -7,    255};
-	static int e4200[]	= { 255,   5,    -3,  255,  255,  255,  255,  255,    255};
-	static int rtn10u[]	= { 255, 255,   255,  255,  255,   -7,  255,   -8,    255};
+	static int e4200[]		= { 255,   5,    -3,  255,  255,  255,  255,  255,    255};
+	static int rtn10u[]		= { 255, 255,   255,  255,  255,   -7,  255,   -8,    255};
+	static int rtn10p[]		= { 255,  -6,   255,  255,  255,   -7,  255,  255,    255};
 	static int rtn12b1[]	= {  -5, 255,   255,  255,  255,  255,  255,  225,    255};
-	static int rtn15u[]	= {   1, 255,     3,  255,  255,  255,  255,   -9,    255};
-	static int rtn66u[]	= { 255, -12,   255,  255,  255,  255,  255,   15,    255};
-	static int w1800r[]     = { 255, -13,   255,  255,  255,  255,  255,  -12,     -5};
-	static int l600n[]      = { 255, 255,   255,  255,  255,  -7,   255,  -8,      -5};
+	static int rtn15u[]		= {   1, 255,     3,  255,  255,  255,  255,   -9,    255};
+	static int rtn53[]		= {   0, -17,   255,  255,  255,  255,  255,  255,    255};
+	static int rtn66u[]		= { 255, -12,   255,  255,  255,  255,  255,   15,     13};
+	static int w1800r[] 	= { 255, -13,   255,  255,  255,  255,  255,  -12,     -5};
+	static int l600n[]  	= { 255, 255,   255,  255,  255,  -7,   255,  -8,      -5};
 	static int dir620c1[]   = { -6,   -8,   255,  255,  255,  -7,   255,  255,     -5};
 	static int wndr3700v3[] = { 255, 255,     2,  255,  255,  -1,   255,  255,    255};
-	
+	static int d1800h[]     = { -12, -13,     8,  255,  255,  -10,  255,    15, 255,   11};
+	static int tdn6[]       = { 255,  -6,     8,  255,  255,  255,  255,   255, 255,  255};
+
 #endif
 
 	char s[16];
@@ -324,11 +328,23 @@ int do_led(int which, int mode)
 	case MODEL_RTN15U:
 		b = rtn15u[which];
 		break;
+	case MODEL_RTN53:
+	case MODEL_RTN53A1:
+		b = rtn53[which];
+		break;
 	case MODEL_RTN66U:
 		b = rtn66u[which];
 		break;
 	case MODEL_W1800R:
 		b = w1800r[which];
+		break;
+	case MODEL_D1800H:
+		if (which == LED_DIAG) {
+			// power led gpio: 0x02 - white, 0x13 - red 
+			b = (mode) ? 13 : 2;
+			c = (mode) ? 2 : 13;
+		} else
+			b = d1800h[which];
 		break;
 	case MODEL_WNDR3700v3:
 		b = wndr3700v3[which];
@@ -389,6 +405,9 @@ int do_led(int which, int mode)
 	case MODEL_RTN10U:
 		b = rtn10u[which];
 		break;
+	case MODEL_RTN10P:
+		b = rtn10p[which];
+		break;
 	case MODEL_RTN12B1:
 		b = rtn12b1[which];
 		break;
@@ -397,6 +416,9 @@ int do_led(int which, int mode)
 		break;
 	case MODEL_DIR620C1:
 		b = dir620c1[which];
+	case MODEL_TDN60: //bwq518
+	case MODEL_TDN6:
+		b = tdn6[which];
 		break;
 #endif
 /*

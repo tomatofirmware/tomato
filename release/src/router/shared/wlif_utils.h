@@ -29,11 +29,11 @@
 #define ETHER_ADDR_LEN 6
 #endif
 #ifdef CONFIG_BCMWL6
-#define WLIFU_MAX_NO_BRIDGE		2
+#define WLIFU_MAX_NO_BRIDGE	4
 #else
 #define WLIFU_MAX_NO_BRIDGE	4
 #endif
-#define WLIFU_MAX_NO_WAN		2
+#define WLIFU_MAX_NO_WAN	2
 
 #define MAX_USER_KEY_LEN	80			/* same as NAS_WKSP_MAX_USER_KEY_LEN */
 #define MAX_SSID_LEN		32			/* same as DOT11_MAX_SSID_LEN */

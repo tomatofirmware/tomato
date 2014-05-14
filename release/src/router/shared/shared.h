@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <errno.h>
 #include <net/if.h>
+#include <string.h>
 
 #ifdef TCONFIG_USB
 #include <mntent.h>	// !!TB
@@ -180,11 +181,15 @@ enum {
 	MODEL_WL500GD,
 	MODEL_WL520GU,
 	MODEL_DIR320,
+	MODEL_L600N,
+	MODEL_DIR620C1,
 	MODEL_H618B,
 	MODEL_CW5358U,
 	MODEL_HG320,
 	MODEL_RG200E_CA,
 	MODEL_H218N,
+	MODEL_TDN60,
+	MODEL_TDN6,
 	MODEL_WL1600GL,
 	MODEL_WBRG54,
 	MODEL_WBR2G54,
@@ -198,12 +203,16 @@ enum {
 	MODEL_RT390W,
 	MODEL_RTN10,
 	MODEL_RTN10U,
+	MODEL_RTN10P,
 	MODEL_RTN12,
 	MODEL_RTN12B1,
 	MODEL_RTN15U,
 	MODEL_RTN16,
 	MODEL_RTN53,
+	MODEL_RTN53A1,
 	MODEL_RTN66U,
+	MODEL_RTAC56U,
+	MODEL_RTAC68U,
 	MODEL_WNR3500L,
 	MODEL_WNR3500LV2,
 	MODEL_WNDR3700v3,
@@ -238,8 +247,8 @@ enum {
 	MODEL_WRT300N,
 	MODEL_WL330GE,
 	MODEL_W1800R,
-	MODEL_L600N,
-	MODEL_DIR620C1
+	MODEL_D1800H,
+	MODEL_EA6500V1
 };
 
 /* NOTE: Do not insert new entries in the middle of this enum,
@@ -270,6 +279,7 @@ enum {
 	HW_BCM5365,
 	HW_BCM4785,
 	HW_BCM4706,
+	HW_BCM4708,
 	HW_UNKNOWN
 };
 
@@ -355,5 +365,8 @@ extern int base64_decoded_len(int len);										// maximum possible, not actual
 // strings.c
 extern const char *find_word(const char *buffer, const char *word);
 extern int remove_word(char *buffer, const char *word);
+
+//bwq518
+extern char* trimstr(char *str);
 
 #endif
