@@ -1,0 +1,40 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "osip2", "osip2.vcproj", "{85255507-5D16-4218-85E2-F683BB2F04DA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{44F46B7E-0E51-4304-9735-330DFBAB41E5} = {44F46B7E-0E51-4304-9735-330DFBAB41E5}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "osipparser2", "osipparser2.vcproj", "{44F46B7E-0E51-4304-9735-330DFBAB41E5}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Debug DLL = Debug DLL
+		Release = Release
+		Release DLL = Release DLL
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{85255507-5D16-4218-85E2-F683BB2F04DA}.Debug.ActiveCfg = Debug|Win32
+		{85255507-5D16-4218-85E2-F683BB2F04DA}.Debug.Build.0 = Debug|Win32
+		{85255507-5D16-4218-85E2-F683BB2F04DA}.Debug DLL.ActiveCfg = Debug DLL|Win32
+		{85255507-5D16-4218-85E2-F683BB2F04DA}.Debug DLL.Build.0 = Debug DLL|Win32
+		{85255507-5D16-4218-85E2-F683BB2F04DA}.Release.ActiveCfg = Release|Win32
+		{85255507-5D16-4218-85E2-F683BB2F04DA}.Release.Build.0 = Release|Win32
+		{85255507-5D16-4218-85E2-F683BB2F04DA}.Release DLL.ActiveCfg = Release DLL|Win32
+		{85255507-5D16-4218-85E2-F683BB2F04DA}.Release DLL.Build.0 = Release DLL|Win32
+		{44F46B7E-0E51-4304-9735-330DFBAB41E5}.Debug.ActiveCfg = Debug|Win32
+		{44F46B7E-0E51-4304-9735-330DFBAB41E5}.Debug.Build.0 = Debug|Win32
+		{44F46B7E-0E51-4304-9735-330DFBAB41E5}.Debug DLL.ActiveCfg = Debug DLL|Win32
+		{44F46B7E-0E51-4304-9735-330DFBAB41E5}.Debug DLL.Build.0 = Debug DLL|Win32
+		{44F46B7E-0E51-4304-9735-330DFBAB41E5}.Release.ActiveCfg = Release|Win32
+		{44F46B7E-0E51-4304-9735-330DFBAB41E5}.Release.Build.0 = Release|Win32
+		{44F46B7E-0E51-4304-9735-330DFBAB41E5}.Release DLL.ActiveCfg = Release DLL|Win32
+		{44F46B7E-0E51-4304-9735-330DFBAB41E5}.Release DLL.Build.0 = Release DLL|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal
