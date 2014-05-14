@@ -2,6 +2,10 @@ include ../common.mak
 
 CFLAGS = -Os -Wall $(EXTRACFLAGS)
 CFLAGS += -I$(SRCBASE) -I$(SRCBASE)/include -I. -I$(TOP)/shared
+ifeq ($(TCONFIG_SIPROXD),y)
+CFLAGS += -I$(TOP)/libosip2/include
+endif
+
 
 OBJS = httpd.o cgi.o tomato.o version.o 
 OBJS += misc.o dhcp.o upgrade.o traceping.o parser.o upnp.o ctnf.o
@@ -16,9 +20,11 @@ endif
 ifeq ($(TCONFIG_USB),y)
 OBJS += usb.o
 endif
-
 ifeq ($(TCONFIG_NOCAT),y)
 OBJS += nocat.o
+endif
+ifeq ($(TCONFIG_SIPROXD),y)
+OBJS += siproxd.o
 endif
 
 LIBS = -L$(TOP)/nvram -lnvram -L$(TOP)/shared -lshared
@@ -26,6 +32,9 @@ LIBS += -L$(TOP)/mssl -lmssl
 
 ifeq ($(FULL_OPENSSL),y)
 LIBS += -L$(TOP)/openssl -lssl -lcrypto
+endif
+ifeq ($(TCONFIG_SIPROXD),y)
+LIBS +=  -L$(TOP)/libosip2/src/osipparser2/.libs -losipparser2
 endif
 
 all: httpd

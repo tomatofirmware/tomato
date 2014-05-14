@@ -190,6 +190,11 @@ extern void wi_uploadsplash(char *url, int len, char *boundary);
 extern void wo_uploadsplash(char *url);
 #endif
 
+#ifdef TCONFIG_SIPROXD
+//siproxd.c
+extern void asp_siproxd_stat(int argc, char **argv);
+#endif
+
 #if TOMATO_SL
 // share.c
 extern void asp_sharelist(int argc, char **argv);
