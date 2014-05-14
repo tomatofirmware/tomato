@@ -1,0 +1,142 @@
+X-Lite - Private Build 1103a
+
+
+Local registration at siproxd
+=============================
+
+System Settings
+   Network
+      Autodetect IP: Yes
+      Listen on IP: -
+**    Use X-NAT to Choose SIP/RTP Ports: Never
+      Listen SIP Port: 5060
+      Listenm RTP Port: 8000
+      NAT Firewall IP: -
+**    Out Bound SIP Proxy: <inbound IP address of siproxd>
+**    Force Firewall Type: Open IP
+      Primary STUN Server: -
+      Secondary STUN Server: -
+      Primary DNS Server: -
+      Secondary DNS Server: -
+      Provider DNS Server: -
+
+** SIP Proxy
+      Enabled: Yes
+      Display Name: Default
+      Username: <registration username>
+      Authorization User: <authorization username>
+      Password: <authorization password>
+1)    Domain/Realm: <host part of SIP URI>
+      SIP Proxy: <inbound IP address of siproxd>
+      Out Bound Proxy: <inbound IP address of siproxd>
+      Use Out Bound Proxy: Always
+      Send Internal IP: Default
+      Register: Always
+      Voicemail SIP URL: -
+      Forward SIP URL: -
+      Use Voicemail: Forward to Voicemail
+      Direct Diap IP: No
+      Dial Prefix: -
+      Provider Website (if applicabla): -
+      Update Settings (if applicable): -
+   
+   X-Tunnels
+      Use X-Tunnels: Never
+
+   X-Cipher
+      Use X-Cipher: Never
+   
+Advanced System Settings:
+   SIP Settings
+      Reregister Proxy(s): 1800
+**    Send UDP Keep-alive Messages to Proxy: No
+      Frequency to send UDP keep-alive Messages to proxy (ms): 10000
+      Send Compact SIP Messages: No
+      Send Basic SDP Messages: No
+      Use SIP rport: Yes
+      Obey Reverse UDP Rules: Yes
+      Should Timeout SIP Messages After (ms): 9000
+      Should Timeout Bye SIP Message After (ms): 4000
+      Should Timeout Provisional SIP Relpies After (ms): 40000
+      Should Wait to Resend Request After Provisional Reply (ms): 10000
+      Should Resend SIP Messages After (ms): 1500
+      
+   RTP Settings
+      RTP Keep-alive Settings
+         Send RTP Keep-alive Messages: Yes
+         Send RTP Keep-alive Messages Frequency (ms): 15000
+         RTP Keep-alive Bogus Payload Type: 13
+      Secure Magic Number: 128
+      Obey Reverse UDP Mapping Rules: Yes
+**    Send RTCP Messages: No
+      
+
+1) must be a hostname that resolves to the public IP address
+   siproxd uses (outbound interface)
+   
+   Codec Settings
+      g711u
+         Enabled: Yes
+         Magic Number: 0
+         Samples Per Frame: 160
+         DTMF Samples per Frame: 160
+         DTMF Prefix Force On: -
+         DTMF Prefix Force Off: -
+      g711a
+         Enabled: Yes
+         Magic Number: 8
+         Samples Per Frame: 160
+         DTMF Samples per Frame: 160
+         DTMF Prefix Force On: -
+         DTMF Prefix Force Off: -
+      gsm
+         Enabled: No
+         Magic Number: 3
+         Samples Per Frame: 160
+         DTMF Prefix Force On: -
+         DTMF Prefix Force Off: -
+      iLBC
+         Enabled: No
+         Magic Number: 98
+         Samples Per Frame: 240
+         DTMF Prefix Force On: -
+         DTMF Prefix Force Off: -
+      Speex
+         Enabled: No
+         Magic Number: 97
+         Speex Quality: 97
+         Speex Complexity: 4
+         DTMF Prefix Force On: -
+         DTMF Prefix Force Off: -
+   
+   Codec Order
+      g711u: 4
+      g711a: 5
+      gsm:   3
+      iLBC:  1
+      Speex: 2
+
+
+Remote registration at 3rd party registrar
+==========================================
+
+System Settings
+** SIP Proxy
+      Enabled: Yes
+      Display Name: Default
+      Username: <registration username>
+      Authorization User: <authorization username>
+      Password: <authorization password>
+      Domain/Realm: <host part of SIP URI>
+      SIP Proxy: <IP address of 3rd party registrar>
+      Out Bound Proxy: <inbound IP address of siproxd>
+      Use Out Bound Proxy: Always
+      Send Internal IP: Default
+      Register: Always
+      Voicemail SIP URL: -
+      Forward SIP URL: -
+      Use Voicemail: Forward to Voicemail
+      Direct Diap IP: No
+      Dial Prefix: -
+      Provider Website (if applicabla): -
+      Update Settings (if applicable): -

@@ -1,0 +1,26 @@
+TODOs, in random order:
+=======================
+
+- check via loop and private IP addresses
+  can comment be used to store a unique ID in there?
+
+- multiple inbound interfaces - do I need to be aware of inbound at all?
+
+- Documentation (yeah, yeah...)
+
+- general security issues
+- security tests for received SIP messages (function securitycheck)
+
+- automagically create a proper config file during install
+
+- get_ip_by_host: reduce DNS timeouts (seems to be a more complex problem...)
+
+- via loop detection: send 482 error code
+
+- feature: don't bind to 0.0.0.0 address, but only to inbound/outbound IF's
+  (defined by IFNAME)
+
+RFC3261 non-compliance:
+- Record-Route header handling
+
+- OpenBSD: Warning for redefinition of MACROS

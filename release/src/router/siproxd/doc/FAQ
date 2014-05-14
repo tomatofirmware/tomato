@@ -1,0 +1,328 @@
+
+
+Still under construction...
+
+
+---------------------------------------------------------------------------
+Q: What softphone work with siproxd?
+
+A: The goal is that every softphone (that is SIP compliant) should be
+   able to work via siproxd. Tested and/or reported to work so far:
+   - linphone (http://www.linphone.org)
+   - kphone   (http://http://www.wirlab.net/kphone/)
+   - MSN Messenger
+   - Grandstream BudgeTone series
+   - X-Lite   (http://www.xten.com)
+---------------------------------------------------------------------------
+Q: Is it possible from a remote computer to call the inbound computer?
+
+A: Yes, see also next question.
+---------------------------------------------------------------------------
+Q: What SIP address must the remote computer use to make a call?
+
+A: Scenario
+   --------
+
+   private IP address range             :          Internet
+   10.0.0.x                             :          (public IP address range)
+                                        :
+                                        :  foo.bar.org          xxx.org
+   +-------------+             +--------------+              +-------------+
+   !             !.10       .1 ! masquerading ! publicIP     !             !
+   ! IntHost     !-------------! Firewall     !------------>>! externalHost!
+   !             !         eth0!              !ppp0          !             !
+   +-------------+             +--------------+              +-------------+
+   user: johndoe                                               user: test                                                       
+
+  - IntHost is running an SIP softphone (like linphone, kphone)
+
+   - The SIP address used by IntHost is sip:johndoe@foo.bar.org
+
+   - The softphone on IntHost is configured to register at siproxd
+     running on the firewall host (10.0.0.1) as sip:johndoe@foo.bar.org
+
+   - foo.bar.org is the domain name corresponding to the public IP address
+     of the firewall (eg use some dynamic DNS service [1])
+
+   - externalHost does *not* register at siproxd running on the firewall host.
+
+
+  The relevant part of the configuration (linphone) of IntHost 
+  then looks like ($HOME/gnome/linphone):
+
+  [sip]
+  sip_port=5060
+  use_registrar=1
+  username=johndoe
+  hostname=foo.bar.org
+  registrar=sip:10.0.0.1
+  reg_passwd=
+  addr_of_rec=sip:johndoe@foo.bar.org
+  reg_expires=900
+  as_proxy=1
+  as_redirect=0
+  as_outbound=1
+
+  To make an outgoing call from IntHost simply use the SIP address of the
+  target ( -> sip:test@xxx.org).
+
+  test@xxx.org can make a incoming calls - it simply has to use the registered
+  SIP address of the softphone running on IntHost (sip:johndoe@foo.bar.org).
+  Siproxd will then rewrite and forward the incoming request to Inthost.
+
+  The externalHost does not need to know anything about the proxy. For the
+  user sip:test@xxx.org it looks as he directly sends the traffic to
+  foo.bar.org, siproxd then takes care about where to send it from there.
+
+---------------------------------------------------------------------------
+Q: How does the registration and mapping of inbound clients work?
+
+A: The mapping mechanism of SIP addresses works basically like:
+
+   Inthost sends a registration to siproxd with:
+   - a 'To:' address of the address to be registered (sip:johndoe@foo.bar.org)
+     (lets call this address the 'masqueraded' or 'public'  address)
+
+   - a 'Contact:' address of the *true* address (sip:johndoe@10.0.0.10)
+
+   Siproxd then will basically 'just' substitute the true address by the
+   masqueraded address and vice versa. That means you can have multiple
+   IntHosts (each of them using a different user name) running at the
+   same time.
+
+   For an incoming call, siproxd will search its registration table for
+   the requested SIP address and so finds the internal host that belong to it.
+
+   This of course *requires* that the username part of the SIP address is
+   unique for each softphone that registers a the proxy (So this is more or
+   less the mechanism that you mentioned in your mail).
+---------------------------------------------------------------------------
+Q: How does the RTP Proxy work?
+
+A: The RTP proxy actually is quite simple. It does not use any RTP
+   protocol stack.  All relevant code is located within rtpproxy.c.
+   The RTP proxy is running as a separate thread. It maintains a
+   list of active RTP transfers (rtp_proxytable).
+   Controlling (registering a new RTP data stream / removing a RTP stream)
+   is done via 2 service routines rtp_start_fwd() and rtp_stop_fwd() from
+   withing the SIP related part of siproxd.
+   
+   When a session is established (INVITE, ACK), siproxd will fetch the
+   relevant information (UDP ports) from the SIP messages and
+   does a rtp_start_fwd().
+   This will create an UDP socket and binds it to the outbound interface
+   address (port number dynamically chosen withing the RTP port range).
+   In addition a entry into the rtp_proxytable will be made.
+   
+   The RTP Proxy then *simply* does wait withing a select() to receive
+   a UDP datagrams on the specified ports and then sends them to the
+   local client. The RTP proxy does absolutely not care about WHAT data
+   is proxied, so it is not aware of RTP or any other high level stuff.
+   It is simply a binary forwarding of datagrams.
+   If the session is closed (BYE) the RTP stream will be stopped via
+   rtp_stop_fwd(). In addition, there exists a timeout supervision
+   (configurable) that will stop RTP streams that have been inactive
+   (no data received) for a specified time.
+   
+   For each RTP data stream, also an RTCP stream will be handled (port
+   number of RTP strem +1).
+   
+---------------------------------------------------------------------------
+Q: Does siproxd need to be installed on the same host as the
+   firewall / NAT is running?
+
+A: Not necesarily. Siproxd needs to know the public IP address, as this
+   address is included in the SIP signalling to establish a session. Also,
+   siproxd needs control on the allocation of UDP ports for sending/receiving
+   RTP data (some User Agents get into trouble/silence if the sending and
+   receiving UDP port is not the same)
+   
+   However, siproxd does *not* interact with ipchains/iptables. The
+   requirement for the firewall rules is to allow port 5060 for incomming
+   UDP datagrams (SIP) as well as the UDP port range for RTP data as
+   specified in the config file (default 7070 - 7079).
+   
+   One mode of operation is to run siproxd on the NAT host, using
+   different if_inboude and if_outbound interfaces.
+   The other method is to ruin siproxd "in front of" the NAT firewall.
+   For configuration details see the documentation (host_outbound).
+   
+---------------------------------------------------------------------------
+Q: How do I configure siproxd to use ICPHAINS based UDP masquerading
+   tunnels for proxying the incomming RTP traffic?
+
+A: Since version 0.5.2, IPCHAINS and IPTABLES are no longer supported.
+   Use the RTP relay instead.
+   
+---------------------------------------------------------------------------
+Q: What types of operation does siproxd support?
+
+A: Siproxd can be used in two ways:
+
+   1) Siproxd as outbound proxy:
+      - Configure your local client to register with some 3rd party service
+        like Sipphone, FWD, Sipgate or any other.
+      - Configure your local client to use siproxd as OUTBOUND PROXY
+
+      Note: In this case, the local client does NOT register with siproxd
+      but only with the external SIP restration service. The only condition
+      is that siproxd needs to stay in the path of communication, therefore
+      the local client must be configured as to use an OUTBOUND PROXY.
+
+   2) Siproxd as registrar:
+      If you don't want to use any 3rd party service, you can have your
+      local clients directly with siproxd. Only in this case you should
+      set-up accounts and passwords in siproxd.
+      - Configure you local client to register with siproxd. As AOR (address
+        of record) choose a user part as you want and a host part that
+        resolves to the public addess of the host running siproxd.
+      - DO use siproxd as outbound proxy
+
+      Note that siproxd has very limited capabilities when used as
+      registrar. So my recommendation is to use method 1) and go with
+      a real registrar.
+
+---------------------------------------------------------------------------
+Q: How do I use siproxd as a pure outbound proxy, so I can register with my
+   SIP phone at a third party registrar?
+
+A: Also Simple. Just configure your SIP phone to use siproxd as outbound
+   proxy and your 3rd party registrar as registrar. Siproxd will then
+   transparently handle (and if needed rewrite) the SIP traffic.
+   
+---------------------------------------------------------------------------
+Q: I have a Grandstream Budgetone-100 SIP phone. The SIP communication
+   seems to work properly (I can register, make and receive calls) but
+   I do not hear any audio. However, transmitting audio works.
+
+A: Since version 0.5.2, IPCHAINS and IPTABLES are no longer supported.
+   Use the RTP relay instead. Grandstream SIP phones are now working
+   properly with the RTP relay.
+
+---------------------------------------------------------------------------
+Q: I use Linux (kernel 2.4.x) with ipchains. However, siproxd
+   always complains "ERROR:IPCHAINS support not built in", why?
+
+A: Since version 0.5.2, IPCHAINS and IPTABLES are no longer supported.
+   Use the RTP relay instead.
+
+---------------------------------------------------------------------------
+Q: I  have two local UA (SIP phones) connected to siproxd. I can
+   make outgoing calls and receive incoming calls to some other
+   SIP phones in the internet. However, making a call between the
+   two locally connected does not succeed, why?
+
+A: Since Version 0.5.3 this is supported.
+
+---------------------------------------------------------------------------
+Q: When I'm experimenting with siproxd, sometimes it is not enough to
+   restart siproxd to get rid of old junk.
+
+A: Siproxd remenbers the registrations made by UAs in a seperate file.
+   Therefore, just restarting siproxd is not enough to get rid of them.
+   Of course eventually they will time out and be removed from the cache.
+   You also can delete the cache file manually.by default it is in
+   /tmp/siproxd_registrations.
+   - stop siproxd
+   - rm siproxd_registrations
+   - start siproxd
+
+   Also, with newer Linux Kernels (2.6.x with conntrack kernel module
+   loaded) there may be some state information stored within conntrack.
+   Stopp all SIP traffic (UAs, including siproxd) and wait about 5
+   minutes, then try again.
+
+---------------------------------------------------------------------------
+Q: I have problems getting MSN Messenger 5.0 to work (using FWD
+   as 3rd party registrar).
+
+A: First make sure that you have an SIP enabled MSN messenger, which
+   is a separate download from the non-SIP-enabled Messenger 5 at 
+   http://www.microsoft.com/windows/messenger.
+
+   For the configuration, enter the local IP address of siproxd as the server
+   and 266xxx@fwd.pulver.com as your address. When the authentication
+   dialog comes up you must use your FWD_NUMBER (266xxx) and your password.
+   Messenger misleads you into typing FWD_NUMBER@fwd.pulver.com which 
+   will fail...
+
+---------------------------------------------------------------------------
+Q: Can you give an example configuration for kphone and FWD?
+
+A:  
+   (FWD_NUMBER is your FWD account number)
+
+   File->Identity
+   --------------
+   Full Name: My Name
+   User part of SIP URL: FWD_NUMBER
+   Host Part of SIP URL: fwd.pulver.com
+   Outbound Proxy: 192.168.1.1          <<-- local IP of siproxd
+   Authentication Username: FWD_NUMBER
+   q-value:                             <<-- empty
+
+   Preferences->SIP->Socket
+   ------------------------
+   Socket Protocol: UDP
+   Use STUN Server: No
+   Symmetric Signalling: No             (may also be 'Yes')
+   Symmetric Media: No                  (may also be 'Yes')
+   STUN Server:                         << n/a
+   Request Period for STUN Server       << n/a
+   Media Min Port: 7070                 << depend of siproxd config
+   Media Max Port: 7080                    (RTP ports)
+
+---------------------------------------------------------------------------
+Q: If I update both inbound and outbound to
+   if_inbound  = ppp0
+   if_outbound = ppp0
+   will this work ?
+
+A: Very likely this will not work properly. Siproxd does masquerade User
+   Agents hidden behind a NAT firewall (inbound network) so they can access
+   other User Agents located in the public internet (outbound network).
+   Therefore there MUST be 2 networks connected to the host running
+   siproxd:
+   - Inbound network 
+   - Outbound network
+
+   If you just want a proxy located in the public IP range you should not
+   use siproxd, but get a real SIP proxy server instead.
+
+---------------------------------------------------------------------------
+Q: I can build siproxd, but when I try to start it, it fails with
+   something like:
+   $ siproxd -h
+   siproxd: error while loading shared libraries: libosipparser2.so.3:
+   cannot open shared object file: No such file ordirectory
+
+A: Make sure you have correctly installed libosip2. If libosip2 is
+   installed somewhere else than the standard library paths, the
+   path MUST be included in the /etc/ld.so.conf file to tell the
+   dynamic linker where to search for libraries.
+   Try the following command:
+   $ /sbin/ldconfig -p|grep libosip
+   The output MUST be something like:
+
+   libosip2.so.3 (libc6) => /usr/lib/libosip2.so.3
+   libosip2.so (libc6) => /usr/lib/libosip2.so
+   libosipparser2.so.3 (libc6) => /usr/lib/libosipparser2.so.3
+   libosipparser2.so (libc6) => /usr/lib/libosipparser2.so
+
+   If not, libosip2 is not correctly installed.
+
+---------------------------------------------------------------------------
+Q: I have two Internet connections, one is my main connection and the
+   second is my backup connection. Can I configure siproxd in a way
+   to handle both Internet connections (switch to the backup connection
+   if the other one fails)?
+
+A: Siproxd itself does not include support for such a thing. However what
+   you can do is, use 2 different siproxd configuration files (with the
+   two different outbound interfaces configured). Then, if the main
+   interface goes down and you activate the backup connection, just
+   copy the second siproxd config file in place and restart siproxd.
+   Active registrations are not lost, as siproxd does save them at exit.
+
+
+

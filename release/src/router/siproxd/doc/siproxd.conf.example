@@ -1,0 +1,423 @@
+#
+# /etc/siproxd.conf - siproxd configuration file
+#
+# !! This is a sample file, adapt it to your needs before using it !!
+#
+# !! Strings may contain spaces (since 0.8.1)
+#
+
+######################################################################
+# The interface names of INBOUND and OUTBOUND interface.
+#
+#    If siproxd is not running on the host doing the masquerading
+#    but on a host within the private network segment, "in front" of
+#    the masquerading router: define if_inbound and if_outbound to
+#    point to the same interface (the inbound interface). In *addition*
+#    define 'host_outbound' to hold your external (public) IP address
+#    or a hostname that resolves to that address (use a dyndns address for
+#    example).
+#
+if_inbound  = eth0
+if_outbound = ppp0
+# uncomment the following line ONLY IF YOU KNOW WHAT YOU ARE DOING!
+# READ THE FAQ FIRST!
+#host_outbound = 1.2.3.4
+
+######################################################################
+# Access control.
+#    Access lists in the form: IP/mask (ex. 10.0.0.1/24)
+#    Multiple entries may be separated by commas NO SPACES ARE ALLOWED!!
+#    Empty list means 'does not apply' - no filtering is done then.
+#    For *allow* lists this means: always allow, for *deny* lists that
+#    this means never deny.
+#
+#    hosts_allow_reg: defines nets from which we accept registrations
+#                     Registrations are *ONLY* allowed from INBOUND!
+#    hosts_allow_sip: defines nets from which we accept SIP traffic
+#    hosts_deny_sip:  defines nets from which we deny SIP traffic
+#
+#    - The deny list takes precedence over the allow lists.
+#    - The allow_reg list also implies allowance for sip.
+#
+#    Example for usage:
+#      local private net -> allow_reg list
+#      external nets (from which we accept incoming calls) -> allow_sip
+#
+#    NOTE: Improper setting here will result in dropped SIP packets!
+#          Usually you do NOT want to define hosts_allow_sip!
+#
+#hosts_allow_reg = 192.168.1.8/24
+#hosts_allow_sip = 123.45.0.0/16,123.46.0.0/16
+#hosts_deny_sip  = 10.0.0.0/8,11.0.0.0/8
+
+
+######################################################################
+# Port to listen for incoming SIP messages.
+#    5060 is usually the correct choice - don't change this unless you
+#    know what you're doing
+#
+sip_listen_port = 5060
+
+
+######################################################################
+# Shall we daemonize?
+#
+daemonize = 1
+
+######################################################################
+# What shall I log to syslog?
+#   0 - DEBUGs, INFOs, WARNINGs and ERRORs
+#   1 - INFOs, WARNINGs and ERRORs (this is the default)
+#   2 - WARNINGs and ERRORs
+#   3 - only ERRORs
+#   4 - absolutely nothing (be careful - you will have no way to
+#                           see what siproxd is doing - or NOT doing)
+silence_log = 1
+
+######################################################################
+# Secure Enviroment settings:
+#   user:	uid/gid to switch to after startup
+#   chrootjail:	path to chroot to (chroot jail)
+user = nobody
+#chrootjail = /var/lib/siproxd/
+
+######################################################################
+# Memory settings
+#
+# THREAD_STACK_SIZE IS AN EXPERIMENTAL FEATURE!
+# It may be used to reduce the stack size allocated
+# by pthreads. This may reduce the overall memory footprint
+# of siproxd and could be helpful on embedded systems.
+# If you don't know what I'm saying above, do not enable this setting!
+# USE AT YOUR OWN RISK! 
+# Too small stack size may lead to unexplainable crashes!
+#thread_stack_size = 512
+
+######################################################################
+# Registration file:
+#   Where to store the current registrations.
+#   An empty value means we do not save registrations. Make sure that
+#   the specified directory path does exist!
+#   Note: If running in chroot jail, this path starts relative
+#         to the jail.
+registration_file = /var/lib/siproxd/siproxd_registrations
+
+######################################################################
+# Automatically save current registrations every 'n' seconds
+#
+autosave_registrations = 300
+
+######################################################################
+# PID file:
+#   Where to create the PID file.
+#   This file holds the PID of the main thread of siproxd.
+#   Note: If running in chroot jail, this path starts relative
+#         to the jail.
+pid_file = /var/run/siproxd/siproxd.pid
+
+######################################################################
+# global switch to control the RTP proxy behaviour
+#       0 - RTP proxy disabled
+#       1 - RTP proxy (UDP relay of siproxd)
+#
+# Note: IPCHAINS and IPTABLES(netfilter) support is no longer present!
+#    
+rtp_proxy_enable = 1
+
+######################################################################
+# Port range to allocate listen ports from for incoming RTP traffic
+#    This should be a range that is not blocked by the firewall
+#
+rtp_port_low  = 7070
+rtp_port_high = 7089
+
+######################################################################
+# Timeout for RTP streams
+#    after this number of seconds, an RTP stream is considered dead
+#    and proxying for it will be stopped.
+#    Be aware that this timeout also applies to streams that are
+#    in HOLD.
+#
+rtp_timeout = 300
+
+######################################################################
+# DSCP value for sent RTP packets
+#    The Differentiated Service Code Point is a selector for
+#    router's per-hop behaviours.
+#    RFC2598 defined a "expedited forwarding" service. This service
+#    is designed to allow ISPs to offer a service with attributes
+#    similar to a "leased line". This service offers the ULTIMATE IN LOW
+#    LOSS, LOW LATENCY AND LOW JITTER by ensuring that there is always
+#    sufficent room in output queues for the contracted expedited forwarding
+#    traffic.
+#    The Expedited Forwarding service has a DSCP of 46.
+#    Putting a 0 here means that siproxd does NOT set the DSCP field.
+#    Siproxd must be started as root for this to work.
+#
+rtp_dscp = 46
+
+######################################################################
+# DSCP value for sent SIP packets
+#    Same as above but for SIP signalling.
+#
+sip_dscp = 0
+
+######################################################################
+# Dejitter value
+#    Artificial delay to be used to de-jitter RTP data streams.
+#    This time is in microseconds.
+#    0 - completely disable dejitter (default)
+#
+rtp_input_dejitter  = 0
+rtp_output_dejitter = 0
+
+######################################################################
+# TCP SIP settings:
+# TCP inactivity timeout:
+#    For TCP SIP signalling, this indicates the inactivity timeout
+#    (seconds) after that an idling TCP connection is disconnected.
+#    Note that making this too short may cause multiple parallell
+#    registrations for the same phone. This timeout must be set larger
+#    than the used registration interval.
+#
+tcp_timeout = 600
+#
+# Timeout for connection attempts in msec:
+#    How many msecs shall siproxd wait for an successful connect
+#    when establishing an outgoing SIP signalling connection. This
+#    should be kept as short as possible as waiting for an TCP
+#    connection to establish is a BLOCKING operation - while waiting
+#    for a connect to succeed not SIP messages are processed (RTP is
+#    not affected).
+#
+tcp_connect_timeout = 500
+#
+# TCP keepalive period
+#    For TCP SIP signalling, if > 0 empty SIP packets will be sent
+#    every 'n' seconds to keep the connection alive. Default is off.
+#
+tcp_keepalive = 20
+
+######################################################################
+# Proxy authentication
+#    If proxy_auth_realm is defined (a string), clients will be forced
+#    to authenticate themselfes at the proxy (for registration only).
+#    To disable Authentication, simply comment out this line.
+#    Note: The proxy_auth_pwfile is independent of the chroot jail.
+#
+#proxy_auth_realm = Authentication_Realm
+#
+# the (global) password to use (will be the same for all local clients)
+#
+#proxy_auth_passwd = password
+#
+# OR use individual per user passwords stored in a file
+#
+#proxy_auth_pwfile = /etc/siproxd_passwd.cfg
+#
+# 'proxy_auth_pwfile' has precedence over 'proxy_auth_passwd'
+
+######################################################################
+# Debug level... (setting to -1 will enable everything)
+#
+#  DBCLASS_BABBLE  0x00000001	   // babble (like entering/leaving func)
+#  DBCLASS_NET     0x00000002	   // network
+#  DBCLASS_SIP     0x00000004	   // SIP manipulations
+#  DBCLASS_REG     0x00000008	   // Client registration
+#  DBCLASS_NOSPEC  0x00000010	   // non specified class
+#  DBCLASS_PROXY   0x00000020	   // proxy
+#  DBCLASS_DNS     0x00000040	   // DNS stuff
+#  DBCLASS_NETTRAF 0x00000080	   // network traffic
+#  DBCLASS_CONFIG  0x00000100	   // configuration
+#  DBCLASS_RTP     0x00000200	   // RTP proxy
+#  DBCLASS_ACCESS  0x00000400	   // Access list evaluation
+#  DBCLASS_AUTH    0x00000800	   // Authentication
+#  DBCLASS_PLUGIN  0x00001000	   // Plugins
+#  DCLASS_RTPBABL  0x00002000	   // RTP babble
+#
+debug_level =      0x00000000
+
+######################################################################
+# TCP debug port
+#
+# You may connect to this port from a remote machine and
+# receive the debug output. This allows bettwer creation of
+# odebug output on embedded systems that do not have enough
+# memory for large disk files.
+# Port number 0 means this feature is disabled.
+#
+debug_port = 0
+
+######################################################################
+# Mask feature (experimental)
+#
+# Some UAs will always use the host/ip they register with as
+# host part in the registration record (which will be the inbound
+# ip address / hostname of the proxy) and can not be told to use a
+# different host part in the registration record (like sipphone, FWD,
+# iptel, ...)
+# This Mask feature allows to force such a UA to be masqueraded to
+# use different host.
+# -> Siemens SIP Phones seem to need this feature.
+#
+# Unles you really KNOW that you need this, don't enable it.
+#
+# mask_host=<inbound_ip/hostname>
+# masked_host=<hostname_to_be_masqueraded_as>
+#
+# mask_host=10.0.1.1			-- inbound IP address of proxy
+# masked_host=my.public.host		-- outbound hostname proxy
+
+######################################################################
+# User Agent Masquerading
+#
+# Siproxd can masquerade the User Agent string of your local UAs.
+# Useful for Providers that do not work with some specific UAs
+# (e.g. sipcall.ch - it does not work if your outgoing SIP
+# traffic contains an Asterisk UA string...)
+# Default is to do no replacement.
+#
+#ua_string = Siproxd-UA
+
+######################################################################
+# Use ;rport in via header
+#
+# may be required in some cases where you have a NAT router that
+# remaps the source port 5060 to something different and the
+# registrar sends back the responses to port 5060.
+# Default is disabled
+#   0 - do not add ;rport to via header
+#   1 - do add ;rport to INCOMING via header only
+#   2 - do add ;rport to OUTGOING via header only
+#   3 - do add ;rport to OUTGOING and INCOMING via headers
+#
+# use_rport = 0
+
+######################################################################
+# Outbound proxy
+#
+# Siproxd itself can be told to send all traffic to another
+# outbound proxy.
+# You can use this feature to 'chain' multiple siproxd proxies
+# if you have several masquerading firewalls to cross.
+#
+# outbound_proxy_host = my.outboundproxy.org
+# outbound_proxy_port = 5060
+
+######################################################################
+# Outbound proxy (Provider specific)
+#
+# Outbound proxies can be specified on a per-domain base.
+# This allows to use an outbound proxy needed for ProviderA
+# and none (or another) for ProviderB.
+#
+#outbound_domain_name = freenet.de
+#outbound_domain_host = proxy.for.domain.freende.de
+#outbound_domain_port = 5060
+
+
+######################################################################
+# Loadable Plug-ins
+#
+# The plugins are loaded in the order they appear here. Also
+# the processing order is given by the load order.
+#
+# plugin_dir: MUST be terminated with '/'
+plugindir=/usr/lib/siproxd/
+#
+# List of plugins to load. MUST use the .la file extension!
+#load_plugin=plugin_demo.la
+#load_plugin=plugin_shortdial.la
+load_plugin=plugin_logcall.la
+#load_plugin=plugin_defaulttarget.la
+#load_plugin=plugin_fix_bogus_via.la
+#load_plugin=plugin_stun.la
+#load_plugin=plugin_prefix.la
+#load_plugin=plugin_regex.la
+
+
+######################################################################
+# Plugin_demo
+#
+plugin_demo_string = This_is_a_string_passed_to_the_demo_plugin
+
+
+######################################################################
+# Plugin_shortdial
+#
+# Quick Dial (Short Dial)
+# ability to define quick dial numbers that can be accessed by
+# dialing "*00" from a local phone. '00' corresponds to the entry number
+# (pi_shortdial_entry) below. The '*' character can be chosen freely
+# (pi_shortdial_akey).
+# Note: If this module is enabled, there does NOT exist a way to dial
+#       a "real" number like *01, siproxd will try to replace it by it's
+#       quick dial entry.
+#
+# The first character is the "key", the following characters give
+# the length of the number string. E.g. "*00" allows speed dials
+# from *01 to *99. (the number "*100" will be passed through unprocessed)
+plugin_shortdial_akey = *00
+#
+# *01 sipphone echo test
+plugin_shortdial_entry = 17474743246
+# *02 sipphone welcome message
+plugin_shortdial_entry = 17474745000
+
+######################################################################
+# Plugin_defaulttarget
+#
+# Log redirects to syslog
+plugin_defaulttarget_log = 1
+# target must be a full SIP URI with the syntax
+# sip:user@host[:port]
+plugin_defaulttarget_target = sip:internal@dddd:port
+
+######################################################################
+# Plugin_fix_bogus_via
+#
+# Incoming (from public network) SIP messages are checked for broken
+# SIP Via headers. If the IP address in the latest Via Header is
+# part of the list below, it will be replaced by the IP where the
+# SIP message has been received from.
+plugin_fix_bogus_via_networks = 10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
+
+######################################################################
+# Plugin_stun
+#
+# Uses an external STUN server to determine the public IP
+# address of siproxd. Useful for "in-front-of-NAT-router"
+# scenarios.
+plugin_stun_server = stun.xten.com
+plugin_stun_port = 3478
+# period in seconds to request IP info from STUN server
+plugin_stun_period = 300
+
+######################################################################
+# Plugin_prefix
+#
+# unconditionally prefixes all outgoing calls with the
+# "akey" prefix specified below.
+plugin_prefix_akey = 0
+
+######################################################################
+# Plugin_regex
+#
+# Applies an extended regular expression to the 'To' URI. A typical
+# SIP URI looks like (port number is optional):
+# sip:12345@some.provider.net
+# sips:12345@some.provider.net:5061
+#
+# Backreferences \1 .. \9 are supported. 
+#
+plugin_regex_desc    = Test Regex 1
+plugin_regex_pattern = ^sip:00
+plugin_regex_replace = +
+
+plugin_regex_desc    = Test Regex 2
+plugin_regex_pattern = ^sip:01
+plugin_regex_replace = +a
+
+plugin_regex_desc    = Test Regex 3
+plugin_regex_pattern = ^(sips?):01
+plugin_regex_replace = \1:001

@@ -1,0 +1,264 @@
+
+
+Be warned, this (and all the other) documentation is far from
+complete. This is still considered an alpha release.
+
+
+OVERVIEW
+========
+Siproxd is a proxy/masquerading daemon for SIP (Session Initiation
+Protocol), which is used in IP telephony.
+It handles registrations of SIP clients on a private IP network
+and performs rewriting of the SIP message bodies to make SIP
+connections work via a masquerading firewall (NAT).
+It allows SIP software clients (like kphone, linphone) or SIP
+hardware clients (Voice over IP phones which are SIP-compatible,
+such as those from Cisco, Grandstream or Snom) to work behind
+an IP masquerading firewall or NAT router.
+
+SIP (Session Initiation Protocol, RFC3261) is the protocol of
+choice for most VoIP (Voice over IP) phones to initiate
+communication. By itself, SIP does not work via masquerading
+firewalls as the transfered data contains IP addresses and
+port numbers. There do exist other solutions to traverse NAT existing
+(like STUN, or SIP aware NAT routers), but such a solutions has its
+disadvantages or may not be applied to a given situation.
+Siproxd does not aim to be a replacement for these solutions,
+however in some situations siproxd may bring advantages.
+
+
+PREREQUISITES
+=============
+- OS of either:
+  * Linux (preferred kernel 2.2.x or 2.4.x)
+  * FreeBSD
+  * OpenBSD
+  * SunOS
+  * Mac OS X
+  
+- libosip2 package (http://www.fsf.org/software/osip/)
+
+
+
+HOW TO GET STARTED
+==================
+- make sure libosip2 is installed
+  If your libposip2 libraries are installed in
+  /usr/local/lib, be sure to include this library path to /etc/ld.so.conf
+
+- ./configure
+  For Flifl: see doc/FLI4L_HOWTO.txt
+
+- make
+
+- make install
+
+- edit /usr/etc/siproxd.conf according to your situation
+  At least configure  'if_inbound' and 'if_outbound'. The must represent
+  the interface names (e.g. on Linux: ppp0, eth1) for the inbound
+  and outbound interface.
+
+
+- edit /usr/etc/siproxd_passwd.cfg if you enable client authentication
+  in siproxd.conf
+
+- start siproxd (siproxd does *not* require root privileges)
+  $ siproxd
+
+
+
+PROBLEM REPORTING
+=================
+If you encounter problems/crashes and ask for support, please include
+as much information as possible. Very helpful is a debug log that
+has been recorded at the time of the misbehavior.
+Also include the exact versions of the siproxd package and libosip2
+that you are using. You should also include your siproxd.conf.
+ 
+
+The easiest way to generate a debug log is:
+  1) make sure siproxd is not started as daemon.
+     -> 'daemonize = 0' in the config file.
+  2) start siproxd:
+     $ ./siproxd -d -1 2>debug.log
+  3) reproduce the error
+  4) include the file debug.log in your error report.
+
+Since Version 0.5.10 there also exists the possibility to obtain
+the debug log remote via TCP (useful if running siproxd on an embedded
+system). To enable this feature, edit the configuration file and
+set 'debug_port' to a free TCP port number (e.g. 5050). Then (after
+starting siproxd) you can connect from any remote client to this
+TCP port (e.g. using netcat) and all the debug output will be sent
+via network:
+  1) edit configuration file:
+     -> 'daemonize = 1' have siproxd started as daemon
+     -> 'silence_log' should be set to 1
+     -> 'debug_level = -1'
+     -> 'debug_port = 5050' (or any other TCP port you like)
+  2) have siproxd started the usual way
+  3) connect from a remote machine and write into a file:
+     $ netcat <IP_of_siproxd> <port> > debug.log
+  4) reproduce the error
+  5) include the file debug.log in your error report.
+
+
+If siproxd crashes, a stack backtrace usually is helpful to me:
+  1) start siproxd in the debugger (daemonize set to 0):
+     $ gdb ./src/siproxd
+     (gdb) set args -c /path/to/siproxd.conf
+     (gdb) run
+  2) reproduce the crash
+  3) use gdb to print the stack backtrace:
+   (gdb) info thread
+   ...
+   (gdb) bt
+   #0  0x400ec9ee in __select ()
+   #1  0xbffff6f8 in ?? ()
+   #2  0x804a5c2 in main (argc=3, argv=0xbffffc54) at siproxd.c:186
+   #3  0x4005bcb3 in __libc_start_main (main=0x804a30c <main>, argc=3, 
+       argv=0xbffffc54, init=0x8049a08 <_init>, fini=0x804edac <_fini>, 
+       rtld_fini=0x4000a350 <_dl_fini>, stack_end=0xbffffc4c)
+       at ../sysdeps/generic/libc-start.c:78
+   (gdb) 
+  4) copy-paste all the output and include it in your error report.
+
+
+
+SENDING A PATCH
+===============
+If you send a patch, please make the diff using "diff -Naur" and
+include the version of siproxd you used to patch. This makes it a lot
+easier for me to merge it.
+
+
+WHAT SIPROXD DOES
+=================
+Siproxd's purpose is to act as an SIP proxy for SIP softphones/hardphones
+located behind an masquerading router (NAT). It will rewrite SIP messages
+to allow a SIP phone to communicate to a counterpart that is located in
+the Internet. Check the scenarios drawn below.
+
+
+
+Scenario 1
+----------
+
+ private IP address range             :          Internet
+ 10.0.0.x                             :          (public IP address range)
+                                      :
+                                      :         foo.bar.org
+ +-------------+	       +--------------+
+ !             !.10	    .1 ! masquerading ! publicIP
+ ! IntHost     !---------------! Firewall     !------------>>  
+ !             !               !              !   
+ +-------------+	       +--------------+
+                           eth0       :        ppp0
+
+ - The Firewall does IP masquerading (NAT) and is running siproxd
+
+ - IntHost is running an SIP phone (like linphone, kphone)
+
+ - The SIP address used by the SIP phone is sip:johndoe@foo.bar.org
+
+ - The SIP phone is configured to register itself at siproxd
+   running on the firewall host (10.0.0.1) as sip:johndoe@foo.bar.org
+
+ - foo.bar.org is the domain name corresponding to the public IP address
+   of the firewall (e.g. use some dynamic DNS service [1])
+
+
+Scenario 2
+----------
+
+ private IP address range             :          Internet
+ 10.0.0.x                             :          (public IP address range)
+                                      :
+                                      :     foo.bar.org
+ +-------------+	       +--------------+              +--------------+
+ !             !.10	    .1 ! masquerading ! publicIP     ! external SIP !
+ ! IntHost     !---------------! Firewall     !------------>>! Registrar    !
+ !             !               !              !              !              !
+ +-------------+	       +--------------+              +--------------+
+                           eth0       :        ppp0
+
+ - The Firewall does IP masquerading (NAT) and is running siproxd
+
+ - IntHost is running an SIP phone (like linphone, kphone)
+
+ - The SIP address used by the SIP phone is sip:johndoe@foo.bar.org
+
+ - The SIP phone is configured to register itself at the external<BR>
+   registrar as sip:johndoe@foo.bar.org
+
+ - foo.bar.org is the domain name corresponding to the public IP address
+   of the firewall (e.g. use some dynamic DNS service [1])
+
+
+IPCHAINS:
+ Firewall rules for incoming traffic:
+ # ipchains -A input --proto udp --dport 5060 --log  -j ACCEPT
+ # ipchains -A input --proto udp --dport 7070:7080   -j ACCEPT
+
+IPTABLES:
+ Firewall rules for incoming traffic:
+ # iptables -A INPUT -i ppp0 -p udp -m udp --dport 5060      -j ACCEPT 
+ # iptables -A INPUT -i ppp0 -p udp -m udp --dport 7070:7080 -j ACCEPT 
+
+ The first line will allow incoming SIP traffic (UDP port 5060). The second
+ line will allow incoming RTP traffic on the ports 7070-7080 (the default port
+ range used by siproxd for incoming RTP traffic).<P>
+
+
+REFERENCES
+==========
+[1] dynamic DNS service http://www.dyndns.org
+
+
+
+LIMITATIONS
+===========
+- currently, the SIP part only supports UDP
+- very likely it does not follow the SIP spec (RFC3261) in all details
+- check the TODO file for more things that we-cannot-do-but-would-like-to
+
+
+IMPORTANT NOTICE
+================
+The gethostbyname() function leaks memory in glibc 2.1.1 (-> RedHat 6.0).
+The quick fix is to delete the nisplus service from hosts entry in
+/etc/nsswitch.conf.
+In my tests, memory usage remained stable after I made the mentioned change.
+
+(source: http://www.squid-cache.org/Doc/FAQ/FAQ-14.html)
+
+
+CONTACTS
+========
+Please feel free to contact the author to:
+   - provide feedback, report bugs,
+   - request for additional features
+   - report interoperability with various phones
+   - ...
+
+and visit the website at http://siproxd.sourceforge.net/
+
+
+There is a siproxd mailing list available on sourceforge.
+
+Thomas Ries  (tries@gmx.net)
+GnuPG: pub  1024D/87BCDC94 2000-03-19 Thomas Ries <tries@gmx.net>
+-      Fingerprint = 13D1 19F5 77D0 4CEC 8D3F  A24E 09FC C18A 87BC DC94
+-      Key via pgp.openpkg.org / http://www.ries.ch.vu/87BCDC94.pub
+VoIP:  sip:17476691342@proxy01.sipphone.com | sip:431783@fwd.pulver.com
+
+
+CREDITS
+=======
+
+Thanks to sourceforge.net for providing the distribution platform and
+infrastructure.
+
+Also credits to the maintainers of linphone from where I have taken some
+code parts for MD5 proxy authentication.
+

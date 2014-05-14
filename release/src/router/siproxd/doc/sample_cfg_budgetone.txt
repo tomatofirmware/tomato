@@ -1,0 +1,79 @@
+
+                     Grandstream IP Phone Configuration
+
+   MAC Address:   00.0B.82.00.31.89
+   Software Version:   Program--1.0.3.81    Bootloader--1.0.0.7
+   HTML--1.0.0.18
+       detected firewall/NAT type is open Internet
+
+   Admin Password:   **********____________________ (password to
+   configure this IP phone)
+   IP Address: 
+   (*) dynamically assigned via DHCP, or
+   (_) statically configured as:
+              IP Address:   ___. ___. ___. ___
+             Subnet Mask:   ___. ___. ___. ___
+          Default Router:   ___. ___. ___. ___
+            DNS Server 1:   ___. ___. ___. ___
+            DNS Server 2:   ___. ___. ___. ___
+   SIP Server:   proxy01.sipphone.com__________ (e.g., sip.mycompany.com,
+   or IP address)
+   Outbound Proxy:   <my siproxd proxy>____________ (e.g.,
+   proxy.myprovider.com, or IP address, if any)
+   SIP User ID:   1747669****<your ID>__________ (the user part of an SIP
+   address)
+   Authenticate ID:   1747669****<your ID>__________ (can be identical to
+   or different from SIP User ID)
+   Authenticate Password:   ______________________________
+   Name:   your name_____________________ (optional, e.g., John Doe)
+
+   Advanced Options: 
+   Preferred Vocoder:
+   (in listed order)   choice 1:   [current setting is "G729"]
+     choice 2:   [current setting is "PCMA"]
+     choice 3:   [current setting is "G723"]
+     choice 4:   [current setting is "PCMU"]
+     choice 5:   [current setting is "G726-32"]
+     choice 6:   [current setting is "G728"]
+   G723 rate:   (*) 6.3kbps encoding rate       (_) 5.3kbps encoding rate
+   Silence Suppression:   (*) No       (_) Yes
+   Voice Frames per TX:   ______1 (up to 10/20/32/64 frames for
+   G711/G726/G723/other codecs respectively)
+   IP QoS:   48_____ (IP Diff-Serv or Precedence value for RTP)
+   VLAN Tag:   0______ (VLAN classification for RTP)
+   SIP User ID is
+   phone number:    (*) No       (_) Yes
+   Dial Plan:   _______ (dial plan prefix string)
+   SIP Registration:   (*) Yes     (_) No
+   Register Expiration:   30_____ (in minutes. default 1 hour, max 45
+   days)
+   Early Dial:   (*) No       (_) Yes (use "Yes" only if proxy supports
+   484 response)
+   Use # as Dial Key:   (*) No       (_) Yes (if set to Yes, "#" will
+   function as the "(Re-)Dial" key)
+   local SIP port:   5060___ (default 5060)
+   local RTP port:   5004___ (1024-65535, default 5004)
+   Use random port:   (_) No      (*) Yes
+   NAT Traversal:   (*) No
+     (_) Yes, STUN server is: ________________________________ (URI or
+   IP:port)
+   TFTP Server:   4__. 3__. 153. _56 (for remote software upgrade and
+   configuration)
+   Voice Mail UserID:   1747669****<your ID>__________ (User ID/extension
+   for 3rd party voice mail system)
+   Offhook Auto-Dial:   ______________________________ (User ID/extension
+   to dial automatically when offhook)
+   Send DTMF:   (*) in-audio     (_) via RTP (RFC2833)     (_) via SIP
+   INFO
+   DTMF Payload Type:   101____
+   Send Flash Event:   (*) No      (_) Yes   (Flash will be sent as a
+   DTMF event if set to Yes)
+   NTP Server:   <your NTP time server>________ (URI or IP address)
+   Time Zone: 
+   [current setting is "GMT+1:00 (Paris, Amsterdam, Berlin, Rome, Vienna,
+    Madrid, Warsaw, Brussels)"]
+   Daylight Savings Time:   (*) No      (_) Yes   (if set to Yes, display
+   time will be 1 hour ahead of normal time)
+   Send Anonymous:   (*) No      (_) Yes   (caller ID will be blocked if
+   set to Yes)
+                       Update   [BUTTON]    [BUTTON]

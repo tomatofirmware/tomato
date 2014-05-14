@@ -1,0 +1,114 @@
+compiling siproxd for FLI4L
+===========================
+
+2.0.x (libc5 based):
+
+   1) LIBOSIP
+   On an libc5 system (eg SUSE 5.3), first build and install
+   libosip. Probably you get an error when building in file
+   parser/port_misc.c, telling you about a non existing include
+   file sys/unistd.h. To fix this, simply edit the .c file and
+   replace the erroneous include statement to include <unistd.h>
+   instead of <sys/unistd.h>
+   $ ./configure
+   $ make 
+   $ make install
+   
+   2) SIPROXD
+   Delete the config.cache file.
+   Configure siproxd:
+   $ ./configure --enable-almost-static
+   This will build siproxd statically linked against libosib, 
+   pthreads and dynamically against libc. Then
+   $ make
+   
+
+
+
+
+2.1.x (uClibc based):
+   Prerequisite: uClibc development enviroment installed
+
+
+   1) LIBOSIP
+   Does not build very smoothly and properly. However, to link siproxd
+   STATICALLY against libosip this procedure might work.
+   Apply same fix to port_misc as described above.
+   Apply the following path to configure.in
+---snipp---
+--- configure.in.orig   Sat Jun 15 02:26:59 2002
++++ configure.in        Sun Mar 23 01:44:12 2003
+@@ -52,6 +52,38 @@
+ 
+ dnl declare --enable-* args and collect ac_help strings
+ 
++dnl&&&&&&&&&&&&&&&&&&
++dnl
++dnl  uClib support (only available on Linux, yet)
++dnl
++uclib_path="/usr/i386-linux-uclibc/"
++AC_MSG_CHECKING("uClib path")
++AC_ARG_WITH(uclib-path,
++   [  --with-uclib-path=DIR       directory to uClib development],
++   uclib_path="$withval" )
++AC_MSG_RESULT($uclib_path)
++
++AC_MSG_CHECKING("build against uClib")
++AC_ARG_ENABLE(uclib,
++   [  --enable-uclib              build against a uClib],
++   build_uclib=$enableval,
++   build_uclib="no")
++AC_MSG_RESULT($build_uclib)
++
++
++if test "x$build_uclib" = "xyes"; then
++
++dnl   export PATH=$uclib_path/bin:$PATH
++dnl   export UCLIBC_DEVEL_PREFIX=$uclib_path
++
++   CC=$uclib_path/bin/i386-uclibc-gcc
++   LDD=$uclib_path/bin/i386-uclibc-ldd
++   LD=$uclib_path/bin/i386-uclibc-ld
++   CPPFLAGS=" -I $uclib_path/include/ $CPPFLAGS"
++   LIBS="-L  $uclib_path/lib/ $LIBS"
++fi
++dnl&&&&&&&&&&&&&&&&&&
++
+ AC_ARG_ENABLE(debug,
+ [  --disable-debug         turn off debugging.],
+ disable_debug=$enableval,disable_debug="yes")
+---snipp---
+
+   Create new ./configure script
+   $ aclocal -I scripts/
+   $ autoconf
+
+   Configure and build libosip:
+   $ ./configure --prefix=<libosip_install_prefix>
+     --with-uclib-path=<path_to_your/usr/i386-linux-uclibc>
+     --enable-uclib
+   $ make -i clean
+   $ make -i
+   $ make -i install
+   
+   Ignore any compile errors!
+   
+   (This is just a very dirty hack to get libosip half way built)
+   
+   2) SIPROXD
+   Delete the config.cache file.
+   Configure siproxd:
+   $ ./configure --with-uclibc-path=<path_to_your/usr/i386-linux-uclibc>
+     --enable-uclibc --with-extra-includes=<libosip_install_prefix>/include
+     --with-extra-libs=<libosip_install_prefix>/lib --enable-almost-static
+   This will build siproxd statically linked against libosib and
+   dynamically linked against uClibc.
+   $ make
+
+   "$ ldd src/siproxd" reports:
+   libpthread.so.0 => <path_to/i386-linux-uclibc>/lib/libpthread.so.0
+   libc.so.0 => <path_to/i386-linux-uclibc>/lib/libc.so.0
+   ld-uClibc.so.0 => <path_to/i386-linux-uclibc>/lib/ld-uClibc.so.0
+
+   Does Flifl 2.1.x include the full uClibc dynamic libraries (especially
+   the pthreads.so)?

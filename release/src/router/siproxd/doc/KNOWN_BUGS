@@ -1,0 +1,30 @@
+* REGISTER transactions:
+  Currently siproxd does only support *one* Contact header in REGISTER
+  transactions. If an UA does send multiple (which is legal) funny things
+  may happen.
+  There are one or two funnies associated with REGISTER transactions that
+  should be mentioned:
+  1)	There can be multiple Contact URIs in the request.  It is legal
+ 	(although very rare) to register multiple extensions at the same
+	time.
+ 	When multiple extensions need to be registered, they are generally
+ 	registered separately.	You probably don't need to worry about this
+ 	for the time being, but it is probably worth bearing it in mind.
+  2)	There can be multiple Contact URIs in the response.  If more than
+	one UA has registered for the same AOR, then the response to the
+	REGISTER will contain all the registered AORs and their current
+        expiry times.
+ 	None or some of these may need 'unmapping'.  Again, this probably
+ 	isn't something you will come across that often, but knowing it can
+ 	happen may save you some debugging time later.
+  3)	The Contact in the request may contain '*'.  This is used by some
+ 	phones to deregister all registrations for the specified AOR.
+  4)	Sometimes, there is no Contact in the request.  This happens when
+ 	a UA is querying the registration database.  This is sometimes used
+ 	for diagnostic purposes, although I suppose a phone could do this
+ 	automatically for some reason.
+  5)	The definitive expires time is not found in the request.  This is
+ 	simply a suggested value.  The actual value is in the response from
+ 	the registrar.
+  For the definitive description -> RFC3261 section 10.
+

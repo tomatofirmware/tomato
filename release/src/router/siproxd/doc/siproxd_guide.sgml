@@ -1,0 +1,1455 @@
+<!doctype book PUBLIC "-//OASIS//DTD DocBook V4.2//EN" [
+]>
+<book id="siproxd-doc">
+  <?dbhtml filename="siproxd_guide.html">
+
+  <bookinfo>
+    <date>2005-04-10</date>
+    <title>Siproxd Users Guide</title>
+    <abbrev>Siproxd</abbrev>
+    <authorgroup>
+      <author>
+        <firstname>Thomas</firstname>
+        <surname>Ries</surname>
+      </author>
+    </authorgroup>
+    <address>
+      <email>tries@users.sourceforge.net</email>
+    </address>
+    <copyright>
+      <year>2005-2010</year>
+      <holder>Thomas Ries</holder>
+    </copyright>
+    <legalnotice>
+      <para>This document can be freely redistributed according to
+        the terms of the GNU General Public License.</para>
+    </legalnotice>
+    <revhistory>
+      <revision>
+        <revnumber>0.1</revnumber>
+        <date>2005-04-10</date>
+        <authorinitials>tries@users.sourceforge.net</authorinitials>
+        <revremark>Initial version</revremark>
+      </revision>
+      <revision>
+        <revnumber>0.2</revnumber>
+        <date>2006-07-28</date>
+        <authorinitials>tries@users.sourceforge.net</authorinitials>
+        <revremark>Comment on Asterisk Scenario</revremark>
+      </revision>
+      <revision>
+        <revnumber>0.3</revnumber>
+        <date>2007-05-15</date>
+        <authorinitials>tries@users.sourceforge.net</authorinitials>
+        <revremark>New Asterisk Config Files</revremark>
+      </revision>
+      <revision>
+        <revnumber>0.7.1</revnumber>
+        <date>2008-01-27</date>
+        <authorinitials>tries@users.sourceforge.net</authorinitials>
+        <revremark>Plug-in API</revremark>
+      </revision>
+      <revision>
+        <revnumber>0.8.0</revnumber>
+        <date>2010-02-24</date>
+        <authorinitials>tries@users.sourceforge.net</authorinitials>
+        <revremark>TCP, STUN plugin, config file updates</revremark>
+      </revision>
+    </revhistory>
+  </bookinfo>
+  <toc></toc>
+
+  <!-- We are done with the preliminaries, now we can start with
+          the body of the document -->
+
+  <!-- Chapter 1: Overview -->
+  <chapter label="" id="README">
+    <?dbhtml filename="siproxd_guide_c0.html">
+    <title>README</title>
+      <para>Important information, please read me!</para>
+
+    <sect1 label="">
+      <?dbhtml filename="siproxd_guide_c0s1.html">
+      <title>Important / Warning</title>
+      <para>As it still happens that people try to mix different NAT
+        traversal techologies together with siproxd I'll put some words
+        here:
+        <itemizedlist mark='bullet'>
+          <listitem><para>Do NOT USE anything like an STUN Server together
+            with siproxd.</para></listitem>
+          <listitem><para>Do NOT USE any additional techologies trying to 
+            help in NAT traversal (additional firewall modules like
+            ip_nat_sip.ko or whatever fancy stuff may tempt you).
+            </para></listitem>
+        </itemizedlist>
+        If you do not follow the above rules, those other
+        "helping technologies" WILL DO CONFLICT with siproxd and result
+        in a mess.</para>
+    </sect1>
+  </chapter>
+
+  <!-- Chapter 1: Overview -->
+  <chapter label="1" id="Overview">
+    <?dbhtml filename="siproxd_guide_c1.html">
+    <title>Overview</title>
+    <para>Siproxd is an proxy/masquerading daemon for the SIP protocol.
+      It handles registrations of SIP clients on a private IP network
+      and performs rewriting of the SIP message bodies to make SIP
+      connections possible via an masquerading firewall. It allows SIP
+      clients (like kphone, linphone) to work behind an IP masquerading
+      firewall or router.</para>
+    <para>SIP (Session Initiation Protocol, RFC3261) is used by Softphones
+      and Hardphones (Voice over IP) to initiate communication. By itself,
+      SIP does not work via masquerading firewalls as the transfered data
+      contains IP addresses and port numbers.</para>
+    <para>There exist so called STUN servers that allow a SIP client to
+      figure out its public visible IP address and use this one instead.
+      As a drawback, usually on the masquerading firewall a very wide port
+      range must be opened up for the incoming  RTP traffic. The SIP client
+      must support STUN (which most of them do).</para>
+    <para>Siproxd uses another approach (application layer proxy) and places
+      itself as outbound proxy in between the local SIP client and the
+      remote client or registrar. It does rewrite the SIP traffic on the
+      fly and also includes a RTP proxy for incoming and outgoing RTP
+      traffic (the actual audio data). The port range to be used for
+      receiving RTP data is configurable, so the firewall only must
+      allow incoming traffic for a small port range.</para>
+    <para>A standard scenario would look like:
+<screen>
+private IP address range             :          Internet
+10.0.0.x                             :          (public IP address range)
+                                     :
+                                     :         foo.bar.org
++-------------+               +--------------+
+!             !.10         .1 ! masquerading ! publicIP
+! IntHost     !---------------! Firewall     !------------>>  
+!             !               !              !   
++-------------+               +--------------+
+                          eth0       :        ppp0
+</screen>
+
+      <itemizedlist mark='bullet'>
+        <listitem><para>The Firewall does IP masquerading and is running
+          siproxd</para></listitem>
+        <listitem><para>IntHost is running an SIP softphone (like linphone,
+          kphone)</para></listitem>
+        <listitem><para>The SIP address used by the softphone is
+          sip:johndoe@foo.bar.org</para></listitem>
+
+        <listitem><para>The softphone is configured to register itself at
+          siproxd running on the firewall host (10.0.0.1) as
+          sip:johndoe@foo.bar.org</para></listitem>
+        <listitem><para>foo.bar.org is the domain name corresponding to the
+          public IP address of the firewall (e.g. use some dynamic DNS
+          service [1])</para></listitem>
+      </itemizedlist>
+    </para>
+  </chapter>
+
+  <!-- Chapter 2: Building and Installation -->
+  <chapter label="2" id="Building-and-Installation">
+    <?dbhtml filename="siproxd_guide_c2.html">
+    <title>Building and Installation</title>
+
+    <!-- Chapter 2.1: Prerequisites -->
+    <sect1 label="2.1" >
+      <?dbhtml filename="siproxd_guide_c2s1.html">
+      <title>Prerequisites</title>
+      <para>Operating system of either:
+        <itemizedlist mark='bullet'>
+          <listitem><para>Linux (should work with any kernel)</para></listitem>
+          <listitem><para>FreeBSD</para></listitem>
+          <listitem><para>Solaris (porting is still being worked on but
+            you may try it)</para></listitem>
+        </itemizedlist>
+        Additional required Packages:
+        <itemizedlist mark='bullet'>
+          <listitem><para><ulink url='http://www.gnu.org/software/osip'>
+            Libosip2 package</ulink></para></listitem>
+        </itemizedlist>
+      </para>
+    </sect1>
+
+    <!-- Chapter 2.2: Compiling and Installing -->
+    <sect1 label="2.2">
+      <?dbhtml filename="siproxd_guide_c2s2.html">
+      <title>Compiling and Installing</title>
+      <para>It is quite simple. If you have a more-or-less standard
+        installation and libosip2 installed at a standard location,
+        it should be sufficient to do:
+<screen>
+./configure
+make
+make install
+</screen>
+      </para>
+      <para>This will install siproxd into /usr/local/. If you wish
+        to install it into another location, specify 
+        <userinput>--prefix=&lt;myprefix></userinput> when running 
+        <userinput>./configure</userinput>. If you have installed
+        libosip2 in an non-standard location use
+        <userinput>--with-libosip-prefix=&lt;libosipprefix></userinput>
+        to tell configure where to find libosip2 (e.g. 
+        <userinput>--with-libosip-prefix=$HOME/lib</userinput>).</para>
+      <para>Common features for ./configure:
+<screen>
+--enable-static                 build statically linked executable
+--with-libosip-prefix=DIR       use libosip2 from DIR/include and DIR/lib
+--with-extra-includes=DIR       adds non standard include paths
+--with-extra-libs=DIR           adds non standard library paths
+</screen>
+      </para>
+      <para>Edit <filename>/usr/etc/siproxd.conf</filename> according
+        to your situation, at least configure
+        <parameter>if_inbound</parameter> and
+        <parameter>if_outbound</parameter>. They must represent the
+        interface names (e.g. on Linux: ppp0, eth1) for the inbound
+        and outbound interfaces.</para>
+      <para>Edit <filename>/usr/etc/siproxd_passwd.cfg</filename>
+        if you enable client authentication.</para>
+      <para>Start siproxd:
+<screen>
+# siproxd
+</screen>
+      </para>
+    </sect1>
+  </chapter>
+
+  <!-- Chapter 3: Configuration -->
+  <chapter label="3" id="Configuration">
+    <?dbhtml filename="siproxd_guide_c3.html">
+    <title>Configuration</title>
+
+    <!-- Chapter 3.1: The configuration file 'siproxd.conf' -->
+    <sect1 label="3.1">
+      <?dbhtml filename="siproxd_guide_c3s1.html">
+      <title>The configuration file 'siproxd.conf'</title>
+      <para>Siproxd by default searches for its configuration
+        file in the following locations:
+        <itemizedlist mark='bullet'>
+          <listitem><para><filename>$HOME/.siproxdrc
+            </filename></para></listitem>
+          <listitem><para><filename>&lt;buildingprefix>/etc/siproxd.conf
+            </filename></para></listitem>
+          <listitem><para><filename>/etc/siproxd.conf
+            </filename></para></listitem>
+          <listitem><para><filename>/usr/etc/siproxd.conf
+            </filename></para></listitem>
+          <listitem><para><filename>/usr/local/etc/siproxd.conf
+            </filename></para></listitem>
+        </itemizedlist>
+      </para>
+
+      <para>The following is a list of directives that do exist.
+        Note that string values MUST NOT contain spaces or tabs.
+        Also read the explanations included in the supplied example
+        configuration file fro more explanation. Items with a # in
+        front are normally disabled / not defined.</para>
+      <para>To start with siproxd in the first run, just adapt the
+        interface definition for the inbound and outbound network
+        interfaces (<parameter>if_inbound</parameter> and 
+        <parameter>if_outbound</parameter>).</para>
+      <para>Definition of network interfaces for the inbound network
+        (local network where your SIP client is connected, this
+        network normally uses IP addresses from on of the private
+        IP ranges like 10.x.x.x, 192.168.x.x) and outbound network
+        (your connection to the Internet, normally this interface
+        has a public IP assigned by your provider).</para>
+<screen>
+if_inbound  = eth0
+if_outbound = ppp0
+</screen>
+      <para>Usually only the <parameter>if_inbound</parameter> and
+        <parameter>if_outbound</parameter> directives will be used.
+        The <parameter>host_outbound</parameter> directive comes into
+        play when running siproxd "in front of" a NAT router. Please
+        check the configuration examples in this document for more
+        details. Also check the STUN plugin.</para>
+<screen>
+# host_outbound = &lt;my_public_ip_address>
+</screen>
+
+      <para>Access control lists for incoming SIP registrations and
+        SIP traffic in general. These are comma separated lists of
+        the form &lt;IP>/&lt;mask>, note that no spaces are
+        allowed within the list (the configuration file parser
+        cannot yet handle spaces).</para>
+<screen>
+# hosts_allow_reg = 192.168.1.0/24,192.168.2.0/24
+# hosts_allow_sip = 123.45.0.0/16,123.46.0.0/16
+# hosts_deny_sip  = 10.0.0.0/8,11.0.0.0/8
+</screen>
+
+      <para>Port to listen for incoming SIP messages. 5060 is
+        usually the correct choice, don't change this unless you
+        have a reason to.</para>
+<screen>
+sip_listen_port = 5060
+</screen>
+
+      <para>Shall siproxd run as daemon? Usually 1 is the correct
+        choice. If you want siproxd not to daemonize and keep
+        running in foreground and writing its output to the terminal
+        set this to 0.</para>
+<screen>
+daemonize = 1
+</screen>
+
+      <para>Siproxd does log using the syslog() facility when
+        running a daemon. This setting controls how much logging
+        is done:
+        <itemizedlist mark='bullet'>
+          <listitem><para><literal>0 - DEBUGs, INFOs, WARNINGs and ERRORs
+            </literal></para></listitem>
+          <listitem><para><literal>1 - INFOs, WARNINGs and ERRORs
+            </literal></para></listitem>
+          <listitem><para><literal>2 - WARNINGs and ERRORs
+            </literal></para></listitem>
+          <listitem><para><literal>3 - only ERRORs
+            </literal></para></listitem>
+          <listitem><para><literal>4 - absolutely nothing
+            </literal></para></listitem>
+        </itemizedlist>
+        </para>
+<screen>
+silence_log = 0
+</screen>
+
+      <para>If siproxd is started as root, it can drop the root
+        privileges and change its user ID at startup. It also can
+        put itself into a chroot() jail (see 4.2 for details)</para>
+<screen>
+user = nobody
+# chrootjail = /var/lib/siproxd/
+</screen>
+
+      <para>Where to store the current registrations and the cycle
+        in seconds to perform the cyclic writing. This allows
+        siproxd to remember registration across a restart. An empty
+        value means we do not save registrations. The specified
+        directory path must exist.</para>
+<screen>
+registration_file = /var/lib/siproxd/siproxd_registrations
+autosave_registrations = 300
+</screen>
+
+      <para>Where to create the PID file.</para>
+<screen>
+pid_file = /var/run/siproxd/siproxd.pid
+</screen>
+
+      <para>Enable/disable the RTP proxy. This must always be
+        enabled. In some future release this directive will
+        become obsolete and will be removed.</para>
+<screen>
+rtp_proxy_enable = 1
+</screen>
+
+      <para>Port range (UDP) that siproxd will use for incoming
+        and outgoing RTP traffic. A firewall must be configured
+        to allow traffic from and to these ports (UDP only). By
+        default the range 7070 up to (and including) 7089 is used.
+        This allows up to 10 simultaneous calls (2 ports per call).
+        If you need more simultaneous calls, increase the range.</para>
+<screen>
+rtp_port_low  = 7070
+rtp_port_high = 7089
+</screen>
+
+      <para>Timeout for an RTP stream. If for the specified number
+        of seconds no data is relayed on an active stream, it is
+        considered dead and will be killed.</para>
+<screen>
+rtp_timeout = 300
+</screen>
+
+      <para>DSCP (differentiated services) value to be assigned 
+        to RTP and SIP UDP packets. Allows QOS aware routers to
+        handle different types traffic with different priorities.</para>
+<screen>
+rtp_dscp = 46
+sip_dscp = 0
+</screen>
+
+      <para>If a REGISTER request does not contain an
+        <literal>Expires</literal> header or <literal>expires=</literal>
+        parameter in the <literal>Contact</literal> header, this
+        number of seconds will be used and reported back to the UA
+        in the answer.</para>
+<screen>
+default_expires = 600
+</screen>
+
+      <para>TCP inactivity timeout: For TCP SIP signalling, this 
+        indicates the inactivity timeout (seconds) after that an 
+        idling TCP connection is disconnected. Note that making 
+        this too short may cause multiple parallell registrations 
+        for the same phone. This timeout must be set larger than the 
+        used registration interval.</para>
+<screen>
+tcp_timeout = 600
+</screen>
+
+      <para>Timeout for connection attempts in msec: 
+        How many msecs shall siproxd wait for an successful connect
+        when establishing an outgoing SIP signalling connection. This
+        should be kept as short as possible as waiting for an TCP
+        connection to establish is a BLOCKING operation - while waiting
+        for a connect to succeed not SIP messages are processed (RTP is
+        not affected).</para>
+<screen>
+tcp_connect_timeout = 500
+</screen>
+
+
+      <para>TCP keepalive period:
+        For TCP SIP signalling, if > 0 empty SIP packets will be sent
+        every 'n' seconds to keep the connection alive. Default is off.
+        </para>
+<screen>
+tcp_keepalive = 20
+</screen>
+
+      <para>If siproxd is used as registration server and
+        authentication is wanted, define the following directive.
+        If <parameter>proxy_auth_realm</parameter> is defined
+        (a string), clients will be forced to authenticate themselfs
+        to the proxy (for registration only). To disable Authentication,
+        simply comment out this line. Default is disabled.</para>
+<screen>
+# proxy_auth_realm = Authentication_Realm
+</screen>
+
+      <para>The password to be used for authentication may be a global
+        one</para>
+<screen>
+# proxy_auth_passwd = some_password
+</screen>
+
+      <para>or on a per user base, stored in its own file.
+        <parameter>proxy_auth_pwfile</parameter> takes precedence over
+        <parameter>proxy_auth_passwd</parameter></para>
+<screen>
+# proxy_auth_pwfile = /etc/mysiproxd_passwd.cfg
+</screen>
+
+      <para>To enable additional debug output of siproxd.
+        This is a bit pattern representing the following items.
+        Default is 0x0 - disabled. See below in this document
+        for information on how to create a debug log file.
+        <itemizedlist mark='bullet'>
+          <listitem><para><literal>DBCLASS_BABBLE  0x00000001 // babble (like entering/leaving fnc)
+            </literal></para></listitem>
+          <listitem><para><literal>DBCLASS_NET     0x00000002 // network
+            </literal></para></listitem>
+          <listitem><para><literal>DBCLASS_SIP     0x00000004 // SIP manipulations
+            </literal></para></listitem>
+          <listitem><para><literal>DBCLASS_REG     0x00000008 // Client registration
+            </literal></para></listitem>
+          <listitem><para><literal>DBCLASS_NOSPEC  0x00000010 // non specified class
+            </literal></para></listitem>
+          <listitem><para><literal>DBCLASS_PROXY   0x00000020 // proxy
+            </literal></para></listitem>
+          <listitem><para><literal>DBCLASS_DNS     0x00000040 // DNS stuff
+            </literal></para></listitem>
+          <listitem><para><literal>DBCLASS_NETTRAF 0x00000080 // network traffic
+            </literal></para></listitem>
+          <listitem><para><literal>DBCLASS_CONFIG  0x00000100 // configuration
+            </literal></para></listitem>
+          <listitem><para><literal>DBCLASS_RTP     0x00000200 // RTP proxy
+            </literal></para></listitem>
+          <listitem><para><literal>DBCLASS_ACCESS  0x00000400 // Access list evaluation
+            </literal></para></listitem>
+          <listitem><para><literal>DBCLASS_AUTH    0x00000800 // Authentication
+            </literal></para></listitem>
+        </itemizedlist>
+        </para>
+<screen>
+debug_level = 0x00000000
+</screen>
+
+      <para>You may connect to this port from a remote machine and
+        receive the debug output. This allows bettwer creation of
+        debug output on embedded systems that do not have enough
+        memory for large disk files. Port number 0 means this feature
+        is disabled.</para>
+<screen>
+debug_port = 0
+</screen>
+
+      <para>Some UAs (SIP clients) will always use the host/ip they
+        register TO as host part in the registration record (which
+        will be the inbound ip address/hostname of the proxy) and
+        can not be told to register a different host (public IP
+        address). This Mask feature allows to force such a UA to be
+        masqueraded to a different host. Siemens SIP Phones seem to
+        need this feature. Normally disabled.</para>
+<screen>
+# mask_host=local.ip.of.sipphone
+# masked_host=public.domaind.org
+</screen>
+
+      <para>User Agent Masquerading: 
+        Siproxd can masquerade the User Agent string of your local UAs.
+        Useful for Providers that do not work with some specific UAs
+        (e.g. sipcall.ch - it does not work if your outgoing SIP
+        traffic contains an Asterisk UA string...)
+        Default is to do no replacement.</para>
+<screen>
+ua_string = Siproxd-UA
+</screen>
+
+      <para>Use ;rport in via header:
+        may be required in some cases where you have a NAT router that
+        remaps the source port 5060 to something different and the
+        registrar sends back the responses to port 5060.
+        Default is disabled (0)</para>
+<screen>
+use_rport = 0
+</screen>
+
+      <para>Siproxd itself can be told to send all traffic to another
+        outbound proxy. You can use this feature to 'chain' multiple
+        siproxd proxies if you have several masquerading firewalls
+        to cross. Normally disabled.</para>
+<screen>
+# outbound_proxy_host = my.outboundproxy.org
+# outbound_proxy_port = 5060
+</screen>
+
+      <para>Outbound proxies can be specified on a per-domain base.
+        This allows to use an outbound proxy needed for ProviderA
+        and none (or another) for ProviderB. Multiple domain specific
+        proxies may be specified, each one with one set of the following
+        directives. Note: These directives must always be specified as a
+        triple, skipping one of them will affect later definitions.</para>
+<screen>
+#outbound_domain_name = freenet.de
+#outbound_domain_host = proxy.for.domain.freende.de
+#outbound_domain_port = 5060
+</screen>
+
+      <para>Siproxd supports dynamic loadable plug-ins. Such plug-ins 
+        are loaded during runtime and do not require recompilation 
+        of the executable. This allows the easy addition of specific
+        functionality to siproxd. Even 3rd party functional extensions
+        are possible without the requirement to patch and rebuild the
+        siproxd source code with each new release.</para>
+      <para>Note: Dynamic loading of shared libraries is not supported
+        on all platforms. If a platform does not support it, plug-ins
+        can still be used but they will be statically linked during
+        the build process of siproxd. The configuration ("loading" the
+        plugins) is identical.
+        For more information on this topic you may familiarize yourself
+        with libltdl.
+      </para>
+      <para>Note: As the plug-in mechanism uses LTDL, the plugins to load 
+        MUST use a .la extension and not an .so extension! Trying to load an
+        plugin using xxx.so as it's name will fail.</para>
+<screen>
+# plugin_dir: MUST be terminated with '/'
+plugindir=/usr/lib/siproxd/
+
+# List of plugins to load:
+#load_plugin=plugin_demo.la
+load_plugin=plugin_logcall.la
+</screen>
+
+      <para>Each plugin does manage it's own set of configuration 
+        options. They are named like plugin_&lt;pluginname>_xxxxx.
+        For the detailed description of configuration settings, refer
+        to the plugin description.</para>
+<screen>
+plugin_demo_string = This_is_a_string_passed_to_the_demo_plugin
+</screen>
+    </sect1>
+
+    <!-- Chapter 3.2: Command Line Options -->
+    <sect1 label="3.2">
+      <?dbhtml filename="siproxd_guide_c3s2.html">
+      <title>Command Line Options</title>
+      <para>Siproxd knows the following command line options:</para>
+<screen>
+-h, --help                      help
+-d, --debug &lt;pattern>           set debug-pattern
+-c, --config &lt;cfgfile>          use the specified config file
+-p, --pid-file &lt;pidfile>        create pid file at &lt;pidfile>
+</screen>
+      <para>These options take precedence over the values configured
+        in the configuration file.</para>
+    </sect1>
+  </chapter>
+
+  <!-- Chapter 4: Features -->
+  <chapter label="4" id="Features">
+    <?dbhtml filename="siproxd_guide_c4.html">
+    <title>Features</title>
+
+    <!-- Chapter 4.1: Custom Firewall Module -->
+    <sect1 label="4.1">
+      <?dbhtml filename="siproxd_guide_c4s1.html">
+      <title>Custom Firewall Module</title>
+<!--&&&& do be completed -->
+      <para>The API</para>
+      <para>make your library</para>
+      <para>example code</para>
+<screen>
+./configure --with-custom-fwmodule=LIBRARY.a 
+</screen>
+    </sect1>
+
+    <!-- Chapter 4.2: Chroot() Jail -->
+    <sect1 label="4.2">
+      <?dbhtml filename="siproxd_guide_c4s2.html">
+      <title>Chroot() Jail</title>
+<!--&&&& do be completed -->
+      <para>Create chroot jail</para>
+      <para>What files must be present? To be completed!</para>
+    </sect1>
+  </chapter>
+
+  <!-- Chapter 5: Plug-ins -->
+  <chapter label="5" id="Plug-ins">
+    <?dbhtml filename="siproxd_guide_c5.html">
+    <title>Plug-ins</title>
+
+    <!-- Chapter 5.1: Plug-in API -->
+    <sect1 label="5.1">
+      <?dbhtml filename="siproxd_guide_c5s1.html">
+      <title>Plug-in API</title>
+      <para>Siproxd plug-ins are dynamic loadable libraries and must provide
+        3 functions towards siproxd. As we make use of some libltdl features
+        we do some internal macor magic - the PLUGIN_xxx funcation names
+        are actually CPP macros that will expand in unique names. Th have
+        this working properly the PLUGIN_NAME must be #defined before 
+        the plugins.h header file is included:
+        </para>
+<screen>
+#define PLUGIN_NAME     plugin_myplugin
+#include "plugins.h"
+[...]
+int  PLUGIN_INIT(plugin_def_t *plugin_def);
+int  PLUGIN_PROCESS(int stage, sip_ticket_t *ticket);
+int  PLUGIN_END(plugin_def_t *plugin_def);
+</screen>
+      <para>
+        The <filename>PLUGIN_INIT</filename> function is called when
+        the plug-in is loaded during startup of siproxd. The plug-in must
+        define the following 4 fields of the plugin_def structure:
+        <orderedlist numeration="arabic">
+          <listitem><para><filename>api_version</filename></para></listitem>
+          <listitem><para><filename>name</filename></para></listitem>
+          <listitem><para><filename>desc</filename></para></listitem>
+          <listitem><para><filename>exe_mask</filename></para></listitem>
+        </orderedlist>
+
+        Example code fragment:
+        </para>
+<screen>
+/* API version number of siproxd that this plug-in is built against.
+ * This constant will change whenever changes to the API are made
+ * that require adaptions in the plug-in. */
+plugin_def->api_version=SIPROXD_API_VERSION;
+
+/* Name and descriptive text of the plug-in. Those item MUST NOT be
+   on the stack but either allocated via malloc (and then freed
+   of course) or a static string in the plug-in. */
+plugin_def->name=strdup("plugin_demo");
+plugin_def->desc=strdup("This is just a demo plugin without any purpose");
+
+/* Execution mask - during what stages of SIP processing shall
+ * the plug-in be called. */
+plugin_def->exe_mask=PLUGIN_DETERMINE_TARGET|PLUGIN_PRE_PROXY;
+</screen>
+      <para>
+        The <filename>PLUGIN_PROCESS</filename> function is called at
+        the requested SIP processing stages (see 'execution mask').
+        Your processing will be done here.
+        </para>
+      <para>
+        The <filename>PLUGIN_END</filename> function is called at
+        shutdown of siproxd and gives the plug-in the opportunity
+        to clean up and properly shutdown itself.</para>
+      <para>Note: The previously allocated 'name' and 'desc' must be
+        freed by the plug-in. If you did use a static string then of
+        course you must not try to free() anything.</para>
+      <para>
+        Minimum required clean up procedure:
+<screen>
+int  PLUGIN_END(plugin_def_t *plugin_def){
+   /* free my allocated rescources (if allocated via malloc only) */
+   if (plugin_def->name) {free(plugin_def->name); plugin_def->name=NULL;}
+   if (plugin_def->desc) {free(plugin_def->desc); plugin_def->desc=NULL;}
+   return STS_SUCCESS;
+}
+</screen>
+        </para>
+      <para>
+        For a simple example refer to the simple demonstration plug-in
+        <filename>plugin_demo</filename>.
+        </para>
+      <para>
+        Each plug-in can have its own set of configuration parameters
+        in <filename>siproxd.conf</filename>. The plug-in has to define
+        a <filename>cfgopts_t</filename> structure and call <filename>
+        read_config</filename> during its initialization. Look at <filename>
+        plugin_demo</filename> for a simple example. The naming of
+        the config parameters is by definition
+        <filename>plugin_name_</filename>option.
+      </para>
+    </sect1>
+
+    <!-- Chapter 5.2: Available Plug-ins -->
+    <sect1 label="5.2">
+      <?dbhtml filename="siproxd_guide_c5s2.html">
+      <title>Available Plug-ins</title>
+      <para>The following plug-ins are provided with siproxd:
+        <orderedlist numeration="arabic">
+          <listitem><para><filename>plugin_demo</filename></para>
+                    <para>Demo plug-in. Provides the basic framework to
+                      be used for plug-ins.
+                    </para></listitem>
+          <listitem><para><filename>plugin_logcall</filename></para>
+                    <para>Very simplistic call logging to syslog.
+                    </para></listitem>
+          <listitem><para><filename>plugin_shortdial</filename></para>
+                    <para>Quick Dial feature.
+                    </para></listitem>
+          <listitem><para><filename>plugin_defaulttarget</filename></para>
+                    <para>Incoming calls to a non-existing UA are
+                      redirected to a specific target (catch-all).
+                    </para></listitem>
+          <listitem><para><filename>plugin_fix_bogus_via</filename></para>
+                    <para>Fixes broken VIA headers on incoming calls.
+                    </para></listitem>
+          <listitem><para><filename>plugin_stun</filename></para>
+                    <para>Cyclically checks with an STUN server for
+                      the public IP address of siproxd.
+                    </para></listitem>
+        </orderedlist>
+        Some of the plug-ins are described in more detail in the
+        following chapters.
+      </para>
+
+      <!-- Chapter 5.2.1: Demo Plug-in -->
+      <sect2 label="5.2.1">
+        <?dbhtml filename="siproxd_guide_c5s2-1.html">
+        <title>Demo Plug-in</title>
+        <para>Name: plugin_demo</para>
+        <para>Purpose: To be used as skeletton for your own plug-ins.</para>
+        <para>Configuration options:</para>
+<screen>
+plugin_demo_string = This_is_a_string_passed_to_the_demo_plugin
+</screen>
+        <para>Description:</para>
+        <para>This plug-in can be used as framework for your own plug-ins.
+          It contains the required code for the API and also shows
+          how to load plug-in specific configuration parameters.
+          </para>
+      </sect2>
+
+      <!-- Chapter 5.2.2: Call Logging Plug-in -->
+      <sect2 label="5.2.2">
+        <?dbhtml filename="siproxd_guide_c5s2-2.html">
+        <title>Call Logging Plug-in</title>
+        <para>Name: plugin_logcall</para>
+        <para>Purpose: Does a very simplistic call logging to syslog.</para>
+        <para>Configuration options:</para>
+<screen>
+none
+</screen>
+        <para>Description:</para>
+        <para>The numbering starts with "1" ("*01") and every following
+          "plugin_shortdial_entry" entry will allocate the following position.
+          It is not possible to freely assign the positions.</para>
+      </sect2>
+
+      <!-- Chapter 5.2.3: Short Dial Plug-in -->
+      <sect2 label="5.2.3">
+        <?dbhtml filename="siproxd_guide_c5s2-3.html">
+        <title>Short Dial Plug-in</title>
+        <para>Name: plugin_shortdial.c</para>
+        <para>Purpose: Provides a quick-Dial feature.
+        </para>
+        <para>Configuration options:</para>
+<screen>
+# The first character is the "key", the following characters give
+# the length of the number string. E.g. "*00" allows speed dials
+# from *01 to *99. (the number "*100" will be passed through unprocessed)
+plugin_shortdial_akey = *00
+#
+# *01 sipphone echo test
+plugin_shortdial_entry = 17474743246
+# *02 sipphone welcome message
+plugin_shortdial_entry = 17474745000
+</screen>
+        <para>Description:</para>
+        <para>Allows the definition of quick dial entries. E.g.
+          *01 to *99 can be defined to redirect the caller.
+          Note: Currently only the user part (phone number) can
+          be replaced, the domain part will not be changed (means
+          a short dial tarket of sip:111@other.domain.com will
+          not work). The '*' character can be chosen freely
+          (plugin_shortdial_akey).
+          Note: To call a real number like "*12" you have to dial
+          "**12"
+          </para>
+      </sect2>
+
+      <!-- Chapter 5.2.4: Default Target Plug-in -->
+      <sect2 label="5.2.4">
+        <?dbhtml filename="siproxd_guide_c5s2-4.html">
+        <title>Default Target Plug-in</title>
+        <para>Name: plugin_defaulttarget</para>
+        <para>Purpose: Incoming calls to non-existing local UAs are 
+          redirected to another SIP URI.</para>
+        <para>Configuration options:</para>
+<screen>
+# Log redirects to syslog
+plugin_defaulttarget_log = 1
+# target must be a full SIP URI with the syntax
+# sip:user@host[:port]
+plugin_defaulttarget_target = sip:defaulttarget@some.sip.domain:port
+</screen>
+        <para>Description:</para>
+        <para>Incoming SIP calls directed to a non-existing (registered)
+          local UA will be redirected to another target. This basically
+          implements a catch-all feature. The new target can be any SIP
+          URI and is not required to be local.</para>
+      </sect2>
+
+      <!-- Chapter 5.2.5: Fix bogus Via Plug-in -->
+      <sect2 label="5.2.5">
+        <?dbhtml filename="siproxd_guide_c5s2-4.html">
+        <title>Fix bogus Via Plug-in</title>
+        <para>Name: plugin_fix_bogus_via</para>
+        <para>Purpose: Fixes broken VIA headers on incoming SIP requests.</para>
+        <para>Configuration options:</para>
+<screen>
+# Incoming (from public network) SIP messages are checked for broken
+# SIP Via headers. If the IP address in the latest Via Header is
+# part of the list below, it will be replaced by the IP where the
+# SIP message has been received from.
+plugin_fix_bogus_via_networks = 10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
+</screen>
+        <para>Description:</para>
+        <para>Fixes broken VIA headers on incoming SIP requests
+          (inspired by Ralph Babel, see http://babel.de/art20080317a.html
+          for more info). Can be applied if you have remote UAs calling you
+          from the Internet and those UAs do have crappy Via headers (like 
+          private IPs because there is some NAT involved on their side).</para>
+      </sect2>
+
+      <!-- Chapter 5.2.6: STUN Plug-in -->
+      <sect2 label="5.2.6">
+        <?dbhtml filename="siproxd_guide_c5s2-6.html">
+        <title>STUN Plug-in</title>
+        <para>Name: plugin_stun</para>
+        <para>Purpose: Uses an external STUN server to determine the
+          public IP address of the host running siproxd.</para>
+        <para>Configuration options:</para>
+<screen>
+# Plugin_stun
+#
+# Uses an external STUN server to determine the public IP
+# address of siproxd. Useful for "in-front-of-NAT-router"
+# scenarios.
+plugin_stun_server = stun.ekiga.net
+plugin_stun_port = 3478
+# period in seconds to request IP info from STUN server
+plugin_stun_period = 300
+</screen>
+        <para>Description:</para>
+        <para>Does contact the configured STUN server at startup and then
+          cyclically at the configured interval to determine the public
+          visible IP address of the host running siproxd. Useful for setups
+          that have changing public IP addresses and siproxd is running
+          in the "in-front-of-NAT-router" scenario.</para>
+      </sect2>
+    </sect1>
+  </chapter>
+
+  <!-- Chapter 6: Troubleshooting -->
+  <chapter label="6" id="Troubleshooting">
+    <?dbhtml filename="siproxd_guide_c6.html">
+    <title>Troubleshooting</title>
+
+    <!-- Chapter 6.1: Problem Reporting -->
+    <sect1 label="6.1">
+      <?dbhtml filename="siproxd_guide_c6s1.html">
+      <title>Problem Reporting</title>
+      <para>If you encounter problems/crashes and ask for support,
+        please include as much information as possible. Very helpful
+        is a debug log that has been recorded at the time of the
+        misbehavior. Also include the exact versions of the siproxd
+        package and libosip2 that you are using. You should also
+        include your <filename>siproxd.conf</filename>.</para>
+    </sect1>
+
+    <!-- Chapter 6.2: Create a Debug Log -->
+    <sect1 label="6.2">
+      <?dbhtml filename="siproxd_guide_c6s2.html">
+      <title>Create a Debug Log</title>
+      <para>The easiest way to generate a debug log is:
+        <orderedlist numeration="arabic">
+          <listitem><para>make sure siproxd is not started as daemon
+            ('daemonize = 0' in the config file)</para></listitem>
+          <listitem><para>start siproxd:
+            <userinput>$ ./siproxd -d -1 2>debug.log</userinput>
+            </para></listitem>
+          <listitem><para>reproduce the error</para></listitem>
+          <listitem><para>include the generated <filename>debug.log
+            </filename> in your error report</para></listitem>
+        </orderedlist>
+        </para>
+      <para>Another possibility of to use TCP logging. This method
+        is recommended if you run siproxd on a router with limited
+        disk space (e.g. an embedded system). To enable TCP logging:
+        <orderedlist numeration="arabic">
+          <listitem><para>Edit the configuration file and set
+            <parameter>debug_port</parameter> to 5050 (or any other
+            TCP port number you like).</para></listitem>
+          <listitem><para>Restart siproxd</para></listitem>
+          <listitem><para><userinput>$ telnet &lt;IP_of_siproxd>
+            5050 > debug.log</userinput></para></listitem>
+        </orderedlist>
+        </para>
+      <para>You may prefer to use netcat instead of telnet.
+        Note: The TCP debug port is bound to all available interfaces
+        on the system, make sure no unauthorized people (like from
+        the outbound network) can connect.</para>
+    </sect1>
+
+    <!-- Chapter 6.3: Siproxd crashes -->
+    <sect1 label="6.3">
+      <?dbhtml filename="siproxd_guide_c6s3.html">
+      <title>Siproxd crashes</title>
+      <para>If siproxd crashes, a stack back trace usually is
+        helpful to me:
+        <orderedlist numeration="arabic">
+          <listitem><para>start siproxd in the debugger
+            (daemonize set to 0):</para>
+            <para><userinput>$ gdb ./src/siproxd</userinput></para>
+            <para><userinput>(gdb) set args -c /path/to/siproxd.conf
+              </userinput></para>
+            <para><userinput>(gdb) run</userinput></para>
+            </listitem>
+          <listitem><para>reproduce the crash</para></listitem>
+
+          <listitem><para>use gdb to print the stack backtrace:
+<screen>
+(gdb) info thread
+...
+(gdb) bt
+#0  0x400ec9ee in __select ()
+#1  0xbffff6f8 in ?? ()
+#2  0x804a5c2 in main (argc=3, argv=0xbffffc54) at siproxd.c:186
+#3  0x4005bcb3 in __libc_start_main (main=0x804a30c &lt;main>, argc=3, 
+    argv=0xbffffc54, init=0x8049a08 &lt;_init>, fini=0x804edac &lt;_fini>, 
+    rtld_fini=0x4000a350 &lt;_dl_fini>, stack_end=0xbffffc4c)
+    at ../sysdeps/generic/libc-start.c:78
+(gdb) 
+</screen>
+            </para></listitem>
+          <listitem><para>copy-paste all the output and include
+            it in your problem report.</para></listitem>
+        </orderedlist>
+        </para>
+    </sect1>
+  </chapter>
+
+  <!-- Chapter 7: Sample Configurations -->
+  <chapter label="7" id="Sample-Configurations">
+     <?dbhtml filename="siproxd_guide_c7.html">
+    <title>Sample Configurations</title>
+    <para>Check also the FAQ in the siproxd package.</para>
+
+    <!-- Chapter 7.1: The "Standard Scenario" -->
+    <sect1 label="7.1">
+      <?dbhtml filename="siproxd_guide_c7s1.html">
+      <title>The "Standard Scenario"</title>
+      <para>Scenario:</para>
+<screen>
+private IP address range             :          Internet
+10.0.0.x                             :          (public IP address range)
+                                     :
+                                     :         foo.bar.org
++-------------+               +--------------+
+!             !.10         .1 ! masquerading ! publicIP
+! IntHost     !---------------! Firewall     !------------>>  
+!             !               !              !   
++-------------+               +--------------+
+                          eth0       :        ppp0
+</screen>
+      <para>The Firewall does IP masquerading and is running
+        siproxd. IntHost is running an SIP softphone (like linphone,
+        kphone). The SIP address used by the softphone is
+        <literal>sip:johndoe@foo.bar.org</literal>. The softphone is
+        configured to register itself at siproxd running on the
+        firewall host (10.0.0.1) as <literal>sip:johndoe@foo.bar.org</literal>.
+        <literal>Foo.bar.org</literal> is the domain name corresponding
+        to the public IP address of the firewall (e.g. use some dynamic
+        DNS service like DynDNS).</para>
+      <para>Firewall configuration (iptables):</para>
+<screen>
+# allow incoming SIP and RTP traffic
+iptables -A INPUT -m udp -p udp -i ppp0 --dport 5060      -j ACCEPT
+iptables -A INPUT -m udp -p udp -i ppp0 --dport 7070:7089 -j ACCEPT
+</screen>
+      <para>Firewall configuration (ipchains):</para>
+<screen>
+# allow incoming SIP and RTP traffic
+ipchains -A input --proto udp --dport 5060      -j ACCEPT
+ipchains -A input --proto udp --dport 7070:7089 -j ACCEPT
+</screen>
+      <para>The first line will allow incoming SIP traffic. The
+        second line will allow incoming RTP traffic on the ports
+        7070 - 7089 (the default port range used by siproxd for
+        incoming RTP traffic).</para>
+    </sect1>
+
+    <!-- Chapter 7.2: GS BT-100 behind NAT Router running Siproxd -->
+    <sect1 label="7.2">
+      <?dbhtml filename="siproxd_guide_c7s2.html">
+      <title>GS BT-100 behind NAT Router running Siproxd</title>
+      <para>Scenario:</para>
+<screen>
+private IP address range             :          Internet
+10.0.0.x                             :          (public IP address range)
+                                     :
+                                     :         foo.bar.org
++-------------+               +--------------+
+!             !.10         .1 ! masquerading ! publicIP
+! SIP UA      !---------------! Firewall     !------------>>  
+! BT-100      !               ! siproxd      !
++-------------+               +--------------+
+                          eth0       :        ppp0
+</screen>
+      <para>Siproxd is running on the same host as the masquerading
+        firewall. The SIP phone is a Grandstream BudgeTone-100.
+        In this example the external SIP registrar used is
+        <ulink url='http://www.sipphone.com/'>sipphone.com</ulink>.</para>
+      <para>siproxd.conf:</para>
+<screen>
+if_inbound  = eth0
+if_outbound = ppp0
+hosts_allow_reg = 10.0.0.0/24
+sip_listen_port = 5060
+daemonize = 1
+silence_log = 1
+user = siproxd
+registration_file = /var/lib/siproxd_registrations
+pid_file = /var/run/siproxd/siproxd.pid
+rtp_proxy_enable = 1
+rtp_port_low  = 7070
+rtp_port_high = 7089
+rtp_timeout = 300
+default_expires = 600
+debug_level = 0
+debug_port = 0
+</screen>
+      <para>Firewall configuration (iptables):</para>
+<screen>
+# allow incoming SIP and RTP traffic
+iptables -A INPUT -m udp -p udp -i ppp0 --dport 5060      -j ACCEPT
+iptables -A INPUT -m udp -p udp -i ppp0 --dport 7070:7089 -j ACCEPT
+</screen>
+      <para>Phone configuration (only the relevant items are listed):</para>
+<screen>
+IP Address:             10.0.0.10
+Subnet Mask:            255.255.255.0
+Default Router: 10.0.0.1
+DNS Server 1:           &lt;DNS Server of your Internet provider>
+SIP Server:             proxy01.sipphone.com
+Outbound Proxy: 10.0.0.1
+SIP User ID:            1747669xxxx
+Authenticate ID:        1747660xxxx
+Authenticate Passwd:    *********
+Name:                   Your Name Here
+Use DNS SRV:            no
+User ID is phone #:     no
+Sip Registration:       yes
+Unregister on reboot:no
+Register expiration:    60
+Early Dial:             no
+local SIP port: 5060
+local RTP port: 5004
+Use random port:        yes
+NAT traversal:  no
+Use NAT IP:             &lt;empty>
+Subscribe for MWI:      No
+Send DTMF:              via RTP (RFC2833)
+</screen>
+    </sect1>
+
+    <!-- Chapter 7.3: GS BT-100 with Siproxd running "in front of" a NAT router -->
+    <sect1 label="7.3">
+      <?dbhtml filename="siproxd_guide_c7s3.html">
+      <title>GS BT-100 with Siproxd running "in front of" a NAT router</title>
+      <para>Scenario:</para>
+<screen>
+private IP address range             :          Internet
+10.0.0.x                             :          (public IP address range)
+                                     :
+                                     :         foo.bar.org
++-------------+               +--------------+
+!             !.10         .1 ! masquerading ! publicIP
+! SIP UA      !---------------! NAT router   !------------>>  
+! BT-100      !      !        !              !
++-------------+      !        +--------------+
+                     !    eth0       :        ppp0
+                     !               :       
+                     !               :       
+                eth0 !.2                     
+              +-------------+                
+              !   siproxd   !                
+              !             !                
+              +-------------+                
+</screen>
+      <para>Siproxd is running on 10.0.0.2. The masquerading NAT
+        router (e.g. a ADSL NAT router that cannot run any user
+        applications).</para>
+      <para>siproxd.conf:</para>
+<screen>
+if_inbound  = eth0
+if_outbound = eth0
+host_outbound = foo.bar.org
+hosts_allow_reg = 10.0.0.0/24
+sip_listen_port = 5060
+daemonize = 1
+silence_log = 1
+user = siproxd
+registration_file = /var/lib/siproxd_registrations
+pid_file = /var/run/siproxd/siproxd.pid
+rtp_proxy_enable = 1
+rtp_port_low  = 7070
+rtp_port_high = 7089
+rtp_timeout = 300
+default_expires = 600
+debug_level = 0
+debug_port = 0
+</screen>
+      <para>NAT router configuration:</para>
+<screen>
+forward all incoming traffic on 5060/udp to 10.0.0.2
+forward all incoming traffic from 7070/udp - 7089/udp to 10.0.0.2
+</screen>
+      <para>Phone configuration:</para>
+<screen>
+IP Address:             10.0.0.10
+Subnet Mask:            255.255.255.0
+Default Router: 10.0.0.1
+DNS Server 1:           &lt;DNS Server of your Internet provider>
+SIP Server:             proxy01.sipphone.com
+Outbound Proxy: 10.0.0.2
+SIP User ID:            1747669xxxx
+Authenticate ID:        1747660xxxx
+Authenticate Passwd:    *********
+Name:                   Your Name Here
+Use DNS SRV:            no
+User ID is phone #:     no
+Sip Registration:       yes
+Unregister on reboot:no
+Register expiration:    60
+Early Dial:             no
+local SIP port: 5060
+local RTP port: 5004
+Use random port:        yes
+NAT traversal:  no
+Use NAT IP:             &lt;empty>
+Subscribe for MWI:      No
+Send DTMF:              via RTP (RFC2833)
+</screen>
+    </sect1>
+
+
+    <!-- Chapter 7.4: Transparent SIP Proxy -->
+    <sect1 label="7.4">
+      <?dbhtml filename="siproxd_guide_c7s4.html">
+      <title>Transparent SIP Proxy</title>
+      <para>Scenario:</para>
+<screen>
+private IP address range             :          Internet
+10.0.0.x                             :          (public IP address range)
+                                     :
+                                     :         foo.bar.org
++-------------+               +--------------+
+!             !.10         .1 ! masquerading ! publicIP
+! SIP UA      !---------------! Firewall     !------------>>  
+!             !               ! siproxd      !
++-------------+               +--------------+
+                          eth0       :        ppp0
+</screen>
+      <para>You may have a SIP UA (Phone) that does not allow the
+        specification of an outbound proxy. If siproxd is running
+        on the masquerading router, the following configuration will
+        do so called transparent proxying. The firewall will redirect
+        outgoing SIP messages to siproxd, however the local Client
+        is not aware of it.</para>
+      <para>siproxd.conf:</para>
+<screen>
+if_inbound  = eth0
+if_outbound = ppp0
+hosts_allow_reg = 10.0.0.0/24
+sip_listen_port = 5060
+daemonize = 1
+silence_log = 1
+user = siproxd
+registration_file = /var/lib/siproxd_registrations
+pid_file = /var/run/siproxd/siproxd.pid
+rtp_proxy_enable = 1
+rtp_port_low  = 7010
+rtp_port_high = 7019
+rtp_timeout = 300
+default_expires = 600
+debug_level = 0
+debug_port = 0
+</screen>
+      <para>Firewall configuration (iptables):</para>
+<screen>
+# redirect outgoing SIP traffic to siproxd (myself)
+iptables -t nat -A PREROUTING -m udp -p udp -i eth0 \
+                              --destination-port 5060     -j REDIRECT
+# allow incoming SIP and RTP traffic
+iptables -A INPUT -m udp -p udp -i ppp0 --dport 5060      -j ACCEPT
+iptables -A INPUT -m udp -p udp -i ppp0 --dport 7070:7089 -j ACCEPT
+</screen>
+    </sect1>
+
+    <!-- Chapter 7.5: Masquerading an Asterisk box -->
+    <sect1 label="7.5">
+      <?dbhtml filename="siproxd_guide_c7s5.html">
+      <title>Masquerading an Asterisk box</title>
+      <para>Scenario:</para>
+<screen>
+private IP address range             :          Internet
+10.0.0.x                             :          (public IP address range)
+                                     :
+                                     :         foo.bar.org
++-------------+               +--------------+
+!             !.10         .1 ! masquerading ! publicIP
+! Asterisk    !---------------! Firewall     !------------>>  
+!             !  SIP trunk    ! siproxd      !
++-------------+               +--------------+
+  ! ! ! ! !               eth0       :        ppp0
+..!.!.!.!.!.....
+ extensions
+ (local SIP clients)
+</screen>
+      <para>Siproxd can also be used to masquerade an Asterisk server.
+        The Asterisk server will register itself as a SIP UA (Client)
+        to an external SIP registrar. In this example this would be
+        again sipphone.com. As Asterisk does not allow to specify an
+        SIP outbound proxy we use the same setup for transparent proxying.
+        The context values of the asterisk configuration probably must
+        be adapted to fit your needs.</para>
+      <para>siproxd.conf:</para>
+<screen>
+if_inbound  = eth0
+if_outbound = ppp0
+hosts_allow_reg = 10.0.0.0/24
+sip_listen_port = 5060
+daemonize = 1
+silence_log = 1
+user = siproxd
+registration_file = /var/lib/siproxd_registrations
+pid_file = /var/run/siproxd/siproxd.pid
+rtp_proxy_enable = 1
+rtp_port_low  = 7070
+rtp_port_high = 7089
+rtp_timeout = 300
+default_expires = 600
+debug_level = 0
+debug_port = 0
+</screen>
+      <para>Firewall configuration (iptables):</para>
+<screen>
+# redirect outgoing SIP traffic to siproxd (myself)
+iptables -t nat -A PREROUTING -m udp -p udp -i eth0 \
+                     --source 10.0.0.11 --destination-port 5060 -j REDIRECT
+# allow incoming SIP and RTP traffic
+iptables -A INPUT -m udp -p udp -i ppp0 --dport 5060      -j ACCEPT
+iptables -A INPUT -m udp -p udp -i ppp0 --dport 7070:7080 -j ACCEPT
+</screen>
+      <para>Asterisk configuration (SIP related part):</para>
+      <para>Note: Very important are the fromuser and fromdomain
+        keywords in the client section. They are required to have
+        Asterisk send the correct From headers in SIP dialogs.
+        The used Asterisk version is 'SVN-branch-1.4-r62331M'.</para>
+      <para>With newer Asterisk versions, it is no longer required
+        to have a separate REGISTER definition, this can be made
+        implicit in the SIP trunk config.</para>
+<screen>
+; sip.conf:
+
+[general]
+port = 5060           ; Port to bind to (SIP is 5060)
+bindaddr = 0.0.0.0    ; Address to bind to (all addresses on machine)
+context = from-sip-external ; Send unknown SIP callers to this context
+
+useragent = PBX       ; NOTE: some providers (e.g sipcall.ch) do simply
+                      ;       not work with the default "AsteriskPBX"
+                      ;       UA String.
+
+; Network Settings
+nat=never
+localnet = 10.0.0.0/24
+domain = 10.0.0.10
+
+; Codecs
+disallow=all
+allow=gsm       ; 13 Kbps
+allow=ulaw      ; 64 Kbps
+allow=alaw      ; 64 Kbps
+autoframing = yes
+
+; SIP Settings
+canreinvite = no      ; important!
+
+; the following are just my settings I use, however
+; I dont' consider them critical
+allowexternaldomains = yes
+allowexternalinvites = yes
+allowguest = yes
+allowsubscribe = no
+allowtransfer = yes
+alwaysauthreject = no
+autodomain = yes
+callevents = no
+compactheaders = no
+dumphistory = no
+g726nonstandard = no
+ignoreregexpire = no
+jbenable = no
+jbforce = no
+jblog = no
+maxcallbitrate = 384
+maxexpiry = 3600
+minexpiry = 180
+notifyringing = no
+pedantic = no
+promiscredir = no
+recordhistory = no
+relaxdtmf = no
+rtcachefriends = no
+rtsavesysname = no
+rtupdate = no
+sendrpid = yes
+sipdebug = no
+t1min = 100
+progressinband = no
+;register = 
+t38pt_udptl = no
+trustrpid = no
+usereqphone = no
+videosupport = no
+</screen>
+      <para>The Trunk definition looks like:</para>
+<screen>
+; users.conf:
+
+[general]
+;
+; Full name of a user
+;
+fullname = New User
+userbase = 200
+;
+; Create voicemail mailbox and use use macro-stdexten
+;
+hasvoicemail = yes
+;
+; Set voicemail mailbox 6000 password to 1234
+;
+vmsecret = 1234
+;
+; Create SIP Peer
+;
+hassip = yes
+hasiax = no
+;
+; Create H.323 friend
+;
+;hash323 = yes
+;
+; Create manager entry
+;
+hasmanager = no
+;
+; Remaining options are not specific to users.conf entries but are general.
+;
+callwaiting = yes
+threewaycalling = yes
+callwaitingcallerid = yes
+transfer = yes
+canpark = yes
+cancallforward = yes
+callreturn = yes
+callgroup = 1
+pickupgroup = 1
+host = dynamic
+localextenlength = 3
+allow_aliasextns = no
+allow_an_extns = no
+hasagent = no
+hasdirectory = no
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Local SIP UAs
+; = locally connected phones. nothing special here.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[201]
+callwaiting = yes
+cid_number = 201
+context = local_sip
+email = e@mail
+fullname = Full Name
+group = 
+hasagent = yes
+hasdirectory = yes
+hasiax = no
+hasmanager = no
+hassip = yes
+hasvoicemail = yes
+host = dynamic
+mailbox = 201
+secret = sip_password
+threewaycalling = yes
+zapchan = 
+registeriax = no
+registersip = yes
+vmsecret = 1234
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; SIP Trunks
+; these are masqueraded via siproxd
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[trunk_1]
+disallow = all
+allow = gsm,ulaw,alaw,adpcm,speex,g729,g723
+callerid = 
+contact = 17476691234       ; IMPORTANT
+context = DID_trunk_1
+dialformat = ${EXTEN:1}
+fromdomain = proxy01.sipphone.com
+fromuser = 17476691234      ; IMPORTANT
+group = 
+hasexten = no
+hasiax = no
+hassip = yes
+host = proxy01.sipphone.com
+insecure = very
+port = 5060
+provider = 
+registeriax = no
+registersip = yes
+secret = sip_password
+trunkname = Custom - sipphone1234
+trunkstyle = customvoip
+username = 17476691234
+</screen>
+    </sect1>
+  </chapter>
+</book>

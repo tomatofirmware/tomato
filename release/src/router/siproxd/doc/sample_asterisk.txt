@@ -1,0 +1,236 @@
+Example Setup, Asterisk running on the same machine as siproxd (= NAT host).
+
+I use a iptables rule to redirect all outgoing SIP traffix from Asterisk
+to siproxd.
+
+/etc/sysconfig/iptables:
+------------------------
+*nat
+######################################################################
+# NAT: redirect locally generated packets
+:OUTPUT - [0:0]
+#########################
+#
+# Asterisk Traffix via local siproxd. (must use DNAT to inbound IF! not REDIRECT)
+-A OUTPUT -o ppp+ -p udp --sport 5061 -j DNAT  --to-destination 192.168.1.1:5060
+
+COMMIT
+
+
+
+
+/etc/asterisk/sip.conf:
+-----------------------
+[general]
+context = default
+allowoverlap = no  ; Disable overlap dialing support. (Default is yes)
+bindport = 5061    ; use a different port than 5060, as that port will be
+                   ; occupied by siproxd!
+bindaddr = 0.0.0.0  ; IP address to bind to (0.0.0.0 binds to all)
+srvlookup = yes  ; Enable DNS SRV lookups on outbound calls
+
+; g726 sounds very bad, useless!
+; g722 is a dead end, no conversion from/to possible
+; g729 sound like through a long metal tube
+disallow = all
+allow = gsm,ulaw,alaw,adpcm,speex,g729,g723
+autoframing = yes
+
+allowexternaldomains = yes
+allowexternalinvites = yes
+allowguest = yes
+allowsubscribe = no
+allowtransfer = yes
+alwaysauthreject = no
+autodomain = yes
+callevents = no
+compactheaders = no
+dumphistory = no
+g726nonstandard = no
+ignoreregexpire = no
+jbenable = no
+jbforce = no
+jblog = no
+maxcallbitrate = 384
+maxexpiry = 3600
+minexpiry = 180
+notifyringing = no
+pedantic = no
+promiscredir = no
+recordhistory = no
+relaxdtmf = no
+rtcachefriends = no
+rtsavesysname = no
+rtupdate = no
+sendrpid = yes
+sipdebug = no
+t1min = 100
+progressinband = no
+t38pt_udptl = no
+trustrpid = no
+usereqphone = no
+videosupport = no
+;
+; the following is required when using siproxd with local DNAT rule
+nat=never
+externip=192.168.1.1
+;
+localnet = 192.168.0.0/16  ; my inbound network with local UAs
+domain = 192.168.1.1       ; inbound IP of host running Asterisk and siproxd
+domain = mynatfirewall     ; -"-
+canreinvite = no
+
+useragent = PBX            ; sipcall.ch (and others?) require UA string
+                           ; to be different from "AsteriskPBX"
+
+[authentication]
+;---end---
+
+
+/etc/asterisk/users.conf
+------------------------
+[general]
+;
+; Full name of a user
+;
+fullname = New User
+userbase = 200
+;
+; Create voicemail mailbox and use use macro-stdexten
+;
+hasvoicemail = yes
+;
+; Set voicemail mailbox 6000 password to 1234
+;
+vmsecret = 1234
+;
+; Create SIP Peer
+;
+hassip = yes
+hasiax = no
+;
+;
+; Create manager entry
+;
+hasmanager = no
+;
+; Remaining options are not specific to users.conf entries but are general.
+;
+callwaiting = yes
+threewaycalling = yes
+callwaitingcallerid = yes
+transfer = yes
+canpark = yes
+cancallforward = yes
+callreturn = yes
+callgroup = 1
+pickupgroup = 1
+host = dynamic
+localextenlength = 3
+allow_aliasextns = no
+allow_an_extns = no
+hasagent = no
+hasdirectory = no
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Local SIP UAs
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[201]
+callwaiting = yes
+cid_number = 201
+context = local_sip
+email = email@host.xx
+fullname = Full Name
+group = 
+hasagent = yes
+hasdirectory = yes
+hasiax = no
+hasmanager = no
+hassip = yes
+hasvoicemail = yes
+host = dynamic
+mailbox = 201
+secret = <secret for AUTH>
+threewaycalling = yes
+zapchan = 
+registeriax = no
+registersip = yes
+vmsecret = <secret for voicemail>
+
+[202]
+callwaiting = yes
+cid_number = 202
+context = local_sip
+email = email@host.xx
+fullname = Full Name
+group = 
+hasagent = yes
+hasdirectory = yes
+hasiax = no
+hasmanager = no
+hassip = yes
+hasvoicemail = yes
+host = dynamic
+mailbox = 202
+secret = <secret for AUTH>
+threewaycalling = yes
+zapchan = 
+registeriax = no
+registersip = yes
+vmsecret = <secret for voicemail>
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; SIP Trunks
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; sipphone.com
+[trunk_1]
+disallow = all
+allow = gsm,ulaw,alaw,adpcm,speex,g729,g723
+callerid = 
+contact = 1747669xxxx
+context = DID_trunk_1
+dialformat = ${EXTEN:1}
+fromdomain = proxy01.sipphone.com
+fromuser = 1747669xxxx
+group = 
+hasexten = no
+hasiax = no
+hassip = yes
+host = proxy01.sipphone.com
+insecure = very
+port = 5060
+provider = 
+registeriax = no
+registersip = yes
+secret = <secret for AUTH>
+trunkname = Custom - sipphone1341
+trunkstyle = customvoip
+username = 1747669xxxx
+
+; sipcall.ch
+[trunk_3]
+disallow = all
+allow = gsm,ulaw,alaw,adpcm,speex,g729,g723
+callerid = 
+contact = 4132511xxxx
+context = DID_trunk_3
+dialformat = ${EXTEN:1}
+fromdomain = sip.backbone.ch
+fromuser = 4132511xxxx
+group = 
+hasexten = no
+hasiax = no
+hassip = yes
+host = sip.backbone.ch
+insecure = very
+port = 5060
+provider = 
+registeriax = no
+registersip = yes
+secret = <secret for AUTH>
+trunkname = Custom - sipcall
+trunkstyle = customvoip
+username = 4132511xxxx
+
+;---end---

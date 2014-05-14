@@ -1,0 +1,59 @@
+RFC3261 describes in detail for UAs and proxies how to behave.
+This document tries to make the link between the RFC and the
+code locations in siproxd where these actions are performed.
+
+
+
+Request Processing:					implemented
+===================
+  Section 16.3:  Request Validation
+    1. Reasonable Syntax					yes
+    2. URI scheme						no
+    3. Max-Forwards						yes
+    4. (Optional) Loop Detection				yes
+    5. Proxy-Require						no
+    6. Proxy-Authorization					yes
+
+  Section 16.4 Route Information Preprocessing			partially
+
+  Section 16.5 Determining Request Targets			no
+
+  Section 16.6 Request Forwarding
+    1.  Make a copy of the received request			yes
+    2.  Update the Request-URI					yes
+    3.  Update the Max-Forwards header field			yes
+    4.  Optionally add a Record-route header field value	no
+    5.  Optionally add additional header fields			no
+    6.  Postprocess routing information				no
+    7.  Determine the next-hop address, port, and transport	yes
+    8.  Add a Via header field value				yes
+    9.  Add a Content-Length header field if necessary		yes
+    10. Forward the new request					yes
+    11. Set timer C						no
+
+Response Processing:					implemented
+====================
+  Section 16.3:  Request Validation
+    1. Reasonable Syntax					yes
+    2. URI scheme						no
+    3. Max-Forwards						no
+    4. (Optional) Loop Detection				yes
+    5. Proxy-Require						no
+    6. Proxy-Authorization					yes
+
+  Section 16.7 Response Processing				n/a
+
+  Section 16.11 Stateless Proxy					partially
+   Response processing as described in Section 16.7 does
+   not apply to a proxy behaving statelessly.  When a 
+   response arrives at a stateless proxy, the proxy MUST 
+   inspect the sent-by value in the first (topmost) Via 
+   header field value.  If that address matches the proxy,
+   (it equals a value this proxy has inserted into previous 
+   requests) the proxy MUST remove that header field value 
+   from the response and forward the result to the location 
+   indicated in the next Via header field value.  The proxy 
+   MUST NOT add to, modify, or remove the message body.
+   Unless specified otherwise, the proxy MUST NOT remove any 
+   other header field values.  If the address does not match 
+   the proxy, the message MUST be silently discarded.

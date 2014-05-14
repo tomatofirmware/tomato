@@ -1,0 +1,703 @@
+0.8.1
+=====
+  10-Jul-2011:  - Released 0.8.1
+  20-Jun-2011:  - removed obsolete files: addrcache.[ch]
+  19-Jun-2011:  - new plugin_regex: apply an extended regular expression
+                  to the SIP 'To' URI and rewrite the target (outgoing
+                  calls only)
+  17-Jun-2011:  - plugin_prefix: correct handling of outgoing ACKs
+                  (could lead to calls being aborted by one side)
+                - generic set of "redirect cache" that can be used by
+                  plugins to keep track of Call-IDs when doing "302 Moved"
+  12-Jun-2011:  - one-off in get_ip_by_ifname(), last interface in chain
+                  was not considered in matching.
+                - Pthread stack size made adjustable (thread_stack_size)
+  11-Jun-2011:  - other stun server in example config file and
+                  reworked some stun code.
+  05-Jun-2011:  - readconf: allow spaces within string values.
+                  Note that leading and trailing spaces are removed.
+  01-Jun-2011:  - new plugin_prefix: unconditionally prefixes outgoing
+                  calls with a configurable prefix string
+  29-May-2011:  - added search path "/etc/siproxd/siproxd.conf" to default
+                  search path for config files (SuSE)
+  09-Jan-2011:  - use CFLAGS -Wall only with GCC compiler
+                - fixed UA masquerading which was always set ("foobar")
+                - fixed more compiler warnings [3086381]
+                - configure.in: set library/include search paths before
+                  searching for local libltdl installation [3086321]
+  14-Oct-2010:  - fixed a number of compiler warnings (by Norm Brandinger)
+                  [3086593,3086371,3086351]
+  03-Oct-2010:  - use getifaddrs() to get the IP address of local interfaces.
+                  This seems to be required with FreeeBSD jails.
+  19-Jun-2010:  - fix: include correct ltdl.h for system & convenience libltdl
+  26-Apr-2010:  - Clean building from distribuion TAR did fail if the host
+                  installed libltdl lib was used (and not the convenience lib)
+  29-Mar-2010:  - fix: siproxd could crash when trying to rewrite a malformed
+                  SIP message. (thank you, Lucas)
+
+0.8.0
+=====
+  23-Feb-2010:  - Released 0.8.0
+  19-Feb-2010:  - CVE-2009-3736: use libltdl on host if existing and fall 
+                  back using convenienve libltdl (with a config warning)
+                - updated libtool version
+  21-Jan-2010:  - Support for UPDATE (RFC3311)
+  07-Jan-2010:  - Better handling of matching the local UAs
+  15-Dec-2009:  - Better handling for SIP redirecting with newer kernels
+  28-Oct-2009:  - Make local UA to local UA calls work better with UAs that
+                  blindly practice symmetric RTP and ignore the SDP media
+                  description completely.
+  26-Oct-2009:  - plugin_stun: use external STUN server to determine
+                  the public IP address of siproxd.
+  13-Jul-2009:  - TCP keepalive feature - to avoid issues with changing
+                  port numbers upon disconnect/reconnect a TCP connection.
+                - symmetric reuse of existing TCP connections
+  12-Jul-2009:  - Added basic TCP support for SIP signalling
+  06-Jun-2009:  - Defined default values for config options
+
+0.7.2
+=====
+  11-Oct-2009:  - Released 0.7.2
+  30-Jul-2009:  - RTP proxy could get confused and mess up RTP streams
+                  if two local UAs did use the same usernames but register
+                  on different providers. A call from UA1 to UA2 then could
+                  mess up the audio.
+  21-May-2009:  - Updated the documentation (plugin related stuff)
+  24-Mar-2009:  - allow the usage of @ in shortdial entries to call
+                  other users on other sip networks (patch by Andreas)
+                - revised rpmbuild (SPEC file and some Makefiles)
+   1-Mar-2009:  - building with --enable-static-libosip2 requires
+                  --disable-shared to be set as well (plugins will
+                  be statically linked into siproxd)
+  28-Feb-2009:  - make install: install docu as well
+                - properly handle some "--disable-*" configure options
+                - added configure option: --disable-doc 
+  22-Feb-2009:  - Reworked handling of plugin mechanism (libltdl "static"
+                  inclusion of plugins should work now). Building under
+                  Windows (with Cygwin) does work (build with
+                  ./configure --enable-static-libosip2).
+  11-Feb-2009:  - Don't abort RTP streams on ENOBUFS (Internet upstream
+                  saturated and a Packet is dropped)
+  24-Jan-2009:  - fixed an issue with RTP timeouts (on calls with multiple
+                  media streams an timeout on one single stream would
+                  cancel all streams in the end. Seen with X-Lite UAs)
+  07-Jan-2009:  - fixed some senseless range checks on "Max-Forward"
+                  and "Expires" headers (Thank you Alex for telling me)
+  08-Nov-2008:  - check & define if SOL_IP not existing (some *BSDs)
+                - honor PTHREAD_LDFLAGS from environment
+  01-Aug-2008:  - SIP DSCP value configurable
+
+0.7.1
+=====
+  23-Jul-2008:  - Released 0.7.1
+  22-Jul-2008:  - fixes some signedness warnings
+  17-May-2008:  - plugin_fix_bogus_via: fixes broken VIA headers on
+                  incoming SIP messages (inspired by Ralph Babel, see
+                  http://babel.de/art20080317a.html for more info)
+  22-Mar-2008:  - dejitter can be completely disabled by specifying 0ms
+  09-Mar-2008:  - libosip2-3.1.0 (changes MD5 related function names)
+  04-Feb-2008:  - 'Default Target' plugin: incoming calls to unknown
+                  are redirected to a "catch-all" target.
+  02-Feb-2008:  - More work on new plugin API.
+                - moved Call Logging functionality to it's own plugin.
+  22-Jan-2008:  - closing </chapter> tag missing in docu
+  21-Jan-2008:  - new plugin API (dynamically loadable plugins)
+
+0.7.0
+=====
+  19-Jan-2008:  - Released 0.7.0
+  19-Jan-2008:  - Converting to use libosip2-3.x.x
+                  This means older libosip2 versions before 3.0.0
+                  are no longer supported and will fail to build!
+
+0.6.1
+=====
+  19-Jan-2008:  - Released 0.6.1
+                  This will be the last release supporting libosip2-2.x.x.
+                  With 0.7.0, siproxd will switch to the new version 
+                  libosip2-3.x.x.
+  20-Dec-2007:  - DNS failure cache: do several attempts before blacklisting
+  28-Nov-2007:  - Fix: Detach from controlling TTY if daemonized
+  22-Nov-2007:  - Working on code that that will allow siproxd to use
+                  separate interfaces in its "in front of NAT router" setup.
+                  ( UA1[LAN0]--siproxd--LAN1--NAT--Internet--UA2 )
+  12-Nov-2007:  - Small changes to compile again under OpenBSD.
+
+0.6.0
+=====
+  28-Oct-2007:  - Released 0.6.0
+  03-Sep-2007:  - keep failed DNS attempts in cache for 10 minutes.
+                  This should protect from repeating DNS timeouts
+                  caused by broken DNS server (possible DOS)
+  16-Aug-2007:  - added comment in siproxd.conf about hosts_allow_sip
+  30-Jun-2007:  - some come cleanup in log.c (Bob Beers)
+  22-Jun-2007:  - fixed an error in "my via" detection when using the
+                  "host_outbound" config directive
+  08-Jun-2007:  - Some cleanup in dejitter code
+  29-May-2007:  - Deal with PRACK requests (RFC3262)
+  25-May-2007:  - Just discovered some patches originating from Debian
+                  project - included most of them as they make sense.
+                  (Hint: People, if you get fixes, please drop me a note
+                  and a .diff - I won't be biting you)
+  24-May-2007:  - new feature: can masquerade User-agent header
+                - new feature: can add ;rport to my own Via Headers
+  13-May-2007:  - deal with locally running UAs on same host (inbound IF side)
+  07-May-2007:  - Client-ID in RTP proxy is derived from Client IP address.
+                  This should fix an issue with unexpectedly timing-out RTP
+                  streams (actually too many RTP streams get started).
+  21-Apr-2007:  - Hack to deal with Asterisks broken Alert-Info headers
+                  (Asterisk in some setups does include Alert-Info header
+                  without '<>'. Note, this is a configuration issue in
+                  Asterisk, not an Asterisk bug!)
+  19-Feb-2007:  - Increased RTP buffer size
+  13-Oct-2006:  - Various fixes due to a code review by Andrew Jones
+  05-Oct-2006:  - route_determine_nexthop(): don't remove header
+  19-Aug-2006:  - increased DNS cache
+  18-Jun-2006:  - included RTCP support and a de-jitter feature
+                  (submitted by Hans Carlos Hofmann)
+
+0.5.13
+======
+  20-Jun-2006:  - Released 0.5.13
+  11-Jun-2006:  - RTP timeout handling: allow unidirectional data w/o 
+                  terminating connection after timeout.
+  20-May-2006:  - Fixed compiling issue when building on MacOS (Georg Schwarz)
+                - A number of correction in debugging code (James Henstridge)
+  26-Apr-2006:  - REGISTER response generated from siproxd includes
+                  a Contact header.
+                - some I64 architecture issues
+
+0.5.12
+======
+  14-Apr-2006:  - Released 0.5.12
+   8-Feb-2006:  - replaced some malloc() by osip_malloc(),
+                  (hopefully) fixed a sporadic crash in sdp_message_parse()
+   6-Feb-2006:  - RTP timeouts on some PBX systems that include an video 
+                  stream, but the called UA has no video capability.
+   3-Feb-2006:  - rewrite complete incoming request URI
+  31-Jan-2006:  - CALLIDHOST_SIZE to 128: support longer hostnames
+   1-Jan-2006:  - short-dial: use "302 Moved" to point to target
+  28-Dec-2005:  - Call logging: display FROM & TO for calls.
+  26-Dec-2005:  - Added a short-dial feature ("pi_shortdial_*" config options)
+  18-Dec-2005:  - Grandstream "unregister at startup" works now
+   9-Oct-2005:  - Expiration timeout is now taken from the REGISTER response
+                - fix: no audio with some UAs that do not include a
+                  Contact header in ACK messages (which is compliant).
+                - static build works again
+   1-Oct-2005:  - [1278537] Read proxy_auth_pwfile after config file is read
+                - [1278591] Proxy-Authenticate header not included in response
+                - process empty Contact header (means "query registrations")
+                  (only supported for registrations at a remote server)
+                - handle multiple Contact headers (e.g. in REGISTER response)
+  14-Jul-2005:  - allocate only even port numbers for RTP traffic
+
+0.5.11
+======
+  05-May-2005:  - Released 0.5.11
+  29-Apr-2005:  - fix: access lists with /32 did not work
+  21-Apr-2005:  - fix: ACK may contain SDP body, process it
+  19-Apr-2005:  - feature: DSCP value for RTP packets defineable (by Nick
+                  Vermeer, Internet Express)
+  15-Apr-2005:  - feature: auto-save registration table during operation
+  10-Apr-2005:  - started DocBook documentation
+   3-Apr-2005:  - fix: changing public IP address
+  27-Mar-2005:  - feature: siproxd "in front of" a NAT router should work
+  20-Mar-2005:  - when allocating local ports for RTP relaying, do this
+                  in a round-robin way over the available port range.
+   1-Mar-2005:  - working on running siproxd in front of a routing device
+                  and NOT on the firewall itself.
+  19-Feb-2005:  - more work on new libosip API
+  13-Feb-2005:  - made compile with libosip2-2.2.0 (change of libosip2 API)
+
+0.5.10
+======
+  01-Feb-2005:  - Released 0.5.10
+  24-Jan-2005:  - fix: Re-Invites may change remote IP address as well
+  08-Jan-2005:  - include ./autogen.sh into distribution
+                - fix: FreeBSD - libgnugetopt is optional library
+                - feature: build support for Cygwin (by Mathias Wohlfarth)
+  01-Jan-2005:  - fix: doc/Makefile.am, install part (by David Taylor)
+  30-Dec-2004:  - feature: remote TCP logging facility
+  29-Dec-2004:  - feature: Outbound proxies configurable per domain
+  08-Dec-2004:  - make install will set siproxd_passwd.cfg to -rw-----
+
+0.5.9
+=====
+  03-Nov-2004:  - Released 0.5.9
+  31-Oct-2004:  - fix: A negative response to an INVITE shall stop
+                  any associated initiated RTP streams
+  24-Oct-2004:  - Default Expires timeout is now configurable.
+  23-Oct-2004:  - fix: route_processing.c - when adding my record-route header,
+                  the 'lr' parameter was not dynamically allocated memory
+                  (possible crash when trying to free is)
+                - up to 1000 characters per line in config file (was 120),
+                  some typos corrected (by Tero Pelander)
+                - fix: various correction in Record-Route processing
+  13-Oct-2004:  - utils.c: preparation for chroot() (consider syslog)
+  09-Oct-2004:  - included startup script (by Guido Trentalancia)
+                - siproxd.spec: create PID and registrations directories
+                  and install startup script
+
+0.5.8
+=====
+  22-Sep-2004:  - Released 0.5.8
+  05-Sep-2004:  - Cross-provider calls (e.g. sipphone <-> FWD, with dial
+                  prefixes) did not work properly
+  04-Sep-2004:  - more on Route headers
+  27-Aug-2004:  - preliminary (and reduced) support for Route Headers
+  26-Aug-2004:  - more DEBUG output
+  22-Aug-2004:  - fix: secure_enviroment - set proper EGID (by Daniel Mueller)
+  19-Aug-2004:  - fix: don't crash on missing Contact header during registration
+  18-Aug-2004:  - reworked configure.in for FLI4L building
+  06-Jul-2004:  - patch from Dan Weber: Open the password file for SIP
+		  accounts at startup, so we still have access after
+                  chroot()ing. PID filename can be given at command-line.
+                - again: using a port number != 5060
+  27-Jun-2004:  - fix: in some configurations incoming requests could
+                  be sent to a wrong port number.
+
+0.5.7
+=====
+  24-Jun-2004:  - Released 0.5.7
+  18-Jun-2004:  - 2 fixes for using a port number != 5060 (by Miguel Angel)
+  13-Jun-2004:  - fix: get_ip_by_host() and buffer allocation for reentrant
+                  gethostbyname_r() functions
+                - if compiled for fli4l 2.0.x, don't use reentrant
+                  gethostbyname_r() - in some cases it fails reproduceably
+                  when running under fli4l (however, the same binary
+                  does behave properly under an old SUSE libc5 system)
+  12-Jun-2004:  - use SIGUSR2 for dmalloc debugging (SIGUSR1 is occupied
+                  with old libc5 & threads)
+                - reworked calling parameters for passing SIP data
+  11-Jun-2004:  - silenced some MSN Messenger provoked WARNings
+  29-May-2004:  - "determine next hop" also takes Route header into account
+                  (outgoing packets only, incoming can not have a proxy
+                  in between siproxd and the client anyway)
+  25-May-2004:  - sip_utils.c:sip_del_myvia check for NULL list
+  24-May-2004:  - included doc/sample_* to package
+  23-May-2004:  - doc/: added configuration example for X-Lite
+
+0.5.6
+=====
+  20-May-2004:  - Released 0.5.6
+                - some cleanup in configure.in
+  14-May-2004:  - FAQ update
+  16-May-2004:  - INFO/WARN/ERROR are always logged to syslog, even
+                  if running in foreground (syslog still can be silenced
+                  using the silence_log config option)
+  09-May-2004:  - Authentication headers: enquote Realm (linphone)
+                - complain about empty values in config file
+                - fli4l-uclibc: statically link against libpthread
+                  (as it seems to be not included in fli4l distribution)
+  02-May-2004:  - better recognition of redirected incoming requests
+                  (like INVITES from sipgate.de - SIP URI points to
+                  the real wanted target but To: header only points to
+                  the initially wanted target before the redirection)
+                - compiling on BSD (fwapi.c, custom_fw_module.c)
+  11-Apr-2004:  - on termination, stop all active RTP streams
+  24-Apr-2004:  - simplified SIP RX & TX routines
+
+0.5.5
+=====
+  11-Apr-2004:  - Released 0.5.5
+   9-Apr-2004:  - SDP body: do rewrite 'o=' (originator) address, too
+                - siproxd can be linked to a customer firewall control
+                  module (library) that will be called for each RTP
+                  stream that is started/stopped.
+   8-Apr-2004:  - small FAQ updates
+   5-Apr-2004:  - config file: don't complain on lines with only whitespaces
+                - fix: Via branch calculation
+                - security.c: increased max acceptable line length
+                - security.c: prevent libosip2 to die with "out of memory"
+                  on some malformed headers
+   4-Apr-2004:  - Realtime Scheduling for RTP proxy
+   3-Apr-2004:  - fix: SDP 'c=' items in media part
+   2-Apr-2004:  - PID file
+  31-Mar-2004:  - accessctl.c: text correction in ERROR output
+  30-Mar-2004:  - Again '*' Contact header in unREGISTER
+                - new: tools/extract_sip.pl 
+  26-Mar-2004:  - SDP rewrite: properly handle 'c=' items in session
+                  *and* media part of SDP data.
+  22-Mar-2004:  - deal with wildcard Contact header for unREGISTER
+                - enhanced security tests to survive the PROTOS test
+  21-Mar-2004:  - added ./autogen.sh
+                - security_check_sip: check existence of mandatory headers
+  19-Mar-2004:  - proxy_rewrite_invitation_body: check success of
+                  starting RTP relay before rewriting SDP body
+                - proxy_rewrite_invitation_body: don't fail on
+                  Contact header with no user part.
+  18-Mar-2004:  - security_check_sip: CSeq header must be present.
+
+0.5.4
+=====
+   6-Mar-2004:  - Released 0.5.4
+                - Some FAQ updates
+  21-Feb-2004:  - Proxy Authorization: enclose strings with quotes
+                  and fixed an error that did not let REGISTER
+                  requests pass through to a 3rd party registrar.
+  17-Feb-2004:  - Documentation spell corrections (patch from Luke Mewburn)
+  16-Feb-2004:  - Hack for Grandstream SIP phones and SUBSCRIBE response
+
+0.5.3
+=====
+  14-Feb-2004:  - Released 0.5.3
+                - Removed superfluous backslashes for line continuation
+  11-Feb-2004:  - Use same SIP port number for RX & TX (-> support
+                  symmetric SIP signalling)
+   7-Feb-2004:  - Fix for local-UA to local-UA RTP proxying, symmetric
+                  RTP was not working.
+                - logging routines now use a MUTEX to be thread safe.
+                - RTP proxy: fixed a bug that could lead to a deadlock
+                  on very rapid HOLD/unHOLD sequences.
+   1-Feb-2004:  - Added handling of Max-Forwards header
+                - a detected via loop results in an 482 Loop detected
+  31-Jan-2004:  - Allow 2 of my vias in header to let 2 UA's sitting
+                  behind the same siproxd have conversation together
+                  UA1 -->--\   >   /-->--\
+                            siproxd       Registrar
+                  UA2 --<--/   <   \--<--/
+                - Redone code for evaluation if a received packet
+                  is coming from the inbound or outbound network
+                - RTP streams are now identified by call_id AND
+                  USERNAME of the contact header. This provides
+                  support for RTP proxying between 2 UAs sitting on the
+                  inbound network. -> Calls between local UAs going via
+                  siproxd should now work.
+                  UA1 -->--\
+                            siproxd 
+                  UA2 --<--/ 
+                - Rewriting of SUBSCRIBE messages should now work.
+                - Removed obsolete prototypes from rtpproxy.h
+                - If the RTP stream in one direction is found to be
+                  aborted (sendto() failure), also stop the stream
+                  for the opposite direction
+
+0.5.2
+=====
+  31-Jan-2004:  - Released 0.5.2
+  30-Jan-2004:  - If RTP proxy is disabled, don't rewrite incomming
+                  SDP bodies (patch from Robert Högberg)
+  29-Jan-2004:  - new doc/RFC3261_compliance.txt and comments in the
+                  code that refer to the RFC.
+  28-Jan-2004:  - don't die on INVITE requests that include no Contact
+                  header - which is legal. (patch from Robert Högberg)
+                - RTP proxy: don't try to forward empty RTP packets
+                - renamed some variables of rtp_proxytable_t to make
+                  better sense (changed meaning in fullduplex RTP proxy)
+  27-Jan-2004:  - added doc/KNOWN_BUGS
+                - better branch parameter calculation (via header),
+                  now honors RFC3261 for stateless proxies (section 16.11)
+                - SIP request: remove a Route header pointing to myself.
+                  This was an issue with Linphone 0.12.1.
+                  (patch from Robert Högberg).
+                - removed IPCHAINS & IPTABLES (netfilter) proxy support
+                - RTPPROXY correction: match RTP ports crosswise -
+                  use one single port (and socket) on each side (inbound/
+                  outbound) to send and receive RTP traffic for every
+                  active stream (patch from Christof Meerwald).
+  22-Jan-2004:  - ./configure option: --enable-static to build
+                  a completely statically linked executable
+                - REGISTER honors the expires parameter
+                  of the contact header
+                - Contact header of REGISTER response must be
+                  rewritten back to the local (true) URL
+  18-Jan-2004:  - security_check_raw:
+                  size check: >= 16 bytes
+                - at exit, check registration file to be writable
+                - no WARNING if SIP user-agent header is not supplied.
+                - Call logging: distinguish between In & Out
+                - include branch parameter for via headers
+
+0.5.1
+=====
+  22-Dec-2003:  - Released 0.5.1
+  21-Dec-2003:  - possibility to log call establishment
+  17-Dec-2003:  - full duplex RTP proxy (many thanks to Chris Ross for
+                  his work on this). Up to now, only the RTP *Relay*
+                  has been tested (it works with KPhone, BudgeTone)
+                - fix: SIP phones that allocate a random port for
+                  incomming SIP traffic should now work (like BudgeTone)
+                - fix: some SIP phones do change the RTP port number
+                  during a session (like KPhone during HOLD/unHOLD)
+                - textual corrections
+  15-Dec-2003:  - use only even port numbers for RTP traffic
+  05-Dec-2003:  - some changes & enhancements inspired by Chris Ross:
+                  * 183 Trying *may* contain SDP data
+                  * compare_url: now does compare the scheme,
+                    if a host is not resolveable, hostnames will be
+                    compared as strings
+  04-Dec-2003:  - have registrations persistent across restarts of
+                  the daemon ('registration_file' config option)
+  29-Nov-2003:  - some documentation & FAQ updates
+
+0.5.0
+=====
+  26-Nov-2003:  - released 0.5.0
+                - included preliminary support for IPTABLES (netfiler)
+                  based systems.
+  24-Nov-2003:  - some fixes in sockbind() (FreeBSD) by Jeremy Shaw
+  23-Nov-2003:  - got the gethostbyname() failure problem solved.
+                  (the resolver needs a shared lib that was tried
+                  to load AFTER chrooting...)
+  22-Nov-2003:  - utils.c: use gethostbyname_r() in favor of
+                  gethostbyname - if available (siproxd uses threads!)
+                - some small items & cleanup
+  19-Nov-2003:  - Integrated a patch from Chris Ross:
+                  * have siproxd compile on Solaris and BSD/OS (more to come)
+                  * ./configure option --with-libosip-prefix
+                  * properly handle getopt_long()/getopt()
+  18-Nov-2003:  - readconfig.c: include sysconfdir to the list of locations
+                  where siproxd will search for its config file
+  14-Nov-2003:  - rtpproxy.c: sys/types.h needed for *BSD
+                - tested: siproxd builds on FreeBSD 4.9
+   2-Nov-2003:  - rtpproxy bugfix: On repetitive INVITES, the UDP media
+                  port could end up as -1 in the rewritten packet.
+   1-Nov-2003:  - siproxd can use another outbound proxy (chaining)
+                - Linux 2.4.x: siproxd with RTP relay could hang
+                  on termination (Thread termination). Fixed.
+                  
+0.4.2
+=====
+  31-Oct-2003:  - released 0.4.2
+                - Makefile: install siproxd to sbin (was bin)
+  24-Oct-2003:  - SPEC file: included config files & more docu
+  19-Oct-2003:  - included compiling support for DMALLOC debugging
+                - fixed 2 memory leaks in proxy.c
+
+0.4.1
+=====
+  12-Oct-2003:  - released 0.4.1
+  12-Oct-2003:  - Local registration of UAs was simply broken. Fixed.
+
+0.4.0
+=====
+  11-Oct-2003:  - released 0.4.0
+  08-Oct-2003:  - rtpproxy_masq: fixed an issue in port allocation
+                  which lead to syslog entries from IPCHAINS complaining
+                  about 'already used connection' in the syslog.
+                - added INFO() for incomming SIP Calls
+  04-Oct-2003:  - Siproxd now also works as outbound proxy 'only',
+                  means that local UAs may register themselfes to a
+                  3rd party registrar and use siproxd only as oubound
+                  proxy for masquerading purpose.
+                - fixed some errors with callid handling (NULL pointers)
+  24-Sep-2003:  - corrected the calling arguments of rtp_masq dummy
+                  routines (non IPCHAINS capable kernels)
+  22-Sep-2003:  - '\0' termination of read() SIP telegram from line
+
+0.3.6
+=====
+  22-Sep-2003:  - released 0.3.6
+                - Code cleanup for RTP proxy
+  07-Sep-2003:  - IPCHAINS based UDP tunneling (kernel masquerading)
+                  for RTP traffic (still experimental - but seems to work).
+                  To activate it, just set 'rtp_proxy_enable' equal 2
+                  in the config. NOTE: siproxd must then be started by
+                  root (but dropping privileges works).
+  05-Sep-2003:  - configure.in: test for pthreads before libosip (RH9.0)
+
+0.3.5
+=====
+ 30-Aug-2003:   - released 0.3.5
+ 20-Aug-2003:   - security tests: responses may have empty SIP URI
+                  don't fail there.
+                - increase size of call_id for RTP proxy table and
+                  include a size check.
+                - rtpproxy: cleaned up some stuff with handling of FD's
+
+0.3.4
+=====
+ 05-Aug-2003:   - released 0.3.4
+ 31-Jul-2003:   - now supports OSIP2 only (due to rather big changes
+                  in the API libosip -> libosip2). Compiles cleanly w/
+                  libosip2 2.0.2
+
+0.3.3
+=====
+ 05-Jul-2003:   - released 0.3.3
+ 10-May-2003:   - rewritten code in proxy_rewrite_invitation_body
+                  should now work (better) with multiple media streams
+ 23-Apr-2003:   - FAQ updates: RTP internals
+                - more debug and error testing (MOREDEBUG)
+  6-Apr-2003:   - build options for FLI4L builds (libc5 & uClibc)
+
+0.3.2
+=====
+ 5-Apr-2003:    - released 0.3.2
+ 4-Apr-2003:    - introduced config option 'silence_log' - this allows
+                  to control how much logging is done to syslog - 
+                  logging can even completely be switched off...
+ 1-Apr-2003:    - should now be able to deal with an outbound interface
+                  that is "temporary" DOWN (dial up internet access)
+                  if outbound IF is down, send back a response to
+                  inbound UAs "408 Request Timeout".
+                - always log to syslog, also when running in foreground
+                - changed some WARNINGS into DEBUG statements
+                - re-arranged some code
+                - rtpproxy: prepared for proper thread termination on exit
+                - introduced short term caching for get_ip_by_ifname
+                - fixed check for socket() return status
+                - fixed bug in RTP Proxy (timeout of inactive streams)
+                  that produced a bunch of "ERROR:Error in close(0): Bad file
+                  descriptor" errors each time a RTP stream timed out
+                - fixed daemonizing (libc5) - now it properly detaches
+30-May-2003:    - always log ERROR, WARNING and INFO to syslog (also
+                  if not running as daemon)
+                - minor corrections on ERROR printouts
+
+0.3.1
+=====
+- 29-May-2003:  - released 0.3.1
+                - fix in configure.in for statically linking to libosip
+                - fix in rewriting SIP messages, figure out proper
+                  destination if *not* rewriting the SIP URI
+                - another NULL pointer related crash (no UA header present)
+
+0.3.0
+=====
+- 29-May-2003:  - released 0.3.0
+                - supports libosip2 (automatically detect osip1/osip2)
+                - redone authentication - now should work with libosip2
+                  libosip0.8.8 has a bug (fails in parse_msg)
+- 28-May-2003:  - changes in rewriting SIP messages - not everything
+                  is blindly rewritten now (e.g. SUBSCRIBE is NOT)
+                - fixed resource leak (sockets) in get_ip_by_ifname
+- 26-Mar-2003:  - Bugfix: some potential NULL pointers passed to atoi()
+                  of optional fields in SIP message could lead to crash
+- 23-Mar-2003:  - send 403 FORBIDDEN response to requests addressed
+                  to proxy itself (-> SUBSCRIBE bug) 
+
+0.2.8
+=====
+- 23-Mar-2003:  - released 0.2.8
+                - made compile with uClibc (see doc/FLI4L_HOWTO.txt)
+- 22-Mar-2003:  - made compile on SUSE5.3 (libc5)
+                - added --enable-almost-static feature switch. This will
+                  build siproxd statically linked against libosip & pthreads
+                  (for Fli4l use)
+- 16-Mar-2003:  - ERROR on unknown keywords in config file
+                - introduced INFO logging
+
+0.2.7
+=====
+- 15-Mar-2003:  - released 0.2.7
+-  9-Mar-2003:  - replaced get_ip_by_ifname by simpler code 
+                  (still to be *BSD tested)
+                - removed old host-name based style for in/outbound interface
+                  configuration. This is only done via interface names
+                - experimental: The host part of UA registration entries
+                  can be masqueraded (mask_host, masked_host config items)
+                  Siemens SIP phones seem to need this 'feature'.
+
+0.2.6
+=====
+- 28-Jan-2003:  - released 0.2.6
+                - New Feature: RTP proxy should be able to handle multiple
+                  media stream in the same session (audio + video)
+- 21-Jan-2003:  - Bugfix: crash in compare_url (MSN Messenger issue)
+- 19-Jan-2003:  - use of libosip-0.9.3 not possible yet -
+                  libosip fails in msg_setproxy_authenticate
+                  -> Bug in libosip? to be investigated!
+                - give IP address in debug for 'received packet'
+                - 'WARNING:proxy.c:202 request from/to unregistered UA' now
+                  includes sender and destination url
+- 17-Jan-2003:  - OpenBSD: do not link against gnugetopt (Luke Renn)
+
+0.2.5a
+======
+-  6-Dec-2002:  - released 0.2.5a (major bugfixes)
+                - Bugfix: interfaces on odd positions (the 1st , 3rd, 5th)
+                  have been skipped during the search (ip by interface)
+                - Bugfix: MSN messenger 4.6 caused a segfault due to
+                  non supplied username in contact header during
+                  registration. (Credits to Dhiraj Bhuyan for the hint)
+                  Included additional tests in that area.
+-  4-Dec-2002:  - fixed a major (but stupid) bug in check_vialoop. Siproxd
+                  wrongly claimed to have detected a loop...
+
+0.2.4
+=====
+- 23-Nov-2002:  - released 0.2.4 (feature enhancements)
+                - BSD: resolved some compatibility issues (sscanf ->
+                  resulted in coredump when reading config file)
+                  should now build on *BSD (tested on FreeBSD 4.7)
+                - inbound/outbound interfaces now can be specified
+                  by their interface name - this removes the need
+                  for a 'quasi' static IP and restarting siproxd at
+                  change of IP address.
+- 13-Nov-2002:  - working on portability - goal is building on *BSD
+                  (feedback from Georg Schwarz)
+0.2.3
+=====
+- 10-Nov-2002:  - released 0.2.3 (minor fixes)
+-  9-Nov-2002:  - make install also installs a sample password file
+                  (/etc/siproxd_passwd.cfg)
+-  8-Nov-2002:  - string manipulations & data structures: better error
+                  handling on some places.
+-  2-Nov-2002:  - 'make install' install now a template config file
+                  (/etc/siproxd.conf.example)
+- 24-Oct-2002:  - small docu updates in README
+- 17-Oct-2002:  - fix in ./configure - abort on missing libraries
+
+0.2.2
+=====
+- 12-Oct-2002:  - Released version 0.2.2
+                - '-d' commandline option supersedes config file setting
+                  of debug_level.
+                - reworked return status from functions - now uses
+                  symbolic values and is more consistent
+                - added individual user passwords for authentication
+
+0.2.1
+=====
+- 28-Sep-2002:  - Released version 0.2.1
+- 27-Sep-2002:  - first implementation of proxy authentication (for REGISTER)
+- 24-Sep-2002:  - if daemonized, log to syslog
+- 22-Sep-2002:  - added access list support for registration and incoming
+                  SIP packets.
+- 21-Sep-2002:  - added RPM support (Spec File)
+
+0.2.0
+=====
+- 17-Sep-2002:  - Released version 0.2.0
+- 15-Sep-2002:  - added functionality to change user ID (drop privs)
+                  after startup (configurable)
+                - added optional chroot jail (configurable)
+
+0.1.3
+=====
+- 11-Sep-2002:  - Fixed a error in the autoconf/automake part of the project.
+                  (scripts subdirectory was missing in the tar.gz archive.
+                  This resulted in an error during ./configure - complaining
+                  about non existent install-sh script)
+                - startup is more silent - set initial debug level to 0
+- 10-Sep-2002:  - Some (yea, I know...) -minor- docu updates
+-  8-Sep-2002:  - Masquerade Contact Headers of inbound clients
+                  (Contact header will be used by the remote SIP
+                  user agent to directly contact the local user agent -
+                  and bypassing the proxy. This of course will *not* work
+                  if the local user agent is located in a private IP range.)
+                - Performance optimizations in RTP proxy
+                - Bugfix: now masqueraded clients work with any
+                  SIP port (other than 5060). Before, incoming
+                  requests/responses where always sent to port 5060.
+
+0.1.2
+=====
+-  7-Sep-2002:  - Released version 0.1.2
+                - fixed registration concept (SIP Contact header is not
+                  a *must* to be present in every frame)
+                - Experimental RTP proxying feature (using pthreads)
+- 26-Aug-2002:  - Optimized DNS caching
+
+0.1.1
+=====
+- 25-Aug-2002:  - Released version 0.1.1
+                - can daemonize (detach and run in background)
+                - do some DNS caching
+- 24-Aug-2002:  - Imlemented support for a config file,
+                - obsoletes siproxd_conf.h
+
+0.1.0
+=====
+- 19-Aug-2002:  - Released version 0.1.0

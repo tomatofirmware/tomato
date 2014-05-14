@@ -1,0 +1,140 @@
+Release Notes for siproxd-0.8.1
+===============================
+
+Major changes since 0.8.0:
+ - new Plugins:
+   plugin_prefix: add a prefix on outgoing calls
+   plugin_regex: regular expression rewriting (To header) for outgoing calls
+ - adjustable pthrad stack size (smaller memory footprint on small
+   embedded systems like OpenWRT routers)
+ - plus various bugfixes
+
+Upgrade Notes 0.8.0 to 0.8.1:
+ - merge your configuration file siproxd.conf (new config options)
+
+General Overview:
+ - SIP (RFC3261) Proxy for SIP based softphones hidden behind a
+   masquerading firewall
+ - basic support for SIP TCP transport
+ - Support for PRACK messages (RFC3262)
+ - Support for UPDATE messages (RFC3311)
+ - SIP UDP and TCP supported
+ - Works with "dial-up" conenctions (dynamic IP addresses)
+ - Multiple local users/hosts can be masqueraded simultaneously
+ - Access control (IP based) for incoming traffic
+ - Proxy Authentication for registration of local clients (User Agents)
+   with individual passwords for each user
+ - May be used as pure outbound proxy (registration of local UAs
+   to a 3rd party registrar)
+ - runs on various operating systems (see below)
+ - Full duplex RTP data stream proxy for *incoming* and *outgoing*
+   audio data - no firewall masquerading entries needed
+ - Port range to be used for RTP traffic is configurable
+   (-> easy to set up apropriate firewall rules for RTP traffic)
+ - RTP proxy can handle multiple RTP streams (eg. audio + video)
+   within a single SIP session.
+ - Symmetric RTP support
+ - Symmetric SIP signalling support
+ - Supports running in a chroot jail and changing user-ID after startup
+ - All configuration done via one simple ascii configuration file
+ - Logging to syslog in daemon mode
+ - RPM package (Spec file)
+ - The host part of UA registration entries can be masqueraded
+   (mask_host, masked_host config items). Some Siemens SIP phones seem to
+   need this 'feature'.
+ - Provider specific outbound proxies can be configured
+ - Can run "in front of" a NAT router.(in the local LAN segment)
+ - supports "Short-Dials"
+ - configurable RFC3581 (rport) support for sent SIP packets
+
+Requirements:
+ - pthreads (Linux)
+ - glibc2 / libc5 / uClibc
+ - libosip2 (3.x.x)
+
+Mainly tested on:
+- CentOS 5, 32bit Linux 
+  This is the main development and testing environment. Other platforms
+  are not extensively tested.
+
+Builds on (tested by dev-team or reported to build):
+- Linux:	CentOS/RedHat EL
+(		Fedora 64bit		)*
+(		WRT54g (133mhz mipsel router))*
+(- FreeBSD:	FreeBSD 4.10-BETA	)*
+(- OpenBSD:	OpenBSD 3.4 GENERIC#18	)*
+(- SunOS:	SunOS 5.9		)*
+(- Mac OS X:	Darwin 6.8		)*
+
+* Note: As the compile farm of sourceforge.net has been discontinued our
+        building test possibilities are now very limited. Currently
+        no explicit testing for systems/distributions other than
+        CentOS/RHEL (x86 architecture) is made. We'll be looking into
+        possibilities to perform some broader testing in future.
+        Of course, external testers are welcome :-)
+
+Reported interoperability with softphones:
+ - Grandstream BudgeTone-100 series
+ - Linphone (local and remote UA) (http://www.linphone.org)
+ - Kphone (local and remote UA) (http://www.wirlab.net/kphone/)
+ - MSN messenger 4.6 (remote and local UA)
+ - X-Lite (Win XP Professional)
+ - SJPhone softphone
+ - Asterisk PBX (using a SIP Trunk, masqueraded via siproxd)
+ - Ekiga
+ - FreePBX
+
+Reported interoperability with SIP service providers:
+ - Sipgate	(http://www.sipgate.de)
+ - Stanaphone	(SIP Gateway to PSTN)
+ - Sipcall.ch	(Swiss VoIP provider)
+ - Ekiga
+
+
+ If you have siproxd successfully running with another SIP phone
+ and/or service provider, please drop me a short note so I can update
+ the list.
+
+Known interoperability issues with SIP service providers:
+ - callcentric.com	(afaik callcentric fails with "500 network failure"
+ 			during REGISTER if more than one Via header is
+			present in a SIP packet. Having multiple Via headers
+			is completely in compliance with RFC3261. This might
+			be related to their "NAT problem avoidance magic".
+			There is nothing that can be done within siproxd
+			to avoid this issue as callcentric does not comply
+			with the SIP specification.
+
+ - asterisk PBX		Asterisk has an issue finding the proper peer
+			if multiple peers originate from the same IP/port
+			tuple (a is the case if multiple phones are proxied
+			via siproxd to the same asterisk instance).
+			This is caused by the SIP implementation in 
+			asterisk (chan_sip).
+			Note: This seems to be no longer valid with
+			      asterisk version 1.6 and up.
+
+
+Known bugs:
+   - SRV DNS records are not yet looked up, only A records
+   There will be more for sure...
+
+If you port siproxd to a new platform or do other kinds of changes
+or bugfixes that might be of general interest, please drop me a
+line. Also if you intend to include siproxd into a software
+distribution I'd be happy to get a short notice.
+
+
+-----
+Signatures for siproxd-0.8.1.tar.gz archive:
+MD5 Hash:	
+SHA-256 Hash:	
+
+GnuPG signature:
+
+
+GnuPG: pub  1024D/87BCDC94 2000-03-19 Thomas Ries (tries at gmx.net)
+-      Fingerprint = 13D1 19F5 77D0 4CEC 8D3F  A24E 09FC C18A 87BC DC94
+-      Key via pgp.openpkg.org / http://www.ries.ch.vu/87BCDC94.pub
+VoIP:  sip:17476691342@proxy01.sipphone.com | sip:431783@fwd.pulver.com
+
