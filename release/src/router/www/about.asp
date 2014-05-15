@@ -164,6 +164,14 @@ Copyright (C) 2011-2012 Augusto Bott<br>
 - IPv6 Full Support (Beta)<br>
 Copyright (C) 2013 Kevin Darbyshire-Bryant<br>
 <br>
+<b>"Lancethepants" Features:</b><br>
+<!-- DNSSEC-BEGIN -->
+- DNSSEC integration and GUI<br>
+<!-- DNSSEC-END -->
+- Comcast DSCP Fix GUI<br>
+Copyright (C) 2014 Lance Fredrickson<br>
+<a href='mailto:lancethepants@gmail.com'>lancethepants@gmail.com</a><br>
+<br>
 <b>"Shibby20" Features:</b><br>
 <!-- DNSCRYPT-BEGIN -->
 - DNScrypt-proxy 0.9.3 integration and GUI<br>

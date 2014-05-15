@@ -571,6 +571,10 @@ static const nvset_t nvset_list[] = {
 	{ "pppoe_lei",			V_RANGE(0, 60)	},
 	{ "pppoe_lef",			V_RANGE(0, 10)	},
 
+#ifdef TCONFIG_DNSSEC
+	{ "dnssec_enable",		V_01			},
+#endif
+
 #ifdef TCONFIG_DNSCRYPT
 	{ "dnscrypt_proxy",		V_01				},
 	{ "dnscrypt_port",		V_PORT				},
@@ -653,52 +657,52 @@ static const nvset_t nvset_list[] = {
 #endif
 #endif
 
-	{ "wl_security_mode",		V_LENGTH(1, 32)		},	// disabled, radius, wep, wpa_personal, wpa_enterprise, wpa2_personal, wpa2_enterprise
-	{ "wl_radius_ipaddr",		V_IP			},
-	{ "wl_radius_port",		V_PORT			},
+	{ "wl_security_mode",	V_LENGTH(1, 32)		},	// disabled, radius, wep, wpa_personal, wpa_enterprise, wpa2_personal, wpa2_enterprise
+	{ "wl_radius_ipaddr",	V_IP				},
+	{ "wl_radius_port",		V_PORT				},
 	{ "wl_radius_key",		V_LENGTH(1, 64)		},
 	{ "wl_wep_bit",			V_RANGE(64, 128)	},	// 64 or 128
 	{ "wl_passphrase",		V_LENGTH(0, 20)		},
-	{ "wl_key",			V_RANGE(1, 4)		},
+	{ "wl_key",				V_RANGE(1, 4)		},
 	{ "wl_key1",			V_LENGTH(0, 26)		},
 	{ "wl_key2",			V_LENGTH(0, 26)		},
 	{ "wl_key3",			V_LENGTH(0, 26)		},
 	{ "wl_key4",			V_LENGTH(0, 26)		},
 	{ "wl_crypto",			V_LENGTH(3, 8)		},	// tkip, aes, tkip+aes
 	{ "wl_wpa_psk",			V_LENGTH(8, 64)		},
-	{ "wl_wpa_gtk_rekey",		V_RANGE(60, 7200)	},
+	{ "wl_wpa_gtk_rekey",	V_RANGE(60, 7200)	},
 
-	{ "wl_lazywds",			V_01			},
-	{ "wl_wds",			V_LENGTH(0, 180)	},	// mac mac mac (x 10)
-	{ "wl_wds_enable",		V_01			},
+	{ "wl_lazywds",			V_01				},
+	{ "wl_wds",				V_LENGTH(0, 180)	},	// mac mac mac (x 10)
+	{ "wl_wds_enable",		V_01				},
 	{ "wl_gmode",			V_RANGE(-1, 6)		},
-	{ "wl_wep",			V_LENGTH(1, 32)		},	//  off, on, restricted,tkip,aes,tkip+aes
-	{ "wl_akm",			V_LENGTH(0, 32)		},	//  wpa, wpa2, psk, psk2, wpa wpa2, psk psk2, ""
+	{ "wl_wep",				V_LENGTH(1, 32)		},	//  off, on, restricted,tkip,aes,tkip+aes
+	{ "wl_akm",				V_LENGTH(0, 32)		},	//  wpa, wpa2, psk, psk2, wpa wpa2, psk psk2, ""
 	{ "wl_auth_mode",	   	V_LENGTH(4, 6)		},	//  none, radius
 
 	{ "wl_nmode",			V_NONE			},
 	{ "wl_nband",			V_RANGE(0, 2)	},	// 2 - 2.4GHz, 1 - 5GHz, 0 - Auto
 	{ "wl_nreqd",			V_NONE			},
 	{ "wl_nbw_cap",			V_RANGE(0, 3)	},	// 0 - 20MHz, 1 - 40MHz, 2 - Auto, 3 - 80M
-	{ "wl_nbw",			V_NONE			},
-	{ "wl_mimo_preamble",		V_WORD			},	// 802.11n Preamble: mm/gf/auto/gfbcm
+	{ "wl_nbw",				V_NONE			},
+	{ "wl_mimo_preamble",	V_WORD			},	// 802.11n Preamble: mm/gf/auto/gfbcm
 	{ "wl_nctrlsb",			V_NONE			},	// none, lower, upper
 
 #ifdef TCONFIG_IPV6
 // basic-ipv6
 	{ "ipv6_service",		V_LENGTH(0, 16)		},	// '', native, native-pd, 6to4, sit, other
-	{ "ipv6_prefix",		V_IPV6(0)		},
-	{ "ipv6_prefix_length",		V_RANGE(3, 127)		},
-	{ "ipv6_rtr_addr",		V_IPV6(0)		},
-	{ "ipv6_radvd",			V_01			},
-	{ "ipv6_accept_ra",		V_NUM			},
-	{ "ipv6_tun_addr",		V_IPV6(1)		},
-	{ "ipv6_tun_addrlen",		V_RANGE(3, 127)		},
+	{ "ipv6_prefix",		V_IPV6(0)			},
+	{ "ipv6_prefix_length",	V_RANGE(3, 127)		},
+	{ "ipv6_rtr_addr",		V_IPV6(0)			},
+	{ "ipv6_radvd",			V_01				},
+	{ "ipv6_accept_ra",		V_NUM				},
+	{ "ipv6_tun_addr",		V_IPV6(1)			},
+	{ "ipv6_tun_addrlen",	V_RANGE(3, 127)		},
 	{ "ipv6_ifname",		V_LENGTH(0, 8)		},
-	{ "ipv6_tun_v4end",		V_IP			},
+	{ "ipv6_tun_v4end",		V_IP				},
 	{ "ipv6_relay",			V_RANGE(1, 254)		},
-	{ "ipv6_tun_mtu",		V_NUM			},	// Tunnel MTU
-	{ "ipv6_tun_ttl",		V_NUM			},	// Tunnel TTL
+	{ "ipv6_tun_mtu",		V_NUM				},	// Tunnel MTU
+	{ "ipv6_tun_ttl",		V_NUM				},	// Tunnel TTL
 	{ "ipv6_dns",			V_LENGTH(0, 40*3)	},	// ip6 ip6 ip6
 	{ "ipv6_6rd_prefix",		V_IPV6(0)		},	// 6rd prefix
 	{ "ipv6_6rd_prefix_length",	V_RANGE(3, 127)		},	// 6rd prefix length
@@ -741,7 +745,8 @@ static const nvset_t nvset_list[] = {
 	{ "dnsmasq_custom",		V_TEXT(0, 2048)		},
 	{ "dnsmasq_q",			V_RANGE(0, 7)		}, // 0= quiet-dhcp, 1=dhcp6 2=ra
 	{ "dhcpd_static_only",		V_01			},
-
+	{ "dnsmasq_strict_order",	V_01			}, // read etc/resolv.conf in the given order. If null --no-resolv
+	
 // advanced-firewall
 	{ "block_wan",			V_01			},
 	{ "block_wan_limit",		V_01			},
@@ -1370,6 +1375,36 @@ static const nvset_t nvset_list[] = {
 	{ "vpn_client2_tlsremote",V_01                },
 	{ "vpn_client2_cn",       V_NONE              },
 #endif // vpn
+
+#ifdef TCONFIG_SIPROXD
+// siproxd
+	{ "siproxd_enable",			V_01			}, // 1-enabled 0-disabled
+	{ "siproxd_reboot",			V_01			}, // 1-enabled 0-disabled - reboot mode do not restart service reboot the unit instead
+	{ "siproxd_if_inbound",			V_LENGTH(2, 5)		}, // br0 lan-ifname
+	{ "siproxd_if_outbound",		V_LENGTH(2, 5)		}, // vlan1 wan ifname
+	{ "siproxd_intcpt",			V_01			}, //1-enabled 0-disabled
+	{ "siproxd_listen_port",		V_PORT			}, // Port to listen for incoming SIP messages usually 5060
+	{ "siproxd_default_expires",		V_LENGTH(2,4)		}, // Default Expiration timeout for Registrations
+	{ "siproxd_daemonize",			V_01			}, // siproxd daemonize 0/1
+	{ "siproxd_autosave_registrations",	V_LENGTH(0,4)		}, // save current registration every 'n' seconds
+	{ "siproxd_rtp_proxy",			V_01			}, // 0 - RTP proxy disabled, 1 - RTP proxy (UDP relay of siproxd)
+	{ "siproxd_rtp_port_low",		V_PORT			}, // Port range to allocate listen ports from for incoming RTP traffic
+	{ "siproxd_rtp_port_high",		V_PORT			}, // This should be a range that is not blocked by the firewall
+	{ "siproxd_rtp_timeout",		V_LENGTH(0,4)		}, // Timeout for RTP streams
+	{ "siproxd_rtp_dscp",			V_LENGTH(0,4)		}, // DSCP (differentiated services) value to be assigned to RTP and SIP UDP packets.
+	{ "siproxd_sip_dscp",			V_LENGTH(0,4)		}, // Allows QOS aware routers to handle different types traffic with different priorities.
+	{ "siproxd_silence_log",		V_RANGE(0, 4)		}, // what shall be logged to syslog : 0 - DEBUGs, INFOs, WARNINGs and ERRORs, 1 - INFOs, WARNINGs and ERRORs (this is the default), 2 - WARNINGs and ERRORs, 3 - only ERRORs, 4 - absolutely nothing
+	{ "siproxd_logcall",			V_01			}, // 0/1 Log Call Plugin
+	{ "siproxd_shortdial",			V_01			}, // 0/1 Quick Dial (Short Dial Plug in)
+	{ "siproxd_pi_shortdial_akey",		V_LENGTH(0, 4)		}, // allows qpeed dials *01 to *99
+	{ "siproxd_pi_shortdial1",		V_LENGTH(0, 16)		}, // pi shortdial #1
+	{ "siproxd_pi_shortdial2",		V_LENGTH(0, 16)		}, // pi shortdial #2
+	{ "siproxd_pi_shortdial3",		V_LENGTH(0, 16)		}, // pi shortdial #3
+	{ "siproxd_pi_shortdial4",		V_LENGTH(0, 16)		}, // pi shortdial #4
+	{ "siproxd_pi_shortdial5",		V_LENGTH(0, 16)		}, // pi shortdial #5
+	{ "siproxd_debug_level",		V_RANGE(0,12)		}, /* 0 0x00000000 debug disabled, 1 0x00000001 babble (like entering/leaving func), 2 0x00000002 network, 3 0x00000004 SIP manipulations, 4 0x00000008 Client registration, 5 0x00000010 non specified  class, 6 0x00000020 proxy, 7 0x00000040 DNS stuff, 8 0x00000080 network traffic, 9 0x00000100 configuration, 10 0x00000200 RTP proxy, 11 0x00000400 Access list evaluation, 12 0x00000800 Authentication */
+	{ "siproxd_debug_port",			V_RANGE(0, 65535)	}, // TCP debug port 0 - Feature Disabled
+#endif
 
 // pptp server
 	{ "pptpd_enable",		V_01				},

@@ -176,6 +176,10 @@ config TCONFIG_TCPDUMP
 	bool "TCPDUMP and LIBPCAP utilities"
 	default n
 
+config TCONFIG_DNSSEC
+	bool "DNSSEC"
+	default n
+
 config TCONFIG_ARIA2
 	bool " Aria2 download"
 	default n

@@ -32,6 +32,7 @@ TCONFIG_SAMBASRV=y
 # TCONFIG_SIPROXD is not set
 # TCONFIG_LIBOSIP2 is not set
 # TCONFIG_CTF is not set
+# TCONFIG_DNSSEC is not set
 # TCONFIG_DNSCRYPT is not set
 # TCONFIG_ZLIB is not set
 # TCONFIG_SNMP is not set

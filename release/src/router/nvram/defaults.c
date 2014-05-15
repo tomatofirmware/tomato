@@ -89,6 +89,9 @@ const defaults_t defaults[] = {
 	{ "wan_gateway",		"0.0.0.0"		},	// WAN gateway
 	{ "wan_gateway_get",	"0.0.0.0"		},	// default gateway for PPP
 	{ "wan_dns",			""				},	// x.x.x.x x.x.x.x ...
+#ifdef TCONFIG_DNSSEC
+	{ "dnssec_enable",		"0"		},
+#endif
 #ifdef TCONFIG_DNSCRYPT
 	{ "dnscrypt_proxy",		""				},
 	{ "dnscrypt_port",		"40"			}, // local port
@@ -439,7 +442,8 @@ const defaults_t defaults[] = {
 	{ "dnsmasq_custom",		""				},
 	{ "dnsmasq_static_only",	"0"			},
 	{ "dnsmasq_q",			"0"				},      // 0= quiet-dhcp 1=dhcp6 2=ra
-
+	{ "dnsmasq_strict_order",	"1"				}, // read etc/resolv.conf in the given order. If null --no-resolv
+	
 // advanced-firewall
 //	{ "block_loopback",		"0"				},	// nat loopback
 	{ "nf_loopback",		"0"				},
