@@ -36,46 +36,47 @@
 
 #define C_IN            1               /* the arpa internet */
 #define C_CHAOS         3               /* for chaos net (MIT) */
+#define C_HESIOD        4               /* hesiod */
 #define C_ANY           255             /* wildcard match */
 
-#define T_A			1
-#define T_NS        2
-#define T_MD        3
-#define T_MF        4             
+#define T_A		1
+#define T_NS            2
+#define T_MD            3
+#define T_MF            4             
 #define T_CNAME		5
 #define T_SOA		6
-#define T_MB        7
-#define T_MG        8
-#define T_MR        9
+#define T_MB            7
+#define T_MG            8
+#define T_MR            9
 #define T_PTR		12
-#define T_MINFO     14
+#define T_MINFO         14
 #define T_MX		15
 #define T_TXT		16
-#define T_RP        17
-#define T_AFSDB     18
-#define T_RT        21
+#define T_RP            17
+#define T_AFSDB         18
+#define T_RT            21
 #define T_SIG		24
-#define T_PX        26
+#define T_PX            26
 #define T_AAAA		28
-#define T_NXT       30
+#define T_NXT           30
 #define T_SRV		33
 #define T_NAPTR		35
-#define T_KX        36
-#define T_DNAME     39
+#define T_KX            36
+#define T_DNAME         39
 #define T_OPT		41
-#define T_DS        43
-#define T_RRSIG     46
-#define T_NSEC      47
-#define T_DNSKEY    48
+#define T_DS            43
+#define T_RRSIG         46
+#define T_NSEC          47
+#define T_DNSKEY        48
+#define T_NSEC3         50
 #define	T_TKEY		249		
 #define	T_TSIG		250
-#define T_AXFR      252
+#define T_AXFR          252
 #define T_MAILB		253	
 #define T_ANY		255
 
 #define EDNS0_OPTION_MAC            65001 /* dyndns.org temporary assignment */
 #define EDNS0_OPTION_CLIENT_SUBNET  8     /* IANA */
-
 
 struct dns_header {
   u16 id;
@@ -135,24 +136,6 @@ struct dns_header {
 	*t_cp   = t_l; \
 	(cp) += 4; \
 }
-
-#define CHECKED_GETCHAR(var, ptr, len) do { \
-    if ((len) < 1) return 0; \
-    var = *ptr++; \
-    (len) -= 1; \
-  } while (0)
-
-#define CHECKED_GETSHORT(var, ptr, len) do { \
-    if ((len) < 2) return 0; \
-    GETSHORT(var, ptr); \
-    (len) -= 2; \
-  } while (0)
-
-#define CHECKED_GETLONG(var, ptr, len) do { \
-    if ((len) < 4) return 0; \
-    GETLONG(var, ptr); \
-    (len) -= 4; \
-  } while (0)
 
 #define CHECK_LEN(header, pp, plen, len) \
     ((size_t)((pp) - (unsigned char *)(header) + (len)) <= (plen))

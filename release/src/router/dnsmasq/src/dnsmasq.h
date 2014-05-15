@@ -164,6 +164,7 @@ struct event_desc {
 #define EVENT_FORK_ERR  18
 #define EVENT_LUA_ERR   19
 #define EVENT_TFTP_ERR  20
+#define EVENT_INIT      21
 
 /* Exit codes. */
 #define EC_GOOD        0
@@ -230,7 +231,11 @@ struct event_desc {
 #define OPT_QUIET_DHCP6    43
 #define OPT_QUIET_RA	   44
 #define OPT_DNSSEC_VALID   45
-#define OPT_LAST           46
+#define OPT_DNSSEC_TIME    46
+#define OPT_DNSSEC_DEBUG   47
+#define OPT_DNSSEC_NO_SIGN 48 
+#define OPT_LOCAL_SERVICE  49
+#define OPT_LAST           50
 
 /* extra flags for my_syslog, we use a couple of facilities since they are known 
    not to occupy the same bits as priorities, no matter how syslog.h is set up. */
@@ -243,7 +248,12 @@ struct all_addr {
 #ifdef HAVE_IPV6
     struct in6_addr addr6;
 #endif
+    /* for log_query */
     unsigned int keytag;
+    /* for cache_insert if RRSIG, DNSKEY, DS */
+    struct {
+      unsigned short class, type;
+    } dnssec;      
   } addr;
 };
 
@@ -271,10 +281,19 @@ struct naptr {
   struct naptr *next;
 };
 
+#define TXT_STAT_CACHESIZE     1
+#define TXT_STAT_INSERTS       2
+#define TXT_STAT_EVICTIONS     3
+#define TXT_STAT_MISSES        4
+#define TXT_STAT_HITS          5
+#define TXT_STAT_AUTH          6
+#define TXT_STAT_SERVERS       7
+
 struct txt_record {
   char *name;
   unsigned char *txt;
   unsigned short class, len;
+  int stat;
   struct txt_record *next;
 };
 
@@ -288,10 +307,10 @@ struct cname {
   struct cname *next;
 }; 
 
-struct dnskey {
-  char *name, *key;
-  int keylen, algo, flags;
-  struct dnskey *next;
+struct ds_config {
+  char *name, *digest;
+  int digestlen, class, algo, keytag, digest_type;
+  struct ds_config *next;
 };
 
 #define ADDRLIST_LITERAL 1
@@ -358,18 +377,28 @@ struct crec {
 	struct crec *cache;
 	struct interface_name *int_name;
       } target;
-      int uid; /* -1 if union is interface-name */
+      unsigned int uid; /* 0 if union is interface-name */
     } cname;
     struct {
       struct blockdata *keydata;
+      unsigned short keylen, flags, keytag;
       unsigned char algo;
-      unsigned char digest; /* DS only */
-      unsigned short keytag;
-    } key;
+    } key; 
+    struct {
+      struct blockdata *keydata;
+      unsigned short keylen, keytag;
+      unsigned char algo;
+      unsigned char digest; 
+    } ds; 
+    struct {
+      struct blockdata *keydata;
+      unsigned short keylen, type_covered, keytag;
+      char algo;
+    } sig;
   } addr;
   time_t ttd; /* time to die */
-  /* used as keylen ifF_DNSKEY, index to source for F_HOSTS */
-  int uid; 
+  /* used as class if DNSKEY/DS/RRSIG, index to source for F_HOSTS */
+  unsigned int uid; 
   unsigned short flags;
   union {
     char sname[SMALLDNAME];
@@ -406,10 +435,14 @@ struct crec {
 #define F_DNSSEC    (1u<<22)
 #define F_KEYTAG    (1u<<23)
 #define F_SECSTAT   (1u<<24)
+#define F_NO_RR     (1u<<25)
+#define F_IPSET     (1u<<26)
 
-/* composites */
-#define F_TYPE      (F_IPV4 | F_IPV6 | F_DNSKEY | F_DS) /* Only one may be set */
-
+/* Values of uid in crecs with F_CONFIG bit set. */
+#define SRC_INTERFACE 0
+#define SRC_CONFIG    1
+#define SRC_HOSTS     2
+#define SRC_AH        3
 
 
 /* struct sockaddr is not large enough to hold any address,
@@ -442,6 +475,7 @@ union mysockaddr {
 #define SERV_COUNTED         512  /* workspace for log code */
 #define SERV_USE_RESOLV     1024  /* forward this domain in the normal way */
 #define SERV_NO_REBIND      2048  /* inhibit dns-rebind protection */
+#define SERV_FROM_FILE      4096  /* read from --servers-file */
 
 struct serverfd {
   int fd;
@@ -508,7 +542,7 @@ struct hostsfile {
   struct hostsfile *next;
   int flags;
   char *fname;
-  int index; /* matches to cache entries for logging */
+  unsigned int index; /* matches to cache entries for logging */
 };
 
 
@@ -518,12 +552,28 @@ struct hostsfile {
 #define STAT_BOGUS              3
 #define STAT_NEED_DS            4
 #define STAT_NEED_KEY           5
+#define STAT_TRUNCATED          6
+#define STAT_SECURE_WILDCARD    7
+#define STAT_NO_SIG             8
+#define STAT_NO_DS              9
+#define STAT_NEED_DS_NEG       10
+#define STAT_CHASE_CNAME       11
 
 #define FREC_NOREBIND           1
 #define FREC_CHECKING_DISABLED  2
 #define FREC_HAS_SUBNET         4
 #define FREC_DNSKEY_QUERY       8
 #define FREC_DS_QUERY          16
+#define FREC_AD_QUESTION       32
+#define FREC_DO_QUESTION       64
+#define FREC_ADDED_PHEADER    128
+#define FREC_CHECK_NOSIGN     256
+
+#ifdef HAVE_DNSSEC
+#define HASH_SIZE 20 /* SHA-1 digest size */
+#else
+#define HASH_SIZE sizeof(int)
+#endif
 
 struct frec {
   union mysockaddr source;
@@ -536,10 +586,10 @@ struct frec {
   unsigned int iface;
   unsigned short orig_id, new_id;
   int fd, forwardall, flags;
-  unsigned int crc;
   time_t time;
-#ifdef HAVE_DNSSEC
-  int class;
+  unsigned char *hash[HASH_SIZE];
+#ifdef HAVE_DNSSEC 
+  int class, work_counter;
   struct blockdata *stash; /* Saved reply, whilst we validate */
   size_t stash_len;
   struct frec *dependent; /* Query awaiting internally-generated DNSKEY or DS query */
@@ -842,6 +892,7 @@ extern struct daemon {
   unsigned int options, options2;
   struct resolvc default_resolv, *resolv_files;
   time_t last_resolv;
+  char *servers_file;
   struct mx_srv_record *mxnames;
   struct naptr *naptr;
   struct txt_record *txt, *rr;
@@ -908,7 +959,7 @@ extern struct daemon {
   struct prefix_class *prefix_classes;
 #endif
 #ifdef HAVE_DNSSEC
-  struct dnskey *dnskeys;
+  struct ds_config *ds;
 #endif
 
   /* globally used stuff for DNS */
@@ -917,6 +968,7 @@ extern struct daemon {
   char *namebuff; /* MAXDNAME size buffer */
 #ifdef HAVE_DNSSEC
   char *keyname; /* MAXDNAME size buffer */
+  char *workspacename; /* ditto */
 #endif
   unsigned int local_answer, queries_forwarded, auth_answer;
   struct frec *frec_list;
@@ -932,6 +984,7 @@ extern struct daemon {
   pid_t tcp_pids[MAX_PROCS];
   struct randfd randomsocks[RANDOM_SOCKS];
   int v6pktinfo; 
+  struct addrlist *interface_addrs; /* list of all addresses/prefix lengths associated with all local interfaces */
 
   /* DHCP state */
   int dhcpfd, helperfd, pxefd; 
@@ -969,13 +1022,13 @@ extern struct daemon {
 /* cache.c */
 void cache_init(void);
 void log_query(unsigned int flags, char *name, struct all_addr *addr, char *arg); 
-char *record_source(int index);
-void querystr(char *desc, char *str, unsigned short type);
+char *record_source(unsigned int index);
+char *querystr(char *desc, unsigned short type);
 struct crec *cache_find_by_addr(struct crec *crecp,
 				struct all_addr *addr, time_t now, 
-				unsigned short prot);
+				unsigned int prot);
 struct crec *cache_find_by_name(struct crec *crecp, 
-				char *name, time_t now, unsigned short  prot);
+				char *name, time_t now, unsigned int prot);
 void cache_end_insert(void);
 void cache_start_insert(void);
 struct crec *cache_insert(char *name, struct all_addr *addr,
@@ -985,16 +1038,17 @@ void cache_add_dhcp_entry(char *host_name, int prot, struct all_addr *host_addre
 struct in_addr a_record_from_hosts(char *name, time_t now);
 void cache_unhash_dhcp(void);
 void dump_cache(time_t now);
+int cache_make_stat(struct txt_record *t);
 char *cache_get_name(struct crec *crecp);
 char *cache_get_cname_target(struct crec *crecp);
 struct crec *cache_enumerate(int init);
 
 /* blockdata.c */
 #ifdef HAVE_DNSSEC
+void blockdata_init(void);
 void blockdata_report(void);
 struct blockdata *blockdata_alloc(char *data, size_t len);
-size_t blockdata_walk(struct blockdata **key, unsigned char **p, size_t cnt);
-int blockdata_retrieve(struct blockdata *block, size_t len, void *data);
+void *blockdata_retrieve(struct blockdata *block, size_t len, void *data);
 void blockdata_free(struct blockdata *blocks);
 #endif
 
@@ -1011,6 +1065,7 @@ int extract_name(struct dns_header *header, size_t plen, unsigned char **pp,
                  char *name, int isExtract, int extrabytes);
 unsigned char *skip_name(unsigned char *ansp, struct dns_header *header, size_t plen, int extrabytes);
 unsigned char *skip_questions(struct dns_header *header, size_t plen);
+unsigned char *skip_section(unsigned char *ansp, int count, struct dns_header *header, size_t plen);
 unsigned int extract_request(struct dns_header *header, size_t qlen, 
 			       char *name, unsigned short *typep);
 size_t setup_reply(struct dns_header *header, size_t  qlen,
@@ -1018,9 +1073,10 @@ size_t setup_reply(struct dns_header *header, size_t  qlen,
 		   unsigned long local_ttl);
 int extract_addresses(struct dns_header *header, size_t qlen, char *namebuff, 
 		      time_t now, char **ipsets, int is_sign, int checkrebind,
-		      int no_cache, int secure);
+		      int no_cache, int secure, int *doctored);
 size_t answer_request(struct dns_header *header, char *limit, size_t qlen,  
-		   struct in_addr local_addr, struct in_addr local_netmask, time_t now);
+		      struct in_addr local_addr, struct in_addr local_netmask, 
+		      time_t now, int *ad_reqd, int *do_bit);
 int check_for_bogus_wildcard(struct dns_header *header, size_t qlen, char *name, 
 			     struct bogus_addr *addr, time_t now);
 unsigned char *find_pseudoheader(struct dns_header *header, size_t plen,
@@ -1055,8 +1111,11 @@ int in_zone(struct auth_zone *zone, char *name, char **cut);
 size_t dnssec_generate_query(struct dns_header *header, char *end, char *name, int class, int type, union mysockaddr *addr);
 int dnssec_validate_by_ds(time_t now, struct dns_header *header, size_t n, char *name, char *keyname, int class);
 int dnssec_validate_ds(time_t now, struct dns_header *header, size_t plen, char *name, char *keyname, int class);
-int dnssec_validate_reply(time_t now, struct dns_header *header, size_t plen, char *name, char *keyname, int *class);
+int dnssec_validate_reply(time_t now, struct dns_header *header, size_t plen, char *name, char *keyname, int *class, int *neganswer);
+int dnssec_chase_cname(time_t now, struct dns_header *header, size_t plen, char *name, char *keyname);
 int dnskey_keytag(int alg, int flags, unsigned char *rdata, int rdlen);
+size_t filter_rrsigs(struct dns_header *header, size_t plen);
+unsigned char* hash_questions(struct dns_header *header, size_t plen, char *name);
 
 /* util.c */
 void rand_init(void);
@@ -1083,9 +1142,6 @@ void prettyprint_time(char *buf, unsigned int t);
 int prettyprint_addr(union mysockaddr *addr, char *buf);
 int parse_hex(char *in, unsigned char *out, int maxlen, 
 	      unsigned int *wildcard_mask, int *mac_type);
-#ifdef HAVE_DNSSEC
-int parse_base64(char *in, char *out);
-#endif
 int memcmp_masked(unsigned char *a, unsigned char *b, int len, 
 		  unsigned int mask);
 int expand_buf(struct iovec *iov, size_t size);
@@ -1109,6 +1165,7 @@ void read_opts (int argc, char **argv, char *compile_opts);
 char *option_string(int prot, unsigned int opt, unsigned char *val, 
 		    int opt_len, char *buf, int buf_len);
 void reread_dhcp(void);
+void read_servers_file(void);
 void set_option_bool(unsigned int opt);
 void reset_option_bool(unsigned int opt);
 struct hostsfile *expand_filelist(struct hostsfile *list);
@@ -1132,6 +1189,13 @@ int local_bind(int fd, union mysockaddr *addr, char *intname, int is_tcp);
 int random_sock(int family);
 void pre_allocate_sfds(void);
 int reload_servers(char *fname);
+void mark_servers(int flag);
+void cleanup_servers(void);
+void add_update_server(int flags,
+		       union mysockaddr *addr,
+		       union mysockaddr *source_addr,
+		       const char *interface,
+		       const char *domain);
 void check_servers(void);
 int enumerate_interfaces(int reset);
 void create_wildcard_listeners(void);
