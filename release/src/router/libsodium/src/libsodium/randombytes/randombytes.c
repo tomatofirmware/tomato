@@ -2,7 +2,6 @@
 #include <sys/types.h>
 
 #include <assert.h>
-#include <inttypes.h>
 #include <limits.h>
 #include <stdint.h>
 
@@ -35,7 +34,7 @@ randombytes_random(void)
 void
 randombytes_stir(void)
 {
-    return implementation->stir();
+    implementation->stir();
 }
 
 uint32_t
@@ -47,7 +46,9 @@ randombytes_uniform(const uint32_t upper_bound)
 void
 randombytes_buf(void * const buf, const size_t size)
 {
-    implementation->buf(buf, size);
+    if (size > (size_t) 0U) {
+        implementation->buf(buf, size);
+    }
 }
 
 int

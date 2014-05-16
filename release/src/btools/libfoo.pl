@@ -159,7 +159,7 @@ sub fixDyn
 	fixDynDep("libcrypto.so.1.0.0", "libssl.so.1.0.0");
 #shibby
 	fixDynDep("miniupnpd", "libnfnetlink.so.0.2.0");
-	fixDynDep("dnscrypt-proxy", "libsodium.so.4.5.0");
+	fixDynDep("dnscrypt-proxy", "libsodium.so.10.0.0");
 #minidlna module, bwq518
 	fixDynDep("minidlna", "libz.so.1");
 	fixDynDep("minidlna", "libstdc.so.6");
@@ -490,7 +490,7 @@ genSO("${root}/usr/lib/libbcmcrypto.so", "${router}/libbcmcrypto/libbcmcrypto.a"
 genSO("${root}/usr/lib/libosipparser2.so.10.0.0", "${router}/libosip2/src/osipparser2/.libs/libosipparser2.a");
 #Shibby
 genSO("${root}/usr/lib/libnfnetlink.so.0.2.0", "${router}/libnfnetlink/src/.libs/libnfnetlink.a");
-genSO("${root}/usr/lib/libsodium.so.4.5.0", "${router}/libsodium/src/libsodium/.libs/libsodium.a");
+genSO("${root}/usr/lib/libsodium.so.10.0.0", "${router}/libsodium/src/libsodium/.libs/libsodium.a");
 genSO("${root}/usr/lib/libiconv.so.2.4.0", "${router}/libiconv/lib/.libs/libiconv.a");
 
 print "\n";

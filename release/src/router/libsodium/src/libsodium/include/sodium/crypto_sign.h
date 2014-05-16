@@ -14,12 +14,19 @@
 #include "export.h"
 
 #ifdef __cplusplus
+# if __GNUC__
+#  pragma GCC diagnostic ignored "-Wlong-long"
+# endif
 extern "C" {
 #endif
 
 #define crypto_sign_BYTES crypto_sign_ed25519_BYTES
 SODIUM_EXPORT
 size_t  crypto_sign_bytes(void);
+
+#define crypto_sign_SEEDBYTES crypto_sign_ed25519_SEEDBYTES
+SODIUM_EXPORT
+size_t  crypto_sign_seedbytes(void);
 
 #define crypto_sign_PUBLICKEYBYTES crypto_sign_ed25519_PUBLICKEYBYTES
 SODIUM_EXPORT
