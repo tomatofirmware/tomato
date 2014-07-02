@@ -114,7 +114,7 @@ Copyright (C) 2010 Keith Moyer,<br>
 
 <b>"Shibby" features:</b><br>
 <!-- BBT-BEGIN -->
-- Transmission 2.82 integration<br>
+- Transmission 2.83 integration<br>
 <!-- BBT-END -->
 <!-- BT-BEGIN -->
 - GUI for Transmission<br>
@@ -136,7 +136,7 @@ Copyright (C) 2010 Keith Moyer,<br>
 - APCUPSD integration and GUI (implemented by @arrmo)<br>
 <!-- UPS-END -->
 <!-- DNSCRYPT-BEGIN -->
-- DNScrypt-proxy 1.3.4 integration and GUI<br>
+- DNScrypt-proxy 1.4.0 integration and GUI<br>
 <!-- DNSCRYPT-END -->
 <!-- TOR-BEGIN -->
 - TOR Project integration and GUI<br>
@@ -174,6 +174,9 @@ Copyright (C) 2010-2012 Jean-Yves Avenard<br>
 <!-- NOCAT-BEGIN -->
 - Captive Portal. (Based in NocatSplash)<br>
 <!-- NOCAT-END -->
+<!-- NGINX-BEGIN -->
+- Web Server. (NGinX)<br>
+<!-- NGINX-END -->
 <!-- HFS-BEGIN -->
 - HFS / HFS+ filesystem integration<br>
 <!-- HFS-END -->
@@ -194,6 +197,18 @@ Copyright (C) 2007-2011 Ofer Chen & Vicente Soriano<br>
 <!-- PPTPD-END -->
 Copyright (C) 2011 Augusto Bott<br>
 <a href='http://code.google.com/p/tomato-sdhc-vlan/' target='_new'>Tomato-sdhc-vlan Homepage</a><br>
+<br>
+
+<b>"Lancethepants" Features:</b><br>
+<!-- DNSSEC-BEGIN -->
+- DNSSEC integration and GUI<br>
+<!-- DNSSEC-END -->
+<!-- DNSCRYPT-BEGIN -->
+- DNSCrypt-Proxy selectable/manual resolver<br>
+<!-- DNSCRYPT-END -->
+- Comcast DSCP Fix GUI<br>
+Copyright (C) 2014 Lance Fredrickson<br>
+<a href='mailto:lancethepants@gmail.com'>lancethepants@gmail.com</a><br>
 <br>
 
 <b>"Toastman" features:</b><br>

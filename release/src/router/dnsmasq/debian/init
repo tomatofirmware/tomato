@@ -29,6 +29,12 @@ if [ -r /etc/default/locale ]; then
         export LANG
 fi
 
+# /etc/dnsmasq.d/README is a non-conffile installed by the dnsmasq package.
+# Should the dnsmasq package be removed, the following test ensures that
+# the daemon is no longer started, even if the dnsmasq-base package is
+# still in place.
+test -e /etc/dnsmasq.d/README || exit 0
+
 test -x $DAEMON || exit 0
 
 # Provide skeleton LSB log functions for backports which don't have LSB functions.
@@ -89,6 +95,14 @@ done
 if [ ! "$DNSMASQ_USER" ]; then
    DNSMASQ_USER="dnsmasq"
 fi
+
+# This tells dnsmasq to ignore DNS requests that don't come from a local network.
+# It's automatically ignored if  --interface --except-interface, --listen-address 
+# or --auth-server exist in the configuration, so for most installations, it will
+# have no effect, but for otherwise-unconfigured installations, it stops dnsmasq
+# from being vulnerable to DNS-reflection attacks.
+
+DNSMASQ_OPTS="$DNSMASQ_OPTS --local-service"
 
 start()
 {

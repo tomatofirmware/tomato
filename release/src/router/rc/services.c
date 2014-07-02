@@ -373,9 +373,21 @@ void start_dnsmasq()
 		fprintf(f, "dhcp-authoritative\n");
 	}
 
+#ifdef TCONFIG_DNSSEC
+	if (nvram_match("dnssec_enable", "1")) {
+		fprintf(f, "conf-file=/etc/trust-anchors.conf\n"
+			   "dnssec\n"
+			   "dnssec-no-timecheck\n");
+	}
+#endif
+
 #ifdef TCONFIG_DNSCRYPT
 	if (nvram_match("dnscrypt_proxy", "1")) {
-		fprintf(f, "strict-order\n");
+		if (nvram_match("dnscrypt_priority", "1"))
+			fprintf(f, "strict-order\n");
+
+		if (nvram_match("dnscrypt_priority", "2"))
+			fprintf(f, "no-resolv\n");
 	}
 #endif
 
@@ -450,15 +462,49 @@ void start_dnsmasq()
 		sprintf(dnscrypt_local, "127.0.0.1:%s", nvram_safe_get("dnscrypt_port") );
 
 		eval("ntp2ip");
-		eval("dnscrypt-proxy", "-d", "-a", dnscrypt_local, nvram_safe_get("dnscrypt_cmd") );
+
+		if (nvram_match("dnscrypt_manual", "1")) {
+			eval("dnscrypt-proxy", "-d",
+			     "-a", dnscrypt_local,
+			     "-m", nvram_safe_get("dnscrypt_log"),
+			     "-N", nvram_safe_get("dnscrypt_provider_name"),
+			     "-k", nvram_safe_get("dnscrypt_provider_key"),
+			     "-r", nvram_safe_get("dnscrypt_resolver_address") );
+		} else {
+			eval("dnscrypt-proxy", "-d",
+			     "-a", dnscrypt_local,
+			     "-m", nvram_safe_get("dnscrypt_log"),
+			     "-R", nvram_safe_get("dnscrypt_resolver"),
+			     "-L", "/etc/dnscrypt-resolvers.csv" );
+		}
 
 #ifdef TCONFIG_IPV6
 		char dnscrypt_local_ipv6[30];
 		sprintf(dnscrypt_local_ipv6, "::1:%s", nvram_safe_get("dnscrypt_port") );
 
-		if (get_ipv6_service() != NULL) //if ipv6 enabled
-			eval("dnscrypt-proxy", "-d", "-a", dnscrypt_local_ipv6, nvram_safe_get("dnscrypt_cmd") );
+		if (get_ipv6_service() != *("NULL")) { // when ipv6 enabled
+			if (nvram_match("dnscrypt_manual", "1")) {
+				eval("dnscrypt-proxy", "-d",
+				     "-a", dnscrypt_local,
+				     "-m", nvram_safe_get("dnscrypt_log"),
+				     "-N", nvram_safe_get("dnscrypt_provider_name"),
+				     "-k", nvram_safe_get("dnscrypt_provider_key"),
+				     "-r", nvram_safe_get("dnscrypt_resolver_address") );
+			} else {
+				eval("dnscrypt-proxy", "-d",
+				     "-a", dnscrypt_local,
+				     "-m", nvram_safe_get("dnscrypt_log"),
+				     "-R", nvram_safe_get("dnscrypt_resolver"),
+				     "-L", "/etc/dnscrypt-resolvers.csv" );
+			}
+		}
 #endif
+	}
+#endif
+
+#ifdef TCONFIG_DNSSEC
+	if ((time(0) > Y2K) && nvram_match("dnssec_enable", "1")){
+		killall("dnsmasq", SIGHUP);
 	}
 #endif
 
@@ -1364,6 +1410,40 @@ void stop_splashd(void)
 #endif
 
 // -----------------------------------------------------------------------------
+#ifdef TCONFIG_NGINX
+
+static pid_t pid_nginx = -1;
+void start_enginex(void)
+{
+	pid_nginx =-1;
+	start_nginx();
+	if (!nvram_contains_word("debug_norestart","enginex")) {
+		pid_nginx = -2;
+	}
+}
+
+void stop_enginex(void)
+{
+	pid_nginx = -1;
+	stop_nginx();
+}
+
+void start_nginxfastpath(void)
+{
+	pid_nginx =-1;
+	start_nginxfp();
+	if (!nvram_contains_word("debug_norestart","nginxfp")) {
+		pid_nginx = -2;
+	}
+}
+void stop_nginxfastpath(void)
+{
+	pid_nginx = -1;
+	stop_nginxfp();
+}
+#endif
+
+// -----------------------------------------------------------------------------
 
 void set_tz(void)
 {
@@ -1509,8 +1589,8 @@ static void start_ftpd(void)
 	FILE *fp, *f;
 	char *buf;
 	char *p, *q;
-	char *user, *pass, *rights, *root_dir;
 	int i;
+	char *user, *pass, *rights, *root_dir;
 
 	if (getpid() != 1) {
 		start_service("ftpd");
@@ -2153,6 +2233,9 @@ void start_services(void)
 	start_dnsmasq();
 	start_cifs();
 	start_httpd();
+#ifdef TCONFIG_NGINX
+	start_enginex();
+#endif
 	start_cron();
 //	start_upnp();
 	start_rstats(0);
@@ -2221,6 +2304,9 @@ void stop_services(void)
 //	stop_upnp();
 	stop_cron();
 	stop_httpd();
+#ifdef TCONFIG_NGINX
+	stop_enginex();
+#endif
 #ifdef TCONFIG_SDHC
 	stop_mmc();
 #endif
@@ -2798,6 +2884,19 @@ TOP:
 	if (strcmp(service, "splashd") == 0) {
 		if (action & A_STOP) stop_splashd();
 		if (action & A_START) start_splashd();
+		goto CLEAR;
+	}
+#endif
+
+#ifdef TCONFIG_NGINX
+	if (strcmp(service, "enginex") == 0) {
+		if (action & A_STOP) stop_enginex();
+		if (action & A_START) start_enginex();
+		goto CLEAR;
+	}
+	if (strcmp(service, "nginxfp") == 0) {
+		if (action & A_STOP) stop_nginxfastpath();
+		if (action & A_START) start_nginxfastpath();
 		goto CLEAR;
 	}
 #endif

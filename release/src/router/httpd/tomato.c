@@ -577,10 +577,21 @@ static const nvset_t nvset_list[] = {
 	{ "lan_netmask",		V_IP				},
 	{ "lan_gateway",		V_IP				},
 	{ "wan_dns",			V_LENGTH(0, 50)		},	// ip ip ip
+
+#ifdef TCONFIG_DNSSEC
+	{ "dnssec_enable",		V_01			},
+#endif
+
 #ifdef TCONFIG_DNSCRYPT
 	{ "dnscrypt_proxy",		V_01				},
+	{ "dnscrypt_priority",		V_RANGE(0, 2)			}, // 0=none, 1=preferred, 2=exclusive
 	{ "dnscrypt_port",		V_PORT				},
-	{ "dnscrypt_cmd",		V_LENGTH(0, 256)		},
+	{ "dnscrypt_resolver",		V_LENGTH(0, 40)			},
+	{ "dnscrypt_log",		V_RANGE(0, 99)			},
+	{ "dnscrypt_manual",		V_01				},
+	{ "dnscrypt_provider_name",	V_LENGTH(0, 60)			},
+	{ "dnscrypt_provider_key",	V_LENGTH(0, 80)			},
+	{ "dnscrypt_resolver_address",	V_LENGTH(0, 50)			},
 #endif
 	{ "lan_state",			V_01				},
 	{ "lan_desc",			V_01				},
@@ -680,7 +691,7 @@ static const nvset_t nvset_list[] = {
 	{ "wl_nmode",			V_NONE				},
 	{ "wl_nband",			V_RANGE(0, 2)			},	// 2 - 2.4GHz, 1 - 5GHz, 0 - Auto
 	{ "wl_nreqd",			V_NONE				},
-	{ "wl_nbw_cap",			V_RANGE(0, 3)			},	// 0 - 20MHz, 1 - 40MHz, 2 - Auto, 3 - 80M
+	{ "wl_nbw_cap",			V_RANGE(0, 2)			},	// 0 - 20MHz, 1 - 40MHz, 2 - Auto
 	{ "wl_nbw",			V_NONE				},
 	{ "wl_mimo_preamble",		V_WORD				},	// 802.11n Preamble: mm/gf/auto/gfbcm
 	{ "wl_nctrlsb",			V_NONE				},	// none, lower, upper
@@ -702,7 +713,7 @@ static const nvset_t nvset_list[] = {
 	{ "ipv6_tun_ttl",		V_NUM				},	// Tunnel TTL
 	{ "ipv6_dns",			V_LENGTH(0, 40*3)		},	// ip6 ip6 ip6
 	{ "ipv6_6rd_prefix",		V_IPV6(0)			},
-	{ "ipv6_6rd_prefix_length",	V_RANGE(32, 62)			},
+	{ "ipv6_6rd_prefix_length",	V_RANGE(3, 127)			},
 	{ "ipv6_6rd_borderrelay",	V_IP				},
 	{ "ipv6_6rd_ipv4masklen",	V_RANGE(0, 30)			},
 #endif
@@ -759,6 +770,7 @@ static const nvset_t nvset_list[] = {
 	{ "udpxy_port",			V_RANGE(0, 65535)		},
 	{ "nf_loopback",		V_NUM				},
 	{ "ne_syncookies",		V_01				},
+	{ "DSCP_fix_enable",		V_01				},
 	{ "ne_snat",			V_01				},
 	{ "dhcp_pass",			V_01				},
 #ifdef TCONFIG_EMF
@@ -886,7 +898,7 @@ static const nvset_t nvset_list[] = {
 	{ "wlx_hpamp",			V_01				},
 	{ "wlx_hperx",			V_01				},
 	{ "wl_reg_mode",		V_LENGTH(1, 3)			},	// !!TB - Regulatory: off, h, d
-	{ "wl_mitigation",		V_RANGE(0, 4)			},	// Interference Mitigation Mode (0|1|2|3|4)
+	{ "wl_mitigation",		V_RANGE(0, 3)			},	// Interference Mitigation Mode (0|1|2|3)
 
 	{ "wl_nmode_protection",	V_WORD,				},	// off, auto
 	{ "wl_nmcsidx",			V_RANGE(-2, 32),	},	// -2 - 32
@@ -1084,9 +1096,6 @@ static const nvset_t nvset_list[] = {
 	{ "usb_uhci",			V_RANGE(-1, 1)			},	// -1 - disabled, 0 - off, 1 - on
 	{ "usb_ohci",			V_RANGE(-1, 1)			},
 	{ "usb_usb2",			V_RANGE(-1, 1)			},
-#if defined(LINUX26) && defined(TCONFIG_MICROSD)
-	{ "usb_mmc",			V_RANGE(-1, 1)			},
-#endif
 	{ "usb_irq_thresh",		V_RANGE(0, 6)			},
 	{ "usb_storage",		V_01				},
 	{ "usb_printer",		V_01				},
@@ -1288,6 +1297,18 @@ static const nvset_t nvset_list[] = {
 	{ "NC_MACWhiteList",		V_LENGTH(0, 255)		},
 	{ "NC_SplashFile",		V_LENGTH(0, 8192)		},
 	{ "NC_BridgeLAN",		V_LENGTH(0, 50)			},
+#endif
+
+// NGinX Roadkill-Victek
+#ifdef TCONFIG_NGINX
+	{"nginx_enable",		V_01			}, // NGinX enabled
+	{"nginx_php",			V_01			}, // PHP enabled
+	{"nginx_keepconf",		V_01			}, // NGinX configuration files overwrite flag
+	{"nginx_docroot",		V_LENGTH(0, 255)	}, // root files path
+	{"nginx_port",			V_PORT			}, // listening port
+	{"nginx_fqdn",			V_LENGTH(0, 255)	}, // server name
+	{"nginx_priority",		V_LENGTH(0, 255)	}, // server priority
+	{"nginx_custom",		V_TEXT(0, 4096)		}, // user window to add parameters to nginx.conf
 #endif
 
 #ifdef TCONFIG_OPENVPN
@@ -1592,49 +1613,6 @@ static int nv_wl_find(int idx, int unit, int subunit, void *param)
 	}
 }
 
-#ifdef CONFIG_BCMWL6
-static int nv_wl_bwcap_chanspec(int idx, int unit, int subunit, void *param){
-	char		chan_spec[32];
-	char		*ch,*nbw_cap,*nctrlsb;
-	int 		write = *((int *)param);
-	ch	= webcgi_get(wl_nvname("channel",unit,0));
-	nbw_cap = webcgi_get(wl_nvname("nbw_cap",unit,0));
-	nctrlsb = webcgi_get(wl_nvname("nctrlsb",unit,0));
-	if(!ch && !nbw_cap && !nctrlsb)
-		return 0;
-	if(ch == NULL || !*ch)	ch = nvram_get(wl_nvname("channel",unit,0));
-	if(nbw_cap == NULL || !*nbw_cap)  nbw_cap = nvram_get(wl_nvname("nbw_cap",unit,0));
-	if(nctrlsb == NULL || !*nctrlsb)  nctrlsb = nvram_get(wl_nvname("nctrlsb",unit,0));
-
-	if(!ch || !nbw_cap || !nctrlsb || !*ch || !*nbw_cap || !*nctrlsb)
-		return 1;
-
-	memset(chan_spec,0,sizeof(chan_spec));
-	strncpy(chan_spec,ch,sizeof(chan_spec));
-	switch(atoi(nbw_cap)){
-		case 0:
-			if(write)
-				nvram_set(wl_nvname("bw_cap",unit,0), "1");
-			break;
-		case 1:
-			if(write)
-				nvram_set(wl_nvname("bw_cap",unit,0), "3");
-			if(*ch != '0')
-				*(chan_spec + strlen(chan_spec)) = *nctrlsb;
-			break;
-		case 3:
-			if(write)
-				nvram_set(wl_nvname("bw_cap",unit,0), "7");
-			if(*ch != '0')
-				strcpy(chan_spec + strlen(chan_spec),"/80");
-			break;
-	}
-	if(write)
-		nvram_set(wl_nvname("chanspec", unit, 0), chan_spec);
-	return 0;
-}
-#endif
-
 static int save_variables(int write)
 {
 	const nvset_t *v;
@@ -1669,9 +1647,6 @@ static int save_variables(int write)
 	}
 
 	// special cases
-#ifdef CONFIG_BCMWL6
-	foreach_wif(0, &write, nv_wl_bwcap_chanspec);
-#endif
 
 	char *p1, *p2;
 	if (((p1 = webcgi_get("set_password_1")) != NULL) && (strcmp(p1, "**********") != 0)) {
