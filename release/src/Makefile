@@ -179,12 +179,6 @@ ifeq ($(LINKSYS_E1000v2),y)
 endif
 ifeq ($(BELKIN),y)
 ifneq ($(NVRAM_SIZE),60)
-	@rm -f image/tomato-F7D????$(current_BUILD_USB)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).bin
-	@rm -f image/tomato-F5D8235v3$(current_BUILD_USB)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).bin
-endif
-endif
-ifeq ($(BELKIN),y)
-ifneq ($(NVRAM_SIZE),60)
 	@rm -f image/tomato-F7D????$(current_BUILD_USB)-$(current_TOMATO_VER).$(current_TOMATO_V1)$(mips_rev)$(beta)$(current_TOMATO_V2)-$(current_BUILD_DESC).bin
 	@rm -f image/tomato-F5D8235v3$(current_BUILD_USB)-$(current_TOMATO_VER).$(current_TOMATO_V1)$(mips_rev)$(beta)$(current_TOMATO_V2)-$(current_BUILD_DESC).bin
 endif
@@ -1202,7 +1196,10 @@ n6:
 	@$(MAKE) bin MIPS32=r2 OPENVPN=y BBEXTRAS=y EBTABLES=y IPV6SUPP=y B=E BUILD_DESC="TendaN6" USB="USB" TOR=y NOCAT=y DNSCRYPT=y PPTPD=y USBAP=y NO_USBAPP=y
 
 n60:
-	@$(MAKE) bin MIPS32=r2 OPENVPN=y BBEXTRAS=y EBTABLES=y IPV6SUPP=y B=E BUILD_DESC="TendaN60" USB="USB" NO_JFFS=y NTFS=y PPTPD=y BTGUI=y MEDIASRV=y USBAP=y
+	@$(MAKE) bin MIPS32=r2 BBEXTRAS=y USBEXTRAS=y EBTABLES=y IPV6SUPP=y B=E BUILD_DESC="TendaN60" USB="USB" NO_JFFS=y NTFS=y MEDIASRV=y USBAP=y
+
+n60init:
+	@$(MAKE) bin MIPS32=r2 B=E BUILD_DESC="TendaN60-init" USB="" NO_JFFS=y NO_CIFS=y NO_HTTPS=y NO_XXTP=y NO_ZEBRA=y NO_SSH=y
 
 # it`s not possible to flash tomato on this router. Maybe in the future.
 #l600n:
