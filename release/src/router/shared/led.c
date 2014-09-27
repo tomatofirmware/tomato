@@ -61,7 +61,7 @@ int gpio_open(uint32_t mask)
 	int f = _gpio_open();
 
 	if ((f >= 0) && mask) {
-		for (i = 0; i <= 15; i++) {
+		for (i = 0; i <= 31; i++) {
 			bit = 1 << i;
 			if ((mask & bit) == bit) {
 				_gpio_ioctl(f, GPIO_IOC_RESERVE, bit, bit);
@@ -168,8 +168,8 @@ int nvget_gpio(const char *name, int *gpio, int *inv)
 
 	if (((p = nvram_get(name)) != NULL) && (*p)) {
 		n = strtoul(p, NULL, 0);
-		if ((n & 0xFFFFFF70) == 0) {
-			*gpio = (n & 15);
+		if ((n & 0xFFFFFF60) == 0) {
+			*gpio = (n & 31);
 			*inv = ((n & 0x80) != 0);
 			return 1;
 		}
@@ -248,6 +248,7 @@ int do_led(int which, int mode)
 	static int wnr2000v2[]	= { 255, 255,   255,  255,  255,   -7,  255,  255,    255};
 	static int wndr4000[]	= { 3, 1,   0,  1,  255,   7,  255,  5,    4};
 	static int wndr3400[]	= { -9, -7,   -3,  -7,  255,   255, 255,  2,    -99}; // Note: 5 = Switch, 4 = Reset button, 8 = SES button
+	static int wndr3400v3[]	= { -17, -16,   -14,   14,  255,  -22,  255,  -20,    -18};
 	static int f7d[]	= { 255, 255,   255,  255,   12,   13,  255,   14,    255};
 	static int wrt160nv3[]	= { 255,   1,     4,    2,  255,  255,  255,  255,    255};
 	static int e900[]	= { 255,  -6,     8,  255,  255,  255,  255,  255,    255};
@@ -462,6 +463,9 @@ int do_led(int which, int mode)
 	case MODEL_WNDR3400v2:
 		b = wndr3400[which];
 		break;
+	case MODEL_WNDR3400v3:
+		b = wndr3400v3[which];
+		break;
 	case MODEL_F7D3301:
 	case MODEL_F7D3302:
 	case MODEL_F7D4301:
@@ -560,7 +564,7 @@ int do_led(int which, int mode)
 	}
 
 SET:
-	if (b < 16) {
+	if (b < 32) {
 		if (mode != LED_PROBE) {
 			gpio_write(1 << b, mode);
 
@@ -569,7 +573,7 @@ SET:
 				else c = -c;
 			}
 			else mode = !mode;
-			if (c < 16) gpio_write(1 << c, mode);
+			if (c < 32) gpio_write(1 << c, mode);
 		}
 	}
 

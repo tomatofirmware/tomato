@@ -498,6 +498,7 @@ static int init_vlan_ports(void)
 		break;
 	case MODEL_WNDR3400:
 	case MODEL_WNDR3400v2:
+	case MODEL_WNDR3400v3:
 		// Note port order is important (or reversed display, if "0 1 2 3 5*" used for vlan1ports) -> doesn't work, invert in Web GUI
 		dirty |= check_nv("vlan1ports", "0 1 2 3 5*");
 		// And change "4 5u" to "4 5" to make WAN port work
@@ -700,6 +701,7 @@ static void check_bootnv(void)
         break;
     case MODEL_WNDR3400:
     case MODEL_WNDR3400v2:
+    case MODEL_WNDR3400v3:
         dirty |= check_nv("vlan2hwname", "et0");
         strcpy(mac, nvram_safe_get("et0macaddr"));
         // inc_mac(mac, 2);
@@ -710,7 +712,7 @@ static void check_bootnv(void)
 	    else
 	        dirty |= check_nv("wl1_hwaddr", mac);	    
 		// Have to check wl ifname(s) ... if not set before eth config, 5 GHz radio does not come up properly
-        //dirty |= check_nv("wl0_ifname", "eth1");
+        dirty |= check_nv("wl0_ifname", "eth1");
         dirty |= check_nv("wl1_ifname", "eth2");        
         break;
 	case MODEL_E900:
@@ -2381,6 +2383,194 @@ static int init_nvram(void)
                 nvram_set("wl_ifname", "eth1");
         }
 		break;
+	case MODEL_WNDR3400v3:
+        mfr = "Netgear";
+        name = "WNDR3400v3";
+        features = SUP_SES | SUP_80211N;
+        // Don't auto-start blink, as shift register causes other LED's to blink slightly because of this.
+        // Rather, turn on in startup script if desired ... so disable the line below.
+        // nvram_set("blink_wl", "1");
+#ifdef TCONFIG_USB
+        nvram_set("usb_uhci", "-1");
+#endif
+        if (!nvram_match("t_fix1", (char *)name)) {
+                nvram_set("lan_ifnames", "vlan1 eth1 eth2");
+                nvram_set("wan_ifnameX", "vlan2");
+                nvram_set("wl_ifname", "eth1");
+        }
+
+        nvram_set("boardflags", "0x80001710");
+        nvram_set("boardflags2", "0x1000");
+
+        // Set Key Parameters for Wireless Interfaces: SB (Southbridge) and PCI, to configure HW (as Netgear intends)
+        struct nvram_tuple wndr3400v3_sb_1_params[] = {
+            {"aa2g", "0x3", 0},
+            {"ag0", "0x0", 0},
+            {"ag1", "0x0", 0},
+            {"ag2", "0x2", 0},
+            {"ag3", "0xff", 0},
+            {"antswctl2g", "0x1", 0},
+            {"antswitch", "0x0", 0},
+            {"boardflags", "0x80001710", 0},
+            {"boardflags2", "0x1000", 0},
+            {"bw40po", "0x0", 0},
+            {"bwduppo", "0x0", 0},
+            {"bxa2g", "0x3", 0},
+            {"cck2gpo", "0x0", 0},
+            {"ccode", "Q1", 0},
+            {"cddpo", "0x0", 0},
+            {"devid", "0x4329", 0},
+            {"elna2g", "2", 0},
+            {"extpagain2g", "0x2", 0},
+            {"itt2ga0", "0x20", 0},
+            {"itt2ga1", "0x20", 0},
+            {"ledbh0", "11", 0},
+            {"ledbh1", "11", 0},
+            {"ledbh2", "11", 0},
+            {"ledbh3", "11", 0},
+            {"leddc", "0xffff", 0},
+            {"maxp2ga0", "0x4C", 0},
+            {"maxp2ga1", "0x4C", 0},
+            {"mcs2gpo0", "0x0", 0},
+            {"mcs2gpo1", "0x5300", 0},
+            {"mcs2gpo2", "0x0", 0},
+            {"mcs2gpo3", "0x5300", 0},
+            {"mcs2gpo4", "0x6666", 0},
+            {"mcs2gpo5", "0x6666", 0},
+            {"mcs2gpo6", "0x6666", 0},
+            {"mcs2gpo7", "0x6666", 0},
+            {"ofdm2gpo", "0x30000000", 0},
+            {"opo", "0x0", 0},
+            {"pa2gw0a0", "0xFEE2", 0},
+            {"pa2gw0a1", "0xFEE4", 0},
+            {"pa2gw1a0", "0x150F", 0},
+            {"pa2gw1a1", "0x141C", 0},
+            {"pa2gw2a0", "0xFACA", 0},
+            {"pa2gw2a1", "0xFAEB", 0},
+            {"pdetrange2g", "0x2", 0},
+            {"regrev", "50", 0},
+            {"rssisav2g", "0x7", 0},
+            {"rssismc2g", "0xf", 0},
+            {"rssismf2g", "0xf", 0},
+            {"rxchain", "0x3", 0},
+            {"rxpo2g", "0xff", 0},
+            {"sromrev", "8", 0},
+            {"stbcpo", "0x0", 0},
+            {"temps_hysteresis", "5", 0},
+            {"temps_period", "5", 0},
+            {"tempthresh", "120", 0},
+            {"tri2g", "0xff", 0},
+            {"triso2g", "0x3", 0},
+            {"tssipos2g", "0x1", 0},
+            {"txchain", "0x3", 0},
+            {"txq_len", "1024", 0},
+            {0, 0, 0}
+        };
+
+        /*
+         * set router's extra parameters
+         */
+        extra_params = wndr3400v3_sb_1_params;
+        while (extra_params->name) {
+            sprintf(s, "sb/1/%s", extra_params->name);
+            nvram_set(s, extra_params->value);
+            extra_params++;
+        }
+
+        struct nvram_tuple wndr3400v3_pci_1_1_params[] = {
+            {"ag0", "0x1", 0},
+            {"ag1", "0x1", 0},
+            {"antswctl2g", "0", 0},
+            {"antswctl5g", "0", 0},
+            {"antswitch", "0", 0},
+            {"bw405ghpo/bw405glpo/bw405gpo/bw402gpo", "0x2", 0},
+            {"bw40po", "0", 0},
+            {"bwduppo", "0", 0},
+            {"ccode", "0", 0},
+            {"cdd5ghpo/cdd5glpo/cdd5gpo/cdd2gpo", "0x0", 0},
+            {"cddpo", "0", 0},
+            {"devid", "0x432d", 0},
+            {"extpagain5g", "2", 0},
+            {"itt5ga0", "0x3e", 0},
+            {"itt5ga1", "0x3e", 0},
+            {"maxp5ga0", "0x4E", 0},
+            {"maxp5ga1", "0x4E", 0},
+            {"maxp5gha0", "0x4E", 0},
+            {"maxp5gha1", "0x4E", 0},
+            {"maxp5gla0", "0x3E", 0},
+            {"maxp5gla1", "0x3E", 0},
+            {"mcs5ghpo0", "0x0000", 0},
+            {"mcs5ghpo1", "0xa820", 0},
+            {"mcs5ghpo2", "0x2222", 0},
+            {"mcs5ghpo3", "0xa822", 0},
+            {"mcs5ghpo4", "0x0000", 0},
+            {"mcs5ghpo5", "0xa820", 0},
+            {"mcs5ghpo6", "0x2222", 0},
+            {"mcs5ghpo7", "0xa822", 0},
+            {"mcs5glpo0", "0x0000", 0},
+            {"mcs5glpo1", "0x2000", 0},
+            {"mcs5glpo2", "0x0000", 0},
+            {"mcs5glpo3", "0x2000", 0},
+            {"mcs5glpo4", "0x0000", 0},
+            {"mcs5glpo5", "0x2000", 0},
+            {"mcs5glpo6", "0x0000", 0},
+            {"mcs5glpo7", "0x2000", 0},
+            {"mcs5gpo0", "0x0000", 0},
+            {"mcs5gpo1", "0xa820", 0},
+            {"mcs5gpo2", "0x2222", 0},
+            {"mcs5gpo3", "0xa822", 0},
+            {"mcs5gpo4", "0x0000", 0},
+            {"mcs5gpo5", "0xa820", 0},
+            {"mcs5gpo6", "0x2222", 0},
+            {"mcs5gpo7", "0xa822", 0},
+            {"ofdm5ghpo0", "0x0000", 0},
+            {"ofdm5ghpo1", "0x2000", 0},
+            {"ofdm5glpo0", "0x0000", 0},
+            {"ofdm5glpo1", "0x0000", 0},
+            {"ofdm5gpo0", "0x0000", 0},
+            {"ofdm5gpo1", "0x2000", 0},
+            {"pa5ghw0a0", "0xfeda", 0},
+            {"pa5ghw0a1", "0xff18", 0},
+            {"pa5ghw1a0", "0x1612", 0},
+            {"pa5ghw1a1", "0x1661", 0},
+            {"pa5ghw2a0", "0xfabe", 0},
+            {"pa5ghw2a1", "0xfafe", 0},
+            {"pa5glw0a0", "0xFEF9", 0},
+            {"pa5glw0a1", "0xFF31", 0},
+            {"pa5glw1a0", "0x154B", 0},
+            {"pa5glw1a1", "0x1517", 0},
+            {"pa5glw2a0", "0xFAFD", 0},
+            {"pa5glw2a1", "0xFB2F", 0},
+            {"pa5gw0a0", "0xFEF9", 0},
+            {"pa5gw0a1", "0xff31", 0},
+            {"pa5gw1a0", "0x164B", 0},
+            {"pa5gw1a1", "0x1697", 0},
+            {"pa5gw2a0", "0xFADD", 0},
+            {"pa5gw2a1", "0xfb08", 0},
+            {"pdetrange5g", "4", 0},
+            {"regrev", "0", 0},
+            {"rxchain", "3", 0},
+            {"sromrev", "8", 0},
+            {"stbc5ghpo/stbc5glpo/stbc5gpo/stbc2gpo", "0x0", 0},
+            {"stbcpo", "0", 0},
+            {"triso5g", "3", 0},
+            {"tssipos5g", "1", 0},
+            {"txchain", "3", 0},
+            {"wdup405ghpo/wdup405glpo/wdup405gpo/wdup402gpo", "0x0", 0},
+            {0, 0, 0}
+        };
+
+        /*
+         * set router's extra parameters
+         */
+        extra_params = wndr3400v3_pci_1_1_params;
+        while (extra_params->name) {
+            sprintf(s, "pci/1/1/%s", extra_params->name);
+            nvram_set(s, extra_params->value);
+            extra_params++;
+        }
+
+        break;
 		
 #endif	// CONFIG_BCMWL5
 

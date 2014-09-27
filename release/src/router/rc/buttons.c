@@ -209,6 +209,10 @@ int buttons_main(int argc, char *argv[])
 	case MODEL_WNDR3400v2:
 		reset_mask = 1 << 4;
 		ses_mask = 1 << 8;
+		break;
+	case MODEL_WNDR3400v3:
+		reset_mask = 1 << 31;
+		ses_mask = 1 << 23;
 		ses_led = LED_AOSS;
 		break;	
 	case MODEL_F7D3301:
