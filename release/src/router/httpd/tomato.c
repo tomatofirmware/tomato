@@ -691,7 +691,7 @@ static const nvset_t nvset_list[] = {
 	{ "wl_nmode",			V_NONE				},
 	{ "wl_nband",			V_RANGE(0, 2)			},	// 2 - 2.4GHz, 1 - 5GHz, 0 - Auto
 	{ "wl_nreqd",			V_NONE				},
-	{ "wl_nbw_cap",			V_RANGE(0, 2)			},	// 0 - 20MHz, 1 - 40MHz, 2 - Auto
+	{ "wl_nbw_cap",			V_RANGE(0, 3)			},	// 0 - 20MHz, 1 - 40MHz, 2 - Auto, 3 - 80M
 	{ "wl_nbw",			V_NONE				},
 	{ "wl_mimo_preamble",		V_WORD				},	// 802.11n Preamble: mm/gf/auto/gfbcm
 	{ "wl_nctrlsb",			V_NONE				},	// none, lower, upper
@@ -898,7 +898,7 @@ static const nvset_t nvset_list[] = {
 	{ "wlx_hpamp",			V_01				},
 	{ "wlx_hperx",			V_01				},
 	{ "wl_reg_mode",		V_LENGTH(1, 3)			},	// !!TB - Regulatory: off, h, d
-	{ "wl_mitigation",		V_RANGE(0, 3)			},	// Interference Mitigation Mode (0|1|2|3)
+	{ "wl_mitigation",		V_RANGE(0, 4)			},	// Interference Mitigation Mode (0|1|2|3|4)
 
 	{ "wl_nmode_protection",	V_WORD,				},	// off, auto
 	{ "wl_nmcsidx",			V_RANGE(-2, 32),	},	// -2 - 32
@@ -959,6 +959,7 @@ static const nvset_t nvset_list[] = {
 	{ "https_lanport",		V_PORT				},
 	{ "web_wl_filter",		V_01				},
 	{ "web_css",			V_LENGTH(1, 32)		},
+	{ "web_dir",			V_LENGTH(1, 32)		},
 	{ "ttb_css",			V_LENGTH(0, 128)		},
 	{ "web_mx",				V_LENGTH(0, 128)	},
 	{ "http_wanport",		V_PORT				},
@@ -1307,8 +1308,16 @@ static const nvset_t nvset_list[] = {
 	{"nginx_docroot",		V_LENGTH(0, 255)	}, // root files path
 	{"nginx_port",			V_PORT			}, // listening port
 	{"nginx_fqdn",			V_LENGTH(0, 255)	}, // server name
+	{"nginx_upload",		V_LENGTH(1, 1000)	}, // upload file size limit
+	{"nginx_remote",		V_01			},
 	{"nginx_priority",		V_LENGTH(0, 255)	}, // server priority
 	{"nginx_custom",		V_TEXT(0, 4096)		}, // user window to add parameters to nginx.conf
+	{"nginx_httpcustom",		V_TEXT(0, 4096)		}, // user window to add parameters to nginx.conf
+	{"nginx_servercustom",		V_TEXT(0, 4096)		}, // user window to add parameters to nginx.conf
+	{"nginx_phpconf",		V_TEXT(0, 4096)		}, // user window to add parameters to php.ini
+	{"nginx_user",			V_LENGTH(0, 255)	}, // user used to start nginx and spawn-fcgi
+	{"nginx_override",		V_01			},
+	{"nginx_overridefile",		V_TEXT(0, 4096)		},
 #endif
 
 #ifdef TCONFIG_OPENVPN
@@ -1349,6 +1358,7 @@ static const nvset_t nvset_list[] = {
 	{ "vpn_server1_crt",      V_NONE              },
 	{ "vpn_server1_key",      V_NONE              },
 	{ "vpn_server1_dh",       V_NONE              },
+	{ "vpn_server1_br",       V_LENGTH(0, 50)     },
 	{ "vpn_server2_poll",     V_RANGE(0, 1440)    },
 	{ "vpn_server2_if",       V_TEXT(3, 3)        },  // tap, tun
 	{ "vpn_server2_proto",    V_TEXT(3, 10)       },  // udp, tcp-server
@@ -1382,6 +1392,7 @@ static const nvset_t nvset_list[] = {
 	{ "vpn_server2_crt",      V_NONE              },
 	{ "vpn_server2_key",      V_NONE              },
 	{ "vpn_server2_dh",       V_NONE              },
+	{ "vpn_server2_br",       V_LENGTH(0, 50)     },
 	{ "vpn_client_eas",       V_NONE              },
 	{ "vpn_client1_poll",     V_RANGE(0, 1440)    },
 	{ "vpn_client1_if",       V_TEXT(3, 3)        },  // tap, tun
@@ -1414,6 +1425,7 @@ static const nvset_t nvset_list[] = {
 	{ "vpn_client1_useronly", V_01                },
 	{ "vpn_client1_tlsremote",V_01                },
 	{ "vpn_client1_cn",       V_NONE              },
+	{ "vpn_client1_br",       V_LENGTH(0, 50)     },
 	{ "vpn_client2_poll",     V_RANGE(0, 1440)    },
 	{ "vpn_client2_if",       V_TEXT(3, 3)        },  // tap, tun
 	{ "vpn_client2_bridge",   V_01                },
@@ -1445,6 +1457,7 @@ static const nvset_t nvset_list[] = {
 	{ "vpn_client2_useronly", V_01                },
 	{ "vpn_client2_tlsremote",V_01                },
 	{ "vpn_client2_cn",       V_NONE              },
+	{ "vpn_client2_br",       V_LENGTH(0, 50)     },
 #endif // vpn
 
 #ifdef TCONFIG_PPTPD
@@ -1461,6 +1474,27 @@ static const nvset_t nvset_list[] = {
 	{ "pptpd_mtu",			V_RANGE(576, 1500)	},
 	{ "pptpd_mru",			V_RANGE(576, 1500)	},
 	{ "pptpd_custom",		V_TEXT(0, 2048)		},
+#endif
+
+#ifdef TCONFIG_TINC
+	{"tinc_wanup",			V_RANGE(0, 1)		},
+	{"tinc_name",			V_LENGTH(0, 30)		},
+	{"tinc_devicetype",		V_TEXT(3, 3)		}, // tun, tap
+	{"tinc_mode",			V_TEXT(3, 6)		}, // switch, hub
+	{"tinc_vpn_netmask",		V_IP			},
+	{"tinc_private_rsa",		V_LENGTH(0, 1700)	},
+	{"tinc_private_ecdsa",		V_LENGTH(0, 280)	},
+	{"tinc_custom",			V_NONE			},
+	{"tinc_hosts",			V_NONE			},
+	{"tinc_manual_firewall",	V_RANGE(0, 1)		},
+	{"tinc_manual_tinc_up",		V_RANGE(0, 1)		},
+	// scripts
+	{"tinc_tinc_up",		V_NONE			},
+	{"tinc_tinc_down",		V_NONE			},
+	{"tinc_host_up",		V_NONE			},
+	{"tinc_host_down",		V_NONE			},
+	{"tinc_subnet_up",		V_NONE			},
+	{"tinc_subnet_down",		V_NONE			},
 #endif
 
 #ifdef TCONFIG_TOR
@@ -1613,6 +1647,49 @@ static int nv_wl_find(int idx, int unit, int subunit, void *param)
 	}
 }
 
+#ifdef CONFIG_BCMWL6
+static int nv_wl_bwcap_chanspec(int idx, int unit, int subunit, void *param){
+	char		chan_spec[32];
+	char		*ch,*nbw_cap,*nctrlsb;
+	int 		write = *((int *)param);
+	ch	= webcgi_get(wl_nvname("channel",unit,0));
+	nbw_cap = webcgi_get(wl_nvname("nbw_cap",unit,0));
+	nctrlsb = webcgi_get(wl_nvname("nctrlsb",unit,0));
+	if(!ch && !nbw_cap && !nctrlsb)
+		return 0;
+	if(ch == NULL || !*ch)	ch = nvram_get(wl_nvname("channel",unit,0));
+	if(nbw_cap == NULL || !*nbw_cap)  nbw_cap = nvram_get(wl_nvname("nbw_cap",unit,0));
+	if(nctrlsb == NULL || !*nctrlsb)  nctrlsb = nvram_get(wl_nvname("nctrlsb",unit,0));
+
+	if(!ch || !nbw_cap || !nctrlsb || !*ch || !*nbw_cap || !*nctrlsb)
+		return 1;
+
+	memset(chan_spec,0,sizeof(chan_spec));
+	strncpy(chan_spec,ch,sizeof(chan_spec));
+	switch(atoi(nbw_cap)){
+		case 0:
+			if(write)
+				nvram_set(wl_nvname("bw_cap",unit,0), "1");
+			break;
+		case 1:
+			if(write)
+				nvram_set(wl_nvname("bw_cap",unit,0), "3");
+			if(*ch != '0')
+				*(chan_spec + strlen(chan_spec)) = *nctrlsb;
+			break;
+		case 3:
+			if(write)
+				nvram_set(wl_nvname("bw_cap",unit,0), "7");
+			if(*ch != '0')
+				strcpy(chan_spec + strlen(chan_spec),"/80");
+			break;
+	}
+	if(write)
+		nvram_set(wl_nvname("chanspec", unit, 0), chan_spec);
+	return 0;
+}
+#endif
+
 static int save_variables(int write)
 {
 	const nvset_t *v;
@@ -1647,6 +1724,9 @@ static int save_variables(int write)
 	}
 
 	// special cases
+	#ifdef CONFIG_BCMWL6
+	    foreach_wif(0, &write, nv_wl_bwcap_chanspec);
+	#endif
 
 	char *p1, *p2;
 	if (((p1 = webcgi_get("set_password_1")) != NULL) && (strcmp(p1, "**********") != 0)) {
