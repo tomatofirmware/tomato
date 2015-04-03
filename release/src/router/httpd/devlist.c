@@ -155,12 +155,14 @@ static int get_wl_clients(int idx, int unit, int subunit, void *param)
 					strcpy(ip, "Unknown");
 					strcpy(host, "Unknown");
 					if (nvram_get_int("wldev_processMAC") == 1) {
+						syslog(LOG_INFO, "Starting remote-leases (as wldev_processMAC == 1) ...");
 						sprintf(mac, "%s", ether_etoa(rssi.ea.octet, buf));
 						sprintf(command, "remote-leases -i %s", mac);
 						shellcmd(command, ip, 15);
 						sprintf(command, "nslookup %s | grep %s | grep \"Address 1\" | cut -f 4 -d \" \" | cut -d \".\" -f 1", ip, ip);
 						shellcmd(command, host, 63);
-					}
+					} else
+						syslog(LOG_INFO, "Not starting remote-leases (as wldev_processMAC != 1) ...");
 
 					web_printf("%c['%s','%s',%d,%u,%u,%u,%d,'%s','%s']",
 						*comma,
