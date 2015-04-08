@@ -883,7 +883,7 @@ static inline void usbled_proc(char *device, int add)
 		if (add)
 			do_led(LED_USB, LED_ON);
 		else
-			do_led(LED_USB, LED_OFF);				
+			do_led(LED_USB, LED_OFF);
 	}
 }
 #endif

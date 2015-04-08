@@ -51,6 +51,7 @@ endif
 
 ifeq ($(TCONFIG_NGINX),y)
 OBJS += nginx.o
+OBJS += mysql.o
 endif
 
 ifeq ($(TOMATO_SL),1)
@@ -104,9 +105,9 @@ install: all
 	@cd $(INSTALLDIR)/sbin && ln -sf rc buttons
 	@cd $(INSTALLDIR)/sbin && ln -sf rc blink
 	@cd $(INSTALLDIR)/sbin && ln -sf rc remote-leases
-ifeq ($(CONFIG_BCMWL6),y)
+//ifeq ($(CONFIG_BCMWL6),y)
 	@cd $(INSTALLDIR)/sbin && ln -sf rc blink_5g
-endif
+//endif
 	@cd $(INSTALLDIR)/sbin && ln -sf rc rcheck
 	@cd $(INSTALLDIR)/sbin && ln -sf rc radio
 	@cd $(INSTALLDIR)/sbin && ln -sf rc led

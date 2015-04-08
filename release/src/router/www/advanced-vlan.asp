@@ -50,7 +50,7 @@
 <script type='text/javascript' src='wireless.jsx?_http_id=<% nv(http_id); %>'></script>
 <script type='text/javascript' src='interfaces.js'></script>
 <script type='text/javascript'>
-<% nvram ("vlan0ports,vlan1ports,vlan2ports,vlan3ports,vlan4ports,vlan5ports,vlan6ports,vlan7ports,vlan8ports,vlan9ports,vlan10ports,vlan11ports,vlan12ports,vlan13ports,vlan14ports,vlan15ports,vlan0hwname,vlan1hwname,vlan2hwname,vlan3hwname,vlan4hwname,vlan5hwname,vlan6hwname,vlan7hwname,vlan8hwname,vlan9hwname,vlan10hwname,vlan11hwname,vlan12hwname,vlan13hwname,vlan14hwname,vlan15hwname,wan_ifnameX,manual_boot_nv,boardtype,boardflags,trunk_vlan_so,lan_ifname,lan_ifnames,lan1_ifname,lan1_ifnames,lan2_ifname,lan2_ifnames,lan3_ifname,lan3_ifnames,boardrev,boardnum,vlan0tag,vlan0vid,vlan1vid,vlan2vid,vlan3vid,vlan4vid,vlan5vid,vlan6vid,vlan7vid,vlan8vid,vlan9vid,vlan10vid,vlan11vid,vlan12vid,vlan13vid,vlan14vid,vlan15vid");%>
+<% nvram ("t_model_name,vlan0ports,vlan1ports,vlan2ports,vlan3ports,vlan4ports,vlan5ports,vlan6ports,vlan7ports,vlan8ports,vlan9ports,vlan10ports,vlan11ports,vlan12ports,vlan13ports,vlan14ports,vlan15ports,vlan0hwname,vlan1hwname,vlan2hwname,vlan3hwname,vlan4hwname,vlan5hwname,vlan6hwname,vlan7hwname,vlan8hwname,vlan9hwname,vlan10hwname,vlan11hwname,vlan12hwname,vlan13hwname,vlan14hwname,vlan15hwname,wan_ifnameX,manual_boot_nv,boardtype,boardflags,trunk_vlan_so,lan_ifname,lan_ifnames,lan1_ifname,lan1_ifnames,lan2_ifname,lan2_ifnames,lan3_ifname,lan3_ifnames,boardrev,boardnum,vlan0tag,vlan0vid,vlan1vid,vlan2vid,vlan3vid,vlan4vid,vlan5vid,vlan6vid,vlan7vid,vlan8vid,vlan9vid,vlan10vid,vlan11vid,vlan12vid,vlan13vid,vlan14vid,vlan15vid");%>
 
 var port_vlan_supported = 0;
 var trunk_vlan_supported = 0;
@@ -73,6 +73,7 @@ switch(nvram['boardtype']) {
   case '0x04ef':  // WRT320N/E2000
   case '0x04cf':  // WRT610Nv2/E3000, RT-N16
   case '0xf52c':  // E4200v1, WNDR4000, WNDR3700v3
+  case '0xf52e':  // R6300V1, WNDR4500, WNDR4500V2
   case '0xf5b2':  // RT-N66
     trunk_vlan_supported = 1;
     break;
@@ -167,8 +168,17 @@ switch(nvram['boardtype']) {
   case '0x058e':  // E900
   case '0xf52a':  // E3200
   case '0xf52c':  // E4200v1, WNDR4000, WNDR3700v3
+  case '0xf52e':  // R6300V1, WNDR4500, WNDR4500V2
   case '0x1202':  // HG320 - not sure, need test
     if ((nvram['boardrev'] == '0x1153') && (nvram['boardnum'] == '45')) { //RT-N10P
+     COL_P0N = '3';
+     COL_P1N = '2';
+     COL_P2N = '1';
+     COL_P3N = '0';
+     COL_P4N = '4';
+     break;
+    }
+    if ((nvram['boardrev'] == '0x1102') && (nvram['boardnum'] == '4536')) { //R6300V1, WNDR4500, WNDR4500V2
      COL_P0N = '3';
      COL_P1N = '2';
      COL_P2N = '1';
@@ -191,7 +201,7 @@ switch(nvram['boardtype']) {
     COL_P4N = '4';
     break;
   case '0x052b':
-   if (nvram['boardrev'] == '02'){ //WNR3500Lv2
+   if (nvram['boardrev'] == '02') { //WNR3500Lv2
     COL_P0N = '4';
     COL_P1N = '3';
     COL_P2N = '2';

@@ -44,11 +44,12 @@ extern const char *tomato_shortver;
 // misc.c
 #define	WP_DISABLED		0		// order must be synced with def in misc.c
 #define	WP_STATIC		1
-#define WP_DHCP			2
+#define	WP_DHCP			2
 #define	WP_L2TP			3
 #define	WP_PPPOE		4
 #define	WP_PPTP			5
 #define	WP_PPP3G		6
+#define	WP_LTE			7
 
 #ifdef TCONFIG_IPV6
 #define	IPV6_DISABLED		0
@@ -243,13 +244,17 @@ enum {
 	MODEL_WRT300N,
 	MODEL_WL330GE,
 	MODEL_W1800R,
-	MODEL_D1800H,
-	MODEL_EA6500V1,
 	MODEL_WNDR4000,
 	MODEL_WNDR3700v3,
 	MODEL_WNDR3400,
 	MODEL_WNDR3400v2,
-	MODEL_WNDR3400v3
+	MODEL_WNDR3400v3,
+	MODEL_D1800H,
+	MODEL_EA6500V1,
+	MODEL_TDN80,
+	MODEL_R6300V1,
+	MODEL_WNDR4500,
+	MODEL_WNDR4500V2
 };
 
 /* NOTE: Do not insert new entries in the middle of this enum,
@@ -312,6 +317,8 @@ extern int ppid(int pid);
 
 extern unsigned long f_size(const char *path);
 extern int f_exists(const char *file);
+//bwq518
+extern int d_exists(const char *file);
 extern int f_read(const char *file, void *buffer, int max);												// returns bytes read
 extern int f_write(const char *file, const void *buffer, int len, unsigned flags, unsigned cmode);		//
 extern int f_read_string(const char *file, char *buffer, int max);										// returns bytes read, not including term; max includes term
@@ -368,5 +375,14 @@ extern int remove_word(char *buffer, const char *word);
 
 //bwq518
 extern char* trimstr(char *str);
-
+#define MAX_PORTS 64 
+#define PORT_SIZE 16 
+extern int is_port(char *str);
+extern char *filter_space(char *str);
+extern char* format_port(char *str);
+extern char* splitpath( char *str, char *pathname, char *filename);
+extern int splitport(char *in_ports, char out_port[MAX_PORTS][PORT_SIZE]);
+extern int is_number(char *a);
+extern int isspacex(char c);
+extern char *shrink_space(char *dest, const char *src, int n);
 #endif

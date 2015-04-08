@@ -127,6 +127,7 @@ Copyright (C) 2010 Keith Moyer,<br>
 - SD-idle tool integration for kernel 2.6<br>
 <!-- USB-BEGIN -->
 - 3G Modem support (big thanks for @LDevil)<br>
+- 4G/LTE Modem support<br>
 <!-- USB-END -->
 <!-- LINUX26-END -->
 <!-- SNMP-BEGIN -->
@@ -237,6 +238,14 @@ Copyright (C) 2009 Tomasz Słodkowicz<br>
 <a href='http://gemini.net.pl/~slodki/tomato-sdhc.html' target='_new'>tomato-sdhc</a><br>
 <br>
 <!-- SDHC-END -->
+
+<!-- NGINX-BEGIN -->
+<b>Tomato-hyzoom feature:</b><br>
+- MySQL Server integration and GUI<br>
+<i>Copyright (C) 2014 Bao Weiquan, Hyzoom</i><br>
+<a href='mailto:bwq518@gmail.com'>bwq518@gmail.com</a><br>
+<br>
+<!-- NGINX-END -->
 
 <b>"Victek/PrinceAMD/Phykris/Shibby" feature:</b><br>
 - Revised IP/MAC Bandwidth Limiter<br>
