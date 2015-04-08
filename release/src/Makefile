@@ -342,10 +342,10 @@ ifeq ($(WNDR),y)
 	@$(MAKE) netgear-check MAXFSIZE=7274496 NG_FNAME=image/tomato-WNDR3400v2-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).chk
 
 	# Make WNDR3400v3, Checksum starts at 0x6FFFF8 => Max size (to not touch the last 64kB block) = 7274496
-	@$(SRCBASE)/wnrtool/mkchkimg -o image/tomato-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC)-WNDR3400v3.chk \
+	@$(SRCBASE)/wnrtool/mkchkimg -o image/tomato-WNDR3400v2-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).chk \
 	-k image/tomato-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).trx \
 	-b U12H208T00_NETGEAR -r 2 2>&1 | tee -a fpkg.log
-	@$(MAKE) netgear-check MAXFSIZE=7274496 NG_FNAME=image/tomato-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC)-WNDR3400v3.chk
+	@$(MAKE) netgear-check MAXFSIZE=7274496 NG_FNAME=image/tomato-WNDR3400v2-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).chk
 
 	@echo "Cleanup ...."
 	@cp fpkg.log image/fpkg-$(V1)$(mips_rev)$(beta)$(V2).log
@@ -1274,9 +1274,6 @@ e2500:
 
 e3200:
 	@$(MAKE) r2o USBAP=y NVRAM_SIZE=60 LINKSYS_E3200=y
-
-wndr64:
-	@$(MAKE) bin MIPS32=r2 BBEXTRAS=y USBEXTRAS=y EBTABLES=y IPV6SUPP=y B=E BUILD_DESC="MiniIPv6" USB="USB" NTFS=y MEDIASRV=y USBAP=y NVRAM_SIZE=64 WNDR=y NO_XXTP=y NO_JFFS=y NO_HTTPS=y NO_ZEBRA=y NO_CIFS=y KERN_SIZE_OPT=y
 
 n6:
 	@$(MAKE) bin MIPS32=r2 OPENVPN=y BBEXTRAS=y EBTABLES=y IPV6SUPP=y B=E BUILD_DESC="TendaN6" USB="USB" TOR=y NOCAT=y DNSCRYPT=y PPTPD=y USBAP=y NO_USBAPP=y
