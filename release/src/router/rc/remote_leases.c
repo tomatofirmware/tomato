@@ -13,12 +13,13 @@
 #define	FILE_LEASES		"/tmp/dnsmasq.leases"		// Filename: Local dnsmasq.leases file (copied from remote)
 
 #define	GET_IP			1							// DNS Lease: Get IP Address
-#define	GET_HOST		2							// DNS Lease: Get IP Address
+#define	GET_HOST		2							// DNS Lease: Get Hostname
 
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))			// Macro: Maximum of inputs
 #define MAX(a, b) (((a) > (b)) ? (a) : (b)) 		// Macro: Minimum of inputs
 
-void usagehelp()
+// Remote-Leases: Retrieve dnsmasq leases information from remote machine (via SSH)
+void usagehelp_remote_leases()
 {
 	fprintf(stderr, "usage: remote-leases [-cuaq] [-d N] [-i MAC] [-h MAC] server filename user password\n");
 	fprintf(stderr, "\nOperations: \n");
@@ -227,7 +228,6 @@ int oper_iphost(int multioper, int quiet, char *macaddr, int getmode) {
 
 	// Search file for target MAC Address
 	cmdresult = FALSE;
-	ipfound[0] = 0;
 	while (fgets(dnslease, LEN_DNSMASQ , leasefile) != 0) {
 		strtok(dnslease, " ");
 		maccheck = strtok(NULL, " ");
@@ -295,7 +295,7 @@ int remote_leases_main(int argc, char *argv[])
 	
 	// If no arguments, print help
 	if (argc <= 1)
-		usagehelp();
+		usagehelp_remote_leases();
 		
 	else {
 		// Get Command Line Options, set up flags / values as needed
@@ -342,7 +342,7 @@ int remote_leases_main(int argc, char *argv[])
 					optcnt++;
 					break;
 				default: /* '?' */
-					usagehelp();
+					usagehelp_remote_leases();
 			}
 		}
 
@@ -364,7 +364,7 @@ int remote_leases_main(int argc, char *argv[])
 			if (opthost == TRUE)
 				oper_iphost(optcnt > 1, optquiet, macaddr_fmt, GET_HOST);
 		} else
-			usagehelp();
+			usagehelp_remote_leases();
 						
 	}
 	

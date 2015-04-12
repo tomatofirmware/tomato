@@ -239,6 +239,7 @@ dg.populate = function()
 		e.rssi = a[2];
 		e.ip = a[7];
 		e.name = a[8];
+		e.lease = a[9];
 
 		if ((a[3] > 1000) || (a[4] > 1000))
 			e.txrx = ((a[3] > 1000) ? Math.round(a[3] / 1000) : '-') + ' / ' + ((a[4] > 1000) ? Math.round(a[4] / 1000) : '-'); //+ '<br><small>Mbps</small>';

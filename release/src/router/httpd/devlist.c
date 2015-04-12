@@ -16,7 +16,6 @@
 #include <wlutils.h>
 #include <syslog.h>
 
-
 // Routine to execute an external shell command, using a string as input (command line) ... and outputs to a string
 int shellcmd(char * cmdstr, char * cmdoutput, int lenoutput)
 {
@@ -120,10 +119,14 @@ static int get_wl_clients(int idx, int unit, int subunit, void *param)
 	struct maclist *mlist;
 	int mlsize;
 	char ifname[16];
+	char *arpargs;
 	char mac[18];
 	char ip[16];
 	char host[64];
+	char lease[16];
+	char leasestr[32];
 	char command[256];
+	char cmdoutput[128];
 
 	mlsize = sizeof(struct maclist) + (255 * sizeof(struct ether_addr));
 	if ((mlist = malloc(mlsize)) != NULL) {
@@ -151,25 +154,35 @@ static int get_wl_clients(int idx, int unit, int subunit, void *param)
 						if (get_wds_ifname(&rssi.ea, ifname)) p = ifname;
 					}
 
-					// Get IP address and hostname, based on MAC address (using remote-leases and nslookup) - items in this list only have MAC addresses
+					// Get IP address and hostname, based on MAC address (using remote-arp) - items in this list have MAC addresses only (i.e. DHCP not handled by Tomato)
+  					arpargs = nvram_safe_get("wldev_MAC_arpargs");
 					strcpy(ip, "Unknown");
 					strcpy(host, "Unknown");
-					if (nvram_get_int("wldev_processMAC") == 1) {
-						syslog(LOG_INFO, "Starting remote-leases (as wldev_processMAC == 1) ...");
+					strcpy(leasestr, "---");
+					// Only process if arpargs (for remote-arp) is defined, not empty. arpargs = "server username password" (to get ARP info)
+					if (strcmp(arpargs, "") != 0) {
+						//syslog(LOG_INFO, "Getting wldev MAC details, using ARP args provided ...");
 						sprintf(mac, "%s", ether_etoa(rssi.ea.octet, buf));
-						sprintf(command, "remote-leases -i %s", mac);
-						shellcmd(command, ip, 15);
-						sprintf(command, "nslookup %s | grep %s | grep \"Address 1\" | cut -f 4 -d \" \" | cut -d \".\" -f 1", ip, ip);
-						shellcmd(command, host, 63);
-					} else
-						syslog(LOG_INFO, "Not starting remote-leases (as wldev_processMAC != 1) ...");
+						sprintf(command, "remote-arp -ihlq %s %s", mac, arpargs);
+						//syslog(LOG_INFO, "   > Command: |%s|", command);
+						shellcmd(command, cmdoutput, 127);
+						//syslog(LOG_INFO, "   > Output: |%s|", cmdoutput);
+						if (strcmp(cmdoutput, "ARP parsing failed!") != 0) {
+							sscanf(cmdoutput, "%[^,],%[^,],%[^,],%*s", ip, host, lease);
+							sprintf(leasestr, "ARP: %s sec", lease); // Hard coded, add units to lease time (seconds)
+							//syslog(LOG_INFO, "   > Parsed: |%s|%s|%s|", ip, host, lease);
+						} //else
+							//syslog(LOG_INFO, "   > Parsed: Not done!");
 
-					web_printf("%c['%s','%s',%d,%u,%u,%u,%d,'%s','%s']",
+					} //else
+						//syslog(LOG_INFO, "Not getting wldev MAC details, no ARP args provided.");
+
+					web_printf("%c['%s','%s',%d,%u,%u,%u,%d,'%s','%s','%s']",
 						*comma,
 						p,
 						ether_etoa(rssi.ea.octet, buf),
 						rssi.val,
-						sti.tx_rate, sti.rx_rate, sti.in, unit, ip, host);
+						sti.tx_rate, sti.rx_rate, sti.in, unit, ip, host, leasestr);
 					*comma = ',';
 				}
 			}
