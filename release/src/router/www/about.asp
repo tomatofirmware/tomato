@@ -253,6 +253,8 @@ Copyright (C) 2009 Tomasz Słodkowicz<br>
 
 <b>"Arrmo" feature:</b><br>
 - Added Netgear WNDR Support (select routers)<br>
+- Added remote-leases feature (dnsmasq)<br>
+- Added remote-arp feature (pfSense)<br>
 <br>
 
 <br>
