@@ -163,7 +163,7 @@ static int get_wl_clients(int idx, int unit, int subunit, void *param)
 					if (strcmp(arpargs, "") != 0) {
 						//syslog(LOG_INFO, "Getting wldev MAC details, using ARP args provided ...");
 						sprintf(mac, "%s", ether_etoa(rssi.ea.octet, buf));
-						sprintf(command, "remote-arp -ihlq %s %s", mac, arpargs);
+						sprintf(command, "remote-arp -ihlu %s %s", mac, arpargs);
 						//syslog(LOG_INFO, "   > Command: |%s|", command);
 						shellcmd(command, cmdoutput, 127);
 						//syslog(LOG_INFO, "   > Output: |%s|", cmdoutput);
