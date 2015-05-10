@@ -15,6 +15,7 @@ No part of this file may be used without permission.
 <% css(); %>
 <script type='text/javascript' src='tomato.js'></script>
 <!-- JavaScript Libraries: For Chart, where possible use hosted libraries to save router space ... like Google Developers -->
+<!-- HighCharts / HighStock requires FrameWork (jQuery, for example) -->
 <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js'></script>
 <script type='text/javascript' src='http://code.highcharts.com/stock/highstock.js'></script>
 <script type='text/javascript' src='http://code.highcharts.com/modules/data.js'></script>
@@ -34,8 +35,11 @@ visibility: hidden;
 }
 </style>
 <script type='text/javascript'>
+// This is key - execute nvram command to get needed nvram parameters (additional needed ones inside quotes).
+// Basic (nvram) info needed for run-time refresh to work (POST)!
 //<% nvram(''); %>
 function cpuChartNew() {
+	// Get File ... note that csv not handled quite right (mime type), so just make a .bin file -> works!
 	$.get('ext/cpuload.bin', function(csv) {
 		// Before setting up chart, get local timezone offset (to include below) -> and set Global option for HighCharts
 		var myDate = new Date()
@@ -50,7 +54,7 @@ function cpuChartNew() {
 		if (csv==""){
 			csv = "DateTime,1 min,5 min,10 min,Last PID"
 		}
-		// Set up HighCharts (OK, actually HighStock) Options
+		// Set up HighCharts (OK, actually HighStock) Options -> process full history (csv) file on page load
 		var options = {
 			chart: {
 				renderTo: 'chart',
@@ -158,13 +162,15 @@ var dateLast = -1;
 var ref = new TomatoRefresh('update.cgi', '', 0, 'status_cpu_refresh');
 ref.refresh = function(text)
 {
+	// On Page Refresh, just get the last entry, to speed processing / minimize CPU load (this file is just the last output)
+	// For this to work, and not miss CPU load samples, make sure the page refresh is less than the cpuload sample rate
 	$.get('ext/cpulast.bin', function(csv) {
 		var items = csv.split(',');
 		var rowdata = [];
 		$.each(items, function(itemNo, item) {
 			rowdata.push(parseFloat(item));
 		});
-		// Only update / add to chart if new data
+		// Only update / add to chart if new data -> avoid duplicate samples
 		if (rowdata[0] != dateLast) {
 			dateLast = rowdata[0];
 			var myHighChart = $('#chart').highcharts();
