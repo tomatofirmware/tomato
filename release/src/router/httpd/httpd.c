@@ -384,6 +384,7 @@ static void handle_request(void)
 	}
 
 	_dprintf("%s\n", line);
+	//syslog(LOG_INFO, "Handling httpd request ... |%s|", line);
 
 	method = path = line;
 	strsep(&path, " ");

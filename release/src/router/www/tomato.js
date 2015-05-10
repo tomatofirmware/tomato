@@ -2415,6 +2415,7 @@ function navi()
 		['Status', 			'status', 0, [
 			['Overview',			'overview.asp'],
 			['Device List',			'devices.asp'],
+			['CPU Load',			'cpu.asp'],
 			['Web Usage',			'webmon.asp'],
 			['Logs',			'log.asp'] ] ],
 		['Bandwidth', 			'bwm', 0, [
