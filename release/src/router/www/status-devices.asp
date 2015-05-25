@@ -63,7 +63,7 @@
 
 ipp = '<% lipp(); %>.';
 //<% nvram('lan_ifname,wl_ifname,wl_mode,wl_radio'); %>
-//	<% devlist(); %>
+//<% devlist(); %>
 
 list = [];
 
@@ -362,7 +362,7 @@ for (var uidx = 0; uidx < wl_ifaces.length; ++uidx) {
 		if (wl_sunit(uidx)<0) {
 			var a = '';
 			if ((nvram['wl'+u+'_mode'] == 'ap') || (nvram['wl'+u+'_mode'] == 'wds'))
-				a = '&nbsp;&nbsp;&nbsp; <input type="button" value="Measure" onclick="javascript:window.location=\'wlmnoise.cgi?_http_id=' + nvram.http_id + '&_wl_unit=' + u +'\'">';
+				a = '&nbsp;&nbsp;&nbsp; <input type="button" value="Refresh" onclick="reloadPage()">';
 			f.push( { title: '<b>Noise Floor (' + wl_ifaces[uidx][0] + ')&nbsp;:</b>',
 				prefix: '<span id="noise'+uidx+'">',
 				custom: wlnoise[uidx],

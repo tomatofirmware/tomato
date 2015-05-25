@@ -10,6 +10,7 @@
 #include <ctype.h>
 #include <wlutils.h>
 #include <sys/ioctl.h>
+#include <syslog.h>
 
 #ifndef WL_BSS_INFO_VERSION
 #error WL_BSS_INFO_VERSION
@@ -290,11 +291,14 @@ static int read_noise(int unit)
 static int get_wlnoise(int client, int unit)
 {
 	int v;
-
+	
+	//syslog(LOG_INFO, "get_wlnoise: client = %d, unit = %d", client, unit);
 	if (client) {
 		v = read_noise(unit);
 	}
 	else {
+		// RMo - added read_noise here, does not take AP down (just reads from register inside Broadcom ASIC). Read keeps value current.
+		v = read_noise(unit);
 		v = nvram_get_int(wl_nvname("tnoise", unit, 0));
 		if ((v >= 0) || (v < -100)) v = -99;
 	}

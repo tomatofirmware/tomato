@@ -16,7 +16,7 @@ OBJS += listen.o redial.o led.o qos.o forward.o misc.o mtd.o
 OBJS += buttons.o restrict.o gpio.o sched.o
 OBJS += new_qoslimit.o arpbind.o
 OBJS += tomatoanon.o
-OBJS += blink.o remote_leases.o remote_arp.o cpuload.o
+OBJS += blink.o remote_leases.o remote_arp.o cpuload.o wlnoise.o
 
 ifeq ($(CONFIG_BCMWL6),y)
 OBJS += blink_5g.o
@@ -108,6 +108,7 @@ install: all
 	@cd $(INSTALLDIR)/sbin && ln -sf rc remote-leases
 	@cd $(INSTALLDIR)/sbin && ln -sf rc remote-arp
 	@cd $(INSTALLDIR)/sbin && ln -sf rc cpuload
+	@cd $(INSTALLDIR)/sbin && ln -sf rc wlnoise
 	@cd $(INSTALLDIR)/sbin && ln -sf rc rcheck
 	@cd $(INSTALLDIR)/sbin && ln -sf rc radio
 	@cd $(INSTALLDIR)/sbin && ln -sf rc led

@@ -558,8 +558,11 @@ extern int remote_leases_main(int argc, char *argv[]);
 // remote_arp.c
 extern int remote_arp_main(int argc, char *argv[]);
 
-// remote_arp.c
+// cpuload.c
 extern int cpuload_main(int argc, char *argv[]);
+
+// wlnoise.c
+extern int wlnoise_main(int argc, char *argv[]);
 
 #endif
 

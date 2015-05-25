@@ -109,6 +109,7 @@ static const applets_t applets[] = {
 	{ "remote-leases",		remote_leases_main		},
 	{ "remote-arp",			remote_arp_main			},
 	{ "cpuload",			cpuload_main			},
+	{ "wlnoise",			wlnoise_main			},
 	{ "rcheck",				rcheck_main				},
 	{ "dhcpc-event",		dhcpc_event_main		},
 	{ "dhcpc-release",		dhcpc_release_main		},

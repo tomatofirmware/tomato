@@ -2416,6 +2416,7 @@ function navi()
 			['Overview',			'overview.asp'],
 			['Device List',			'devices.asp'],
 			['CPU Load',			'cpu.asp'],
+			['Wireless Noise',		'wlnoise.asp'],
 			['Web Usage',			'webmon.asp'],
 			['Logs',			'log.asp'] ] ],
 		['Bandwidth', 			'bwm', 0, [
