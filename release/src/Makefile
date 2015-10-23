@@ -318,6 +318,12 @@ ifeq ($(WNDR),y)
 	@echo "*********************** Convert TRX to CHK (add Netgear Checksum) ************************" >>fpkg.log
 	# Make multiple versions / files, as file is HW specific (HW information is captured in the .chk file itself!)
 
+	# Make WNDR4000, Checksum starts at 0x6FFFF8 => Max size (to not touch the last 64kB block) = 7274496
+	@$(SRCBASE)/wnrtool/mkchkimg -o image/tomato-WNDR4000-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).chk \
+	-k image/tomato-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).trx \
+	-b U12H181T00_NETGEAR -r 2 2>&1 | tee -a fpkg.log
+	@$(MAKE) netgear-check MAXFSIZE=7274496 NG_FNAME=image/tomato-WNDR4000-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).chk
+
 	# Make WNDR3700v3, Checksum starts at 0x6FFFF8 => Max size (to not touch the last 64kB block) = 7274496
 	@$(SRCBASE)/wnrtool/mkchkimg -o image/tomato-WNDR3700v3-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).chk \
 	-k image/tomato-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).trx \
