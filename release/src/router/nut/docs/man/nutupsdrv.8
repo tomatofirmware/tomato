@@ -1,0 +1,182 @@
+'\" t
+.\"     Title: nutupsdrv
+.\"    Author: [FIXME: author] [see http://docbook.sf.net/el/author]
+.\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
+.\"      Date: 04/17/2015
+.\"    Manual: NUT Manual
+.\"    Source: Network UPS Tools 2.7.3
+.\"  Language: English
+.\"
+.TH "NUTUPSDRV" "8" "04/17/2015" "Network UPS Tools 2\&.7\&.3" "NUT Manual"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+nutupsdrv \- generic manual for unified NUT drivers
+.SH "SYNOPSIS"
+.sp
+\fBnutupsdrv\fR \fI\-h\fR
+.sp
+\fBnutupsdrv\fR [OPTIONS]
+.SH "DESCRIPTION"
+.sp
+\fBnutupsdrv\fR is not actually a driver\&. This is a combined man page for the shared code that is the core of many drivers within the Network UPS Tools package\&.
+.sp
+For information on the specific drivers, see their individual man pages\&.
+.sp
+UPS drivers provide a communication channel between the physical UPS hardware and the \fBupsd\fR(8) server\&. The driver is responsible for translating the native protocol of the UPS to the common format used by the rest of this package\&.
+.sp
+The core has two modes of operation which are determined by the command line switches\&. In the normal mode, the driver will periodically poll the UPS for its state and parameters\&. The results of this command is presented to upsd\&. The driver will also handle setting variables and instant commands if available\&.
+.sp
+The driver can also instruct the UPS to shut down the load, possibly after some delay\&. This mode of operation is intended for cases when it is known that the UPS is running out of battery power and the systems attached must be turned off to ensure a proper reboot when power returns\&.
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+.sp
+You probably don\(cqt want to use any of these options directly\&. You should use \fBupsdrvctl\fR(8) to control your drivers, and \fBups.conf\fR(5) to configure them\&. The rest of this manual describes options and parameters that generally are not needed by normal users\&.
+.sp .5v
+.RE
+.SH "OPTIONS"
+.PP
+\fB\-h\fR
+.RS 4
+Display a help message without doing anything else\&. This will also list possible values for
+\fI\-x\fR
+in that driver, and other help text that the driver\(cqs author may have provided\&.
+.RE
+.PP
+\fB\-a\fR \fIid\fR
+.RS 4
+Autoconfigure this driver using the
+\fIid\fR
+section of
+\fBups.conf\fR(5)\&.
+\fBThis argument is mandatory when calling the driver directly\&.\fR
+.RE
+.PP
+\fB\-D\fR
+.RS 4
+Raise the debugging level\&. Use this multiple times to see more details\&. Running a driver in debug mode will prevent it from backgrounding after startup\&. It will keep on logging information to the console until it receives a SIGINT (usually Ctrl\-C) or SIGTERM signal\&.
+.sp
+The level of debugging needed depends both on the driver and the problem you\(cqre trying to diagnose\&. Therefore, first explain the problem you have with a driver to a developer/maintainer, before sending them debugging output\&. More often than not, if you just pick a level, the output may be either too limited or too verbose to be of any use\&.
+.RE
+.PP
+\fB\-q\fR
+.RS 4
+Raise log level threshold\&. Use this multiple times to log more details\&.
+.sp
+The debugging comment above also applies here\&.
+.RE
+.PP
+\fB\-i\fR \fIinterval\fR
+.RS 4
+Set the poll interval for the device\&.
+.RE
+.PP
+\fB\-V\fR
+.RS 4
+Print only version information, then exit\&.
+.RE
+.PP
+\fB\-L\fR
+.RS 4
+Print a parseable list of driver variables\&. Mostly useful for configuration wizard programs\&.
+.RE
+.PP
+\fB\-k\fR
+.RS 4
+("Kill" power) Forced shutdown mode\&. The UPS will power off the attached load, if possible\&.
+.sp
+You should use
+upsdrvctl shutdown
+whenever possible instead of calling this directly\&.
+.RE
+.PP
+\fB\-r\fR \fIdirectory\fR
+.RS 4
+The driver will chroot(2) to
+\fIdirectory\fR
+during initialization\&. This can be useful when securing systems\&.
+.sp
+In addition to the state path, many systems will require /dev/null to exist within
+\fIdirectory\fR
+for this to work\&. The serial ports are opened before the chroot call, so you do not need to create them inside the jail\&. In fact, it is somewhat safer if you do not\&.
+.RE
+.PP
+\fB\-u\fR \fIusername\fR
+.RS 4
+If started as root, the driver will setuid(2) to the user id associated with
+\fIusername\fR\&.
+.sp
+If you do not specify this value and start it as root, the driver will switch to the default value that was compiled into the code\&. This is typically
+\fInobody\fR, and is far from ideal\&.
+.RE
+.PP
+\fB\-x\fR \fIvar\fR=\fIval\fR
+.RS 4
+Define a variable called
+\fIvar\fR
+with the value of
+\fIvar\fR
+in the driver\&. This varies from driver to driver \- see the specific man pages for more information\&.
+.sp
+This is like setting
+\fIvar\fR=\fIval\fR
+in
+\fBups.conf\fR(5), but
+\fB\-x\fR
+overrides any settings from that file\&.
+.RE
+.SH "DIAGNOSTICS"
+.sp
+Information about the startup process is printed to stdout\&. Additional messages after that point are available in the syslog\&. After \fBupsd\fR(8) starts, the UPS clients such as \fBupsc\fR(8) can be used to query the status of an UPS\&.
+.SH "PROGRAM CONTROL"
+.sp
+You should always use \fBupsdrvctl\fR(8) to control the drivers\&. While drivers can be started by hand for testing purposes, it is not recommended for production use\&.
+.SH "FILES"
+.PP
+ups\&.conf
+.RS 4
+Required configuration file\&. This contains all details on which drivers to start and where the hardware is attached\&.
+.RE
+.SH "BUGS"
+.sp
+Some of the drivers may have bugs\&. See their manuals for more information\&.
+.SH "SEE ALSO"
+.sp
+Server: \fBupsd\fR(8)
+.sp
+Clients: \fBupsc\fR(8), \fBupscmd\fR(8), \fBupsrw\fR(8), \fBupslog\fR(8), \fBupsmon\fR(8)
+.sp
+CGI programs: \fBupsset.cgi\fR(8), \fBupsstats.cgi\fR(8), \fBupsimage.cgi\fR(8)
+.sp
+Driver control: \fBupsdrvctl\fR(8)
+.sp
+Drivers: \fBal175\fR(8) \fBapcsmart\fR(8), \fBbcmxcp\fR(8), \fBbcmxcp_usb\fR(8), \fBbelkin\fR(8), \fBbelkinunv\fR(8), \fBbestfcom\fR(8), \fBbestuferrups\fR(8), \fBbestups\fR(8), \fBblazer_ser\fR(8), \fBblazer_usb\fR(8), \fBcyberpower\fR(8), \fBdummy-ups\fR(8), \fBetapro\fR(8), \fBeverups\fR(8), \fBgamatronic\fR(8), \fBgenericups\fR(8), \fBisbmex\fR(8), \fBliebert\fR(8), \fBmasterguard\fR(8), \fBmetasys\fR(8), \fBmge-shut\fR(8), \fBmge-utalk\fR(8), \fBmge-xml\fR(8), \fBnewmge-shut\fR(8), \fBnitram\fR(8), \fBnutdrv_qx\fR(8), \fBoneac\fR(8), \fBoptiups\fR(8), \fBpowercom\fR(8), \fBpowerman-pdu\fR(8), \fBpowerpanel\fR(8), \fBrhino\fR(8), \fBrichcomm_usb\fR(8), \fBsafenet\fR(8), \fBsnmp-ups\fR(8), \fBsolis\fR(8), \fBtripplite\fR(8), \fBtripplitesu\fR(8), \fBtripplite_usb\fR(8), \fBusbhid-ups\fR(8), \fBupscode2\fR(8), \fBvictronups\fR(8)
+.sp
+Internet resources: The NUT (Network UPS Tools) home page: http://www\&.networkupstools\&.org/

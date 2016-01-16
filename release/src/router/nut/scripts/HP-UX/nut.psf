@@ -1,0 +1,141 @@
+B/
+# PSF file for Network UPS Tools 				  11/2/2011
+# 
+# Useful commands:
+#
+# swpackage -p -vv -s /depot/psf_files/xxx.psf -d /depot/s700_opt
+# swmodify -p -d -vv -s /depot/psf_files/xxx.psf xxx @ /depot/s700_opt
+# swremove -p -v -d xxx,r=yyy @ /depot/s700_opt
+# swinstall -p -v -s /depot/s700_opt xxx
+#
+# References:
+# - Creating a Product Specification File (PSF)
+# http://docs.hp.com/en/B2355-90127/ch09s05.html
+# - swpackage(8) manual page
+# http://nixdoc.net/man-pages/hp-ux/man4/swpackage.4.html
+#
+# http://www.massconfusion.com/tim/notes/hpux_depot_create_howto.txt
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# 
+# This section is optional
+
+# This section is optional -- delete it if you don't want it.
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+vendor
+	tag 			NUT-Team
+	title 			"NUT - Network UPS Tools - Team"
+	description    	"UPS monitoring tool"
+end
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+product
+# ----------------------------------------	
+	tag 			NUT
+    title 			"Network UPS Tools"
+	
+	description 	"Network UPS Tools (NUT) is a client/server monitoring system that allows computers 
+	to share uninterruptible power supply (UPS) and power distribution unit (PDU) hardware. 
+	Clients access the hardware through the server, and are notified whenever the power status changes."
+	
+    revision       2.7.3
+	
+# ----------------------------------------
+	architecture   S700/S800_HPUX_10/HP-UX_B.11.23_IA/PA
+    machine_type   *
+    os_name        HP-UX
+    #os_release     ?.11.2*
+	os_release 		?.10.*|?.11.*
+    os_version     *
+# ----------------------------------------
+#Including "NUT - Server" files.
+	fileset
+		tag 		Server
+		title 		"nut-server"
+		revision	2.7.3
+		postinstall     ./postinstall
+
+#Including "conf" files under "/usr/local/ups/etc/".
+		file -u 644 -g bin -o bin ./nut_install/usr/etc/ups.conf.sample	/usr/etc/ups.conf.sample
+		file -u 644 -g bin -o bin ./nut_install/usr/etc/upsd.conf.sample  	/usr/etc/upsd.conf.sample
+		file -u 644 -g bin -o bin ./nut_install/usr/etc/upsd.users.sample	/usr/etc/upsd.users.sample
+
+#Including "server" files under "/usr/local/ups/sbin".		
+		file -u 755 -g bin -o bin ./nut_install/usr/sbin/upsd	 	/usr/sbin/upsd
+
+#Including "share" files under "/usr/local/ups/share".
+		file -u 644 -g bin -o bin ./nut_install/usr/share/cmdvartab	/usr/share/cmdvartab
+		file -u 644 -g bin -o bin ./nut_install/usr/share/driver.list	/usr/share/driver.list
+
+#Including required "libupsclient1" under "/usr/local/ups/lib"
+		file -u 755 -g bin -o bin ./nut_install/usr/lib/libupsclient.sl.3		/usr/lib/libupsclient.sl.3
+		file -u 555 -g bin -o bin ./nut_install/usr/lib/libupsclient.sl.3.1	/usr/lib/libupsclient.sl.3.1			
+
+#Including nut service script to "usr/local/ups/script"
+		file -u 744 -g bin -o bin ../../scripts/HP-UX/nut-upsd.sh		/usr/script/nut-upsd.sh
+		file -u 744 -g bin -o bin ../../scripts/HP-UX/nut-drvctl.sh		/usr/script/nut-drvctl.sh
+		file -u 744 -g bin -o bin ../../scripts/HP-UX/nut-upsmon.sh		/usr/script/nut-upsmon.sh
+		file -u 444 -g bin -o bin ../../scripts/HP-UX/nut-upsd			/usr/script/nut-upsd
+		file -u 444 -g bin -o bin ../../scripts/HP-UX/nut-drvctl			/usr/script/nut-drvctl
+		file -u 444 -g bin -o bin ../../scripts/HP-UX/nut-upsmon			/usr/script/nut-upsmon
+
+#Including required UPS drivers files under "/usr/local/ups/bin/".
+#such as "nut-snmp", "nut-xml or netxml-ups"
+		directory 	./nut_install/usr/bin=/usr/bin/
+		#file_permissions -u 755 -g bin -o bin
+		file *
+	
+#TBD files to be added under "/usr/share/doc/nut-server/*.gz"
+#TBD files to be added under "/usr/share/man/man5/*.gz"
+#TBD files to be added under "/usr/share/man/man8/*.gz"
+
+	end
+# ----------------------------------------
+#Including "NUT - Client" files.
+	fileset
+		tag 		Client
+		title 		"nut-client"
+		revision	2.7.3
+
+		file -u 755 -g bin -o bin ./nut_install/usr/bin/upsc	/usr/bin/upsc
+		file -u 755 -g bin -o bin ./nut_install/usr/bin/upscmd	/usr/bin/upscmd
+		file -u 755 -g bin -o bin ./nut_install/usr/bin/upslog	/usr/bin/upslog
+		file -u 755 -g bin -o bin ./nut_install/usr/bin/upsrw	/usr/bin/upsrw
+		file -u 755 -g bin -o bin ./nut_install/usr/sbin/upsmon 	/usr/sbin/upsmon
+		file -u 755 -g bin -o bin ./nut_install/usr/sbin/upssched 	/usr/sbin/upssched
+
+#Including "conf" files under "/usr/local/ups/etc".	
+		file -u 644 -g bin -o bin ./nut_install/usr/etc/nut.conf.sample	 	/usr/etc/nut.conf.sample
+		file -u 644 -g bin -o bin ./nut_install/usr/etc/upsmon.conf.sample   	/usr/etc/upsmon.conf.sample
+		file -u 644 -g bin -o bin ./nut_install/usr/etc/upssched.conf.sample	/usr/etc/upssched.conf.sample
+
+#Need to check if "libupsclient1" required for Client again.
+		#file -u 755 -g bin -o bin ./nut_install/usr/lib/libupsclient.sl.3		/usr/lib/libupsclient.sl.3
+		#file -u 555 -g bin -o bin ./nut_install/usr/lib/libupsclient.sl.3.1	/usr/lib/libupsclient.sl.3.1	
+	end
+# ----------------------------------------
+#Including "libupsclient1-dev" files.
+	fileset
+		tag 		Development
+		title 		"libupsclient1-dev"
+		revision	2.7.3
+		
+		file -u 755 -g bin -o bin ./nut_install/usr/lib/libupsclient.a	/usr/lib/libupsclient.a
+		file -u 755 -g bin -o bin ./nut_install/usr/lib/libupsclient.la	/usr/lib/libupsclient.la
+		file -u 755 -g bin -o bin ./nut_install/usr/lib/libupsclient.sl	/usr/lib/libupsclient.sl
+		file -u 644 -g bin -o bin ../../include/parseconf.h		/usr/include/parseconf.h
+		file -u 644 -g bin -o bin ../../clients/upsclient.h		/usr/include/upsclient.h
+		file -u 755 -g bin -o bin ./nut_install/usr/lib/pkgconfig/libupsclient.pc		/usr/lib/pkgconfig/libupsclient.pc
+	end
+# ----------------------------------------
+
+#Including "libups-nut-perl" files.
+	fileset
+		tag		libups-nut-perl
+		title		"libups-nut-perl"
+		revision	2.7.3
+		
+		file -u 644 -g bin -o bin ../../scripts/perl/Nut.pm	/usr/share/perl5/UPS/Nut.pm
+	end
+# ----------------------------------------	
+
+end	#End product
+

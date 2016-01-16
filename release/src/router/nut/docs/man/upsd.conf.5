@@ -1,0 +1,146 @@
+'\" t
+.\"     Title: upsd.conf
+.\"    Author: [FIXME: author] [see http://docbook.sf.net/el/author]
+.\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
+.\"      Date: 04/17/2015
+.\"    Manual: NUT Manual
+.\"    Source: Network UPS Tools 2.7.3
+.\"  Language: English
+.\"
+.TH "UPSD\&.CONF" "5" "04/17/2015" "Network UPS Tools 2\&.7\&.3" "NUT Manual"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+upsd.conf \- Configuration for Network UPS Tools upsd
+.SH "DESCRIPTION"
+.sp
+upsd uses this file to control access to the server and set some other miscellaneous configuration values\&. This file contains details on access controls, so keep it secure\&. Ideally, only the upsd process should be able to read it\&.
+.SH "CONFIGURATION DIRECTIVES"
+.PP
+"MAXAGE \fIseconds\fR"
+.RS 4
+upsd usually allows a driver to stop responding for up to 15 seconds before declaring the data "stale"\&. If your driver takes a very long time to process updates but is otherwise operational, you can use MAXAGE to make upsd wait longer\&.
+.sp
+Most users should leave this at the default value\&.
+.RE
+.PP
+"STATEPATH \fIpath\fR"
+.RS 4
+Tell upsd to look for the driver state sockets in
+\fIpath\fR
+rather than the default that was compiled into the program\&.
+.RE
+.PP
+"LISTEN \fIinterface\fR \fIport\fR"
+.RS 4
+Bind a listening port to the interface specified by its Internet address\&. This may be useful on hosts with multiple interfaces\&. You should not rely exclusively on this for security, as it can be subverted on many systems\&.
+.sp
+Listen on TCP port
+\fIport\fR
+instead of the default value which was compiled into the code\&. This overrides any value you may have set with
+\fIconfigure \-\-with\-port\fR\&. If you don\(cqt change it with configure or this value, upsd will listen on port 3493 for this interface\&.
+.sp
+Multiple LISTEN addresses may be specified\&. The default is to bind to 127\&.0\&.0\&.1 if no LISTEN addresses are specified (and ::1 if IPv6 support is compiled in)\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+LISTEN 127\&.0\&.0\&.1
+LISTEN 192\&.168\&.50\&.1
+LISTEN ::1
+LISTEN 2001:0db8:1234:08d3:1319:8a2e:0370:7344
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+This parameter will only be read at startup\&. You\(cqll need to restart (rather than reload) upsd to apply any changes made here\&.
+.RE
+.PP
+"MAXCONN \fIconnections\fR"
+.RS 4
+This defaults to maximum number allowed on your system\&. Each UPS, each LISTEN address and each client count as one connection\&. If the server runs out of connections, it will no longer accept new incoming client connections\&. Only set this if you know exactly what you\(cqre doing\&.
+.RE
+.PP
+"CERTFILE \fIcertificate file\fR"
+.RS 4
+When compiled with SSL support with OpenSSL backend, you can enter the certificate file here\&. The certificates must be in PEM format and must be sorted starting with the subject\(cqs certificate (server certificate), followed by intermediate CA certificates (if applicable_ and the highest level (root) CA\&. It should end with the server key\&. See
+\fIdocs/security\&.txt\fR
+or the Security chapter of NUT user manual for more information on the SSL support in NUT\&.
+.RE
+.PP
+"CERTPATH \fIcertificate database\fR"
+.RS 4
+When compiled with SSL support with NSS backend, you can enter the certificate path here\&. Certificates are stored in a dedicated database (splitted in 3 files)\&. Specify the path of the database directory\&.
+.RE
+.PP
+"CERTIDENT \fIcertificate name\fR \fIdatabase password\fR"
+.RS 4
+When compiled with SSL support with NSS backend, you can specify the certificate name to retrieve from database to authenticate itself and the password required to access certificate related private key\&.
+.RE
+.PP
+"CERTREQUEST \fIcertificate request level\fR"
+.RS 4
+When compiled with SSL support with NSS backend and client certificate validation (disabled by default, see
+\fIdocs/security\&.txt\fR), you can specify if upsd requests or requires client\(cqs\*(Aq certificates\&. Possible values are :
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fI0\fR
+to not request to clients to provide any certificate
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fI1\fR
+to require to all clients a certificate
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\fI2\fR
+to require to all clients a valid certificate
+.RE
+.RE
+.SH "SEE ALSO"
+.sp
+\fBupsd\fR(8), \fBnutupsdrv\fR(8), \fBupsd.users\fR(5)
+.SH "INTERNET RESOURCES"
+.sp
+The NUT (Network UPS Tools) home page: http://www\&.networkupstools\&.org/

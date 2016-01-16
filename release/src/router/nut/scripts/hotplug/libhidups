@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# This script changes the permissions and ownership of a USB device under
+# /proc/bus/usb to grant access to this device to users in the nut group.
+#
+# Ownership is set to root.nobody, permissions are set to 0664.
+#
+# Arguments :
+# -----------
+# ACTION=[add|remove]
+# DEVICE=/proc/bus/usb/BBB/DDD
+# TYPE=usb
+
+if [ "$ACTION" = "add" -a "$TYPE" = "usb" ]; then
+  chown root:nobody "$DEVICE"
+  chmod 0664 "$DEVICE"
+fi

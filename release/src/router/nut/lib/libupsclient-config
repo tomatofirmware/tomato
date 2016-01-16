@@ -1,0 +1,31 @@
+#!/bin/sh
+# **********************************************************#
+# libupsclient-config: helper script for NUT libupsclient   #
+# **********************************************************#
+# Copyright 2003 - Arnaud Quette                            #
+# Distributed under the GNU GPL v2                          #
+# See the distribution lib/README for usage information     #
+# **********************************************************#
+
+Version="2.7.3"
+prefix=/usr
+exec_prefix=${prefix}
+Libs="-L${exec_prefix}/lib -lupsclient "
+Cflags="-I${prefix}/include "
+
+case "$1" in
+
+  --cflags)
+	echo "$Cflags"
+	;;
+  --libs)
+	echo "$Libs"
+	;;
+  --version)
+	echo $Version
+	;;
+  *)
+	echo "Usage: libupsclient-config {--cflags|--libs|--version}"
+	exit 1
+esac
+

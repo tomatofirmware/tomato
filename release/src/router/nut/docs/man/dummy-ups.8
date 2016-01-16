@@ -1,0 +1,147 @@
+'\" t
+.\"     Title: dummy-ups
+.\"    Author: [see the "AUTHOR" section]
+.\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
+.\"      Date: 04/17/2015
+.\"    Manual: NUT Manual
+.\"    Source: Network UPS Tools 2.7.3
+.\"  Language: English
+.\"
+.TH "DUMMY\-UPS" "8" "04/17/2015" "Network UPS Tools 2\&.7\&.3" "NUT Manual"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+dummy-ups \- Driver for multi\-purpose UPS emulation
+.SH "NOTE"
+.sp
+This man page only documents the specific features of the dummy\-ups driver\&. For information about the core driver, see \fBnutupsdrv\fR(8)\&.
+.SH "DESCRIPTION"
+.sp
+This program is a multi\-purpose UPS emulation tool\&. Its behavior depends on the running mode:
+.SS "Dummy Mode"
+.sp
+\fBdummy\-ups\fR looks like a standard device driver to \fBupsd\fR(8) and allows one to change any value for testing purposes\&. It is both interactive, controllable through the \fBupsrw\fR(1) and \fBupscmd\fR(1) commands (or equivalent graphical tool), and batchable through script files\&. It can be configured, launched and used as any other real driver\&. This mode is mostly useful for development and testing purposes\&.
+.SS "Repeater Mode"
+.sp
+\fBdummy\-ups\fR acts as a NUT client, simply forwarding data\&. This can be useful for supervision purposes\&. This can also allow some load sharing between several UPS instances, using a point\-to\-point communication with the UPS\&.
+.SH "IMPLEMENTATION"
+.sp
+The port specification depends on the running mode, and allows the driver to select the right mode\&.
+.SS "Dummy Mode"
+.sp
+Port is a definition file name for \fBdummy\-ups\fR\&. This can either be an absolute or a relative path name\&. In the latter case the NUT sysconfig directory (ie /etc/nut, /usr/local/ups/etc, \&...) is prepended\&.
+.sp
+For instance:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+[dummy]
+        driver = dummy\-ups
+        port = evolution500\&.dev
+        desc = "dummy\-ups in dummy mode"
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+This file is generally named "something\&.dev"\&. It contains a list of all valid data and associated values, and has the same format as an \fBupsc\fR(8) dump (<varname>: <value>)\&. So you can easily create definition files from an existing UPS using "upsc > file\&.dev"\&. It can also be empty, in which case only a basic set of data is available: device\&.\fB, driver\&.\fR, ups\&.mfr, ups\&.model, ups\&.status
+.sp
+Samples definition files are available in the "data" directory of the nut source tree, and generally in the sysconfig directory of your system distribution\&.
+.sp
+Since \fBdummy\-ups\fR will loop on reading this file, you can dynamically modify it to interact with the driver\&. This will avoid message spam into your system log files, if you are using NUT default configuration\&.
+.sp
+You can also use the "TIMER <seconds>" instruction to create scheduled events sequences\&. For example, the following sequence will loop on switching ups\&.status between "OL", "OB" and "OB LB" every minute:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ups\&.status: OL
+TIMER 60
+ups\&.status: OB
+TIMER 60
+ups\&.status: LB
+TIMER 60
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+It is wise to end the script with a TIMER\&. Otherwise dummy\-ups will directly go back to the beginning of the file\&.
+.SS "Repeater Mode"
+.sp
+Port is the name of a remote UPS, using the NUT form, ie:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+<upsname>@<hostname>[:<port>]
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+For instance:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+[repeater]
+            driver = dummy\-ups
+            port = ups@hostname
+            desc = "dummy\-ups in repeater mode"
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Unlike UPS specifications in the rest of NUT, the @hostname portion is not optional \- it is the @ character which enables Repeater Mode\&. To refer to an UPS on the same host as \fBdummy\-ups\fR, use port = upsname@localhost\&.
+.SH "INTERACTION"
+.sp
+Once the driver is loaded in dummy mode, you can change any variables, except those of the driver\&.* and server\&.* collections\&. You can do this by either editing the definition file, or use the \fBupsrw\fR(1) and \fBupscmd\fR(1) commands\&.
+.sp
+Note that in simulation mode, new variables can be added on the fly, by adding these to the definition file\&. Conversely, if you need to remove variable (such as transient ones, like ups\&.alarm), simply update these by setting an empty value\&. As a result, they will get removed from the data\&.
+.sp
+In repeater mode, the driver acts according to the capabilities of the UPS, and so support the same instant commands and settable values\&.
+.SH "BACKGROUND"
+.sp
+Dummy Mode was originally written in one evening to replace the previous dummycons testing driver, which was too limited, and required a terminal for interaction\&.
+.sp
+\fBdummy\-ups\fR is useful for NUT client development, and other testing purposes\&.
+.sp
+It also helps the NUT Quality Assurance effort, by automating some tests on the NUT framework\&.
+.sp
+It now offers a repeater mode\&. This will help in building the Meta UPS approach, which allows one to build a virtual device, composed of several other devices (either UPS, PDUs)\&.
+.SH "BUGS"
+.sp
+Instant commands are not yet supported in Dummy Mode, and data need name/value checking enforcement, as well as boundaries or enumeration definition\&.
+.SH "AUTHOR"
+.sp
+Arnaud Quette
+.SH "SEE ALSO"
+.sp
+\fBupscmd\fR(1), \fBupsrw\fR(1), \fBups.conf\fR(5), \fBnutupsdrv\fR(8)
+.SS "Internet Resources:"
+.sp
+The NUT (Network UPS Tools) home page: http://www\&.networkupstools\&.org/

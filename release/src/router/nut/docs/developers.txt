@@ -1,0 +1,596 @@
+Information for developers
+==========================
+
+This document is intended to explain some of the more useful things
+within the tree, and provide a standard for working on the code.
+
+General stuff - common subdirectory
+-----------------------------------
+
+String handling
+~~~~~~~~~~~~~~~
+
+Use snprintf().  It's even provided with a compatibility module if the
+target system doesn't have it natively.
+
+If you use snprintf() to load some value into a buffer, make sure you
+provide the format string.  Don't use user-provided format strings,
+since that's an easy way to open yourself up to an exploit.
+
+Don't use strcat().  We have a neat wrapper for snprintf() called snprintfcat()
+that allows you to append to char * with a format string and all the usual
+string length checking of snprintf().
+
+Error reporting
+~~~~~~~~~~~~~~~
+
+Don't call syslog() directly.  Use upslog_with_errno() and upslogx().
+They may write to the syslog, stderr, or both as appropriate.  This
+means you don't have to worry about whether you're running in the
+background or not.
+
+upslog_with_errno prints your message plus the string expansion of
+errno.  upslogx just prints the message.
+
+fatal_with_errno and fatalx work the same way, but they
+exit(EXIT_FAILURE) afterwards. Don't call exit() directly.
+
+Debugging information
+~~~~~~~~~~~~~~~~~~~~~
+
+upsdebug_with_errno(), upsdebugx(), upsdebug_hex() and upsdebug_ascii()
+use the global `nut_debug_level` so you don't have to mess around with
+printf()s yourself.  Use them.
+
+Memory allocation
+~~~~~~~~~~~~~~~~~
+
+xmalloc, xcalloc, xrealloc and xstrdup all check the results of the base
+calls before continuing, so you don't have to.  Don't use the raw calls
+directly.
+
+Config file parsing
+~~~~~~~~~~~~~~~~~~~
+
+The configuration parser, called parseconf, is now up to its fourth
+major version.  It has multiple entry points, and can handle many
+different jobs.  It's usually used for parsing files, but it can also
+take input a line at a time or even a character at a time.
+
+You must initialize a context buffer with pconf_init before using any
+other parseconf function.  pconf_encode is the only exception, since it
+operates on a buffer you supply and is an auxiliary function.
+
+Escaping special characters and quoting multiple-word elements is all
+handled by the state machine.  Using the same code for all config files
+avoids code duplication.
+
+NOTE: this does not apply to drivers.  Driver authors should use the
+upsdrv_makevartable() scheme to pick up values from ups.conf.  Drivers
+should not have their own config files.
+
+Drivers may have their own data files, such as lists of hardware,
+mapping tables, or similar.  The difference between a data file and a
+config file is that users should never be expected to edit a data file
+under normal circumstances.  This technique might be used to add more
+hardware support to a driver without recompiling.
+
+<time.h> vs. <sys/time.h>
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This is already handled by autoconf, so just include "timehead.h" and you
+will get the right headers on every system.
+
+Device drivers - main.c
+-----------------------
+
+The device drivers use main.c as their core.
+
+To write a new driver, you create a file with a series of support
+functions that will be called by main.  These all have names that start
+with `upsdrv_`, and they will be called at different times by main
+depending on what needs to happen.
+
+See the <<new-drivers,driver documentation>> for information on writing
+drivers, and also refer to the skeletal driver in skel.c.
+
+Portability
+-----------
+
+Avoid things that will break on other systems.  All the world is not an
+x86 Linux box.
+
+There are still older systems out there that don't do C++ style comments.
+
+--------------------------------------
+/* Comments look like this. */
+// Not like this.
+--------------------------------------
+
+Newer versions of gcc allow you to declare a variable inside a function
+somewhat like the way C++ operates, like this:
+
+--------------------------------------------------------------------------------
+function do_stuff(void)
+{
+	check_something();
+
+	int a;
+
+	a = do_something_else();
+}
+--------------------------------------------------------------------------------
+
+While this will compile and run on these newer versions, it will fail
+miserably for anyone on an older system.  That means you must not use
+it.  gcc only warns about this with -pedantic.
+
+Coding style
+------------
+
+This is how we do things:
+
+--------------------------------------------------------------------------------
+int open_subspace(char *ship, int privacy)
+{
+	if (!privacy)
+		return insecure_channel(ship);
+
+	if (!init_privacy(ship))
+		fatal_with_errno("Can't open secure channel");
+
+	return secure_channel(ship);
+}
+--------------------------------------------------------------------------------
+
+The basic idea is that we try to group things into functions, and then
+find ways to drop out of them when we can't go any further.  There's
+another way to program this involving a big else chunk and a bunch of
+braces, and it can be hard to follow.  You can read this from top to
+bottom and have a pretty good idea of what's going on without having to
+track too much { } nesting and indenting.
+
+We don't really care for pretentiousVariableNamingSchemes, but you can
+probably get away with it in your own driver that we will never have to
+touch.  If your function or variable names start pushing important code
+off the right margin of the screen, expect them to meet the byte
+chainsaw sooner or later.
+
+All types defined with typedef should end in "_t", because this is
+easier to read, and it enables tools (such as indent and emacs) to
+display the source code correctly.
+
+Indenting with tabs vs. spaces
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Another thing to notice is that the indenting happens with tabs instead
+of spaces.  This lets everyone have their personal tab-width setting
+without inflicting much pain on other developers.  If you use a space,
+then you've fixed the spacing in stone and have really annoyed half of
+the people out there.
+
+Note that tabs apply only to *indenting*.  Alignment of text after any
+non-tab character has appeared on the line must be done by spaces in
+order for it to remain at the same alignment when someone views tabs at
+a different widths.
+
+If you write something that uses spaces, you may get away with it in a
+driver that's relatively secluded.  However, if we have to work on that
+code, expect it to get reformatted according to the above.
+
+Patches to existing code that don't conform to the coding style being
+used in that file will probably be dropped.  If it's something we really
+need, it will be grudgingly reformatted before being included.
+
+When in doubt, have a look at Linus's take on this topic in the Linux
+kernel - Documentation/CodingStyle.  He's done a far better job of
+explaining this.
+
+Line breaks
+~~~~~~~~~~~
+
+It is better to have lines that are longer than 80 characters than to
+wrap lines in random places. This makes it easier to work with tools
+such as "grep", and it also lets each developer choose their own
+window size and tab setting without being stuck to one particular
+choice.
+
+Of course, this does not mean that lines should be made unnecessarily
+long when there is a better alternative (see the note on
+pretentiousVariableNamingSchemes above).  Certainly there should not
+be more than one statement per line. Please do not use
+
+--------------------------------------------------------------------------------
+if (condition) break;
+--------------------------------------------------------------------------------
+
+but use the following:
+
+--------------------------------------------------------------------------------
+if (condition) {
+	break;
+}
+--------------------------------------------------------------------------------
+
+Miscellaneous coding style tools
+--------------------------------
+
+You can go a long way towards converting your source code to the NUT
+coding style by piping it through the following command:
+
+	indent -kr -i8 -T FILE -l1000 -nhnl
+
+This next command does a reasonable job of converting most C++ style
+comments (but not URLs and DOCTYPE strings):
+
+	sed 's#\(^\|[ \t]\)//[ \t]*\(.*\)[ \t]*#/* \2 */#'
+
+Emacs users can adjust how tabs are displayed. For example, it is
+possible to set a tab stop to be 3 spaces, rather than the usual 8.
+(Note that in the saved file, one indentation level will still
+correspond to one tab stop; the difference is only how the file is
+rendered on screen). It is even possible to set this on a
+per-directory basis, by putting something like this into your .emacs
+file:
+
+--------------------------------------------------------------------------------
+;; NUT style
+
+(defun nut-c-mode ()
+ "C mode with adjusted defaults for use with the NUT sources."
+ (interactive)
+ (c-mode)
+ (c-set-style "K&R")
+ (setq c-basic-offset 3)  ;; 3 spaces C-indentation
+ (setq tab-width 3))      ;; 3 spaces per tab
+
+;; apply NUT style to all C source files in all subdirectories of nut/
+
+(setq auto-mode-alist (cons '(".*/nut/.*\\.[ch]$". nut-c-mode)
+                       auto-mode-alist))
+--------------------------------------------------------------------------------
+
+Finishing touches
+~~~~~~~~~~~~~~~~~
+
+We like code that uses const and static liberally.  If you don't need to
+expose a function or global variable to the outside world, static is
+your friend.  If nobody should edit the contents of some buffer that's
+behind a pointer, const keeps them honest.
+
+We always compile with -Wall, so things like const and static help you
+find implementation flaws.  Functions that attempt to modify a constant
+or access something outside their scope will throw a warning or even
+fail to compile in some cases.  This is what we want.
+
+
+Spaghetti
+~~~~~~~~~
+
+If you use a goto, expect us to drop it when our head stops spinning.
+It gives us flashbacks to the very old code we wrote.
+We've tried to clean up our act, and you should make the effort
+as well.  
+
+We're not making a blanket statement about gotos, since everything
+probably has at least one good use.  There are a few cases where a goto
+is more efficient than any other approach, but you probably won't
+encounter them very often in this software.
+
+
+Legacy code
+~~~~~~~~~~~
+
+There are parts of the source tree that do not yet conform to these
+specs.  Part of this is due to the fact that the coding style has been
+evolving slightly over the course of the project.  Some of the code you
+see in these directories is 5 years old, and things have gotten cleaner
+since then.  Don't worry - it'll get cleaned up the next time something
+in the vicinity gets a visit.
+
+Memory leak checking
+~~~~~~~~~~~~~~~~~~~~
+
+We can't say enough good things about valgrind.  If you do anything with
+dynamic memory in your code, you need to use this.  Just compile with -g
+and start the program inside valgrind.  Run it through the suspected
+area and then exit cleanly.  valgrind will tell you if you've done
+anything dodgy like freeing regions twice, reading uninitialized memory,
+or if you've leaked memory anywhere.
+
+For more information, refer to the link:http://valgrind.kde.org[Valgrind]
+project.
+
+Conclusion
+~~~~~~~~~~
+
+The summary: please be kind to our eyes.  There's a lot of stuff in here,
+and many people have put a lot of time and energy to improve it.
+
+Submitting patches
+------------------
+
+Small patches that arrive in unified format (diff -u) as plain text attachments
+with no HTML and a brief summary at the top are the easiest to handle.
+
+If a patch is sent to the nut-upsdev mailing list, it stands a better chance of
+being seen immediately. However, it is likely to be dropped if any issues
+cannot be resolved quickly. If your code might not work for others, or if it is
+a large change, your best bet is to submit a pull request or create an
+link:https://github.com/networkupstools/nut/issues[issue on GitHub].
+
+The issue tracker allows us to track the patches over a longer period of time,
+and it is less likely that a patch will fall through the cracks. Posting a
+reminder to the developers (via the nut-upsdev list) about a patch on GitHub is
+fair game.
+
+Patch cohesion
+--------------
+
+Patches should have some kind of unifying element.  One patch set is one
+message, and it should all touch similar things.  If you have to edit 6
+files to add support for neutrino detection in UPS hardware, that's
+fine.
+
+However, sending one huge patch that does massive separate changes all over
+the tree is not recommended.  That kind of patch has to be split up and
+evaluated separately, assuming the core developers care enough to do that
+instead of just dropping it.
+
+If you have to make big changes in lots of places, send multiple
+patches - one per item.
+
+The finishing touches: manual pages and device entry in HCL
+-----------------------------------------------------------
+
+If you change something that involves an argument to a program or
+configuration file parsing, the man page is probably now out of date.
+If you don't update it, we have to, and we have enough to do as it is.
+
+If you write a new driver, send in the man page when you send us the
+source code for your driver.  Otherwise, we will be forced to write a
+skeletal man page that will probably miss many of the finer points of
+the driver and hardware.
+
+The same remark goes for device entries: if you add support for new models,
+remember to also complete the hardware compatibility list, present
+in data/driver.list.in. This will be used to generate both textual, static
+HTML and dynamic searchable HTML for the website.
+
+Source code management
+----------------------
+
+We currently use a Git repository hosted at GitHub (with a mirror at Alioth) to track
+changes to the NUT source code. This allows you to clone the repository (or
+fork, in GitHub parlance), make changes, and post them online for review prior
+to integration.
+
+To obtain permission to commit directly to the master NUT repository, you must
+be prepared to spend a fair amount of time contributing to the NUT codebase.
+Most developers will be well served by committing to their own Git repository,
+and having the NUT team merge their changes.
+
+Git offers a little more flexibility than the +svn update+ command. You may
+fetch other developers' changes into your repository, but hold off on
+actually combining them with your branch until you have compared the two
+branches (for instance, with `gitk --all`). Git also allows you to accumulate
+more than one commit worth of changes before pushing to another repository.
+This allows development to continue without a constant network connection.
+
+For a quick change to a file in the Git working copy, you can use `git diff` to
+generate a patch to send to the nut-upsdev mailing list.  If you have more
+extensive changes, you can use `git format-patch` on a complete commit or
+branch, and send the resulting series of patches to the list.
+
+If you use GitHub's web-based editor to make changes, it tends to create lots
+of small commits, one per change per file. Unless there is reason to keep the
+intermediate history, we will probably collapse the entire branch into one
+commit with `git rebase -i` before merging.
+
+The link:https://git.wiki.kernel.org/index.php/GitSvnCrashCourse[GitSvnCrashCourse]
+wiki page has some useful information for long-time users of Subversion.
+
+Git access
+~~~~~~~~~~
+
+Anonymous Git checkouts are possible:
+
+	git clone git://github.com/networkupstools/nut.git
+
+or
+
+	git clone https://github.com/networkupstools/nut.git
+
+if it is necessary to get around a pesky firewall that blocks the native Git
+protocol.
+
+For a quicker checkout (when you don't need the entire repository history),
+you can limit the depth of the clone:
+
+	git clone --depth 1 git://github.com/networkupstools/nut.git
+
+In case the GitHub repository is temporarily unavailable for any reason, we
+also plan to push to Alioth's
+link:https://alioth.debian.org/scm/?group_id=30602[Git server] as well. You can
+add a remote reference to your local repository:
+
+	cd path/to/nut
+	git remote add -f alioth git://anonscm.debian.org/nut/nut.git
+
+Mercurial (hg) access
+~~~~~~~~~~~~~~~~~~~~~
+
+There are those who prefer the simplicity and self-consistency of the Mercurial
+SCM client over the hodgepodge of unique commands which make up Git. Rather
+than debate the merits of each system, we will gently guide you towards the
+link:http://hg-git.github.com/[hg-git project] which would theoretically be a
+transparent bridge between the central Git repository, and your local Mercurial
+working copy.
+
+Other tools for hg/git interoperability are sure to exist. We would welcome any
+feedback about this process on the nut-upsdev mailing list.
+
+Subversion (SVN) access
+~~~~~~~~~~~~~~~~~~~~~~~
+
+If you prefer to check out the NUT source code using an SVN client, GitHub
+has a link:https://github.com/blog/966-improved-subversion-client-support[SVN
+interface to Git repositories] hosted on their servers. You can fork a copy of
+the NUT repository and commit to your fork with SVN.
+
+Be aware that the examples in the GitHub blog post might result in a checkout
+that includes all of the current branches, as well as the trunk. You are most
+likely interested in a command line similar to the following:
+
+	svn co https://github.com/networkupstools/nut/trunk nut-trunk-svn
+
+Ignoring generated files
+------------------------
+
+The NUT repository generally only holds files which are not generated from
+other files. This prevents spurious differences from being recorded in the
+repository history.
+
+If you add a driver, it is recommended that you add the driver executable name
+to the .gitignore file in that directory. Similarly, files generated from *.in
+and *.am sources should be ignored as well. We try to include a number of
+generated files in the tarball releases with `make dist` hooks in order to
+minimize the number of dependencies for end users, but the assumption is that
+a developer can install the packages needed to regenerate those files.
+
+Commit message formatting
+-------------------------
+
+From the `git commit` man page:
+
+[quote]
+Though not required, it’s a good idea to begin the commit message with a single
+short (less than 50 character) line summarizing the change, followed by a blank
+line and then a more thorough description. The text up to the first blank line
+in a commit message is treated as the commit title, and that title is used
+throughout git.
+
+If your commit is just a change to one component, such as the HCL, upsd or a
+specific driver, prefix your commit message in a way that matches similar
+commits. This helps when searching the repository or tracking down a
+regression.
+
+Referring to previous commits can be tricky. If you are referring to the
+immediate parent of a given commit, it suffices to say "the previous commit".
+(Are you correcting a typo in the previous commit? If you haven't pushed yet,
+consider using the `git commit --amend` command instead of creating a new
+commit.) For other commits, even though tools like gitk and GitHub's
+repository viewers recognize Git hashes and create links automatically, it is
+best to add some context such as the commit title or a date.
+
+You may notice that some older commits have `[[SVN:####]]` tags and Fossil-ID
+footers. These were lifted from the old SVN commit messages using reposurgeon,
+and should *not* be used as a guide for future commits.
+
+Repository etiquette and quality assurance
+------------------------------------------
+
+Please keep the Git master branch in working condition at all times. The
+master branch may be used to generate daily tarballs, and should not contain
+broken code. If you need to commit incremental changes that leave the system
+in a broken state, please do so in a separate branch and merge the changes
+back into master once they are complete.
+
+You are encouraged to use `git rebase -i` on your private Git branches to
+separate your changes into <<_patch_cohesion,logical changes>>.
+
+From there, you can generate patches for the issue tracker, or the nut-upsdev list.
+
+Note that once you rebase a branch, anyone else who has a copy of this branch
+will need to rebase on top of your rebased branch. Obviously, this hinders
+collaboration. In this case, we recommend that you rebase only in your private
+repository, and push when things are ready for discussion. Merging instead of
+rebasing will help with collaboration, but please do not turn the repository
+history into a pile of spaghetti by merging unnecessarily. (Test merges can be
+done on integration branches, which can be discarded if the merge is trivial.)
+Be sure that your commit messages are descriptive when merging.
+
+If you haven't created a commit out of your local changes yet, and you want to
+fetch the latest code, you can also use +git stash+ before pulling, then +git
+stash pop+ to apply your saved changes.
+
+Here is an example workflow:
+
+--------------------------------------------------------------------------------
+	git clone -o central git://github.com/networkupstools/nut.git
+
+	cd nut
+	git remote add -f username git://github.com/username/nut.git
+
+	git checkout master
+	git branch my-new-feature
+	git checkout my-new-feature
+
+	# Hack away
+
+	git add changed-file.c
+	git commit
+
+	# Fix a typo in a file or commit message:
+
+	git commit -a --amend
+
+	# Someone committed something to the central repository. Fetch it.
+
+	git fetch central
+	git rebase central/master
+
+	# Publish your branch to your GitHub repository:
+
+	git push username my-new-feature
+--------------------------------------------------------------------------------
+
+If you are new to Git, but are familiar with SVN, the
+link:http://git-scm.com/course/svn.html[following link] may be of use.
+
+[[building]]
+Building the Code
+-----------------
+
+For a developer, the NUT build process starts with `./autogen.sh`. This script
+generates the `./configure` script that end users typically invoke to build
+NUT. If you are making a number of changes to the NUT source tree, configuring
+with the `--enable-maintainer-mode` flag will ensure that after you change
+`Makefile.am`, the `Makefile.in` and `Makefile` get regenerated. At a
+minimum, you will need:
+
+* autoconf
+* automake
+* libtool
+* Python
+* Perl
+
+After running `./autogen.sh`, you can pass your local configuration options to
+`./configure` and run `make` from the top-level directory. To avoid the need
+for root privileges when testing new NUT code, you may wish to use
+`--prefix=$HOME/local/nut --with-statepath=/tmp`. You can also keep
+compilation times down by only building the driver you are currently working
+on: `--with-drivers=driver1,dummy-ups`.
+
+Before pushing your commits upstream, please run +make distcheck-light+. This
+checks that the Makefiles are not broken, that all the
+relevant files are distributed, and that there are no compilation or
+installation errors. Note that this requires all of the dependencies necessary
+to build the documentation, including asciidoc, a2x, xsltproc, dblatex and any
+additional XSL stylesheets.
+
+Running +make distcheck-light+ is especially important if you have added or
+removed files, or updated configure.in or some Makefile.am.  Remember: simply
+adding a file to Git does not mean it will be distributed. To distribute a
+file, you must update the corresponding Makefile.am.
+
+There is also +make distcheck+, which runs an even stricter set of
+tests than +make distcheck-light+, but will not work unless you have all the
+optional libraries and features installed.
+
+Even if you do not use your distribution's packages of NUT, installing the
+distribution's list of build dependencies for NUT can reduce the amount of
+trial-and-error when installing dependencies. For instance, in Debian, you can
+run `apt-get build-dep nut` to install all of the auto* tools as well as any
+development libraries and headers.
+

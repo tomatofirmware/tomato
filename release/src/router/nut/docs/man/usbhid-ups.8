@@ -1,0 +1,350 @@
+'\" t
+.\"     Title: usbhid-ups
+.\"    Author: [see the "AUTHORS" section]
+.\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
+.\"      Date: 04/17/2015
+.\"    Manual: NUT Manual
+.\"    Source: Network UPS Tools 2.7.3
+.\"  Language: English
+.\"
+.TH "USBHID\-UPS" "8" "04/17/2015" "Network UPS Tools 2\&.7\&.3" "NUT Manual"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+usbhid-ups \- Driver for USB/HID UPS equipment
+.SH "NOTE"
+.sp
+This man page only documents the hardware\-specific features of the usbhid\-ups driver\&. For information about the core driver, see \fBnutupsdrv\fR(8)\&.
+.sp
+This driver, formerly called \fInewhidups\fR, replaces the legacy \fIhidups\fR driver, which only supported Linux systems\&.
+.SH "SUPPORTED HARDWARE"
+.sp
+\fBusbhid\-ups\fR brings USB/HID UPS monitoring to NUT on all platform supporting USB through libusb\&. It should detect any UPS that uses the HID power device class, but the amount of data will vary depending on the manufacturer and model\&.
+.sp
+At the present time, usbhid\-ups supports:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+the newer Eaton USB models,
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+all MGE USB models,
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+all Dell USB models,
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+some APC models,
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+some Belkin models,
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+some Cyber Power Systems models,
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+some Powercom models,
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+some TrippLite models\&.
+.RE
+.sp
+For a more complete list, refer to the NUT hardware compatibility list, available in the source distribution as data/drivers\&.list, or on the NUT website\&. You may use the "explore" driver option to gather information from HID UPSes which are not yet supported; see below for details\&.
+.sp
+This driver is known to work on:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+most Linux systems,
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+FreeBSD (beta stage) and maybe other *BSD,
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Darwin / Mac OS X,
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Solaris 10\&.
+.RE
+.SH "EXTRA ARGUMENTS"
+.sp
+This driver also supports the following optional settings:
+.PP
+\fBoffdelay\fR=\fInum\fR
+.RS 4
+Set the timer before the UPS is turned off after the kill power command is sent (via the
+\fB\-k\fR
+switch)\&.
+.sp
+The default value is 20 (in seconds)\&. Usually this
+\fBmust be lower\fR
+than
+\fIondelay\fR, but the driver will
+\fBnot\fR
+warn you upon startup if it isn\(cqt\&.
+.RE
+.PP
+\fBondelay\fR=\fInum\fR
+.RS 4
+Set the timer for the UPS to switch on in case the power returns after the kill power command had been sent but before the actual switch off\&. This ensures the machines connected to the UPS are, in all cases, rebooted after a power failure\&.
+.sp
+The default value is 30 (in seconds)\&. Usually this
+\fBmust be greater\fR
+than offdelay, but the driver will
+\fBnot\fR
+warn you upon startup if it isn\(cqt\&. Some UPS\(cqes will restart no matter what, even if the power is (still) out at the moment this timer elapses\&. In that case, you could try if setting
+\fIondelay = \-1\fR
+in
+\fBups\&.conf\fR
+helps\&.
+.RE
+.PP
+\fBpollfreq\fR=\fInum\fR
+.RS 4
+Set polling frequency, in seconds, to reduce the USB data flow\&. Between two polling requests, the driver will wait for interrupts (aka UPS notifications), which are data changes returned by the UPS by itself\&. This mechanism allow to avoid or reduce staleness message, due to the UPS being temporarily overloaded with too much polling requests\&. The default value is 30 (in seconds)\&.
+.RE
+.PP
+\fBpollonly\fR
+.RS 4
+If this flag is set, the driver will ignore interrupts it receives from the UPS (not recommended, but needed if these reports are broken on your UPS)\&.
+.RE
+.PP
+\fBvendor\fR=\fIregex\fR, \fBproduct\fR=\fIregex\fR, \fBserial\fR=\fIregex\fR, \fBvendorid\fR=\fIregex\fR, \fBproductid\fR=\fIregex\fR
+.RS 4
+Select a specific UPS, in case there is more than one connected via USB Each option specifies an extended regular expression (see regex(7)) that must match the UPS\(cqs entire vendor/product/serial string (minus any surrounding whitespace), or the whole 4\-digit hexadecimal code for vendorid and productid\&. Try
+\fB\-DD\fR
+for finding out the strings to match\&.
+.sp
+Examples:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\-x vendor="Foo\&.Corporation\&.*"
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\-x vendorid=051d*
+(APC)
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+\-x product="\&.*(Smart|Back)\-?UPS\&.*"
+.RE
+.RE
+.PP
+\fBbus\fR=\fIregex\fR
+.RS 4
+Select a UPS on a specific USB bus or group of busses\&. The argument is a regular expression that must match the bus name where the UPS is connected (e\&.g\&. bus="002", bus="00[2\-3]")\&.
+.RE
+.PP
+\fBexplore\fR
+.RS 4
+With this option, the driver will connect to any device, including ones that are not yet supported\&. This must always be combined with the "vendorid" option\&. In this mode, the driver will not do anything useful except for printing debugging information (typically used with \-DD)\&.
+.RE
+.PP
+\fBmaxreport\fR
+.RS 4
+With this option, the driver activates a tweak to workaround buggy firmware returning invalid HID report length\&. Some APC Back\-UPS units are known to have this bug\&.
+.RE
+.PP
+\fBinterruptonly\fR
+.RS 4
+If this flag is set, the driver will not poll UPS\&. This also implies using of INPUT flagged objects\&. Some Powercom units need this option\&.
+.RE
+.PP
+\fBinterruptsize\fR=\fInum\fR
+.RS 4
+Limit the number of bytes to read from interrupt pipe\&. For some Powercom units this option should be equal to 8\&.
+.RE
+.SH "INSTALLATION"
+.sp
+This driver is not built by default\&. You can build it by using "configure \-\-with\-usb=yes"\&. Note that it will also install other USB drivers\&.
+.sp
+You also need to install manually the legacy hotplug files (libhidups and libhid\&.usermap, generally in /etc/hotplug/usb/), or the udev file (nut\-usbups\&.rules, generally in /etc/udev/rules\&.d/) to address the permission settings problem\&. For more information, refer to the README file in nut/scripts/hotplug or nut/scripts/udev\&.
+.sp
+On Linux with MGE equipment, you will need at least a 2\&.4\&.25 or 2\&.6\&.2 kernel as well as libusb\-0\&.1\&.8 or later to disable hiddev support and avoid conflict\&.
+.SH "IMPLEMENTATION"
+.sp
+The driver ignores the "port" value in \fBups\&.conf\fR\&. Unlike previous versions of this driver, it is now possible to control multiple UPS units simultaneously with this driver, provided they can be distinguished by setting some combination of the "vendor", "product", "serial", "vendorid", and "productid" options\&. For instance:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+[mge]
+        driver = usbhid\-ups
+        port = auto
+        vendorid = 0463
+[tripplite]
+        driver = usbhid\-ups
+        port = auto
+        vendorid = 09ae
+.fi
+.if n \{\
+.RE
+.\}
+.SH "KNOWN ISSUES AND BUGS"
+.SS "Repetitive timeout and staleness"
+.sp
+Some models tends to be unresponsive with the default polling frequency\&. The result is that your system log will have lots of messages like:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+usb 2\-1: control timeout on ep0in
+usb 2\-1: usbfs: USBDEVFS_CONTROL failed cmd usbhid\-ups rqt 128 rq 6 len 256
+ret \-110
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+In this case, simply modify the general parameter "pollinterval" to a higher value (like 10 for 10 seconds)\&. This should solve the issue\&.
+.SS "Got EPERM: Operation not permitted upon driver startup"
+.sp
+You have forgotten to install the hotplug files, as explained in the INSTALLATION section above\&. Don\(cqt forget to restart hotplug so that it applies these changes\&.
+.SS "Unattended shutdowns"
+.sp
+The hardware which was used for development of this driver is almost certainly different from what you have, and not all manufacturers follow the USB HID Power Device Class specifications to the letter\&. You don\(cqt want to find out that yours has issues here when a power failure hits your server room and you\(cqre not around to manually restart your servers\&.
+.sp
+If you rely on the UPS to shutdown your systems in case of mains failure and to restart them when the power returns, you \fBmust\fR test this\&. You can do so by running \fIupsmon \-c fsd\fR\&. With the mains present, this should bring your systems down and then cycle the power to restart them again\&. If you do the same without mains present, it should do the same, but in this case, the outputs shall remain off until mains power is applied again\&.
+.SH "AUTHORS"
+.sp
+Originally sponsored by MGE UPS SYSTEMS\&. Now sponsored by Eaton http://opensource\&.eaton\&.com Arnaud Quette, Peter Selinger, Arjen de Korte
+.SH "SEE ALSO"
+.SS "The core driver"
+.sp
+\fBnutupsdrv\fR(8)
+.SS "Internet resources"
+.sp
+The NUT (Network UPS Tools) home page: http://www\&.networkupstools\&.org/
