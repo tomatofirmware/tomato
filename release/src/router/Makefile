@@ -84,6 +84,8 @@ obj-$(TCONFIG_USB) += comgt
 obj-$(TCONFIG_USB) += uqmi
 
 obj-$(TCONFIG_UPS) += apcupsd
+obj-$(TCONFIG_UPS) += nut
+
 
 ifeq ($(CONFIG_LINUX26),y)
 obj-$(TCONFIG_USB) += sd-idle
@@ -92,7 +94,7 @@ obj-$(TCONFIG_USB) += scsi-idle
 endif
 
 obj-y += libusb10
-#obj-y += libusb
+obj-y += libusb
 obj-y += usbmodeswitch
 obj-$(TCONFIG_FTP) += vsftpd
 
@@ -299,7 +301,6 @@ install package: $(obj-install) $(LINUXDIR)/.config
 	@$(SEP)
 
 	install -d $(TARGETDIR)
-
 
 # kernel modules
 	$(MAKE) -C $(LINUXDIR) modules_install \
@@ -2477,6 +2478,41 @@ apcupsd-install: apcupsd
 	@rm -rf $(INSTALLDIR)/apcupsd/www/apcupsd/ups*.cgi
 	$(STRIP) $(INSTALLDIR)/apcupsd/sbin/*
 	$(STRIP) $(INSTALLDIR)/apcupsd/www/apcupsd/*
+
+nut/stamp-h1: libusb
+	cd nut && CC=$(CC) STRIP='mipsel-uclibc-strip' \
+	$(MAKE) configure && \
+	CFLAGS="-Os -Wall $(EXTRACFLAGS)" \
+	LDFLAGS="-L$(TOOLCHAIN)/lib -ffunction-sections -fdata-sections" \
+	$(CONFIGURE) --prefix=/usr --with-usb --with-cgipath=/www/nut --with-driver=blazer_usb --sysconfdir=/etc/nut --bindir=/bin \
+	--with-usb-includes=-I$(TOP)/libusb/libusb --with-usb-libs="-L$(TOP)/libusb/libusb/.libs -lusb-0.1 -L$(TOP)/libusb10/libusb/.libs -lusb-1.0"
+	touch nut/stamp-h1
+
+nut: nut/stamp-h1
+	$(MAKE) -C nut $(PARALLEL_BUILD)
+
+nut-clean:
+	-@$(MAKE) -C nut clean
+	@rm -f nut/stamp-h1
+
+nut-install: nut
+	$(MAKE) -C nut DESTDIR=$(INSTALLDIR)/nut install
+	@rm -rf $(INSTALLDIR)/nut/usr/lib/libnutclient*
+	find $(INSTALLDIR)/nut/usr/bin/* ! -name 'blazer_usb' -type f -exec rm -f {} +
+#	find $(INSTALLDIR)/nut/bin/* ! -name 'upssched-cmd' -type f -exec $(STRIP) {} +
+#	$(STRIP) $(INSTALLDIR)/nut/bin/*
+#	$(STRIP) $(INSTALLDIR)/nut/www/nut/*
+
+
+	install -d $(INSTALLDIR)/iptables/usr/lib/iptables
+	install -D iptables/extensions/*.so $(INSTALLDIR)/iptables/usr/lib/iptables/
+
+	install -D iptables/libiptc.so $(INSTALLDIR)/iptables/usr/lib/libiptc.so
+
+	$(STRIP) $(INSTALLDIR)/iptables/usr/sbin/iptables
+	$(STRIP) $(INSTALLDIR)/iptables/usr/lib/iptables/*.so
+	$(STRIP) $(INSTALLDIR)/iptables/usr/lib/libiptc.so
+
 
 libsodium/stamp-h1:
 	cd $(TOP)/libsodium && CC=$(CC) STRIP='mipsel-uclibc-strip' \
