@@ -259,13 +259,6 @@ sub fixDyn
 	fixDynDep("apcupsd", "libc.so.0");
 	fixDynDep("apcupsd", "libgcc_s.so.1");
 	fixDynDep("apcaccess", "libc.so.0");
-	fixDynDep("upsc", "libupsclient.so.4.0.0");
-	fixDynDep("upscmd", "libupsclient.so.4.0.0");
-	fixDynDep("upsmon", "libupsclient.so.4.0.0");
-	fixDynDep("upslog", "libupsclient.so.4.0.0");
-	fixDynDep("upsrw", "libupsclient.so.4.0.0");
-	fixDynDep("dummy-ups", "libupsclient.so.4.0.0");
-	fixDynDep("blazer_usb", "libusb-0.1.so");
 	fixDynDep("smtp", "libc.so.0");
 
 #	fixDynDep("libbcm.so", "libshared.so");
