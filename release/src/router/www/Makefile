@@ -50,9 +50,19 @@ else
 	done
 endif
 
-# Add Build Information to about.asp page (placeholders exist)
-	sed -i $(INSTALLDIR)/www/about.asp -e "s/#param-blddate#/`date +"%Y %B %d, %H:%M %P"`/"
-	sed -i $(INSTALLDIR)/www/about.asp -e "s/#param-bldmach#/`uname -m -r -s -n`/"
+#only include  MultiWAN options if MULTIWAN is configured in.
+ifneq ($(TCONFIG_MULTIWAN),y)
+	cd $(INSTALLDIR)/www && \
+	for F in $(wildcard *.asp *.js *.jsx); do \
+		sed -i $$F -e "/MULTIWAN-BEGIN/,/MULTIWAN-END/d"; \
+	done
+# or remove dualwan options
+else
+	cd $(INSTALLDIR)/www && \
+	for F in $(wildcard *.asp *.js *.jsx); do \
+		sed -i $$F -e "/DUALWAN-BEGIN/,/DUALWAN-END/d"; \
+	done
+endif
 
 # Only include the CIFS pages if CIFS is configured in.
 ifneq ($(TCONFIG_CIFS),y)
@@ -304,6 +314,8 @@ endif
 		-e "/DNSSEC-BEGIN/d"	-e "/DNSSEC-END/d"\
 		-e "/TOR-BEGIN/d"	-e "/TOR-END/d"\
 		-e "/TINC-BEGIN/d"	-e "/TINC-END/d"\
+		-e "/MULTIWAN-BEGIN/d"	-e "/MULTIWAN-END/d"\
+		-e "/DUALWAN-BEGIN/d"	-e "/DUALWAN-END/d"\
 		|| true; \
 	done
 

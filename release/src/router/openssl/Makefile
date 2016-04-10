@@ -4,7 +4,7 @@
 ## Makefile for OpenSSL
 ##
 
-VERSION=1.0.2d
+VERSION=1.0.2g
 MAJOR=1
 MINOR=0.2
 SHLIB_VERSION_NUMBER=1.0.0
@@ -13,7 +13,7 @@ SHLIB_MAJOR=1
 SHLIB_MINOR=0.0
 SHLIB_EXT=.so.$(SHLIB_MAJOR).$(SHLIB_MINOR)
 PLATFORM=linux-armv4
-OPTIONS=--openssldir=/etc --cross-compile-prefix=  -ffunction-sections -fdata-sections -Wl,--gc-sections enable-shared enable-rc5 no-camellia no-capieng no-dtls1 no-ec_nistp_64_gcc_128 no-engines no-err no-gmp no-gms no-hw no-jpake no-krb5 no-libunbound no-md2 no-mdc2 no-psk no-rfc3779 no-ripemd no-rmd160 no-sctp no-seed no-sha0 no-smime no-sse2 no-ssl-trace no-ssl2 no-ssl3 no-store no-ts no-unit-test no-zlib no-zlib-dynamic no-static-engine
+OPTIONS=--openssldir=/etc --cross-compile-prefix=  -ffunction-sections -fdata-sections -Wl,--gc-sections enable-shared enable-rc5 no-camellia no-capieng no-dtls1 no-ec_nistp_64_gcc_128 no-engines no-err no-gmp no-gms no-hw no-jpake no-krb5 no-libunbound no-md2 no-mdc2 no-psk no-rfc3779 no-ripemd no-rmd160 no-sctp no-seed no-sha0 no-smime no-sse2 no-ssl-trace no-ssl2 no-ssl3 no-store no-ts no-unit-test no-weak-ssl-ciphers no-zlib no-zlib-dynamic no-static-engine
 CONFIGURE_ARGS=linux-armv4 --openssldir=/etc --cross-compile-prefix=  -ffunction-sections -fdata-sections -Wl,--gc-sections shared enable-rc5 no-ssl2 no-ssl3 no-sha0 no-smime no-camellia no-krb5 no-rmd160 no-ripemd no-seed no-capieng no-gms no-gmp no-rfc3779 no-err no-hw no-jpake no-zlib no-engines no-sse2 no-libunbound no-ssl-trace no-dtls1 no-store no-psk no-md2 no-mdc2 no-ts
 SHLIB_TARGET=linux-shared
 
@@ -62,7 +62,7 @@ OPENSSLDIR=/etc
 CROSS_COMPILE=  
 CC= $(CROSS_COMPILE)arm-brcm-linux-uclibcgnueabi-gcc
 CFLAG= -fPIC -DOPENSSL_PIC -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -ffunction-sections -fdata-sections -DOPENSSL_NO_ERR -O3 -Wall -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_GF2m -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DBSAES_ASM -DGHASH_ASM
-DEPFLAG= -DOPENSSL_NO_CAMELLIA -DOPENSSL_NO_CAPIENG -DOPENSSL_NO_DTLS1 -DOPENSSL_NO_EC_NISTP_64_GCC_128 -DOPENSSL_NO_ENGINES -DOPENSSL_NO_GMP -DOPENSSL_NO_GMS -DOPENSSL_NO_JPAKE -DOPENSSL_NO_LIBUNBOUND -DOPENSSL_NO_MD2 -DOPENSSL_NO_MDC2 -DOPENSSL_NO_PSK -DOPENSSL_NO_RFC3779 -DOPENSSL_NO_RIPEMD -DOPENSSL_NO_RMD160 -DOPENSSL_NO_SCTP -DOPENSSL_NO_SEED -DOPENSSL_NO_SHA0 -DOPENSSL_NO_SMIME -DOPENSSL_NO_SSL_TRACE -DOPENSSL_NO_SSL2 -DOPENSSL_NO_SSL3 -DOPENSSL_NO_STORE -DOPENSSL_NO_TS -DOPENSSL_NO_UNIT_TEST
+DEPFLAG= -DOPENSSL_NO_CAMELLIA -DOPENSSL_NO_CAPIENG -DOPENSSL_NO_DTLS1 -DOPENSSL_NO_EC_NISTP_64_GCC_128 -DOPENSSL_NO_ENGINES -DOPENSSL_NO_GMP -DOPENSSL_NO_GMS -DOPENSSL_NO_JPAKE -DOPENSSL_NO_LIBUNBOUND -DOPENSSL_NO_MD2 -DOPENSSL_NO_MDC2 -DOPENSSL_NO_PSK -DOPENSSL_NO_RFC3779 -DOPENSSL_NO_RIPEMD -DOPENSSL_NO_RMD160 -DOPENSSL_NO_SCTP -DOPENSSL_NO_SEED -DOPENSSL_NO_SHA0 -DOPENSSL_NO_SMIME -DOPENSSL_NO_SSL_TRACE -DOPENSSL_NO_SSL2 -DOPENSSL_NO_SSL3 -DOPENSSL_NO_STORE -DOPENSSL_NO_TS -DOPENSSL_NO_UNIT_TEST -DOPENSSL_NO_WEAK_SSL_CIPHERS
 PEX_LIBS= 
 EX_LIBS= -Wl,--gc-sections -ldl
 EXE_EXT= 
@@ -183,8 +183,7 @@ SHARED_LDFLAGS=
 GENERAL=        Makefile
 BASENAME=       openssl
 NAME=           $(BASENAME)-$(VERSION)
-TARFILE=        $(NAME).tar
-WTARFILE=       $(NAME)-win.tar
+TARFILE=        ../$(NAME).tar
 EXHEADER=       e_os2.h
 HEADER=         e_os.h
 
@@ -206,7 +205,9 @@ CLEARENV=	TOP= && unset TOP $${LIB+LIB} $${LIBS+LIBS}	\
 		$${SHAREDCMD+SHAREDCMD} $${SHAREDFLAGS+SHAREDFLAGS}	\
 		$${SHARED_LIB+SHARED_LIB} $${LIBEXTRAS+LIBEXTRAS}
 
-BUILDENV=	PLATFORM='$(PLATFORM)' PROCESSOR='$(PROCESSOR)' \
+# LC_ALL=C ensures that error [and other] messages are delivered in
+# same language for uniform treatment.
+BUILDENV=	LC_ALL=C PLATFORM='$(PLATFORM)' PROCESSOR='$(PROCESSOR)'\
 		CC='$(CC)' CFLAG='$(CFLAG)' 			\
 		AS='$(CC)' ASFLAG='$(CFLAG) -c'			\
 		AR='$(AR)' NM='$(NM)' RANLIB='$(RANLIB)'	\
@@ -494,35 +495,35 @@ TABLE: Configure
 # would occur. Therefore the list of files is temporarily stored into a file
 # and read directly, requiring GNU-Tar. Call "make TAR=gtar dist" if the normal
 # tar does not support the --files-from option.
-tar:
+TAR_COMMAND=$(TAR) $(TARFLAGS) --files-from $(TARFILE).list \
+	                       --owner 0 --group 0 \
+			       --transform 's|^|$(NAME)/|' \
+			       -cvf -
+
+$(TARFILE).list:
+	find * \! -name STATUS \! -name TABLE \! -name '*.o' \! -name '*.a' \
+	       \! -name '*.so' \! -name '*.so.*'  \! -name 'openssl' \
+	       \( \! -name '*test' -o -name bctest -o -name pod2mantest \) \
+	       \! -name '.#*' \! -name '*~' \! -type l \
+	    | sort > $(TARFILE).list
+
+tar: $(TARFILE).list
 	find . -type d -print | xargs chmod 755
 	find . -type f -print | xargs chmod a+r
 	find . -type f -perm -0100 -print | xargs chmod a+x
-	find * \! -path CVS/\* \! -path \*/CVS/\* \! -name CVS \! -name .cvsignore \! -name STATUS \! -name TABLE | sort > ../$(TARFILE).list; \
-	$(TAR) $(TARFLAGS) --files-from ../$(TARFILE).list -cvf - | \
-	tardy --user_number=0  --user_name=openssl \
-	      --group_number=0 --group_name=openssl \
-	      --prefix=openssl-$(VERSION) - |\
-	gzip --best >../$(TARFILE).gz; \
-	rm -f ../$(TARFILE).list; \
-	ls -l ../$(TARFILE).gz
+	$(TAR_COMMAND) | gzip --best > $(TARFILE).gz
+	rm -f $(TARFILE).list
+	ls -l $(TARFILE).gz
 
-tar-snap:
-	@$(TAR) $(TARFLAGS) -cvf - \
-		`find * \! -path CVS/\* \! -path \*/CVS/\* \! -name CVS \! -name .cvsignore \! -name STATUS \! -name TABLE \! -name '*.o' \! -name '*.a' \! -name '*.so' \! -name '*.so.*'  \! -name 'openssl' \! -name '*test' \! -name '.#*' \! -name '*~' | sort` |\
-	tardy --user_number=0  --user_name=openssl \
-	      --group_number=0 --group_name=openssl \
-	      --prefix=openssl-$(VERSION) - > ../$(TARFILE);\
-	ls -l ../$(TARFILE)
+tar-snap: $(TARFILE).list
+	$(TAR_COMMAND) > $(TARFILE)
+	rm -f $(TARFILE).list
+	ls -l $(TARFILE)
 
 dist:   
 	$(PERL) Configure dist
-	@$(MAKE) dist_pem_h
 	@$(MAKE) SDIRS='$(SDIRS)' clean
-	@$(MAKE) TAR='$(TAR)' TARFLAGS='$(TARFLAGS)' tar
-
-dist_pem_h:
-	(cd crypto/pem; $(MAKE) -e $(BUILDENV) pem.h; $(MAKE) clean)
+	@$(MAKE) TAR='$(TAR)' TARFLAGS='$(TARFLAGS)' $(DISTTARVARS) tar
 
 install: all install_sw
 

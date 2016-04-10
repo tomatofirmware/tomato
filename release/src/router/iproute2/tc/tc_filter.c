@@ -15,8 +15,6 @@
 #include <unistd.h>
 #include <syslog.h>
 #include <fcntl.h>
-#include <net/if.h>
-#include <net/if_arp.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -32,8 +30,8 @@ static void usage(void);
 
 static void usage(void)
 {
-	fprintf(stderr, "Usage: tc filter [ add | del | change | get ] dev STRING\n");
-	fprintf(stderr, "       [ pref PRIO ] [ protocol PROTO ]\n");
+	fprintf(stderr, "Usage: tc filter [ add | del | change | replace | show ] dev STRING\n");
+	fprintf(stderr, "       [ pref PRIO ] protocol PROTO\n");
 	fprintf(stderr, "       [ estimator INTERVAL TIME_CONSTANT ]\n");
 	fprintf(stderr, "       [ root | classid CLASSID ] [ handle FILTERID ]\n");
 	fprintf(stderr, "       [ [ FILTER_TYPE ] [ help | OPTIONS ] ]\n");
@@ -73,6 +71,9 @@ int tc_filter_modify(int cmd, unsigned flags, int argc, char **argv)
 	req.n.nlmsg_type = cmd;
 	req.t.tcm_family = AF_UNSPEC;
 
+	if (cmd == RTM_NEWTFILTER && flags & NLM_F_CREATE)
+		protocol = htons(ETH_P_ALL);
+
 	while (argc > 0) {
 		if (strcmp(*argv, "dev") == 0) {
 			NEXT_ARG();
@@ -104,7 +105,7 @@ int tc_filter_modify(int cmd, unsigned flags, int argc, char **argv)
 			if (prio)
 				duparg("priority", *argv);
 			if (get_u32(&prio, *argv, 0))
-				invarg(*argv, "invalid prpriority value");
+				invarg(*argv, "invalid priority value");
 		} else if (matches(*argv, "protocol") == 0) {
 			__u16 id;
 			NEXT_ARG();
@@ -176,8 +177,8 @@ static int filter_ifindex;
 static __u32 filter_prio;
 static __u32 filter_protocol;
 
-static int print_filter(const struct sockaddr_nl *who,
-			struct nlmsghdr *n, 
+int print_filter(const struct sockaddr_nl *who,
+			struct nlmsghdr *n,
 			void *arg)
 {
 	FILE *fp = (FILE*)arg;
@@ -363,8 +364,10 @@ int do_filter(int argc, char **argv)
 	if (matches(*argv, "list") == 0 || matches(*argv, "show") == 0
 	    || matches(*argv, "lst") == 0)
 		return tc_filter_list(argc-1, argv+1);
-	if (matches(*argv, "help") == 0)
+	if (matches(*argv, "help") == 0) {
 		usage();
+		return 0;
+        }
 	fprintf(stderr, "Command \"%s\" is unknown, try \"tc filter help\".\n", *argv);
 	return -1;
 }
