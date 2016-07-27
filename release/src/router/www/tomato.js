@@ -2455,6 +2455,7 @@ function navi()
 			['Conntrack/Netfilter',		'ctnf.asp'],
 			['DHCP/DNS',			'dhcpdns.asp'],
 			['Firewall',			'firewall.asp'],
+			['Adblock',			'adblock.asp'],
 			['MAC Address',			'mac.asp'],
 			['Miscellaneous',		'misc.asp'],
 			['Routing',			'routing.asp'],
@@ -2462,7 +2463,12 @@ function navi()
 /* TOR-BEGIN */
 			['TOR Project',			'tor.asp'],
 /* TOR-END */
+/* MIPSR2-BEGIN */
 			['VLAN',			'vlan.asp'],
+/* MIPSR2-END */
+/* MIPSR1-BEGIN */
+			['VLAN',			'vlan-r1.asp'],
+/* MIPSR1-END */
 			['LAN Access',			'access.asp'],
 			['Virtual Wireless',		'wlanvifs.asp'],
 			['Wireless',			'wireless.asp'] ] ],
