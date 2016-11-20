@@ -294,13 +294,13 @@ static int renew(char *ifname, char *prefix)
 	nvram_unset(strcat_r(prefix, "_routes2_save", tmp));
 
 	TRACE_PT(strcat_r(prefix, "_ipaddr=%s\n", tmp), nvram_safe_get(strcat_r(prefix, "_ipaddr", tmp)));
-	TRACE_PT(strcat_r(prefix, "_netmask=%s\n" tmp), nvram_safe_get(strcat_r(prefix, "_netmask", tmp)));
-	TRACE_PT(strcat_r(prefix, "_gateway=%s\n" tmp), nvram_safe_get(strcat_r(prefix, "_gateway", tmp)));
-	TRACE_PT(strcat_r(prefix, "_get_domain=%s\n" tmp), nvram_safe_get(strcat_r(prefix, "_get_domain", tmp)));
-	TRACE_PT(strcat_r(prefix, "_get_dns=%s\n" tmp), nvram_safe_get(strcat_r(prefix, "_get_dns", tmp)));
-	TRACE_PT(strcat_r(prefix, "_lease=%s\n" tmp), nvram_safe_get(strcat_r(prefix, "_lease", tmp)));
-	TRACE_PT(strcat_r(prefix, "_routes1=%s\n" tmp), nvram_safe_get(strcat_r(prefix, "_routes1", tmp)));
-	TRACE_PT(strcat_r(prefix, "_routes2=%s\n" tmp), nvram_safe_get(strcat_r(prefix, "_routes2", tmp)));
+	TRACE_PT(strcat_r(prefix, "_netmask=%s\n", tmp), nvram_safe_get(strcat_r(prefix, "_netmask", tmp)));
+	TRACE_PT(strcat_r(prefix, "_gateway=%s\n", tmp), nvram_safe_get(strcat_r(prefix, "_gateway", tmp)));
+	TRACE_PT(strcat_r(prefix, "_get_domain=%s\n", tmp), nvram_safe_get(strcat_r(prefix, "_get_domain", tmp)));
+	TRACE_PT(strcat_r(prefix, "_get_dns=%s\n", tmp), nvram_safe_get(strcat_r(prefix, "_get_dns", tmp)));
+	TRACE_PT(strcat_r(prefix, "_lease=%s\n", tmp), nvram_safe_get(strcat_r(prefix, "_lease", tmp)));
+	TRACE_PT(strcat_r(prefix, "_routes1=%s\n", tmp), nvram_safe_get(strcat_r(prefix, "_routes1", tmp)));
+	TRACE_PT(strcat_r(prefix, "_routes2=%s\n", tmp), nvram_safe_get(strcat_r(prefix, "_routes2", tmp)));
 	TRACE_PT("end\n");
 	return 0;
 }
