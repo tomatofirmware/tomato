@@ -12,9 +12,9 @@ SHLIB_VERSION_HISTORY=
 SHLIB_MAJOR=1
 SHLIB_MINOR=0.0
 SHLIB_EXT=.so.$(SHLIB_MAJOR).$(SHLIB_MINOR)
-PLATFORM=linux-armv4
+PLATFORM=linux-mipsel
 OPTIONS=--openssldir=/etc --cross-compile-prefix=  -ffunction-sections -fdata-sections -Wl,--gc-sections enable-shared enable-rc5 no-camellia no-capieng no-dtls1 no-ec_nistp_64_gcc_128 no-engines no-err no-gmp no-gms no-hw no-jpake no-krb5 no-libunbound no-md2 no-mdc2 no-psk no-rfc3779 no-ripemd no-rmd160 no-sctp no-seed no-sha0 no-smime no-sse2 no-ssl-trace no-ssl2 no-ssl3 no-store no-ts no-unit-test no-weak-ssl-ciphers no-zlib no-zlib-dynamic no-static-engine
-CONFIGURE_ARGS=linux-armv4 --openssldir=/etc --cross-compile-prefix=  -ffunction-sections -fdata-sections -Wl,--gc-sections shared enable-rc5 no-ssl2 no-ssl3 no-sha0 no-smime no-camellia no-krb5 no-rmd160 no-ripemd no-seed no-capieng no-gms no-gmp no-rfc3779 no-err no-hw no-jpake no-zlib no-engines no-sse2 no-libunbound no-ssl-trace no-dtls1 no-store no-psk no-md2 no-mdc2 no-ts
+CONFIGURE_ARGS=linux-mipsel --openssldir=/etc --cross-compile-prefix=  -ffunction-sections -fdata-sections -Wl,--gc-sections shared enable-rc5 no-ssl2 no-ssl3 no-sha0 no-smime no-camellia no-krb5 no-rmd160 no-ripemd no-seed no-capieng no-gms no-gmp no-rfc3779 no-err no-hw no-jpake no-zlib no-engines no-sse2 no-libunbound no-ssl-trace no-dtls1 no-store no-psk no-md2 no-mdc2 no-ts
 SHLIB_TARGET=linux-shared
 
 # HERE indicates where this Makefile lives.  This can be used to indicate
@@ -60,8 +60,8 @@ OPENSSLDIR=/etc
 # PKCS1_CHECK - pkcs1 tests.
 
 CROSS_COMPILE=  
-CC= $(CROSS_COMPILE)arm-brcm-linux-uclibcgnueabi-gcc
-CFLAG= -fPIC -DOPENSSL_PIC -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -ffunction-sections -fdata-sections -DOPENSSL_NO_ERR -O3 -Wall -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_GF2m -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DBSAES_ASM -DGHASH_ASM
+CC= $(CROSS_COMPILE)mipsel-uclibc-gcc
+CFLAG= -fPIC -DOPENSSL_PIC -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -ffunction-sections -fdata-sections -DOPENSSL_NO_ERR -DL_ENDIAN -DTERMIO -O3 $(EXTRACFLAGS) -DOPENSSL_SMALL_FOOTPRINT -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DSHA1_ASM -DSHA256_ASM -DAES_ASM
 DEPFLAG= -DOPENSSL_NO_CAMELLIA -DOPENSSL_NO_CAPIENG -DOPENSSL_NO_DTLS1 -DOPENSSL_NO_EC_NISTP_64_GCC_128 -DOPENSSL_NO_ENGINES -DOPENSSL_NO_GMP -DOPENSSL_NO_GMS -DOPENSSL_NO_JPAKE -DOPENSSL_NO_LIBUNBOUND -DOPENSSL_NO_MD2 -DOPENSSL_NO_MDC2 -DOPENSSL_NO_PSK -DOPENSSL_NO_RFC3779 -DOPENSSL_NO_RIPEMD -DOPENSSL_NO_RMD160 -DOPENSSL_NO_SCTP -DOPENSSL_NO_SEED -DOPENSSL_NO_SHA0 -DOPENSSL_NO_SMIME -DOPENSSL_NO_SSL_TRACE -DOPENSSL_NO_SSL2 -DOPENSSL_NO_SSL3 -DOPENSSL_NO_STORE -DOPENSSL_NO_TS -DOPENSSL_NO_UNIT_TEST -DOPENSSL_NO_WEAK_SSL_CIPHERS
 PEX_LIBS= 
 EX_LIBS= -Wl,--gc-sections -ldl
@@ -89,23 +89,23 @@ ASFLAG=$(CFLAG)
 PROCESSOR= 
 
 # CPUID module collects small commonly used assembler snippets
-CPUID_OBJ= armcap.o armv4cpuid.o
-BN_ASM= bn_asm.o armv4-mont.o armv4-gf2m.o
+CPUID_OBJ= mem_clr.o
+BN_ASM= bn-mips.o mips-mont.o
 EC_ASM= 
 DES_ENC= des_enc.o fcrypt_b.o
-AES_ENC= aes_cbc.o aes-armv4.o bsaes-armv7.o aesv8-armx.o
+AES_ENC= aes_cbc.o aes-mips.o
 BF_ENC= bf_enc.o
 CAST_ENC= c_enc.o
 RC4_ENC= rc4_enc.o rc4_skey.o
 RC5_ENC= rc5_enc.o
 MD5_ASM_OBJ= 
-SHA1_ASM_OBJ= sha1-armv4-large.o sha256-armv4.o sha512-armv4.o
+SHA1_ASM_OBJ= sha1-mips.o sha256-mips.o
 RMD160_ASM_OBJ= 
 WP_ASM_OBJ= wp_block.o
 CMLL_ENC= camellia.o cmll_misc.o cmll_cbc.o
-MODES_ASM_OBJ= ghash-armv4.o ghashv8-armx.o
+MODES_ASM_OBJ= 
 ENGINES_ASM_OBJ= 
-PERLASM_SCHEME= void
+PERLASM_SCHEME= o32
 
 # KRB5 stuff
 KRB5_INCLUDES=

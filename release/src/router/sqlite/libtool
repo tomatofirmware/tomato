@@ -1,8 +1,8 @@
-#! /bin/sh
+#! /bin/bash
 
 # libtool - Provide generalized library-building support services.
 # Generated automatically by config.status (sqlite) 3.8.6
-# Libtool was configured on host builder:
+# Libtool was configured on host linuxServer:
 # NOTE: Changes made to this file will be lost: look at ltmain.sh.
 #
 #   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2003, 2004, 2005,
@@ -56,7 +56,7 @@ pic_mode=default
 fast_install=yes
 
 # Shell to use when invoking shell scripts.
-SHELL="/bin/sh"
+SHELL="/bin/bash"
 
 # An echo program that protects backslashes.
 ECHO="printf %s\\n"
@@ -65,8 +65,8 @@ ECHO="printf %s\\n"
 PATH_SEPARATOR=":"
 
 # The host system.
-host_alias=arm-linux
-host=arm-unknown-linux-gnu
+host_alias=mipsel-linux
+host=mipsel-unknown-linux-gnu
 host_os=linux-gnu
 
 # The build system.
@@ -90,13 +90,13 @@ EGREP="/bin/grep -E"
 FGREP="/bin/grep -F"
 
 # A BSD- or MS-compatible name lister.
-NM="arm-brcm-linux-uclibcgnueabi-nm"
+NM="mipsel-uclibc-nm"
 
 # Whether we need soft or hard links.
 LN_S="ln -s"
 
 # What is the maximum length of a command?
-max_cmd_len=3458764513820540925
+max_cmd_len=1572864
 
 # Object file suffix (normally "o").
 objext=o
@@ -120,7 +120,7 @@ to_host_file_cmd=func_convert_file_noop
 to_tool_file_cmd=func_convert_file_noop
 
 # An object symbol dumper.
-OBJDUMP="objdump"
+OBJDUMP="mipsel-linux-objdump"
 
 # Method to check whether dependent libraries are shared objects.
 deplibs_check_method="pass_all"
@@ -141,7 +141,7 @@ DLLTOOL="false"
 sharedlib_from_linklib_cmd="printf %s\\n"
 
 # The archiver.
-AR="arm-brcm-linux-uclibcgnueabi-ar"
+AR="mipsel-uclibc-ar"
 
 # Flags to create an archive.
 AR_FLAGS="cru"
@@ -150,10 +150,10 @@ AR_FLAGS="cru"
 archiver_list_spec="@"
 
 # A symbol stripping program.
-STRIP="arm-brcm-linux-uclibcgnueabi-strip"
+STRIP="mipsel-uclibc-strip -R .note -R .comment"
 
 # Commands used to install an old-style archive.
-RANLIB="arm-brcm-linux-uclibcgnueabi-ranlib"
+RANLIB="mipsel-uclibc-ranlib"
 old_postinstall_cmds="chmod 644 \$oldlib~\$RANLIB \$tool_oldlib"
 old_postuninstall_cmds=""
 
@@ -161,10 +161,10 @@ old_postuninstall_cmds=""
 lock_old_archive_extraction=no
 
 # A C compiler.
-LTCC="arm-brcm-linux-uclibcgnueabi-gcc"
+LTCC="mipsel-uclibc-gcc"
 
 # LTCC compiler flags.
-LTCFLAGS="-Os -DLINUX26 -DCONFIG_BCMWL5 -DCONFIG_BCMWL6 -DCONFIG_BCMWL6A -DPART_JFFS2_GAP=0UL -pipe -fno-strict-aliasing -DBCMWPA2 -DBCMARM -marm  -DTCONFIG_NVRAM_64K -DLINUX_KERNEL_VERSION=132644 -ffunction-sections -fdata-sections"
+LTCFLAGS="-Os -DLINUX26 -DCONFIG_BCMWL5 -DCONFIG_BCMWL6 -DPART_JFFS2_GAP=0UL -pipe -DDEBUG_NOISY -DBCMWPA2 -funit-at-a-time -Wno-pointer-sign -mtune=mips32 -mips32  -DTCONFIG_NVRAM_64K -ffunction-sections -fdata-sections"
 
 # Take the output of nm and produce a listing of raw symbols and C names.
 global_symbol_pipe="sed -n -e 's/^.*[	 ]\\([ABCDGIRSTW][ABCDGIRSTW]*\\)[	 ][	 ]*\\([_A-Za-z][_A-Za-z0-9]*\\)\$/\\1 \\2 \\2/p' | sed '/ __gnu_lto/d'"
@@ -272,10 +272,10 @@ finish_eval=""
 hardcode_into_libs=yes
 
 # Compile-time system search path for libraries.
-sys_lib_search_path_spec="/opt/hndtools-arm-linux-2.6.36-uclibc-4.5.3/lib/gcc/arm-brcm-linux-uclibcgnueabi/4.5.3 /opt/hndtools-arm-linux-2.6.36-uclibc-4.5.3/lib/gcc /opt/hndtools-arm-linux-2.6.36-uclibc-4.5.3/arm-brcm-linux-uclibcgnueabi/lib /opt/hndtools-arm-linux-2.6.36-uclibc-4.5.3/arm-brcm-linux-uclibcgnueabi/sysroot/lib /opt/hndtools-arm-linux-2.6.36-uclibc-4.5.3/arm-brcm-linux-uclibcgnueabi/sysroot/usr/lib "
+sys_lib_search_path_spec="/mnt/ProgSSD/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/lib/gcc/mipsel-linux-uclibc/4.2.4 /mnt/ProgSSD/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/lib/gcc /mnt/ProgSSD/tomato/tools/brcm/K26/hndtools-mipsel-uclibc-4.2.4/mipsel-linux-uclibc/lib "
 
 # Run-time system search path for libraries.
-sys_lib_dlsearch_path_spec="/lib /usr/lib /lib/i386-linux-gnu /usr/lib/i386-linux-gnu /lib/i486-linux-gnu /usr/lib/i486-linux-gnu /usr/local/lib /lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu /lib32 /usr/lib32 "
+sys_lib_dlsearch_path_spec="/lib /usr/lib /usr/lib/x86_64-linux-gnu/libfakeroot /lib/i386-linux-gnu /usr/lib/i386-linux-gnu /lib/i686-linux-gnu /usr/lib/i686-linux-gnu /usr/lib/i386-linux-gnu/mesa /usr/local/lib /lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu/mesa-egl /usr/lib/x86_64-linux-gnu/mesa /lib32 /usr/lib32 /libx32 /usr/libx32 "
 
 # Whether dlopen is supported.
 dlopen_support=unknown
@@ -287,12 +287,12 @@ dlopen_self=unknown
 dlopen_self_static=unknown
 
 # Commands to strip libraries.
-old_striplib="arm-brcm-linux-uclibcgnueabi-strip --strip-debug"
-striplib="arm-brcm-linux-uclibcgnueabi-strip --strip-unneeded"
+old_striplib="mipsel-uclibc-strip -R .note -R .comment --strip-debug"
+striplib="mipsel-uclibc-strip -R .note -R .comment --strip-unneeded"
 
 
 # The linker used to build libraries.
-LD="arm-brcm-linux-uclibcgnueabi-ld"
+LD="mipsel-uclibc-ld"
 
 # How to create reloadable object files.
 reload_flag=" -r"
@@ -302,7 +302,7 @@ reload_cmds="\$LD\$reload_flag -o \$output\$reload_objs"
 old_archive_cmds="\$AR \$AR_FLAGS \$oldlib\$oldobjs~\$RANLIB \$tool_oldlib"
 
 # A language specific compiler.
-CC="arm-brcm-linux-uclibcgnueabi-gcc"
+CC="mipsel-uclibc-gcc"
 
 # Is the compiler the GNU compiler?
 with_gcc=yes
