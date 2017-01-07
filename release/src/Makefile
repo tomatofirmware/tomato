@@ -1284,10 +1284,10 @@ e1200v1i:
 
 #Builds for WNR3500L v2
 v2z:
-	@$(MAKE) z MIPS32=r2 WNR3500LV2=1 NO_JFFS=y
+	@$(MAKE) z MIPS32=r2 WNR3500LV2=1 NAND=y
 
 v2e:
-	@$(MAKE) e MIPS32=r2 WNR3500LV2=1 NO_JFFS=y
+	@$(MAKE) e MIPS32=r2 WNR3500LV2=1 NAND=y
 
 #Builds with wl_high module
 rtn53:
