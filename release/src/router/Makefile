@@ -832,7 +832,7 @@ nettle-clean:
 	@rm -rf nettle/include nettle/lib nettle/bin nettle/share
 
 gmp/stamp-h1:
-	@cd gmp && CC=$(CC) AR=$(AR) RANLIB=$(RANLIB) LD=$(LD) \
+	@cd gmp && autoreconf -fvi && CC=$(CC) AR=$(AR) RANLIB=$(RANLIB) LD=$(LD) \
 	CFLAGS="-Os -Wall $(EXTRACFLAGS) -fPIC -ffunction-sections -fdata-sections" \
 	LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC" \
 	$(CONFIGURE)
@@ -840,7 +840,7 @@ gmp/stamp-h1:
 
 gmp: gmp/stamp-h1
 	@$(SEP)
-	@$(MAKE) -C gmp
+	@$(MAKE) -C gmp $(PARALLEL_BUILD)
 
 gmp-clean:
 	@$(MAKE) -C gmp clean
