@@ -739,7 +739,11 @@ endif
 
 openssl/stamp-h1:
 	cd openssl && \
-	./Configure linux-mipsel --openssldir=/etc --cross-compile-prefix=' ' \
+	CC=$(CC:$(CROSS_COMPILE)%=%) \
+	AR=$(AR:$(CROSS_COMPILE)%=%) \
+	NM=$(NM:$(CROSS_COMPILE)%=%) \
+	RANLIB=$(RANLIB:$(CROSS_COMPILE)%=%) \
+	./Configure linux-mipsel --openssldir=/etc \
 	-ffunction-sections -fdata-sections -Wl,--gc-sections \
 	shared $(OPENSSL_CIPHERS) \
 	no-sha0 no-smime no-camellia no-krb5 no-rmd160 no-ripemd \
@@ -748,7 +752,7 @@ openssl/stamp-h1:
 	no-zlib no-engines no-sse2 no-libunbound no-ssl-trace \
 	no-dtls1 no-store no-psk no-md2 no-mdc2 no-ts
 
-	@$(MAKE) -C openssl clean
+	@$(MAKE) -C openssl clean depend
 	@touch openssl/stamp-h1
 
 openssl: openssl/stamp-h1
