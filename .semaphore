@@ -58,17 +58,17 @@ build_deploy() {
 }
 
 WNR3500Lv2() {
-  DIR=src-rt KERN=K26 TARGET=v2z V1=AT-RT-N5x V2=-3.4p-138 FILE=tomato-Netgear-3500Lv2-K26USB-1.28.$V1$V2-AIO.chk
+  DIR=src-rt KERN=K26 TARGET=v2z V1=RT-N5x V2=--138 FILE=tomato-Netgear-3500Lv2-K26USB-1.28.$V1$V2-AIO.chk
   build_deploy
 }
 
 WNR3500Lv2_vpn() {
-  DIR=src-rt KERN=K26 TARGET=v2e V1=AT-RT-N5x V2=-3.4p-138 FILE=tomato-Netgear-3500Lv2-K26USB-1.28.$V1$V2-VPN.chk
+  DIR=src-rt KERN=K26 TARGET=v2e V1=RT-N5x V2=--138 FILE=tomato-Netgear-3500Lv2-K26USB-1.28.$V1$V2-VPN.chk
   build_deploy
 }
 
 R7000_vpn() {
-  DIR=src-rt-6.x.4708 TARGET=r7000e V1=test1 V2=test2 FILE='tomato-\*.trx'
+  DIR=src-rt-6.x.4708 TARGET=r7000e V1=ARM V2=--138 FILE='tomato-\*.trx'
   build_deploy
 }
 
