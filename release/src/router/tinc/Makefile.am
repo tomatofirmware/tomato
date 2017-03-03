@@ -2,7 +2,7 @@
 
 AUTOMAKE_OPTIONS = gnu
 
-SUBDIRS =  m4 src doc gui test
+SUBDIRS =  m4 src test # doc gui
 
 ACLOCAL_AMFLAGS = -I m4 
 
