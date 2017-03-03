@@ -1500,7 +1500,7 @@ ifeq ($(TCONFIG_NGINX),y)
 endif
 
 libid3tag/stamp-h1: zlib
-	cd libid3tag && \
+	cd libid3tag && autoreconf -vi && \
 	CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" CPPFLAGS="-I$(TOP)/zlib" \
 	LDFLAGS="-L$(TOP)/zlib -fPIC -ffunction-sections -fdata-sections -Wl,--gc-sections" \
 	$(CONFIGURE) --enable-shared --enable-static --prefix='' \
