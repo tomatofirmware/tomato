@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+N="$SEMAPHORE_PROJECT_NAME"
+JOBS=( WNR3500Lv2 WNR3500Lv2_vpn R7000_vpn )
+
+setup() {
+  [[ -e "${SETUP:=$HOME/setup-done}" ]] && return
+  set -x
+  export DEBIAN_FRONTEND=noninteractive
+  sudo -E apt-get -qq --ignore-missing --auto-remove --fix-broken purge \
+    'postgresql.*' 'mongodb.*' 'qt.*' '.*-dev' 'google-chrome.*' 'mysql.*' 'gradle.*' '.*python.*' 'openjdk.*' 'erlang.*' \
+    chef rethinkdb elasticsearch libgl1-mesa-dri
+  sudo -E apt-get -qq --purge autoremove
+  #dpkg-query --show --showformat='${Package;-50}\t${Installed-Size}\n' | sort -k 2 -n -r | head -50
+  cd ~; curl -sSLO https://raw.githubusercontent.com/slodki/github-releases-upload/master/github_releases_upload.sh \
+    && chmod +x github_releases_upload.sh; cd -
+  docker-cache restore
+  docker build -t buildenv --build-arg myuser="$N" --build-arg uid=$UID - <<-'eof'
+	FROM debian:8
+	LABEL Description="tomato firmware build environment" Vendor="slodki" Version="1.1"
+	ARG myuser
+	ARG uid
+	ENV DEBIAN_FRONTEND=noninteractive \
+	    PATH=$PATH:/home/$myuser/hndtools/bin
+	RUN dpkg --add-architecture i386 && apt-get -qq update && \
+	  apt-get -qq --no-install-suggests --no-install-recommends install \
+	    autoconf autogen automake autopoint binutils bison build-essential bzip2 flex g++ gawk gcc gcc-multilib \
+	    gettext gperf intltool lib32stdc++6 lib32z1-dev libc6 libcurl4-openssl-dev libelf1:i386 libevent-dev libglib2.0-dev \
+	    libncurses5 libncurses5-dev libnfnetlink0 libssl-dev libstdc++5 libtool libxml2-dev m4 make \
+	    mtd-utils net-tools patch pkg-config xsltproc zlib1g-dev \
+	  && rm -rf /var/lib/apt/lists/*
+	RUN useradd -Ums /bin/bash -u $uid $myuser
+	USER $myuser
+	WORKDIR /home/$myuser/$myuser
+	eof
+  docker-cache snapshot
+  { set +x; } 2>/dev/null
+  touch "$SETUP"
+}
+
+build_deploy() {
+  [[ -d "release/$DIR" ]] || { log err "sources not found in release/$DIR"; return; }
+  isfunc setup && setup
+  set -x
+  git reset --hard && git clean -dxfq
+  docker run --rm -i -v "$SEMAPHORE_PROJECT_DIR:/home/$N/$N" buildenv bash <<-eof
+	set -ex
+	if [[ -d "/home/$N/$N/tools/brcm/$KERN/hndtools-mipsel-uclibc-4.2.4" ]]; then
+	  ln -sf "/home/$N/$N/tools/brcm/$KERN/hndtools-mipsel-uclibc-4.2.4" "/home/$N/hndtools"
+	else
+	  ln -sf "/home/$N/$N/release/$DIR/toolchains/hndtools-arm-linux-2.6.36-uclibc-4.5.3" "/home/$N/hndtools"
+	fi
+	make -C "release/$DIR" distclean $TARGET V1="$V1" V2="$V2"
+	eof
+  [[ ${GITHUB_TOKEN:+x} ]] && ~/github_releases_upload.sh "$SEMAPHORE_REPO_SLUG" "sem-$BRANCH_NAME-$SEMAPHORE_BUILD_NUMBER" \
+    "release/$DIR/image/$FILE" draft "$REVISION" "test build $SEMAPHORE_BUILD_NUMBER of $BRANCH_NAME" \
+    "Firmware build on [Semaphore CI](https://semaphoreci.com/$SEMAPHORE_REPO_SLUG/branches/$BRANCH_NAME/builds/$SEMAPHORE_BUILD_NUMBER)"
+  { set +x; } 2>/dev/null
+}
+
+WNR3500Lv2() {
+  DIR=src-rt KERN=K26 TARGET=v2z V1=AT-RT-N5x V2=-3.4p-138 FILE=tomato-Netgear-3500Lv2-K26USB-1.28.$V1$V2-AIO.chk
+  build_deploy
+}
+
+WNR3500Lv2_vpn() {
+  DIR=src-rt KERN=K26 TARGET=v2e V1=AT-RT-N5x V2=-3.4p-138 FILE=tomato-Netgear-3500Lv2-K26USB-1.28.$V1$V2-VPN.chk
+  build_deploy
+}
+
+R7000_vpn() {
+  DIR=src-rt-6.x.4708 TARGET=r7000e V1=test1 V2=test2 FILE='tomato-\*.trx'
+  build_deploy
+}
+
+log() {
+  [[ "$1" == err ]] && { C=1; shift; } || C=2
+  echo -e "\033[1;3${C}m$*\033[m"
+}
+
+isfunc() { [[ "$1" && $(type -t "$1" 2>/dev/null) == function ]]; }
+
+set -e
+[[ "$SEMAPHORE_CURRENT_THREAD" ]] || exit 1
+for ((i=SEMAPHORE_CURRENT_THREAD;i<=${#JOBS[*]};i+=SEMAPHORE_THREAD_COUNT)); do
+  if isfunc "${JOBS[i-1]}"; then
+    MYJOBS=( ${MYJOBS[@]} $((i-1)) )
+  else
+    log err "'${JOBS[i-1]}' job not defined"
+  fi
+done
+[[ "${MYJOBS[*]}" ]] || { log Nothing to do.; exit; }
+for a in "${MYJOBS[@]}"; do
+  log "Running job '${JOBS[a]}' script:"
+  ${JOBS[a]}
+  log "Finished job '${JOBS[a]}'."
+done
