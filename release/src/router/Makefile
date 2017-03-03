@@ -1957,7 +1957,7 @@ libncurses-install: libncurses
 
 mysql/stamp-h1: openssl zlib libncurses
 	@$(SEP)
-	cd mysql && cp -f configure.mipsel configure && \
+	cd mysql && patch -p1 <bison-3.0-compat.patch && cp -f configure.mipsel configure && \
 	CFLAGS="-O2 -Wall -fno-delete-null-pointer-checks -funit-at-a-time --param large-function-growth=800 \
 		--param max-inline-insns-single=3000 -ffunction-sections -fdata-sections -I$(TOP)/zlib \
 		-I$(TOP)/openssl/include -I$(TOP)/libncurses/include" \
@@ -1980,9 +1980,9 @@ mysql/stamp-h1: openssl zlib libncurses
 		ac_cv_c_stack_direction=-1
 	cd mysql && tar xvfz .host.tgz
 	# Update time of config.status to avoid run 'config.status --recheck'
-	touch mysql/config.status
+	touch mysql/config.status mysql/aclocal.m4 mysql/Makefile.in mysql/configure
 	# Update time of Makefile to avoid regenerate it when do make
-	sleep 5
+	sleep 2
 	-find mysql -name Makefile -print | xargs -i touch {}
 	touch mysql/stamp-h1
 
