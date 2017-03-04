@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 N="$SEMAPHORE_PROJECT_NAME"
-JOBS=( WNR3500Lv2 WNR3500Lv2_vpn R7000_vpn )
+JOBS=(
+  'DIR=src-rt KERN=K26 TARGET=v2z V1=RT-N5x V2=--138 FILE=tomato-Netgear-3500Lv2-K26USB-1.28.$V1$V2-AIO.chk'
+  'DIR=src-rt KERN=K26 TARGET=v2e V1=RT-N5x V2=--138 FILE=tomato-Netgear-3500Lv2-K26USB-1.28.$V1$V2-VPN.chk'
+  'DIR=src-rt-6.x.4708 TARGET=r7000e V1=ARM V2=--138 FILE=tomato-*.trx'
+)
 
 setup() {
   [[ -e "${SETUP:=$HOME/setup-done}" ]] && return
@@ -39,7 +43,7 @@ setup() {
 
 build_deploy() {
   [[ -d "release/$DIR" ]] || { log err "sources not found in release/$DIR"; return; }
-  isfunc setup && setup
+  setup
   set -x
   git reset --hard && git clean -dxfq
   docker run --rm -i -v "$SEMAPHORE_PROJECT_DIR:/home/$N/$N" buildenv bash <<-eof
@@ -51,25 +55,10 @@ build_deploy() {
 	fi
 	make -C "release/$DIR" distclean $TARGET V1="$V1" V2="$V2"
 	eof
-  [[ ${GITHUB_TOKEN:+x} ]] && ~/github_releases_upload.sh "$SEMAPHORE_REPO_SLUG" "sem-$BRANCH_NAME-$SEMAPHORE_BUILD_NUMBER" \
+  [[ ${GITHUB_TOKEN:+x} ]] && ~/github_releases_upload.sh "$SEMAPHORE_REPO_SLUG" "$BRANCH_NAME-$SEMAPHORE_BUILD_NUMBER-sem" \
     "release/$DIR/image/$FILE" draft "$REVISION" "test build $SEMAPHORE_BUILD_NUMBER of $BRANCH_NAME" \
     "Firmware build on [Semaphore CI](https://semaphoreci.com/$SEMAPHORE_REPO_SLUG/branches/$BRANCH_NAME/builds/$SEMAPHORE_BUILD_NUMBER)"
   { set +x; } 2>/dev/null
-}
-
-WNR3500Lv2() {
-  DIR=src-rt KERN=K26 TARGET=v2z V1=RT-N5x V2=--138 FILE=tomato-Netgear-3500Lv2-K26USB-1.28.$V1$V2-AIO.chk
-  build_deploy
-}
-
-WNR3500Lv2_vpn() {
-  DIR=src-rt KERN=K26 TARGET=v2e V1=RT-N5x V2=--138 FILE=tomato-Netgear-3500Lv2-K26USB-1.28.$V1$V2-VPN.chk
-  build_deploy
-}
-
-R7000_vpn() {
-  DIR=src-rt-6.x.4708 TARGET=r7000e V1=ARM V2=--138 FILE='tomato-\*.trx'
-  build_deploy
 }
 
 log() {
@@ -77,20 +66,15 @@ log() {
   echo -e "\033[1;3${C}m$*\033[m"
 }
 
-isfunc() { [[ "$1" && $(type -t "$1" 2>/dev/null) == function ]]; }
-
-set -e
-[[ "$SEMAPHORE_CURRENT_THREAD" ]] || exit 1
+set -e; unset SETUP
+[[ $SEMAPHORE_CURRENT_THREAD ]] || exit 1
 for ((i=SEMAPHORE_CURRENT_THREAD;i<=${#JOBS[*]};i+=SEMAPHORE_THREAD_COUNT)); do
-  if isfunc "${JOBS[i-1]}"; then
-    MYJOBS=( ${MYJOBS[@]} $((i-1)) )
-  else
-    log err "'${JOBS[i-1]}' job not defined"
+  unset DIR KERN TARGET V1 V2 FILE
+  source <(echo ${JOBS[i-1]})
+  if [[ "$DIR" && "$TARGET" ]]; then
+    log "Building $TARGET image:"
+    build_deploy
+    log "Finished $TARGET."
   fi
 done
-[[ "${MYJOBS[*]}" ]] || { log Nothing to do.; exit; }
-for a in "${MYJOBS[@]}"; do
-  log "Running job '${JOBS[a]}' script:"
-  ${JOBS[a]}
-  log "Finished job '${JOBS[a]}'."
-done
+[[ $SETUP ]] || log Nothing to do.
