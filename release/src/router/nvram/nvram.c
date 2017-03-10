@@ -2,9 +2,11 @@
 
 	NVRAM Utility
 	Copyright (C) 2006-2009 Jonathan Zarate
+	              2017 Tomasz Słodkowicz
 
 */
 
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -18,55 +20,27 @@
 #include <shutils.h>
 #include <shared.h>
 
-#include "nvram_convert.h"
 #include "defaults.h"
 
+#define reterr(...) do { fprintf(stderr, __VA_ARGS__); return 1; } while (0)
+static void help(const char *applet) __attribute__ ((noreturn));
 
-__attribute__ ((noreturn))
-static void help(void)
-{
-	printf(
-		"NVRAM Utility\n"
-		"Copyright (C) 2006-2009 Jonathan Zarate\n\n"	
-		"Usage: nvram set <key=value> | get <key> | unset <key> |\n"
-		"ren <key> <key> | commit | erase | show [--nosort|--nostat] |\n"
-		"find <text> | defaults <--yes|--initcheck> | backup <filename> |\n"
-		"restore <filename> [--test] [--force] [--forceall] [--nocommit] |\n"
-		"export <--quote|--c|--set|--tab> [--nodefaults] |\n"
-		"export <--dump|--dump0> | import [--forceall] <filename> |\n"
-		"setfb64 <key> <filename> | getfb64 <key> <filename> |\n"
-		"setfile <key> <filename> | getfile <key> <filename> | setfile2nvram <filename>"
-//		"test"
-		"\n");
-	exit(1);
-}
-
-static void getall(char *buffer)
-{
-	if (nvram_getall(buffer, NVRAM_SPACE) != 0) {
-		fprintf(stderr, "Error reading NVRAM\n");
+static void getall(char *buffer) {
+	if (nvram_getall(buffer, NVRAM_SPACE)) {
+		fputs("Error reading NVRAM\n", stderr);
 		exit(1);
 	}
 }
 
-static int set_main(int argc, char **argv)
-{
-	char *b, *p;
+static int set_main(int argc, char **argv) {
+	char *k, *v = argv[1];
 
-	if ((b = strdup(argv[1])) == NULL) {
-		fprintf(stderr, "Not enough memory");
-		return 1;
-	}
-	if ((p = strchr(b, '=')) != NULL) {
-		*p = 0;
-		nvram_set(b, p + 1);
-		return 0;
-	}
-	help();
+	k = strsep(&v, "=");
+	if (v) return nvram_set(k, v);
+	help(*argv);
 }
 
-static int get_main(int argc, char **argv)
-{
+static int get_main(int argc, char **argv) {
 	char *p;
 
 	if ((p = nvram_get(argv[1])) != NULL) {
@@ -76,100 +50,111 @@ static int get_main(int argc, char **argv)
 	return 1;
 }
 
-static int unset_main(int argc, char **argv)
-{
-	nvram_unset(argv[1]);
-	return 0;
+static int unset_main(int argc, char **argv) {
+	return nvram_unset(argv[1]);
 }
 
-static int ren_main(int argc, char **argv)
-{
+static int ren_main(int argc, char **argv) {
 	char *p;
 
-	if ((p = nvram_get(argv[1])) == NULL) {
-		fprintf(stderr, "Unable to find %s\n", argv[1]);
-		return 1;
+	if (strcmp(argv[1], argv[2])) {
+		if ((p = nvram_get(argv[1])) == NULL) reterr("Unable to find %s\n", argv[1]);
+		if (nvram_set(argv[2], p) == 0) return nvram_unset(argv[1]);
+		reterr("Unable to set %s\n", argv[2]);
 	}
-	if (strcmp(argv[1], argv[2]) != 0) {
-		nvram_set(argv[2], p);
-		nvram_unset(argv[1]);
-	}
-	return 0;
+	help(*argv);
 }
 
 extern int nvram_file2nvram(const char *name, const char *filename);
 extern int nvram_nvram2file(const char *name, const char *filename);
 
-static int f2n_main(int argc, char **argv)
-{
+static int f2n_main(int argc, char **argv) {
 	return (nvram_file2nvram(argv[1], argv[2]));
 }
 
-
-static int n2f_main(int argc, char **argv)
-{
+static int n2f_main(int argc, char **argv) {
 	return (nvram_nvram2file(argv[1], argv[2]));
 }
 
-static int save2f_main(int argc, char **argv)
-{
+static int save2f_main(int argc, char **argv) {
 	char name[128] = "FILE:";
 
 	strcpy(name+5, argv[1]);
 	return (nvram_file2nvram(name, argv[1]));
 }
 
-static int show_main(int argc, char **argv)
-{
+static int cmpstringp(const void *a, const void *b) { return strcmp(*(const char**)a, *(const char**)b); }
+
+static int show_main(int argc, char **argv) {
 	char *p, *q;
+	const char **index = NULL, *find = NULL;
 	char buffer[NVRAM_SPACE];
-	int n;
-	int count;
-	int show = 1;
+	int n, count = 0;
+	int index_size = 0;
 	int stat = 1;
 	int sort = 1;
+	int ignore_case = 0;
 
-	for (n = 1; n < argc; ++n) {
-        if (strcmp(argv[n], "--nostat") == 0) stat = 0;
-			else if (strcmp(argv[n], "--nosort") == 0) sort = 0;
-				else help();
+	for (n = 1; n < argc; ++n)
+		if (strcmp(argv[n], "--nostat") == 0) stat = 0;
+		else if (strcmp(argv[n], "--nosort") == 0) sort = 0;
+		else if (strcmp(argv[n], "--ignore-case") == 0) ignore_case = 1;
+		else if (strcmp(argv[n], "--find") == 0) {
+		   if (n+1 == argc) help(*argv);
+		   find = argv[++n];
+		} else help(*argv);
+	if (ignore_case && !find) help(*argv);
+
+	getall(buffer);
+	for (n = 0, p = buffer; *p; p += strlen(p)+1) {
+		for (q = p; *q; ++q) if (!isprint(*q)) *q = ' ';
+		if (!find || (ignore_case && strcasestr(p, find)) || strstr(p, find)) {
+			count++;
+			if (stat) n += strlen(p)+1;
+			if (sort) {
+				if (count > index_size) {
+					index_size += index_size ? 100 : 1000 ;
+					if ((index = (const char **)realloc(index, index_size*sizeof(char *))) == NULL )
+						reterr("Not enough memory\n");
+				}
+				index[count-1] = p;
+			} else puts(p);
+		}
 	}
 
 	if (sort) {
-		system("nvram show --nostat --nosort | sort");	// smallest and easiest way :)
-		show = 0;
+		int i;
+		qsort(index, count, sizeof(char *), cmpstringp);
+		for (i = 0; i < count; i++) puts(index[i]);
+		if (index) free(index);
 	}
 
-	getall(buffer);
-	count = 0;
-	for (p = buffer; *p; p += strlen(p) + 1) {
-		q = p;
-		while (*q) {
-			if (!isprint(*q)) *q = ' ';
-			++q;
-		}
-		if (show) puts(p);
-		++count;
-	}
 	if (stat) {
-		n = sizeof(struct nvram_header) + (p - buffer);
-		printf("---\n%d entries, %d bytes used, %d bytes free.\n", count, n, NVRAM_SPACE - n);
+		int used = sizeof(struct nvram_header) + (p - buffer);
+		puts("---");
+		if (find)
+			if (count) printf("%d entr%s (%d bytes) matched", count, count==1?"y":"ies", n);
+			else printf("0 entries matched");
+		else printf ("%d entries", count);
+		printf(", total %d bytes used, %d bytes free.\n", used, NVRAM_SPACE-used);
 	}
-	return 0;
+	return count ? 0 : 1;
 }
 
-static int find_main(int argc, char **argv)
-{
-	char cmd[512];
-	int r;
+static int find_main(int argc, char **argv) {
+	int n, nargc;
+	const char *cmd[] = { argv[0], "--nostat", "--find", NULL, NULL, NULL, NULL };
 
-	snprintf(cmd, sizeof(cmd), "nvram show --nostat --nosort | sort | grep \"%s\"", argv[1]);
-	r = system(cmd);
-	return (r == -1) ? 1 : WEXITSTATUS(r);
+	for (n = 1, nargc = 4; n < argc && nargc < sizeof(cmd)/sizeof(*cmd); ++n)
+		if (!strcmp(argv[n], "--nosort") || !strcmp(argv[n], "--ignore-case")) cmd[nargc++] = argv[n];
+		else if (!cmd[3]) cmd[3]=argv[n];
+		else help(*argv);
+	if (!cmd[3] || nargc == sizeof(cmd)/sizeof(*cmd)) help(*argv);
+
+	return show_main(nargc, cmd);
 }
 
-static const char *nv_default_value(const defaults_t *t)
-{
+static const char *default_value_for_model(const defaults_t *t) {
 	int model = get_model();
 
 	if (strcmp(t->key, "wl_txpwr") == 0) {
@@ -211,47 +196,39 @@ static const char *nv_default_value(const defaults_t *t)
 	return t->value;
 }
 
-static void nv_fix_wl(const char *oldnv, const char *newnv)
-{
+static void nv_fix_wl(const char *oldnv, const char *newnv) {
 	char *p;
 
 	if (nvram_get(wl_nvname(newnv, 0, 0)) == NULL) {
 		p = nvram_get(oldnv);
-		if (p != NULL) nvram_set(wl_nvname(newnv, -1, 0), p);
+		if (p) nvram_set(wl_nvname(newnv, -1, 0), p);
 		nvram_unset(oldnv);
 	}
 }
 
-static int validate_main(int argc, char **argv)
-{
+static int validate_main(int argc, char **argv) {
 	const defaults_t *t;
 	char *p;
 	int i;
 	int force = 0;
 	int unit = 0;
 
-	for (i = 1; i < argc; ++i) {
-		if (strcmp(argv[i], "--restore") == 0) {
-			force = 1;
-		}
-		else if (strncmp(argv[i], "--wl", 4) == 0) {
-			unit = atoi(argv[i] + 4);
-		}
-	}
+	for (i = 1; i < argc; ++i)
+		if (strcmp(argv[i], "--restore") == 0) force = 1;
+		else if (strncmp(argv[i], "--wl", 4) == 0) unit = atoi(argv[i] + 4);
 
-	for (t = defaults; t->key; t++) {
+	for (t = defaults; t->key; t++)
 		if (strncmp(t->key, "wl_", 3) == 0) {
 			// sync wl_ and wlX_
 			p = wl_nvname(t->key + 3, unit, 0);
 			if (force || nvram_get(p) == NULL)
-				nvram_set(p, t->value);
+				nvram_set(p, default_value_for_model(t));
 		}
-	}
+
 	return 0;
 }
 
-static int defaults_main(int argc, char **argv)
-{
+static int defaults_main(int argc, char **argv) {
 	const defaults_t *t;
 	char *p;
 	char s[256];
@@ -259,22 +236,17 @@ static int defaults_main(int argc, char **argv)
 	int force = 0;
 	int commit = 0;
 
-	if (strcmp(argv[1], "--yes") == 0) {
-		force = 1;
-	}
-	else if (strcmp(argv[1], "--initcheck") != 0) {
-		help();
-	}
+	if (strcmp(argv[1], "--yes") == 0) force = 1;
+	else if (strcmp(argv[1], "--initcheck") != 0) help(*argv);
 
-	if ((!nvram_match("restore_defaults", "0")) || (!nvram_match("os_name", "linux"))) {
+	if (!nvram_match("restore_defaults", "0") || !nvram_match("os_name", "linux"))
 		force = 1;
-	}
 
 #if 0	// --need to test--
 	// prevent lockout if upgrading from DD-WRT v23 SP2+ w/ encrypted password
 	if (nvram_match("nvram_ver", "2")) {
 		nvram_unset("nvram_ver");
-		
+
 		// If username is "", root or admin, then nvram_ver was probably a left-over
 		// from an old DD-WRT installation (ex: DD-WRT -> Linksys (reset) ->
 		// Tomato) and we don't need to do anything. Otherwise, reset.
@@ -295,54 +267,49 @@ static int defaults_main(int argc, char **argv)
 	nv_fix_wl("wds_enable", "wds_enable");
 	nv_fix_wl("mac_wl", "macaddr");
 
-	for (t = defaults; t->key; t++) {
-		if (((p = nvram_get(t->key)) == NULL) || (force)) {
-			if (t->value == NULL) {
+	for (t = defaults; t->key; t++)
+		if (((p = nvram_get(t->key)) == NULL) || force) {
+			if (default_value_for_model(t) == NULL) {
 				if (p != NULL) {
 					nvram_unset(t->key);
 					if (!force) _dprintf("%s=%s is not the default (NULL) - resetting\n", t->key, p);
 					commit = 1;
 				}
-			}
-			else {
-				nvram_set(t->key, nv_default_value(t));
-				if (!force) _dprintf("%s=%s is not the default (%s) - resetting\n", t->key, p ? p : "(NULL)", nv_default_value(t));
+			} else {
+				nvram_set(t->key, default_value_for_model(t));
+				if (!force) _dprintf("%s=%s is not the default (%s) - resetting\n", t->key, p ? p : "(NULL)", default_value_for_model(t));
 				commit = 1;
 			}
-		}
-		else if (strncmp(t->key, "wl_", 3) == 0) {
+		} else if (strncmp(t->key, "wl_", 3) == 0) {
 			// sync wl_ and wl0_
 			strcpy(s, "wl0_");
 			strcat(s, t->key + 3);
 			if (nvram_get(s) == NULL) nvram_set(s, nvram_safe_get(t->key));
 		}
-	}
 
 	// todo: moveme
-	if ((strtoul(nvram_safe_get("boardflags"), NULL, 0) & BFL_ENETVLAN) ||
-		(check_hw_type() == HW_BCM4712)) t = if_vlan;
-			else t = if_generic;
-	for (; t->key; t++) {
+	if ((strtoul(nvram_safe_get("boardflags"), NULL, 0) & BFL_ENETVLAN) || (check_hw_type() == HW_BCM4712))
+		t = if_vlan;
+	else t = if_generic;
+	for (; t->key; t++)
 		if (((p = nvram_get(t->key)) == NULL) || (*p == 0) || (force)) {
 			nvram_set(t->key, t->value);
 			commit = 1;
 			if (!force) _dprintf("%s=%s is not the default (%s) - resetting\n", t->key, p ? p : "(NULL)", t->value);
 		}
-	}
 
 	if (force) {
-		for (j = 0; j < 2; j++) {
+		for (j = 0; j < 2; j++)
 			for (i = 0; i < 20; i++) {
 				sprintf(s, "wl%d_wds%d", j, i);
 				nvram_unset(s);
 			}
-		}
 
 		for (i = 0; i < LED_COUNT; ++i) {
 			sprintf(s, "led_%s", led_names[i]);
 			nvram_unset(s);
 		}
-		
+
 		// 0 = example
 		for (i = 1; i < 50; i++) {
 			sprintf(s, "rrule%d", i);
@@ -359,30 +326,27 @@ static int defaults_main(int argc, char **argv)
 	nvram_set("os_version", tomato_version);
 	nvram_set("os_date", tomato_buildtime);
 
-	if ((commit) || (force)) {
-		printf("Saving...\n");
-		nvram_commit();
+	if (commit || force) {
+		puts("Saving...");
+		return nvram_commit() ? 1 : 0;
 	}
-	else {
-		printf("No change was necessary.\n");
-	}
+	puts("No change was necessary");
 	return 0;
 }
 
-static int commit_main(int argc, char **argv)
-{
+static int commit_main(int argc, char **argv) {
 	int r;
 
 	printf("Commit... ");
 	fflush(stdout);
 	r = nvram_commit();
-	printf("done.\n");
+	puts("done");
 	return r ? 1 : 0;
 }
 
-static int erase_main(int argc, char **argv)
-{
-	printf("Erasing nvram...\n");
+static int erase_main(int argc, char **argv) {
+	puts("Erasing nvram...");
+	fflush(stdout);
 	return eval("mtd-erase", "-d", "nvram");
 }
 
@@ -394,28 +358,34 @@ static int erase_main(int argc, char **argv)
  * return the normal default value if asked for wl_ or wl0_.  But it will
  * return 0 if asked for a virtual BSS reference like wl0.1_.
  */
-static const char *get_default_value(const char *name)
-{
+static const char *get_default_value(const char *name) {
 	char *p;
 	const defaults_t *t;
 	char fixed_name[NVRAM_MAX_PARAM_LEN + 1];
 
 	if (strncmp(name, "wl", 2) == 0 && isdigit(name[2]) && ((p = strchr(name, '_'))))
 		snprintf(fixed_name, sizeof(fixed_name) - 1, "wl%s", p);
-	else
-		strncpy(fixed_name, name, sizeof(fixed_name));
+	else strncpy(fixed_name, name, sizeof(fixed_name));
 
-	if (strcmp(fixed_name, "wl_bss_enabled") == 0) {
+	if (strcmp(fixed_name, "wl_bss_enabled") == 0)
 		if (name[3] == '.' || name[4] == '.') /* Virtual interface */
 			return "0";
-	}
 
-	for (t = defaults; t->key; t++) {
+	for (t = defaults; t->key; t++)
 		if (strcmp(t->key, name) == 0 || strcmp(t->key, fixed_name) == 0)
-			return (t->value ? : "");
-	}
+			return (default_value_for_model(t) ? : "");
 
 	return NULL;
+}
+
+static int default_get_main(int argc, char **argv) {
+	char *p;
+
+	if ((p = (char *)get_default_value(argv[1])) != NULL) {
+		puts(p);
+		return 0;
+	}
+	return 1;
 }
 
 #define X_QUOTE		0
@@ -423,8 +393,7 @@ static const char *get_default_value(const char *name)
 #define X_C		2
 #define X_TAB		3
 
-static int export_main(int argc, char **argv)
-{
+static int export_main(int argc, char **argv) {
 	char *p;
 	char buffer[NVRAM_SPACE];
 	int eq;
@@ -441,24 +410,22 @@ static int export_main(int argc, char **argv)
 	p = buffer;
 
 	all = 1;
-	for (n = 1; n < argc; ++n) {
+	for (n = 1; n < argc; ++n)
 		if (strcmp(argv[n], "--nodefaults") == 0) {
-			if (argc < 3) help();
+			if (argc < 3) help("export");
 			all = 0;
 			if (n == 1) ++argv;
 			break;
 		}
-	}
 
 	if (strcmp(argv[1], "--dump") == 0) {
-		if (!all) help();
-		for (p = buffer; *p; p += strlen(p) + 1) {
+		if (!all) help("export");
+		for (p = buffer; *p; p += strlen(p) + 1)
 			puts(p);
-		}
 		return 0;
 	}
 	if (strcmp(argv[1], "--dump0") == 0) {
-		if (!all) help();
+		if (!all) help("export");
 		for (p = buffer; *p; p += strlen(p) + 1) { }
 		fwrite(buffer, p - buffer, 1, stdout);
 		return 0;
@@ -468,7 +435,7 @@ static int export_main(int argc, char **argv)
 	else if (strcmp(argv[1], "--set") == 0) mode = X_SET;
 	else if (strcmp(argv[1], "--tab") == 0) mode = X_TAB;
 	else if (strcmp(argv[1], "--quote") == 0) mode = X_QUOTE;
-	else help();
+	else help("export");
 
 	while (*p) {
 		eq = 0;
@@ -480,15 +447,12 @@ static int export_main(int argc, char **argv)
 			bv = strchr(bk, '=');
 			*bv++ = 0;
 
-			if ((v = (char *)get_default_value(bk)) != NULL) {
+			if ((v = (char *)get_default_value(bk)) != NULL)
 				skip = (strcmp(bv, v) == 0);
-			}
 
 			*(bv - 1) = '=';
-			if (skip)
-				continue;
-			else
-				p = bk;
+			if (skip) continue;
+			else p = bk;
 		}
 
 		printf("%s", start[mode]);
@@ -525,7 +489,7 @@ static int export_main(int argc, char **argv)
 				eq = 1;
 			default:
 				if (!isprint(*p)) printf("\\x%02x", *p);
-					else putchar(*p);
+				else putchar(*p);
 				break;
 			}
 			++p;
@@ -536,57 +500,57 @@ static int export_main(int argc, char **argv)
 	return 0;
 }
 
-static int in_defaults(const char *key)
-{
+/*
+ * Check if nvram variable is used in this firmware version, using defined
+ * defaults as a list of used variables in this firmware build.
+ * Used to skip unused (old, used-defined, from different firmware etc.)
+ * variables during import or restore operations, if --forceall not used.
+ *
+ * NOTE: This routine special-cases the variable rruleNN (NN > 0).
+ * It will return 1 even if not defined in defaults.
+ */
+static int used_in_this_version(const char *key) {
 	const defaults_t *t;
 	int n;
 
-	for (t = defaults; t->key; t++) {
-		if (strcmp(t->key, key) == 0) return 1;
-	}
-	
-	if ((strncmp(key, "rrule", 5) == 0) && ((n = atoi(key + 5)) > 0) && (n < 50)) return 1;
+	for (t = defaults; t->key; t++)
+		if (!strcmp(t->key, key)) return 1;
 
+	if ((strncmp(key, "rrule", 5) == 0) && ((n = atoi(key + 5)) > 0) && (n < 50)) return 1;
 	return 0;
 }
 
-static int import_main(int argc, char **argv)
-{
+static int import_main(int argc, char **argv) {
 	FILE *f;
 	char s[10240];
 	int n;
 	char *k, *v;
 	char *p, *q;
-	int all;
+	int forceall = 0;
 	int same, skip, set;
 
-	all = 0;
 	if (strcmp(argv[1], "--forceall") == 0) {
-		all = 1;
+		forceall = 1;
 		++argv;
 	}
-	
-	if ((f = fopen(argv[1], "r")) == NULL) {
-		printf("Error opening file.\n");
-		return 1;
-	}
-	
-	same = skip = set = 0;
 
+	if ((f = fopen(argv[1], "r")) == NULL) reterr("Error opening file\n");
+
+	same = skip = set = 0;
 	while (fgets(s, sizeof(s), f) != NULL) {
 		n = strlen(s);
 		while ((--n > 0) && (isspace(s[n]))) ;
 		if ((n <= 0) || (s[n] != '"')) continue;
 		s[n] = 0;
-		
+
 		k = s;
 		while (isspace(*k)) ++k;
 		if (*k != '"') continue;
 		++k;
-		
+
 		if ((v = strchr(k, '=')) == NULL) continue;
 		*v++ = 0;
-		
+
 		p = q = v;
 		while (*p) {
 			if (*p == '\\') {
@@ -606,18 +570,14 @@ static int import_main(int argc, char **argv)
 					*q++ = *p;
 					break;
 				default:
-					printf("Error unescaping %s=%s\n", k, v);
-					return 1;
+					reterr("Error unescaping %s=%s\n", k, v);
 				}
-			}
-			else {
-				*q++ = *p;
-			}
+			} else *q++ = *p;
 			++p;
 		}
 		*q = 0;
-		
-		if ((all) || (in_defaults(k))) {
+
+		if (forceall || used_in_this_version(k)) {
 			if (nvram_match(k, v)) {
 				++same;
 //				printf("SAME: %s=%s\n", k, v);
@@ -627,15 +587,14 @@ static int import_main(int argc, char **argv)
 				printf("%s=%s\n", k, v);
 				nvram_set(k, v);
 			}
-		}
-		else {
+		} else {
 			++skip;
 //			printf("SKIP: %s=%s\n", k, v);
 		}
 	}
 
-	fclose(f);	
-	
+	fclose(f);
+
 	printf("---\n%d skipped, %d same, %d set\n", skip, same, set);
 	return 0;
 }
@@ -648,8 +607,7 @@ typedef struct {
 	char buffer[NVRAM_SPACE];
 } backup_t;
 
-static int backup_main(int argc, char **argv)
-{
+static int backup_main(int argc, char **argv) {
 	backup_t data;
 	unsigned int size;
 	char *p;
@@ -669,29 +627,24 @@ static int backup_main(int argc, char **argv)
 
 	strcpy(tmp, "/tmp/nvramXXXXXX");
 	mktemp(tmp);
-	if (f_write(tmp, &data, size, 0, 0) != size) {
-		printf("Error saving file.\n");
-		return 1;
-	}
+	if (f_write(tmp, &data, size, 0, 0) != size) reterr("Error saving file\n");
 	sprintf(s, "gzip < %s > %s", tmp, argv[1]);
 	r = system(s);
 	unlink(tmp);
 
 	if (r != 0) {
 		unlink(argv[1]);
-		printf("Error compressing file.\n");
-		return 1;
+		reterr("Error compressing file\n");
 	}
 
-	printf("Saved.\n");
+	puts("Saved");
 	return 0;
 }
 
-static int restore_main(int argc, char **argv)
-{
+static int restore_main(int argc, char **argv) {
 	char *name;
 	int test;
-	int force;
+	int force, forceall;
 	int commit;
 	backup_t data;
 	unsigned int size;
@@ -708,103 +661,67 @@ static int restore_main(int argc, char **argv)
 	int i;
 
 	test = 0;
-	force = 0;
+	force = forceall = 0;
 	commit = 1;
 	name = NULL;
 	for (i = 1; i < argc; ++i) {
 		if (argv[i][0] == '-') {
-			if (strcmp(argv[i], "--test") == 0) {
-				test = 1;
-			}
-			else if (strcmp(argv[i], "--force") == 0) {
-				force = 1;
-			}
-			else if (strcmp(argv[i], "--forceall") == 0) {
-				force = 2;
-			}
-			else if (strcmp(argv[i], "--nocommit") == 0) {
-				commit = 0;
-			}
-			else {
-				help();
-			}
-		}
-		else {
-			name = argv[i];
-		}
+			if (strcmp(argv[i], "--test") == 0) test = 1;
+			else if (strcmp(argv[i], "--force") == 0) force = 1;
+			else if (strcmp(argv[i], "--forceall") == 0) forceall = 1;
+			else if (strcmp(argv[i], "--nocommit") == 0) commit = 0;
+			else help(*argv);
+		} else name = argv[i];
 	}
-	if (!name) help();
+	if (!name) help(*argv);
 
 	strcpy(tmp, "/tmp/nvramXXXXXX");
 	mktemp(tmp);
 	sprintf(s, "gzip -d < %s > %s", name, tmp);
 	if (system(s) != 0) {
 		unlink(tmp);
-		printf("Error decompressing file.\n");
-		return 1;
+		reterr("Error decompressing file\n");
 	}
 
 	size = f_size(tmp);
-	if ((size <= (sizeof(data) - sizeof(data.buffer))) || (size > sizeof(data)) ||
-		(f_read(tmp, &data, sizeof(data)) != size)) {
+	if ((size <= (sizeof(data) - sizeof(data.buffer))) || (size > sizeof(data))
+		|| (f_read(tmp, &data, sizeof(data)) != size)) {
 		unlink(tmp);
-		printf("Invalid data size or read error.\n");
-		return 1;
+		reterr("Invalid data size or read error\n");
 	}
 
 	unlink(tmp);
 
-	if (data.sig != V1) {
-		printf("Invalid signature: %08lX / %08lX\n", data.sig, V1);
-		return 1;
-	}
+	if (data.sig != V1) reterr("Invalid signature: %08lX / %08lX\n", data.sig, V1);
 
 	hw = check_hw_type();
-	if ((data.hwid != hw) && (!force)) {
-		printf("Invalid hardware type: %08lX / %08lX\n", data.hwid, hw);
-		return 1;
-	}
+	if ((data.hwid != hw) && (!force)) reterr("Invalid hardware type: %08lX / %08lX\n", data.hwid, hw);
 
 	// 1 - check data
 
 	size -= sizeof(data) - sizeof(data.buffer);
-	if ((data.buffer[size - 1] != 0) || (data.buffer[size - 2] != 0)) {
+	if ((data.buffer[size - 1] != 0) || (data.buffer[size - 2] != 0))
 CORRUPT:
-		printf("Corrupted data area.\n");
-		return 1;
-	}
+		reterr("Corrupted data area\n");
 
 	b = data.buffer;
 	while (*b) {
 		bk = b;
 		b += strlen(b) + 1;
-		if ((bv = strchr(bk, '=')) == NULL) {
+		if ((bv = strchr(bk, '=')) == NULL)
 			goto CORRUPT;
-		}
 		*bv = 0;
-		if (strcmp(bk, "et0macaddr") == 0) {
-			if (!nvram_match(bk, bv + 1)) {
-				if (!force) {
-					printf("Cannot restore on a different router.\n");
-					return 1;
-				}
-			}
-		}
+		if ((strcmp(bk, "et0macaddr") == 0) && !nvram_match(bk, bv + 1) && !force)
+			reterr("Cannot restore on a different router\n");
 		*bv = '=';
 	}
-	if (((b - data.buffer) + 1) != size) {
-		printf("Extra data found at the end.\n");
-		return 1;
-	}
+	if (((b - data.buffer) + 1) != size) reterr("Extra data found at the end\n");
 
 
 	// 2 - set
 
 	if (!test) {
-		if (!wait_action_idle(10)) {
-			printf("System busy.\n");
-			return 1;
-		}
+		if (!wait_action_idle(10)) reterr("System busy\n");
 		set_action(ACT_SW_RESTORE);
 		led(LED_DIAG, 1);
 	}
@@ -818,15 +735,12 @@ CORRUPT:
 		bv = strchr(bk, '=');
 		*bv++ = 0;
 
-		if ((force != 1) || (in_defaults(bk))) {
+		if (forceall || used_in_this_version(bk)) {
 			if (!nvram_match(bk, bv)) {
 				if (test) printf("nvram set \"%s=%s\"\n", bk, bv);
-					else nvram_set(bk, bv);
+				else nvram_set(bk, bv);
 				++nset;
-			}
-			else {
-				++nsame;
-			}
+			} else ++nsame;
 		}
 
 		*(bv - 1) = '=';
@@ -841,12 +755,12 @@ CORRUPT:
 		ck = c;
 		c += strlen(c) + 1;
 		if ((cv = strchr(ck, '=')) == NULL) {
-			printf("Invalid data in NVRAM: %s.", ck);
+			fprintf(stderr, "Invalid data in NVRAM: %s", ck);
 			continue;
 		}
 		*cv++ = 0;
 
-		if ((force != 1) || (in_defaults(ck))) {
+		if (forceall || used_in_this_version(ck)) {
 			cmp = 1;
 			b = data.buffer;
 			while (*b) {
@@ -861,27 +775,25 @@ CORRUPT:
 			if (cmp != 0) {
 				++nunset;
 				if (test) printf("nvram unset \"%s\"\n", ck);
-					else nvram_unset(ck);
+				else nvram_unset(ck);
 			}
 		}
 	}
-	
 
-	if ((nset == 0) && (nunset == 0)) commit = 0;
-	printf("\nPerformed %d set and %d unset operations. %d required no changes.\n%s\n",
-		nset, nunset, nsame, commit ? "Committing..." : "Not commiting.");
+	if (!nset && !nunset) commit = 0;
+	printf("\nPerformed %d set and %d unset operations. %d required no changes\n%s\n",
+		nset, nunset, nsame, commit ? "Committing..." : "Not commiting");
 	fflush(stdout);
 
 	if (!test) {
 		set_action(ACT_IDLE);
-		if (commit) nvram_commit();
+		if (commit) return nvram_commit();
 	}
 	return 0;
 }
 
 #if 0
-static int test_main(int argc, char **argv)
-{
+static int test_main(int argc, char **argv) {
 /*
 	static const char *extra[] = {
 		"clkfreq", "pa0b0", "pa0b1", "pa0b2", "pa0itssit", "pa0maxpwr",
@@ -891,8 +803,7 @@ static int test_main(int argc, char **argv)
 	char buffer[NVRAM_SPACE];
 	char *k, *v, *e;
 	const defaults_t *rest;
-	struct nvram_convert *conv;
-	
+
 	printf("Unknown keys:\n");
 
 	getall(buffer);
@@ -905,12 +816,9 @@ static int test_main(int argc, char **argv)
 				if (strcmp(k, rest->key) == 0) break;
 			}
 			if (rest->key == NULL) {
-				for (conv = nvram_converts; conv->name; ++conv) {
-					if ((strcmp(k, conv->name) == 0) || (strcmp(k, conv->wl0_name) == 0)) break;
-				}
-				if (conv->name == NULL) {
+				if (strcmp(k, "wl0_ifname") && strcmp(k, "wl_ifname")) {
 					printf("%s=%s\n", k, v + 1);
-/*				
+/*
 					for (x = extra; *x; ++x) {
 						if (strcmp(k, *x) == 0) break;
 					}
@@ -920,10 +828,7 @@ static int test_main(int argc, char **argv)
 */
 				}
 			}
-		}
-		else {
-			printf("WARNING: '%s' doesn't have a '=' delimiter\n", k);
-		}
+		} else printf("WARNING: '%s' doesn't have a '=' delimiter\n", k);
 		k = e;
 	}
 
@@ -931,22 +836,15 @@ static int test_main(int argc, char **argv)
 }
 #endif
 
-
-static int setfb64_main(int argc, char **argv)
-{
-	if (!nvram_set_file(argv[1], argv[2], 10240)) {
-		fprintf(stderr, "Unable to set %s or read %s\n", argv[1], argv[2]);
-		return 1;
-	}
+static int setfb64_main(int argc, char **argv) {
+	if (!nvram_set_file(argv[1], argv[2], 10240))
+		reterr("Unable to set %s or read %s\n", argv[1], argv[2]);
 	return 0;
 }
 
-static int getfb64_main(int argc, char **argv)
-{
-	if (!nvram_get_file(argv[1], argv[2], 10240)) {
-		fprintf(stderr, "Unable to get %s or write %s\n", argv[1], argv[2]);
-		return 1;
-	}
+static int getfb64_main(int argc, char **argv) {
+	if (!nvram_get_file(argv[1], argv[2], 10240))
+		reterr(stderr, "Unable to get %s or write %s\n", argv[1], argv[2]);
 	return 0;
 }
 
@@ -956,45 +854,63 @@ typedef struct {
 	const char *name;
 	int args;
 	int (*main)(int argc, char *argv[]);
+	const char *usage;
 } applets_t;
 
 static const applets_t applets[] = {
-	{ "set",		3,	set_main		},
-	{ "get",		3,	get_main		},
-	{ "unset",		3,	unset_main		},
-	{ "ren",		4,	ren_main		},
-	{ "show",		-2,	show_main		},
-	{ "commit",		2,	commit_main		},
-	{ "erase",		2,	erase_main		},
-	{ "find",		3,	find_main		},
-	{ "export",		-3,	export_main		},
-	{ "import",		-3,	import_main		},
-	{ "defaults",	3,	defaults_main	},
-	{ "validate",		-3,	validate_main		},
-	{ "backup",		3,	backup_main		},
-	{ "restore",	-3,	restore_main	},
-	{ "setfb64",	4,	setfb64_main	},
-	{ "getfb64",	4,	getfb64_main	},
-	{ "setfile",		4,	f2n_main		},
-	{ "getfile",		4,	n2f_main		},
-	{ "setfile2nvram",	3,	save2f_main		},
-//	{ "test",		2,	test_main		},
-	{ NULL, 		0,	NULL			}
+	{ "set",		3,	set_main,		"<key=value>" },
+	{ "get",		3,	get_main,		"<key>" },
+	{ "unset",		3,	unset_main,		"<key>" },
+	{ "ren",		4,	ren_main,		"<key_old> <key_new>" },
+	{ "commit",		2,	commit_main,		"" },
+	{ "show",		-2,	show_main,		"[--nosort] [--nostat] [[--ignore-case] --find <text>]" },
+	{ "find",		-3,	find_main,		"[--nosort] [--ignore-case] <text>" },
+	{ "erase",		2,	erase_main,		"" },
+	{ "defaults",		3,	defaults_main,		"<--yes|--initcheck>" },
+	{ "export",		-3,	export_main,		"<--quote|--c|--set|--tab> [--nodefaults]\n<--dump|--dump0>" },
+	{ "import",		-3,	import_main,		"[--forceall] <filename>" },
+	{ "backup",		3,	backup_main,		"<filename>" },
+	{ "restore",		-3,	restore_main,		"<filename> [--test] [--force] [--forceall] [--nocommit]" },
+	{ "setfb64",		4,	setfb64_main,		"<key> <filename>" },
+	{ "getfb64",		4,	getfb64_main,		"<key> <filename>" },
+	{ "setfile",		4,	f2n_main,		"<key> <filename>" },
+	{ "getfile",		4,	n2f_main,		"<key> <filename>" },
+	{ "setfile2nvram",	3,	save2f_main,		"<filename>" },
+	{ "default_get",	3,	default_get_main,	"<key>" },
+	{ "validate",		-3,	validate_main,		"[--restore] [--wl<N>]" },
+//	{ "test",		2,	test_main,		NULL },
+	{ NULL, 		0,	NULL,			NULL }
 };
 
-int main(int argc, char **argv)
-{
+static const char *exec_name;
+
+static void help(const char const *applet) {
+	const applets_t *a;
+	char *t, *p;
+
+	puts(	"NVRAM Utility\n"
+		"Copyright (C) 2006-2009 Jonathan Zarate\n\n"
+		"Usage:");
+	for (a = applets; a->name; ++a)
+		if ((!applet || !strcmp(applet, a->name)) && a->usage) {
+			for (t = strdup(a->usage), p = strtok(t, "\n"); p; p = strtok(NULL, "\n"))
+				printf("  %s %s %s\n", exec_name, a->name, p);
+			free(t);
+		}
+	exit(1);
+}
+
+int main(int argc, char **argv) {
 	const applets_t *a;
 
-	if (argc >= 2) {
-		a = applets;
-		while (a->name) {
-			if (strcmp(argv[1], a->name) == 0) {
-				if ((argc != a->args) && ((a->args > 0) || (argc < -(a->args)))) help();
-				return a->main(argc - 1, argv + 1);
+	if ((exec_name = strrchr(*argv, '/')) != NULL) ++exec_name;
+	else exec_name = *argv;
+
+	if (argc >= 2)
+		for (a = applets; a->name; ++a)
+			if (!strcmp(argv[1], a->name)) {
+				if ((argc != a->args) && ((a->args > 0) || (argc < -(a->args)))) help(a->name);
+				return a->main(argc-1, argv+1);
 			}
-			++a;
-		}
-	}
-	help();
+	help(NULL);
 }

@@ -8,11 +8,11 @@ endif
 
 all: libnvram.so libnvram.a nvram
 
-libnvram.so: nvram_linux.o nvram_convert.o
+libnvram.so: nvram_linux.o
 	@echo " [nvram] CC $@"
 	@$(CC) -shared $(CFLAGS) -o $@ $^
 
-libnvram.a: nvram_linux.o nvram_convert.o
+libnvram.a: nvram_linux.o
 	@echo " [nvram] AR $@"
 	@$(AR) cruv $@ $^
 	

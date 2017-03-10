@@ -26,7 +26,6 @@
 
 #include <typedefs.h>
 #include <bcmnvram.h>
-#include <nvram_convert.h>
 #include <shutils.h>
 #include <utils.h>
 #include <shared.h>
@@ -133,15 +132,8 @@ static int _nvram_set(const char *name, const char *value)
 
 int nvram_set(const char *name, const char *value)
 {
-	struct nvram_convert *v;
+	if (!strcmp("wl0_ifname", name)) _nvram_set("wl_ifname", value);
 
-	for (v = nvram_converts; v->name; v++) {
-		if (!strcmp(v->name, name)) {
-			_nvram_set(v->wl0_name, value);
-			break;
-		}
-	}
-	
 	if (strncmp(name, "wl_", 3) == 0) {
 		char wl0[48];
 		
@@ -175,12 +167,12 @@ int nvram_commit(void)
 			perror(PATH_DEV_NVRAM);
 			cprintf("commit: error\n");
 		}
+		return r;
 	}
 	else {
 		cprintf("commit: system busy\n");
+		return -1;
 	}
-
-	return r;
 }
 
 /*

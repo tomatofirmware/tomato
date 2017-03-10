@@ -11,7 +11,7 @@
 	This software should be used as a reference only, and it not
 	intended for production use!
 
-	THIS SOFTWARE IS OFFERED "AS IS",	AND CYBERTAN GRANTS NO WARRANTIES OF ANY
+	THIS SOFTWARE IS OFFERED "AS IS", AND CYBERTAN GRANTS NO WARRANTIES OF ANY
 	KIND, EXPRESS OR IMPLIED, BY STATUTE, COMMUNICATION OR OTHERWISE.  CYBERTAN
 	SPECIFICALLY DISCLAIMS ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
 	FOR A SPECIFIC PURPOSE OR NONINFRINGEMENT CONCERNING THIS SOFTWARE
@@ -22,7 +22,7 @@
 	Copyright 2005, Broadcom Corporation
 	All Rights Reserved.
 
-	THIS SOFTWARE IS OFFERED "AS IS",	AND BROADCOM GRANTS NO WARRANTIES OF ANY
+	THIS SOFTWARE IS OFFERED "AS IS", AND BROADCOM GRANTS NO WARRANTIES OF ANY
 	KIND, EXPRESS OR IMPLIED, BY STATUTE, COMMUNICATION OR OTHERWISE. BROADCOM
 	SPECIFICALLY DISCLAIMS ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
 	FOR A SPECIFIC PURPOSE OR NONINFRINGEMENT CONCERNING THIS SOFTWARE.
@@ -629,7 +629,7 @@ const defaults_t defaults[] = {
 
 // advanced-wireless
 	{ "wl_txant",			"3"				},
-	{ "wl_txpwr",			"42"			},
+	{ "wl_txpwr",			"42"			},	// can be overwritten in nvram.c default_value_for_model() depending on model
 	{ "wl_maxassoc",		"128"			},	// Max associations driver could support
 	{ "wl_bss_maxassoc",		"128"			},
 	{ "wl_distance",		""				},
@@ -849,7 +849,7 @@ const defaults_t defaults[] = {
 
 #ifdef TCONFIG_USB
 // nas-usb - !!TB
-	{ "usb_enable",			"1"				},
+	{ "usb_enable",			"1"				},	// can be overwritten in nvram.c default_value_for_model() depending on model
 	{ "usb_uhci",			"0"				},
 	{ "usb_ohci",			"0"				},
 	{ "usb_usb2",			"1"				},
@@ -1210,105 +1210,6 @@ const defaults_t defaults[] = {
 	{ "bt_log",				"0"			},
 	{ "bt_log_path",			"/var/log"		},
 #endif
-
-#if 0
-// safe to remove?
-	{ "QoS",					"0"			},
-
-	{ "ses_enable",			"0"				},	// enable ses
-	{ "ses_event",			"2"				},	// initial ses event
-	{ "ses_led_assertlvl",	"0"				},	// For SES II
-	{ "ses_client_join",	"0"				},	// For SES II
-	{ "ses_sw_btn_status",	"DEFAULTS"		},	// Barry Adds 20050309 for SW SES BTN
-	{ "ses_count",			"0"				},
-	{ "eou_configured",		"0"				},
-
-	{ "port_priority_1",		"0"			},	// port 1 priority; 1:high, 0:low
-	{ "port_flow_control_1",	"1"			},	// port 1 flow control; 1:enable, 0:disable
-	{ "port_rate_limit_1",		"0"			},	// port 1 rate limit: 256k,512k,1M,2M,5M,10M,20M,50M
-	{ "port_priority_2",		"0"			},	// port 2 priority; 1:high, 0:low
-	{ "port_flow_control_2",	"1"			},	// port 2 flow control; 1:enable, 0:disable
-	{ "port_rate_limit_2",		"0" 		},	// port 2 rate limit: 256k,512k,1M,2M,5M,10M,20M,50M
-	{ "port_priority_3",		"0"			},	// port 3 priority; 1:high, 0:low
-	{ "port_flow_control_3",	"1"			},	// port 3 flow control; 1:enable, 0:disable
-	{ "port_rate_limit_3",		"0"			},	// port 3 rate limit: 256k,512k,1M,2M,5M,10M,20M,50M
-	{ "port_priority_4",		"0"			},	// port 4 priority; 1:high, 0:low
-	{ "port_flow_control_4",	"1"			},	// port 4 flow control; 1:enable, 0:disable
-	{ "port_rate_limit_4",		"0"			},	// port 4 rate limit: 256k,512k,1M,2M,5M,10M,20M,50M
-
-//obs	zzz	{ "http_method",		"post"	},	// HTTP method
-
-//	{ "wl_macmode1",		"disabled"		},
-
-/* obsolete
-	{ "filter",				"on"	},	// Firewall Protection [on|off]
-	{ "ipsec_pass",			"1"	},	// IPSec Pass Through [1|0]
-	{ "pptp_pass",			"1"	},	// PPTP Pass Through [1|0]
-	{ "l2tp_pass",			"1"	},	// L2TP Pass Through [1|0]
-	{ "block_cookie",		"0"	},	// Block Cookie [1|0]
-	{ "ident_pass",			"0"	},	// IDENT passthrough [1|0]
-	{ "block_proxy",		"0"	},	// Block Proxy [1|0]
-*/
-
-/* --- obsolete ---
-	{ "forward_port",		""	},	// name:[on|off]:[tcp|udp|both]:wan_port>lan_ipaddr:lan_port0
-	{ "port_trigger",		""	},	// name:[on|off]:[tcp|udp|both]:wan_port0-wan_port1>lan_port0-lan_port1
-
-	// for mac clone
-	{ "mac_clone_enable",	"0"	},	// User define WAN interface MAC address
-	{ "def_hwaddr",	"00:00:00:00:00:00"	},	// User define WAN interface MAC address
-
-	{ "public_ip",			""	},	// public ip
-*/
-
-//forced in rc.c	{ "os_name",			""	},	// OS name string
-//forced in rc.c	{ "os_version",			EPI_VERSION_STR	},	// OS revision
-//forced in rc.c	{ "os_date",			__DATE__	},	// OS date
-//not used	{ "ct_modules",			""	},	// CyberTAN kernel modules
-//obs	{ "timer_interval",		"3600"	},	// Timer interval in seconds
-//obs	{ "ezc_enable",			"1"	},	// Enable EZConfig updates
-//obs	{ "ezc_version",		EZC_VERSION_STR	},	// EZConfig version
-//obs	{ "is_default",			"1"	},	// is it default setting: 1:yes 0:no*/
-//obs	{ "os_server",			""	},	// URL for getting upgrades
-//obs	{ "stats_server",		""	},	// URL for posting stats	-- used by httpd/stats.c
-//obs	{ "router_disable",		"0"	},	// lan_proto=static lan_stp=0 wan_proto=disabled
-//obs	{ "fw_disable",			"0"	},	// Disable firewall (allow new connections from the WAN)
-//obs	{ "static_route",		""	},	// Static routes (ipaddr:netmask:gateway:metric:ifname ...)
-//obs	{ "static_route_name",	""	},	// Static routes name ($NAME:name)
-//	{ "filter_port",		""				},	// [lan_ipaddr|*]:lan_port0-lan_port1
-	//{ "dhcp_end",			"150"			},	// Last assignable DHCP address	// Remove
-//zzz	not used	{ "dhcp_wins",			"wan"	},	// Use WAN WINS first if available (wan|lan)
-	//{ "eou_device_id",	""				},
-	//{ "eou_public_key",	""	},
-	//{ "eou_private_key",	""	},
-	//{ "eou_public",		"b49b5ec6866f5b166cc058110b20551d4fe7a5c96a9b5f01a3929f40015e4248359732b7467bae4948d6bb62f96996a7122c6834311c1ea276b35d12c37895501c0f5bd215499cf443d580b999830ac620ac2bf3b7f912741f54fea17627d13a92f44d014030d5c8d3249df385f500ffc90311563e89aa290e7c6f06ef9a6ec311"	},
-	//{ "eou_private",		"1fdf2ed7bd5ef1f4e603d34e4d41f0e70e19d1f65e1b6b1e6828eeed2d6afca354c0543e75d9973a1be9a898fed665e13f713f90bd5f50b3421fa7034fabde1ce63c44d01a5489765dc4dc3486521163bf6288db6c5e99c44bbb0ad7494fef20148ad862662dabcbff8dae7b466fad087d9f4754e9a6c84bc9adcbda7bc22e59"	},
- 	{ "eou_expired_hour",	"72"	},     //The expired time is 72 hours, and this value = 72 * 10*/
-//	{ "ntp_enable",			"1"	},	// replaced with ntp_updates
-//	{ "ntp_mode",			"auto"	},	// auto, manual
-
-
-	// for AOL
-	{ "aol_block_traffic",	"0"				},	// 0:Disable 1:Enable for global
-	{ "aol_block_traffic1",	"0"				},	// 0:Disable 1:Enable for "ppp_username"
-	{ "aol_block_traffic2",	"0"				},	// 0:Disable 1:Enable for "Parental control"
-	{ "skip_amd_check",		"0"				},	// 0:Disable 1:Enable
-	{ "skip_intel_check",	"0"				},	// 0:Disable 1:Enable
-
-// advanced-watchdog
-	{ "wd_en",				""				},
-	{ "wd_atp0",			""				},
-	{ "wd_atp1",			""				},
-	{ "wd_atp2",			""				},
-	{ "wd_atp3",			""				},
-	{ "wd_atp4",			""				},
-	{ "wd_mxr",				"3"				},
-	{ "wd_rdy",				"15"			},
-	{ "wd_cki",				"300"			},
-	{ "wd_fdm",				""				},
-	{ "wd_aof",				""				},
-
-#endif	// 0
 
 // new_qoslimit
 	{ "new_qoslimit_enable",		"0"			},
