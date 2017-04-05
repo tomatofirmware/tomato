@@ -289,8 +289,11 @@ static int ntpsync_main(int argc, char **argv)
 								sprintf(s, "%d ", (tms->tm_min + 20 + (rand() % 20)) % 60);
 
 								// schedule every nu hours
-								for (i = 0; i < 24; ++i) {
-									if ((i % nu) == 0) sprintf(s + strlen(s), "%s%d", i ? "," : "", (i + tms->tm_hour + 1)  % 24);
+								if (nu == 1) {
+									strcat(s, "*");
+								} else {
+									for (i = 0; i < 24; ++i)
+										if ((i % nu) == 0) sprintf(s + strlen(s), "%s%d", i ? "," : "", (i + tms->tm_hour + 1)  % 24);
 								}
 								strcat(s, " * * * ntpsync --cron");
 								eval("cru", "a", "ntpsync", s);
