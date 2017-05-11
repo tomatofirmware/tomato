@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 N="$SEMAPHORE_PROJECT_NAME"
 JOBS=(
-  'DIR=src-rt KERN=K26 TARGET=v2z V1=RT-N5x V2=-138-slodki FILE=tomato-Netgear-3500Lv2-K26USB-1.28.$V1$V2-AIO.chk'
-  'DIR=src-rt KERN=K26 TARGET=v2e V1=RT-N5x V2=-138-slodki FILE=tomato-Netgear-3500Lv2-K26USB-1.28.$V1$V2-VPN.chk'
-  'DIR=src-rt-6.x.4708 TARGET=r7000e V1=ARM V2=-138-slodki FILE=tomato-*.trx'
+  'DIR=src-rt KERN=K26 TARGET=v2z V1=RT-N5x V2=-140-slodki FILE=tomato-Netgear-3500Lv2-K26USB-1.28.$V1$V2-AIO.chk'
+  'DIR=src-rt KERN=K26 TARGET=v2e V1=RT-N5x V2=-140-slodki FILE=tomato-Netgear-3500Lv2-K26USB-1.28.$V1$V2-VPN.chk'
+  'DIR=src-rt-6.x.4708 TARGET=r7000e V1=ARM V2=-140-slodki FILE=tomato-*.trx'
 )
 
 setup() {
