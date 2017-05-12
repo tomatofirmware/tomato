@@ -762,7 +762,7 @@ openssl/stamp-h1:
 
 openssl: openssl/stamp-h1
 	@$(SEP)
-	@$(MAKE) -C openssl $(PARALLEL_BUILD)
+	@$(MAKE) -C openssl
 
 openssl-clean:
 	-@$(MAKE) -C openssl clean
