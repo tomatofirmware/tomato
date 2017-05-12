@@ -788,7 +788,7 @@ openssl/stamp-h1:
 
 openssl: openssl/stamp-h1
 	@$(SEP)
-	@$(MAKE) -C openssl $(PARALLEL_BUILD)
+	@$(MAKE) -C openssl
 
 openssl-clean:
 	-@$(MAKE) -C openssl clean
@@ -2306,7 +2306,7 @@ btgui-install: btgui
 	install -D transmission/btcheck $(INSTALLDIR)/btgui/usr/bin/btcheck
 
 libnfsidmap/stamp-h1:
-	cd libnfsidmap && \
+	cd libnfsidmap && autoreconf -vi && \
 	CFLAGS="-Os -Wall $(EXTRACFLAGS)" \
 	ac_cv_func_malloc_0_nonnull=yes \
 	ac_cv_func_realloc_0_nonnull=yes \
