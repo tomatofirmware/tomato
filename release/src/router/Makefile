@@ -2273,7 +2273,7 @@ btgui-install: btgui
 	install -D transmission/btcheck $(INSTALLDIR)/btgui/usr/bin/btcheck
 
 libnfsidmap/stamp-h1:
-	cd libnfsidmap && \
+	cd libnfsidmap && autoreconf -vi && \
 	CFLAGS="-Os -Wall $(EXTRACFLAGS)" \
 	ac_cv_func_malloc_0_nonnull=yes \
 	ac_cv_func_realloc_0_nonnull=yes \
