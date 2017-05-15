@@ -1333,7 +1333,7 @@ dropbear/config.h:
 # Media libraries
 
 sqlite/stamp-h1:
-	cd sqlite && \
+	cd sqlite && autoreconf -fvi && \
 	CC=$(CC) CFLAGS="-Os $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
 		LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections" \
 		$(CONFIGURE) --prefix=/usr --enable-shared --enable-static \
