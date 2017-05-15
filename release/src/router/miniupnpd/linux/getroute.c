@@ -14,6 +14,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 /*#include <linux/in_route.h>*/
+#include <linux/types.h>
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>
 #ifdef USE_LIBNFNETLINK
