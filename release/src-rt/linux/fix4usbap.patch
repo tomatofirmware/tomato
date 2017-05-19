@@ -1,0 +1,147 @@
+diff --git a/release/src-rt/linux/linux-2.6/drivers/usb/core/driver.c b/release/src-rt/linux/linux-2.6/drivers/usb/core/driver.c
+index b3107df..8eadb22 100644
+--- a/release/src-rt/linux/linux-2.6/drivers/usb/core/driver.c
++++ b/release/src-rt/linux/linux-2.6/drivers/usb/core/driver.c
+@@ -426,14 +426,15 @@ int usb_match_one_id(struct usb_interface *interface,
+ 	if (!usb_match_device(dev, id))
+ 		return 0;
+ 
+-	/* The interface class, subclass, and protocol should never be
++	/* The interface class, subclass, protocol and number should never be
+ 	 * checked for a match if the device class is Vendor Specific,
+ 	 * unless the match record specifies the Vendor ID. */
+ 	if (dev->descriptor.bDeviceClass == USB_CLASS_VENDOR_SPEC &&
+ 			!(id->match_flags & USB_DEVICE_ID_MATCH_VENDOR) &&
+ 			(id->match_flags & (USB_DEVICE_ID_MATCH_INT_CLASS |
+ 				USB_DEVICE_ID_MATCH_INT_SUBCLASS |
+-				USB_DEVICE_ID_MATCH_INT_PROTOCOL)))
++				USB_DEVICE_ID_MATCH_INT_PROTOCOL |
++				USB_DEVICE_ID_MATCH_INT_NUMBER)))
+ 		return 0;
+ 
+ 	if ((id->match_flags & USB_DEVICE_ID_MATCH_INT_CLASS) &&
+@@ -448,6 +449,10 @@ int usb_match_one_id(struct usb_interface *interface,
+ 	    (id->bInterfaceProtocol != intf->desc.bInterfaceProtocol))
+ 		return 0;
+ 
++	if ((id->match_flags & USB_DEVICE_ID_MATCH_INT_NUMBER) &&
++	    (id->bInterfaceNumber != intf->desc.bInterfaceNumber))
++		return 0;
++
+ 	return 1;
+ }
+ EXPORT_SYMBOL_GPL(usb_match_one_id);
+diff --git a/release/src-rt/linux/linux-2.6/drivers/usb/core/message.c b/release/src-rt/linux/linux-2.6/drivers/usb/core/message.c
+index 02e7ca4..0f9df72 100644
+--- a/release/src-rt/linux/linux-2.6/drivers/usb/core/message.c
++++ b/release/src-rt/linux/linux-2.6/drivers/usb/core/message.c
+@@ -1447,7 +1447,7 @@ static int usb_if_uevent(struct device *dev, char **envp, int num_envp,
+ 	if (add_uevent_var(envp, num_envp, &i,
+ 		   buffer, buffer_size, &length,
+ 		   "MODALIAS=usb:"
+-		   "v%04Xp%04Xd%04Xdc%02Xdsc%02Xdp%02Xic%02Xisc%02Xip%02X",
++		   "v%04Xp%04Xd%04Xdc%02Xdsc%02Xdp%02Xic%02Xisc%02Xip%02Xin%02X",
+ 		   le16_to_cpu(usb_dev->descriptor.idVendor),
+ 		   le16_to_cpu(usb_dev->descriptor.idProduct),
+ 		   le16_to_cpu(usb_dev->descriptor.bcdDevice),
+@@ -1456,7 +1456,8 @@ static int usb_if_uevent(struct device *dev, char **envp, int num_envp,
+ 		   usb_dev->descriptor.bDeviceProtocol,
+ 		   alt->desc.bInterfaceClass,
+ 		   alt->desc.bInterfaceSubClass,
+-		   alt->desc.bInterfaceProtocol))
++		   alt->desc.bInterfaceProtocol,
++		   alt->desc.bInterfaceNumber))
+ 		return -ENOMEM;
+ 
+ 	envp[i] = NULL;
+diff --git a/release/src-rt/linux/linux-2.6/drivers/usb/core/sysfs.c b/release/src-rt/linux/linux-2.6/drivers/usb/core/sysfs.c
+index 5a15a9a..895c9ad 100644
+--- a/release/src-rt/linux/linux-2.6/drivers/usb/core/sysfs.c
++++ b/release/src-rt/linux/linux-2.6/drivers/usb/core/sysfs.c
+@@ -715,7 +715,7 @@ static ssize_t show_modalias(struct device *dev,
+ 	alt = intf->cur_altsetting;
+ 
+ 	return sprintf(buf, "usb:v%04Xp%04Xd%04Xdc%02Xdsc%02Xdp%02X"
+-			"ic%02Xisc%02Xip%02X\n",
++			"ic%02Xisc%02Xip%02Xin%02X\n",
+ 			le16_to_cpu(udev->descriptor.idVendor),
+ 			le16_to_cpu(udev->descriptor.idProduct),
+ 			le16_to_cpu(udev->descriptor.bcdDevice),
+@@ -724,7 +724,8 @@ static ssize_t show_modalias(struct device *dev,
+ 			udev->descriptor.bDeviceProtocol,
+ 			alt->desc.bInterfaceClass,
+ 			alt->desc.bInterfaceSubClass,
+-			alt->desc.bInterfaceProtocol);
++			alt->desc.bInterfaceProtocol,
++			alt->desc.bInterfaceNumber);
+ }
+ static DEVICE_ATTR(modalias, S_IRUGO, show_modalias, NULL);
+ 
+diff --git a/release/src-rt/linux/linux-2.6/include/linux/mod_devicetable.h b/release/src-rt/linux/linux-2.6/include/linux/mod_devicetable.h
+index af04a55..971ffc2 100644
+--- a/release/src-rt/linux/linux-2.6/include/linux/mod_devicetable.h
++++ b/release/src-rt/linux/linux-2.6/include/linux/mod_devicetable.h
+@@ -78,6 +78,9 @@ struct ieee1394_device_id {
+  *	of a given interface; other interfaces may support other classes.
+  * @bInterfaceSubClass: Subclass of interface; associated with bInterfaceClass.
+  * @bInterfaceProtocol: Protocol of interface; associated with bInterfaceClass.
++ * @bInterfaceNumber: Number of interface; composite devices may use
++ *	fixed interface numbers to differentiate between vendor-specific
++ *	interfaces.
+  * @driver_info: Holds information used by the driver.  Usually it holds
+  *	a pointer to a descriptor understood by the driver, or perhaps
+  *	device flags.
+@@ -115,8 +118,12 @@ struct usb_device_id {
+ 	__u8		bInterfaceSubClass;
+ 	__u8		bInterfaceProtocol;
+ 
++	/* Used for vendor-specific interface matches */
++	__u8		bInterfaceNumber;
++
+ 	/* not matched against */
+-	kernel_ulong_t	driver_info;
++	kernel_ulong_t	driver_info
++		__attribute__((aligned(sizeof(kernel_ulong_t))));
+ };
+ 
+ /* Some useful macros to use to create struct usb_device_id */
+@@ -130,6 +137,7 @@ struct usb_device_id {
+ #define USB_DEVICE_ID_MATCH_INT_CLASS		0x0080
+ #define USB_DEVICE_ID_MATCH_INT_SUBCLASS	0x0100
+ #define USB_DEVICE_ID_MATCH_INT_PROTOCOL	0x0200
++#define USB_DEVICE_ID_MATCH_INT_NUMBER		0x0400
+ 
+ /* s390 CCW devices */
+ struct ccw_device_id {
+@@ -195,7 +203,7 @@ struct of_device_id
+ 	char	type[32];
+ 	char	compatible[128];
+ #ifdef __KERNEL__
+-	void	*data;
++	const void *data;
+ #else
+ 	kernel_ulong_t data;
+ #endif
+diff --git a/release/src-rt/linux/linux-2.6/scripts/mod/file2alias.c b/release/src-rt/linux/linux-2.6/scripts/mod/file2alias.c
+index 40d1f2e..541a756 100644
+--- a/release/src-rt/linux/linux-2.6/scripts/mod/file2alias.c
++++ b/release/src-rt/linux/linux-2.6/scripts/mod/file2alias.c
+@@ -69,7 +69,7 @@ static void device_id_size_check(const char *modname, const char *device_id,
+ }
+ 
+ /* USB is special because the bcdDevice can be matched against a numeric range */
+-/* Looks like "usb:vNpNdNdcNdscNdpNicNiscNipN" */
++/* Looks like "usb:vNpNdNdcNdscNdpNicNiscNipNinN" */
+ static void do_usb_entry(struct usb_device_id *id,
+ 			 unsigned int bcdDevice_initial, int bcdDevice_initial_digits,
+ 			 unsigned char range_lo, unsigned char range_hi,
+@@ -110,6 +110,9 @@ static void do_usb_entry(struct usb_device_id *id,
+ 	ADD(alias, "ip",
+ 	    id->match_flags&USB_DEVICE_ID_MATCH_INT_PROTOCOL,
+ 	    id->bInterfaceProtocol);
++	ADD(alias, "in",
++	    id->match_flags&USB_DEVICE_ID_MATCH_INT_NUMBER,
++	    id->bInterfaceNumber);
+ 
+ 	/* Always end in a wildcard, for future extension */
+ 	if (alias[strlen(alias)-1] != '*')
