@@ -1,15 +1,32 @@
 #!/usr/bin/env bash
 N="$SEMAPHORE_PROJECT_NAME"
+V2=-140-slodki
 JOBS=(
-  'DIR=src-rt KERN=K26 TARGET=v2z V1=RT-N5x V2=-140-slodki FILE=tomato-Netgear-3500Lv2-K26USB-1.28.$V1$V2-AIO.chk'
-  'DIR=src-rt KERN=K26 TARGET=v2e V1=RT-N5x V2=-140-slodki FILE=tomato-Netgear-3500Lv2-K26USB-1.28.$V1$V2-VPN.chk'
-  'DIR=src-rt-6.x.4708 TARGET=r7000e V1=ARM V2=-140-slodki FILE=tomato-*.trx'
+  'TARGET=n DIR=src KERN=K24 V1=5x EXT=trx'
+  'TARGET=w DIR=src KERN=K24 V1=5x EXT=trx'
+  'TARGET=e DIR=src KERN=K24 V1=5x EXT=trx'
+  'TARGET=r2e DIR=src-rt KERN=K26 V1=RT-N5x- EXT=trx'
+  'TARGET=r2c DIR=src-rt KERN=K26 V1=RT-N5x- EXT=trx'
+  'TARGET=r2d DIR=src-rt KERN=K26 V1=RT-N5x- EXT=trx'
+  'TARGET=r2g DIR=src-rt KERN=K26 V1=RT-N5x- EXT=trx'
+  'TARGET=r2t DIR=src-rt KERN=K26 V1=RT-N5x- EXT=trx'
+  'TARGET=r2b DIR=src-rt KERN=K26 V1=RT-N5x- EXT=trx'
+  'TARGET=r2v DIR=src-rt KERN=K26 V1=RT-N5x- EXT=trx'
+  'TARGET=r2m DIR=src-rt KERN=K26 V1=RT-N5x- EXT=trx'
+  'TARGET=r2i DIR=src-rt KERN=K26 V1=RT-N5x- EXT=trx'
+  'TARGET=r2j DIR=src-rt KERN=K26 V1=RT-N5x- EXT=trx'
+  'TARGET=r2f DIR=src-rt KERN=K26 V1=RT-N5x- EXT="{trx,bin}"'
+  'TARGET=r2z DIR=src-rt KERN=K26 V1=RT-N5x- EXT=trx'
+  'TARGET=v2z DIR=src-rt KERN=K26 V1=RT-N5x- EXT=chk'
+  'TARGET=v2e DIR=src-rt KERN=K26 V1=RT-N5x- EXT=chk'
+  'TARGET=r7000e DIR=src-rt-6.x.4708 V1=ARM EXT=trx'
 )
 
 setup() {
   [[ -e "${SETUP:=$HOME/setup-done}" ]] && return
   set -x
   export DEBIAN_FRONTEND=noninteractive
+  sudo -E apt-get -qq install p7zip
   sudo -E apt-get -qq --ignore-missing --auto-remove --fix-broken purge \
     'postgresql.*' 'mongodb.*' 'qt.*' '.*-dev' 'google-chrome.*' 'mysql.*' 'gradle.*' '.*python.*' 'openjdk.*' 'erlang.*' \
     chef rethinkdb elasticsearch libgl1-mesa-dri
@@ -17,7 +34,7 @@ setup() {
   #dpkg-query --show --showformat='${Package;-50}\t${Installed-Size}\n' | sort -k 2 -n -r | head -50
   cd ~; curl -sSLO https://raw.githubusercontent.com/slodki/github-releases-upload/master/github_releases_upload.sh \
     && chmod +x github_releases_upload.sh; cd -
-  docker-cache restore
+#  docker-cache restore
   docker build -t buildenv --build-arg myuser="$N" --build-arg uid=$UID - <<-'eof'
 	FROM debian:8
 	LABEL Description="tomato firmware build environment" Vendor="slodki" Version="1.1"
@@ -36,7 +53,7 @@ setup() {
 	USER $myuser
 	WORKDIR /home/$myuser/$myuser
 	eof
-  docker-cache snapshot
+#  docker-cache snapshot
   { set +x; } 2>/dev/null
   touch "$SETUP"
 }
@@ -48,15 +65,19 @@ build_deploy() {
   git reset --hard && git clean -dxfq
   docker run --rm -i -v "$SEMAPHORE_PROJECT_DIR:/home/$N/$N" buildenv bash <<-eof
 	set -ex
-	if [[ -d "/home/$N/$N/tools/brcm/$KERN/hndtools-mipsel-uclibc-4.2.4" ]]; then
-	  ln -sf "/home/$N/$N/tools/brcm/$KERN/hndtools-mipsel-uclibc-4.2.4" "/home/$N/hndtools"
-	else
-	  ln -sf "/home/$N/$N/release/$DIR/toolchains/hndtools-arm-linux-2.6.36-uclibc-4.5.3" "/home/$N/hndtools"
-	fi
-	make -C "release/$DIR" distclean $TARGET V1="$V1" V2="$V2"
+	HNDTOOLS="/home/$N/$N/tools/brcm/$KERN/hndtools-mipsel-uclibc-4.2.4"
+	[[ -d "\$HNDTOOLS" ]] || HNDTOOLS="/home/$N/$N/release/$DIR/toolchains/hndtools-arm-linux-2.6.36-uclibc-4.5.3"
+	ln -svf "\$HNDTOOLS" "/home/$N/hndtools"
+	make -C "release/$DIR" distclean V1="$V1" V2="$V2" $TARGET
 	eof
-  [[ ${GITHUB_TOKEN:+x} ]] && ~/github_releases_upload.sh "$SEMAPHORE_REPO_SLUG" "$BRANCH_NAME-$SEMAPHORE_BUILD_NUMBER-sem" \
-    "release/$DIR/image/$FILE" draft "$REVISION" "test build $SEMAPHORE_BUILD_NUMBER of $BRANCH_NAME" \
+  FILES=( $(shopt -s nullglob; echo $(shopt -u nullglob; eval echo ./release/$DIR/image/tomato-*.$EXT)) )
+  PKG="$FILES"
+  if (( ${#FILES[@]}>1 )); then
+    PKG="${PKG/#*\//\/tmp\/}" PKG="${PKG%.*}.7z"
+    7zr a -bd "$PKG" "${FILES[@]}"
+  fi
+  [[ "$PKG" && ${GITHUB_TOKEN:+x} ]] && ~/github_releases_upload.sh "$SEMAPHORE_REPO_SLUG" "$BRANCH_NAME-$SEMAPHORE_BUILD_NUMBER-sem" \
+    "$PKG" draft "$REVISION" "test build $SEMAPHORE_BUILD_NUMBER of $BRANCH_NAME" \
     "Firmware build on [Semaphore CI](https://semaphoreci.com/$SEMAPHORE_REPO_SLUG/branches/$BRANCH_NAME/builds/$SEMAPHORE_BUILD_NUMBER)"
   { set +x; } 2>/dev/null
 }
@@ -69,7 +90,7 @@ log() {
 set -e; unset SETUP
 [[ $SEMAPHORE_CURRENT_THREAD ]] || exit 1
 for ((i=SEMAPHORE_CURRENT_THREAD;i<=${#JOBS[*]};i+=SEMAPHORE_THREAD_COUNT)); do
-  unset DIR KERN TARGET V1 V2 FILE
+  unset TARGET DIR KERN V1 EXT
   source <(echo ${JOBS[i-1]})
   if [[ "$DIR" && "$TARGET" ]]; then
     log "Building $TARGET image:"
