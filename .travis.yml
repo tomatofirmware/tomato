@@ -1,0 +1,77 @@
+os: linux
+dist: trusty # nano requires gettext-0.18.3 now not available in precise
+sudo: false
+language: c
+compiler: gcc
+git: { depth: 10 }
+
+env:
+  global:
+    - V2=-140
+  matrix:
+    - TARGET=n DIR=src KERN=K24 V1=5x EXT=trx
+    - TARGET=w DIR=src KERN=K24 V1=5x EXT=trx
+    - TARGET=e DIR=src KERN=K24 V1=5x EXT=trx
+    # - TARGET=v2e DIR=src-rt KERN=K26 V1=RT-N5x- EXT=chk
+    - TARGET=r2e DIR=src-rt KERN=K26 V1=RT-N5x- EXT=trx
+    - TARGET=r2c DIR=src-rt KERN=K26 V1=RT-N5x- EXT=trx
+    - TARGET=r2d DIR=src-rt KERN=K26 V1=RT-N5x- EXT=trx
+    - TARGET=r2g DIR=src-rt KERN=K26 V1=RT-N5x- EXT=trx
+    - TARGET=r2t DIR=src-rt KERN=K26 V1=RT-N5x- EXT=trx
+    - TARGET=r2b DIR=src-rt KERN=K26 V1=RT-N5x- EXT=trx
+    - TARGET=r2v DIR=src-rt KERN=K26 V1=RT-N5x- EXT=trx
+    - TARGET=r2m DIR=src-rt KERN=K26 V1=RT-N5x- EXT=trx
+    - TARGET=r2i DIR=src-rt KERN=K26 V1=RT-N5x- EXT=trx
+    - TARGET=r2j DIR=src-rt KERN=K26 V1=RT-N5x- EXT=trx
+    - TARGET=r2f DIR=src-rt KERN=K26 V1=RT-N5x- EXT='{trx,bin}'
+  # AIO build time is longer then free version Travis time limit (50 min)
+  # - TARGET=v2z DIR=src-rt KERN=K26 V1=RT-N5x- EXT=chk
+  # - TARGET=r2z DIR=src-rt KERN=K26 V1=RT-N5x- EXT=trx
+  # still some errors to be fixed
+  # - TARGET=a DIR=src KERN=K26 V1=5x EXT=trx
+  # - TARGET=e DIR=src KERN=K26 V1=5x EXT=trx
+  # - TARGET=r2o DIR=src-rt KERN=K26 V1=RT-N5x- EXT=trx
+
+addons:
+  apt:
+    packages: [ autoconf, autogen, automake, autopoint, binutils, bison,
+    build-essential, bzip2, flex, g++, gawk, gcc, gcc-multilib,
+    gettext, gperf, intltool, lib32stdc++6, lib32z1-dev, libc6,
+    libcurl4-openssl-dev, 'libelf1:i386', libevent-dev, libglib2.0-dev,
+    libncurses5, libncurses5-dev, libnfnetlink0, libssl-dev, libstdc++5,
+    libtool, libxml2-dev, m4, make, mtd-utils, net-tools, patch, pkg-config,
+    xsltproc, zlib1g-dev, p7zip ]
+
+install: curl -sSLO https://raw.githubusercontent.com/slodki/travis-wait-log/master/travis_wait_log
+         && chmod +x travis_wait_log
+before_script:
+  - HNDTOOLS="tools/brcm/$KERN/hndtools-mipsel-uclibc-4.2.4"
+  - if [[ ! -d "$HNDTOOLS" ]]; then HNDTOOLS="release/$DIR/toolchains/hndtools-arm-linux-2.6.36-uclibc-4.5.3"; fi
+  - ln -svf "$TRAVIS_BUILD_DIR/$HNDTOOLS" ~/hndtools && export PATH=$PATH:~/hndtools/bin
+script: ./travis_wait_log make -C release/$DIR distclean V1="$V1" V2="$V2" $TARGET
+after_success:
+  - FILES=( $(shopt -s nullglob; echo $(shopt -u nullglob; eval echo ./release/$DIR/image/tomato-*.$EXT)) )
+  - wc -c "${FILES[@]}"
+after_script:
+  - cat -s release/$DIR/router/config_current
+  - cat -s release/$DIR/linux/*/config_current
+  - cat -s release/$DIR/router/busybox/config_current
+
+before_deploy:
+  - LOGS="/tmp/travis-${TRAVIS_BRANCH}-${TRAVIS_JOB_NUMBER}-logs.tar.xz"
+  - tar cvhJf "$LOGS" --xform='s#/\([^/]*\)_current$#_\1#;s#.*/##;s#wait.log#log#;s#$#.txt#'
+    release/$DIR/{,*/}*/config_current -C /tmp travis_wait.log
+  - PKG="$FILES"
+  - if (( ${#FILES[@]}>1 )); then PKG="${PKG##*/}" PKG="/tmp/${PKG%.*}.7z"; 7zr a -bd "$PKG" "${FILES[@]}"; fi
+deploy:
+  provider: releases
+  api_key: ${api_key}
+  file_glob: true
+  file:
+    - $PKG
+    - $LOGS
+  skip_cleanup: true
+  overwrite: true
+  on:
+    tags: true
+    condition: "${#api_key} != 0" # API GitHub key must be set in Travis settings to deploy
