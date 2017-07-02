@@ -38,8 +38,8 @@
 #  include <ares.h>
 #endif
 
-#ifdef USE_LIBIDN
-#include <stringprep.h>
+#ifdef USE_LIBIDN2
+#include <idn2.h>
 #endif
 
 #if defined(HAVE_ICONV) && defined(CURL_DOES_CONVERSIONS)
@@ -95,9 +95,9 @@ char *curl_version(void)
   left -= len;
   ptr += len;
 #endif
-#ifdef USE_LIBIDN
-  if(stringprep_check_version(LIBIDN_REQUIRED_VERSION)) {
-    len = snprintf(ptr, left, " libidn/%s", stringprep_check_version(NULL));
+#ifdef USE_LIBIDN2
+  if(idn2_check_version(IDN2_VERSION)) {
+    len = snprintf(ptr, left, " libidn2/%s", idn2_check_version(NULL));
     left -= len;
     ptr += len;
   }
@@ -284,6 +284,18 @@ static curl_version_info_data version_info = {
 #if defined(USE_NGHTTP2)
   | CURL_VERSION_HTTP2
 #endif
+<<<<<<< HEAD
+=======
+#if defined(USE_UNIX_SOCKETS)
+  | CURL_VERSION_UNIX_SOCKETS
+#endif
+#if defined(USE_LIBPSL)
+  | CURL_VERSION_PSL
+#endif
+#if defined(HTTPS_PROXY_SUPPORT)
+  | CURL_VERSION_HTTPS_PROXY
+#endif
+>>>>>>> origin/tomato-shibby-RT-AC
   ,
   NULL, /* ssl_version */
   0,    /* ssl_version_num, this is kept at zero */
@@ -319,10 +331,10 @@ curl_version_info_data *curl_version_info(CURLversion stamp)
     version_info.ares_num = aresnum;
   }
 #endif
-#ifdef USE_LIBIDN
+#ifdef USE_LIBIDN2
   /* This returns a version string if we use the given version or later,
      otherwise it returns NULL */
-  version_info.libidn = stringprep_check_version(LIBIDN_REQUIRED_VERSION);
+  version_info.libidn = idn2_check_version(IDN2_VERSION);
   if(version_info.libidn)
     version_info.features |= CURL_VERSION_IDN;
 #elif defined(USE_WIN32_IDN)

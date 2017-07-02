@@ -29,6 +29,49 @@ my $errors;
 my $file;
 my $dir=".";
 my $wlist;
+<<<<<<< HEAD
+=======
+my $windows_os = $^O eq 'MSWin32' || $^O eq 'msys' || $^O eq 'cygwin';
+my $verbose;
+my %whitelist;
+
+my %warnings = (
+    'LONGLINE' =>         "Line longer than $max_column",
+    'TABS' =>             'TAB characters not allowed',
+    'TRAILINGSPACE' =>    'Trailing white space on the line',
+    'CPPCOMMENTS' =>      '// comment detected',
+    'SPACEBEFOREPAREN' => 'space before an open parenthesis',
+    'SPACEAFTERPAREN'  => 'space after open parenthesis',
+    'SPACEBEFORECLOSE' => 'space before a close parenthesis',
+    'SPACEBEFORECOMMA' => 'space before a comma',
+    'RETURNNOSPACE'    => 'return without space',
+    'COMMANOSPACE'     => 'comma without following space',
+    'BRACEELSE'        => '} else on the same line',
+    'PARENBRACE'       => '){ without sufficient space',
+    'SPACESEMILCOLON'  => 'space before semicolon',
+    'BANNEDFUNC'       => 'a banned function was used',
+    'FOPENMODE'        => 'fopen needs a macro for the mode string',
+    'BRACEPOS'         => 'wrong position for an open brace',
+    'INDENTATION'      => 'wrong start column for code',
+    'COPYRIGHT'        => 'file missing a copyright statement',
+    'BADCOMMAND'       => 'bad !checksrc! instruction',
+    'UNUSEDIGNORE'     => 'a warning ignore was not used',
+    'OPENCOMMENT'      => 'file ended with a /* comment still "open"',
+    'ASTERISKSPACE'    => 'pointer declared with space after asterisk',
+    'ASTERISKNOSPACE'  => 'pointer declared without space before asterisk',
+    'ASSIGNWITHINCONDITION'  => 'assignment within conditional expression'
+    );
+
+sub readwhitelist {
+    open(W, "<$dir/checksrc.whitelist");
+    my @all=<W>;
+    for(@all) {
+        $windows_os ? $_ =~ s/\r?\n$// : chomp;
+        $whitelist{$_}=1;
+    }
+    close(W);
+}
+>>>>>>> origin/tomato-shibby-RT-AC
 
 sub checkwarn {
     my ($num, $col, $file, $line, $msg, $error) = @_;
@@ -89,6 +132,12 @@ do {
 } while($file);
 
 
+sub nostrings {
+    my ($str) = @_;
+    $str =~ s/\".*\"//g;
+    return $str;
+}
+
 sub scanfile {
     my ($file) = @_;
 
@@ -122,10 +171,20 @@ sub scanfile {
             checkwarn($line, length($1), $file, $l, "Trailing whitespace");
         }
 
-        # check spaces after for/if/while
-        if($l =~ /^(.*)(for|if|while) \(/) {
+        my $nostr = nostrings($l);
+        # check spaces after for/if/while/function call
+        if($nostr =~ /^(.*)(for|if|while| ([a-zA-Z0-9_]+)) \((.)/) {
             if($1 =~ / *\#/) {
                 # this is a #if, treat it differently
+            }
+            elsif($3 eq "return") {
+                # return must have a space
+            }
+            elsif($4 eq "*") {
+                # (* beginning makes the space OK!
+            }
+            elsif($1 =~ / *typedef/) {
+                # typedefs can use space-paren
             }
             else {
                 checkwarn($line, length($1)+length($2), $file, $l,
@@ -133,8 +192,43 @@ sub scanfile {
             }
         }
 
+<<<<<<< HEAD
         # check spaces after open paren after for/if/while
         if($l =~ /^(.*)(for|if|while)\( /) {
+=======
+        if($nostr =~ /^((.*)(if) *\()(.*)\)/) {
+            my $pos = length($1);
+            if($4 =~ / = /) {
+                checkwarn("ASSIGNWITHINCONDITION",
+                          $line, $pos+1, $file, $l,
+                          "assignment within conditional expression");
+            }
+        }
+        # check spaces after open parentheses
+        if($l =~ /^(.*[a-z])\( /i) {
+            checkwarn("SPACEAFTERPAREN",
+                      $line, length($1)+1, $file, $l,
+                      "space after open parenthesis");
+        }
+
+        # check spaces before close parentheses, unless it was a space or a
+        # close parenthesis!
+        if($l =~ /(.*[^\) ]) \)/) {
+            checkwarn("SPACEBEFORECLOSE",
+                      $line, length($1)+1, $file, $l,
+                      "space before close parenthesis");
+        }
+
+        # check spaces before comma!
+        if($l =~ /(.*[^ ]) ,/) {
+            checkwarn("SPACEBEFORECOMMA",
+                      $line, length($1)+1, $file, $l,
+                      "space before comma");
+        }
+
+        # check for "return(" without space
+        if($l =~ /^(.*)return\(/) {
+>>>>>>> origin/tomato-shibby-RT-AC
             if($1 =~ / *\#/) {
                 # this is a #if, treat it differently
             }
@@ -154,8 +248,21 @@ sub scanfile {
         }
 
         # scan for use of banned functions
+<<<<<<< HEAD
         if($l =~ /^(.*\W)(sprintf|vsprintf|strcat|strncat|gets)\s*\(/) {
             checkwarn($line, length($1), $file, $l,
+=======
+        if($l =~ /^(.*\W)
+                   (gets|
+	            strtok|
+                    v?sprintf|
+                    (str|_mbs|_tcs|_wcs)n?cat|
+                    LoadLibrary(Ex)?(A|W)?)
+                   \s*\(
+                 /x) {
+            checkwarn("BANNEDFUNC",
+                      $line, length($1), $file, $ol,
+>>>>>>> origin/tomato-shibby-RT-AC
                       "use of $2 is banned");
         }
 
@@ -185,6 +292,31 @@ sub scanfile {
             }
         }
 
+        # check for 'char * name'
+        if(($l =~ /(^.*(char|int|long|void|curl_slist|CURL|CURLM|CURLMsg|curl_httppost) *(\*+)) (\w+)/) && ($4 ne "const")) {
+            checkwarn("ASTERISKNOSPACE",
+                      $line, length($1), $file, $ol,
+                      "no space after declarative asterisk");
+        }
+        # check for 'char*'
+        if(($l =~ /(^.*(char|int|long|void|curl_slist|CURL|CURLM|CURLMsg|curl_httppost|sockaddr_in|FILE)\*)/)) {
+            checkwarn("ASTERISKNOSPACE",
+                      $line, length($1)-1, $file, $ol,
+                      "no space before asterisk");
+        }
+
+        # check for 'void func() {', but avoid false positives by requiring
+        # both an open and closed parentheses before the open brace
+        if($l =~ /^((\w).*){\z/) {
+            my $k = $1;
+            $k =~ s/const *//;
+            $k =~ s/static *//;
+            if($k =~ /\(.*\)/) {
+                checkwarn("BRACEPOS",
+                          $line, length($l)-1, $file, $ol,
+                          "wrongly placed open brace");
+            }
+        }
         $line++;
         $prevl = $l;
     }

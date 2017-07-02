@@ -668,6 +668,7 @@ touched. Do not rely on the contents in those cases.
 Pass a FILE * as parameter. Tell libcurl to use this stream instead of stderr
 when showing the progress meter and displaying \fICURLOPT_VERBOSE\fP data.
 .IP CURLOPT_FAILONERROR
+<<<<<<< HEAD
 A parameter set to 1 tells the library to fail silently if the HTTP code
 returned is equal to or larger than 400. The default action would be to return
 the page normally, ignoring that code.
@@ -679,6 +680,11 @@ response codes will slip through, especially when authentication is involved
 You might get some amounts of headers transferred before this situation is
 detected, like when a "100-continue" is received as a response to a
 POST/PUT and a 401 or 407 is received immediately afterwards.
+=======
+Fail on HTTP 4xx errors. \fICURLOPT_FAILONERROR(3)\fP
+.IP CURLOPT_KEEP_SENDING_ON_ERROR
+Keep sending on HTTP >= 300 errors. \fICURLOPT_KEEP_SENDING_ON_ERROR(3)\fP
+>>>>>>> origin/tomato-shibby-RT-AC
 .SH NETWORK OPTIONS
 .IP CURLOPT_URL
 Pass in a pointer to the actual URL to deal with. The parameter should be a
@@ -949,6 +955,7 @@ redirections. By default libcurl will allow all protocols except for FILE and
 SCP. This is a difference compared to pre-7.19.4 versions which
 unconditionally would follow to all protocols supported. (Added in 7.19.4)
 .IP CURLOPT_PROXY
+<<<<<<< HEAD
 Set HTTP proxy to use. The parameter should be a char * to a zero terminated
 string holding the host name or dotted IP address. To specify port number in
 this string, append :[port] to the end of the host name. The proxy string may
@@ -981,6 +988,11 @@ socks5h:// (the last one to enable socks5 and asking the proxy to do the
 resolving, also known as CURLPROXY_SOCKS5_HOSTNAME type) to request the
 specific SOCKS version to be used. No protocol specified, http:// and all
 others will be treated as HTTP proxies.
+=======
+Proxy to use. See \fICURLOPT_PROXY(3)\fP
+.IP CURLOPT_PRE_PROXY
+Socks proxy to use. See \fICURLOPT_PRE_PROXY(3)\fP
+>>>>>>> origin/tomato-shibby-RT-AC
 .IP CURLOPT_PROXYPORT
 Pass a long with this option to set the proxy port to connect to unless it is
 specified in the proxy string \fICURLOPT_PROXY\fP.
@@ -1065,6 +1077,7 @@ thread-safe and this will use a global variable.
 to using the share interface instead! See \fICURLOPT_SHARE\fP and
 \fIcurl_share_init(3)\fP.
 .IP CURLOPT_BUFFERSIZE
+<<<<<<< HEAD
 Pass a long specifying your preferred size (in bytes) for the receive buffer
 in libcurl.  The main point of this would be that the write callback gets
 called more often and with smaller chunks. This is just treated as a request,
@@ -1073,6 +1086,9 @@ in 7.10)
 
 This size is by default set as big as possible (CURL_MAX_WRITE_SIZE), so it
 only makes sense to use this option if you want it smaller.
+=======
+Ask for alternate buffer size. See \fICURLOPT_BUFFERSIZE(3)\fP
+>>>>>>> origin/tomato-shibby-RT-AC
 .IP CURLOPT_PORT
 Pass a long specifying what remote port number to connect to, instead of the
 one specified in the URL or the default port for the used protocol.
@@ -1105,9 +1121,17 @@ Pass a long. Sets the delay, in seconds, that the operating system will wait
 while the connection is idle before sending keepalive probes. Not all operating
 systems support this option. (Added in 7.25.0)
 .IP CURLOPT_TCP_KEEPINTVL
+<<<<<<< HEAD
 Pass a long. Sets the interval, in seconds, that the operating system will wait
 between sending keepalive probes. Not all operating systems support this
 option. (Added in 7.25.0)
+=======
+Interval between keep-alive probes. See \fICURLOPT_TCP_KEEPINTVL(3)\fP
+.IP CURLOPT_UNIX_SOCKET_PATH
+Path to a Unix domain socket. See \fICURLOPT_UNIX_SOCKET_PATH(3)\fP
+.IP CURLOPT_ABSTRACT_UNIX_SOCKET
+Path to an abstract Unix domain socket. See \fICURLOPT_ABSTRACT_UNIX_SOCKET(3)\fP
+>>>>>>> origin/tomato-shibby-RT-AC
 .SH NAMES and PASSWORDS OPTIONS (Authentication)
 .IP CURLOPT_NETRC
 This parameter controls the preference of libcurl between using user names and
@@ -1306,6 +1330,7 @@ You need to build libcurl with GnuTLS or OpenSSL with TLS-SRP support for this
 to work. (Added in 7.21.4)
 .RE
 .IP CURLOPT_TLSAUTH_USERNAME
+<<<<<<< HEAD
 Pass a char * as parameter, which should point to the zero terminated username
 to use for the TLS authentication method specified with the
 \fICURLOPT_TLSAUTH_TYPE\fP option. Requires that the
@@ -1315,6 +1340,19 @@ Pass a char * as parameter, which should point to the zero terminated password
 to use for the TLS authentication method specified with the
 \fICURLOPT_TLSAUTH_TYPE\fP option. Requires that the
 \fICURLOPT_TLS_USERNAME\fP option also be set. (Added in 7.21.4)
+=======
+TLS authentication user name. See \fICURLOPT_TLSAUTH_USERNAME(3)\fP
+.IP CURLOPT_PROXY_TLSAUTH_USERNAME
+Proxy TLS authentication user name. See \fICURLOPT_PROXY_TLSAUTH_USERNAME(3)\fP
+.IP CURLOPT_TLSAUTH_PASSWORD
+TLS authentication password. See \fICURLOPT_TLSAUTH_PASSWORD(3)\fP
+.IP CURLOPT_PROXY_TLSAUTH_PASSWORD
+Proxy TLS authentication password. See \fICURLOPT_PROXY_TLSAUTH_PASSWORD(3)\fP
+.IP CURLOPT_TLSAUTH_TYPE
+TLS authentication methods. See \fICURLOPT_TLSAUTH_TYPE(3)\fP
+.IP CURLOPT_PROXY_TLSAUTH_TYPE
+Proxy TLS authentication methods. See \fICURLOPT_PROXY_TLSAUTH_TYPE(3)\fP
+>>>>>>> origin/tomato-shibby-RT-AC
 .IP CURLOPT_PROXYAUTH
 Pass a long as parameter, which is set to a bitmask, to tell libcurl which
 authentication method(s) you want it to use for your proxy authentication.  If
@@ -2477,6 +2515,7 @@ server to connect back to libcurl when an active FTP connection is used. If no
 timeout is set, the internal default of 60000 will be used. (Added in 7.24.0)
 .SH SSL and SECURITY OPTIONS
 .IP CURLOPT_SSLCERT
+<<<<<<< HEAD
 Pass a pointer to a zero terminated string as parameter. The string should be
 the file name of your certificate. The default format is "P12" on Secure
 Transport and "PEM" on other engines, and can be changed with
@@ -2517,6 +2556,27 @@ load your private key.
 
 (This option was known as CURLOPT_SSLKEYPASSWD up to 7.16.4 and
 CURLOPT_SSLCERTPASSWD up to 7.9.2)
+=======
+Client cert. See \fICURLOPT_SSLCERT(3)\fP
+.IP CURLOPT_PROXY_SSLCERT
+Proxy client cert. See \fICURLOPT_PROXY_SSLCERT(3)\fP
+.IP CURLOPT_SSLCERTTYPE
+Client cert type.  See \fICURLOPT_SSLCERTTYPE(3)\fP
+.IP CURLOPT_PROXY_SSLCERTTYPE
+Proxy client cert type.  See \fICURLOPT_PROXY_SSLCERTTYPE(3)\fP
+.IP CURLOPT_SSLKEY
+Client key. See \fICURLOPT_SSLKEY(3)\fP
+.IP CURLOPT_PROXY_SSLKEY
+Proxy client key. See \fICURLOPT_PROXY_SSLKEY(3)\fP
+.IP CURLOPT_SSLKEYTYPE
+Client key type. See \fICURLOPT_SSLKEYTYPE(3)\fP
+.IP CURLOPT_PROXY_SSLKEYTYPE
+Proxy client key type. See \fICURLOPT_PROXY_SSLKEYTYPE(3)\fP
+.IP CURLOPT_KEYPASSWD
+Client key password. See \fICURLOPT_KEYPASSWD(3)\fP
+.IP CURLOPT_PROXY_KEYPASSWD
+Proxy client key password. See \fICURLOPT_PROXY_KEYPASSWD(3)\fP
+>>>>>>> origin/tomato-shibby-RT-AC
 .IP CURLOPT_SSL_ENABLE_ALPN
 Pass a long as parameter, 0 or 1 where 1 is for enable and 0 for disable. By
 default, libcurl assumes a value of 1. This option enables/disables ALPN in
@@ -2549,6 +2609,7 @@ Even though this option doesn't need any parameter, in some configurations
 \fIcurl_easy_setopt\fP might be defined as a macro taking exactly three
 arguments. Therefore, it's recommended to pass 1 as parameter to this option.
 .IP CURLOPT_SSLVERSION
+<<<<<<< HEAD
 Pass a long as parameter to control what version of SSL/TLS to attempt to use.
 (Added in 7.9.2)
 
@@ -2608,6 +2669,25 @@ is assumed to be stored, as established at build time.
 
 If curl is built against the NSS SSL library, the NSS PEM PKCS#11 module
 (libnsspem.so) needs to be available for this option to work properly.
+=======
+SSL version to use. See \fICURLOPT_SSLVERSION(3)\fP
+.IP CURLOPT_PROXY_SSLVERSION
+Proxy SSL version to use. See \fICURLOPT_PROXY_SSLVERSION(3)\fP
+.IP CURLOPT_SSL_VERIFYHOST
+Verify the host name in the SSL certificate. See \fICURLOPT_SSL_VERIFYHOST(3)\fP
+.IP CURLOPT_PROXY_SSL_VERIFYHOST
+Verify the host name in the proxy SSL certificate. See \fICURLOPT_PROXY_SSL_VERIFYHOST(3)\fP
+.IP CURLOPT_SSL_VERIFYPEER
+Verify the SSL certificate. See \fICURLOPT_SSL_VERIFYPEER(3)\fP
+.IP CURLOPT_PROXY_SSL_VERIFYPEER
+Verify the proxy SSL certificate. See \fICURLOPT_PROXY_SSL_VERIFYPEER(3)\fP
+.IP CURLOPT_SSL_VERIFYSTATUS
+Verify the SSL certificate's status. See \fICURLOPT_SSL_VERIFYSTATUS(3)\fP
+.IP CURLOPT_CAINFO
+CA cert bundle. See \fICURLOPT_CAINFO(3)\fP
+.IP CURLOPT_PROXY_CAINFO
+Proxy CA cert bundle. See \fICURLOPT_PROXY_CAINFO(3)\fP
+>>>>>>> origin/tomato-shibby-RT-AC
 .IP CURLOPT_ISSUERCERT
 Pass a char * to a zero terminated string naming a file holding a CA
 certificate in PEM format. If the option is set, an additional check against
@@ -2625,6 +2705,7 @@ which is returned if the setup of the SSL/TLS session has failed due to a
 mismatch with the issuer of peer certificate (\fICURLOPT_SSL_VERIFYPEER\fP has
 to be set too for the check to fail). (Added in 7.19.0)
 .IP CURLOPT_CAPATH
+<<<<<<< HEAD
 Pass a char * to a zero terminated string naming a directory holding multiple
 CA certificates to verify the peer with. If libcurl is built against OpenSSL,
 the certificate directory must be prepared using the openssl c_rehash utility.
@@ -2693,6 +2774,22 @@ and data about the certificates in the certificate chain used in the SSL
 connection. This data may then be retrieved after a transfer using
 \fIcurl_easy_getinfo(3)\fP and its option \fICURLINFO_CERTINFO\fP. (Added in
 7.19.1)
+=======
+Path to CA cert bundle. See \fICURLOPT_CAPATH(3)\fP
+.IP CURLOPT_PROXY_CAPATH
+Path to proxy CA cert bundle. See \fICURLOPT_PROXY_CAPATH(3)\fP
+.IP CURLOPT_CRLFILE
+Certificate Revocation List. See \fICURLOPT_CRLFILE(3)\fP
+.IP CURLOPT_PROXY_CRLFILE
+Proxy Certificate Revocation List. See \fICURLOPT_PROXY_CRLFILE(3)\fP
+.IP CURLOPT_CERTINFO
+Extract certificate info. See \fICURLOPT_CERTINFO(3)\fP
+.IP CURLOPT_PINNEDPUBLICKEY
+Set pinned SSL public key . See \fICURLOPT_PINNEDPUBLICKEY(3)\fP
+.IP CURLOPT_PROXY_PINNEDPUBLICKEY
+Set the proxy's pinned SSL public key. See
+\fICURLOPT_PROXY_PINNEDPUBLICKEY(3)\fP
+>>>>>>> origin/tomato-shibby-RT-AC
 .IP CURLOPT_RANDOM_FILE
 Pass a char * to a zero terminated file name. The file will be used to read
 from to seed the random engine for SSL. The more random the specified file is,
@@ -2701,6 +2798,7 @@ the more secure the SSL connection will become.
 Pass a char * to the zero terminated path name to the Entropy Gathering Daemon
 socket. It will be used to seed the random engine for SSL.
 .IP CURLOPT_SSL_CIPHER_LIST
+<<<<<<< HEAD
 Pass a char *, pointing to a zero terminated string holding the list of
 ciphers to use for the SSL connection. The list must be syntactically correct,
 it consists of one or more cipher strings separated by colons. Commas or
@@ -2722,6 +2820,11 @@ are enabled.
 You'll find more details about the NSS cipher lists on this URL:
 \fIhttp://git.fedorahosted.org/cgit/mod_nss.git/plain/docs/mod_nss.html#Directives\fP
 
+=======
+Ciphers to use. See \fICURLOPT_SSL_CIPHER_LIST(3)\fP
+.IP CURLOPT_PROXY_SSL_CIPHER_LIST
+Proxy ciphers to use. See \fICURLOPT_PROXY_SSL_CIPHER_LIST(3)\fP
+>>>>>>> origin/tomato-shibby-RT-AC
 .IP CURLOPT_SSL_SESSIONID_CACHE
 Pass a long set to 0 to disable libcurl's use of SSL session-ID caching. Set
 this to 1 to enable it. By default all transfers are done using the
@@ -2729,6 +2832,7 @@ cache. While nothing ever should get hurt by attempting to reuse SSL
 session-IDs, there seem to be broken SSL implementations in the wild that may
 require you to disable this in order for you to succeed. (Added in 7.16.0)
 .IP CURLOPT_SSL_OPTIONS
+<<<<<<< HEAD
 Pass a long with a bitmask to tell libcurl about specific SSL behaviors.
 
 CURLSSLOPT_ALLOW_BEAST is the only supported bit and by setting this the user
@@ -2738,6 +2842,11 @@ set to 0, the SSL layer libcurl uses may use a work-around for this flaw
 although it might cause interoperability problems with some (older) SSL
 implementations. WARNING: avoiding this work-around loosens the security, and
 by setting this option to 1 you ask for exactly that. (Added in 7.25.0)
+=======
+Control SSL behavior. See \fICURLOPT_SSL_OPTIONS(3)\fP
+.IP CURLOPT_PROXY_SSL_OPTIONS
+Control proxy SSL behavior. See \fICURLOPT_PROXY_SSL_OPTIONS(3)\fP
+>>>>>>> origin/tomato-shibby-RT-AC
 .IP CURLOPT_KRBLEVEL
 Pass a char * as parameter. Set the kerberos security level for FTP; this also
 enables kerberos awareness.  This is a string, \&'clear', \&'safe',

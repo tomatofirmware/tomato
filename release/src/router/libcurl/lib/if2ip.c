@@ -51,7 +51,7 @@
 #endif
 
 #include "inet_ntop.h"
-#include "strequal.h"
+#include "strcase.h"
 #include "if2ip.h"
 
 #define _MPRINTF_REPLACE /* use our functions only */
@@ -63,6 +63,41 @@
 
 /* ------------------------------------------------------------------ */
 
+<<<<<<< HEAD
+=======
+/* Return the scope of the given address. */
+unsigned int Curl_ipv6_scope(const struct sockaddr *sa)
+{
+#ifndef ENABLE_IPV6
+  (void) sa;
+#else
+  if(sa->sa_family == AF_INET6) {
+    const struct sockaddr_in6 * sa6 = (const struct sockaddr_in6 *)(void *) sa;
+    const unsigned char *b = sa6->sin6_addr.s6_addr;
+    unsigned short w = (unsigned short) ((b[0] << 8) | b[1]);
+
+    switch(w & 0xFFC0) {
+    case 0xFE80:
+      return IPV6_SCOPE_LINKLOCAL;
+    case 0xFEC0:
+      return IPV6_SCOPE_SITELOCAL;
+    case 0x0000:
+      w = b[1] | b[2] | b[3] | b[4] | b[5] | b[6] | b[7] | b[8] | b[9] |
+          b[10] | b[11] | b[12] | b[13] | b[14];
+      if(w || b[15] != 0x01)
+        break;
+      return IPV6_SCOPE_NODELOCAL;
+    default:
+      break;
+    }
+  }
+#endif
+
+  return IPV6_SCOPE_GLOBAL;
+}
+
+
+>>>>>>> origin/tomato-shibby-RT-AC
 #if defined(HAVE_GETIFADDRS)
 
 bool Curl_if_is_interface_name(const char *interf)
@@ -73,7 +108,7 @@ bool Curl_if_is_interface_name(const char *interf)
 
   if(getifaddrs(&head) >= 0) {
     for(iface=head; iface != NULL; iface=iface->ifa_next) {
-      if(curl_strequal(iface->ifa_name, interf)) {
+      if(strcasecompare(iface->ifa_name, interf)) {
         result = TRUE;
         break;
       }
@@ -97,7 +132,7 @@ if2ip_result_t Curl_if2ip(int af, unsigned int remote_scope,
     for(iface=head; iface != NULL; iface=iface->ifa_next) {
       if(iface->ifa_addr != NULL) {
         if(iface->ifa_addr->sa_family == af) {
-          if(curl_strequal(iface->ifa_name, interf)) {
+          if(strcasecompare(iface->ifa_name, interf)) {
             void *addr;
             char *ip;
             char scope[12]="";
@@ -132,7 +167,7 @@ if2ip_result_t Curl_if2ip(int af, unsigned int remote_scope,
           }
         }
         else if((res == IF2IP_NOT_FOUND) &&
-                curl_strequal(iface->ifa_name, interf)) {
+                strcasecompare(iface->ifa_name, interf)) {
           res = IF2IP_AF_NOT_SUPPORTED;
         }
       }

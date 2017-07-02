@@ -143,8 +143,16 @@ static void MD4Pad(MD4_CTX *context)
   unsigned char bits[8];
   unsigned int bufindex, padLen;
 
+<<<<<<< HEAD
   /* Save number of bits */
   Encode (bits, context->count, 8);
+=======
+  saved_lo = ctx->lo;
+  ctx->lo = (saved_lo + size) & 0x1fffffff;
+  if(ctx->lo < saved_lo)
+    ctx->hi++;
+  ctx->hi += (MD4_u32plus)size >> 29;
+>>>>>>> origin/tomato-shibby-RT-AC
 
   /* Pad out to 56 mod 64.
    */

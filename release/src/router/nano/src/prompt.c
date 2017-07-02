@@ -1,23 +1,31 @@
 /* $Id: prompt.c 4475 2010-01-17 05:30:22Z astyanax $ */
 /**************************************************************************
- *   prompt.c                                                             *
+ *   prompt.c  --  This file is part of GNU nano.                         *
  *                                                                        *
  *   Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,  *
+<<<<<<< HEAD
  *   2008, 2009 Free Software Foundation, Inc.                            *
  *   This program is free software; you can redistribute it and/or modify *
  *   it under the terms of the GNU General Public License as published by *
  *   the Free Software Foundation; either version 3, or (at your option)  *
  *   any later version.                                                   *
+=======
+ *   2008, 2009, 2010, 2011, 2013, 2014 Free Software Foundation, Inc.    *
+ *   Copyright (C) 2016 Benno Schulenberg                                 *
+>>>>>>> origin/tomato-shibby-RT-AC
  *                                                                        *
- *   This program is distributed in the hope that it will be useful, but  *
- *   WITHOUT ANY WARRANTY; without even the implied warranty of           *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU    *
- *   General Public License for more details.                             *
+ *   GNU nano is free software: you can redistribute it and/or modify     *
+ *   it under the terms of the GNU General Public License as published    *
+ *   by the Free Software Foundation, either version 3 of the License,    *
+ *   or (at your option) any later version.                               *
+ *                                                                        *
+ *   GNU nano is distributed in the hope that it will be useful,          *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty          *
+ *   of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.              *
+ *   See the GNU General Public License for more details.                 *
  *                                                                        *
  *   You should have received a copy of the GNU General Public License    *
- *   along with this program; if not, write to the Free Software          *
- *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA            *
- *   02110-1301, USA.                                                     *
+ *   along with this program.  If not, see http://www.gnu.org/licenses/.  *
  *                                                                        *
  **************************************************************************/
 
@@ -29,8 +37,9 @@
 
 static char *prompt = NULL;
 	/* The prompt string used for statusbar questions. */
-static size_t statusbar_x = (size_t)-1;
+static size_t statusbar_x = HIGHEST_POSITIVE;
 	/* The cursor position in answer. */
+<<<<<<< HEAD
 static size_t statusbar_pww = (size_t)-1;
 	/* The place we want in answer. */
 static size_t old_statusbar_x = (size_t)-1;
@@ -54,6 +63,14 @@ static bool reset_statusbar_x = FALSE;
 int do_statusbar_input(bool *meta_key, bool *func_key, bool *have_shortcut,
 	bool *ran_func, bool *finished, bool allow_funcs, void
 	(*refresh_func)(void))
+=======
+
+/* Read in a keystroke, interpret it if it is a shortcut or toggle, and
+ * return it.  Set ran_func to TRUE if we ran a function associated with
+ * a shortcut key, and set finished to TRUE if we're done after running
+ * or trying to run a function associated with a shortcut key. */
+int do_statusbar_input(bool *ran_func, bool *finished)
+>>>>>>> origin/tomato-shibby-RT-AC
 {
     int input;
 	/* The character we read in. */
@@ -72,6 +89,7 @@ int do_statusbar_input(bool *meta_key, bool *func_key, bool *have_shortcut,
     input = get_kbinput(bottomwin, meta_key, func_key);
 
 #ifndef DISABLE_MOUSE
+<<<<<<< HEAD
     if (allow_funcs) {
 	/* If we got a mouse click and it was on a shortcut, read in the
 	 * shortcut character. */
@@ -84,6 +102,15 @@ int do_statusbar_input(bool *meta_key, bool *func_key, bool *have_shortcut,
 		input = ERR;
 	    }
 	}
+=======
+    /* If we got a mouse click and it was on a shortcut, read in the
+     * shortcut character. */
+    if (input == KEY_MOUSE) {
+	if (do_statusbar_mouse() == 1)
+	    input = get_kbinput(bottomwin);
+	else
+	    return ERR;
+>>>>>>> origin/tomato-shibby-RT-AC
     }
 #endif
 
@@ -96,15 +123,22 @@ int do_statusbar_input(bool *meta_key, bool *func_key, bool *have_shortcut,
 
     /* If we got a non-high-bit control key, a meta key sequence, or a
      * function key, and it's not a shortcut or toggle, throw it out. */
+<<<<<<< HEAD
     if (!*have_shortcut) {
 	if (is_ascii_cntrl_char(input) || *meta_key || *func_key) {
 	    beep();
 	    *meta_key = FALSE;
 	    *func_key = FALSE;
+=======
+    if (!have_shortcut) {
+	if (is_ascii_cntrl_char(input) || meta_key || !is_byte(input)) {
+	    beep();
+>>>>>>> origin/tomato-shibby-RT-AC
 	    input = ERR;
 	}
     }
 
+<<<<<<< HEAD
     if (allow_funcs) {
 	/* If we got a character, and it isn't a shortcut or toggle,
 	 * it's a normal text character.  Display the warning if we're
@@ -233,7 +267,82 @@ int do_statusbar_input(bool *meta_key, bool *func_key, bool *have_shortcut,
 		        iso_me_harder_funcmap(f->scfunc);
 		}
 		*finished = TRUE;
+=======
+    /* If the keystroke isn't a shortcut nor a toggle, it's a normal text
+     * character: add the it to the input buffer, when allowed. */
+    if (input != ERR && !have_shortcut) {
+	/* Only accept input when not in restricted mode, or when not at
+	 * the "Write File" prompt, or when there is no filename yet. */
+	if (!ISSET(RESTRICTED) || currmenu != MWRITEFILE ||
+			openfile->filename[0] == '\0') {
+	    kbinput_len++;
+	    kbinput = (int *)nrealloc(kbinput, kbinput_len * sizeof(int));
+	    kbinput[kbinput_len - 1] = input;
+	}
+     }
+
+    /* If we got a shortcut, or if there aren't any other keystrokes waiting
+     * after the one we read in, we need to insert all the characters in the
+     * input buffer (if not empty) into the answer. */
+    if ((have_shortcut || get_key_buffer_len() == 0) && kbinput != NULL) {
+	/* Inject all characters in the input buffer at once, filtering out
+	 * control characters. */
+	do_statusbar_output(kbinput, kbinput_len, TRUE);
+
+	/* Empty the input buffer. */
+	kbinput_len = 0;
+	free(kbinput);
+	kbinput = NULL;
+    }
+
+    if (have_shortcut) {
+	if (s->scfunc == do_tab || s->scfunc == do_enter)
+	    ;
+	else if (s->scfunc == do_left)
+	    do_statusbar_left();
+	else if (s->scfunc == do_right)
+	    do_statusbar_right();
+#ifndef NANO_TINY
+	else if (s->scfunc == do_prev_word_void)
+	    do_statusbar_prev_word();
+	else if (s->scfunc == do_next_word_void)
+	    do_statusbar_next_word();
+#endif
+	else if (s->scfunc == do_home_void)
+	    do_statusbar_home();
+	else if (s->scfunc == do_end_void)
+	    do_statusbar_end();
+	/* When in restricted mode at the "Write File" prompt and the
+	 * filename isn't blank, disallow any input and deletion. */
+	else if (ISSET(RESTRICTED) && currmenu == MWRITEFILE &&
+				openfile->filename[0] != '\0' &&
+				(s->scfunc == do_verbatim_input ||
+				s->scfunc == do_cut_text_void ||
+				s->scfunc == do_delete ||
+				s->scfunc == do_backspace))
+	    ;
+	else if (s->scfunc == do_verbatim_input) {
+	    do_statusbar_verbatim_input();
+	} else if (s->scfunc == do_cut_text_void)
+	    do_statusbar_cut_text();
+	else if (s->scfunc == do_delete)
+	    do_statusbar_delete();
+	else if (s->scfunc == do_backspace)
+	    do_statusbar_backspace();
+	else {
+	    /* Handle any other shortcut in the current menu, setting
+	     * ran_func to TRUE if we try to run their associated functions,
+	     * and setting finished to TRUE to indicatethat we're done after
+	     * running or trying to run their associated functions. */
+	    f = sctofunc(s);
+	    if (s->scfunc != NULL) {
+		*ran_func = TRUE;
+		if (f && (!ISSET(VIEW_MODE) || f->viewok) &&
+				f->scfunc != do_gotolinecolumn_void)
+		    f->scfunc();
+>>>>>>> origin/tomato-shibby-RT-AC
 	    }
+	    *finished = TRUE;
 	}
     }
 
@@ -252,8 +361,6 @@ int do_statusbar_mouse(void)
 	FALSE)) {
 	size_t start_col;
 
-	assert(prompt != NULL);
-
 	start_col = strlenpt(prompt) + 2;
 
 	/* Move to where the click occurred. */
@@ -263,10 +370,14 @@ int do_statusbar_mouse(void)
 	    statusbar_x = actual_x(answer,
 			get_statusbar_page_start(start_col, start_col +
 			statusbar_xplustabs()) + mouse_x - start_col);
+<<<<<<< HEAD
 	    statusbar_pww = statusbar_xplustabs();
 
 	    if (need_statusbar_horizontal_update(pww_save))
 		update_statusbar_line(answer, statusbar_x);
+=======
+	    update_the_statusbar();
+>>>>>>> origin/tomato-shibby-RT-AC
 	}
     }
 
@@ -274,17 +385,25 @@ int do_statusbar_mouse(void)
 }
 #endif
 
+<<<<<<< HEAD
 /* The user typed output_len multibyte characters.  Add them to the
  * statusbar prompt, setting got_enter to TRUE if we get a newline, and
  * filtering out all ASCII control characters if allow_cntrls is
  * TRUE. */
 void do_statusbar_output(char *output, size_t output_len, bool
 	*got_enter, bool allow_cntrls)
+=======
+/* The user typed input_len multibyte characters.  Add them to the answer,
+ * filtering out ASCII control characters if filtering is TRUE. */
+void do_statusbar_output(int *the_input, size_t input_len,
+	bool filtering)
+>>>>>>> origin/tomato-shibby-RT-AC
 {
     size_t answer_len, i = 0;
     char *char_buf = charalloc(mb_cur_max());
     int char_buf_len;
 
+<<<<<<< HEAD
     assert(answer != NULL);
 
     answer_len = strlen(answer);
@@ -308,6 +427,19 @@ void do_statusbar_output(char *output, size_t output_len, bool
 		return;
 	    }
 	}
+=======
+    /* Copy the typed stuff so it can be treated. */
+    for (i = 0; i < input_len; i++)
+	output[i] = (char)the_input[i];
+    output[i] = '\0';
+
+    i = 0;
+
+    while (i < input_len) {
+	/* Encode any NUL byte as 0x0A. */
+	if (output[i] == '\0')
+	    output[i] = '\n';
+>>>>>>> origin/tomato-shibby-RT-AC
 
 	/* Interpret the next multibyte character. */
 	char_buf_len = parse_mbchar(output + i, char_buf, NULL);
@@ -320,10 +452,18 @@ void do_statusbar_output(char *output, size_t output_len, bool
 		char_buf_len)))
 	    continue;
 
+<<<<<<< HEAD
 	/* More dangerousness fun =) */
 	answer = charealloc(answer, answer_len + (char_buf_len * 2));
 
 	assert(statusbar_x <= answer_len);
+=======
+	/* Insert the typed character into the existing answer string. */
+	answer = charealloc(answer, strlen(answer) + char_len + 1);
+	charmove(answer + statusbar_x + char_len, answer + statusbar_x,
+				strlen(answer) - statusbar_x + 1);
+	strncpy(answer + statusbar_x, char_buf, char_len);
+>>>>>>> origin/tomato-shibby-RT-AC
 
 	charmove(answer + statusbar_x + char_buf_len,
 		answer + statusbar_x, answer_len - statusbar_x +
@@ -336,6 +476,7 @@ void do_statusbar_output(char *output, size_t output_len, bool
 
     free(char_buf);
 
+<<<<<<< HEAD
     statusbar_pww = statusbar_xplustabs();
 
     update_statusbar_line(answer, statusbar_x);
@@ -370,18 +511,32 @@ void do_statusbar_home(void)
 
     if (need_statusbar_horizontal_update(pww_save))
 	update_statusbar_line(answer, statusbar_x);
+=======
+    update_the_statusbar();
 }
 
-/* Move to the end of the prompt text. */
+/* Move to the beginning of the answer. */
+void do_statusbar_home(void)
+{
+    statusbar_x = 0;
+    update_the_statusbar();
+>>>>>>> origin/tomato-shibby-RT-AC
+}
+
+/* Move to the end of the answer. */
 void do_statusbar_end(void)
 {
     size_t pww_save = statusbar_pww;
 
     statusbar_x = strlen(answer);
+<<<<<<< HEAD
     statusbar_pww = statusbar_xplustabs();
 
     if (need_statusbar_horizontal_update(pww_save))
 	update_statusbar_line(answer, statusbar_x);
+=======
+    update_the_statusbar();
+>>>>>>> origin/tomato-shibby-RT-AC
 }
 
 /* Move left one character. */
@@ -391,16 +546,21 @@ void do_statusbar_left(void)
 	size_t pww_save = statusbar_pww;
 
 	statusbar_x = move_mbleft(answer, statusbar_x);
+<<<<<<< HEAD
 	statusbar_pww = statusbar_xplustabs();
 
 	if (need_statusbar_horizontal_update(pww_save))
 	    update_statusbar_line(answer, statusbar_x);
+=======
+	update_the_statusbar();
+>>>>>>> origin/tomato-shibby-RT-AC
     }
 }
 
 /* Move right one character. */
 void do_statusbar_right(void)
 {
+<<<<<<< HEAD
     if (statusbar_x < strlen(answer)) {
 	size_t pww_save = statusbar_pww;
 
@@ -409,6 +569,11 @@ void do_statusbar_right(void)
 
 	if (need_statusbar_horizontal_update(pww_save))
 	    update_statusbar_line(answer, statusbar_x);
+=======
+    if (answer[statusbar_x] != '\0') {
+	statusbar_x = move_mbright(answer, statusbar_x);
+	update_the_statusbar();
+>>>>>>> origin/tomato-shibby-RT-AC
     }
 }
 
@@ -424,13 +589,12 @@ void do_statusbar_backspace(void)
 /* Delete one character. */
 void do_statusbar_delete(void)
 {
-    statusbar_pww = statusbar_xplustabs();
-
     if (answer[statusbar_x] != '\0') {
 	int char_buf_len = parse_mbchar(answer + statusbar_x, NULL,
 		NULL);
 	size_t line_len = strlen(answer + statusbar_x);
 
+<<<<<<< HEAD
 	assert(statusbar_x < strlen(answer));
 
 	charmove(answer + statusbar_x, answer + statusbar_x +
@@ -438,14 +602,19 @@ void do_statusbar_delete(void)
 		char_buf_len + 1);
 
 	null_at(&answer, statusbar_x + line_len - char_buf_len);
+=======
+	charmove(answer + statusbar_x, answer + statusbar_x + char_len,
+			strlen(answer) - statusbar_x - char_len + 1);
+>>>>>>> origin/tomato-shibby-RT-AC
 
 	update_statusbar_line(answer, statusbar_x);
     }
 }
 
-/* Move text from the prompt into oblivion. */
+/* Zap some or all text from the answer. */
 void do_statusbar_cut_text(void)
 {
+<<<<<<< HEAD
     assert(answer != NULL);
 
 #ifndef NANO_TINY
@@ -459,21 +628,33 @@ void do_statusbar_cut_text(void)
 #ifndef NANO_TINY
     }
 #endif
+=======
+    if (!ISSET(CUT_TO_END))
+	statusbar_x = 0;
+
+    answer[statusbar_x] = '\0';
+>>>>>>> origin/tomato-shibby-RT-AC
 
     update_statusbar_line(answer, statusbar_x);
 }
 
 #ifndef NANO_TINY
+<<<<<<< HEAD
 /* Move to the next word in the prompt text.  If allow_punct is TRUE,
  * treat punctuation as part of a word.  Return TRUE if we started on a
  * word, and FALSE otherwise. */
 bool do_statusbar_next_word(bool allow_punct)
+=======
+/* Move to the next word in the answer. */
+void do_statusbar_next_word(void)
+>>>>>>> origin/tomato-shibby-RT-AC
 {
     size_t pww_save = statusbar_pww;
     char *char_mb;
     int char_mb_len;
     bool end_line = FALSE, started_on_word = FALSE;
 
+<<<<<<< HEAD
     assert(answer != NULL);
 
     char_mb = charalloc(mb_cur_max());
@@ -491,6 +672,11 @@ bool do_statusbar_next_word(bool allow_punct)
 	/* If we haven't found it, then we've started on a word, so set
 	 * started_on_word to TRUE. */
 	started_on_word = TRUE;
+=======
+    /* Move forward until we reach the start of a word. */
+    while (answer[statusbar_x] != '\0') {
+	statusbar_x = move_mbright(answer, statusbar_x);
+>>>>>>> origin/tomato-shibby-RT-AC
 
 	if (answer[statusbar_x] == '\0')
 	    end_line = TRUE;
@@ -518,6 +704,7 @@ bool do_statusbar_next_word(bool allow_punct)
 	    statusbar_x += char_mb_len;
     }
 
+<<<<<<< HEAD
     free(char_mb);
 
     statusbar_pww = statusbar_xplustabs();
@@ -533,12 +720,20 @@ bool do_statusbar_next_word(bool allow_punct)
  * TRUE, treat punctuation as part of a word.  Return TRUE if we started
  * on a word, and FALSE otherwise. */
 bool do_statusbar_prev_word(bool allow_punct)
+=======
+    update_the_statusbar();
+}
+
+/* Move to the previous word in the answer. */
+void do_statusbar_prev_word(void)
+>>>>>>> origin/tomato-shibby-RT-AC
 {
     size_t pww_save = statusbar_pww;
     char *char_mb;
     int char_mb_len;
     bool begin_line = FALSE, started_on_word = FALSE;
 
+<<<<<<< HEAD
     assert(answer != NULL);
 
     char_mb = charalloc(mb_cur_max());
@@ -568,6 +763,10 @@ bool do_statusbar_prev_word(bool allow_punct)
     if (statusbar_x == 0)
 	begin_line = TRUE;
     else
+=======
+    /* Move backward until we pass over the start of a word. */
+    while (statusbar_x != 0) {
+>>>>>>> origin/tomato-shibby-RT-AC
 	statusbar_x = move_mbleft(answer, statusbar_x);
 
     while (!begin_line) {
@@ -620,14 +819,17 @@ bool do_statusbar_prev_word(bool allow_punct)
     if (need_statusbar_horizontal_update(pww_save))
 	update_statusbar_line(answer, statusbar_x);
 
+<<<<<<< HEAD
     /* Return whether we started on a word. */
     return started_on_word;
+=======
+    update_the_statusbar();
+>>>>>>> origin/tomato-shibby-RT-AC
 }
 #endif /* !NANO_TINY */
 
-/* Get verbatim input.  Set got_enter to TRUE if we got the Enter key as
- * part of the verbatim input. */
-void do_statusbar_verbatim_input(bool *got_enter)
+/* Get verbatim input and inject it into the answer, without filtering. */
+void do_statusbar_verbatim_input(void)
 {
     int *kbinput;
     size_t kbinput_len, i;
@@ -635,9 +837,9 @@ void do_statusbar_verbatim_input(bool *got_enter)
 
     *got_enter = FALSE;
 
-    /* Read in all the verbatim characters. */
     kbinput = get_verbatim_kbinput(bottomwin, &kbinput_len);
 
+<<<<<<< HEAD
     /* Display all the verbatim characters at once, not filtering out
      * control characters. */
     output = charalloc(kbinput_len + 1);
@@ -811,33 +1013,60 @@ void do_statusbar_find_bracket(void)
 /* Return the placewewant associated with statusbar_x, i.e. the
  * zero-based column position of the cursor.  The value will be no
  * smaller than statusbar_x. */
+=======
+    do_statusbar_output(kbinput, kbinput_len, FALSE);
+}
+
+/* Return the zero-based column position of the cursor in the answer. */
+>>>>>>> origin/tomato-shibby-RT-AC
 size_t statusbar_xplustabs(void)
 {
     return strnlenpt(answer, statusbar_x);
 }
 
-/* nano scrolls horizontally within a line in chunks.  This function
- * returns the column number of the first character displayed in the
- * statusbar prompt when the cursor is at the given column with the
- * prompt ending at start_col.  Note that (0 <= column -
- * get_statusbar_page_start(column) < COLS). */
-size_t get_statusbar_page_start(size_t start_col, size_t column)
+/* Return the column number of the first character of the answer that is
+ * displayed in the statusbar when the cursor is at the given column,
+ * with the available room for the answer starting at base.  Note that
+ * (0 <= column - get_statusbar_page_start(column) < COLS). */
+size_t get_statusbar_page_start(size_t base, size_t column)
 {
+<<<<<<< HEAD
     if (column == start_col || column < COLS - 1)
+=======
+    if (column == base || column < COLS - 1)
+>>>>>>> origin/tomato-shibby-RT-AC
 	return 0;
+    else if (COLS > base + 2)
+	return column - base - 1 - (column - base - 1) % (COLS - base - 2);
     else
-	return column - start_col - (column - start_col) % (COLS -
-		start_col - 1);
+	return column - 2;
 }
 
+<<<<<<< HEAD
 /* Put the cursor in the statusbar prompt at statusbar_x. */
+=======
+/* Reinitialize the cursor position in the answer. */
+void reinit_statusbar_x(void)
+{
+    statusbar_x = HIGHEST_POSITIVE;
+}
+
+/* Put the cursor in the answer at statusbar_x. */
+>>>>>>> origin/tomato-shibby-RT-AC
 void reset_statusbar_cursor(void)
 {
     size_t start_col = strlenpt(prompt) + 2;
     size_t xpt = statusbar_xplustabs();
 
+    /* Work around a cursor-misplacement bug in VTEs. */
+    wmove(bottomwin, 0, 0);
+    wnoutrefresh(bottomwin);
+    doupdate();
+
     wmove(bottomwin, 0, start_col + xpt -
-	get_statusbar_page_start(start_col, start_col + xpt));
+			get_statusbar_page_start(start_col, start_col + xpt));
+
+    wnoutrefresh(bottomwin);
 }
 
 /* Repaint the statusbar when getting a character in
@@ -845,6 +1074,7 @@ void reset_statusbar_cursor(void)
  * starting with curranswer[index]. */
 void update_statusbar_line(const char *curranswer, size_t index)
 {
+<<<<<<< HEAD
     size_t start_col, page_start;
     char *expanded;
 
@@ -855,13 +1085,24 @@ void update_statusbar_line(const char *curranswer, size_t index)
     page_start = get_statusbar_page_start(start_col, start_col + index);
 
     wattron(bottomwin, reverse_attr);
+=======
+    size_t base, the_page, end_page;
+    char *expanded;
+
+    base = strlenpt(prompt) + 2;
+    the_page = get_statusbar_page_start(base, base + strnlenpt(answer, statusbar_x));
+    end_page = get_statusbar_page_start(base, base + strlenpt(answer) - 1);
+
+    wattron(bottomwin, interface_color_pair[TITLE_BAR]);
+>>>>>>> origin/tomato-shibby-RT-AC
 
     blank_statusbar();
 
-    mvwaddnstr(bottomwin, 0, 0, prompt, actual_x(prompt, COLS - 2));
+    mvwaddstr(bottomwin, 0, 0, prompt);
     waddch(bottomwin, ':');
-    waddch(bottomwin, (page_start == 0) ? ' ' : '$');
+    waddch(bottomwin, (the_page == 0) ? ' ' : '<');
 
+<<<<<<< HEAD
     expanded = display_string(curranswer, page_start, COLS - start_col -
 	1, FALSE);
     waddstr(bottomwin, expanded);
@@ -901,6 +1142,23 @@ const sc *get_prompt_string(int *actual, bool allow_tabs,
 	const char *curranswer,
 	bool *meta_key, bool *func_key,
 #ifndef NANO_TINY
+=======
+    expanded = display_string(answer, the_page, COLS - base - 1, FALSE);
+    waddstr(bottomwin, expanded);
+    free(expanded);
+
+    waddch(bottomwin, (the_page >= end_page) ? ' ' : '>');
+
+    wattroff(bottomwin, interface_color_pair[TITLE_BAR]);
+
+    reset_statusbar_cursor();
+}
+
+/* Get a string of input at the statusbar prompt. */
+functionptrtype acquire_an_answer(int *actual, bool allow_tabs,
+	bool allow_files, bool *listed,
+#ifndef DISABLE_HISTORIES
+>>>>>>> origin/tomato-shibby-RT-AC
 	filestruct **history_list,
 #endif
 	void (*refresh_func)(void), int menu
@@ -932,6 +1190,7 @@ const sc *get_prompt_string(int *actual, bool allow_tabs,
 #endif
 #endif /* !NANO_TINY */
 
+<<<<<<< HEAD
     answer = mallocstrcpy(answer, curranswer);
     curranswer_len = strlen(answer);
 
@@ -952,11 +1211,19 @@ const sc *get_prompt_string(int *actual, bool allow_tabs,
 	statusbar_x = curranswer_len;
 	statusbar_pww = statusbar_xplustabs();
     }
+=======
+    if (statusbar_x > strlen(answer))
+	statusbar_x = strlen(answer);
+>>>>>>> origin/tomato-shibby-RT-AC
 
     currmenu = menu;
 
 #ifdef DEBUG
+<<<<<<< HEAD
 fprintf(stderr, "get_prompt_string: answer = \"%s\", statusbar_x = %lu\n", answer, (unsigned long) statusbar_x);
+=======
+    fprintf(stderr, "acquiring: answer = \"%s\", statusbar_x = %lu\n", answer, (unsigned long) statusbar_x);
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif
 
     update_statusbar_line(answer, statusbar_x);
@@ -966,6 +1233,7 @@ fprintf(stderr, "get_prompt_string: answer = \"%s\", statusbar_x = %lu\n", answe
     wnoutrefresh(edit);
     wnoutrefresh(bottomwin);
 
+<<<<<<< HEAD
     /* If we're using restricted mode, we aren't allowed to change the
      * name of the current file once it has one, because that would
      * allow writing to files not specified on the command line.  In
@@ -977,6 +1245,27 @@ fprintf(stderr, "get_prompt_string: answer = \"%s\", statusbar_x = %lu\n", answe
 	assert(statusbar_x <= strlen(answer));
 
 	s = get_shortcut(currmenu, &kbinput, meta_key, func_key);
+=======
+    while (TRUE) {
+	/* Ensure the cursor is shown when waiting for input. */
+	curs_set(1);
+
+	kbinput = do_statusbar_input(&ran_func, &finished);
+
+#ifndef NANO_TINY
+	/* If the window size changed, go reformat the prompt string. */
+	if (kbinput == KEY_WINCH) {
+	    refresh_func();
+	    *actual = KEY_WINCH;
+#ifndef DISABLE_HISTORIES
+	    free(magichistory);
+#endif
+	    return NULL;
+	}
+#endif /* !NANO_TINY */
+
+	func = func_from_key(&kbinput);
+>>>>>>> origin/tomato-shibby-RT-AC
 
 	if (s)
 	    if (s->scfunc ==  CANCEL_MSG || s->scfunc == DO_ENTER)
@@ -985,6 +1274,7 @@ fprintf(stderr, "get_prompt_string: answer = \"%s\", statusbar_x = %lu\n", answe
 #ifndef DISABLE_TABCOMP
 	if (s && s->scfunc != DO_TAB)
 	    tabbed = FALSE;
+<<<<<<< HEAD
 #endif
 
 #ifndef DISABLE_TABCOMP
@@ -1008,6 +1298,26 @@ fprintf(stderr, "get_prompt_string: answer = \"%s\", statusbar_x = %lu\n", answe
 
 		update_statusbar_line(answer, statusbar_x);
 	} else 
+=======
+
+	if (func == do_tab) {
+#ifndef DISABLE_HISTORIES
+	    if (history_list != NULL) {
+		if (last_kbinput != the_code_for(do_tab, TAB_CODE))
+		    complete_len = strlen(answer);
+
+		if (complete_len > 0) {
+		    answer = get_history_completion(history_list,
+					answer, complete_len);
+		    statusbar_x = strlen(answer);
+		}
+	    } else
+#endif
+	    if (allow_tabs)
+		answer = input_tab(answer, allow_files, &statusbar_x,
+					&tabbed, refresh_func, listed);
+	} else
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif /* !DISABLE_TABCOMP */
 #ifndef NANO_TINY
 	if (s && s->scfunc ==  PREV_HISTORY_MSG) {
@@ -1029,6 +1339,7 @@ fprintf(stderr, "get_prompt_string: answer = \"%s\", statusbar_x = %lu\n", answe
 			statusbar_x = strlen(answer);
 		    }
 
+<<<<<<< HEAD
 		    update_statusbar_line(answer, statusbar_x);
 
 		    /* This key has a shortcut list entry when it's used
@@ -1037,6 +1348,21 @@ fprintf(stderr, "get_prompt_string: answer = \"%s\", statusbar_x = %lu\n", answe
 		     * FALSE here, so that we aren't kicked out of the
 		     * statusbar prompt. */
 		    finished = FALSE;
+=======
+		/* This key has a shortcut-list entry when it's used to
+		 * move to an older search, which means that finished has
+		 * been set to TRUE.  Set it back to FALSE here, so that
+		 * we aren't kicked out of the statusbar prompt. */
+		finished = FALSE;
+	    }
+	} else if (func == get_history_newer_void) {
+	    if (history_list != NULL) {
+		/* Get the newer search from the history list and save it in
+		 * answer.  If there is no newer search, don't do anything. */
+		if ((history = get_history_newer(history_list)) != NULL) {
+		    answer = mallocstrcpy(answer, history);
+		    statusbar_x = strlen(answer);
+>>>>>>> origin/tomato-shibby-RT-AC
 		}
 	} else if (s && s->scfunc ==  NEXT_HISTORY_MSG) {
 		if (history_list != NULL) {
@@ -1059,6 +1385,7 @@ fprintf(stderr, "get_prompt_string: answer = \"%s\", statusbar_x = %lu\n", answe
 			statusbar_x = strlen(answer);
 		    }
 
+<<<<<<< HEAD
 		    update_statusbar_line(answer, statusbar_x);
 
 		    /* This key has a shortcut list entry when it's used
@@ -1080,6 +1407,23 @@ fprintf(stderr, "get_prompt_string: answer = \"%s\", statusbar_x = %lu\n", answe
 		 * here, so that we aren't kicked out of the statusbar
 		 * prompt. */
 		finished = FALSE;
+=======
+		/* This key has a shortcut-list entry when it's used to
+		 * move to a newer search, which means that finished has
+		 * been set to TRUE.  Set it back to FALSE here, so that
+		 * we aren't kicked out of the statusbar prompt. */
+		finished = FALSE;
+	    }
+	} else
+#endif /* !DISABLE_HISTORIES */
+	if (func == do_help_void) {
+	    /* This key has a shortcut-list entry when it's used to go to
+	     * the help browser or display a message indicating that help
+	     * is disabled, which means that finished has been set to TRUE.
+	     * Set it back to FALSE here, so that we aren't kicked out of
+	     * the statusbar prompt. */
+	    finished = FALSE;
+>>>>>>> origin/tomato-shibby-RT-AC
 	}
 
 	/* If we have a shortcut with an associated function, break out
@@ -1088,12 +1432,20 @@ fprintf(stderr, "get_prompt_string: answer = \"%s\", statusbar_x = %lu\n", answe
 	if (finished)
 	    break;
 
+<<<<<<< HEAD
 #if !defined(NANO_TINY) && !defined(DISABLE_TABCOMP)
 	last_kbinput = kbinput;
 #endif
 
 	reset_statusbar_cursor();
 	wnoutrefresh(bottomwin);
+=======
+	update_the_statusbar();
+
+#if !defined(DISABLE_HISTORIES) && !defined(DISABLE_TABCOMP)
+	last_kbinput = kbinput;
+#endif
+>>>>>>> origin/tomato-shibby-RT-AC
     }
 
 
@@ -1142,12 +1494,17 @@ fprintf(stderr, "get_prompt_string: answer = \"%s\", statusbar_x = %lu\n", answe
  *
  * The allow_tabs parameter indicates whether we should allow tabs to be
  * interpreted.  The allow_files parameter indicates whether we should
+<<<<<<< HEAD
  * allow all files (as opposed to just directories) to be tab
  * completed. */
 int do_prompt(bool allow_tabs,
 #ifndef DISABLE_TABCOMP
 	bool allow_files,
 #endif
+=======
+ * allow all files (as opposed to just directories) to be tab completed. */
+int do_prompt(bool allow_tabs, bool allow_files,
+>>>>>>> origin/tomato-shibby-RT-AC
 	int menu, const char *curranswer,
 	bool *meta_key, bool *func_key,
 #ifndef NANO_TINY
@@ -1157,6 +1514,7 @@ int do_prompt(bool allow_tabs,
 {
     va_list ap;
     int retval;
+<<<<<<< HEAD
     const sc *s;
 #ifndef DISABLE_TABCOMP
     bool list = FALSE;
@@ -1168,14 +1526,28 @@ int do_prompt(bool allow_tabs,
 	free(prompt);
 
     prompt = charalloc(((COLS - 4) * mb_cur_max()) + 1);
+=======
+    functionptrtype func = NULL;
+    bool listed = FALSE;
+    /* Save a possible current statusbar x position. */
+    size_t was_statusbar_x = statusbar_x;
+>>>>>>> origin/tomato-shibby-RT-AC
 
     bottombars(menu);
 
-    va_start(ap, msg);
-    vsnprintf(prompt, (COLS - 4) * mb_cur_max(), msg, ap);
-    va_end(ap);
-    null_at(&prompt, actual_x(prompt, COLS - 4));
+    answer = mallocstrcpy(answer, curranswer);
 
+#ifndef NANO_TINY
+  redo_theprompt:
+#endif
+    prompt = charalloc((COLS * mb_cur_max()) + 1);
+    va_start(ap, msg);
+    vsnprintf(prompt, COLS * mb_cur_max(), msg, ap);
+    va_end(ap);
+    /* Reserve five columns for colon plus angles plus answer, ":<aa>". */
+    prompt[actual_x(prompt, (COLS < 5) ? 0 : COLS - 5)] = '\0';
+
+<<<<<<< HEAD
     s = get_prompt_string(&retval, allow_tabs,
 #ifndef DISABLE_TABCOMP
 	allow_files,
@@ -1190,14 +1562,33 @@ int do_prompt(bool allow_tabs,
 	, &list
 #endif
 	);
+=======
+    func = acquire_an_answer(&retval, allow_tabs, allow_files, &listed,
+#ifndef DISABLE_HISTORIES
+			history_list,
+#endif
+			refresh_func);
+>>>>>>> origin/tomato-shibby-RT-AC
 
     free(prompt);
     prompt = NULL;
 
+<<<<<<< HEAD
     /* We're done with the prompt, so save the statusbar cursor
      * position. */
     old_statusbar_x = statusbar_x;
     old_pww = statusbar_pww;
+=======
+#ifndef NANO_TINY
+    if (retval == KEY_WINCH)
+	goto redo_theprompt;
+#endif
+
+    /* If we're done with this prompt, restore the x position to what
+     * it was at a possible previous prompt. */
+    if (func == do_cancel || func == do_enter)
+	statusbar_x = was_statusbar_x;
+>>>>>>> origin/tomato-shibby-RT-AC
 
     /* If we left the prompt via Cancel or Enter, set the return value
      * properly. */
@@ -1240,6 +1631,7 @@ void do_prompt_abort(void)
  * TRUE when passed in), and -1 for Cancel. */
 int do_yesno_prompt(bool all, const char *msg)
 {
+<<<<<<< HEAD
     int ok = -2, width = 16;
     const char *yesstr;		/* String of Yes characters accepted. */
     const char *nostr;		/* Same for No. */
@@ -1248,21 +1640,35 @@ int do_yesno_prompt(bool all, const char *msg)
     int oldmenu = currmenu;
 
     assert(msg != NULL);
+=======
+    int response = -2, width = 16;
+    char *message = display_string(msg, 0, COLS, FALSE);
+>>>>>>> origin/tomato-shibby-RT-AC
 
-    /* yesstr, nostr, and allstr are strings of any length.  Each string
-     * consists of all single-byte characters accepted as valid
-     * characters for that value.  The first value will be the one
-     * displayed in the shortcuts. */
     /* TRANSLATORS: For the next three strings, if possible, specify
      * the single-byte shortcuts for both your language and English.
-     * For example, in French: "OoYy" for "Oui". */
-    yesstr = _("Yy");
-    nostr = _("Nn");
-    allstr = _("Aa");
+     * For example, in French: "OoYy", for both "Oui" and "Yes". */
+    const char *yesstr = _("Yy");
+    const char *nostr = _("Nn");
+    const char *allstr = _("Aa");
 
+    /* The above three variables consist of all the single-byte characters
+     * that are accepted for the corresponding answer.  Of each variable,
+     * the first character is displayed in the help lines. */
+
+<<<<<<< HEAD
     if (!ISSET(NO_HELP)) {
 	char shortstr[3];
 		/* Temp string for Yes, No, All. */
+=======
+    while (response == -2) {
+	int kbinput;
+	functionptrtype func;
+
+	if (!ISSET(NO_HELP)) {
+	    char shortstr[3];
+		/* Temporary string for (translated) " Y", " N" and " A". */
+>>>>>>> origin/tomato-shibby-RT-AC
 
 	if (COLS < 32)
 	    width = COLS / 2;
@@ -1280,6 +1686,7 @@ int do_yesno_prompt(bool all, const char *msg)
 	    onekey(shortstr, _("All"), width);
 	}
 
+<<<<<<< HEAD
 	wmove(bottomwin, 2, 0);
 	shortstr[1] = nostr[0];
 	onekey(shortstr, _("No"), width);
@@ -1310,11 +1717,30 @@ int do_yesno_prompt(bool all, const char *msg)
 	currmenu = MYESNO;
 	kbinput = get_kbinput(bottomwin, &meta_key, &func_key);
 	s = get_shortcut(currmenu, &kbinput, &meta_key, &func_key);
+=======
+	/* Color the statusbar over its full width and display the question. */
+	wattron(bottomwin, interface_color_pair[TITLE_BAR]);
+	blank_statusbar();
+	mvwaddnstr(bottomwin, 0, 0, message, actual_x(message, COLS - 1));
+	wattroff(bottomwin, interface_color_pair[TITLE_BAR]);
+
+	wnoutrefresh(bottomwin);
+
+	/* When not replacing, show the cursor. */
+	if (!all)
+	    curs_set(1);
+
+	currmenu = MYESNO;
+	kbinput = get_kbinput(bottomwin);
+
+	func = func_from_key(&kbinput);
+>>>>>>> origin/tomato-shibby-RT-AC
 
 	if (s && s->scfunc ==  CANCEL_MSG)
 	    ok = -1;
 #ifndef DISABLE_MOUSE
 	else if (kbinput == KEY_MOUSE) {
+<<<<<<< HEAD
 		/* We can click on the Yes/No/All shortcut list to
 		 * select an answer. */
 		if (get_mouseinput(&mouse_x, &mouse_y, FALSE) == 0 &&
@@ -1357,6 +1783,41 @@ int do_yesno_prompt(bool all, const char *msg)
 		    ok = 2;
 	}
     } while (ok == -2);
+=======
+	    int mouse_x, mouse_y;
+	    /* We can click on the Yes/No/All shortcuts to select an answer. */
+	    if (get_mouseinput(&mouse_x, &mouse_y, FALSE) == 0 &&
+			wmouse_trafo(bottomwin, &mouse_y, &mouse_x, FALSE) &&
+			mouse_x < (width * 2) && mouse_y > 0) {
+		int x = mouse_x / width;
+			/* The x-coordinate among the Yes/No/All shortcuts. */
+		int y = mouse_y - 1;
+			/* The y-coordinate among the Yes/No/All shortcuts. */
+
+		assert(0 <= x && x <= 1 && 0 <= y && y <= 1);
+
+		/* x == 0 means they clicked Yes or No.
+		 * y == 0 means Yes or All. */
+		response = -2 * x * y + x - y + 1;
+
+		if (response == 2 && !all)
+		    response = -2;
+	    }
+	}
+#endif /* !DISABLE_MOUSE */
+	else {
+	    /* Look for the kbinput in the Yes, No (and All) strings. */
+	    if (strchr(yesstr, kbinput) != NULL)
+		response = 1;
+	    else if (strchr(nostr, kbinput) != NULL)
+		response = 0;
+	    else if (all && strchr(allstr, kbinput) != NULL)
+		response = 2;
+	}
+    }
+
+    free(message);
+>>>>>>> origin/tomato-shibby-RT-AC
 
     currmenu = oldmenu;
     return ok;

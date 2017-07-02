@@ -11,11 +11,23 @@
 # the official API, but we re-use the code here to avoid duplication.
 CURLX_ONES = \
 	../lib/strtoofft.c \
+<<<<<<< HEAD
 	../lib/strdup.c \
 	../lib/rawstr.c \
 	../lib/nonblock.c \
 	../lib/warnless.c
 
+=======
+	../lib/nonblock.c \
+	../lib/warnless.c
+
+CURLX_HFILES = \
+	../lib/curl_setup.h \
+	../lib/strtoofft.h \
+	../lib/nonblock.h \
+	../lib/warnless.h
+
+>>>>>>> origin/tomato-shibby-RT-AC
 CURL_CFILES = \
 	tool_binmode.c \
 	tool_bname.c \

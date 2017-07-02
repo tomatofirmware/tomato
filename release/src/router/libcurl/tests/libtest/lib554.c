@@ -155,7 +155,12 @@ int test(char *URL)
   if(formrc)
     printf("curl_formadd(4) = %d\n", (int)formrc);
 
+<<<<<<< HEAD
   if ((curl = curl_easy_init()) == NULL) {
+=======
+  curl = curl_easy_init();
+  if(!curl) {
+>>>>>>> origin/tomato-shibby-RT-AC
     fprintf(stderr, "curl_easy_init() failed\n");
     curl_formfree(formpost);
     curl_global_cleanup();

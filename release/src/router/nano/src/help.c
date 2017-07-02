@@ -1,23 +1,31 @@
 /* $Id: help.c 4453 2009-12-02 03:36:22Z astyanax $ */
 /**************************************************************************
- *   help.c                                                               *
+ *   help.c  --  This file is part of GNU nano.                           *
  *                                                                        *
  *   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,  *
+<<<<<<< HEAD
  *   2009 Free Software Foundation, Inc.                                  *
  *   This program is free software; you can redistribute it and/or modify *
  *   it under the terms of the GNU General Public License as published by *
  *   the Free Software Foundation; either version 3, or (at your option)  *
  *   any later version.                                                   *
+=======
+ *   2009, 2010, 2011, 2013, 2014 Free Software Foundation, Inc.          *
+ *   Copyright (C) 2014, 2015, 2016 Benno Schulenberg                     *
+>>>>>>> origin/tomato-shibby-RT-AC
  *                                                                        *
- *   This program is distributed in the hope that it will be useful, but  *
- *   WITHOUT ANY WARRANTY; without even the implied warranty of           *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU    *
- *   General Public License for more details.                             *
+ *   GNU nano is free software: you can redistribute it and/or modify     *
+ *   it under the terms of the GNU General Public License as published    *
+ *   by the Free Software Foundation, either version 3 of the License,    *
+ *   or (at your option) any later version.                               *
+ *                                                                        *
+ *   GNU nano is distributed in the hope that it will be useful,          *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty          *
+ *   of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.              *
+ *   See the GNU General Public License for more details.                 *
  *                                                                        *
  *   You should have received a copy of the GNU General Public License    *
- *   along with this program; if not, write to the Free Software          *
- *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA            *
- *   02110-1301, USA.                                                     *
+ *   along with this program.  If not, see http://www.gnu.org/licenses/.  *
  *                                                                        *
  **************************************************************************/
 
@@ -137,6 +145,7 @@ void do_help(void (*refresh_func)(void))
 	}
 #endif
 
+<<<<<<< HEAD
 	parse_help_input(&kbinput, &meta_key, &func_key);
         s = get_shortcut(MHELP, &kbinput, &meta_key, &func_key);
 	if (!s)
@@ -177,6 +186,36 @@ void do_help(void (*refresh_func)(void))
 		abort = TRUE;
 		break;
 	}
+=======
+	func = parse_help_input(&kbinput);
+
+	if (func == total_refresh) {
+	    total_redraw();
+	} else if (func == do_up_void) {
+	    if (line > 0)
+		line--;
+	} else if (func == do_down_void) {
+	    if (line + (editwinrows - 1) < last_line)
+		line++;
+	} else if (func == do_page_up) {
+	    if (line > editwinrows - 2)
+		line -= editwinrows - 2;
+	    else
+		line = 0;
+	} else if (func == do_page_down) {
+	    if (line + (editwinrows - 1) < last_line)
+		line += editwinrows - 2;
+	} else if (func == do_first_line) {
+	    line = 0;
+	} else if (func == do_last_line) {
+	    if (line + (editwinrows - 1) < last_line)
+		line = last_line - (editwinrows - 1);
+	} else if (func == do_exit) {
+	    /* Exit from the help viewer. */
+	    break;
+	} else
+	    unbound_key(kbinput);
+>>>>>>> origin/tomato-shibby-RT-AC
     }
 
 #ifndef DISABLE_MOUSE
@@ -454,12 +493,28 @@ void help_init(void)
 
             if (s->scfunc == f->scfunc) {
 		scsfound++;
+<<<<<<< HEAD
 
 		if (scsfound == 1)
 		    ptr += sprintf(ptr, "%s", s->keystr);
 		else
 		    ptr += sprintf(ptr, "(%s)", s->keystr);
 		*(ptr++) = '\t';
+=======
+		/* Make the first column narrower (6) than the second (10),
+		 * but allow it to spill into the second, for "M-Space". */
+		if (scsfound == 1) {
+		    sprintf(ptr, "%s              ", s->keystr);
+		    /* Unicode arrows take three bytes instead of one. */
+		    if (s->keystr[1] == '\xE2')
+			ptr += 8;
+		    else
+			ptr += 6;
+		} else {
+		    ptr += sprintf(ptr, "(%s)\t", s->keystr);
+		    break;
+		}
+>>>>>>> origin/tomato-shibby-RT-AC
 	    }
 	}
 	/* Pad with tabs if we didnt find 3 */
@@ -515,8 +570,16 @@ void parse_help_input(int *kbinput, bool *meta_key, bool *func_key)
 	    /* Cancel is equivalent to Exit here. */
 	    case 'E':
 	    case 'e':
+<<<<<<< HEAD
 		*kbinput = sc_seq_or(DO_EXIT, 0);;
 		break;
+=======
+	    case 'Q':
+	    case 'q':
+	    case 'X':
+	    case 'x':
+		return do_exit;
+>>>>>>> origin/tomato-shibby-RT-AC
 	}
     }
 }

@@ -188,6 +188,7 @@ else(HAVE_WINDOWS_H)
   add_header_include(HAVE_SYS_TIME_H "sys/time.h")
   add_header_include(TIME_WITH_SYS_TIME "time.h")
   add_header_include(HAVE_TIME_H "time.h")
+<<<<<<< HEAD
 endif(HAVE_WINDOWS_H)
 set(EXTRA_DEFINES "${EXTRA_DEFINES}\n${headers_hack}\n#define __unused5")
 curl_check_c_source_compiles("struct timeval ts;\nts.tv_sec  = 0;\nts.tv_usec = 0" HAVE_STRUCT_TIMEVAL)
@@ -200,6 +201,34 @@ if(HAVE_SYS_POLL_H)
   set(HEADER_INCLUDES "sys/poll.h")
 endif(HAVE_SYS_POLL_H)
 curl_check_c_source_runs("return poll((void *)0, 0, 10 /*ms*/)" HAVE_POLL_FINE)
+=======
+endif()
+check_c_source_compiles("${_source_epilogue}
+int main(void) {
+  struct timeval ts;
+  ts.tv_sec  = 0;
+  ts.tv_usec = 0;
+  (void)ts;
+  return 0;
+}" HAVE_STRUCT_TIMEVAL)
+
+
+include(CheckCSourceRuns)
+# See HAVE_POLL in CMakeLists.txt for why poll is disabled on macOS
+if(NOT APPLE)
+  set(CMAKE_REQUIRED_FLAGS)
+  if(HAVE_SYS_POLL_H)
+    set(CMAKE_REQUIRED_FLAGS "-DHAVE_SYS_POLL_H")
+  endif(HAVE_SYS_POLL_H)
+  check_c_source_runs("
+    #ifdef HAVE_SYS_POLL_H
+    #  include <sys/poll.h>
+    #endif
+    int main(void) {
+      return poll((void *)0, 0, 10 /*ms*/);
+    }" HAVE_POLL_FINE)
+endif()
+>>>>>>> origin/tomato-shibby-RT-AC
 
 set(HAVE_SIG_ATOMIC_T 1)
 set(EXTRA_DEFINES)

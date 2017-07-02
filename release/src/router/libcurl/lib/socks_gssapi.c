@@ -54,10 +54,10 @@ static gss_ctx_id_t gss_context = GSS_C_NO_CONTEXT;
 /*
  * Helper gssapi error functions.
  */
-static int check_gss_err(struct SessionHandle *data,
+static int check_gss_err(struct Curl_easy *data,
                          OM_uint32 major_status,
                          OM_uint32 minor_status,
-                         const char* function)
+                         const char *function)
 {
   if(GSS_ERROR(major_status)) {
     OM_uint32 maj_stat,min_stat;
@@ -76,7 +76,7 @@ static int check_gss_err(struct SessionHandle *data,
                                     &msg_ctx, &status_string);
       if(maj_stat == GSS_S_COMPLETE) {
         if(sizeof(buf) > len + status_string.length + 1) {
-          strcpy(buf+len, (char*) status_string.value);
+          strcpy(buf+len, (char *) status_string.value);
           len += status_string.length;
         }
         gss_release_buffer(&min_stat, &status_string);
@@ -97,7 +97,7 @@ static int check_gss_err(struct SessionHandle *data,
                                     &msg_ctx, &status_string);
       if(maj_stat == GSS_S_COMPLETE) {
         if(sizeof(buf) > len + status_string.length)
-          strcpy(buf+len, (char*) status_string.value);
+          strcpy(buf+len, (char *) status_string.value);
         gss_release_buffer(&min_stat, &status_string);
         break;
       }
@@ -113,7 +113,7 @@ static int check_gss_err(struct SessionHandle *data,
 CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
                                       struct connectdata *conn)
 {
-  struct SessionHandle *data = conn->data;
+  struct Curl_easy *data = conn->data;
   curl_socket_t sock = conn->sock[sockindex];
   CURLcode code;
   ssize_t actualread;
@@ -131,8 +131,15 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
   gss_name_t       gss_client_name = GSS_C_NO_NAME;
   unsigned short   us_length;
   char             *user=NULL;
+<<<<<<< HEAD
   unsigned char socksreq[4]; /* room for gssapi exchange header only */
   char *serviceptr = data->set.str[STRING_SOCKS5_GSSAPI_SERVICE];
+=======
+  unsigned char socksreq[4]; /* room for GSS-API exchange header only */
+  const char *serviceptr = data->set.str[STRING_PROXY_SERVICE_NAME] ?
+                           data->set.str[STRING_PROXY_SERVICE_NAME] : "rcmd";
+  const size_t serviceptr_length = strlen(serviceptr);
+>>>>>>> origin/tomato-shibby-RT-AC
 
   /*   GSSAPI request looks like
    * +----+------+-----+----------------+
@@ -143,23 +150,29 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
    */
 
   /* prepare service name */
+<<<<<<< HEAD
   if(strchr(serviceptr,'/')) {
     service.value = malloc(strlen(serviceptr));
+=======
+  if(strchr(serviceptr, '/')) {
+    service.length = serviceptr_length;
+    service.value = malloc(service.length);
+>>>>>>> origin/tomato-shibby-RT-AC
     if(!service.value)
       return CURLE_OUT_OF_MEMORY;
-    service.length = strlen(serviceptr);
     memcpy(service.value, serviceptr, service.length);
 
     gss_major_status = gss_import_name(&gss_minor_status, &service,
                                        (gss_OID) GSS_C_NULL_OID, &server);
   }
   else {
-    service.value = malloc(strlen(serviceptr) +strlen(conn->proxy.name)+2);
+    service.value = malloc(serviceptr_length +
+                           strlen(conn->socks_proxy.host.name)+2);
     if(!service.value)
       return CURLE_OUT_OF_MEMORY;
-    service.length = strlen(serviceptr) +strlen(conn->proxy.name)+1;
+    service.length = serviceptr_length + strlen(conn->socks_proxy.host.name)+1;
     snprintf(service.value, service.length+1, "%s@%s",
-             serviceptr, conn->proxy.name);
+             serviceptr, conn->socks_proxy.host.name);
 
     gss_major_status = gss_import_name(&gss_minor_status, &service,
                                        gss_nt_service_name, &server);
@@ -298,11 +311,19 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
   gss_release_name(&gss_status, &server);
 
   /* Everything is good so far, user was authenticated! */
+<<<<<<< HEAD
   gss_major_status = gss_inquire_context (&gss_minor_status, gss_context,
                                           &gss_client_name, NULL, NULL, NULL,
                                           NULL, NULL, NULL);
   if(check_gss_err(data,gss_major_status,
                    gss_minor_status,"gss_inquire_context")) {
+=======
+  gss_major_status = gss_inquire_context(&gss_minor_status, gss_context,
+                                         &gss_client_name, NULL, NULL, NULL,
+                                         NULL, NULL, NULL);
+  if(check_gss_err(data, gss_major_status,
+                   gss_minor_status, "gss_inquire_context")) {
+>>>>>>> origin/tomato-shibby-RT-AC
     gss_delete_sec_context(&gss_status, &gss_context, NULL);
     gss_release_name(&gss_status, &gss_client_name);
     failf(data, "Failed to determine user name.");

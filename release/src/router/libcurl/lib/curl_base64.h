@@ -22,9 +22,15 @@
  *
  ***************************************************************************/
 
-CURLcode Curl_base64_encode(struct SessionHandle *data,
+CURLcode Curl_base64_encode(struct Curl_easy *data,
                             const char *inputbuff, size_t insize,
                             char **outptr, size_t *outlen);
+<<<<<<< HEAD
+=======
+CURLcode Curl_base64url_encode(struct Curl_easy *data,
+                               const char *inputbuff, size_t insize,
+                               char **outptr, size_t *outlen);
+>>>>>>> origin/tomato-shibby-RT-AC
 
 CURLcode Curl_base64_decode(const char *src,
                             unsigned char **outptr, size_t *outlen);

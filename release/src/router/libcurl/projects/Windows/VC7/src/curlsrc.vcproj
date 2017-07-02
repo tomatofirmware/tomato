@@ -144,8 +144,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386 /FIXED:NO"
+<<<<<<< HEAD:release/src/router/libcurl/projects/Windows/VC7/src/curlsrc.vcproj
 				AdditionalDependencies="wldap32.lib ws2_32.lib libcurl.lib"
 				OutputFile="$(OutDir)\curl.exe"
+=======
+				AdditionalDependencies="wldap32.lib ws2_32.lib crypt32.lib libcurl.lib"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
+>>>>>>> origin/tomato-shibby-RT-AC:release/src/router/libcurl/projects/Windows/VC7/src/curl.vcproj
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="..\..\..\..\build\Win32\VC7\$(ConfigurationName)"
@@ -955,8 +960,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386 /FIXED:NO"
+<<<<<<< HEAD:release/src/router/libcurl/projects/Windows/VC7/src/curlsrc.vcproj
 				AdditionalDependencies="wldap32.lib ws2_32.lib libcurld.lib"
 				OutputFile="$(OutDir)\curld.exe"
+=======
+				AdditionalDependencies="wldap32.lib ws2_32.lib crypt32.lib libcurld.lib"
+				OutputFile="$(OutDir)\$(ProjectName)d.exe"
+>>>>>>> origin/tomato-shibby-RT-AC:release/src/router/libcurl/projects/Windows/VC7/src/curl.vcproj
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="..\..\..\..\build\Win32\VC7\$(ConfigurationName)"
@@ -1064,7 +1074,10 @@
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386 /FIXED:NO"
 				AdditionalDependencies="wldap32.lib ws2_32.lib libcurld.lib"
+<<<<<<< HEAD:release/src/router/libcurl/projects/Windows/VC7/src/curlsrc.vcproj
 				OutputFile="$(OutDir)\curld.exe"
+=======
+				OutputFile="$(OutDir)\$(ProjectName)d.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="..\..\..\..\build\Win32\VC7\$(ConfigurationName)"
@@ -1090,6 +1103,210 @@
 			<Tool
 				Name="VCWebDeploymentTool"/>
 		</Configuration>
+		<Configuration
+			Name="DLL Debug - DLL Windows SSPI - DLL WinIDN|Win32"
+			OutputDirectory=".\..\..\..\..\build\Win32\VC7\$(ConfigurationName)"
+			IntermediateDirectory="$(OutDir)\src"
+			ConfigurationType="1"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE">
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="/EHsc "
+				Optimization="0"
+				AdditionalIncludeDirectories="$(ProgramFiles)\Microsoft Platform SDK\Include,..\..\..\..\include,..\..\..\..\lib,..\..\..\..\src"
+				PreprocessorDefinitions="_DEBUG;_CONSOLE;DEBUGBUILD"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				WarningLevel="4"
+				SuppressStartupBanner="TRUE"
+				DebugInformationFormat="3"
+				CompileAs="0"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="/MACHINE:I386 /FIXED:NO"
+				AdditionalDependencies="wldap32.lib ws2_32.lib libcurld.lib"
+				OutputFile="$(OutDir)\$(ProjectName)d.exe"
+				LinkIncremental="1"
+				SuppressStartupBanner="TRUE"
+				AdditionalLibraryDirectories="..\..\..\..\build\Win32\VC7\$(ConfigurationName)"
+				GenerateDebugInformation="TRUE"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
+				SubSystem="1"/>
+			<Tool
+				Name="VCMIDLTool"
+				TypeLibraryName="$(OutDir)\$(ProjectName).tlb"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="1033"
+				AdditionalIncludeDirectories="..\..\..\..\include"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
+		</Configuration>
+		<Configuration
+			Name="DLL Release - DLL Windows SSPI - DLL WinIDN|Win32"
+			OutputDirectory=".\..\..\..\..\build\Win32\VC7\$(ConfigurationName)"
+			IntermediateDirectory="$(OutDir)\src"
+			ConfigurationType="1"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE">
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="/EHsc "
+				InlineFunctionExpansion="1"
+				AdditionalIncludeDirectories="$(ProgramFiles)\Microsoft Platform SDK\Include,..\..\..\..\include,..\..\..\..\lib,..\..\..\..\src"
+				PreprocessorDefinitions="NDEBUG;_CONSOLE"
+				StringPooling="TRUE"
+				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="TRUE"
+				WarningLevel="4"
+				SuppressStartupBanner="TRUE"
+				CompileAs="0"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="/MACHINE:I386 /FIXED:NO"
+				AdditionalDependencies="wldap32.lib ws2_32.lib libcurl.lib"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
+				LinkIncremental="1"
+				SuppressStartupBanner="TRUE"
+				AdditionalLibraryDirectories="..\..\..\..\build\Win32\VC7\$(ConfigurationName)"
+				SubSystem="1"/>
+			<Tool
+				Name="VCMIDLTool"
+				TypeLibraryName="$(OutDir)\$(ProjectName).tlb"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="1033"
+				AdditionalIncludeDirectories="..\..\..\..\include"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
+		</Configuration>
+		<Configuration
+			Name="LIB Debug - DLL Windows SSPI - DLL WinIDN|Win32"
+			OutputDirectory=".\..\..\..\..\build\Win32\VC7\$(ConfigurationName)"
+			IntermediateDirectory="$(OutDir)\src"
+			ConfigurationType="1"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE">
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="/EHsc "
+				Optimization="0"
+				AdditionalIncludeDirectories="$(ProgramFiles)\Microsoft Platform SDK\Include,..\..\..\..\include,..\..\..\..\lib,..\..\..\..\src"
+				PreprocessorDefinitions="_DEBUG;_CONSOLE;DEBUGBUILD;CURL_STATICLIB"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				WarningLevel="4"
+				SuppressStartupBanner="TRUE"
+				DebugInformationFormat="3"
+				CompileAs="0"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="/MACHINE:I386 /FIXED:NO"
+				AdditionalDependencies="normaliz.lib wldap32.lib ws2_32.lib crypt32.lib libcurld.lib"
+				OutputFile="$(OutDir)\$(ProjectName)d.exe"
+>>>>>>> origin/tomato-shibby-RT-AC:release/src/router/libcurl/projects/Windows/VC7/src/curl.vcproj
+				LinkIncremental="1"
+				SuppressStartupBanner="TRUE"
+				AdditionalLibraryDirectories="..\..\..\..\build\Win32\VC7\$(ConfigurationName)"
+				GenerateDebugInformation="TRUE"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
+				SubSystem="1"/>
+			<Tool
+				Name="VCMIDLTool"
+				TypeLibraryName="$(OutDir)\$(ProjectName).tlb"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="1033"
+				AdditionalIncludeDirectories="..\..\..\..\include"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
+		</Configuration>
+<<<<<<< HEAD:release/src/router/libcurl/projects/Windows/VC7/src/curlsrc.vcproj
+=======
+		<Configuration
+			Name="LIB Release - DLL Windows SSPI - DLL WinIDN|Win32"
+			OutputDirectory=".\..\..\..\..\build\Win32\VC7\$(ConfigurationName)"
+			IntermediateDirectory="$(OutDir)\src"
+			ConfigurationType="1"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE">
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="/EHsc "
+				InlineFunctionExpansion="1"
+				AdditionalIncludeDirectories="$(ProgramFiles)\Microsoft Platform SDK\Include,..\..\..\..\include,..\..\..\..\lib,..\..\..\..\src"
+				PreprocessorDefinitions="NDEBUG;_CONSOLE;CURL_STATICLIB"
+				StringPooling="TRUE"
+				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="TRUE"
+				WarningLevel="4"
+				SuppressStartupBanner="TRUE"
+				CompileAs="0"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="/MACHINE:I386 /FIXED:NO"
+				AdditionalDependencies="normaliz.lib wldap32.lib ws2_32.lib crypt32.lib libcurl.lib"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
+				LinkIncremental="1"
+				SuppressStartupBanner="TRUE"
+				AdditionalLibraryDirectories="..\..\..\..\build\Win32\VC7\$(ConfigurationName)"
+				SubSystem="1"/>
+			<Tool
+				Name="VCMIDLTool"
+				TypeLibraryName="$(OutDir)\$(ProjectName).tlb"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="1033"
+				AdditionalIncludeDirectories="..\..\..\..\include"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
+		</Configuration>
+>>>>>>> origin/tomato-shibby-RT-AC:release/src/router/libcurl/projects/Windows/VC7/src/curl.vcproj
 	</Configurations>
 	<Files>
 		<Filter
@@ -1097,9 +1314,6 @@
 			Filter="">
 			<File
 				RelativePath="..\..\..\..\lib\nonblock.c">
-			</File>
-			<File
-				RelativePath="..\..\..\..\lib\rawstr.c">
 			</File>
 			<File
 				RelativePath="..\..\..\..\lib\strtoofft.c">
@@ -1232,10 +1446,14 @@
 				RelativePath="..\..\..\..\lib\nonblock.h">
 			</File>
 			<File
+<<<<<<< HEAD:release/src/router/libcurl/projects/Windows/VC7/src/curlsrc.vcproj
 				RelativePath="..\..\..\..\lib\rawstr.h">
 			</File>
 			<File
 				RelativePath="..\..\..\..\lib\setup.h">
+=======
+				RelativePath="..\..\..\..\lib\strtoofft.h">
+>>>>>>> origin/tomato-shibby-RT-AC:release/src/router/libcurl/projects/Windows/VC7/src/curl.vcproj
 			</File>
 			<File
 				RelativePath="..\..\..\..\lib\strtoofft.h">

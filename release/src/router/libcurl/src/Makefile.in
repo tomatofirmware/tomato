@@ -121,6 +121,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libcurltool_la_LIBADD =
+<<<<<<< HEAD
 am__libcurltool_la_SOURCES_DIST = tool_binmode.c tool_bname.c \
 	tool_cb_dbg.c tool_cb_hdr.c tool_cb_prg.c tool_cb_rea.c \
 	tool_cb_see.c tool_cb_wrt.c tool_cfgable.c tool_convert.c \
@@ -133,6 +134,20 @@ am__libcurltool_la_SOURCES_DIST = tool_binmode.c tool_bname.c \
 	tool_vms.c tool_writeenv.c tool_writeout.c tool_xattr.c \
 	../lib/strtoofft.c ../lib/strdup.c ../lib/rawstr.c \
 	../lib/nonblock.c ../lib/warnless.c tool_binmode.h \
+=======
+am__libcurltool_la_SOURCES_DIST = slist_wc.c tool_binmode.c \
+	tool_bname.c tool_cb_dbg.c tool_cb_hdr.c tool_cb_prg.c \
+	tool_cb_rea.c tool_cb_see.c tool_cb_wrt.c tool_cfgable.c \
+	tool_convert.c tool_dirhie.c tool_doswin.c tool_easysrc.c \
+	tool_formparse.c tool_getparam.c tool_getpass.c tool_help.c \
+	tool_helpers.c tool_homedir.c tool_hugehelp.c tool_libinfo.c \
+	tool_main.c tool_metalink.c tool_mfiles.c tool_msgs.c \
+	tool_operate.c tool_operhlp.c tool_panykey.c tool_paramhlp.c \
+	tool_parsecfg.c tool_strdup.c tool_setopt.c tool_sleep.c \
+	tool_urlglob.c tool_util.c tool_vms.c tool_writeenv.c \
+	tool_writeout.c tool_xattr.c ../lib/strtoofft.c \
+	../lib/nonblock.c ../lib/warnless.c slist_wc.h tool_binmode.h \
+>>>>>>> origin/tomato-shibby-RT-AC
 	tool_bname.h tool_cb_dbg.h tool_cb_hdr.h tool_cb_prg.h \
 	tool_cb_rea.h tool_cb_see.h tool_cb_wrt.h tool_cfgable.h \
 	tool_convert.h tool_dirhie.h tool_doswin.h tool_easysrc.h \
@@ -141,6 +156,7 @@ am__libcurltool_la_SOURCES_DIST = tool_binmode.c tool_bname.c \
 	tool_main.h tool_metalink.h tool_mfiles.h tool_msgs.h \
 	tool_operate.h tool_operhlp.h tool_panykey.h tool_paramhlp.h \
 	tool_parsecfg.h tool_sdecls.h tool_setopt.h tool_setup.h \
+<<<<<<< HEAD
 	tool_sleep.h tool_urlglob.h tool_util.h tool_version.h \
 	tool_vms.h tool_writeenv.h tool_writeout.h tool_xattr.h
 am__objects_1 = libcurltool_la-tool_binmode.lo \
@@ -150,6 +166,19 @@ am__objects_1 = libcurltool_la-tool_binmode.lo \
 	libcurltool_la-tool_cb_wrt.lo libcurltool_la-tool_cfgable.lo \
 	libcurltool_la-tool_convert.lo libcurltool_la-tool_dirhie.lo \
 	libcurltool_la-tool_doswin.lo libcurltool_la-tool_easysrc.lo \
+=======
+	tool_sleep.h tool_strdup.h tool_urlglob.h tool_util.h \
+	tool_version.h tool_vms.h tool_writeenv.h tool_writeout.h \
+	tool_xattr.h
+am__objects_1 = libcurltool_la-slist_wc.lo \
+	libcurltool_la-tool_binmode.lo libcurltool_la-tool_bname.lo \
+	libcurltool_la-tool_cb_dbg.lo libcurltool_la-tool_cb_hdr.lo \
+	libcurltool_la-tool_cb_prg.lo libcurltool_la-tool_cb_rea.lo \
+	libcurltool_la-tool_cb_see.lo libcurltool_la-tool_cb_wrt.lo \
+	libcurltool_la-tool_cfgable.lo libcurltool_la-tool_convert.lo \
+	libcurltool_la-tool_dirhie.lo libcurltool_la-tool_doswin.lo \
+	libcurltool_la-tool_easysrc.lo \
+>>>>>>> origin/tomato-shibby-RT-AC
 	libcurltool_la-tool_formparse.lo \
 	libcurltool_la-tool_getparam.lo libcurltool_la-tool_getpass.lo \
 	libcurltool_la-tool_help.lo libcurltool_la-tool_helpers.lo \
@@ -166,8 +195,11 @@ am__objects_1 = libcurltool_la-tool_binmode.lo \
 	libcurltool_la-tool_writeout.lo libcurltool_la-tool_xattr.lo
 am__dirstamp = $(am__leading_dot)dirstamp
 am__objects_2 = ../lib/libcurltool_la-strtoofft.lo \
+<<<<<<< HEAD
 	../lib/libcurltool_la-strdup.lo \
 	../lib/libcurltool_la-rawstr.lo \
+=======
+>>>>>>> origin/tomato-shibby-RT-AC
 	../lib/libcurltool_la-nonblock.lo \
 	../lib/libcurltool_la-warnless.lo
 am__objects_3 =
@@ -204,10 +236,17 @@ am__objects_5 = curl-tool_binmode.$(OBJEXT) curl-tool_bname.$(OBJEXT) \
 	curl-tool_urlglob.$(OBJEXT) curl-tool_util.$(OBJEXT) \
 	curl-tool_vms.$(OBJEXT) curl-tool_writeenv.$(OBJEXT) \
 	curl-tool_writeout.$(OBJEXT) curl-tool_xattr.$(OBJEXT)
+<<<<<<< HEAD
 am__objects_6 = ../lib/curl-strtoofft.$(OBJEXT) \
 	../lib/curl-strdup.$(OBJEXT) ../lib/curl-rawstr.$(OBJEXT) \
 	../lib/curl-nonblock.$(OBJEXT) ../lib/curl-warnless.$(OBJEXT)
 am_curl_OBJECTS = $(am__objects_5) $(am__objects_6) $(am__objects_3)
+=======
+am__objects_7 = ../lib/curl-strtoofft.$(OBJEXT) \
+	../lib/curl-nonblock.$(OBJEXT) ../lib/curl-warnless.$(OBJEXT)
+am__objects_8 = $(am__objects_6) $(am__objects_7) $(am__objects_3)
+am_curl_OBJECTS = $(am__objects_8)
+>>>>>>> origin/tomato-shibby-RT-AC
 curl_OBJECTS = $(am_curl_OBJECTS)
 curl_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -470,7 +509,11 @@ top_srcdir = @top_srcdir@
 #                            | (__| |_| |  _ <| |___
 #                             \___|\___/|_| \_\_____|
 #
+<<<<<<< HEAD
 # Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
+=======
+# Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+>>>>>>> origin/tomato-shibby-RT-AC
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
@@ -507,11 +550,23 @@ AM_CPPFLAGS = -I$(top_builddir)/include/curl -I$(top_builddir)/include \
 # the official API, but we re-use the code here to avoid duplication.
 CURLX_ONES = \
 	../lib/strtoofft.c \
+<<<<<<< HEAD
 	../lib/strdup.c \
 	../lib/rawstr.c \
 	../lib/nonblock.c \
 	../lib/warnless.c
 
+=======
+	../lib/nonblock.c \
+	../lib/warnless.c
+
+CURLX_HFILES = \
+	../lib/curl_setup.h \
+	../lib/strtoofft.h \
+	../lib/nonblock.h \
+	../lib/warnless.h
+
+>>>>>>> origin/tomato-shibby-RT-AC
 CURL_CFILES = \
 	tool_binmode.c \
 	tool_bname.c \
@@ -611,13 +666,20 @@ curl_DEPENDENCIES = $(top_builddir)/lib/libcurl.la
 @BUILD_UNITTESTS_TRUE@libcurltool_la_SOURCES = $(curl_SOURCES)
 BUILT_SOURCES = tool_hugehelp.c
 CLEANFILES = tool_hugehelp.c
+<<<<<<< HEAD
 EXTRA_DIST = mkhelp.pl makefile.dj Makefile.vc6 Makefile.b32 Makefile.m32 \
 	macos/curl.mcp.xml.sit.hqx                                        \
 	macos/MACINSTALL.TXT macos/src/curl_GUSIConfig.cpp \
 	macos/src/macos_main.cpp makefile.amiga curl.rc                   \
 	Makefile.netware Makefile.inc Makefile.Watcom CMakeLists.txt
+=======
+EXTRA_DIST = mkhelp.pl makefile.dj Makefile.b32		\
+ Makefile.m32 macos/curl.mcp.xml.sit.hqx macos/MACINSTALL.TXT		\
+ macos/src/curl_GUSIConfig.cpp macos/src/macos_main.cpp makefile.amiga	\
+ curl.rc Makefile.netware Makefile.inc Makefile.Watcom CMakeLists.txt
+>>>>>>> origin/tomato-shibby-RT-AC
 
-MANPAGE = $(top_srcdir)/docs/curl.1
+MANPAGE = $(top_builddir)/docs/curl.1
 README = $(top_srcdir)/docs/MANUAL
 MKHELP = $(top_srcdir)/src/mkhelp.pl
 HUGE = tool_hugehelp.c
@@ -676,10 +738,13 @@ clean-noinstLTLIBRARIES:
 	@: > ../lib/$(DEPDIR)/$(am__dirstamp)
 ../lib/libcurltool_la-strtoofft.lo: ../lib/$(am__dirstamp) \
 	../lib/$(DEPDIR)/$(am__dirstamp)
+<<<<<<< HEAD
 ../lib/libcurltool_la-strdup.lo: ../lib/$(am__dirstamp) \
 	../lib/$(DEPDIR)/$(am__dirstamp)
 ../lib/libcurltool_la-rawstr.lo: ../lib/$(am__dirstamp) \
 	../lib/$(DEPDIR)/$(am__dirstamp)
+=======
+>>>>>>> origin/tomato-shibby-RT-AC
 ../lib/libcurltool_la-nonblock.lo: ../lib/$(am__dirstamp) \
 	../lib/$(DEPDIR)/$(am__dirstamp)
 ../lib/libcurltool_la-warnless.lo: ../lib/$(am__dirstamp) \
@@ -738,10 +803,13 @@ clean-binPROGRAMS:
 	rm -f $$list
 ../lib/curl-strtoofft.$(OBJEXT): ../lib/$(am__dirstamp) \
 	../lib/$(DEPDIR)/$(am__dirstamp)
+<<<<<<< HEAD
 ../lib/curl-strdup.$(OBJEXT): ../lib/$(am__dirstamp) \
 	../lib/$(DEPDIR)/$(am__dirstamp)
 ../lib/curl-rawstr.$(OBJEXT): ../lib/$(am__dirstamp) \
 	../lib/$(DEPDIR)/$(am__dirstamp)
+=======
+>>>>>>> origin/tomato-shibby-RT-AC
 ../lib/curl-nonblock.$(OBJEXT): ../lib/$(am__dirstamp) \
 	../lib/$(DEPDIR)/$(am__dirstamp)
 ../lib/curl-warnless.$(OBJEXT): ../lib/$(am__dirstamp) \
@@ -760,6 +828,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@../lib/$(DEPDIR)/curl-nonblock.Po@am__quote@
+<<<<<<< HEAD
 @AMDEP_TRUE@@am__include@ @am__quote@../lib/$(DEPDIR)/curl-rawstr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../lib/$(DEPDIR)/curl-strdup.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../lib/$(DEPDIR)/curl-strtoofft.Po@am__quote@
@@ -767,6 +836,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@../lib/$(DEPDIR)/libcurltool_la-nonblock.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../lib/$(DEPDIR)/libcurltool_la-rawstr.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../lib/$(DEPDIR)/libcurltool_la-strdup.Plo@am__quote@
+=======
+@AMDEP_TRUE@@am__include@ @am__quote@../lib/$(DEPDIR)/curl-strtoofft.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../lib/$(DEPDIR)/curl-warnless.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../lib/$(DEPDIR)/libcurltool_la-nonblock.Plo@am__quote@
+>>>>>>> origin/tomato-shibby-RT-AC
 @AMDEP_TRUE@@am__include@ @am__quote@../lib/$(DEPDIR)/libcurltool_la-strtoofft.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../lib/$(DEPDIR)/libcurltool_la-warnless.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/curl-tool_binmode.Po@am__quote@
@@ -1143,6 +1217,7 @@ libcurltool_la-tool_xattr.lo: tool_xattr.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcurltool_la_CPPFLAGS) $(CPPFLAGS) $(libcurltool_la_CFLAGS) $(CFLAGS) -c -o ../lib/libcurltool_la-strtoofft.lo `test -f '../lib/strtoofft.c' || echo '$(srcdir)/'`../lib/strtoofft.c
 
+<<<<<<< HEAD
 ../lib/libcurltool_la-strdup.lo: ../lib/strdup.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcurltool_la_CPPFLAGS) $(CPPFLAGS) $(libcurltool_la_CFLAGS) $(CFLAGS) -MT ../lib/libcurltool_la-strdup.lo -MD -MP -MF ../lib/$(DEPDIR)/libcurltool_la-strdup.Tpo -c -o ../lib/libcurltool_la-strdup.lo `test -f '../lib/strdup.c' || echo '$(srcdir)/'`../lib/strdup.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../lib/$(DEPDIR)/libcurltool_la-strdup.Tpo ../lib/$(DEPDIR)/libcurltool_la-strdup.Plo
@@ -1157,6 +1232,8 @@ libcurltool_la-tool_xattr.lo: tool_xattr.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcurltool_la_CPPFLAGS) $(CPPFLAGS) $(libcurltool_la_CFLAGS) $(CFLAGS) -c -o ../lib/libcurltool_la-rawstr.lo `test -f '../lib/rawstr.c' || echo '$(srcdir)/'`../lib/rawstr.c
 
+=======
+>>>>>>> origin/tomato-shibby-RT-AC
 ../lib/libcurltool_la-nonblock.lo: ../lib/nonblock.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcurltool_la_CPPFLAGS) $(CPPFLAGS) $(libcurltool_la_CFLAGS) $(CFLAGS) -MT ../lib/libcurltool_la-nonblock.lo -MD -MP -MF ../lib/$(DEPDIR)/libcurltool_la-nonblock.Tpo -c -o ../lib/libcurltool_la-nonblock.lo `test -f '../lib/nonblock.c' || echo '$(srcdir)/'`../lib/nonblock.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../lib/$(DEPDIR)/libcurltool_la-nonblock.Tpo ../lib/$(DEPDIR)/libcurltool_la-nonblock.Plo
@@ -1717,6 +1794,7 @@ curl-tool_xattr.obj: tool_xattr.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(curl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../lib/curl-strtoofft.obj `if test -f '../lib/strtoofft.c'; then $(CYGPATH_W) '../lib/strtoofft.c'; else $(CYGPATH_W) '$(srcdir)/../lib/strtoofft.c'; fi`
 
+<<<<<<< HEAD
 ../lib/curl-strdup.o: ../lib/strdup.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(curl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../lib/curl-strdup.o -MD -MP -MF ../lib/$(DEPDIR)/curl-strdup.Tpo -c -o ../lib/curl-strdup.o `test -f '../lib/strdup.c' || echo '$(srcdir)/'`../lib/strdup.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../lib/$(DEPDIR)/curl-strdup.Tpo ../lib/$(DEPDIR)/curl-strdup.Po
@@ -1745,6 +1823,8 @@ curl-tool_xattr.obj: tool_xattr.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(curl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ../lib/curl-rawstr.obj `if test -f '../lib/rawstr.c'; then $(CYGPATH_W) '../lib/rawstr.c'; else $(CYGPATH_W) '$(srcdir)/../lib/rawstr.c'; fi`
 
+=======
+>>>>>>> origin/tomato-shibby-RT-AC
 ../lib/curl-nonblock.o: ../lib/nonblock.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(curl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ../lib/curl-nonblock.o -MD -MP -MF ../lib/$(DEPDIR)/curl-nonblock.Tpo -c -o ../lib/curl-nonblock.o `test -f '../lib/nonblock.c' || echo '$(srcdir)/'`../lib/nonblock.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) ../lib/$(DEPDIR)/curl-nonblock.Tpo ../lib/$(DEPDIR)/curl-nonblock.Po
@@ -1996,6 +2076,9 @@ uninstall-am: uninstall-binPROGRAMS
 
 
 # Here are the stuff to create a built-in manual
+
+@USE_MANUAL_TRUE@$(MANPAGE):
+@USE_MANUAL_TRUE@	cd $(top_builddir)/docs && make curl.1
 
 # This generates the tool_hugehelp.c file in both uncompressed and
 # compressed formats

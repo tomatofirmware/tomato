@@ -41,18 +41,10 @@ the GNU MP Library test suite.  If not, see https://www.gnu.org/licenses/.  */
 #include "gmp-impl.h"
 #include "tests.h"
 
-#ifdef __MINGW32__
-int
-main (void)
-{
-  exit (0);
-}
-#else
-
 const char *decimal_point;
 
 /* Replace the libc localeconv with one we can manipulate. */
-#if HAVE_LOCALECONV
+#if HAVE_LOCALECONV && ! defined __MINGW32__
 struct lconv *
 localeconv (void)
 {
@@ -198,4 +190,3 @@ main (void)
   tests_memory_end ();
   exit (0);
 }
-#endif

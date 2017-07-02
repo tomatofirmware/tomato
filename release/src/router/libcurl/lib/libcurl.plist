@@ -15,7 +15,11 @@
 	<string>se.haxx.curl.libcurl</string>
 
 	<key>CFBundleVersion</key>
+<<<<<<< HEAD
 	<string>7.37.0</string>
+=======
+	<string>7.53.1</string>
+>>>>>>> origin/tomato-shibby-RT-AC
 
 	<key>CFBundleName</key>
 	<string>libcurl</string>
@@ -27,9 +31,16 @@
 	<string>????</string>
 
 	<key>CFBundleShortVersionString</key>
+<<<<<<< HEAD
 	<string>libcurl 7.37.0</string>
 
 	<key>CFBundleGetInfoString</key>
 	<string>libcurl.plist 7.37.0</string>
+=======
+	<string>libcurl 7.53.1</string>
+
+	<key>CFBundleGetInfoString</key>
+	<string>libcurl.plist 7.53.1</string>
+>>>>>>> origin/tomato-shibby-RT-AC
 </dict>
 </plist>

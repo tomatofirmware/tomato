@@ -5,7 +5,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
+<<<<<<< HEAD
  * Copyright (C) 1998 - 2011, Daniel Stenberg, <daniel@haxx.se>, et al.
+=======
+ * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+>>>>>>> origin/tomato-shibby-RT-AC
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -40,6 +44,11 @@ struct userdata {
   int counter;
 };
 
+<<<<<<< HEAD
+=======
+static int locks[3];
+
+>>>>>>> origin/tomato-shibby-RT-AC
 /* lock callback */
 static void my_lock(CURL *handle, curl_lock_data data, curl_lock_access laccess,
           void *useptr )
@@ -50,7 +59,11 @@ static void my_lock(CURL *handle, curl_lock_data data, curl_lock_access laccess,
   (void)handle;
   (void)laccess;
 
+<<<<<<< HEAD
   switch ( data ) {
+=======
+  switch(data) {
+>>>>>>> origin/tomato-shibby-RT-AC
     case CURL_LOCK_DATA_SHARE:
       what = "share";
       break;
@@ -64,6 +77,17 @@ static void my_lock(CURL *handle, curl_lock_data data, curl_lock_access laccess,
       fprintf(stderr, "lock: no such data: %d\n", (int)data);
       return;
   }
+<<<<<<< HEAD
+=======
+
+  /* detect locking of locked locks */
+  if(locks[locknum]) {
+    printf("lock: double locked %s\n", what);
+    return;
+  }
+  locks[locknum]++;
+
+>>>>>>> origin/tomato-shibby-RT-AC
   printf("lock:   %-6s [%s]: %d\n", what, user->text, user->counter);
   user->counter++;
 }
@@ -74,7 +98,11 @@ static void my_unlock(CURL *handle, curl_lock_data data, void *useptr )
   const char *what;
   struct userdata *user = (struct userdata *)useptr;
   (void)handle;
+<<<<<<< HEAD
   switch ( data ) {
+=======
+  switch(data) {
+>>>>>>> origin/tomato-shibby-RT-AC
     case CURL_LOCK_DATA_SHARE:
       what = "share";
       break;
@@ -88,6 +116,17 @@ static void my_unlock(CURL *handle, curl_lock_data data, void *useptr )
       fprintf(stderr, "unlock: no such data: %d\n", (int)data);
       return;
   }
+<<<<<<< HEAD
+=======
+
+  /* detect unlocking of unlocked locks */
+  if(!locks[locknum]) {
+    printf("unlock: double unlocked %s\n", what);
+    return;
+  }
+  locks[locknum]--;
+
+>>>>>>> origin/tomato-shibby-RT-AC
   printf("unlock: %-6s [%s]: %d\n", what, user->text, user->counter);
   user->counter++;
 }
@@ -167,8 +206,14 @@ int test(char *URL)
   }
 
   /* prepare share */
+<<<<<<< HEAD
   printf( "SHARE_INIT\n" );
   if ((share = curl_share_init()) == NULL) {
+=======
+  printf("SHARE_INIT\n");
+  share = curl_share_init();
+  if(!share) {
+>>>>>>> origin/tomato-shibby-RT-AC
     fprintf(stderr, "curl_share_init() failed\n");
     curl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;
@@ -203,7 +248,12 @@ int test(char *URL)
   }
 
   /* initial cookie manipulation */
+<<<<<<< HEAD
   if ((curl = curl_easy_init()) == NULL) {
+=======
+  curl = curl_easy_init();
+  if(!curl) {
+>>>>>>> origin/tomato-shibby-RT-AC
     fprintf(stderr, "curl_easy_init() failed\n");
     curl_share_cleanup(share);
     curl_global_cleanup();
@@ -248,8 +298,14 @@ int test(char *URL)
 
 
   /* fetch a another one and save cookies */
+<<<<<<< HEAD
   printf( "*** run %d\n", i );
   if ((curl = curl_easy_init()) == NULL) {
+=======
+  printf("*** run %d\n", i);
+  curl = curl_easy_init();
+  if(!curl) {
+>>>>>>> origin/tomato-shibby-RT-AC
     fprintf(stderr, "curl_easy_init() failed\n");
     curl_share_cleanup(share);
     curl_global_cleanup();
@@ -267,8 +323,52 @@ int test(char *URL)
   printf( "CURLOPT_COOKIELIST FLUSH\n" );
   test_setopt( curl, CURLOPT_COOKIELIST, "FLUSH" );
 
+<<<<<<< HEAD
   printf( "PERFORM\n" );
   curl_easy_perform( curl );
+=======
+  /* load cookies */
+  curl = curl_easy_init();
+  if(!curl) {
+    fprintf(stderr, "curl_easy_init() failed\n");
+    curl_share_cleanup(share);
+    curl_global_cleanup();
+    return TEST_ERR_MAJOR_BAD;
+  }
+  url = suburl(URL, i);
+  headers = sethost(NULL);
+  test_setopt(curl, CURLOPT_HTTPHEADER, headers);
+  test_setopt(curl, CURLOPT_URL,        url);
+  printf("CURLOPT_SHARE\n");
+  test_setopt(curl, CURLOPT_SHARE,      share);
+  printf("CURLOPT_COOKIELIST ALL\n");
+  test_setopt(curl, CURLOPT_COOKIELIST, "ALL");
+  printf("CURLOPT_COOKIEJAR\n");
+  test_setopt(curl, CURLOPT_COOKIEFILE, JAR);
+  printf("CURLOPT_COOKIELIST RELOAD\n");
+  test_setopt(curl, CURLOPT_COOKIELIST, "RELOAD");
+
+  code = curl_easy_getinfo(curl, CURLINFO_COOKIELIST, &cookies);
+  if(code != CURLE_OK) {
+    fprintf(stderr, "curl_easy_getinfo() failed\n");
+    res = TEST_ERR_MAJOR_BAD;
+    goto test_cleanup;
+  }
+  printf("loaded cookies:\n");
+  if(!cookies) {
+    fprintf(stderr, "  reloading cookies from '%s' failed\n", JAR);
+    res = TEST_ERR_MAJOR_BAD;
+    goto test_cleanup;
+  }
+  printf("-----------------\n");
+  next_cookie = cookies;
+  while(next_cookie) {
+    printf("  %s\n", next_cookie->data);
+    next_cookie = next_cookie->next;
+  }
+  printf("-----------------\n");
+  curl_slist_free_all(cookies);
+>>>>>>> origin/tomato-shibby-RT-AC
 
   /* try to free share, expect to fail because share is in use*/
   printf( "try SHARE_CLEANUP...\n" );

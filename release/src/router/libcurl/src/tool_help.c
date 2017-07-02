@@ -75,13 +75,22 @@ static const char *const helptext[] = {
   "     --dns-interface  Interface to use for DNS requests",
   "     --dns-ipv4-addr  IPv4 address to use for DNS requests, dot notation",
   "     --dns-ipv6-addr  IPv6 address to use for DNS requests, dot notation",
+<<<<<<< HEAD
   " -D, --dump-header FILE  Write the headers to this file",
+=======
+  " -D, --dump-header FILE  Write the received headers to FILE",
+>>>>>>> origin/tomato-shibby-RT-AC
   "     --egd-file FILE  EGD socket path for random data (SSL)",
   "     --engine ENGINE  Crypto engine (SSL). \"--engine list\" for list",
 #ifdef USE_ENVIRONMENT
   "     --environment   Write results to environment variables (RISC OS)",
 #endif
   " -f, --fail          Fail silently (no output at all) on HTTP errors (H)",
+<<<<<<< HEAD
+=======
+  "     --fail-early    Fail on first transfer error, do not continue",
+  "     --false-start   Enable TLS False Start.",
+>>>>>>> origin/tomato-shibby-RT-AC
   " -F, --form CONTENT  Specify HTTP multipart POST data (H)",
   "     --form-string STRING  Specify HTTP multipart POST data (H)",
   "     --ftp-account DATA  Account data string (F)",
@@ -157,6 +166,7 @@ static const char *const helptext[] = {
   "Do not switch to GET after following a 302 redirect (H)",
   "     --post303       "
   "Do not switch to GET after following a 303 redirect (H)",
+  "     --preproxy [PROTOCOL://]HOST[:PORT] Proxy before HTTP(S) proxy",
   " -#, --progress-bar  Display transfer progress as a progress bar",
   "     --proto PROTOCOLS  Enable/disable specified protocols",
   "     --proto-redir PROTOCOLS  "
@@ -165,8 +175,41 @@ static const char *const helptext[] = {
   "     --proxy-anyauth Pick \"any\" proxy authentication method (H)",
   "     --proxy-basic   Use Basic authentication on the proxy (H)",
   "     --proxy-digest  Use Digest authentication on the proxy (H)",
+<<<<<<< HEAD
   "     --proxy-negotiate Use Negotiate authentication on the proxy (H)",
   "     --proxy-ntlm    Use NTLM authentication on the proxy (H)",
+=======
+  "     --proxy-cacert FILE "
+  "CA certificate to verify peer against for proxy (SSL)",
+  "     --proxy-capath DIR "
+  "CA directory to verify peer against for proxy (SSL)",
+  "     --proxy-cert CERT[:PASSWD] "
+  "Client certificate file and password for proxy (SSL)",
+  "     --proxy-cert-type TYPE "
+  "Certificate file type (DER/PEM/ENG) for proxy (SSL)",
+  "     --proxy-ciphers LIST SSL ciphers to use for proxy (SSL)",
+  "     --proxy-crlfile FILE "
+  "Get a CRL list in PEM format from the given file for proxy",
+  "     --proxy-insecure "
+  "Allow connections to SSL sites without certs for proxy (H)",
+  "     --proxy-key KEY Private key file name for proxy (SSL)",
+  "     --proxy-key-type TYPE "
+  "Private key file type for proxy (DER/PEM/ENG) (SSL)",
+  "     --proxy-negotiate  "
+  "Use HTTP Negotiate (SPNEGO) authentication on the proxy (H)",
+  "     --proxy-ntlm    Use NTLM authentication on the proxy (H)",
+  "     --proxy-header LINE Pass custom header LINE to proxy (H)",
+  "     --proxy-pass PASS Pass phrase for the private key for proxy (SSL)",
+  "     --proxy-ssl-allow-beast "
+  "Allow security flaw to improve interop for proxy (SSL)",
+  "     --proxy-tlsv1   Use TLSv1 for proxy (SSL)",
+  "     --proxy-tlsuser USER TLS username for proxy",
+  "     --proxy-tlspassword STRING TLS password for proxy",
+  "     --proxy-tlsauthtype STRING "
+  "TLS authentication type for proxy (default SRP)",
+  "     --proxy-service-name NAME  SPNEGO proxy service name",
+  "     --service-name NAME  SPNEGO service name",
+>>>>>>> origin/tomato-shibby-RT-AC
   " -U, --proxy-user USER[:PASSWORD]  Proxy user and password",
   "     --proxy1.0 HOST[:PORT]  Use HTTP/1.0 proxy on given port",
   " -p, --proxytunnel   Operate through a HTTP proxy tunnel (using CONNECT)",
@@ -184,8 +227,13 @@ static const char *const helptext[] = {
   "     --resolve HOST:PORT:ADDRESS  Force resolve of HOST:PORT to ADDRESS",
   "     --retry NUM   "
   "Retry request NUM times if transient problems occur",
+<<<<<<< HEAD
   "     --retry-delay SECONDS "
   "When retrying, wait this many seconds between each",
+=======
+  "     --retry-connrefused  Retry on connection refused (use with --retry)",
+  "     --retry-delay SECONDS  Wait SECONDS between retries",
+>>>>>>> origin/tomato-shibby-RT-AC
   "     --retry-max-time SECONDS  Retry only within this period",
   "     --sasl-ir       Enable initial response in SASL authentication",
   " -S, --show-error    "
@@ -218,8 +266,14 @@ static const char *const helptext[] = {
   "     --tlsv1.0       Use TLSv1.0 (SSL)",
   "     --tlsv1.1       Use TLSv1.1 (SSL)",
   "     --tlsv1.2       Use TLSv1.2 (SSL)",
+<<<<<<< HEAD
   "     --trace FILE    Write a debug trace to the given file",
   "     --trace-ascii FILE  Like --trace but without the hex output",
+=======
+  "     --tlsv1.3       Use TLSv1.3 (SSL)",
+  "     --trace FILE    Write a debug trace to FILE",
+  "     --trace-ascii FILE  Like --trace, but without hex output",
+>>>>>>> origin/tomato-shibby-RT-AC
   "     --trace-time    Add time stamps to trace/verbose output",
   "     --tr-encoding   Request compressed transfer encoding (H)",
   " -T, --upload-file FILE  Transfer FILE to destination",
@@ -227,9 +281,17 @@ static const char *const helptext[] = {
   " -B, --use-ascii     Use ASCII/text transfer",
   " -u, --user USER[:PASSWORD]  Server user and password",
   "     --tlsuser USER  TLS username",
+<<<<<<< HEAD
   "     --tlspassword STRING TLS password",
   "     --tlsauthtype STRING  TLS authentication type (default SRP)",
   " -A, --user-agent STRING  User-Agent to send to server (H)",
+=======
+  "     --tlspassword STRING  TLS password",
+  "     --tlsauthtype STRING  TLS authentication type (default: SRP)",
+  "     --unix-socket PATH    Connect through this Unix domain socket",
+  "     --abstract-unix-socket PATH Connect to an abstract Unix domain socket",
+  " -A, --user-agent STRING  Send User-Agent STRING to server (H)",
+>>>>>>> origin/tomato-shibby-RT-AC
   " -v, --verbose       Make the operation more talkative",
   " -V, --version       Show version number and quit",
 #ifdef USE_WATT32
@@ -271,7 +333,13 @@ static const struct feat feats[] = {
   {"libz",           CURL_VERSION_LIBZ},
   {"CharConv",       CURL_VERSION_CONV},
   {"TLS-SRP",        CURL_VERSION_TLSAUTH_SRP},
+<<<<<<< HEAD
   {"HTTP2",          CURL_VERSION_HTTP2}
+=======
+  {"HTTP2",          CURL_VERSION_HTTP2},
+  {"UnixSockets",    CURL_VERSION_UNIX_SOCKETS},
+  {"HTTPS-proxy",    CURL_VERSION_HTTPS_PROXY}
+>>>>>>> origin/tomato-shibby-RT-AC
 };
 
 void tool_help(void)

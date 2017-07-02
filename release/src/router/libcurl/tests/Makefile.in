@@ -396,7 +396,12 @@ EXTRA_DIST = ftpserver.pl httpserver.pl secureserver.pl runtests.pl getpart.pm \
  FILEFORMAT README stunnel.pem memanalyze.pl testcurl.pl valgrind.pm ftp.pm   \
  sshserver.pl sshhelp.pm testcurl.1 runtests.1 $(HTMLPAGES) $(PDFPAGES) \
  serverhelp.pm tftpserver.pl rtspserver.pl directories.pm symbol-scan.pl \
+<<<<<<< HEAD
  CMakeLists.txt mem-include-scan.pl valgrind.supp http_pipe.py
+=======
+ CMakeLists.txt mem-include-scan.pl valgrind.supp http_pipe.py extern-scan.pl \
+ manpage-scan.pl nroff-scan.pl http2-server.pl
+>>>>>>> origin/tomato-shibby-RT-AC
 
 DISTCLEANFILES = configurehelp.pm
 @BUILD_UNITTESTS_FALSE@BUILD_UNIT = 
@@ -615,7 +620,8 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-recursive
-all-am: Makefile
+@CURLDEBUG_FALSE@all-local:
+all-am: Makefile all-local
 installdirs: installdirs-recursive
 installdirs-am:
 install: install-recursive
@@ -718,9 +724,9 @@ uninstall-am:
 
 .MAKE: $(am__recursive_targets) install-am install-strip
 
-.PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am check \
-	check-am clean clean-generic clean-libtool cscopelist-am ctags \
-	ctags-am distclean distclean-generic distclean-libtool \
+.PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am all-local \
+	check check-am clean clean-generic clean-libtool cscopelist-am \
+	ctags ctags-am distclean distclean-generic distclean-libtool \
 	distclean-tags distdir dvi dvi-am html html-am info info-am \
 	install install-am install-data install-data-am install-dvi \
 	install-dvi-am install-exec install-exec-am install-html \
@@ -764,6 +770,17 @@ torture-test: perlcheck all
 	rm $$foo.ps; \
 	echo "converted $< to $@")
 
+<<<<<<< HEAD
+=======
+checksrc:
+	cd libtest && $(MAKE) checksrc
+	cd unit && $(MAKE) checksrc
+	cd server && $(MAKE) checksrc
+
+# for debug builds, we scan the sources on all regular make invokes
+@CURLDEBUG_TRUE@all-local: checksrc
+
+>>>>>>> origin/tomato-shibby-RT-AC
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

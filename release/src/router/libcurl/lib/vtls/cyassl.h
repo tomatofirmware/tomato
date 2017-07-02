@@ -7,7 +7,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
+<<<<<<< HEAD
  * Copyright (C) 1998 - 2011, Daniel Stenberg, <daniel@haxx.se>, et al.
+=======
+ * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+>>>>>>> origin/tomato-shibby-RT-AC
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -43,6 +47,27 @@ int Curl_cyassl_init(void);
 CURLcode Curl_cyassl_connect_nonblocking(struct connectdata *conn,
                                          int sockindex,
                                          bool *done);
+<<<<<<< HEAD
+=======
+CURLcode Curl_cyassl_random(struct Curl_easy *data,
+                            unsigned char *entropy,
+                            size_t length);
+void Curl_cyassl_sha256sum(const unsigned char *tmp, /* input */
+                     size_t tmplen,
+                     unsigned char *sha256sum, /* output */
+                     size_t unused);
+
+/* Set the API backend definition to CyaSSL */
+#define CURL_SSL_BACKEND CURLSSLBACKEND_CYASSL
+
+/* this backend supports CURLOPT_SSL_CTX_* */
+#define have_curlssl_ssl_ctx 1
+
+#ifdef KEEP_PEER_CERT
+/* this backend supports CURLOPT_PINNEDPUBLICKEY */
+#define have_curlssl_pinnedpubkey 1
+#endif
+>>>>>>> origin/tomato-shibby-RT-AC
 
 /* API setup for CyaSSL */
 #define curlssl_init Curl_cyassl_init

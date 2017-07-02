@@ -340,10 +340,39 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 advapi32.lib wldap32.lib ws2_32.lib libcurld.lib /nologo /subsystem:console /incremental:no /debug /machine:I386 /out:"..\..\..\..\build\Win32\VC6\LIB Debug - DLL Windows SSPI\curld.exe" /pdbtype:con /libpath:"..\..\..\..\build\Win32\VC6\LIB Debug - DLL Windows SSPI" /fixed:no
-# ADD LINK32 advapi32.lib wldap32.lib ws2_32.lib libcurld.lib /nologo /subsystem:console /incremental:no /debug /machine:I386 /out:"..\..\..\..\build\Win32\VC6\LIB Debug - DLL Windows SSPI\curld.exe" /pdbtype:con /libpath:"..\..\..\..\build\Win32\VC6\LIB Debug - DLL Windows SSPI" /fixed:no
+# ADD BASE LINK32 advapi32.lib wldap32.lib ws2_32.lib crypt32.lib libcurld.lib /nologo /subsystem:console /incremental:no /debug /machine:I386 /out:"..\..\..\..\build\Win32\VC6\LIB Debug - DLL Windows SSPI\curld.exe" /pdbtype:con /libpath:"..\..\..\..\build\Win32\VC6\LIB Debug - DLL Windows SSPI" /fixed:no
+# ADD LINK32 advapi32.lib wldap32.lib ws2_32.lib crypt32.lib libcurld.lib /nologo /subsystem:console /incremental:no /debug /machine:I386 /out:"..\..\..\..\build\Win32\VC6\LIB Debug - DLL Windows SSPI\curld.exe" /pdbtype:con /libpath:"..\..\..\..\build\Win32\VC6\LIB Debug - DLL Windows SSPI" /fixed:no
 
+<<<<<<< HEAD:release/src/router/libcurl/projects/Windows/VC6/src/curlsrc.dsp
 !ELSEIF  "$(CFG)" == "curlsrc - Win32 LIB Debug LIB OpenSSL"
+=======
+!ELSEIF  "$(CFG)" == "curl - Win32 LIB Debug DLL Windows SSPI DLL WinIDN"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 1
+# PROP BASE Output_Dir "..\..\..\..\build\Win32\VC6\LIB Debug - DLL Windows SSPI - DLL WinIDN"
+# PROP BASE Intermediate_Dir "..\..\..\..\build\Win32\VC6\LIB Debug - DLL Windows SSPI - DLL WinIDN\src"
+# PROP BASE Ignore_Export_Lib 0
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 1
+# PROP Output_Dir "..\..\..\..\build\Win32\VC6\LIB Debug - DLL Windows SSPI - DLL WinIDN"
+# PROP Intermediate_Dir "..\..\..\..\build\Win32\VC6\LIB Debug - DLL Windows SSPI - DLL WinIDN\src"
+# PROP Ignore_Export_Lib 0
+# PROP Target_Dir ""
+# ADD BASE CPP /nologo /MDd /W4 /Zi /Od /I "$(ProgramFiles)\Microsoft Platform SDK\Include" /I "..\..\..\..\include" /I "..\..\..\..\lib" /I "..\..\..\..\src" /D "_DEBUG" /D "_CONSOLE" /D "DEBUGBUILD" /D "CURL_STATICLIB" /FD /EHsc /GZ /c
+# ADD CPP /nologo /MDd /W4 /Zi /Od /I "$(ProgramFiles)\Microsoft Platform SDK\Include" /I "..\..\..\..\include" /I "..\..\..\..\lib" /I "..\..\..\..\src" /D "_DEBUG" /D "_CONSOLE" /D "DEBUGBUILD" /D "CURL_STATICLIB" /FD /EHsc /GZ /c
+# ADD BASE RSC /l 0x409 /i "..\..\..\..\include" /d "_DEBUG"
+# ADD RSC /l 0x409 /i "..\..\..\..\include" /d "_DEBUG"
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+LINK32=link.exe
+# ADD BASE LINK32 advapi32.lib normaliz.lib wldap32.lib ws2_32.lib crypt32.lib libcurld.lib /nologo /subsystem:console /incremental:no /debug /machine:I386 /out:"..\..\..\..\build\Win32\VC6\LIB Debug - DLL Windows SSPI - DLL WinIDN\curld.exe" /pdbtype:con /libpath:"..\..\..\..\build\Win32\VC6\LIB Debug - DLL Windows SSPI - DLL WinIDN" /fixed:no
+# ADD LINK32 advapi32.lib normaliz.lib wldap32.lib ws2_32.lib crypt32.lib libcurld.lib /nologo /subsystem:console /incremental:no /debug /machine:I386 /out:"..\..\..\..\build\Win32\VC6\LIB Debug - DLL Windows SSPI - DLL WinIDN\curld.exe" /pdbtype:con /libpath:"..\..\..\..\build\Win32\VC6\LIB Debug - DLL Windows SSPI - DLL WinIDN" /fixed:no
+
+!ELSEIF  "$(CFG)" == "curl - Win32 LIB Debug LIB OpenSSL"
+>>>>>>> origin/tomato-shibby-RT-AC:release/src/router/libcurl/projects/Windows/VC6/src/curl.dsp
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -489,10 +518,39 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 advapi32.lib wldap32.lib ws2_32.lib libcurl.lib /nologo /subsystem:console /pdb:none /machine:I386 /out:"..\..\..\..\build\Win32\VC6\LIB Release - DLL Windows SSPI\curl.exe" /libpath:"..\..\..\..\build\Win32\VC6\LIB Release - DLL Windows SSPI" /fixed:no
-# ADD LINK32 advapi32.lib wldap32.lib ws2_32.lib libcurl.lib /nologo /subsystem:console /pdb:none /machine:I386 /out:"..\..\..\..\build\Win32\VC6\LIB Release - DLL Windows SSPI\curl.exe" /libpath:"..\..\..\..\build\Win32\VC6\LIB Release - DLL Windows SSPI" /fixed:no
+# ADD BASE LINK32 advapi32.lib wldap32.lib ws2_32.lib crypt32.lib libcurl.lib /nologo /subsystem:console /pdb:none /machine:I386 /out:"..\..\..\..\build\Win32\VC6\LIB Release - DLL Windows SSPI\curl.exe" /libpath:"..\..\..\..\build\Win32\VC6\LIB Release - DLL Windows SSPI" /fixed:no
+# ADD LINK32 advapi32.lib wldap32.lib ws2_32.lib crypt32.lib libcurl.lib /nologo /subsystem:console /pdb:none /machine:I386 /out:"..\..\..\..\build\Win32\VC6\LIB Release - DLL Windows SSPI\curl.exe" /libpath:"..\..\..\..\build\Win32\VC6\LIB Release - DLL Windows SSPI" /fixed:no
 
+<<<<<<< HEAD:release/src/router/libcurl/projects/Windows/VC6/src/curlsrc.dsp
 !ELSEIF  "$(CFG)" == "curlsrc - Win32 LIB Release LIB OpenSSL"
+=======
+!ELSEIF  "$(CFG)" == "curl - Win32 LIB Release DLL Windows SSPI DLL WinIDN"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 0
+# PROP BASE Output_Dir "..\..\..\..\build\Win32\VC6\LIB Release - DLL Windows SSPI - DLL WinIDN"
+# PROP BASE Intermediate_Dir "..\..\..\..\build\Win32\VC6\LIB Release - DLL Windows SSPI - DLL WinIDN\src"
+# PROP BASE Ignore_Export_Lib 0
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 0
+# PROP Output_Dir "..\..\..\..\build\Win32\VC6\LIB Release - DLL Windows SSPI - DLL WinIDN"
+# PROP Intermediate_Dir "..\..\..\..\build\Win32\VC6\LIB Release - DLL Windows SSPI - DLL WinIDN\src"
+# PROP Ignore_Export_Lib 0
+# PROP Target_Dir ""
+# ADD BASE CPP /nologo /MD /W4 /O2 /I "$(ProgramFiles)\Microsoft Platform SDK\Include" /I "..\..\..\..\include" /I "..\..\..\..\lib" /I "..\..\..\..\src" /D "NDEBUG" /D "_CONSOLE" /D "CURL_STATICLIB" /FD /EHsc /c
+# ADD CPP /nologo /MD /W4 /O2 /I "$(ProgramFiles)\Microsoft Platform SDK\Include" /I "..\..\..\..\include" /I "..\..\..\..\lib" /I "..\..\..\..\src" /D "NDEBUG" /D "_CONSOLE" /D "CURL_STATICLIB" /FD /EHsc /c
+# ADD BASE RSC /l 0x409 /i "..\..\..\..\include" /d "NDEBUG"
+# ADD RSC /l 0x409 /i "..\..\..\..\include" /d "NDEBUG"
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+LINK32=link.exe
+# ADD BASE LINK32 advapi32.lib normaliz.lib wldap32.lib ws2_32.lib crypt32.lib libcurl.lib /nologo /subsystem:console /pdb:none /machine:I386 /out:"..\..\..\..\build\Win32\VC6\LIB Release - DLL Windows SSPI - DLL WinIDN\curl.exe" /libpath:"..\..\..\..\build\Win32\VC6\LIB Release - DLL Windows SSPI - DLL WinIDN" /fixed:no
+# ADD LINK32 advapi32.lib normaliz.lib wldap32.lib ws2_32.lib crypt32.lib libcurl.lib /nologo /subsystem:console /pdb:none /machine:I386 /out:"..\..\..\..\build\Win32\VC6\LIB Release - DLL Windows SSPI - DLL WinIDN\curl.exe" /libpath:"..\..\..\..\build\Win32\VC6\LIB Release - DLL Windows SSPI - DLL WinIDN" /fixed:no
+
+!ELSEIF  "$(CFG)" == "curl - Win32 LIB Release LIB OpenSSL"
+>>>>>>> origin/tomato-shibby-RT-AC:release/src/router/libcurl/projects/Windows/VC6/src/curl.dsp
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
@@ -572,10 +630,6 @@ LINK32=link.exe
 # Begin Source File
 
 SOURCE=..\..\..\..\lib\nonblock.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\lib\rawstr.c
 # End Source File
 # Begin Source File
 
@@ -751,11 +805,15 @@ SOURCE=..\..\..\..\lib\nonblock.h
 # End Source File
 # Begin Source File
 
+<<<<<<< HEAD:release/src/router/libcurl/projects/Windows/VC6/src/curlsrc.dsp
 SOURCE=..\..\..\..\lib\rawstr.h
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\..\..\lib\setup.h
+=======
+SOURCE=..\..\..\..\lib\strtoofft.h
+>>>>>>> origin/tomato-shibby-RT-AC:release/src/router/libcurl/projects/Windows/VC6/src/curl.dsp
 # End Source File
 # Begin Source File
 

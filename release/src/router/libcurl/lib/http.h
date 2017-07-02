@@ -68,7 +68,7 @@ CURLcode Curl_add_buffer_send(Curl_send_buffer *in,
                               size_t included_body_bytes,
                               int socketindex);
 
-CURLcode Curl_add_timecondition(struct SessionHandle *data,
+CURLcode Curl_add_timecondition(struct Curl_easy *data,
                                 Curl_send_buffer *buf);
 CURLcode Curl_add_custom_headers(struct connectdata *conn,
                                  bool is_connect,
@@ -86,7 +86,7 @@ CHUNKcode Curl_httpchunk_read(struct connectdata *conn, char *datap,
                               ssize_t length, ssize_t *wrote);
 
 /* These functions are in http.c */
-void Curl_http_auth_stage(struct SessionHandle *data, int stage);
+void Curl_http_auth_stage(struct Curl_easy *data, int stage);
 CURLcode Curl_http_input_auth(struct connectdata *conn, bool proxy,
                               const char *auth);
 CURLcode Curl_http_auth_act(struct connectdata *conn);
@@ -152,6 +152,39 @@ struct HTTP {
 
   void *send_buffer; /* used if the request couldn't be sent in one chunk,
                         points to an allocated send_buffer struct */
+<<<<<<< HEAD
+=======
+
+#ifdef USE_NGHTTP2
+  /*********** for HTTP/2 we store stream-local data here *************/
+  int32_t stream_id; /* stream we are interested in */
+
+  bool bodystarted;
+  /* We store non-final and final response headers here, per-stream */
+  Curl_send_buffer *header_recvbuf;
+  size_t nread_header_recvbuf; /* number of bytes in header_recvbuf fed into
+                                  upper layer */
+  Curl_send_buffer *trailer_recvbuf;
+  int status_code; /* HTTP status code */
+  const uint8_t *pausedata; /* pointer to data received in on_data_chunk */
+  size_t pauselen; /* the number of bytes left in data */
+  bool closed; /* TRUE on HTTP2 stream close */
+  bool close_handled; /* TRUE if stream closure is handled by libcurl */
+  uint32_t error_code; /* HTTP/2 error code */
+
+  char *mem;     /* points to a buffer in memory to store received data */
+  size_t len;    /* size of the buffer 'mem' points to */
+  size_t memlen; /* size of data copied to mem */
+
+  const uint8_t *upload_mem; /* points to a buffer to read from */
+  size_t upload_len; /* size of the buffer 'upload_mem' points to */
+  curl_off_t upload_left; /* number of bytes left to upload */
+
+  char **push_headers;       /* allocated array */
+  size_t push_headers_used;  /* number of entries filled in */
+  size_t push_headers_alloc; /* number of entries allocated */
+#endif
+>>>>>>> origin/tomato-shibby-RT-AC
 };
 
 typedef int (*sending)(void); /* Curl_send */
@@ -182,15 +215,28 @@ struct http_conn {
      nghttp2_session_mem_recv() but mem buffer is still not full. In
      this case, we wrongly sends the content of mem buffer if we share
      them for both cases. */
+<<<<<<< HEAD
   const uint8_t *upload_mem; /* points to a buffer to read from */
   size_t upload_len; /* size of the buffer 'upload_mem' points to */
   size_t upload_left; /* number of bytes left to upload */
+=======
+  int32_t pause_stream_id; /* stream ID which paused
+                              nghttp2_session_mem_recv */
+  size_t drain_total; /* sum of all stream's UrlState.drain */
+
+  /* this is a hash of all individual streams (Curl_easy structs) */
+  struct h2settings settings;
+
+  /* list of settings that will be sent */
+  nghttp2_settings_entry local_settings[3];
+  size_t local_settings_num;
+>>>>>>> origin/tomato-shibby-RT-AC
 #else
   int unused; /* prevent a compiler warning */
 #endif
 };
 
-CURLcode Curl_http_readwrite_headers(struct SessionHandle *data,
+CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
                                      struct connectdata *conn,
                                      ssize_t *nread,
                                      bool *stop_reading);

@@ -1,27 +1,35 @@
 /* io.c
- *
- * Miscellaneous functions used by the example programs.
- */
 
-/* nettle, low-level cryptographics library
- *
- * Copyright (C) 2002 Niels Möller
- *  
- * The nettle library is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 2.1 of the License, or (at your
- * option) any later version.
- * 
- * The nettle library is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
- * License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public License
- * along with the nettle library; see the file COPYING.LIB.  If not, write to
- * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02111-1301, USA.
- */
+   Miscellaneous functions used by the example programs.
+
+   Copyright (C) 2002, 2012 Niels Möller
+
+   This file is part of GNU Nettle.
+
+   GNU Nettle is free software: you can redistribute it and/or
+   modify it under the terms of either:
+
+     * the GNU Lesser General Public License as published by the Free
+       Software Foundation; either version 3 of the License, or (at your
+       option) any later version.
+
+   or
+
+     * the GNU General Public License as published by the Free
+       Software Foundation; either version 2 of the License, or (at your
+       option) any later version.
+
+   or both in parallel, as here.
+
+   GNU Nettle is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received copies of the GNU General Public License and
+   the GNU Lesser General Public License along with this program.  If
+   not, see http://www.gnu.org/licenses/.
+*/
 
 #if HAVE_CONFIG_H
 # include "config.h"
@@ -66,13 +74,11 @@ werror(const char *format, ...)
     }
 }
 
-#define MIN(a,b) (((a) < (b)) ? (a) : (b))
-
-unsigned
-read_file(const char *name, unsigned max_size, char **contents)
+size_t
+read_file(const char *name, size_t max_size, uint8_t **contents)
 {
-  unsigned size, done;
-  char *buffer;
+  size_t size, done;
+  uint8_t *buffer;
   FILE *f;
     
   f = fopen(name, "rb");
@@ -86,7 +92,7 @@ read_file(const char *name, unsigned max_size, char **contents)
 
   for (buffer = NULL, done = 0;; size *= 2)
     {
-      char *p;
+      uint8_t *p;
 
       if (max_size && size > max_size)
 	size = max_size;
@@ -137,7 +143,7 @@ read_file(const char *name, unsigned max_size, char **contents)
 }
 
 int
-write_string(FILE *f, unsigned size, const char *buffer)
+write_data(FILE *f, size_t size, const void *buffer)
 {
   size_t res = fwrite(buffer, 1, size, f);
 
@@ -145,7 +151,7 @@ write_string(FILE *f, unsigned size, const char *buffer)
 }
 
 int
-write_file(const char *name, unsigned size, const char *buffer)
+write_file(const char *name, size_t size, const void *buffer)
 {
   FILE *f = fopen(name, "wb");
   int res;
@@ -153,7 +159,7 @@ write_file(const char *name, unsigned size, const char *buffer)
   if (!f)
     return 0;
 
-  res = write_string(f, size, buffer);
+  res = write_data(f, size, buffer);
   return fclose(f) == 0 && res;
 }
 
@@ -161,7 +167,7 @@ int
 simple_random(struct yarrow256_ctx *ctx, const char *name)
 {
   unsigned length;
-  char *buffer;
+  uint8_t *buffer;
 
   if (name)
     length = read_file(name, 0, &buffer);
@@ -183,7 +189,7 @@ hash_file(const struct nettle_hash *hash, void *ctx, FILE *f)
 {
   for (;;)
     {
-      char buffer[BUFSIZE];
+      uint8_t buffer[BUFSIZE];
       size_t res = fread(buffer, 1, sizeof(buffer), f);
       if (ferror(f))
 	return 0;

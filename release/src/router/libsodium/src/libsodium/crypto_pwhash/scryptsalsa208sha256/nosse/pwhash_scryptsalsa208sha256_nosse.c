@@ -34,21 +34,38 @@
 #include <stdlib.h>
 #include <string.h>
 
+<<<<<<< HEAD
 #include "../pbkdf2-sha256.h"
 #include "../sysendian.h"
 #include "../crypto_scrypt.h"
+=======
+#include "../crypto_scrypt.h"
+#include "../pbkdf2-sha256.h"
+#include "private/common.h"
+>>>>>>> origin/tomato-shibby-RT-AC
 
 static inline void
 blkcpy_64(escrypt_block_t *dest, const escrypt_block_t *src)
 {
 	int i;
 
+<<<<<<< HEAD
 #if (ARCH_BITS==32)
 	for (i = 0; i < 16; ++i)
 		dest->w[i] = src->w[i];
 #else
 	for (i = 0; i < 8; ++i)
 		dest->d[i] = src->d[i];
+=======
+#if (ARCH_BITS == 32)
+    for (i = 0; i < 16; ++i) {
+        dest->w[i] = src->w[i];
+    }
+#else
+    for (i = 0; i < 8; ++i) {
+        dest->d[i] = src->d[i];
+    }
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif
 }
 
@@ -57,18 +74,30 @@ blkxor_64(escrypt_block_t *dest, const escrypt_block_t *src)
 {
 	int i;
 
+<<<<<<< HEAD
 #if (ARCH_BITS==32)
 	for (i = 0; i < 16; ++i)
 		dest->w[i] ^= src->w[i];
 #else
 	for (i = 0; i < 8; ++i)
 		dest->d[i] ^= src->d[i];
+=======
+#if (ARCH_BITS == 32)
+    for (i = 0; i < 16; ++i) {
+        dest->w[i] ^= src->w[i];
+    }
+#else
+    for (i = 0; i < 8; ++i) {
+        dest->d[i] ^= src->d[i];
+    }
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif
 }
 
 static inline void
 blkcpy(escrypt_block_t *dest, const escrypt_block_t *src, size_t len)
 {
+<<<<<<< HEAD
 	size_t i, L;
 #if (ARCH_BITS==32)
 	L = (len>>2);
@@ -78,12 +107,27 @@ blkcpy(escrypt_block_t *dest, const escrypt_block_t *src, size_t len)
 	L = (len>>3);
 	for (i = 0; i < L; ++i)
 		dest->d[i] = src->d[i];
+=======
+    size_t i, L;
+
+#if (ARCH_BITS == 32)
+    L = (len >> 2);
+    for (i = 0; i < L; ++i) {
+        dest->w[i] = src->w[i];
+    }
+#else
+    L = (len >> 3);
+    for (i = 0; i < L; ++i) {
+        dest->d[i] = src->d[i];
+    }
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif
 }
 
 static inline void
 blkxor(escrypt_block_t *dest, const escrypt_block_t *src, size_t len)
 {
+<<<<<<< HEAD
 	size_t i, L;
 #if (ARCH_BITS==32)
 	L = (len>>2);
@@ -93,6 +137,20 @@ blkxor(escrypt_block_t *dest, const escrypt_block_t *src, size_t len)
 	L = (len>>3);
 	for (i = 0; i < L; ++i)
 		dest->d[i] ^= src->d[i];
+=======
+    size_t i, L;
+
+#if (ARCH_BITS == 32)
+    L = (len >> 2);
+    for (i = 0; i < L; ++i) {
+        dest->w[i] ^= src->w[i];
+    }
+#else
+    L = (len >> 3);
+    for (i = 0; i < L; ++i) {
+        dest->d[i] ^= src->d[i];
+    }
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif
 }
 
@@ -103,6 +161,7 @@ blkxor(escrypt_block_t *dest, const escrypt_block_t *src, size_t len)
 static void
 salsa20_8(uint32_t B[16])
 {
+<<<<<<< HEAD
 	escrypt_block_t X;
 	uint32_t *x = X.w;
 	size_t i;
@@ -135,6 +194,56 @@ salsa20_8(uint32_t B[16])
 
 		x[12] ^= R(x[15]+x[14], 7);  x[13] ^= R(x[12]+x[15], 9);
 		x[14] ^= R(x[13]+x[12],13);  x[15] ^= R(x[14]+x[13],18);
+=======
+    escrypt_block_t X;
+    uint32_t *      x = X.w;
+    size_t          i;
+
+    blkcpy_64(&X, (escrypt_block_t *) B);
+    for (i = 0; i < 8; i += 2) {
+#define R(a, b) (((a) << (b)) | ((a) >> (32 - (b))))
+        /* Operate on columns. */
+        x[4] ^= R(x[0] + x[12], 7);
+        x[8] ^= R(x[4] + x[0], 9);
+        x[12] ^= R(x[8] + x[4], 13);
+        x[0] ^= R(x[12] + x[8], 18);
+
+        x[9] ^= R(x[5] + x[1], 7);
+        x[13] ^= R(x[9] + x[5], 9);
+        x[1] ^= R(x[13] + x[9], 13);
+        x[5] ^= R(x[1] + x[13], 18);
+
+        x[14] ^= R(x[10] + x[6], 7);
+        x[2] ^= R(x[14] + x[10], 9);
+        x[6] ^= R(x[2] + x[14], 13);
+        x[10] ^= R(x[6] + x[2], 18);
+
+        x[3] ^= R(x[15] + x[11], 7);
+        x[7] ^= R(x[3] + x[15], 9);
+        x[11] ^= R(x[7] + x[3], 13);
+        x[15] ^= R(x[11] + x[7], 18);
+
+        /* Operate on rows. */
+        x[1] ^= R(x[0] + x[3], 7);
+        x[2] ^= R(x[1] + x[0], 9);
+        x[3] ^= R(x[2] + x[1], 13);
+        x[0] ^= R(x[3] + x[2], 18);
+
+        x[6] ^= R(x[5] + x[4], 7);
+        x[7] ^= R(x[6] + x[5], 9);
+        x[4] ^= R(x[7] + x[6], 13);
+        x[5] ^= R(x[4] + x[7], 18);
+
+        x[11] ^= R(x[10] + x[9], 7);
+        x[8] ^= R(x[11] + x[10], 9);
+        x[9] ^= R(x[8] + x[11], 13);
+        x[10] ^= R(x[9] + x[8], 18);
+
+        x[12] ^= R(x[15] + x[14], 7);
+        x[13] ^= R(x[12] + x[15], 9);
+        x[14] ^= R(x[13] + x[12], 13);
+        x[15] ^= R(x[14] + x[13], 18);
+>>>>>>> origin/tomato-shibby-RT-AC
 #undef R
 	}
 	for (i = 0; i < 16; i++)
@@ -148,10 +257,11 @@ salsa20_8(uint32_t B[16])
  * temporary space X must be 64 bytes.
  */
 static void
-blockmix_salsa8(const uint32_t * Bin, uint32_t * Bout, uint32_t * X, size_t r)
+blockmix_salsa8(const uint32_t *Bin, uint32_t *Bout, uint32_t *X, size_t r)
 {
 	size_t i;
 
+<<<<<<< HEAD
 	/* 1: X <-- B_{2r - 1} */
 	blkcpy_64((escrypt_block_t*)X, (escrypt_block_t*)&Bin[(2 * r - 1) * 16]);
 
@@ -173,6 +283,31 @@ blockmix_salsa8(const uint32_t * Bin, uint32_t * Bout, uint32_t * X, size_t r)
 		/* 6: B' <-- (Y_0, Y_2 ... Y_{2r-2}, Y_1, Y_3 ... Y_{2r-1}) */
 		blkcpy_64((escrypt_block_t*)&Bout[i * 8 + r * 16], (escrypt_block_t*)X);
 	}
+=======
+    /* 1: X <-- B_{2r - 1} */
+    blkcpy_64((escrypt_block_t *) X,
+              (escrypt_block_t *) &Bin[(2 * r - 1) * 16]);
+
+    /* 2: for i = 0 to 2r - 1 do */
+    for (i = 0; i < 2 * r; i += 2) {
+        /* 3: X <-- H(X \xor B_i) */
+        blkxor_64((escrypt_block_t *) X, (escrypt_block_t *) &Bin[i * 16]);
+        salsa20_8(X);
+
+        /* 4: Y_i <-- X */
+        /* 6: B' <-- (Y_0, Y_2 ... Y_{2r-2}, Y_1, Y_3 ... Y_{2r-1}) */
+        blkcpy_64((escrypt_block_t *) &Bout[i * 8], (escrypt_block_t *) X);
+
+        /* 3: X <-- H(X \xor B_i) */
+        blkxor_64((escrypt_block_t *) X, (escrypt_block_t *) &Bin[i * 16 + 16]);
+        salsa20_8(X);
+
+        /* 4: Y_i <-- X */
+        /* 6: B' <-- (Y_0, Y_2 ... Y_{2r-2}, Y_1, Y_3 ... Y_{2r-1}) */
+        blkcpy_64((escrypt_block_t *) &Bout[i * 8 + r * 16],
+                  (escrypt_block_t *) X);
+    }
+>>>>>>> origin/tomato-shibby-RT-AC
 }
 
 /**
@@ -180,9 +315,13 @@ blockmix_salsa8(const uint32_t * Bin, uint32_t * Bout, uint32_t * X, size_t r)
  * Return the result of parsing B_{2r-1} as a little-endian integer.
  */
 static inline uint64_t
-integerify(const void * B, size_t r)
+integerify(const void *B, size_t r)
 {
+<<<<<<< HEAD
 	const uint32_t * X = (const uint32_t *)((uintptr_t)(B) + (2 * r - 1) * 64);
+=======
+    const uint32_t *X = (const uint32_t *) ((uintptr_t)(B) + (2 * r - 1) * 64);
+>>>>>>> origin/tomato-shibby-RT-AC
 
 	return (((uint64_t)(X[1]) << 32) + X[0]);
 }
@@ -196,8 +335,9 @@ integerify(const void * B, size_t r)
  * multiple of 64 bytes.
  */
 static void
-smix(uint8_t * B, size_t r, uint64_t N, uint32_t * V, uint32_t * XY)
+smix(uint8_t *B, size_t r, uint64_t N, uint32_t *V, uint32_t *XY)
 {
+<<<<<<< HEAD
 	uint32_t * X = XY;
 	uint32_t * Y = &XY[32 * r];
 	uint32_t * Z = &XY[64 * r];
@@ -243,6 +383,58 @@ smix(uint8_t * B, size_t r, uint64_t N, uint32_t * V, uint32_t * XY)
 	/* 10: B' <-- X */
 	for (k = 0; k < 32 * r; k++)
 		le32enc(&B[4 * k], X[k]);
+=======
+    uint32_t *X = XY;
+    uint32_t *Y = &XY[32 * r];
+    uint32_t *Z = &XY[64 * r];
+    uint64_t  i;
+    uint64_t  j;
+    size_t    k;
+
+    /* 1: X <-- B */
+    for (k = 0; k < 32 * r; k++) {
+        X[k] = LOAD32_LE(&B[4 * k]);
+    }
+    /* 2: for i = 0 to N - 1 do */
+    for (i = 0; i < N; i += 2) {
+        /* 3: V_i <-- X */
+        blkcpy((escrypt_block_t *) &V[i * (32 * r)], (escrypt_block_t *) X,
+               128 * r);
+
+        /* 4: X <-- H(X) */
+        blockmix_salsa8(X, Y, Z, r);
+
+        /* 3: V_i <-- X */
+        blkcpy((escrypt_block_t *) &V[(i + 1) * (32 * r)],
+               (escrypt_block_t *) Y, 128 * r);
+
+        /* 4: X <-- H(X) */
+        blockmix_salsa8(Y, X, Z, r);
+    }
+
+    /* 6: for i = 0 to N - 1 do */
+    for (i = 0; i < N; i += 2) {
+        /* 7: j <-- Integerify(X) mod N */
+        j = integerify(X, r) & (N - 1);
+
+        /* 8: X <-- H(X \xor V_j) */
+        blkxor((escrypt_block_t *) X, (escrypt_block_t *) &V[j * (32 * r)],
+               128 * r);
+        blockmix_salsa8(X, Y, Z, r);
+
+        /* 7: j <-- Integerify(X) mod N */
+        j = integerify(Y, r) & (N - 1);
+
+        /* 8: X <-- H(X \xor V_j) */
+        blkxor((escrypt_block_t *) Y, (escrypt_block_t *) &V[j * (32 * r)],
+               128 * r);
+        blockmix_salsa8(Y, X, Z, r);
+    }
+    /* 10: B' <-- X */
+    for (k = 0; k < 32 * r; k++) {
+        STORE32_LE(&B[4 * k], X[k]);
+    }
+>>>>>>> origin/tomato-shibby-RT-AC
 }
 
 /**
@@ -256,12 +448,12 @@ smix(uint8_t * B, size_t r, uint64_t N, uint32_t * V, uint32_t * XY)
  * Return 0 on success; or -1 on error.
  */
 int
-escrypt_kdf_nosse(escrypt_local_t * local,
-    const uint8_t * passwd, size_t passwdlen,
-    const uint8_t * salt, size_t saltlen,
-    uint64_t N, uint32_t _r, uint32_t _p,
-    uint8_t * buf, size_t buflen)
+escrypt_kdf_nosse(escrypt_local_t *local, const uint8_t *passwd,
+                  size_t passwdlen, const uint8_t *salt, size_t saltlen,
+                  uint64_t N, uint32_t _r, uint32_t _p, uint8_t *buf,
+                  size_t buflen)
 {
+<<<<<<< HEAD
 	size_t B_size, V_size, XY_size, need;
 	uint8_t * B;
 	uint32_t * V, * XY;
@@ -269,6 +461,15 @@ escrypt_kdf_nosse(escrypt_local_t * local,
 	uint32_t i;
 
 	/* Sanity-check parameters. */
+=======
+    size_t    B_size, V_size, XY_size, need;
+    uint8_t * B;
+    uint32_t *V, *XY;
+    size_t    r = _r, p = _p;
+    uint32_t  i;
+
+/* Sanity-check parameters. */
+>>>>>>> origin/tomato-shibby-RT-AC
 #if SIZE_MAX > UINT32_MAX
 	if (buflen > (((uint64_t)(1) << 32) - 1) * 32) {
 		errno = EFBIG;
@@ -295,6 +496,7 @@ escrypt_kdf_nosse(escrypt_local_t * local,
 #if SIZE_MAX / 256 <= UINT32_MAX
 	    (r > SIZE_MAX / 256) ||
 #endif
+<<<<<<< HEAD
 	    (N > SIZE_MAX / 128 / r)) {
 		errno = ENOMEM;
 		return -1;
@@ -338,4 +540,51 @@ escrypt_kdf_nosse(escrypt_local_t * local,
 
 	/* Success! */
 	return 0;
+=======
+        (N > SIZE_MAX / 128 / r)) {
+        errno = ENOMEM;
+        return -1;
+    }
+
+    /* Allocate memory. */
+    B_size = (size_t) 128 * r * p;
+    V_size = (size_t) 128 * r * N;
+    need   = B_size + V_size;
+    if (need < V_size) {
+        errno = ENOMEM;
+        return -1;
+    }
+    XY_size = (size_t) 256 * r + 64;
+    need += XY_size;
+    if (need < XY_size) {
+        errno = ENOMEM;
+        return -1;
+    }
+    if (local->size < need) {
+        if (free_region(local)) {
+            return -1;
+        }
+        if (!alloc_region(local, need)) {
+            return -1;
+        }
+    }
+    B  = (uint8_t *) local->aligned;
+    V  = (uint32_t *) ((uint8_t *) B + B_size);
+    XY = (uint32_t *) ((uint8_t *) V + V_size);
+
+    /* 1: (B_0 ... B_{p-1}) <-- PBKDF2(P, S, 1, p * MFLen) */
+    PBKDF2_SHA256(passwd, passwdlen, salt, saltlen, 1, B, B_size);
+
+    /* 2: for i = 0 to p - 1 do */
+    for (i = 0; i < p; i++) {
+        /* 3: B_i <-- MF(B_i, N) */
+        smix(&B[(size_t) 128 * i * r], r, N, V, XY);
+    }
+
+    /* 5: DK <-- PBKDF2(P, B, 1, dkLen) */
+    PBKDF2_SHA256(passwd, passwdlen, B, B_size, 1, buf, buflen);
+
+    /* Success! */
+    return 0;
+>>>>>>> origin/tomato-shibby-RT-AC
 }

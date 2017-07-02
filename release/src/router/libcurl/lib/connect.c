@@ -76,6 +76,7 @@
 #include "warnless.h"
 #include "conncache.h"
 #include "multihandle.h"
+#include "system_win32.h"
 
 /* The last #include file should be: */
 #include "memdebug.h"
@@ -105,7 +106,7 @@ struct tcp_keepalive {
 #endif
 
 static void
-tcpkeepalive(struct SessionHandle *data,
+tcpkeepalive(struct Curl_easy *data,
              curl_socket_t sockfd)
 {
   int optval = data->set.tcp_keepalive?1:0;
@@ -180,12 +181,12 @@ singleipconnect(struct connectdata *conn,
  *
  * @unittest: 1303
  */
-long Curl_timeleft(struct SessionHandle *data,
-                   struct timeval *nowp,
-                   bool duringconnect)
+time_t Curl_timeleft(struct Curl_easy *data,
+                     struct timeval *nowp,
+                     bool duringconnect)
 {
   int timeout_set = 0;
-  long timeout_ms = duringconnect?DEFAULT_CONNECT_TIMEOUT:0;
+  time_t timeout_ms = duringconnect?DEFAULT_CONNECT_TIMEOUT:0;
   struct timeval now;
 
   /* if a timeout is set, use the most restrictive one */
@@ -195,7 +196,7 @@ long Curl_timeleft(struct SessionHandle *data,
   if(duringconnect && (data->set.connecttimeout > 0))
     timeout_set |= 2;
 
-  switch (timeout_set) {
+  switch(timeout_set) {
   case 1:
     timeout_ms = data->set.timeout;
     break;
@@ -240,7 +241,7 @@ long Curl_timeleft(struct SessionHandle *data,
 static CURLcode bindlocal(struct connectdata *conn,
                           curl_socket_t sockfd, int af)
 {
-  struct SessionHandle *data = conn->data;
+  struct Curl_easy *data = conn->data;
 
   struct Curl_sockaddr_storage sa;
   struct sockaddr *sock = (struct sockaddr *)&sa;  /* bind to this address */
@@ -597,26 +598,32 @@ void Curl_persistconninfo(struct connectdata *conn)
 {
   memcpy(conn->data->info.conn_primary_ip, conn->primary_ip, MAX_IPADR_LEN);
   memcpy(conn->data->info.conn_local_ip, conn->local_ip, MAX_IPADR_LEN);
+  conn->data->info.conn_scheme = conn->handler->scheme;
+  conn->data->info.conn_protocol = conn->handler->protocol;
   conn->data->info.conn_primary_port = conn->primary_port;
   conn->data->info.conn_local_port = conn->local_port;
 }
 
 /* retrieves ip address and port from a sockaddr structure */
-static bool getaddressinfo(struct sockaddr* sa, char* addr,
-                           long* port)
+static bool getaddressinfo(struct sockaddr *sa, char *addr,
+                           long *port)
 {
   unsigned short us_port;
-  struct sockaddr_in* si = NULL;
+  struct sockaddr_in *si = NULL;
 #ifdef ENABLE_IPV6
-  struct sockaddr_in6* si6 = NULL;
+  struct sockaddr_in6 *si6 = NULL;
 #endif
 #if defined(HAVE_SYS_UN_H) && defined(AF_UNIX)
-  struct sockaddr_un* su = NULL;
+  struct sockaddr_un *su = NULL;
 #endif
 
-  switch (sa->sa_family) {
+  switch(sa->sa_family) {
     case AF_INET:
+<<<<<<< HEAD
       si = (struct sockaddr_in*) sa;
+=======
+      si = (struct sockaddr_in *)(void *) sa;
+>>>>>>> origin/tomato-shibby-RT-AC
       if(Curl_inet_ntop(sa->sa_family, &si->sin_addr,
                         addr, MAX_IPADR_LEN)) {
         us_port = ntohs(si->sin_port);
@@ -626,7 +633,11 @@ static bool getaddressinfo(struct sockaddr* sa, char* addr,
       break;
 #ifdef ENABLE_IPV6
     case AF_INET6:
+<<<<<<< HEAD
       si6 = (struct sockaddr_in6*)sa;
+=======
+      si6 = (struct sockaddr_in6 *)(void *) sa;
+>>>>>>> origin/tomato-shibby-RT-AC
       if(Curl_inet_ntop(sa->sa_family, &si6->sin6_addr,
                         addr, MAX_IPADR_LEN)) {
         us_port = ntohs(si6->sin6_port);
@@ -660,7 +671,7 @@ void Curl_updateconninfo(struct connectdata *conn, curl_socket_t sockfd)
   curl_socklen_t len;
   struct Curl_sockaddr_storage ssrem;
   struct Curl_sockaddr_storage ssloc;
-  struct SessionHandle *data = conn->data;
+  struct Curl_easy *data = conn->data;
 
   if(conn->socktype == SOCK_DGRAM)
     /* there's no connection! */
@@ -715,9 +726,15 @@ CURLcode Curl_is_connected(struct connectdata *conn,
                            int sockindex,
                            bool *connected)
 {
+<<<<<<< HEAD
   struct SessionHandle *data = conn->data;
   CURLcode code = CURLE_OK;
   long allow;
+=======
+  struct Curl_easy *data = conn->data;
+  CURLcode result = CURLE_OK;
+  time_t allow;
+>>>>>>> origin/tomato-shibby-RT-AC
   int error = 0;
   struct timeval now;
   int result;
@@ -756,7 +773,11 @@ CURLcode Curl_is_connected(struct connectdata *conn,
 #endif
 
     /* check socket for connect */
+<<<<<<< HEAD
     result = Curl_socket_ready(CURL_SOCKET_BAD, conn->tempsock[i], 0);
+=======
+    rc = SOCKET_WRITABLE(conn->tempsock[i], 0);
+>>>>>>> origin/tomato-shibby-RT-AC
 
     if(result == 0) { /* no connection yet */
       if(curlx_tvdiff(now, conn->connecttime) >= conn->timeoutms_per_addr) {
@@ -832,6 +853,11 @@ CURLcode Curl_is_connected(struct connectdata *conn,
   if(code) {
     /* no more addresses to try */
 
+<<<<<<< HEAD
+=======
+    const char *hostname;
+
+>>>>>>> origin/tomato-shibby-RT-AC
     /* if the first address family runs out of addresses to try before
        the happy eyeball timeout, go ahead and try the next family now */
     if(conn->tempaddr[1] == NULL) {
@@ -841,6 +867,18 @@ CURLcode Curl_is_connected(struct connectdata *conn,
         return CURLE_OK;
     }
 
+<<<<<<< HEAD
+=======
+    if(conn->bits.socksproxy)
+      hostname = conn->socks_proxy.host.name;
+    else if(conn->bits.httpproxy)
+      hostname = conn->http_proxy.host.name;
+    else if(conn->bits.conn_to_host)
+      hostname = conn->conn_to_host.name;
+    else
+      hostname = conn->host.name;
+
+>>>>>>> origin/tomato-shibby-RT-AC
     failf(data, "Failed to connect to %s port %ld: %s",
           conn->bits.proxy?conn->proxy.name:conn->host.name,
           conn->port, Curl_strerror(conn, error));
@@ -852,9 +890,17 @@ CURLcode Curl_is_connected(struct connectdata *conn,
 static void tcpnodelay(struct connectdata *conn,
                        curl_socket_t sockfd)
 {
+<<<<<<< HEAD
 #ifdef TCP_NODELAY
   struct SessionHandle *data= conn->data;
   curl_socklen_t onoff = (curl_socklen_t) data->set.tcp_nodelay;
+=======
+#if defined(TCP_NODELAY)
+#if !defined(CURL_DISABLE_VERBOSE_STRINGS)
+  struct Curl_easy *data = conn->data;
+#endif
+  curl_socklen_t onoff = (curl_socklen_t) 1;
+>>>>>>> origin/tomato-shibby-RT-AC
   int level = IPPROTO_TCP;
 
 #if 0
@@ -890,7 +936,7 @@ static void tcpnodelay(struct connectdata *conn,
 static void nosigpipe(struct connectdata *conn,
                       curl_socket_t sockfd)
 {
-  struct SessionHandle *data= conn->data;
+  struct Curl_easy *data= conn->data;
   int onoff = 1;
   if(setsockopt(sockfd, SOL_SOCKET, SO_NOSIGPIPE, (void *)&onoff,
                 sizeof(onoff)) < 0)
@@ -923,11 +969,11 @@ void Curl_sndbufset(curl_socket_t sockfd)
   int val = CURL_MAX_WRITE_SIZE + 32;
   int curval = 0;
   int curlen = sizeof(curval);
-  DWORD majorVersion = 6;
 
   static int detectOsState = DETECT_OS_NONE;
 
   if(detectOsState == DETECT_OS_NONE) {
+<<<<<<< HEAD
 #if !defined(_WIN32_WINNT) || !defined(_WIN32_WINNT_WIN2K) || \
     (_WIN32_WINNT < _WIN32_WINNT_WIN2K)
     OSVERSIONINFO osver;
@@ -951,10 +997,13 @@ void Curl_sndbufset(curl_socket_t sockfd)
                                            VER_GREATER_EQUAL);
 
     if(VerifyVersionInfo(&osver, VER_MAJORVERSION, majorVersionMask))
+=======
+    if(Curl_verify_windows_version(6, 0, PLATFORM_WINNT,
+                                   VERSION_GREATER_THAN_EQUAL))
+>>>>>>> origin/tomato-shibby-RT-AC
       detectOsState = DETECT_OS_VISTA_OR_LATER;
     else
       detectOsState = DETECT_OS_PREVISTA;
-#endif
   }
 
   if(detectOsState == DETECT_OS_VISTA_OR_LATER)
@@ -986,7 +1035,7 @@ singleipconnect(struct connectdata *conn,
   int rc;
   int error = 0;
   bool isconnected = FALSE;
-  struct SessionHandle *data = conn->data;
+  struct Curl_easy *data = conn->data;
   curl_socket_t sockfd;
   CURLcode res = CURLE_OK;
   char ipaddress[MAX_IPADR_LEN];
@@ -1058,7 +1107,33 @@ singleipconnect(struct connectdata *conn,
 
   /* Connect TCP sockets, bind UDP */
   if(!isconnected && (conn->socktype == SOCK_STREAM)) {
+<<<<<<< HEAD
     rc = connect(sockfd, &addr.sa_addr, addr.addrlen);
+=======
+    if(conn->bits.tcp_fastopen) {
+#if defined(CONNECT_DATA_IDEMPOTENT) /* OS X */
+      sa_endpoints_t endpoints;
+      endpoints.sae_srcif = 0;
+      endpoints.sae_srcaddr = NULL;
+      endpoints.sae_srcaddrlen = 0;
+      endpoints.sae_dstaddr = &addr.sa_addr;
+      endpoints.sae_dstaddrlen = addr.addrlen;
+
+      rc = connectx(sockfd, &endpoints, SAE_ASSOCID_ANY,
+                    CONNECT_RESUME_ON_READ_WRITE | CONNECT_DATA_IDEMPOTENT,
+                    NULL, 0, NULL, NULL);
+#elif defined(MSG_FASTOPEN) /* Linux */
+      if(conn->given->flags & PROTOPT_SSL)
+        rc = connect(sockfd, &addr.sa_addr, addr.addrlen);
+      else
+        rc = 0; /* Do nothing */
+#endif
+    }
+    else {
+      rc = connect(sockfd, &addr.sa_addr, addr.addrlen);
+    }
+
+>>>>>>> origin/tomato-shibby-RT-AC
     if(-1 == rc)
       error = SOCKERRNO;
   }
@@ -1114,11 +1189,11 @@ singleipconnect(struct connectdata *conn,
 CURLcode Curl_connecthost(struct connectdata *conn,  /* context */
                           const struct Curl_dns_entry *remotehost)
 {
-  struct SessionHandle *data = conn->data;
+  struct Curl_easy *data = conn->data;
   struct timeval before = Curl_tvnow();
   CURLcode res = CURLE_COULDNT_CONNECT;
 
-  long timeout_ms = Curl_timeleft(data, &before, TRUE);
+  time_t timeout_ms = Curl_timeleft(data, &before, TRUE);
 
   if(timeout_ms < 0) {
     /* a precaution, no need to continue if time already is up */
@@ -1170,11 +1245,11 @@ static int conn_is_conn(struct connectdata *conn, void *param)
 
 /*
  * Used to extract socket and connectdata struct for the most recent
- * transfer on the given SessionHandle.
+ * transfer on the given Curl_easy.
  *
  * The returned socket will be CURL_SOCKET_BAD in case of failure!
  */
-curl_socket_t Curl_getconnectinfo(struct SessionHandle *data,
+curl_socket_t Curl_getconnectinfo(struct Curl_easy *data,
                                   struct connectdata **connp)
 {
   curl_socket_t sockfd;
@@ -1200,6 +1275,7 @@ curl_socket_t Curl_getconnectinfo(struct SessionHandle *data,
       /* only store this if the caller cares for it */
       *connp = c;
     sockfd = c->sock[FIRSTSOCKET];
+<<<<<<< HEAD
     /* we have a socket connected, let's determine if the server shut down */
     /* determine if ssl */
     if(c->ssl[FIRSTSOCKET].use) {
@@ -1218,11 +1294,40 @@ curl_socket_t Curl_getconnectinfo(struct SessionHandle *data,
       }
     }
 #endif
+=======
+>>>>>>> origin/tomato-shibby-RT-AC
   }
   else
     return CURL_SOCKET_BAD;
 
   return sockfd;
+}
+
+/*
+ * Check if a connection seems to be alive.
+ */
+bool Curl_connalive(struct connectdata *conn)
+{
+  /* First determine if ssl */
+  if(conn->ssl[FIRSTSOCKET].use) {
+    /* use the SSL context */
+    if(!Curl_ssl_check_cxn(conn))
+      return false;   /* FIN received */
+  }
+/* Minix 3.1 doesn't support any flags on recv; just assume socket is OK */
+#ifdef MSG_PEEK
+  else if(conn->sock[FIRSTSOCKET] == CURL_SOCKET_BAD)
+    return false;
+  else {
+    /* use the socket */
+    char buf;
+    if(recv((RECV_TYPE_ARG1)conn->sock[FIRSTSOCKET], (RECV_TYPE_ARG2)&buf,
+            (RECV_TYPE_ARG3)1, (RECV_TYPE_ARG4)MSG_PEEK) == 0) {
+      return false;   /* FIN received */
+    }
+  }
+#endif
+  return true;
 }
 
 /*
@@ -1266,7 +1371,7 @@ CURLcode Curl_socket(struct connectdata *conn,
                      struct Curl_sockaddr_ex *addr,
                      curl_socket_t *sockfd)
 {
-  struct SessionHandle *data = conn->data;
+  struct Curl_easy *data = conn->data;
   struct Curl_sockaddr_ex dummy;
 
   if(!addr)
@@ -1321,3 +1426,43 @@ CURLcode Curl_socket(struct connectdata *conn,
   return CURLE_OK;
 
 }
+<<<<<<< HEAD
+=======
+
+/*
+ * Curl_conncontrol() marks streams or connection for closure.
+ */
+void Curl_conncontrol(struct connectdata *conn,
+                      int ctrl /* see defines in header */
+#ifdef DEBUGBUILD
+                      , const char *reason
+#endif
+  )
+{
+  /* close if a connection, or a stream that isn't multiplexed */
+  bool closeit = (ctrl == CONNCTRL_CONNECTION) ||
+    ((ctrl == CONNCTRL_STREAM) && !(conn->handler->flags & PROTOPT_STREAM));
+  if((ctrl == CONNCTRL_STREAM) &&
+     (conn->handler->flags & PROTOPT_STREAM))
+    DEBUGF(infof(conn->data, "Kill stream: %s\n", reason));
+  else if(closeit != conn->bits.close) {
+    DEBUGF(infof(conn->data, "Marked for [%s]: %s\n",
+                 closeit?"closure":"keep alive", reason));
+    conn->bits.close = closeit; /* the only place in the source code that
+                                   should assign this bit */
+  }
+}
+
+/* Data received can be cached at various levels, so check them all here. */
+bool Curl_conn_data_pending(struct connectdata *conn, int sockindex)
+{
+  int readable;
+
+  if(Curl_ssl_data_pending(conn, sockindex) ||
+     Curl_recv_has_postponed_data(conn, sockindex))
+    return true;
+
+  readable = SOCKET_READABLE(conn->sock[sockindex], 0);
+  return (readable > 0 && (readable & CURL_CSELECT_IN));
+}
+>>>>>>> origin/tomato-shibby-RT-AC

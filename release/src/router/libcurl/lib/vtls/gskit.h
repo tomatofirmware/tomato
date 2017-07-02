@@ -7,7 +7,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
+<<<<<<< HEAD
  * Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
+=======
+ * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
+>>>>>>> origin/tomato-shibby-RT-AC
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -39,8 +43,22 @@ void Curl_gskit_close(struct connectdata *conn, int sockindex);
 int Curl_gskit_close_all(struct SessionHandle * data);
 int Curl_gskit_shutdown(struct connectdata * conn, int sockindex);
 
+<<<<<<< HEAD
 size_t Curl_gskit_version(char * buffer, size_t size);
 int Curl_gskit_check_cxn(struct connectdata * cxn);
+=======
+size_t Curl_gskit_version(char *buffer, size_t size);
+int Curl_gskit_check_cxn(struct connectdata *cxn);
+
+/* Support HTTPS-proxy */
+/* TODO: add '#define HTTPS_PROXY_SUPPORT 1' and fix test #1014 (if need) */
+
+/* Set the API backend definition to GSKit */
+#define CURL_SSL_BACKEND CURLSSLBACKEND_GSKIT
+
+/* this backend supports CURLOPT_CERTINFO */
+#define have_curlssl_certinfo 1
+>>>>>>> origin/tomato-shibby-RT-AC
 
 /* API setup for GSKit */
 #define curlssl_init Curl_gskit_init
@@ -59,6 +77,11 @@ int Curl_gskit_check_cxn(struct connectdata * cxn);
 #define curlssl_version Curl_gskit_version
 #define curlssl_check_cxn(x) Curl_gskit_check_cxn(x)
 #define curlssl_data_pending(x,y) 0
+<<<<<<< HEAD
+=======
+#define curlssl_random(x,y,z) (x=x, y=y, z=z, CURLE_NOT_BUILT_IN)
+
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif /* USE_GSKIT */
 
 #endif /* HEADER_CURL_GSKIT_H */

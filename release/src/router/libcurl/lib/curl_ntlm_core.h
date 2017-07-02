@@ -53,11 +53,25 @@ void Curl_ntlm_core_lm_resp(const unsigned char *keys,
                             const unsigned char *plaintext,
                             unsigned char *results);
 
+<<<<<<< HEAD
 void Curl_ntlm_core_mk_lm_hash(struct SessionHandle *data,
                                const char *password,
                                unsigned char *lmbuffer /* 21 bytes */);
 
 #if USE_NTRESPONSES
+=======
+CURLcode Curl_ntlm_core_mk_lm_hash(struct Curl_easy *data,
+                                   const char *password,
+                                   unsigned char *lmbuffer /* 21 bytes */);
+
+#if USE_NTRESPONSES
+CURLcode Curl_ntlm_core_mk_nt_hash(struct Curl_easy *data,
+                                   const char *password,
+                                   unsigned char *ntbuffer /* 21 bytes */);
+
+#if USE_NTLM_V2 && !defined(USE_WINDOWS_SSPI)
+
+>>>>>>> origin/tomato-shibby-RT-AC
 CURLcode Curl_hmac_md5(const unsigned char *key, unsigned int keylen,
                        const unsigned char *data, unsigned int datalen,
                        unsigned char *output);

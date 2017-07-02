@@ -1,23 +1,31 @@
 /* $Id: search.c 4472 2010-01-05 23:35:50Z astyanax $ */
 /**************************************************************************
- *   search.c                                                             *
+ *   search.c  --  This file is part of GNU nano.                         *
  *                                                                        *
  *   Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,  *
+<<<<<<< HEAD
  *   2008, 2009 Free Software Foundation, Inc.                            *
  *   This program is free software; you can redistribute it and/or modify *
  *   it under the terms of the GNU General Public License as published by *
  *   the Free Software Foundation; either version 3, or (at your option)  *
  *   any later version.                                                   *
+=======
+ *   2008, 2009, 2010, 2011, 2013, 2014 Free Software Foundation, Inc.    *
+ *   Copyright (C) 2015, 2016, 2017 Benno Schulenberg                     *
+>>>>>>> origin/tomato-shibby-RT-AC
  *                                                                        *
- *   This program is distributed in the hope that it will be useful, but  *
- *   WITHOUT ANY WARRANTY; without even the implied warranty of           *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU    *
- *   General Public License for more details.                             *
+ *   GNU nano is free software: you can redistribute it and/or modify     *
+ *   it under the terms of the GNU General Public License as published    *
+ *   by the Free Software Foundation, either version 3 of the License,    *
+ *   or (at your option) any later version.                               *
+ *                                                                        *
+ *   GNU nano is distributed in the hope that it will be useful,          *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty          *
+ *   of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.              *
+ *   See the GNU General Public License for more details.                 *
  *                                                                        *
  *   You should have received a copy of the GNU General Public License    *
- *   along with this program; if not, write to the Free Software          *
- *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA            *
- *   02110-1301, USA.                                                     *
+ *   along with this program.  If not, see http://www.gnu.org/licenses/.  *
  *                                                                        *
  **************************************************************************/
 
@@ -36,18 +44,17 @@ static bool search_last_line = FALSE;
 static bool history_changed = FALSE;
 	/* Have any of the history lists changed? */
 #endif
-#ifdef HAVE_REGEX_H
 static bool regexp_compiled = FALSE;
 	/* Have we compiled any regular expressions? */
 
-/* Compile the regular expression regexp to see if it's valid.  Return
- * TRUE if it is, or FALSE otherwise. */
+/* Compile the given regular expression and store it in search_regexp.
+ * Return TRUE if the expression is valid, and FALSE otherwise. */
 bool regexp_init(const char *regexp)
 {
-    int rc;
+    int value = regcomp(&search_regexp, fixbounds(regexp),
+		NANO_REG_EXTENDED | (ISSET(CASE_SENSITIVE) ? 0 : REG_ICASE));
 
-    assert(!regexp_compiled);
-
+<<<<<<< HEAD
     rc = regcomp(&search_regexp, regexp, REG_EXTENDED
 #ifndef NANO_TINY
 	| (ISSET(CASE_SENSITIVE) ? 0 : REG_ICASE)
@@ -60,6 +67,15 @@ bool regexp_init(const char *regexp)
 
 	regerror(rc, &search_regexp, str, len);
 	statusbar(_("Bad regex \"%s\": %s"), regexp, str);
+=======
+    /* If regex compilation failed, show the error message. */
+    if (value != 0) {
+	size_t len = regerror(value, &search_regexp, NULL, 0);
+	char *str = charalloc(len);
+
+	regerror(value, &search_regexp, str, len);
+	statusline(ALERT, _("Bad regex \"%s\": %s"), regexp, str);
+>>>>>>> origin/tomato-shibby-RT-AC
 	free(str);
 
 	return FALSE;
@@ -79,7 +95,6 @@ void regexp_cleanup(void)
 	regfree(&search_regexp);
     }
 }
-#endif
 
 /* Indicate on the statusbar that the string at str was not found by the
  * last search. */
@@ -108,11 +123,9 @@ void search_replace_abort(void)
     display_main_list();
 #ifndef NANO_TINY
     if (openfile->mark_set)
-	edit_refresh();
+	refresh_needed = TRUE;
 #endif
-#ifdef HAVE_REGEX_H
     regexp_cleanup();
-#endif
 }
 
 /* Initialize the global search and replace strings. */
@@ -173,6 +186,7 @@ int search_init(bool replacing, bool use_answer)
 	buf = mallocstrcpy(NULL, "");
 
     /* This is now one simple call.  It just does a lot. */
+<<<<<<< HEAD
     i = do_prompt(FALSE,
 #ifndef DISABLE_TABCOMP
 	TRUE,
@@ -193,9 +207,21 @@ int search_init(bool replacing, bool use_answer)
 	/* TRANSLATORS: This string is just a modifier for the search
 	 * prompt; no grammar is implied. */
 	ISSET(USE_REGEXP) ? _(" [Regexp]") :
+=======
+    i = do_prompt(FALSE, FALSE,
+		replacing ? MREPLACE : MWHEREIS, backupstring,
+#ifndef DISABLE_HISTORIES
+		&search_history,
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif
-	"",
+		/* TRANSLATORS: This is the main search prompt. */
+		edit_refresh, "%s%s%s%s%s%s", _("Search"),
+		/* TRANSLATORS: The next three modify the search prompt. */
+		ISSET(CASE_SENSITIVE) ? _(" [Case Sensitive]") : "",
+		ISSET(USE_REGEXP) ? _(" [Regexp]") : "",
+		ISSET(BACKWARDS_SEARCH) ? _(" [Backwards]") : "", replacing ?
 #ifndef NANO_TINY
+<<<<<<< HEAD
 	/* TRANSLATORS: This string is just a modifier for the search
 	 * prompt; no grammar is implied. */
 	ISSET(BACKWARDS_SEARCH) ? _(" [Backwards]") :
@@ -205,6 +231,12 @@ int search_init(bool replacing, bool use_answer)
 	openfile->mark_set ? _(" (to replace) in selection") :
 #endif
 	_(" (to replace)") : "", buf);
+=======
+		/* TRANSLATORS: The next two modify the search prompt. */
+		openfile->mark_set ? _(" (to replace) in selection") :
+#endif
+		_(" (to replace)") : "", buf);
+>>>>>>> origin/tomato-shibby-RT-AC
 
     fflush(stderr);
 
@@ -226,6 +258,7 @@ int search_init(bool replacing, bool use_answer)
 	  	break;
 	    }
 
+<<<<<<< HEAD
 	if (i == -2 || i == 0 ) {
 #ifdef HAVE_REGEX_H
 		/* Use last_search if answer is an empty string, or
@@ -265,11 +298,50 @@ int search_init(bool replacing, bool use_answer)
 	} else {
 		return -1;
 	}
+=======
+    /* If Enter was pressed, see what we got. */
+    if (i == 0 || i == -2) {
+	/* If an answer was given, remember it. */
+	if (*answer != '\0') {
+	    last_search = mallocstrcpy(last_search, answer);
+#ifndef DISABLE_HISTORIES
+	    update_history(&search_history, answer);
+#endif
+	}
+	if (ISSET(USE_REGEXP) && !regexp_init(last_search))
+	    return -1;
+	else
+	    return 0;	/* We have a valid string or regex. */
+    }
+
+    func = func_from_key(&i);
+
+    if (func == case_sens_void) {
+	TOGGLE(CASE_SENSITIVE);
+	backupstring = mallocstrcpy(backupstring, answer);
+	return 1;
+    } else if (func == backwards_void) {
+	TOGGLE(BACKWARDS_SEARCH);
+	backupstring = mallocstrcpy(backupstring, answer);
+	return 1;
+    } else if (func == regexp_void) {
+	TOGGLE(USE_REGEXP);
+	backupstring = mallocstrcpy(backupstring, answer);
+	return 1;
+    } else if (func == do_replace || func == flip_replace_void) {
+	backupstring = mallocstrcpy(backupstring, answer);
+	return -2;	/* Call the opposite search function. */
+    } else if (func == do_gotolinecolumn_void) {
+	do_gotolinecolumn(openfile->current->lineno,
+			openfile->placewewant + 1, TRUE, TRUE);
+	return 3;
+>>>>>>> origin/tomato-shibby-RT-AC
     }
 
     return 0;
 }
 
+<<<<<<< HEAD
 /* Look for needle, starting at (current, current_x).  If no_sameline is
  * TRUE, skip over begin when looking for needle.  begin is the line
  * where we first started searching, at column begin_x.  The return
@@ -305,6 +377,29 @@ bool findnextstr(
 	openfile->current_x + 1;
 
     /* Look for needle in the current line we're searching. */
+=======
+/* Look for needle, starting at (current, current_x).  begin is the line
+ * where we first started searching, at column begin_x.  Return 1 when we
+ * found something, 0 when nothing, and -2 on cancel.  When match_len is
+ * not NULL, set it to the length of the found string, if any. */
+int findnextstr(const char *needle, bool whole_word_only, bool have_region,
+	size_t *match_len, bool skipone, const filestruct *begin, size_t begin_x)
+{
+    size_t found_len = strlen(needle);
+	/* The length of a match -- will be recomputed for a regex. */
+    int feedback = 0;
+	/* When bigger than zero, show and wipe the "Searching..." message. */
+    filestruct *line = openfile->current;
+	/* The line that we will search through now. */
+    const char *from = line->data + openfile->current_x;
+	/* The point in the line from where we start searching. */
+    const char *found = NULL;
+	/* A pointer to the location of the match, if any. */
+    size_t found_x;
+	/* The x coordinate of a found occurrence. */
+    time_t lastkbcheck = time(NULL);
+
+>>>>>>> origin/tomato-shibby-RT-AC
     enable_nodelay();
     while (TRUE) {
         if (time(NULL) - lastkbcheck > 1) {
@@ -316,10 +411,32 @@ bool findnextstr(
 	    }
 	}
 
+<<<<<<< HEAD
 	found = strstrwrapper(fileptr->data, needle, rev_start);
+=======
+	/* Search for the needle in the current line. */
+	if (!skipone)
+	    found = strstrwrapper(line->data, needle, from);
+
+	/* Ignore the initial match at the starting position: continue
+	 * searching from the next character, or invalidate the match. */
+	if (skipone || (!whole_word_only && !came_full_circle &&
+				found == begin->data + begin_x)) {
+	    skipone = FALSE;
+	    if (ISSET(BACKWARDS_SEARCH) && from != line->data) {
+		from = line->data + move_mbleft(line->data, from - line->data);
+		continue;
+	    } else if (!ISSET(BACKWARDS_SEARCH) && *from != '\0') {
+		from += move_mbright(from, 0);
+		continue;
+	    }
+	    found = NULL;
+	}
+>>>>>>> origin/tomato-shibby-RT-AC
 
 	/* We've found a potential match. */
 	if (found != NULL) {
+<<<<<<< HEAD
 #ifndef DISABLE_SPELLER
 	    bool found_whole = FALSE;
 		/* Is this potential match a whole word? */
@@ -356,6 +473,22 @@ bool findnextstr(
 #endif
 		(!no_sameline || fileptr != openfile->current))
 		break;
+=======
+	    /* When doing a regex search, compute the length of the match. */
+	    if (ISSET(USE_REGEXP))
+		found_len = regmatches[0].rm_eo - regmatches[0].rm_so;
+#ifndef DISABLE_SPELLER
+	    /* When we're spell checking, a match should be a separate word;
+	     * if it's not, continue looking in the rest of the line. */
+	    if (whole_word_only && !is_separate_word(found - line->data,
+						found_len, line->data)) {
+		from = found + move_mbright(found, 0);
+		continue;
+	    }
+#endif
+	    /* The match is valid. */
+	    break;
+>>>>>>> origin/tomato-shibby-RT-AC
 	}
 
 	/* We've finished processing the file, so get out. */
@@ -366,6 +499,7 @@ bool findnextstr(
 	}
 
 	/* Move to the previous or next line in the file. */
+<<<<<<< HEAD
 #ifndef NANO_TINY
 	if (ISSET(BACKWARDS_SEARCH)) {
 	    fileptr = fileptr->prev;
@@ -392,20 +526,49 @@ bool findnextstr(
 #ifndef NANO_TINY
 	    }
 #endif
+=======
+	if (ISSET(BACKWARDS_SEARCH))
+	    line = line->prev;
+	else
+	    line = line->next;
+
+	/* If we've reached the start or end of the buffer, wrap around;
+	 * but stop when spell-checking or replacing in a region. */
+	if (line == NULL) {
+	    if (whole_word_only || have_region) {
+		disable_nodelay();
+		return 0;
+	    }
+
+	    if (ISSET(BACKWARDS_SEARCH))
+		line = openfile->filebot;
+	    else
+		line = openfile->fileage;
+
+>>>>>>> origin/tomato-shibby-RT-AC
 	    statusbar(_("Search Wrapped"));
 	}
 
+<<<<<<< HEAD
 	/* We've reached the original starting line. */
 	if (fileptr == begin)
 	    search_last_line = TRUE;
 
 	rev_start = fileptr->data;
 #ifndef NANO_TINY
+=======
+	/* If we've reached the original starting line, take note. */
+	if (line == begin)
+	    came_full_circle = TRUE;
+
+	/* Set the starting x to the start or end of the line. */
+	from = line->data;
+>>>>>>> origin/tomato-shibby-RT-AC
 	if (ISSET(BACKWARDS_SEARCH))
-	    rev_start += strlen(fileptr->data);
-#endif
+	    from += strlen(line->data);
     }
 
+<<<<<<< HEAD
     /* We found an instance. */
     current_x_find = found - fileptr->data;
 
@@ -418,17 +581,31 @@ bool findnextstr(
 	current_x_find > begin_x
 #endif
 	) {
+=======
+    found_x = found - line->data;
+
+    /* Ensure that the found occurrence is not beyond the starting x. */
+    if (came_full_circle && ((!ISSET(BACKWARDS_SEARCH) && found_x > begin_x) ||
+			(ISSET(BACKWARDS_SEARCH) && found_x < begin_x))) {
+>>>>>>> origin/tomato-shibby-RT-AC
 	not_found_msg(needle);
 	disable_nodelay();
 	return FALSE;
     }
 
     disable_nodelay();
+<<<<<<< HEAD
     /* We've definitely found something. */
     openfile->current = fileptr;
     openfile->current_x = current_x_find;
     openfile->placewewant = xplustabs();
     openfile->current_y = current_y_find;
+=======
+
+    /* Set the current position to point at what we found. */
+    openfile->current = line;
+    openfile->current_x = found_x;
+>>>>>>> origin/tomato-shibby-RT-AC
 
     /* needle_len holds the length of needle. */
     if (needle_len != NULL)
@@ -462,11 +639,14 @@ void do_search(void)
     else if (i == -2)
 	/* Replace. */
 	do_replace();
+<<<<<<< HEAD
 #if !defined(NANO_TINY) || defined(HAVE_REGEX_H)
     else if (i == 1)
 	/* Case Sensitive, Backwards, or Regexp search toggle. */
+=======
+    else if (i == 1)	/* Toggled something. */
+>>>>>>> origin/tomato-shibby-RT-AC
 	do_search();
-#endif
 
     if (i != 0)
 	return;
@@ -525,7 +705,10 @@ void do_search(void)
     search_replace_abort();
 }
 
+<<<<<<< HEAD
 #ifndef NANO_TINY
+=======
+>>>>>>> origin/tomato-shibby-RT-AC
 /* Search for the last string without prompting. */
 void do_research(void)
 {
@@ -536,6 +719,7 @@ void do_research(void)
 
     search_init_globals();
 
+<<<<<<< HEAD
     if (last_search[0] != '\0') {
 #ifdef HAVE_REGEX_H
 	/* Since answer is "", use last_search! */
@@ -550,6 +734,32 @@ void do_research(void)
 #endif
 		FALSE, openfile->current, openfile->current_x,
 		last_search, NULL);
+=======
+    if (ISSET(USE_REGEXP) && !regexp_init(last_search))
+	return;
+
+    /* Use the search-menu key bindings, to allow cancelling. */
+    currmenu = MWHEREIS;
+
+    go_looking();
+}
+
+/* Search for the global string 'last_search'.  Inform the user when
+ * the string occurs only once. */
+void go_looking(void)
+{
+    filestruct *was_current = openfile->current;
+    size_t was_current_x = openfile->current_x;
+    int didfind;
+#ifdef DEBUG
+    clock_t start = clock();
+#endif
+
+    came_full_circle = FALSE;
+
+    didfind = findnextstr(last_search, FALSE, FALSE, NULL, FALSE,
+				openfile->current, openfile->current_x);
+>>>>>>> origin/tomato-shibby-RT-AC
 
 	/* Check to see if there's only one occurrence of the string and
 	 * we're on it now. */
@@ -582,13 +792,27 @@ void do_research(void)
     } else
         statusbar(_("No current search pattern"));
 
+<<<<<<< HEAD
     openfile->placewewant = xplustabs();
     edit_redraw(fileptr, pww_save);
+=======
+#ifdef DEBUG
+    statusline(HUSH, "Took: %.2f", (double)(clock() - start) / CLOCKS_PER_SEC);
+#endif
+
+    edit_redraw(was_current);
+>>>>>>> origin/tomato-shibby-RT-AC
     search_replace_abort();
 }
 #endif
 
+<<<<<<< HEAD
 #ifdef HAVE_REGEX_H
+=======
+/* Calculate the size of the replacement text, taking possible
+ * subexpressions \1 to \9 into account.  Return the replacement
+ * text in the passed string only when create is TRUE. */
+>>>>>>> origin/tomato-shibby-RT-AC
 int replace_regexp(char *string, bool create)
 {
     /* We have a split personality here.  If create is FALSE, just
@@ -625,7 +849,7 @@ int replace_regexp(char *string, bool create)
 	     * subexpression match to the new line. */
 	    if (create) {
 		strncpy(string, openfile->current->data +
-			openfile->current_x + regmatches[num].rm_so, i);
+					regmatches[num].rm_so, i);
 		string += i;
 	    }
 	}
@@ -636,26 +860,37 @@ int replace_regexp(char *string, bool create)
 
     return new_line_size;
 }
+<<<<<<< HEAD
 #endif
+=======
+>>>>>>> origin/tomato-shibby-RT-AC
 
 char *replace_line(const char *needle)
 {
     char *copy;
     size_t new_line_size, search_match_count;
 
+<<<<<<< HEAD
     /* Calculate the size of the new line. */
 #ifdef HAVE_REGEX_H
+=======
+    /* First adjust the size of the new line for the change. */
+>>>>>>> origin/tomato-shibby-RT-AC
     if (ISSET(USE_REGEXP)) {
 	search_match_count = regmatches[0].rm_eo - regmatches[0].rm_so;
 	new_line_size = replace_regexp(NULL, FALSE);
     } else {
+<<<<<<< HEAD
 #endif
 	search_match_count = strlen(needle);
 	new_line_size = strlen(openfile->current->data) -
 		search_match_count + strlen(answer) + 1;
 #ifdef HAVE_REGEX_H
+=======
+	match_len = strlen(needle);
+	new_line_size += strlen(answer) - match_len;
+>>>>>>> origin/tomato-shibby-RT-AC
     }
-#endif
 
     /* Create the buffer. */
     copy = charalloc(new_line_size);
@@ -663,12 +898,15 @@ char *replace_line(const char *needle)
     /* The head of the original line. */
     strncpy(copy, openfile->current->data, openfile->current_x);
 
+<<<<<<< HEAD
     /* The replacement text. */
 #ifdef HAVE_REGEX_H
+=======
+    /* Add the replacement text. */
+>>>>>>> origin/tomato-shibby-RT-AC
     if (ISSET(USE_REGEXP))
 	replace_regexp(copy + openfile->current_x, TRUE);
     else
-#endif
 	strcpy(copy + openfile->current_x, answer);
 
     /* The tail of the original line. */
@@ -680,9 +918,11 @@ char *replace_line(const char *needle)
     return copy;
 }
 
-/* Step through each replace word and prompt user before replacing.
- * Parameters real_current and real_current_x are needed in order to
+/* Step through each occurrence of the search string and prompt the user
+ * before replacing it.  We seek for needle, and replace it with answer.
+ * The parameters real_current and real_current_x are needed in order to
  * allow the cursor position to be updated when a word before the cursor
+<<<<<<< HEAD
  * is replaced by a shorter word.
  *
  * needle is the string to seek.  We replace it with answer.  Return -1
@@ -694,10 +934,17 @@ ssize_t do_replace_loop(
 #endif
 	bool *canceled, const filestruct *real_current, size_t
 	*real_current_x, const char *needle)
+=======
+ * is replaced by a shorter word.  Return -1 if needle isn't found, -2 if
+ * the seeking is aborted, else the number of replacements performed. */
+ssize_t do_replace_loop(const char *needle, bool whole_word_only,
+	const filestruct *real_current, size_t *real_current_x)
+>>>>>>> origin/tomato-shibby-RT-AC
 {
     ssize_t numreplaced = -1;
     size_t match_len;
     bool replaceall = FALSE;
+<<<<<<< HEAD
 #ifdef HAVE_REGEX_H
     /* The starting-line match and bol/eol regex flags. */
     bool begin_line = FALSE, bol_or_eol = FALSE;
@@ -705,30 +952,56 @@ ssize_t do_replace_loop(
 #ifndef NANO_TINY
     bool old_mark_set = openfile->mark_set;
     filestruct *edittop_save = openfile->edittop, *top, *bot;
+=======
+    bool skipone = FALSE;
+    bool mark_was_set = FALSE;
+#ifndef NANO_TINY
+    filestruct *top, *bot;
+>>>>>>> origin/tomato-shibby-RT-AC
     size_t top_x, bot_x;
     bool right_side_up = FALSE;
 	/* TRUE if (mark_begin, mark_begin_x) is the top of the mark,
 	 * FALSE if (current, current_x) is. */
 
+<<<<<<< HEAD
     if (old_mark_set) {
 	/* If the mark is on, partition the filestruct so that it
 	 * contains only the marked text, set edittop to the top of the
 	 * partition, turn the mark off, and refresh the screen. */
+=======
+    mark_was_set = openfile->mark_set;
+
+    /* If the mark is on, frame the region, and turn the mark off. */
+    if (mark_was_set) {
+>>>>>>> origin/tomato-shibby-RT-AC
 	mark_order((const filestruct **)&top, &top_x,
 	    (const filestruct **)&bot, &bot_x, &right_side_up);
 	filepart = partition_filestruct(top, top_x, bot, bot_x);
 	openfile->edittop = openfile->fileage;
 	openfile->mark_set = FALSE;
+<<<<<<< HEAD
 #ifdef ENABLE_COLOR
 	reset_multis(openfile->current, TRUE);
 #endif
 	edit_refresh();
+=======
+
+	/* Start either at the top or the bottom of the marked region. */
+	if (!ISSET(BACKWARDS_SEARCH)) {
+	    openfile->current = top;
+	    openfile->current_x = top_x;
+	} else {
+	    openfile->current = bot;
+	    openfile->current_x = bot_x;
+	}
+>>>>>>> origin/tomato-shibby-RT-AC
     }
 #endif
 
     if (canceled != NULL)
 	*canceled = FALSE;
 
+<<<<<<< HEAD
     findnextstr_wrap_reset();
     while (findnextstr(
 #ifndef DISABLE_SPELLER
@@ -745,6 +1018,12 @@ ssize_t do_replace_loop(
 #endif
 	, real_current, *real_current_x, needle, &match_len)) {
 	int i = 0;
+=======
+    while (TRUE) {
+	int i = 0;
+	int result = findnextstr(needle, whole_word_only, mark_was_set,
+			&match_len, skipone, real_current, *real_current_x);
+>>>>>>> origin/tomato-shibby-RT-AC
 
 #ifdef HAVE_REGEX_H
 	/* If the bol_or_eol flag is set, we've found a match on the
@@ -754,6 +1033,7 @@ ssize_t do_replace_loop(
 	if (bol_or_eol && begin_line && openfile->current ==
 		real_current)
 	    break;
+<<<<<<< HEAD
 	/* Otherwise, set the begin_line flag if we've found a match on
 	 * the beginning line, reset the bol_or_eol flag, and
 	 * continue. */
@@ -762,6 +1042,19 @@ ssize_t do_replace_loop(
 		begin_line = TRUE;
 	    bol_or_eol = FALSE;
 	}
+=======
+	}
+
+#ifndef NANO_TINY
+	/* An occurrence outside of the marked region means we're done. */
+	if (mark_was_set && (openfile->current->lineno > bot->lineno ||
+				openfile->current->lineno < top->lineno ||
+				(openfile->current == bot &&
+				openfile->current_x + match_len > bot_x) ||
+				(openfile->current == top &&
+				openfile->current_x < top_x)))
+	    break;
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif
 
 	if (!replaceall)
@@ -793,6 +1086,7 @@ ssize_t do_replace_loop(
 		if (canceled != NULL)
 		    *canceled = TRUE;
 		break;
+<<<<<<< HEAD
 	    }
 	}
 
@@ -805,25 +1099,39 @@ ssize_t do_replace_loop(
 #endif
 
 	if (i > 0 || replaceall) {	/* Yes, replace it!!!! */
+=======
+	    else if (i == 2)
+		replaceall = TRUE;
+
+	    /* When "No" or moving backwards, the search routine should
+	     * first move one character further before continuing. */
+	    skipone = (i == 0 || ISSET(BACKWARDS_SEARCH));
+	}
+
+	if (i == 1 || replaceall) {  /* Yes, replace it. */
+>>>>>>> origin/tomato-shibby-RT-AC
 	    char *copy;
 	    size_t length_change;
 
 #ifndef NANO_TINY
 	    update_undo(REPLACE);
 #endif
-	    if (i == 2)
-		replaceall = TRUE;
-
 	    copy = replace_line(needle);
 
 	    length_change = strlen(copy) -
 		strlen(openfile->current->data);
 
 #ifndef NANO_TINY
+<<<<<<< HEAD
 	    /* If the mark was on and (mark_begin, mark_begin_x) was the
 	     * top of it, don't change mark_begin_x. */
 	    if (!old_mark_set || !right_side_up) {
 		/* Keep mark_begin_x in sync with the text changes. */
+=======
+	    /* If the mark was on and it was located after the cursor,
+	     * then adjust its x position for any text length changes. */
+	    if (mark_was_set && !right_side_up) {
+>>>>>>> origin/tomato-shibby-RT-AC
 		if (openfile->current == openfile->mark_begin &&
 			openfile->mark_begin_x > openfile->current_x) {
 		    if (openfile->mark_begin_x < openfile->current_x +
@@ -834,31 +1142,46 @@ ssize_t do_replace_loop(
 		}
 	    }
 
+<<<<<<< HEAD
 	    /* If the mark was on and (current, current_x) was the top
 	     * of it, don't change real_current_x. */
 	    if (!old_mark_set || right_side_up) {
+=======
+	    /* If the mark was not on or it was before the cursor, then
+	     * adjust the cursor's x position for any text length changes. */
+	    if (!mark_was_set || right_side_up) {
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif
 		/* Keep real_current_x in sync with the text changes. */
 		if (openfile->current == real_current &&
+<<<<<<< HEAD
 			openfile->current_x <= *real_current_x) {
 		    if (*real_current_x <
 			openfile->current_x + match_len)
 			*real_current_x = openfile->current_x +
 				match_len;
+=======
+			openfile->current_x < *real_current_x) {
+		    if (*real_current_x < openfile->current_x + match_len)
+			*real_current_x = openfile->current_x + match_len;
+>>>>>>> origin/tomato-shibby-RT-AC
 		    *real_current_x += length_change;
 		}
 #ifndef NANO_TINY
 	    }
+<<<<<<< HEAD
 #endif
+=======
 
-	    /* Set the cursor at the last character of the replacement
-	     * text, so searching will resume after the replacement
-	     * text.  Note that current_x might be set to (size_t)-1
-	     * here. */
-#ifndef NANO_TINY
+	    /* Don't find the same zero-length or BOL match again. */
+	    if (match_len == 0 || (*needle == '^' && ISSET(USE_REGEXP)))
+		skipone = TRUE;
+>>>>>>> origin/tomato-shibby-RT-AC
+
+	    /* When moving forward, put the cursor just after the replacement
+	     * text, so that searching will continue there. */
 	    if (!ISSET(BACKWARDS_SEARCH))
-#endif
-		openfile->current_x += match_len + length_change - 1;
+		openfile->current_x += match_len + length_change;
 
 	    /* Cleanup. */
 	    openfile->totsize += mbstrlen(copy) -
@@ -866,6 +1189,7 @@ ssize_t do_replace_loop(
 	    free(openfile->current->data);
 	    openfile->current->data = copy;
 
+<<<<<<< HEAD
 #ifdef ENABLE_COLOR
 	reset_multis(openfile->current, TRUE);
 #endif
@@ -876,6 +1200,13 @@ ssize_t do_replace_loop(
 		 * need to call edit_refresh(). */
 		if (openfile->colorstrings != NULL &&
 			!ISSET(NO_COLOR_SYNTAX))
+=======
+	    if (!replaceall) {
+#ifndef DISABLE_COLOR
+		/* When doing syntax coloring, the replacement might require
+		 * a change of colors, so refresh the whole edit window. */
+		if (openfile->colorstrings != NULL && !ISSET(NO_COLOR_SYNTAX))
+>>>>>>> origin/tomato-shibby-RT-AC
 		    edit_refresh();
 		else
 #endif
@@ -883,10 +1214,12 @@ ssize_t do_replace_loop(
 	    }
 
 	    set_modified();
+	    as_an_at = TRUE;
 	    numreplaced++;
 	}
     }
 
+<<<<<<< HEAD
 #ifndef NANO_TINY
     if (old_mark_set) {
 	/* If the mark was on, unpartition the filestruct so that it
@@ -894,6 +1227,17 @@ ssize_t do_replace_loop(
 	 * before, turn the mark back on, and refresh the screen. */
 	unpartition_filestruct(&filepart);
 	openfile->edittop = edittop_save;
+=======
+    if (numreplaced == -1)
+	not_found_msg(needle);
+#ifndef DISABLE_COLOR
+    else if (numreplaced > 0)
+	refresh_needed = TRUE;
+#endif
+
+#ifndef NANO_TINY
+    if (mark_was_set)
+>>>>>>> origin/tomato-shibby-RT-AC
 	openfile->mark_set = TRUE;
 	edit_refresh();
     }
@@ -911,14 +1255,17 @@ ssize_t do_replace_loop(
 void do_replace(void)
 {
     filestruct *edittop_save, *begin;
+<<<<<<< HEAD
     size_t begin_x, pww_save;
     bool meta_key = FALSE, func_key = FALSE;
+=======
+    size_t firstcolumn_save, begin_x;
+>>>>>>> origin/tomato-shibby-RT-AC
     ssize_t numreplaced;
     int i;
 
     if (ISSET(VIEW_MODE)) {
 	print_view_warning();
-	search_replace_abort();
 	return;
     }
 
@@ -939,6 +1286,7 @@ void do_replace(void)
     if (i != 0)
 	return;
 
+<<<<<<< HEAD
     /* If answer is not "", add answer to the search history list and
      * copy answer into last_search. */
     if (answer[0] != '\0') {
@@ -960,6 +1308,14 @@ void do_replace(void)
 	&replace_history,
 #endif
 	edit_refresh, _("Replace with"));
+=======
+    i = do_prompt(FALSE, FALSE, MREPLACEWITH, NULL,
+#ifndef DISABLE_HISTORIES
+		&replace_history,
+#endif
+		/* TRANSLATORS: This is a prompt. */
+		edit_refresh, _("Replace with"));
+>>>>>>> origin/tomato-shibby-RT-AC
 
 #ifndef NANO_TINY
     /* Add this replace string to the replace history list.  i == 0
@@ -982,23 +1338,33 @@ void do_replace(void)
 
     /* Save where we are. */
     edittop_save = openfile->edittop;
+    firstcolumn_save = openfile->firstcolumn;
     begin = openfile->current;
     begin_x = openfile->current_x;
     pww_save = openfile->placewewant;
 
+<<<<<<< HEAD
     numreplaced = do_replace_loop(
 #ifndef DISABLE_SPELLER
 	FALSE,
 #endif
 	NULL, begin, &begin_x, last_search);
+=======
+    numreplaced = do_replace_loop(last_search, FALSE, begin, &begin_x);
+>>>>>>> origin/tomato-shibby-RT-AC
 
     /* Restore where we were. */
     openfile->edittop = edittop_save;
+    openfile->firstcolumn = firstcolumn_save;
     openfile->current = begin;
     openfile->current_x = begin_x;
+<<<<<<< HEAD
     openfile->placewewant = pww_save;
 
     edit_refresh();
+=======
+    refresh_needed = TRUE;
+>>>>>>> origin/tomato-shibby-RT-AC
 
     if (numreplaced >= 0)
 	statusbar(P_("Replaced %lu occurrence",
@@ -1022,6 +1388,7 @@ void do_gotolinecolumn(ssize_t line, ssize_t column, bool use_answer,
 	char *ans = mallocstrcpy(NULL, answer);
 
 	/* Ask for the line and column. */
+<<<<<<< HEAD
 	int i = do_prompt(FALSE,
 #ifndef DISABLE_TABCOMP
 		TRUE,
@@ -1029,6 +1396,11 @@ void do_gotolinecolumn(ssize_t line, ssize_t column, bool use_answer,
 		MGOTOLINE, use_answer ? ans : "",
 		&meta_key, &func_key,
 #ifndef NANO_TINY
+=======
+	int i = do_prompt(FALSE, FALSE, MGOTOLINE,
+		use_answer ? answer : NULL,
+#ifndef DISABLE_HISTORIES
+>>>>>>> origin/tomato-shibby-RT-AC
 		NULL,
 #endif
 		edit_refresh, _("Enter line number, column number"));
@@ -1052,6 +1424,7 @@ void do_gotolinecolumn(ssize_t line, ssize_t column, bool use_answer,
 	    return;
 	}
 
+<<<<<<< HEAD
 	/* Do a bounds check.  Display a warning on an out-of-bounds
 	 * line or column number only if we hit Enter at the statusbar
 	 * prompt. */
@@ -1060,6 +1433,11 @@ void do_gotolinecolumn(ssize_t line, ssize_t column, bool use_answer,
 	    if (i == 0)
 		statusbar(_("Invalid line or column number"));
 	    display_main_list();
+=======
+	/* Try to extract one or two numbers from the user's response. */
+	if (!parse_line_column(answer, &line, &column)) {
+	    statusline(ALERT, _("Invalid line or column number"));
+>>>>>>> origin/tomato-shibby-RT-AC
 	    return;
 	}
     } else {
@@ -1077,6 +1455,7 @@ void do_gotolinecolumn(ssize_t line, ssize_t column, bool use_answer,
     openfile->current_x = actual_x(openfile->current->data, column - 1);
     openfile->placewewant = column - 1;
 
+<<<<<<< HEAD
     /* Put the top line of the edit window in range of the current line.
      * If save_pos is TRUE, don't change the cursor position when doing
      * it. */
@@ -1087,6 +1466,36 @@ void do_gotolinecolumn(ssize_t line, ssize_t column, bool use_answer,
 	edit_refresh();
 
     display_main_list();
+=======
+    /* When the position was manually given, center the target line. */
+    if (interactive) {
+	adjust_viewport(CENTERING);
+	refresh_needed = TRUE;
+    } else {
+	int rows_from_tail;
+
+#ifndef NANO_TINY
+	if (ISSET(SOFTWRAP)) {
+	    filestruct *line = openfile->current;
+	    size_t leftedge = (xplustabs() / editwincols) * editwincols;
+
+	    rows_from_tail = (editwinrows / 2) -
+			go_forward_chunks(editwinrows / 2, &line, &leftedge);
+	} else
+#endif
+	    rows_from_tail = openfile->filebot->lineno -
+				openfile->current->lineno;
+
+	/* If the target line is close to the tail of the file, put the last
+	 * line or chunk on the bottom line of the screen; otherwise, just
+	 * center the target line. */
+	if (rows_from_tail < editwinrows / 2) {
+	    openfile->current_y = editwinrows - 1 - rows_from_tail;
+	    adjust_viewport(STATIONARY);
+	} else
+	    adjust_viewport(CENTERING);
+    }
+>>>>>>> origin/tomato-shibby-RT-AC
 }
 
 /* Go to the specified line and column, asking for them beforehand. */
@@ -1167,8 +1576,11 @@ bool find_bracket_match(bool reverse, const char *bracket_set)
     /* We've definitely found something. */
     openfile->current = fileptr;
     openfile->current_x = found - fileptr->data;
+<<<<<<< HEAD
     openfile->placewewant = xplustabs();
     openfile->current_y = current_y_find;
+=======
+>>>>>>> origin/tomato-shibby-RT-AC
 
     return TRUE;
 }
@@ -1257,7 +1669,7 @@ void do_find_bracket(void)
     bracket_set = charalloc((mb_cur_max() * 2) + 1);
     strncpy(bracket_set, ch, ch_len);
     strncpy(bracket_set + ch_len, wanted_ch, wanted_ch_len);
-    null_at(&bracket_set, ch_len + wanted_ch_len);
+    bracket_set[ch_len + wanted_ch_len] = '\0';
 
     found_ch = charalloc(mb_cur_max() + 1);
 
@@ -1380,11 +1792,15 @@ void update_history(filestruct **h, const char *s)
      * for the new entry at the end.  We assume that MAX_SEARCH_HISTORY
      * is greater than zero. */
     if ((*hbot)->lineno == MAX_SEARCH_HISTORY + 1) {
-	filestruct *foo = *hage;
+	filestruct *oldest = *hage;
 
 	*hage = (*hage)->next;
+<<<<<<< HEAD
 	unlink_node(foo);
 	delete_node(foo);
+=======
+	unlink_node(oldest);
+>>>>>>> origin/tomato-shibby-RT-AC
 	renumber(*hage);
     }
 

@@ -53,7 +53,7 @@
 #include "parsedate.h"
 #include "connect.h" /* for the connect timeout */
 #include "select.h"
-#include "rawstr.h"
+#include "strcase.h"
 #include "polarssl_threadlock.h"
 
 #define _MPRINTF_REPLACE /* use our functions only */
@@ -66,6 +66,11 @@
 #if defined(USE_THREADS_POSIX) || defined(USE_THREADS_WIN32)
 #define THREADING_SUPPORT
 #endif
+
+#ifndef POLARSSL_ERROR_C
+#define error_strerror(x,y,z)
+#endif /* POLARSSL_ERROR_C */
+
 
 #if defined(THREADING_SUPPORT)
 static entropy_context entropy;
@@ -88,13 +93,21 @@ static void entropy_init_mutex(entropy_context *ctx)
 /* start of entropy_func_mutex() */
 static int entropy_func_mutex(void *data, unsigned char *output, size_t len)
 {
+<<<<<<< HEAD
     int ret;
     /* lock 1 = entropy_func_mutex() */
     polarsslthreadlock_lock_function(1);
     ret = entropy_func(data, output, len);
     polarsslthreadlock_unlock_function(1);
+=======
+  int ret;
+  /* lock 1 = entropy_func_mutex() */
+  Curl_polarsslthreadlock_lock_function(1);
+  ret = entropy_func(data, output, len);
+  Curl_polarsslthreadlock_unlock_function(1);
+>>>>>>> origin/tomato-shibby-RT-AC
 
-    return ret;
+  return ret;
 }
 /* end of entropy_func_mutex() */
 
@@ -106,12 +119,12 @@ static int entropy_func_mutex(void *data, unsigned char *output, size_t len)
 #ifdef POLARSSL_DEBUG
 static void polarssl_debug(void *context, int level, const char *line)
 {
-  struct SessionHandle *data = NULL;
+  struct Curl_easy *data = NULL;
 
   if(!context)
     return;
 
-  data = (struct SessionHandle *)context;
+  data = (struct Curl_easy *)context;
 
   infof(data, "%s", line);
   (void) level;
@@ -125,13 +138,16 @@ static Curl_send polarssl_send;
 
 static CURLcode
 polarssl_connect_step1(struct connectdata *conn,
-                     int sockindex)
+                       int sockindex)
 {
-  struct SessionHandle *data = conn->data;
+  struct Curl_easy *data = conn->data;
   struct ssl_connect_data* connssl = &conn->ssl[sockindex];
-
-  bool sni = TRUE; /* default is SNI enabled */
+  const char *capath = SSL_CONN_CONFIG(CApath);
+  const char * const hostname = SSL_IS_PROXY() ? conn->http_proxy.host.name :
+    conn->host.name;
+  const long int port = SSL_IS_PROXY() ? conn->port : conn->remote_port;
   int ret = -1;
+<<<<<<< HEAD
 #ifdef ENABLE_IPV6
   struct in6_addr addr;
 #else
@@ -140,85 +156,111 @@ polarssl_connect_step1(struct connectdata *conn,
   void *old_session = NULL;
   size_t old_session_size = 0;
 
+=======
+>>>>>>> origin/tomato-shibby-RT-AC
   char errorbuf[128];
   memset(errorbuf, 0, sizeof(errorbuf));
 
 
   /* PolarSSL only supports SSLv3 and TLSv1 */
-  if(data->set.ssl.version == CURL_SSLVERSION_SSLv2) {
+  if(SSL_CONN_CONFIG(version) == CURL_SSLVERSION_SSLv2) {
     failf(data, "PolarSSL does not support SSLv2");
     return CURLE_SSL_CONNECT_ERROR;
   }
-  else if(data->set.ssl.version == CURL_SSLVERSION_SSLv3)
-    sni = FALSE; /* SSLv3 has no SNI */
 
 #ifdef THREADING_SUPPORT
   entropy_init_mutex(&entropy);
 
   if((ret = ctr_drbg_init(&connssl->ctr_drbg, entropy_func_mutex, &entropy,
+<<<<<<< HEAD
                                connssl->ssn.id, connssl->ssn.length)) != 0) {
 #ifdef POLARSSL_ERROR_C
      error_strerror(ret, errorbuf, sizeof(errorbuf));
 #endif /* POLARSSL_ERROR_C */
      failf(data, "Failed - PolarSSL: ctr_drbg_init returned (-0x%04X) %s\n",
                                                             -ret, errorbuf);
+=======
+                          NULL, 0)) != 0) {
+    error_strerror(ret, errorbuf, sizeof(errorbuf));
+    failf(data, "Failed - PolarSSL: ctr_drbg_init returned (-0x%04X) %s\n",
+          -ret, errorbuf);
+>>>>>>> origin/tomato-shibby-RT-AC
   }
 #else
   entropy_init(&connssl->entropy);
 
   if((ret = ctr_drbg_init(&connssl->ctr_drbg, entropy_func, &connssl->entropy,
+<<<<<<< HEAD
                                 connssl->ssn.id, connssl->ssn.length)) != 0) {
 #ifdef POLARSSL_ERROR_C
      error_strerror(ret, errorbuf, sizeof(errorbuf));
 #endif /* POLARSSL_ERROR_C */
      failf(data, "Failed - PolarSSL: ctr_drbg_init returned (-0x%04X) %s\n",
                                                             -ret, errorbuf);
+=======
+                          NULL, 0)) != 0) {
+    error_strerror(ret, errorbuf, sizeof(errorbuf));
+    failf(data, "Failed - PolarSSL: ctr_drbg_init returned (-0x%04X) %s\n",
+          -ret, errorbuf);
+>>>>>>> origin/tomato-shibby-RT-AC
   }
 #endif /* THREADING_SUPPORT */
 
   /* Load the trusted CA */
   memset(&connssl->cacert, 0, sizeof(x509_crt));
 
-  if(data->set.str[STRING_SSL_CAFILE]) {
+  if(SSL_CONN_CONFIG(CAfile)) {
     ret = x509_crt_parse_file(&connssl->cacert,
-                              data->set.str[STRING_SSL_CAFILE]);
+                              SSL_CONN_CONFIG(CAfile));
 
     if(ret<0) {
-#ifdef POLARSSL_ERROR_C
       error_strerror(ret, errorbuf, sizeof(errorbuf));
-#endif /* POLARSSL_ERROR_C */
       failf(data, "Error reading ca cert file %s - PolarSSL: (-0x%04X) %s",
-            data->set.str[STRING_SSL_CAFILE], -ret, errorbuf);
+            SSL_CONN_CONFIG(CAfile), -ret, errorbuf);
 
-      if(data->set.ssl.verifypeer)
+      if(SSL_CONN_CONFIG(verifypeer))
         return CURLE_SSL_CACERT_BADFILE;
     }
   }
 
+<<<<<<< HEAD
+=======
+  if(capath) {
+    ret = x509_crt_parse_path(&connssl->cacert, capath);
+
+    if(ret<0) {
+      error_strerror(ret, errorbuf, sizeof(errorbuf));
+      failf(data, "Error reading ca cert path %s - PolarSSL: (-0x%04X) %s",
+            capath, -ret, errorbuf);
+
+      if(SSL_CONN_CONFIG(verifypeer))
+        return CURLE_SSL_CACERT_BADFILE;
+    }
+  }
+
+>>>>>>> origin/tomato-shibby-RT-AC
   /* Load the client certificate */
   memset(&connssl->clicert, 0, sizeof(x509_crt));
 
-  if(data->set.str[STRING_CERT]) {
+  if(SSL_SET_OPTION(cert)) {
     ret = x509_crt_parse_file(&connssl->clicert,
-                              data->set.str[STRING_CERT]);
+                              SSL_SET_OPTION(cert));
 
     if(ret) {
-#ifdef POLARSSL_ERROR_C
       error_strerror(ret, errorbuf, sizeof(errorbuf));
-#endif /* POLARSSL_ERROR_C */
       failf(data, "Error reading client cert file %s - PolarSSL: (-0x%04X) %s",
-            data->set.str[STRING_CERT], -ret, errorbuf);
+            SSL_SET_OPTION(cert), -ret, errorbuf);
 
       return CURLE_SSL_CERTPROBLEM;
     }
   }
 
   /* Load the client private key */
-  if(data->set.str[STRING_KEY]) {
+  if(SSL_SET_OPTION(key)) {
     pk_context pk;
     pk_init(&pk);
-    ret = pk_parse_keyfile(&pk, data->set.str[STRING_KEY],
-                           data->set.str[STRING_KEY_PASSWD]);
+    ret = pk_parse_keyfile(&pk, SSL_SET_OPTION(key),
+                           SSL_SET_OPTION(key_passwd));
     if(ret == 0 && !pk_can_do(&pk, POLARSSL_PK_RSA))
       ret = POLARSSL_ERR_PK_TYPE_MISMATCH;
     if(ret == 0)
@@ -228,11 +270,9 @@ polarssl_connect_step1(struct connectdata *conn,
     pk_free(&pk);
 
     if(ret) {
-#ifdef POLARSSL_ERROR_C
       error_strerror(ret, errorbuf, sizeof(errorbuf));
-#endif /* POLARSSL_ERROR_C */
       failf(data, "Error reading private key %s - PolarSSL: (-0x%04X) %s",
-            data->set.str[STRING_KEY], -ret, errorbuf);
+            SSL_SET_OPTION(key), -ret, errorbuf);
 
       return CURLE_SSL_CERTPROBLEM;
     }
@@ -241,29 +281,71 @@ polarssl_connect_step1(struct connectdata *conn,
   /* Load the CRL */
   memset(&connssl->crl, 0, sizeof(x509_crl));
 
-  if(data->set.str[STRING_SSL_CRLFILE]) {
+  if(SSL_SET_OPTION(CRLfile)) {
     ret = x509_crl_parse_file(&connssl->crl,
-                              data->set.str[STRING_SSL_CRLFILE]);
+                              SSL_SET_OPTION(CRLfile));
 
     if(ret) {
-#ifdef POLARSSL_ERROR_C
       error_strerror(ret, errorbuf, sizeof(errorbuf));
-#endif /* POLARSSL_ERROR_C */
       failf(data, "Error reading CRL file %s - PolarSSL: (-0x%04X) %s",
-            data->set.str[STRING_SSL_CRLFILE], -ret, errorbuf);
+            SSL_SET_OPTION(CRLfile), -ret, errorbuf);
 
       return CURLE_SSL_CRL_BADFILE;
     }
   }
 
-  infof(data, "PolarSSL: Connecting to %s:%d\n",
-        conn->host.name, conn->remote_port);
+  infof(data, "PolarSSL: Connecting to %s:%d\n", hostname, port);
 
   if(ssl_init(&connssl->ssl)) {
     failf(data, "PolarSSL: ssl_init failed");
     return CURLE_SSL_CONNECT_ERROR;
   }
 
+<<<<<<< HEAD
+=======
+  switch(SSL_CONN_CONFIG(version)) {
+  case CURL_SSLVERSION_DEFAULT:
+  case CURL_SSLVERSION_TLSv1:
+    ssl_set_min_version(&connssl->ssl, SSL_MAJOR_VERSION_3,
+                        SSL_MINOR_VERSION_1);
+    break;
+  case CURL_SSLVERSION_SSLv3:
+    ssl_set_min_version(&connssl->ssl, SSL_MAJOR_VERSION_3,
+                        SSL_MINOR_VERSION_0);
+    ssl_set_max_version(&connssl->ssl, SSL_MAJOR_VERSION_3,
+                        SSL_MINOR_VERSION_0);
+    infof(data, "PolarSSL: Forced min. SSL Version to be SSLv3\n");
+    break;
+  case CURL_SSLVERSION_TLSv1_0:
+    ssl_set_min_version(&connssl->ssl, SSL_MAJOR_VERSION_3,
+                        SSL_MINOR_VERSION_1);
+    ssl_set_max_version(&connssl->ssl, SSL_MAJOR_VERSION_3,
+                        SSL_MINOR_VERSION_1);
+    infof(data, "PolarSSL: Forced min. SSL Version to be TLS 1.0\n");
+    break;
+  case CURL_SSLVERSION_TLSv1_1:
+    ssl_set_min_version(&connssl->ssl, SSL_MAJOR_VERSION_3,
+                        SSL_MINOR_VERSION_2);
+    ssl_set_max_version(&connssl->ssl, SSL_MAJOR_VERSION_3,
+                        SSL_MINOR_VERSION_2);
+    infof(data, "PolarSSL: Forced min. SSL Version to be TLS 1.1\n");
+    break;
+  case CURL_SSLVERSION_TLSv1_2:
+    ssl_set_min_version(&connssl->ssl, SSL_MAJOR_VERSION_3,
+                        SSL_MINOR_VERSION_3);
+    ssl_set_max_version(&connssl->ssl, SSL_MAJOR_VERSION_3,
+                        SSL_MINOR_VERSION_3);
+    infof(data, "PolarSSL: Forced min. SSL Version to be TLS 1.2\n");
+    break;
+  case CURL_SSLVERSION_TLSv1_3:
+    failf(data, "PolarSSL: TLS 1.3 is not yet supported");
+    return CURLE_SSL_CONNECT_ERROR;
+  default:
+    failf(data, "Unrecognized parameter passed via CURLOPT_SSLVERSION");
+    return CURLE_SSL_CONNECT_ERROR;
+  }
+
+>>>>>>> origin/tomato-shibby-RT-AC
   ssl_set_endpoint(&connssl->ssl, SSL_IS_CLIENT);
   ssl_set_authmode(&connssl->ssl, SSL_VERIFY_OPTIONAL);
 
@@ -274,9 +356,28 @@ polarssl_connect_step1(struct connectdata *conn,
               net_send, &conn->sock[sockindex]);
 
   ssl_set_ciphersuites(&connssl->ssl, ssl_list_ciphersuites());
+<<<<<<< HEAD
   if(!Curl_ssl_getsessionid(conn, &old_session, &old_session_size)) {
     memcpy(&connssl->ssn, old_session, old_session_size);
     infof(data, "PolarSSL re-using session\n");
+=======
+
+  /* Check if there's a cached ID we can/should use here! */
+  if(data->set.general_ssl.sessionid) {
+    void *old_session = NULL;
+
+    Curl_ssl_sessionid_lock(conn);
+    if(!Curl_ssl_getsessionid(conn, &old_session, NULL, sockindex)) {
+      ret = ssl_set_session(&connssl->ssl, old_session);
+      if(ret) {
+        Curl_ssl_sessionid_unlock(conn);
+        failf(data, "ssl_set_session returned -0x%x", -ret);
+        return CURLE_SSL_CONNECT_ERROR;
+      }
+      infof(data, "PolarSSL re-using session\n");
+    }
+    Curl_ssl_sessionid_unlock(conn);
+>>>>>>> origin/tomato-shibby-RT-AC
   }
 
   ssl_set_session(&connssl->ssl,
@@ -285,14 +386,35 @@ polarssl_connect_step1(struct connectdata *conn,
   ssl_set_ca_chain(&connssl->ssl,
                    &connssl->cacert,
                    &connssl->crl,
-                   conn->host.name);
+                   hostname);
 
   ssl_set_own_cert_rsa(&connssl->ssl,
                        &connssl->clicert, &connssl->rsa);
 
+<<<<<<< HEAD
   if(!Curl_inet_pton(AF_INET, conn->host.name, &addr) &&
 #ifdef ENABLE_IPV6
      !Curl_inet_pton(AF_INET6, conn->host.name, &addr) &&
+=======
+  if(ssl_set_hostname(&connssl->ssl, hostname)) {
+    /* ssl_set_hostname() sets the name to use in CN/SAN checks *and* the name
+       to set in the SNI extension. So even if curl connects to a host
+       specified as an IP address, this function must be used. */
+    failf(data, "couldn't set hostname in PolarSSL");
+    return CURLE_SSL_CONNECT_ERROR;
+  }
+
+#ifdef HAS_ALPN
+  if(conn->bits.tls_enable_alpn) {
+    static const char *protocols[3];
+    int cur = 0;
+
+#ifdef USE_NGHTTP2
+    if(data->set.httpversion >= CURL_HTTP_VERSION_2) {
+      protocols[cur++] = NGHTTP2_PROTO_VERSION_ID;
+      infof(data, "ALPN, offering %s\n", NGHTTP2_PROTO_VERSION_ID);
+    }
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif
      sni && ssl_set_hostname(&connssl->ssl, conn->host.name)) {
      infof(data, "WARNING: failed to configure "
@@ -310,12 +432,16 @@ polarssl_connect_step1(struct connectdata *conn,
 
 static CURLcode
 polarssl_connect_step2(struct connectdata *conn,
-                     int sockindex)
+                       int sockindex)
 {
   int ret;
-  struct SessionHandle *data = conn->data;
+  struct Curl_easy *data = conn->data;
   struct ssl_connect_data* connssl = &conn->ssl[sockindex];
   char buffer[1024];
+  const char * const pinnedpubkey = SSL_IS_PROXY() ?
+            data->set.str[STRING_SSL_PINNEDPUBLICKEY_PROXY] :
+            data->set.str[STRING_SSL_PINNEDPUBLICKEY_ORIG];
+
 
   char errorbuf[128];
   memset(errorbuf, 0, sizeof(errorbuf));
@@ -323,6 +449,7 @@ polarssl_connect_step2(struct connectdata *conn,
   conn->recv[sockindex] = polarssl_recv;
   conn->send[sockindex] = polarssl_send;
 
+<<<<<<< HEAD
   for(;;) {
     if(!(ret = ssl_handshake(&connssl->ssl)))
       break;
@@ -349,6 +476,27 @@ polarssl_connect_step2(struct connectdata *conn,
       return CURLE_SSL_CONNECT_ERROR;
 
     }
+=======
+  ret = ssl_handshake(&connssl->ssl);
+
+  switch(ret) {
+  case 0:
+    break;
+
+  case POLARSSL_ERR_NET_WANT_READ:
+    connssl->connecting_state = ssl_connect_2_reading;
+    return CURLE_OK;
+
+  case POLARSSL_ERR_NET_WANT_WRITE:
+    connssl->connecting_state = ssl_connect_2_writing;
+    return CURLE_OK;
+
+  default:
+    error_strerror(ret, errorbuf, sizeof(errorbuf));
+    failf(data, "ssl_handshake returned - PolarSSL: (-0x%04X) %s",
+          -ret, errorbuf);
+    return CURLE_SSL_CONNECT_ERROR;
+>>>>>>> origin/tomato-shibby-RT-AC
   }
 
   infof(data, "PolarSSL: Handshake complete, cipher is %s\n",
@@ -357,7 +505,7 @@ polarssl_connect_step2(struct connectdata *conn,
 
   ret = ssl_get_verify_result(&conn->ssl[sockindex].ssl);
 
-  if(ret && data->set.ssl.verifypeer) {
+  if(ret && SSL_CONN_CONFIG(verifypeer)) {
     if(ret & BADCERT_EXPIRED)
       failf(data, "Cert verify failed: BADCERT_EXPIRED");
 
@@ -384,6 +532,87 @@ polarssl_connect_step2(struct connectdata *conn,
       infof(data, "Dumping cert info:\n%s\n", buffer);
   }
 
+<<<<<<< HEAD
+=======
+  /* adapted from mbedtls.c */
+  if(pinnedpubkey) {
+    int size;
+    CURLcode result;
+    x509_crt *p;
+    unsigned char pubkey[PUB_DER_MAX_BYTES];
+    const x509_crt *peercert;
+
+    peercert = ssl_get_peer_cert(&connssl->ssl);
+
+    if(!peercert || !peercert->raw.p || !peercert->raw.len) {
+      failf(data, "Failed due to missing peer certificate");
+      return CURLE_SSL_PINNEDPUBKEYNOTMATCH;
+    }
+
+    p = calloc(1, sizeof(*p));
+
+    if(!p)
+      return CURLE_OUT_OF_MEMORY;
+
+    x509_crt_init(p);
+
+    /* Make a copy of our const peercert because pk_write_pubkey_der
+       needs a non-const key, for now.
+       https://github.com/ARMmbed/mbedtls/issues/396 */
+    if(x509_crt_parse_der(p, peercert->raw.p, peercert->raw.len)) {
+      failf(data, "Failed copying peer certificate");
+      x509_crt_free(p);
+      free(p);
+      return CURLE_SSL_PINNEDPUBKEYNOTMATCH;
+    }
+
+    size = pk_write_pubkey_der(&p->pk, pubkey, PUB_DER_MAX_BYTES);
+
+    if(size <= 0) {
+      failf(data, "Failed copying public key from peer certificate");
+      x509_crt_free(p);
+      free(p);
+      return CURLE_SSL_PINNEDPUBKEYNOTMATCH;
+    }
+
+    /* pk_write_pubkey_der writes data at the end of the buffer. */
+    result = Curl_pin_peer_pubkey(data,
+                                  pinnedpubkey,
+                                  &pubkey[PUB_DER_MAX_BYTES - size], size);
+    if(result) {
+      x509_crt_free(p);
+      free(p);
+      return result;
+    }
+
+    x509_crt_free(p);
+    free(p);
+  }
+
+#ifdef HAS_ALPN
+  if(conn->bits.tls_enable_alpn) {
+    const char *next_protocol = ssl_get_alpn_protocol(&connssl->ssl);
+
+    if(next_protocol != NULL) {
+      infof(data, "ALPN, server accepted to use %s\n", next_protocol);
+
+#ifdef USE_NGHTTP2
+      if(!strncmp(next_protocol, NGHTTP2_PROTO_VERSION_ID,
+                  NGHTTP2_PROTO_VERSION_ID_LEN)) {
+        conn->negnpn = CURL_HTTP_VERSION_2;
+      }
+      else
+#endif
+        if(!strncmp(next_protocol, ALPN_HTTP_1_1, ALPN_HTTP_1_1_LENGTH)) {
+          conn->negnpn = CURL_HTTP_VERSION_1_1;
+        }
+    }
+    else
+      infof(data, "ALPN, server did not agree to a protocol\n");
+  }
+#endif
+
+>>>>>>> origin/tomato-shibby-RT-AC
   connssl->connecting_state = ssl_connect_3;
   infof(data, "SSL connected\n");
 
@@ -392,10 +621,11 @@ polarssl_connect_step2(struct connectdata *conn,
 
 static CURLcode
 polarssl_connect_step3(struct connectdata *conn,
-                     int sockindex)
+                       int sockindex)
 {
   CURLcode retcode = CURLE_OK;
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
+<<<<<<< HEAD
   struct SessionHandle *data = conn->data;
   void *old_ssl_sessionid = NULL;
   ssl_session *our_ssl_sessionid = &conn->ssl[sockindex].ssn ;
@@ -427,6 +657,38 @@ polarssl_connect_step3(struct connectdata *conn,
     }
 
     if(retcode) {
+=======
+  struct Curl_easy *data = conn->data;
+
+  DEBUGASSERT(ssl_connect_3 == connssl->connecting_state);
+
+  if(data->set.general_ssl.sessionid) {
+    int ret;
+    ssl_session *our_ssl_sessionid;
+    void *old_ssl_sessionid = NULL;
+
+    our_ssl_sessionid = malloc(sizeof(ssl_session));
+    if(!our_ssl_sessionid)
+      return CURLE_OUT_OF_MEMORY;
+
+    ssl_session_init(our_ssl_sessionid);
+
+    ret = ssl_get_session(&connssl->ssl, our_ssl_sessionid);
+    if(ret) {
+      failf(data, "ssl_get_session returned -0x%x", -ret);
+      return CURLE_SSL_CONNECT_ERROR;
+    }
+
+    /* If there's already a matching session in the cache, delete it */
+    Curl_ssl_sessionid_lock(conn);
+    if(!Curl_ssl_getsessionid(conn, &old_ssl_sessionid, NULL, sockindex))
+      Curl_ssl_delsessionid(conn, old_ssl_sessionid);
+
+    retcode = Curl_ssl_addsessionid(conn, our_ssl_sessionid, 0, sockindex);
+    Curl_ssl_sessionid_unlock(conn);
+    if(retcode) {
+      free(our_ssl_sessionid);
+>>>>>>> origin/tomato-shibby-RT-AC
       failf(data, "failed to store ssl session");
       return retcode;
     }
@@ -515,8 +777,13 @@ polarssl_connect_common(struct connectdata *conn,
                         bool nonblocking,
                         bool *done)
 {
+<<<<<<< HEAD
   CURLcode retcode;
   struct SessionHandle *data = conn->data;
+=======
+  CURLcode result;
+  struct Curl_easy *data = conn->data;
+>>>>>>> origin/tomato-shibby-RT-AC
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
   curl_socket_t sockfd = conn->sock[sockindex];
   long timeout_ms;
@@ -564,7 +831,8 @@ polarssl_connect_common(struct connectdata *conn,
       curl_socket_t readfd = ssl_connect_2_reading==
         connssl->connecting_state?sockfd:CURL_SOCKET_BAD;
 
-      what = Curl_socket_ready(readfd, writefd, nonblocking?0:timeout_ms);
+      what = Curl_socket_check(readfd, CURL_SOCKET_BAD, writefd,
+                               nonblocking?0:timeout_ms);
       if(what < 0) {
         /* fatal error */
         failf(data, "select/poll on SSL socket, errno: %d", SOCKERRNO);
@@ -623,8 +891,8 @@ polarssl_connect_common(struct connectdata *conn,
 
 CURLcode
 Curl_polarssl_connect_nonblocking(struct connectdata *conn,
-                                int sockindex,
-                                bool *done)
+                                  int sockindex,
+                                  bool *done)
 {
   return polarssl_connect_common(conn, sockindex, TRUE, done);
 }
@@ -632,7 +900,7 @@ Curl_polarssl_connect_nonblocking(struct connectdata *conn,
 
 CURLcode
 Curl_polarssl_connect(struct connectdata *conn,
-                    int sockindex)
+                      int sockindex)
 {
   CURLcode retcode;
   bool done = FALSE;
@@ -658,6 +926,12 @@ int polarssl_init(void)
 void polarssl_cleanup(void)
 {
   (void)polarsslthreadlock_thread_cleanup();
+}
+
+
+int Curl_polarssl_data_pending(const struct connectdata *conn, int sockindex)
+{
+  return ssl_get_bytes_avail(&conn->ssl[sockindex].ssl) != 0;
 }
 
 #endif /* USE_POLARSSL */

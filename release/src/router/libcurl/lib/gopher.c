@@ -5,7 +5,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
+<<<<<<< HEAD
  * Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
+=======
+ * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
+>>>>>>> origin/tomato-shibby-RT-AC
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -28,13 +32,11 @@
 #include <curl/curl.h>
 #include "transfer.h"
 #include "sendf.h"
-
 #include "progress.h"
-#include "strequal.h"
 #include "gopher.h"
-#include "rawstr.h"
 #include "select.h"
 #include "url.h"
+#include "escape.h"
 #include "warnless.h"
 
 #define _MPRINTF_REPLACE /* use our functions only */
@@ -79,7 +81,7 @@ const struct Curl_handler Curl_handler_gopher = {
 static CURLcode gopher_do(struct connectdata *conn, bool *done)
 {
   CURLcode result=CURLE_OK;
-  struct SessionHandle *data=conn->data;
+  struct Curl_easy *data=conn->data;
   curl_socket_t sockfd = conn->sock[FIRSTSOCKET];
 
   curl_off_t *bytecount = &data->req.bytecount;
@@ -87,6 +89,10 @@ static CURLcode gopher_do(struct connectdata *conn, bool *done)
   char *sel;
   char *sel_org = NULL;
   ssize_t amount, k;
+<<<<<<< HEAD
+=======
+  size_t len;
+>>>>>>> origin/tomato-shibby-RT-AC
 
   *done = TRUE; /* unconditionally */
 
@@ -109,7 +115,7 @@ static CURLcode gopher_do(struct connectdata *conn, bool *done)
         newp[i] = '\x09';
 
     /* ... and finally unescape */
-    sel = curl_easy_unescape(data, newp, 0, &len);
+    result = Curl_urldecode(data, newp, 0, &sel, &len, FALSE);
     if(!sel)
       return CURLE_OUT_OF_MEMORY;
     sel_org = sel;
@@ -123,20 +129,32 @@ static CURLcode gopher_do(struct connectdata *conn, bool *done)
     result = Curl_write(conn, sockfd, sel, k, &amount);
     if(CURLE_OK == result) { /* Which may not have written it all! */
       result = Curl_client_write(conn, CLIENTWRITE_HEADER, sel, amount);
+<<<<<<< HEAD
       if(result) {
         Curl_safefree(sel_org);
         return result;
       }
+=======
+      if(result)
+        break;
+
+>>>>>>> origin/tomato-shibby-RT-AC
       k -= amount;
       sel += amount;
       if(k < 1)
         break; /* but it did write it all */
     }
+<<<<<<< HEAD
     else {
       failf(data, "Failed sending Gopher request");
       Curl_safefree(sel_org);
       return result;
     }
+=======
+    else
+      break;
+
+>>>>>>> origin/tomato-shibby-RT-AC
     /* Don't busyloop. The entire loop thing is a work-around as it causes a
        BLOCKING behavior which is a NO-NO. This function should rather be
        split up in a do and a doing piece where the pieces that aren't
@@ -146,15 +164,26 @@ static CURLcode gopher_do(struct connectdata *conn, bool *done)
        Wait a while for the socket to be writable. Note that this doesn't
        acknowledge the timeout.
     */
-    Curl_socket_ready(CURL_SOCKET_BAD, sockfd, 100);
+    if(SOCKET_WRITABLE(sockfd, 100) < 0) {
+      result = CURLE_SEND_ERROR;
+      break;
+    }
   }
 
   Curl_safefree(sel_org);
 
+<<<<<<< HEAD
   /* We can use Curl_sendf to send the terminal \r\n relatively safely and
      save allocing another string/doing another _write loop. */
   result = Curl_sendf(sockfd, conn, "\r\n");
   if(result != CURLE_OK) {
+=======
+  if(!result)
+    /* We can use Curl_sendf to send the terminal \r\n relatively safely and
+       save allocing another string/doing another _write loop. */
+    result = Curl_sendf(sockfd, conn, "\r\n");
+  if(result) {
+>>>>>>> origin/tomato-shibby-RT-AC
     failf(data, "Failed sending Gopher request");
     return result;
   }

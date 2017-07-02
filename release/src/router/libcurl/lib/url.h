@@ -27,14 +27,19 @@
  * Prototypes for library-wide functions provided by url.c
  */
 
+<<<<<<< HEAD
 CURLcode Curl_open(struct SessionHandle **curl);
+=======
+CURLcode Curl_init_do(struct Curl_easy *data, struct connectdata *conn);
+CURLcode Curl_open(struct Curl_easy **curl);
+>>>>>>> origin/tomato-shibby-RT-AC
 CURLcode Curl_init_userdefined(struct UserDefined *set);
-CURLcode Curl_setopt(struct SessionHandle *data, CURLoption option,
+CURLcode Curl_setopt(struct Curl_easy *data, CURLoption option,
                      va_list arg);
-CURLcode Curl_dupset(struct SessionHandle * dst, struct SessionHandle * src);
-void Curl_freeset(struct SessionHandle * data);
-CURLcode Curl_close(struct SessionHandle *data); /* opposite of curl_open() */
-CURLcode Curl_connect(struct SessionHandle *, struct connectdata **,
+CURLcode Curl_dupset(struct Curl_easy * dst, struct Curl_easy * src);
+void Curl_freeset(struct Curl_easy * data);
+CURLcode Curl_close(struct Curl_easy *data); /* opposite of curl_open() */
+CURLcode Curl_connect(struct Curl_easy *, struct connectdata **,
                       bool *async, bool *protocol_connect);
 CURLcode Curl_do(struct connectdata **, bool *done);
 CURLcode Curl_do_more(struct connectdata *, int *completed);
@@ -45,7 +50,7 @@ CURLcode Curl_protocol_connecting(struct connectdata *conn, bool *done);
 CURLcode Curl_protocol_doing(struct connectdata *conn, bool *done);
 CURLcode Curl_setup_conn(struct connectdata *conn,
                          bool *protocol_done);
-void Curl_free_request_state(struct SessionHandle *data);
+void Curl_free_request_state(struct Curl_easy *data);
 
 int Curl_protocol_getsock(struct connectdata *conn,
                           curl_socket_t *socks,
@@ -54,21 +59,31 @@ int Curl_doing_getsock(struct connectdata *conn,
                        curl_socket_t *socks,
                        int numsocks);
 
-bool Curl_isPipeliningEnabled(const struct SessionHandle *handle);
-CURLcode Curl_addHandleToPipeline(struct SessionHandle *handle,
+bool Curl_isPipeliningEnabled(const struct Curl_easy *handle);
+CURLcode Curl_addHandleToPipeline(struct Curl_easy *handle,
                                   struct curl_llist *pipeline);
-int Curl_removeHandleFromPipeline(struct SessionHandle *handle,
+int Curl_removeHandleFromPipeline(struct Curl_easy *handle,
                                   struct curl_llist *pipeline);
+<<<<<<< HEAD
+=======
+struct connectdata *
+Curl_oldest_idle_connection(struct Curl_easy *data);
+>>>>>>> origin/tomato-shibby-RT-AC
 /* remove the specified connection from all (possible) pipelines and related
    queues */
-void Curl_getoff_all_pipelines(struct SessionHandle *data,
+void Curl_getoff_all_pipelines(struct Curl_easy *data,
                                struct connectdata *conn);
 
-void Curl_close_connections(struct SessionHandle *data);
+void Curl_close_connections(struct Curl_easy *data);
 
 #define CURL_DEFAULT_PROXY_PORT 1080 /* default proxy port unless specified */
+<<<<<<< HEAD
 #define CURL_DEFAULT_SOCKS5_GSSAPI_SERVICE "rcmd" /* default socks5 gssapi
                                                      service */
+=======
+#define CURL_DEFAULT_HTTPS_PROXY_PORT 443 /* default https proxy port unless
+                                             specified */
+>>>>>>> origin/tomato-shibby-RT-AC
 
 CURLcode Curl_connected_proxy(struct connectdata *conn, int sockindex);
 
@@ -78,5 +93,16 @@ CURLcode Curl_connected_proxy(struct connectdata *conn, int sockindex);
 void Curl_verboseconnect(struct connectdata *conn);
 #endif
 
+#define CONNECT_PROXY_SSL()\
+  (conn->http_proxy.proxytype == CURLPROXY_HTTPS &&\
+  !conn->bits.proxy_ssl_connected[sockindex])
+
+#define CONNECT_FIRSTSOCKET_PROXY_SSL()\
+  (conn->http_proxy.proxytype == CURLPROXY_HTTPS &&\
+  !conn->bits.proxy_ssl_connected[FIRSTSOCKET])
+
+#define CONNECT_SECONDARYSOCKET_PROXY_SSL()\
+  (conn->http_proxy.proxytype == CURLPROXY_HTTPS &&\
+  !conn->bits.proxy_ssl_connected[SECONDARYSOCKET])
 
 #endif /* HEADER_CURL_URL_H */

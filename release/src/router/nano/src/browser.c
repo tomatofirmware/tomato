@@ -1,23 +1,32 @@
 /* $Id: browser.c 4461 2009-12-09 17:09:37Z astyanax $ */
 /**************************************************************************
- *   browser.c                                                            *
+ *   browser.c  --  This file is part of GNU nano.                        *
  *                                                                        *
+<<<<<<< HEAD
  *   Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009   *
  *   Free Software Foundation, Inc.                                       *
  *   This program is free software; you can redistribute it and/or modify *
  *   it under the terms of the GNU General Public License as published by *
  *   the Free Software Foundation; either version 3, or (at your option)  *
  *   any later version.                                                   *
+=======
+ *   Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,  *
+ *   2010, 2011, 2013, 2014, 2015 Free Software Foundation, Inc.          *
+ *   Copyright (C) 2015, 2016 Benno Schulenberg                           *
  *                                                                        *
- *   This program is distributed in the hope that it will be useful, but  *
- *   WITHOUT ANY WARRANTY; without even the implied warranty of           *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU    *
- *   General Public License for more details.                             *
+ *   GNU nano is free software: you can redistribute it and/or modify     *
+ *   it under the terms of the GNU General Public License as published    *
+ *   by the Free Software Foundation, either version 3 of the License,    *
+ *   or (at your option) any later version.                               *
+>>>>>>> origin/tomato-shibby-RT-AC
+ *                                                                        *
+ *   GNU nano is distributed in the hope that it will be useful,          *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty          *
+ *   of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.              *
+ *   See the GNU General Public License for more details.                 *
  *                                                                        *
  *   You should have received a copy of the GNU General Public License    *
- *   along with this program; if not, write to the Free Software          *
- *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA            *
- *   02110-1301, USA.                                                     *
+ *   along with this program.  If not, see http://www.gnu.org/licenses/.  *
  *                                                                        *
  **************************************************************************/
 
@@ -35,7 +44,7 @@ static char **filelist = NULL;
 static size_t filelist_len = 0;
 	/* The number of files in the list. */
 static int width = 0;
-	/* The number of files that we can display per line. */
+	/* The number of files that we can display per screen row. */
 static int longest = 0;
 	/* The number of columns in the longest filename in the list. */
 static size_t selected = 0;
@@ -59,6 +68,7 @@ char *do_browser(char *path, DIR *dir)
     char *ans = NULL;
 	/* The last answer the user typed at the statusbar prompt. */
     size_t old_selected;
+<<<<<<< HEAD
 	/* The selected file we had before the current selected file. */
     const sc *s;
     const subnfunc *f;
@@ -70,6 +80,16 @@ char *do_browser(char *path, DIR *dir)
 #endif
     bottombars(MBROWSER);
     wnoutrefresh(bottomwin);
+=======
+	/* The number of the selected file before the current selected file. */
+    functionptrtype func;
+	/* The function of the key the user typed in. */
+    DIR *dir;
+	/* The directory whose contents we are showing. */
+
+    /* Don't show a cursor in the file list. */
+    curs_set(0);
+>>>>>>> origin/tomato-shibby-RT-AC
 
     UNSET(CONST_UPDATE);
 
@@ -78,6 +98,7 @@ char *do_browser(char *path, DIR *dir)
   change_browser_directory:
 	/* We go here after we select a new directory. */
 
+<<<<<<< HEAD
     /* Start with no key pressed. */
     kbinput = ERR;
 
@@ -87,6 +108,26 @@ char *do_browser(char *path, DIR *dir)
 
     /* Get the file list, and set longest and width in the process. */
     browser_init(path, dir);
+=======
+    path = free_and_assign(path, get_full_path(path));
+
+    if (path != NULL)
+	dir = opendir(path);
+
+    if (path == NULL || dir == NULL) {
+	statusline(ALERT, _("Cannot open directory: %s"), strerror(errno));
+	/* If we don't have a file list yet, there is nothing to show. */
+	if (filelist == NULL) {
+	    napms(1200);
+	    lastmessage = HUSH;
+	    free(path);
+	    free(present_name);
+	    return NULL;
+	}
+	path = mallocstrcpy(path, present_path);
+	present_name = mallocstrcpy(present_name, filelist[selected]);
+    }
+>>>>>>> origin/tomato-shibby-RT-AC
 
     assert(filelist != NULL);
 
@@ -106,6 +147,7 @@ char *do_browser(char *path, DIR *dir)
 
     old_selected = (size_t)-1;
 
+<<<<<<< HEAD
     titlebar(path);
 
     while (!abort) {
@@ -120,16 +162,44 @@ char *do_browser(char *path, DIR *dir)
 	/* Display the file list if we don't have a key, or if the
 	 * selected file has changed, and set width in the process. */
 	if (kbinput == ERR || old_selected != selected)
+=======
+    present_path = mallocstrcpy(present_path, path);
+
+    titlebar(path);
+
+    while (TRUE) {
+	/* Make sure that the cursor is off. */
+	curs_set(0);
+	lastmessage = HUSH;
+
+	bottombars(MBROWSER);
+
+	/* Display (or redisplay) the file list if the list itself or
+	 * the selected file has changed. */
+	if (old_selected != selected)
+>>>>>>> origin/tomato-shibby-RT-AC
 	    browser_refresh();
 
 	old_selected = selected;
 
+<<<<<<< HEAD
 	kbinput = get_kbinput(edit, &meta_key, &func_key);
+=======
+	kbinput = get_kbinput(edit);
+>>>>>>> origin/tomato-shibby-RT-AC
 
 #ifndef DISABLE_MOUSE
         if (kbinput == KEY_MOUSE) {
 
+<<<<<<< HEAD
 		    int mouse_x, mouse_y;
+=======
+		/* If we selected the same filename as last time, fake a
+		 * press of the Enter key so that the file is read in. */
+		if (old_selected == selected)
+		    unget_kbinput(KEY_ENTER, FALSE);
+	    }
+>>>>>>> origin/tomato-shibby-RT-AC
 
 		    /* We can click on the edit window to select a
 		     * filename. */
@@ -161,6 +231,7 @@ char *do_browser(char *path, DIR *dir)
 	}
 #endif /* !DISABLE_MOUSE */
 
+<<<<<<< HEAD
 	parse_browser_input(&kbinput, &meta_key, &func_key);
         s = get_shortcut(MBROWSER, &kbinput, &meta_key, &func_key);
         if (!s)
@@ -175,6 +246,23 @@ char *do_browser(char *path, DIR *dir)
 #ifndef DISABLE_HELP
 	    do_browser_help();
 	    curs_set(0);
+=======
+	func = parse_browser_input(&kbinput);
+
+	if (func == total_refresh) {
+	    total_redraw();
+#ifndef NANO_TINY
+	    /* Simulate a window resize to force a directory reread. */
+	    kbinput = KEY_WINCH;
+#endif
+	} else if (func == do_help_void) {
+#ifndef DISABLE_HELP
+	    do_help_void();
+#ifndef NANO_TINY
+	    /* The window dimensions might have changed, so act as if. */
+	    kbinput = KEY_WINCH;
+#endif
+>>>>>>> origin/tomato-shibby-RT-AC
 #else
 		nano_disabled_msg();
 #endif
@@ -184,6 +272,7 @@ char *do_browser(char *path, DIR *dir)
 		do_filesearch();
 		curs_set(0);
 	    /* Search for another filename. */
+<<<<<<< HEAD
 	} else if (f->scfunc == DO_RESEARCH) {
 		do_fileresearch();
 	} else if (f->scfunc == DO_PAGE_UP) {
@@ -259,6 +348,101 @@ char *do_browser(char *path, DIR *dir)
 			strlen(answer) + 1);
 		    sprintf(new_path, "%s%s", path, answer);
 		}
+=======
+	    do_fileresearch();
+	} else if (func == do_left) {
+	    if (selected > 0)
+		selected--;
+	} else if (func == do_right) {
+	    if (selected < filelist_len - 1)
+		selected++;
+#ifndef NANO_TINY
+	} else if (func == do_prev_word_void) {
+	    selected -= (selected % width);
+	} else if (func == do_next_word_void) {
+	    selected += width - 1 - (selected % width);
+	    if (selected >= filelist_len)
+		selected = filelist_len - 1;
+#endif
+	} else if (func == do_up_void) {
+	    if (selected >= width)
+		selected -= width;
+	} else if (func == do_down_void) {
+	    if (selected + width <= filelist_len - 1)
+		selected += width;
+	} else if (func == do_page_up) {
+	    if (selected < width)
+		selected = 0;
+	    else if (selected < editwinrows * width)
+		selected = selected % width;
+	    else
+		selected -= editwinrows * width;
+	} else if (func == do_page_down) {
+	    if (selected + width >= filelist_len - 1)
+		selected = filelist_len - 1;
+	    else if (selected + editwinrows * width >= filelist_len)
+		selected = (selected + editwinrows * width - filelist_len) %
+				width +	filelist_len - width;
+	    else
+		selected += editwinrows * width;
+	} else if (func == do_first_file) {
+	    selected = 0;
+	} else if (func == do_last_file) {
+	    selected = filelist_len - 1;
+	} else if (func == goto_dir_void) {
+	    /* Ask for the directory to go to. */
+	    int i = do_prompt(TRUE, FALSE, MGOTODIR, NULL,
+#ifndef DISABLE_HISTORIES
+			NULL,
+#endif
+			/* TRANSLATORS: This is a prompt. */
+			browser_refresh, _("Go To Directory"));
+
+	    if (i < 0) {
+		statusbar(_("Cancelled"));
+		continue;
+	    }
+
+	    path = free_and_assign(path, real_dir_from_tilde(answer));
+
+	    /* If the given path is relative, join it with the current path. */
+	    if (*path != '/') {
+		path = charealloc(path, strlen(present_path) +
+						strlen(answer) + 1);
+		sprintf(path, "%s%s", present_path, answer);
+	    }
+
+#ifndef DISABLE_OPERATINGDIR
+	    if (check_operating_dir(path, FALSE)) {
+		/* TRANSLATORS: This refers to the confining effect of the
+		 * option --operatingdir, not of --restricted. */
+		statusline(ALERT, _("Can't go outside of %s"),
+				full_operating_dir);
+		path = mallocstrcpy(path, present_path);
+		continue;
+	    }
+#endif
+	    /* Snip any trailing slashes, so the name can be compared. */
+	    while (strlen(path) > 1 && path[strlen(path) - 1] == '/')
+		path[strlen(path) - 1] = '\0';
+
+	    /* In case the specified directory cannot be entered, select it
+	     * (if it is in the current list) so it will be highlighted. */
+	    for (i = 0; i < filelist_len; i++)
+		if (strcmp(filelist[i], path) == 0)
+		    selected = i;
+
+	    /* Try opening and reading the specified directory. */
+	    goto read_directory_contents;
+	} else if (func == do_enter) {
+	    struct stat st;
+
+	    /* It isn't possible to move up from the root directory. */
+	    if (strcmp(filelist[selected], "/..") == 0) {
+		statusline(ALERT, _("Can't move up a directory"));
+		continue;
+	    }
+>>>>>>> origin/tomato-shibby-RT-AC
 
 #ifndef DISABLE_OPERATINGDIR
 		if (check_operating_dir(new_path, FALSE)) {
@@ -269,6 +453,7 @@ char *do_browser(char *path, DIR *dir)
 		    continue;
 		}
 #endif
+<<<<<<< HEAD
 
 		dir = opendir(new_path);
 		if (dir == NULL) {
@@ -358,6 +543,48 @@ char *do_browser(char *path, DIR *dir)
 	} else if (f->scfunc == DO_EXIT) {
 		abort = TRUE;
 	}
+=======
+	    /* If for some reason the file is inaccessible, complain. */
+	    if (stat(filelist[selected], &st) == -1) {
+		statusline(ALERT, _("Error reading %s: %s"),
+				filelist[selected], strerror(errno));
+		continue;
+	    }
+
+	    /* If it isn't a directory, a file was selected -- we're done. */
+	    if (!S_ISDIR(st.st_mode)) {
+		retval = mallocstrcpy(NULL, filelist[selected]);
+		break;
+	    }
+
+	    /* If we are moving up one level, remember where we came from, so
+	     * this directory can be highlighted and easily reentered. */
+	    if (strcmp(tail(filelist[selected]), "..") == 0)
+		present_name = strip_last_component(filelist[selected]);
+
+	    /* Try opening and reading the selected directory. */
+	    path = mallocstrcpy(path, filelist[selected]);
+	    goto read_directory_contents;
+	} else if (func == do_exit) {
+	    /* Exit from the file browser. */
+	    break;
+#ifndef NANO_TINY
+	} else if (kbinput == KEY_WINCH) {
+	    ;
+#endif
+	} else
+	    unbound_key(kbinput);
+
+#ifndef NANO_TINY
+	/* If the window resized, refresh the file list. */
+	if (kbinput == KEY_WINCH) {
+	    /* Remember the selected file, to be able to reselect it. */
+	    present_name = mallocstrcpy(NULL, filelist[selected]);
+	    /* Reread the contents of the current directory. */
+	    goto read_directory_contents;
+	}
+#endif
+>>>>>>> origin/tomato-shibby-RT-AC
     }
     titlebar(NULL);
     edit_refresh();
@@ -385,8 +612,6 @@ char *do_browse_from(const char *inpath)
 	/* This holds the tilde-expanded version of inpath. */
     DIR *dir = NULL;
 
-    assert(inpath != NULL);
-
     path = real_dir_from_tilde(inpath);
 
     /* Perhaps path is a directory.  If so, we'll pass it to
@@ -396,16 +621,28 @@ char *do_browse_from(const char *inpath)
      * at all.  If so, we'll just pass the current directory to
      * do_browser(). */
     if (stat(path, &st) == -1 || !S_ISDIR(st.st_mode)) {
-	path = mallocstrassn(path, striponedir(path));
+	path = free_and_assign(path, strip_last_component(path));
 
 	if (stat(path, &st) == -1 || !S_ISDIR(st.st_mode)) {
 	    free(path);
+<<<<<<< HEAD
 
 	    path = charalloc(PATH_MAX + 1);
 	    path = getcwd(path, PATH_MAX + 1);
 
 	    if (path != NULL)
 		align(&path);
+=======
+	    path = getcwd(currentdir, PATH_MAX + 1);
+
+	    if (path == NULL) {
+		free(currentdir);
+		statusline(MILD, _("The working directory has disappeared"));
+		beep();
+		napms(1200);
+		return NULL;
+	    }
+>>>>>>> origin/tomato-shibby-RT-AC
 	}
     }
 
@@ -434,10 +671,15 @@ char *do_browse_from(const char *inpath)
  * set filelist_len to the number of files in that list, set longest to
  * the width in columns of the longest filename in that list (between 15
  * and COLS), and set width to the number of files that we can display
+<<<<<<< HEAD
  * per line.  longest needs to be at least 15 columns in order to
  * display ".. (parent dir)", as Pico does.  Assume path exists and is a
  * directory. */
 void browser_init(const char *path, DIR *dir)
+=======
+ * per screen row.  And sort the list too. */
+void read_the_list(const char *path, DIR *dir)
+>>>>>>> origin/tomato-shibby-RT-AC
 {
     const struct dirent *nextdir;
     size_t i = 0, path_len = strlen(path);
@@ -565,8 +807,16 @@ void parse_browser_input(int *kbinput, bool *meta_key, bool *func_key)
 	    /* Cancel equivalent to Exit here. */
 	    case 'E':
 	    case 'e':
+<<<<<<< HEAD
 		*kbinput = sc_seq_or(DO_EXIT, 0);
 		break;
+=======
+	    case 'Q':
+	    case 'q':
+	    case 'X':
+	    case 'x':
+		return do_exit;
+>>>>>>> origin/tomato-shibby-RT-AC
 	    case 'G':
 	    case 'g':
 		*kbinput = sc_seq_or(GOTO_DIR_MSG, 0);
@@ -583,12 +833,13 @@ void parse_browser_input(int *kbinput, bool *meta_key, bool *func_key)
     }
 }
 
-/* Set width to the number of files that we can display per line, if
- * necessary, and display the list of files. */
+/* Set width to the number of files that we can display per screen row,
+ * if necessary, and display the list of files. */
 void browser_refresh(void)
 {
     static int uimax_digits = -1;
     size_t i;
+<<<<<<< HEAD
     int col = 0;
 	/* The maximum number of columns that the filenames will take
 	 * up. */
@@ -600,6 +851,14 @@ void browser_refresh(void)
 
     if (uimax_digits == -1)
 	uimax_digits = digits(UINT_MAX);
+=======
+    int row = 0, col = 0;
+	/* The current row and column while the list is getting displayed. */
+    int the_row = 0, the_column = 0;
+	/* The row and column of the selected item. */
+    char *info;
+	/* The additional information that we'll display about a file. */
+>>>>>>> origin/tomato-shibby-RT-AC
 
     blank_edit();
 
@@ -607,7 +866,7 @@ void browser_refresh(void)
 
     i = width * editwinrows * ((selected / width) / editwinrows);
 
-    for (; i < filelist_len && line < editwinrows; i++) {
+    for (; i < filelist_len && row < editwinrows; i++) {
 	struct stat st;
 	const char *filetail = tail(filelist[i]);
 		/* The filename we display, minus the path. */
@@ -615,6 +874,7 @@ void browser_refresh(void)
 		/* The length of the filename in columns. */
 	size_t foolen;
 		/* The length of the file information in columns. */
+<<<<<<< HEAD
 	int foomaxlen = 7;
 		/* The maximum length of the file information in
 		 * columns: seven for "--", "(dir)", or the file size,
@@ -636,40 +896,73 @@ void browser_refresh(void)
 	 * directory. */
 	if (i == selected)
 	    wattron(edit, reverse_attr);
+=======
+	int infomaxlen = 7;
+		/* The maximum length of the file information in columns:
+		 * normally seven, but will be twelve for "(parent dir)". */
+	bool dots = (COLS >= 15 && namelen >= longest - infomaxlen);
+		/* Whether to put an ellipsis before the filename?  We don't
+		 * waste space on dots when there are fewer than 15 columns. */
+	char *disp = display_string(thename, dots ?
+		namelen + infomaxlen + 4 - longest : 0, longest, FALSE);
+		/* The filename (or a fragment of it) in displayable format.
+		 * When a fragment, account for dots plus one space padding. */
 
-	blank_line(edit, line, col, longest);
+	/* If this is the selected item, start its highlighting, and
+	 * remember its location to be able to place the cursor on it. */
+	if (i == selected) {
+	    wattron(edit, hilite_attribute);
+	    the_row = row;
+	    the_column = col;
+	}
+>>>>>>> origin/tomato-shibby-RT-AC
 
+	blank_row(edit, row, col, longest);
+
+<<<<<<< HEAD
 	/* If dots is TRUE, we will display something like
 	 * "...ename". */
+=======
+	/* If the name is too long, we display something like "...ename". */
+>>>>>>> origin/tomato-shibby-RT-AC
 	if (dots)
-	    mvwaddstr(edit, line, col, "...");
-	mvwaddstr(edit, line, dots ? col + 3 : col, disp);
+	    mvwaddstr(edit, row, col, "...");
+	mvwaddstr(edit, row, dots ? col + 3 : col, disp);
 
 	free(disp);
 
 	col += longest;
 
-	/* Show information about the file.  We don't want to report
-	 * file sizes for links, so we use lstat(). */
+	/* Show information about the file: "--" for symlinks (except when
+	 * they point to a directory) and for files that have disappeared,
+	 * "(dir)" for directories, and the file size for normal files. */
 	if (lstat(filelist[i], &st) == -1 || S_ISLNK(st.st_mode)) {
-	    /* If the file doesn't exist (i.e. it's been deleted while
-	     * the file browser is open), or it's a symlink that doesn't
-	     * point to a directory, display "--". */
 	    if (stat(filelist[i], &st) == -1 || !S_ISDIR(st.st_mode))
+<<<<<<< HEAD
 		foo = mallocstrcpy(NULL, "--");
 	    /* If the file is a symlink that points to a directory,
 	     * display it as a directory. */
+=======
+		info = mallocstrcpy(NULL, "--");
+>>>>>>> origin/tomato-shibby-RT-AC
 	    else
 		/* TRANSLATORS: Try to keep this at most 7
 		 * characters. */
 		foo = mallocstrcpy(NULL, _("(dir)"));
 	} else if (S_ISDIR(st.st_mode)) {
+<<<<<<< HEAD
 	    /* If the file is a directory, display it as such. */
 	    if (strcmp(filetail, "..") == 0) {
 		/* TRANSLATORS: Try to keep this at most 12
 		 * characters. */
 		foo = mallocstrcpy(NULL, _("(parent dir)"));
 		foomaxlen = 12;
+=======
+	    if (strcmp(thename, "..") == 0) {
+		/* TRANSLATORS: Try to keep this at most 12 characters. */
+		info = mallocstrcpy(NULL, _("(parent dir)"));
+		infomaxlen = 12;
+>>>>>>> origin/tomato-shibby-RT-AC
 	    } else
 		foo = mallocstrcpy(NULL, _("(dir)"));
 	} else {
@@ -678,7 +971,11 @@ void browser_refresh(void)
 
 	    foo = charalloc(uimax_digits + 4);
 
+<<<<<<< HEAD
 	    /* Bytes. */
+=======
+	    /* Massage the file size into a human-readable form. */
+>>>>>>> origin/tomato-shibby-RT-AC
 	    if (st.st_size < (1 << 10))
 		modifier = ' ';
 	    /* Kilobytes. */
@@ -695,6 +992,7 @@ void browser_refresh(void)
 		modifier = 'G';
 	    }
 
+<<<<<<< HEAD
 	    sprintf(foo, "%4lu %cB", result, modifier);
 	}
 
@@ -709,6 +1007,27 @@ void browser_refresh(void)
 
 	/* Finish highlighting the currently selected file or
 	 * directory. */
+=======
+	    /* Show the size if less than a terabyte, else show "(huge)". */
+	    if (result < (1 << 10))
+		sprintf(info, "%4ju %cB", (intmax_t)result, modifier);
+	    else
+		/* TRANSLATORS: Try to keep this at most 7 characters.
+		 * If necessary, you can leave out the parentheses. */
+		info = mallocstrcpy(info, _("(huge)"));
+	}
+
+	/* Make sure info takes up no more than infomaxlen columns. */
+	infolen = strlenpt(info);
+	if (infolen > infomaxlen) {
+	    info[actual_x(info, infomaxlen)] = '\0';
+	    infolen = infomaxlen;
+	}
+
+	mvwaddstr(edit, row, col - infolen, info);
+
+	/* If this is the selected item, finish its highlighting. */
+>>>>>>> origin/tomato-shibby-RT-AC
 	if (i == selected)
 	    wattroff(edit, reverse_attr);
 
@@ -717,14 +1036,18 @@ void browser_refresh(void)
 	/* Add some space between the columns. */
 	col += 2;
 
-	/* If the next entry isn't going to fit on the current line,
-	 * move to the next line. */
+	/* If the next entry isn't going to fit on the current row,
+	 * move to the next row. */
 	if (col > COLS - longest) {
-	    line++;
+	    row++;
 	    col = 0;
 	}
+    }
 
-	wmove(edit, line, col);
+    /* If requested, put the cursor on the selected item and switch it on. */
+    if (ISSET(SHOW_CURSOR)) {
+	wmove(edit, the_row, the_column);
+	curs_set(1);
     }
 
     wnoutrefresh(edit);
@@ -789,6 +1112,7 @@ int filesearch_init(void)
 	buf = mallocstrcpy(NULL, "");
 
     /* This is now one simple call.  It just does a lot. */
+<<<<<<< HEAD
     i = do_prompt(FALSE,
 #ifndef DISABLE_TABCOMP
 	TRUE,
@@ -817,6 +1141,13 @@ int filesearch_init(void)
 	ISSET(BACKWARDS_SEARCH) ? _(" [Backwards]") :
 #endif
 	"", "", buf);
+=======
+    input = do_prompt(FALSE, FALSE, MWHEREISFILE, NULL,
+#ifndef DISABLE_HISTORIES
+		&search_history,
+#endif
+		browser_refresh, "%s%s", _("Search"), buf);
+>>>>>>> origin/tomato-shibby-RT-AC
 
     /* Release buf now that we don't need it anymore. */
     free(buf);
@@ -870,6 +1201,7 @@ int filesearch_init(void)
  * anything. */
 bool findnextfile(bool no_sameline, size_t begin, const char *needle)
 {
+<<<<<<< HEAD
     size_t currselected = selected;
 	/* The location in the current file list of the match we
 	 * find. */
@@ -881,6 +1213,33 @@ bool findnextfile(bool no_sameline, size_t begin, const char *needle)
     if (ISSET(BACKWARDS_SEARCH))
 	rev_start += strlen(rev_start);
 #endif
+=======
+    size_t looking_at = selected;
+	/* The location in the file list of the filename we're looking at. */
+    const char *thename;
+	/* The plain filename, without the path. */
+    unsigned stash[sizeof(flags) / sizeof(flags[0])];
+	/* A storage place for the current flag settings. */
+
+    /* Save the settings of all flags. */
+    memcpy(stash, flags, sizeof(flags));
+
+    /* Search forward, case insensitive, and without regexes. */
+    UNSET(BACKWARDS_SEARCH);
+    UNSET(CASE_SENSITIVE);
+    UNSET(USE_REGEXP);
+
+    /* Step through each filename in the list until a match is found or
+     * we've come back to the point where we started. */
+    while (TRUE) {
+	/* Move to the next filename in the list, or back to the first. */
+	if (looking_at < filelist_len - 1)
+	    looking_at++;
+	else {
+	    looking_at = 0;
+	    statusbar(_("Search Wrapped"));
+	}
+>>>>>>> origin/tomato-shibby-RT-AC
 
     /* Look for needle in the current filename we're searching. */
     while (TRUE) {
@@ -1056,23 +1415,24 @@ void do_last_file(void)
     selected = filelist_len - 1;
 }
 
-/* Strip one directory from the end of path, and return the stripped
- * path.  The returned string is dynamically allocated, and should be
- * freed. */
-char *striponedir(const char *path)
+/* Strip one element from the end of path, and return the stripped path.
+ * The returned string is dynamically allocated, and should be freed. */
+char *strip_last_component(const char *path)
 {
-    char *retval, *tmp;
+    char *copy = mallocstrcpy(NULL, path);
+    char *last_slash = strrchr(copy, '/');
 
-    assert(path != NULL);
+    if (last_slash != NULL)
+	*last_slash = '\0';
 
-    retval = mallocstrcpy(NULL, path);
-
-    tmp = strrchr(retval, '/');
-
+<<<<<<< HEAD
     if (tmp != NULL)
  	null_at(&retval, tmp - retval);
 
     return retval;
+=======
+    return copy;
+>>>>>>> origin/tomato-shibby-RT-AC
 }
 
 #endif /* !DISABLE_BROWSER */

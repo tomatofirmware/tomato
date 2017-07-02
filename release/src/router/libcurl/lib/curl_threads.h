@@ -7,7 +7,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
+<<<<<<< HEAD
  * Copyright (C) 1998 - 2010, Daniel Stenberg, <daniel@haxx.se>, et al.
+=======
+ * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
+>>>>>>> origin/tomato-shibby-RT-AC
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -45,7 +49,8 @@
 
 #if defined(USE_THREADS_POSIX) || defined(USE_THREADS_WIN32)
 
-curl_thread_t Curl_thread_create(unsigned int (CURL_STDCALL *func) (void*),
+/* !checksrc! disable SPACEBEFOREPAREN 1 */
+curl_thread_t Curl_thread_create(unsigned int (CURL_STDCALL *func) (void *),
                                  void *arg);
 
 void Curl_thread_destroy(curl_thread_t hnd);

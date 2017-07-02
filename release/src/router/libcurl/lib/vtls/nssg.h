@@ -7,7 +7,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
+<<<<<<< HEAD
  * Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
+=======
+ * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+>>>>>>> origin/tomato-shibby-RT-AC
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -46,23 +50,55 @@ void Curl_nss_cleanup(void);
 
 size_t Curl_nss_version(char *buffer, size_t size);
 int Curl_nss_check_cxn(struct connectdata *cxn);
-int Curl_nss_seed(struct SessionHandle *data);
+int Curl_nss_seed(struct Curl_easy *data);
 
 /* initialize NSS library if not already */
-CURLcode Curl_nss_force_init(struct SessionHandle *data);
+CURLcode Curl_nss_force_init(struct Curl_easy *data);
 
+<<<<<<< HEAD
 void Curl_nss_random(struct SessionHandle *data,
                      unsigned char *entropy,
                      size_t length);
+=======
+CURLcode Curl_nss_random(struct Curl_easy *data,
+                         unsigned char *entropy,
+                         size_t length);
+>>>>>>> origin/tomato-shibby-RT-AC
 
 void Curl_nss_md5sum(unsigned char *tmp, /* input */
                      size_t tmplen,
                      unsigned char *md5sum, /* output */
                      size_t md5len);
 
+<<<<<<< HEAD
 /* this backend provides these functions: */
 #define have_curlssl_random 1
 #define have_curlssl_md5sum 1
+=======
+void Curl_nss_sha256sum(const unsigned char *tmp, /* input */
+                     size_t tmplen,
+                     unsigned char *sha256sum, /* output */
+                     size_t sha256len);
+
+bool Curl_nss_cert_status_request(void);
+
+bool Curl_nss_false_start(void);
+
+/* Support HTTPS-proxy */
+#define HTTPS_PROXY_SUPPORT 1
+
+/* Set the API backend definition to NSS */
+#define CURL_SSL_BACKEND CURLSSLBACKEND_NSS
+
+/* this backend supports the CAPATH option */
+#define have_curlssl_ca_path 1
+
+/* this backend supports CURLOPT_CERTINFO */
+#define have_curlssl_certinfo 1
+
+/* this backends supports CURLOPT_PINNEDPUBLICKEY */
+#define have_curlssl_pinnedpubkey 1
+>>>>>>> origin/tomato-shibby-RT-AC
 
 /* API setup for NSS */
 #define curlssl_init Curl_nss_init

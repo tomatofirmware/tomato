@@ -23,11 +23,15 @@
 /* Base64 encoding/decoding */
 
 #include "curl_setup.h"
+<<<<<<< HEAD
 
 #define _MPRINTF_REPLACE /* use our functions only */
 #include <curl/mprintf.h>
 
 #include "urldata.h" /* for the SessionHandle definition */
+=======
+#include "urldata.h" /* for the Curl_easy definition */
+>>>>>>> origin/tomato-shibby-RT-AC
 #include "warnless.h"
 #include "curl_base64.h"
 #include "curl_memory.h"
@@ -167,6 +171,7 @@ CURLcode Curl_base64_decode(const char *src,
   return CURLE_OK;
 }
 
+<<<<<<< HEAD
 /*
  * Curl_base64_encode()
  *
@@ -187,6 +192,12 @@ CURLcode Curl_base64_decode(const char *src,
 CURLcode Curl_base64_encode(struct SessionHandle *data,
                             const char *inputbuff, size_t insize,
                             char **outptr, size_t *outlen)
+=======
+static CURLcode base64_encode(const char *table64,
+                              struct Curl_easy *data,
+                              const char *inputbuff, size_t insize,
+                              char **outptr, size_t *outlen)
+>>>>>>> origin/tomato-shibby-RT-AC
 {
   CURLcode error;
   unsigned char ibuf[3];
@@ -205,8 +216,18 @@ CURLcode Curl_base64_encode(struct SessionHandle *data,
   if(0 == insize)
     insize = strlen(indata);
 
+<<<<<<< HEAD
   base64data = output = malloc(insize*4/3+4);
   if(NULL == output)
+=======
+#if SIZEOF_SIZE_T == 4
+  if(insize > UINT_MAX/4)
+    return CURLE_OUT_OF_MEMORY;
+#endif
+
+  base64data = output = malloc(insize * 4 / 3 + 4);
+  if(!output)
+>>>>>>> origin/tomato-shibby-RT-AC
     return CURLE_OUT_OF_MEMORY;
 
   /*
@@ -274,4 +295,55 @@ CURLcode Curl_base64_encode(struct SessionHandle *data,
 
   return CURLE_OK;
 }
+<<<<<<< HEAD
 /* ---- End of Base64 Encoding ---- */
+=======
+
+/*
+ * Curl_base64_encode()
+ *
+ * Given a pointer to an input buffer and an input size, encode it and
+ * return a pointer in *outptr to a newly allocated memory area holding
+ * encoded data. Size of encoded data is returned in variable pointed by
+ * outlen.
+ *
+ * Input length of 0 indicates input buffer holds a NUL-terminated string.
+ *
+ * Returns CURLE_OK on success, otherwise specific error code. Function
+ * output shall not be considered valid unless CURLE_OK is returned.
+ *
+ * When encoded data length is 0, returns NULL in *outptr.
+ *
+ * @unittest: 1302
+ */
+CURLcode Curl_base64_encode(struct Curl_easy *data,
+                            const char *inputbuff, size_t insize,
+                            char **outptr, size_t *outlen)
+{
+  return base64_encode(base64, data, inputbuff, insize, outptr, outlen);
+}
+
+/*
+ * Curl_base64url_encode()
+ *
+ * Given a pointer to an input buffer and an input size, encode it and
+ * return a pointer in *outptr to a newly allocated memory area holding
+ * encoded data. Size of encoded data is returned in variable pointed by
+ * outlen.
+ *
+ * Input length of 0 indicates input buffer holds a NUL-terminated string.
+ *
+ * Returns CURLE_OK on success, otherwise specific error code. Function
+ * output shall not be considered valid unless CURLE_OK is returned.
+ *
+ * When encoded data length is 0, returns NULL in *outptr.
+ *
+ * @unittest: 1302
+ */
+CURLcode Curl_base64url_encode(struct Curl_easy *data,
+                               const char *inputbuff, size_t insize,
+                               char **outptr, size_t *outlen)
+{
+  return base64_encode(base64url, data, inputbuff, insize, outptr, outlen);
+}
+>>>>>>> origin/tomato-shibby-RT-AC

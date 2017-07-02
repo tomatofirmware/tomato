@@ -30,15 +30,50 @@
 #include "progress.h"
 #include "multiif.h"
 #include "sendf.h"
+<<<<<<< HEAD
 #include "rawstr.h"
 #include "bundles.h"
+=======
+>>>>>>> origin/tomato-shibby-RT-AC
 #include "conncache.h"
 
 #include "curl_memory.h"
 /* The last #include file should be: */
 #include "memdebug.h"
 
+<<<<<<< HEAD
 static void free_bundle_hash_entry(void *freethis)
+=======
+static void conn_llist_dtor(void *user, void *element)
+{
+  struct connectdata *data = element;
+  (void)user;
+
+  data->bundle = NULL;
+}
+
+static CURLcode bundle_create(struct Curl_easy *data,
+                              struct connectbundle **cb_ptr)
+{
+  (void)data;
+  DEBUGASSERT(*cb_ptr == NULL);
+  *cb_ptr = malloc(sizeof(struct connectbundle));
+  if(!*cb_ptr)
+    return CURLE_OUT_OF_MEMORY;
+
+  (*cb_ptr)->num_connections = 0;
+  (*cb_ptr)->multiuse = BUNDLE_UNKNOWN;
+
+  (*cb_ptr)->conn_list = Curl_llist_alloc((curl_llist_dtor) conn_llist_dtor);
+  if(!(*cb_ptr)->conn_list) {
+    Curl_safefree(*cb_ptr);
+    return CURLE_OUT_OF_MEMORY;
+  }
+  return CURLE_OK;
+}
+
+static void bundle_destroy(struct connectbundle *cb_ptr)
+>>>>>>> origin/tomato-shibby-RT-AC
 {
   struct connectbundle *b = (struct connectbundle *) freethis;
 
@@ -66,11 +101,33 @@ struct conncache *Curl_conncache_init(int size)
 
 void Curl_conncache_destroy(struct conncache *connc)
 {
+<<<<<<< HEAD
   if(connc) {
     Curl_hash_destroy(connc->hash);
     connc->hash = NULL;
     free(connc);
   }
+=======
+  if(connc)
+    Curl_hash_destroy(&connc->hash);
+}
+
+/* returns an allocated key to find a bundle for this connection */
+static char *hashkey(struct connectdata *conn)
+{
+  const char *hostname;
+
+  if(conn->bits.socksproxy)
+    hostname = conn->socks_proxy.host.name;
+  else if(conn->bits.httpproxy)
+    hostname = conn->http_proxy.host.name;
+  else if(conn->bits.conn_to_host)
+    hostname = conn->conn_to_host.name;
+  else
+    hostname = conn->host.name;
+
+  return aprintf("%s:%ld", hostname, conn->port);
+>>>>>>> origin/tomato-shibby-RT-AC
 }
 
 struct connectbundle *Curl_conncache_find_bundle(struct conncache *connc,
@@ -125,7 +182,7 @@ CURLcode Curl_conncache_add_conn(struct conncache *connc,
   CURLcode result;
   struct connectbundle *bundle;
   struct connectbundle *new_bundle = NULL;
-  struct SessionHandle *data = conn->data;
+  struct Curl_easy *data = conn->data;
 
   bundle = Curl_conncache_find_bundle(data->state.conn_cache,
                                       conn->host.name);

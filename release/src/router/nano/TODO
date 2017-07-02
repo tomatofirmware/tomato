@@ -1,16 +1,20 @@
-TODO file (? means the feature may be implemented, but not definitely)
-------------------------------------------------------------------------
+A list of desired features
+--------------------------
 
+<<<<<<< HEAD
 For the future (no targeted version, catch-all)
 - Compatibility with vi/emacs status files so we can let other editors 
   know we're in a file?
+=======
+Vague musings:
+>>>>>>> origin/tomato-shibby-RT-AC
 - FriBidi support?
-- Port to DJGPP?
 - Make matching bracket searches sophisticated enough to skip over
   brackets inside comments?
 - Allow indentation of marked text by spaces as well as tabs?
 - Allow indentation to add just enough columns to reach the nearest
   multiple of tabsize, rather than always adding tabsize columns?
+<<<<<<< HEAD
 - Allow conversion between different character sets.  Maybe use glib's
   iconv() if the system's iconv() is inadequate, since we already use
   glib's vsnprintf() if the system lacks vsnprintf()?
@@ -37,9 +41,30 @@ For version 2.4:
   the center line, and M-' (M-") to go to the last line.
 - Detect when we're pasting text, so that we can handle it differently
   (i.e. faster than currently with screen redraws)
+=======
+- Allow conversion between different character sets.
+- Allow setting marks (saved positions, not to be confused with the mark
+  set via Ctrl-^) at various lines and/or columns in the buffer, and
+  allow movement between them with a single keystroke?
+- Allow searching for and replacing newlines?
+  See also https://savannah.gnu.org/bugs/?47053.
+- New regression framework built on expect?
+- Add the ability to move to different lines of the screen with a single
+  keystroke, e.g. M-` (M-~) to go to the top line, M-& (M-7) to go to
+  the center line, and M-' (M-") to go to the last line?
+
+Somewhat urgent:
+- Allow text searches in the help viewer.
+  See https://savannah.gnu.org/bugs/?28994.
+- Detect when text is being pasted, so that we can handle it faster.
+  See https://savannah.gnu.org/bugs/?40060.
+- Allow color syntaxes to apply to more than just color, so that we can
+  e.g. specify a different alternate spell checker depending on which
+  file type we have open.
+>>>>>>> origin/tomato-shibby-RT-AC
 - Allow piping marked text to an external command and replacing it with
-  the command's output (as the internal spell checker already does with
-  the "spell" command)?
+  the command's output -- that is: generalize the spell-check flow.
+  See also https://savannah.gnu.org/bugs/?28993.
 
 For version 2.2:
 - Rebindable keys? [DONE]

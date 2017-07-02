@@ -5,7 +5,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
+<<<<<<< HEAD
  * Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
+=======
+ * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
+>>>>>>> origin/tomato-shibby-RT-AC
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -21,7 +25,7 @@
  ***************************************************************************/
 #include "tool_setup.h"
 
-#include "rawstr.h"
+#include "strcase.h"
 
 #define ENABLE_CURLX_PRINTF
 /* use our own printf() functions */
@@ -87,7 +91,7 @@ CURLcode get_libcurl_info(void)
   if(curlinfo->protocols) {
     for(proto = curlinfo->protocols; *proto; proto++) {
       for(p = possibly_built_in; p->proto_name; p++) {
-        if(curlx_raw_equal(*proto, p->proto_name)) {
+        if(curl_strequal(*proto, p->proto_name)) {
           built_in_protos |= p->proto_pattern;
           break;
         }

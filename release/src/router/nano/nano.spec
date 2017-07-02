@@ -1,5 +1,9 @@
 %define name	nano
+<<<<<<< HEAD
 %define version	2.2.6
+=======
+%define version	2.8.0
+>>>>>>> origin/tomato-shibby-RT-AC
 %define release	1
 
 Summary	: Pico editor clone with enhancements
@@ -15,7 +19,11 @@ BuildRequires	: autoconf, automake, gettext-devel, ncurses-devel
 
 %description
 GNU nano is a small and friendly text editor.  It aims to emulate the
+<<<<<<< HEAD
 Pico text editor while also offering a few enhancements.
+=======
+Pico text editor while also offering several enhancements.
+>>>>>>> origin/tomato-shibby-RT-AC
 
 %prep
 %setup -q
@@ -30,7 +38,11 @@ make DESTDIR="%{buildroot}" install
 
 %files
 %defattr(-,root,root)
+<<<<<<< HEAD
 %doc AUTHORS BUGS COPYING ChangeLog INSTALL NEWS README THANKS TODO doc/faq.html doc/nanorc.sample
+=======
+%doc AUTHORS COPYING ChangeLog INSTALL NEWS README THANKS TODO doc/faq.html doc/sample.nanorc
+>>>>>>> origin/tomato-shibby-RT-AC
 %{_bindir}/*
 %{_mandir}/man*/*
 %{_mandir}/fr/man*/*

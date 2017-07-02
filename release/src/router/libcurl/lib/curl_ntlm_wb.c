@@ -27,8 +27,13 @@
 /*
  * NTLM details:
  *
+<<<<<<< HEAD
  * http://davenport.sourceforge.net/ntlm.html
  * http://www.innovation.ch/java/ntlm.html
+=======
+ * https://davenport.sourceforge.io/ntlm.html
+ * https://www.innovation.ch/java/ntlm.html
+>>>>>>> origin/tomato-shibby-RT-AC
  */
 
 #define DEBUG_ME 0
@@ -46,6 +51,12 @@
 #include "curl_ntlm_wb.h"
 #include "url.h"
 #include "strerror.h"
+<<<<<<< HEAD
+=======
+#include "strdup.h"
+/* The last 3 #include files should be in this order */
+#include "curl_printf.h"
+>>>>>>> origin/tomato-shibby-RT-AC
 #include "curl_memory.h"
 
 #define _MPRINTF_REPLACE /* use our functions only */
@@ -126,7 +137,8 @@ static CURLcode ntlm_wb_init(struct connectdata *conn, const char *userp)
   username = userp;
   slash = strpbrk(username, "\\/");
   if(slash) {
-    if((domain = strdup(username)) == NULL)
+    domain = strdup(username);
+    if(!domain)
       return CURLE_OUT_OF_MEMORY;
     slash = domain + (slash - username);
     *slash = '\0';
@@ -253,12 +265,26 @@ static CURLcode ntlm_wb_response(struct connectdata *conn,
     }
     else if(size == 0)
       goto done;
+<<<<<<< HEAD
     else if(tmpbuf[size - 1] == '\n') {
       tmpbuf[size - 1] = '\0';
       goto wrfinish;
     }
     tmpbuf += size;
     len_out -= size;
+=======
+
+    len_out += size;
+    if(buf[len_out - 1] == '\n') {
+      buf[len_out - 1] = '\0';
+      break;
+    }
+    newbuf = Curl_saferealloc(buf, len_out + NTLM_BUFSIZE);
+    if(!newbuf)
+      return CURLE_OUT_OF_MEMORY;
+
+    buf = newbuf;
+>>>>>>> origin/tomato-shibby-RT-AC
   }
   goto done;
 wrfinish:
@@ -308,7 +334,7 @@ CURLcode Curl_output_ntlm_wb(struct connectdata *conn,
 
   if(proxy) {
     allocuserpwd = &conn->allocptr.proxyuserpwd;
-    userp = conn->proxyuser;
+    userp = conn->http_proxy.user;
     ntlm = &conn->proxyntlm;
     authp = &conn->data->state.authproxy;
   }

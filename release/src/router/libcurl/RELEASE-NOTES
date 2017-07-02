@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Curl and libcurl 7.37.0
 
  Public curl releases:         139
@@ -82,6 +83,25 @@ This release includes the following bugfixes:
  o configure: add GSS-API to supported features [25]
  o ALPN: fix typo in http/1.1 identifier
  o http2: make connection re-use work [26]
+=======
+Curl and libcurl 7.53.1
+
+ Public curl releases:         164
+ Command line options:         205
+ curl_easy_setopt() options:   244
+ Public functions in libcurl:  61
+ Contributors:                 1507
+
+This release includes the following bugfixes:
+
+ o cyassl: fix typo
+ o url: Improve CURLOPT_PROXY_CAPATH error handling [1]
+ o urldata: include curl_sspi.h when Windows SSPI is enabled [2]
+ o formdata: check for EOF when reading from stdin [3]
+ o tests: Set CHARSET & LANG to UTF-8 in 1035, 2046 and 2047 [4]
+ o url: Default the proxy CA bundle location to CURL_CA_BUNDLE [5]
+ o rand: added missing #ifdef HAVE_FCNTL_H around fcntl.h header [6]
+>>>>>>> origin/tomato-shibby-RT-AC
 
 This release includes the following known bugs:
 
@@ -90,6 +110,7 @@ This release includes the following known bugs:
 This release would not have looked like this without help, code, reports and
 advice from friends like these:
 
+<<<<<<< HEAD
   Aaro Koskinen, Cody Mack, Damian Dixon, Dan Fandrich, Daniel Johnson,
   Daniel Stenberg, David Woodhouse, Dilyan Palauzov, Fabian Frank,
   Ivo Bellin Salarin, Jeff King, Jeroen Koekkoek, Jon Torrey, Kamil Dudka,
@@ -97,11 +118,17 @@ advice from friends like these:
   Nick Zitzmann, Patrick Watson, Paul Marks, Radu Simionescu, Remi Gacogne,
   Ryan Braud, Steve Holme, Tatsuhiro Tsujikawa, Till Maas, Tom Sparrow,
   Török Edwin, Vijay Panghal,
+=======
+  Dan Fandrich, Daniel Stenberg, İsmail Dönmez, jveazey on github, Ray Satiro,
+  Sergii Pylypenko, Shachaf Ben-Kiki, Viktor Szakáts,
+  (8 contributors)
+>>>>>>> origin/tomato-shibby-RT-AC
 
         Thanks! (and sorry if I forgot to mention someone)
 
 References to bug reports and discussions on issues:
 
+<<<<<<< HEAD
  [1] = http://curl.haxx.se/bug/view.cgi?id=1350
  [2] = http://curl.haxx.se/mail/lib-2014-03/0173.html
  [3] = http://curl.haxx.se/mail/lib-2014-02/0135.html (ruined)
@@ -128,3 +155,11 @@ References to bug reports and discussions on issues:
  [24] = http://curl.haxx.se/bug/view.cgi?id=1343
  [25] = http://curl.haxx.se/bug/view.cgi?id=1344
  [26] = http://curl.haxx.se/bug/view.cgi?id=1374
+=======
+ [1] = https://curl.haxx.se/bug/?i=1257
+ [2] = https://curl.haxx.se/bug/?i=1276
+ [3] = https://curl.haxx.se/bug/?i=1281
+ [4] = https://curl.haxx.se/bug/?i=1277
+ [5] = https://curl.haxx.se/bug/?i=1257
+ [6] = https://curl.haxx.se/bug/?i=1285
+>>>>>>> origin/tomato-shibby-RT-AC

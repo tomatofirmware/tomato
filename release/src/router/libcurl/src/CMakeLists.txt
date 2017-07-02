@@ -20,9 +20,15 @@ add_executable(
   ${curl_SOURCES}
   )
 
+<<<<<<< HEAD
 source_group("cURLX source files" FILES ${CURLX_ONES})
 source_group("cURL source files" FILES ${CURL_CFILES})
 source_group("cURL header files" FILES ${CURL_HFILES})
+=======
+source_group("curlX source files" FILES ${CURLX_CFILES})
+source_group("curl source files" FILES ${CURL_CFILES})
+source_group("curl header files" FILES ${CURL_HFILES})
+>>>>>>> origin/tomato-shibby-RT-AC
 
 include_directories(
   ${CURL_SOURCE_DIR}/lib        # To be able to reach "curl_setup_once.h"
@@ -30,11 +36,16 @@ include_directories(
   ${CURL_BINARY_DIR}/include    # To be able to reach "curl/curlbuild.h"
   )
 
+<<<<<<< HEAD
 
 # Setup dependencies
 setup_curl_dependencies(${EXE_NAME})
 target_link_libraries( ${EXE_NAME} libcurl )
 
+=======
+#Build curl executable
+target_link_libraries( ${EXE_NAME} libcurl ${CURL_LIBS})
+>>>>>>> origin/tomato-shibby-RT-AC
 
 ################################################################################
 

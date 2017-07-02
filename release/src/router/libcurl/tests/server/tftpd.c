@@ -15,7 +15,7 @@
  */
 
 /*
- * Copyright (c) 1983 Regents of the University of California.
+ * Copyright (c) 1983, 2016 Regents of the University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -376,31 +376,36 @@ static void install_signal_handlers(void)
 {
 #ifdef SIGHUP
   /* ignore SIGHUP signal */
-  if((old_sighup_handler = signal(SIGHUP, SIG_IGN)) == SIG_ERR)
+  old_sighup_handler = signal(SIGHUP, SIG_IGN);
+  if(old_sighup_handler == SIG_ERR)
     logmsg("cannot install SIGHUP handler: %s", strerror(errno));
 #endif
 #ifdef SIGPIPE
   /* ignore SIGPIPE signal */
-  if((old_sigpipe_handler = signal(SIGPIPE, SIG_IGN)) == SIG_ERR)
+  old_sigpipe_handler = signal(SIGPIPE, SIG_IGN);
+  if(old_sigpipe_handler == SIG_ERR)
     logmsg("cannot install SIGPIPE handler: %s", strerror(errno));
 #endif
 #ifdef SIGINT
   /* handle SIGINT signal with our exit_signal_handler */
-  if((old_sigint_handler = signal(SIGINT, exit_signal_handler)) == SIG_ERR)
+  old_sigint_handler = signal(SIGINT, exit_signal_handler);
+  if(old_sigint_handler == SIG_ERR)
     logmsg("cannot install SIGINT handler: %s", strerror(errno));
   else
     siginterrupt(SIGINT, 1);
 #endif
 #ifdef SIGTERM
   /* handle SIGTERM signal with our exit_signal_handler */
-  if((old_sigterm_handler = signal(SIGTERM, exit_signal_handler)) == SIG_ERR)
+  old_sigterm_handler = signal(SIGTERM, exit_signal_handler);
+  if(old_sigterm_handler == SIG_ERR)
     logmsg("cannot install SIGTERM handler: %s", strerror(errno));
   else
     siginterrupt(SIGTERM, 1);
 #endif
 #if defined(SIGBREAK) && defined(WIN32)
   /* handle SIGBREAK signal with our exit_signal_handler */
-  if((old_sigbreak_handler = signal(SIGBREAK, exit_signal_handler)) == SIG_ERR)
+  old_sigbreak_handler = signal(SIGBREAK, exit_signal_handler);
+  if(old_sigbreak_handler == SIG_ERR)
     logmsg("cannot install SIGBREAK handler: %s", strerror(errno));
   else
     siginterrupt(SIGBREAK, 1);
@@ -1019,10 +1024,10 @@ again:
 #ifdef USE_WINSOCK
   recvtimeout = sizeof(recvtimeoutbak);
   getsockopt(peer, SOL_SOCKET, SO_RCVTIMEO,
-             (char*)&recvtimeoutbak, (int*)&recvtimeout);
+             (char *)&recvtimeoutbak, (int *)&recvtimeout);
   recvtimeout = TIMEOUT*1000;
   setsockopt(peer, SOL_SOCKET, SO_RCVTIMEO,
-             (const char*)&recvtimeout, sizeof(recvtimeout));
+             (const char *)&recvtimeout, sizeof(recvtimeout));
 #endif
 
   if (tp->th_opcode == opcode_WRQ)
@@ -1033,7 +1038,7 @@ again:
 #ifdef USE_WINSOCK
   recvtimeout = recvtimeoutbak;
   setsockopt(peer, SOL_SOCKET, SO_RCVTIMEO,
-             (const char*)&recvtimeout, sizeof(recvtimeout));
+             (const char *)&recvtimeout, sizeof(recvtimeout));
 #endif
 
   return 0;
@@ -1211,19 +1216,29 @@ static void sendtftp(struct testcase *test, struct formats *pf)
 {
   int size;
   ssize_t n;
+<<<<<<< HEAD
   unsigned short sendblock; /* block count */
   struct tftphdr *sdp;      /* data buffer */
   struct tftphdr *sap;      /* ack buffer */
+=======
+  /* These are volatile to live through a siglongjmp */
+  volatile unsigned short sendblock; /* block count */
+  struct tftphdr * volatile sdp = r_init(); /* data buffer */
+  struct tftphdr * const sap = &ackbuf.hdr; /* ack buffer */
+>>>>>>> origin/tomato-shibby-RT-AC
 
   sendblock = 1;
 #if defined(HAVE_ALARM) && defined(SIGALRM)
   mysignal(SIGALRM, timer);
 #endif
-  sdp = r_init();
-  sap = &ackbuf.hdr;
   do {
+<<<<<<< HEAD
     size = readit(test, &sdp, pf->f_convert);
     if (size < 0) {
+=======
+    size = readit(test, (struct tftphdr **)&sdp, pf->f_convert);
+    if(size < 0) {
+>>>>>>> origin/tomato-shibby-RT-AC
       nak(errno + 100);
       return;
     }

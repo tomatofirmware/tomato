@@ -6,7 +6,11 @@
 #                            | (__| |_| |  _ <| |___
 #                             \___|\___/|_| \_\_____|
 #
+<<<<<<< HEAD
 # Copyright (C) 1998 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
+=======
+# Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
+>>>>>>> origin/tomato-shibby-RT-AC
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
@@ -141,6 +145,11 @@ my $HTTPTLSPORT;         # HTTP TLS (non-stunnel) server port
 my $HTTPTLS6PORT;        # HTTP TLS (non-stunnel) IPv6 server port
 my $HTTPPROXYPORT;       # HTTP proxy port, when using CONNECT
 my $HTTPPIPEPORT;        # HTTP pipelining port
+<<<<<<< HEAD
+=======
+my $HTTPUNIXPATH;        # HTTP server Unix domain socket path
+my $HTTP2PORT;           # HTTP/2 server port
+>>>>>>> origin/tomato-shibby-RT-AC
 
 my $srcdir = $ENV{'srcdir'} || '.';
 my $CURL="../src/curl".exe_ext(); # what curl executable to run on the tests
@@ -346,7 +355,11 @@ delete $ENV{'CURL_CA_BUNDLE'} if($ENV{'CURL_CA_BUNDLE'});
 # Load serverpidfile hash with pidfile names for all possible servers.
 #
 sub init_serverpidfile_hash {
+<<<<<<< HEAD
   for my $proto (('ftp', 'http', 'imap', 'pop3', 'smtp', 'http')) {
+=======
+  for my $proto (('ftp', 'http', 'imap', 'pop3', 'smtp', 'http/2')) {
+>>>>>>> origin/tomato-shibby-RT-AC
     for my $ssl (('', 's')) {
       for my $ipvnum ((4, 6)) {
         for my $idnum ((1, 2, 3)) {
@@ -366,6 +379,16 @@ sub init_serverpidfile_hash {
       }
     }
   }
+<<<<<<< HEAD
+=======
+  for my $proto (('http', 'imap', 'pop3', 'smtp', 'http/2')) {
+    for my $ssl (('', 's')) {
+      my $serv = servername_id("$proto$ssl", "unix", 1);
+      my $pidf = server_pidfilename("$proto$ssl", "unix", 1);
+      $serverpidfile{$serv} = $pidf;
+    }
+  }
+>>>>>>> origin/tomato-shibby-RT-AC
 }
 
 #######################################################################
@@ -1157,6 +1180,63 @@ sub responsiveserver {
     my $srvrname = servername_str($proto, $ipvnum, $idnum);
     logmsg " server precheck FAILED (unresponsive $srvrname server)\n";
     return 0;
+}
+
+#######################################################################
+# start the http2 server
+#
+sub runhttp2server {
+    my ($verbose, $port) = @_;
+    my $server;
+    my $srvrname;
+    my $pidfile;
+    my $logfile;
+    my $flags = "";
+    my $proto="http/2";
+    my $ipvnum = 4;
+    my $idnum = 0;
+    my $exe = "$perl $srcdir/http2-server.pl";
+    my $verbose_flag = "--verbose ";
+
+    $server = servername_id($proto, $ipvnum, $idnum);
+
+    $pidfile = $serverpidfile{$server};
+
+    # don't retry if the server doesn't work
+    if ($doesntrun{$pidfile}) {
+        return (0,0);
+    }
+
+    my $pid = processexists($pidfile);
+    if($pid > 0) {
+        stopserver($server, "$pid");
+    }
+    unlink($pidfile) if(-f $pidfile);
+
+    $srvrname = servername_str($proto, $ipvnum, $idnum);
+
+    $logfile = server_logfilename($LOGDIR, $proto, $ipvnum, $idnum);
+
+    $flags .= "--pidfile \"$pidfile\" --logfile \"$logfile\" ";
+    $flags .= "--port $HTTP2PORT ";
+    $flags .= $verbose_flag if($debugprotocol);
+
+    my $cmd = "$exe $flags";
+    my ($http2pid, $pid2) = startnew($cmd, $pidfile, 15, 0);
+
+    if($http2pid <= 0 || !pidexists($http2pid)) {
+        # it is NOT alive
+        logmsg "RUN: failed to start the $srvrname server\n";
+        stopserver($server, "$pid2");
+        $doesntrun{$pidfile} = 1;
+        return (0,0);
+    }
+
+    if($verbose) {
+        logmsg "RUN: $srvrname server is now running PID $http2pid\n";
+    }
+
+    return ($http2pid, $pid2);
 }
 
 #######################################################################
@@ -2433,6 +2513,15 @@ sub checksystem {
                     $resolver="threaded";
                 }
             }
+<<<<<<< HEAD
+=======
+            if($feat =~ /HTTP2/) {
+                # http2 enabled
+                $has_http2=1;
+
+                push @protocols, 'http/2';
+            }
+>>>>>>> origin/tomato-shibby-RT-AC
         }
         #
         # Test harness currently uses a non-stunnel server in order to
@@ -2532,6 +2621,7 @@ sub checksystem {
                "*\n");
     }
 
+<<<<<<< HEAD
     logmsg sprintf("* Server SSL:   %8s", $stunnel?"ON ":"OFF");
     logmsg sprintf("  libcurl SSL:  %s\n", $ssl_version?"ON ":"OFF");
     logmsg sprintf("* debug build:  %8s", $debug_build?"ON ":"OFF");
@@ -2589,6 +2679,61 @@ sub checksystem {
         logmsg "\n";
     }
     logmsg sprintf("*   HTTP-PIPE/%d \n", $HTTPPIPEPORT);
+=======
+    logmsg sprintf("* Servers: %s", $stunnel?"SSL ":"");
+    logmsg sprintf("%s", $http_ipv6?"HTTP-IPv6 ":"");
+    logmsg sprintf("%s", $http_unix?"HTTP-unix ":"");
+    logmsg sprintf("%s\n", $ftp_ipv6?"FTP-IPv6 ":"");
+
+    logmsg sprintf("* Env: %s%s", $valgrind?"Valgrind ":"",
+                   $run_event_based?"event-based ":"");
+    logmsg sprintf("%s\n", $libtool?"Libtool ":"");
+
+    if($verbose) {
+        logmsg "* Ports:\n";
+
+        logmsg sprintf("*   HTTP/%d ", $HTTPPORT);
+        logmsg sprintf("FTP/%d ", $FTPPORT);
+        logmsg sprintf("FTP2/%d ", $FTP2PORT);
+        logmsg sprintf("RTSP/%d ", $RTSPPORT);
+        if($stunnel) {
+            logmsg sprintf("FTPS/%d ", $FTPSPORT);
+            logmsg sprintf("HTTPS/%d ", $HTTPSPORT);
+        }
+        logmsg sprintf("\n*   TFTP/%d ", $TFTPPORT);
+        if($http_ipv6) {
+            logmsg sprintf("HTTP-IPv6/%d ", $HTTP6PORT);
+            logmsg sprintf("RTSP-IPv6/%d ", $RTSP6PORT);
+        }
+        if($ftp_ipv6) {
+            logmsg sprintf("FTP-IPv6/%d ", $FTP6PORT);
+        }
+        if($tftp_ipv6) {
+            logmsg sprintf("TFTP-IPv6/%d ", $TFTP6PORT);
+        }
+        logmsg sprintf("\n*   GOPHER/%d ", $GOPHERPORT);
+        if($gopher_ipv6) {
+            logmsg sprintf("GOPHER-IPv6/%d", $GOPHERPORT);
+        }
+        logmsg sprintf("\n*   SSH/%d ", $SSHPORT);
+        logmsg sprintf("SOCKS/%d ", $SOCKSPORT);
+        logmsg sprintf("POP3/%d ", $POP3PORT);
+        logmsg sprintf("IMAP/%d ", $IMAPPORT);
+        logmsg sprintf("SMTP/%d\n", $SMTPPORT);
+        if($ftp_ipv6) {
+            logmsg sprintf("*   POP3-IPv6/%d ", $POP36PORT);
+            logmsg sprintf("IMAP-IPv6/%d ", $IMAP6PORT);
+            logmsg sprintf("SMTP-IPv6/%d\n", $SMTP6PORT);
+        }
+        if($httptlssrv) {
+            logmsg sprintf("*   HTTPTLS/%d ", $HTTPTLSPORT);
+            if($has_ipv6) {
+                logmsg sprintf("HTTPTLS-IPv6/%d ", $HTTPTLS6PORT);
+            }
+            logmsg "\n";
+        }
+        logmsg sprintf("*   HTTP-PIPE/%d \n", $HTTPPIPEPORT);
+>>>>>>> origin/tomato-shibby-RT-AC
 
     $has_textaware = ($^O eq 'MSWin32') || ($^O eq 'msys');
 
@@ -2616,6 +2761,7 @@ sub subVariables {
   $$thing =~ s/%HTTPTLSPORT/$HTTPTLSPORT/g;
   $$thing =~ s/%HTTP6PORT/$HTTP6PORT/g;
   $$thing =~ s/%HTTPSPORT/$HTTPSPORT/g;
+  $$thing =~ s/%HTTP2PORT/$HTTP2PORT/g;
   $$thing =~ s/%HTTPPORT/$HTTPPORT/g;
   $$thing =~ s/%HTTPPIPEPORT/$HTTPPIPEPORT/g;
   $$thing =~ s/%PROXYPORT/$HTTPPROXYPORT/g;
@@ -2882,6 +3028,19 @@ sub singletest {
                     next;
                 }
             }
+<<<<<<< HEAD
+=======
+            elsif($1 eq "http/2") {
+                if($has_http2) {
+                    next;
+                }
+            }
+            elsif($1 eq "PSL") {
+                if($has_psl) {
+                    next;
+                }
+            }
+>>>>>>> origin/tomato-shibby-RT-AC
             elsif($1 eq "socks") {
                 next;
             }
@@ -3376,7 +3535,7 @@ sub singletest {
             $usevalgrind = 1;
             my $valgrindcmd = "$valgrind ";
             $valgrindcmd .= "$valgrind_tool " if($valgrind_tool);
-            $valgrindcmd .= "--leak-check=yes ";
+            $valgrindcmd .= "--quiet --leak-check=yes ";
             $valgrindcmd .= "--suppressions=$srcdir/valgrind.supp ";
            # $valgrindcmd .= "--gen-suppressions=all ";
             $valgrindcmd .= "--num-callers=16 ";
@@ -3621,6 +3780,23 @@ sub singletest {
     if (@validstdout) {
         # verify redirected stdout
         my @actual = loadarray($STDOUT);
+
+        # what parts to cut off from stdout
+        my @stripfile = getpart("verify", "stripfile");
+
+        foreach my $strip (@stripfile) {
+            chomp $strip;
+            my @newgen;
+            for(@actual) {
+                eval $strip;
+                if($_) {
+                    push @newgen, $_;
+                }
+            }
+            # this is to get rid of array entries that vanished (zero
+            # length) because of replacements
+            @actual = @newgen;
+        }
 
         # variable-replace in the stdout we have from the test case file
         @validstdout = fixarray(@validstdout);
@@ -4028,7 +4204,7 @@ sub startservers {
     for(@what) {
         my (@whatlist) = split(/\s+/,$_);
         my $what = lc($whatlist[0]);
-        $what =~ s/[^a-z0-9-]//g;
+        $what =~ s/[^a-z0-9\/-]//g;
 
         my $certfile;
         if($what =~ /^(ftp|http|imap|pop3|smtp)s((\d*)(-ipv6|))$/) {
@@ -4112,6 +4288,17 @@ sub startservers {
                 logmsg sprintf("* pid gopher-ipv6 => %d %d\n", $pid,
                                $pid2) if($verbose);
                 $run{'gopher-ipv6'}="$pid $pid2";
+            }
+        }
+        elsif($what eq "http/2") {
+            if(!$run{'http/2'}) {
+                ($pid, $pid2) = runhttp2server($verbose, $HTTP2PORT);
+                if($pid <= 0) {
+                    return "failed starting HTTP/2 server";
+                }
+                logmsg sprintf ("* pid http/2 => %d %d\n", $pid, $pid2)
+                    if($verbose);
+                $run{'http/2'}="$pid $pid2";
             }
         }
         elsif($what eq "http") {
@@ -4838,6 +5025,11 @@ $HTTPTLSPORT     = $base++; # HTTP TLS (non-stunnel) server port
 $HTTPTLS6PORT    = $base++; # HTTP TLS (non-stunnel) IPv6 server port
 $HTTPPROXYPORT   = $base++; # HTTP proxy port, when using CONNECT
 $HTTPPIPEPORT    = $base++; # HTTP pipelining port
+<<<<<<< HEAD
+=======
+$HTTP2PORT       = $base++; # HTTP/2 port
+$HTTPUNIXPATH    = 'http.sock'; # HTTP server Unix domain socket path
+>>>>>>> origin/tomato-shibby-RT-AC
 
 #######################################################################
 # clear and create logging directory:

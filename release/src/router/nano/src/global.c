@@ -1,23 +1,31 @@
 /* $Id: global.c 4520 2010-11-12 06:23:14Z astyanax $ */
 /**************************************************************************
- *   global.c                                                             *
+ *   global.c  --  This file is part of GNU nano.                         *
  *                                                                        *
  *   Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,  *
+<<<<<<< HEAD
  *   2008, 2009 Free Software Foundation, Inc.                            *
  *   This program is free software; you can redistribute it and/or modify *
  *   it under the terms of the GNU General Public License as published by *
  *   the Free Software Foundation; either version 3, or (at your option)  *
  *   any later version.                                                   *
+=======
+ *   2008, 2009, 2010, 2011, 2013, 2014 Free Software Foundation, Inc.    *
+ *   Copyright (C) 2014, 2015, 2016 Benno Schulenberg                     *
+>>>>>>> origin/tomato-shibby-RT-AC
  *                                                                        *
- *   This program is distributed in the hope that it will be useful, but  *
- *   WITHOUT ANY WARRANTY; without even the implied warranty of           *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU    *
- *   General Public License for more details.                             *
+ *   GNU nano is free software: you can redistribute it and/or modify     *
+ *   it under the terms of the GNU General Public License as published    *
+ *   by the Free Software Foundation, either version 3 of the License,    *
+ *   or (at your option) any later version.                               *
+ *                                                                        *
+ *   GNU nano is distributed in the hope that it will be useful,          *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty          *
+ *   of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.              *
+ *   See the GNU General Public License for more details.                 *
  *                                                                        *
  *   You should have received a copy of the GNU General Public License    *
- *   along with this program; if not, write to the Free Software          *
- *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA            *
- *   02110-1301, USA.                                                     *
+ *   along with this program.  If not, see http://www.gnu.org/licenses/.  *
  *                                                                        *
  **************************************************************************/
 
@@ -30,12 +38,49 @@
 
 /* Global variables. */
 #ifndef NANO_TINY
+<<<<<<< HEAD
 sigjmp_buf jump_buf;
 	/* Used to return to either main() or the unjustify routine in
 	 * do_justify() after a SIGWINCH. */
 bool jump_buf_main = FALSE;
 	/* Have we set jump_buf so that we return to main() after a
 	 * SIGWINCH? */
+=======
+volatile sig_atomic_t the_window_resized = FALSE;
+	/* Set to TRUE by the handler whenever a SIGWINCH occurs. */
+#endif
+
+#ifdef __linux__
+bool console;
+	/* Whether we're running on a Linux VC (TRUE) or under X (FALSE). */
+#endif
+
+bool meta_key;
+	/* Whether the current keystroke is a Meta key. */
+bool shift_held;
+	/* Whether Shift was being held together with a movement key. */
+bool focusing = TRUE;
+	/* Whether an update of the edit window should center the cursor. */
+
+bool as_an_at = TRUE;
+	/* Whether a 0x0A byte should be shown as a ^@ instead of a ^J. */
+
+int margin = 0;
+	/* The amount of space reserved at the left for line numbers. */
+int editwincols = -1;
+	/* The number of usable columns in the edit window: COLS - margin. */
+
+message_type lastmessage = HUSH;
+	/* Messages of type HUSH should not overwrite type MILD nor ALERT. */
+
+filestruct *pletion_line = NULL;
+	/* The line where the last completion was found, if any. */
+
+int controlleft, controlright, controlup, controldown;
+#ifndef NANO_TINY
+int shiftcontrolleft, shiftcontrolright, shiftcontrolup, shiftcontroldown;
+int shiftaltleft, shiftaltright, shiftaltup, shiftaltdown;
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif
 
 #ifndef DISABLE_WRAPJUSTIFY
@@ -66,19 +111,18 @@ WINDOW *bottomwin;
 	 * messages, the statusbar prompt, and a list of shortcuts. */
 int editwinrows = 0;
 	/* How many rows does the edit window take up? */
+<<<<<<< HEAD
 int maxrows = 0;
 	/* How many usable lines are there (due to soft wrapping) */
+=======
+>>>>>>> origin/tomato-shibby-RT-AC
 
 filestruct *cutbuffer = NULL;
 	/* The buffer where we store cut text. */
 filestruct *cutbottom = NULL;
-#ifndef DISABLE_JUSTIFY
-filestruct *jusbuffer = NULL;
-	/* The buffer where we store unjustified text. */
-#endif
+	/* The last line in the cutbuffer. */
 partition *filepart = NULL;
-	/* The partition where we store a portion of the current
-	 * file. */
+	/* The "partition" where we store a portion of the current file. */
 openfilestruct *openfile = NULL;
 	/* The list of all open file buffers. */
 
@@ -104,18 +148,16 @@ char *brackets = NULL;
 	 * can end sentences. */
 char *quotestr = NULL;
 	/* The quoting string.  The default value is set in main(). */
-#ifdef HAVE_REGEX_H
 regex_t quotereg;
 	/* The compiled regular expression from the quoting string. */
 int quoterc;
 	/* Whether it was compiled successfully. */
 char *quoteerr = NULL;
 	/* The error message, if it didn't. */
-#else
-size_t quotelen;
-	/* The length of the quoting string in bytes. */
-#endif
-#endif
+#endif /* !DISABLE_JUSTIFY */
+
+char *word_chars = NULL;
+	/* Nonalphanumeric characters that also form words. */
 
 bool nodelay_mode = FALSE;
 	/* Are we in nodelay mode (checking for a cancel wile doing something */
@@ -124,8 +166,7 @@ char *answer = NULL;
 	/* The answer string used by the statusbar prompt. */
 
 ssize_t tabsize = -1;
-	/* The width of a tab in spaces.  The default value is set in
-	 * main(). */
+	/* The width of a tab in spaces.  The default is set in main(). */
 
 #ifndef NANO_TINY
 char *backup_dir = NULL;
@@ -162,11 +203,25 @@ int currmenu;
 	/* The currently loaded menu */
 
 sc *sclist = NULL;
+<<<<<<< HEAD
 	/* New shortcut key struct */
 subnfunc *allfuncs = NULL;
 	/* New struct for the function list */
 
 #ifndef NANO_TINY
+=======
+	/* The start of the shortcuts list. */
+subnfunc *allfuncs = NULL;
+	/* The start of the functions list. */
+subnfunc *tailfunc;
+	/* The last function in the list. */
+subnfunc *exitfunc;
+	/* A pointer to the special Exit/Close item. */
+subnfunc *uncutfunc;
+	/* A pointer to the special Uncut/Unjustify item. */
+
+#ifndef DISABLE_HISTORIES
+>>>>>>> origin/tomato-shibby-RT-AC
 filestruct *search_history = NULL;
 	/* The search string history list. */
 filestruct *searchage = NULL;
@@ -181,35 +236,52 @@ filestruct *replacebot = NULL;
 	/* The bottom of the replace string history list. */
 #endif
 
-/* Regular expressions. */
-#ifdef HAVE_REGEX_H
 regex_t search_regexp;
 	/* The compiled regular expression to use in searches. */
 regmatch_t regmatches[10];
 	/* The match positions for parenthetical subexpressions, 10
 	 * maximum, used in regular expression searches. */
-#endif
 
+<<<<<<< HEAD
 int reverse_attr = A_REVERSE;
 	/* The curses attribute we use for reverse video. */
+=======
+int hilite_attribute = A_REVERSE;
+	/* The curses attribute we use to highlight something. */
+#ifndef DISABLE_COLOR
+char* specified_color_combo[] = {};
+	/* The color combinations as specified in the rcfile. */
+#endif
+int interface_color_pair[] = {};
+	/* The processed color pairs for the interface elements. */
+>>>>>>> origin/tomato-shibby-RT-AC
 
 char *homedir = NULL;
 	/* The user's home directory, from $HOME or /etc/passwd. */
 
+<<<<<<< HEAD
 /* Return the number of entries in the shortcut list s for a given menu. */
+=======
+
+/* Return the number of entries in the shortcut list for a given menu. */
+>>>>>>> origin/tomato-shibby-RT-AC
 size_t length_of_list(int menu)
 {
     subnfunc *f;
     size_t i = 0;
 
     for (f = allfuncs; f != NULL; f = f->next)
+<<<<<<< HEAD
         if ((f->menus & menu) != 0
 #ifndef DISABLE_HELP
 	    && strlen(f->help) > 0
 #endif
 	                          ) {
+=======
+	if ((f->menus & menu) && first_sc_for(menu, f->scfunc) != NULL)
+>>>>>>> origin/tomato-shibby-RT-AC
 	    i++;
-	}
+
     return i;
 }
 
@@ -257,9 +329,21 @@ void add_to_funcs(short func, int menus, const char *desc, const char *help,
 #endif
 }
 
+<<<<<<< HEAD
 const sc *first_sc_for(int menu, short func) {
     const sc *s;
     const sc *metasc = NULL;
+=======
+/* Add a key combo to the shortcut list. */
+void add_to_sclist(int menus, const char *scstring, const int keycode,
+			void (*func)(void), int toggle)
+{
+    static sc *tailsc;
+#ifndef NANO_TINY
+    static int counter = 0;
+#endif
+    sc *s = (sc *)nmalloc(sizeof(sc));
+>>>>>>> origin/tomato-shibby-RT-AC
 
     for (s = sclist; s != NULL; s = s->next) {
 	if ((s->menu & menu) && s->scfunc == func) {
@@ -275,12 +359,27 @@ const sc *first_sc_for(int menu, short func) {
 	}
     }
 
+<<<<<<< HEAD
     /* If we're here we may have found only meta sequences, if so use one */
     if (metasc)
 	return metasc;
 
 #ifdef DEBUG
     fprintf(stderr, "Whoops, returning null given func %ld in menu %d\n", (long) func, menu);
+=======
+    /* Fill in the data. */
+    s->menus = menus;
+    s->scfunc = func;
+#ifndef NANO_TINY
+    s->toggle = toggle;
+    if (toggle)
+	s->ordinal = ++counter;
+#endif
+    assign_keyinfo(s, scstring, keycode);
+
+#ifdef DEBUG
+    fprintf(stderr, "Setting keycode to %d for shortcut \"%s\" in menus %x\n", s->keycode, scstring, s->menus);
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif
     /* Otherwise... */
     return NULL;
@@ -326,6 +425,7 @@ void add_to_sclist(int menu, const char *scstring, short func, int toggle, int e
 #endif
 }
 
+<<<<<<< HEAD
 /* Return the given menu's first shortcut sequence, or the default value
   (2nd arg).  Assumes currmenu for the menu to check*/
 int sc_seq_or (short func, int defaultval) 
@@ -389,6 +489,58 @@ void assign_keyinfo(sc *s)
 	s->seq = KEY_END;
 #endif
 
+=======
+/* Return the first keycode that is bound to the given function in the
+ * current menu, if any; otherwise, return the given default value. */
+int the_code_for(void (*func)(void), int defaultval)
+{
+    const sc *s = first_sc_for(currmenu, func);
+
+    if (s == NULL)
+	return defaultval;
+
+    meta_key = s->meta;
+    return s->keycode;
+}
+
+/* Return a pointer to the function that is bound to the given key. */
+functionptrtype func_from_key(int *kbinput)
+{
+    const sc *s = get_shortcut(kbinput);
+
+    if (s)
+	return s->scfunc;
+    else
+	return NULL;
+}
+
+/* Set the string and its corresponding keycode for the given shortcut s. */
+void assign_keyinfo(sc *s, const char *keystring, const int keycode)
+{
+    s->keystr = keystring;
+    s->meta = (keystring[0] == 'M');
+
+    assert(strlen(keystring) > 1 && (!s->meta || strlen(keystring) > 2));
+
+    if (keycode)
+	s->keycode = keycode;
+    else if (keystring[0] == '^') {
+	if (strcasecmp(keystring, "^Space") == 0)
+	    s->keycode = 0;
+	else
+	    s->keycode = keystring[1] - 64;
+    } else if (s->meta) {
+	if (strcasecmp(keystring, "M-Space") == 0)
+	    s->keycode = (int)' ';
+	else
+	    s->keycode = tolower((unsigned char)keystring[2]);
+    } else if (keystring[0] == 'F')
+	s->keycode = KEY_F0 + atoi(&keystring[1]);
+    else if (!strcasecmp(keystring, "Ins"))
+	s->keycode = KEY_IC;
+    else if (!strcasecmp(keystring, "Del"))
+	s->keycode = KEY_DC;
+>>>>>>> origin/tomato-shibby-RT-AC
 }
 
 #ifdef DEBUG
@@ -490,11 +642,17 @@ void shortcut_init(bool unjustify)
     const char *end_of_par_msg = N_("End of Par");
     const char *fulljstify_msg = N_("FullJstify");
 #endif
+<<<<<<< HEAD
     const char *refresh_msg = N_("Refresh");
 #ifndef NANO_TINY
     const char *insert_file_msg =  N_("Insert File");
 #endif
     const char *go_to_line_msg = N_("Go To Line");
+=======
+    const char *refresh_tag = N_("Refresh");
+    /* TRANSLATORS: Try to keep this string at most 12 characters. */
+    const char *whereis_next_tag = N_("WhereIs Next");
+>>>>>>> origin/tomato-shibby-RT-AC
 
 #ifndef DISABLE_JUSTIFY
     const char *nano_justify_msg = N_("Justify the current paragraph");
@@ -517,12 +675,26 @@ void shortcut_init(bool unjustify)
 	N_("Insert another file into the current one");
     const char *nano_whereis_msg =
 	N_("Search for a string or a regular expression");
+<<<<<<< HEAD
     const char *nano_prevpage_msg = N_("Go to previous screen");
     const char *nano_nextpage_msg = N_("Go to next screen");
+=======
+#ifndef DISABLE_BROWSER
+    const char *nano_browser_whereis_msg = N_("Search for a string");
+    const char *nano_browser_refresh_msg = N_("Refresh the file list");
+#ifndef NANO_TINY
+    const char *nano_browser_lefthand_msg = N_("Go to lefthand column");
+    const char *nano_browser_righthand_msg = N_("Go to righthand column");
+#endif
+#endif
+    const char *nano_prevpage_msg = N_("Go one screenful up");
+    const char *nano_nextpage_msg = N_("Go one screenful down");
+>>>>>>> origin/tomato-shibby-RT-AC
     const char *nano_cut_msg =
 	N_("Cut the current line and store it in the cutbuffer");
     const char *nano_uncut_msg =
 	N_("Uncut from the cutbuffer into the current line");
+<<<<<<< HEAD
     const char *nano_cursorpos_msg =
 	N_("Display the position of the cursor");
     const char *nano_spell_msg =
@@ -533,6 +705,17 @@ void shortcut_init(bool unjustify)
 #ifndef NANO_TINY
     const char *nano_mark_msg = N_("Mark text at the cursor position");
     const char *nano_whereis_next_msg = N_("Repeat last search");
+=======
+    const char *nano_cursorpos_msg = N_("Display the position of the cursor");
+#ifndef DISABLE_SPELLER
+    const char *nano_spell_msg = N_("Invoke the spell checker, if available");
+#endif
+    const char *nano_replace_msg = N_("Replace a string or a regular expression");
+    const char *nano_gotoline_msg = N_("Go to line and column number");
+    const char *nano_whereis_next_msg = N_("Repeat the last search");
+#ifndef NANO_TINY
+    const char *nano_mark_msg = N_("Mark text starting from the cursor position");
+>>>>>>> origin/tomato-shibby-RT-AC
     const char *nano_copy_msg =
 	N_("Copy the current line and store it in the cutbuffer");
     const char *nano_indent_msg = N_("Indent the current line");
@@ -541,15 +724,22 @@ void shortcut_init(bool unjustify)
     const char *nano_redo_msg = N_("Redo the last undone operation");
 #endif
     const char *nano_forward_msg = N_("Go forward one character");
+<<<<<<< HEAD
     const char *nano_back_msg = N_("Go back one character");
 #ifndef NANO_TINY
     const char *nano_nextword_msg = N_("Go forward one word");
     const char *nano_prevword_msg = N_("Go back one word");
 #endif
+=======
+    const char *nano_prevword_msg = N_("Go back one word");
+    const char *nano_nextword_msg = N_("Go forward one word");
+>>>>>>> origin/tomato-shibby-RT-AC
     const char *nano_prevline_msg = N_("Go to previous line");
     const char *nano_nextline_msg = N_("Go to next line");
     const char *nano_home_msg = N_("Go to beginning of current line");
     const char *nano_end_msg = N_("Go to end of current line");
+    const char *nano_prevblock_msg = N_("Go to previous block of text");
+    const char *nano_nextblock_msg = N_("Go to next block of text");
 #ifndef DISABLE_JUSTIFY
     const char *nano_parabegin_msg =
 	N_("Go to beginning of paragraph; then of previous paragraph");
@@ -597,18 +787,36 @@ void shortcut_init(bool unjustify)
     const char *nano_refresh_msg =
 	N_("Refresh (redraw) the current screen");
     const char *nano_suspend_msg =
+<<<<<<< HEAD
 	N_("Suspend the editor (if suspend is enabled)");
 #ifndef NANO_TINY
+=======
+	N_("Suspend the editor (if suspension is enabled)");
+#ifdef ENABLE_WORDCOMPLETION
+    const char *nano_completion_msg = N_("Try and complete the current word");
+#endif
+#ifdef ENABLE_COMMENT
+    const char *nano_comment_msg =
+	N_("Comment/uncomment the current line or marked lines");
+#endif
+#ifndef NANO_TINY
+    const char *nano_savefile_msg = N_("Save file without prompting");
+    const char *nano_findprev_msg = N_("Search next occurrence backward");
+    const char *nano_findnext_msg = N_("Search next occurrence forward");
+#endif
+>>>>>>> origin/tomato-shibby-RT-AC
     const char *nano_case_msg =
 	N_("Toggle the case sensitivity of the search");
     const char *nano_reverse_msg =
 	N_("Reverse the direction of the search");
-#endif
-#ifdef HAVE_REGEX_H
     const char *nano_regexp_msg =
 	N_("Toggle the use of regular expressions");
+<<<<<<< HEAD
 #endif
 #ifndef NANO_TINY
+=======
+#ifndef DISABLE_HISTORIES
+>>>>>>> origin/tomato-shibby-RT-AC
     const char *nano_prev_history_msg =
 	N_("Recall the previous search/replace string");
     const char *nano_next_history_msg =
@@ -750,6 +958,7 @@ void shortcut_init(bool unjustify)
     add_to_funcs(DO_GOTOLINECOLUMN_VOID, (MMAIN|MWHEREIS),
 	go_to_line_msg, IFSCHELP(nano_gotoline_msg), FALSE, VIEW);
 
+<<<<<<< HEAD
 #ifdef NANO_TINY
     /* TRANSLATORS: Try to keep this at most 10 characters. */
     add_to_funcs(DO_CURSORPOS_VOID, MMAIN, N_("Cur Pos"), IFSCHELP(nano_cursorpos_msg),
@@ -765,9 +974,41 @@ void shortcut_init(bool unjustify)
 	TRUE,
 #endif
 	NOVIEW);
+=======
+    add_to_funcs(do_cursorpos_void, MMAIN,
+	N_("Cur Pos"), IFSCHELP(nano_cursorpos_msg), TOGETHER, VIEW);
+
+#if (!defined(DISABLE_JUSTIFY) && (!defined(DISABLE_SPELLER) || !defined(DISABLE_COLOR)) || \
+	defined(DISABLE_JUSTIFY) && defined(DISABLE_SPELLER) && defined(DISABLE_COLOR))
+    /* Conditionally placing this one here or further on, to keep the
+     * help items nicely paired in most conditions. */
+    add_to_funcs(do_gotolinecolumn_void, MMAIN,
+	gotoline_tag, IFSCHELP(nano_gotoline_msg), BLANKAFTER, VIEW);
+#endif
+
+#ifndef NANO_TINY
+    add_to_funcs(do_undo, MMAIN,
+	N_("Undo"), IFSCHELP(nano_undo_msg), TOGETHER, NOVIEW);
+    add_to_funcs(do_redo, MMAIN,
+	N_("Redo"), IFSCHELP(nano_redo_msg), BLANKAFTER, NOVIEW);
+
+    add_to_funcs(do_mark, MMAIN,
+	N_("Mark Text"), IFSCHELP(nano_mark_msg), TOGETHER, VIEW);
+    add_to_funcs(do_copy_text, MMAIN,
+	N_("Copy Text"), IFSCHELP(nano_copy_msg), BLANKAFTER, NOVIEW);
+#endif
+
+    add_to_funcs(case_sens_void, MWHEREIS|MREPLACE,
+	N_("Case Sens"), IFSCHELP(nano_case_msg), TOGETHER, VIEW);
+    add_to_funcs(regexp_void, MWHEREIS|MREPLACE,
+	N_("Regexp"), IFSCHELP(nano_regexp_msg), TOGETHER, VIEW);
+    add_to_funcs(backwards_void, MWHEREIS|MREPLACE,
+	N_("Backwards"), IFSCHELP(nano_reverse_msg), TOGETHER, VIEW);
+>>>>>>> origin/tomato-shibby-RT-AC
 
 #ifndef NANO_TINY
 
+<<<<<<< HEAD
     add_to_funcs(DO_MARK, MMAIN, N_("Mark Text"), 
 	IFSCHELP(nano_mark_msg), FALSE, VIEW);
 
@@ -806,11 +1047,39 @@ void shortcut_init(bool unjustify)
     add_to_funcs(DO_LEFT, MMAIN, N_("Back"), IFSCHELP(nano_back_msg),
 	FALSE, VIEW);
 
+=======
+#ifndef DISABLE_JUSTIFY
+    add_to_funcs(do_full_justify, MWHEREIS,
+	fulljustify_tag, IFSCHELP(nano_fulljustify_msg), TOGETHER, NOVIEW);
+
+    add_to_funcs(do_gotolinecolumn_void, MWHEREIS,
+	gotoline_tag, IFSCHELP(nano_gotoline_msg), BLANKAFTER, VIEW);
+#endif
+
+#ifndef NANO_TINY
+    add_to_funcs(do_find_bracket, MMAIN,
+	N_("To Bracket"), IFSCHELP(nano_bracket_msg), BLANKAFTER, VIEW);
+
+    add_to_funcs(do_research, MMAIN,
+	whereis_next_tag, IFSCHELP(nano_whereis_next_msg), TOGETHER, VIEW);
+
+    add_to_funcs(do_findprevious, MMAIN,
+	N_("Previous"), IFSCHELP(nano_findprev_msg), TOGETHER, VIEW);
+    add_to_funcs(do_findnext, MMAIN,
+	N_("Next"), IFSCHELP(nano_findnext_msg), BLANKAFTER, VIEW);
+#endif /* !NANO_TINY */
+
+    add_to_funcs(do_left, MMAIN,
+	N_("Back"), IFSCHELP(nano_back_msg), TOGETHER, VIEW);
+    add_to_funcs(do_right, MMAIN,
+	N_("Forward"), IFSCHELP(nano_forward_msg), TOGETHER, VIEW);
+>>>>>>> origin/tomato-shibby-RT-AC
 #ifndef DISABLE_BROWSER
     add_to_funcs(DO_LEFT, MBROWSER, N_("Back"), IFSCHELP(nano_backfile_msg),
 	FALSE, VIEW);
 #endif
 
+<<<<<<< HEAD
     add_to_funcs(DO_LEFT, MALL, "", "", FALSE, VIEW);
 
 #ifndef NANO_TINY
@@ -832,11 +1101,55 @@ void shortcut_init(bool unjustify)
 
     add_to_funcs(DO_END, MMAIN, N_("End"), IFSCHELP(nano_end_msg),
 	FALSE, VIEW);
+=======
+    add_to_funcs(do_prev_word_void, MMAIN,
+	N_("Prev Word"), IFSCHELP(nano_prevword_msg), TOGETHER, VIEW);
+    add_to_funcs(do_next_word_void, MMAIN,
+	N_("Next Word"), IFSCHELP(nano_nextword_msg), TOGETHER, VIEW);
+
+    add_to_funcs(do_home_void, MMAIN,
+	N_("Home"), IFSCHELP(nano_home_msg), TOGETHER, VIEW);
+    add_to_funcs(do_end_void, MMAIN,
+	N_("End"), IFSCHELP(nano_end_msg), BLANKAFTER, VIEW);
+
+    add_to_funcs(do_up_void, MMAIN|MBROWSER,
+	prev_line_tag, IFSCHELP(nano_prevline_msg), TOGETHER, VIEW);
+    add_to_funcs(do_down_void, MMAIN|MBROWSER,
+	next_line_tag, IFSCHELP(nano_nextline_msg), TOGETHER, VIEW);
+#ifndef NANO_TINY
+    add_to_funcs(do_scroll_up, MMAIN,
+	N_("Scroll Up"), IFSCHELP(nano_scrollup_msg), TOGETHER, VIEW);
+    add_to_funcs(do_scroll_down, MMAIN,
+	N_("Scroll Down"), IFSCHELP(nano_scrolldown_msg), BLANKAFTER, VIEW);
+#endif
+
+    add_to_funcs(do_prev_block, MMAIN,
+	N_("Prev Block"), IFSCHELP(nano_prevblock_msg), TOGETHER, VIEW);
+    add_to_funcs(do_next_block, MMAIN,
+	N_("Next Block"), IFSCHELP(nano_nextblock_msg), TOGETHER, VIEW);
+#ifndef DISABLE_JUSTIFY
+    add_to_funcs(do_para_begin_void, MMAIN|MWHEREIS,
+	N_("Beg of Par"), IFSCHELP(nano_parabegin_msg), TOGETHER, VIEW);
+    add_to_funcs(do_para_end_void, MMAIN|MWHEREIS,
+	N_("End of Par"), IFSCHELP(nano_paraend_msg), BLANKAFTER, VIEW);
+#endif
+
+    add_to_funcs(do_page_up, MMAIN|MHELP,
+	prev_page_tag, IFSCHELP(nano_prevpage_msg), TOGETHER, VIEW);
+    add_to_funcs(do_page_down, MMAIN|MHELP,
+	next_page_tag, IFSCHELP(nano_nextpage_msg), TOGETHER, VIEW);
+
+    add_to_funcs(do_first_line, MMAIN|MHELP|MWHEREIS|MREPLACE|MREPLACEWITH|MGOTOLINE,
+	N_("First Line"), IFSCHELP(nano_firstline_msg), TOGETHER, VIEW);
+    add_to_funcs(do_last_line, MMAIN|MHELP|MWHEREIS|MREPLACE|MREPLACEWITH|MGOTOLINE,
+	N_("Last Line"), IFSCHELP(nano_lastline_msg), BLANKAFTER, VIEW);
+>>>>>>> origin/tomato-shibby-RT-AC
 
 #ifndef DISABLE_JUSTIFY
     add_to_funcs(DO_PARA_BEGIN_VOID, (MMAIN|MWHEREIS), beg_of_par_msg,
 	IFSCHELP(nano_parabegin_msg), FALSE, VIEW);
 
+<<<<<<< HEAD
     add_to_funcs(DO_PARA_END_VOID, (MMAIN|MWHEREIS), end_of_par_msg,
 	IFSCHELP(nano_paraend_msg), FALSE, VIEW);
 #endif
@@ -880,6 +1193,27 @@ void shortcut_init(bool unjustify)
 	TRUE,
 #endif
 	NOVIEW);
+=======
+#if (defined(DISABLE_JUSTIFY) && (!defined(DISABLE_SPELLER) || !defined(DISABLE_COLOR)) || \
+	!defined(DISABLE_JUSTIFY) && defined(DISABLE_SPELLER) && defined(DISABLE_COLOR))
+    add_to_funcs(do_gotolinecolumn_void, MMAIN,
+	gotoline_tag, IFSCHELP(nano_gotoline_msg), BLANKAFTER, VIEW);
+#endif
+
+#ifdef NANO_TINY
+    /* Place this one here only in the tiny version; otherwise further up. */
+    add_to_funcs(do_research, MMAIN,
+	whereis_next_tag, IFSCHELP(nano_whereis_next_msg), TOGETHER, VIEW);
+#endif
+
+    add_to_funcs(do_verbatim_input, MMAIN,
+	N_("Verbatim"), IFSCHELP(nano_verbatim_msg), TOGETHER, NOVIEW);
+
+    add_to_funcs(do_tab, MMAIN,
+	N_("Tab"), IFSCHELP(nano_tab_msg), TOGETHER, NOVIEW);
+    add_to_funcs(do_enter, MMAIN,
+	N_("Enter"), IFSCHELP(nano_enter_msg), BLANKAFTER, NOVIEW);
+>>>>>>> origin/tomato-shibby-RT-AC
 
     add_to_funcs(DO_BACKSPACE, MALL, "", "",
 #ifndef NANO_TINY
@@ -913,6 +1247,7 @@ void shortcut_init(bool unjustify)
     add_to_funcs(DO_SUSPEND_VOID, MMAIN, suspend_msg,
 	IFSCHELP(nano_suspend_msg), TRUE, VIEW);
 
+<<<<<<< HEAD
 #ifndef NANO_TINY
     add_to_funcs( CASE_SENS_MSG,
 	(MWHEREIS|MREPLACE|MWHEREISFILE),
@@ -921,6 +1256,25 @@ void shortcut_init(bool unjustify)
     add_to_funcs( BACKWARDS_MSG,
 	(MWHEREIS|MREPLACE|MWHEREISFILE),
 	backwards_msg, IFSCHELP(nano_reverse_msg), FALSE, VIEW);
+=======
+#ifndef NANO_TINY
+    add_to_funcs(do_indent_void, MMAIN,
+	N_("Indent Text"), IFSCHELP(nano_indent_msg), TOGETHER, NOVIEW);
+    add_to_funcs(do_unindent, MMAIN,
+	N_("Unindent Text"), IFSCHELP(nano_unindent_msg), BLANKAFTER, NOVIEW);
+#endif
+#ifdef ENABLE_WORDCOMPLETION
+    add_to_funcs(complete_a_word, MMAIN,
+	N_("Complete"), IFSCHELP(nano_completion_msg), TOGETHER, NOVIEW);
+#endif
+#ifdef ENABLE_COMMENT
+    add_to_funcs(do_comment, MMAIN,
+	N_("Comment Lines"), IFSCHELP(nano_comment_msg), BLANKAFTER, NOVIEW);
+#endif
+#ifndef NANO_TINY
+    add_to_funcs(do_savefile, MMAIN,
+	N_("Save"), IFSCHELP(nano_savefile_msg), BLANKAFTER, NOVIEW);
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif
 
 #ifdef HAVE_REGEX_H
@@ -929,6 +1283,7 @@ void shortcut_init(bool unjustify)
 	regexp_msg, IFSCHELP(nano_regexp_msg), FALSE, VIEW);
 #endif
 
+<<<<<<< HEAD
 #ifndef NANO_TINY
     add_to_funcs( PREV_HISTORY_MSG,
 	(MWHEREIS|MREPLACE|MREPLACE2|MWHEREISFILE),
@@ -937,6 +1292,11 @@ void shortcut_init(bool unjustify)
     add_to_funcs( NEXT_HISTORY_MSG,
 	(MWHEREIS|MREPLACE|MREPLACE2|MWHEREISFILE),
 	next_history_msg, IFSCHELP(nano_next_history_msg), FALSE, VIEW);
+=======
+#ifdef DISABLE_JUSTIFY
+    add_to_funcs(do_gotolinecolumn_void, MWHEREIS,
+	gotoline_tag, IFSCHELP(nano_gotoline_msg), BLANKAFTER, VIEW);
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif
 
     add_to_funcs( NO_REPLACE_MSG, MREPLACE,
@@ -1011,6 +1371,7 @@ void shortcut_init(bool unjustify)
     add_to_funcs(DO_EXIT, MHELP, exit_msg, IFSCHELP(nano_exit_msg), FALSE, VIEW);
 
 
+<<<<<<< HEAD
 #endif
 
 #ifndef DISABLE_BROWSER
@@ -1207,6 +1568,269 @@ void shortcut_init(bool unjustify)
     add_to_sclist(MALL, "kdel", DO_DELETE, 0, TRUE);
     add_to_sclist(MALL, "^H", DO_BACKSPACE, 0, TRUE);
     add_to_sclist(MALL, "kbsp", DO_BACKSPACE, 0, TRUE);
+=======
+#ifndef DISABLE_BROWSER
+    add_to_funcs(do_research, MBROWSER,
+	whereis_next_tag, IFSCHELP(nano_whereis_next_msg), TOGETHER, VIEW);
+    add_to_funcs(total_refresh, MBROWSER,
+	refresh_tag, IFSCHELP(nano_browser_refresh_msg), BLANKAFTER, VIEW);
+#ifndef NANO_TINY
+    add_to_funcs(do_prev_word_void, MBROWSER,
+	N_("Left Column"), IFSCHELP(nano_browser_lefthand_msg), TOGETHER, VIEW);
+    add_to_funcs(do_next_word_void, MBROWSER,
+	N_("Right Column"), IFSCHELP(nano_browser_righthand_msg), BLANKAFTER, VIEW);
+#endif
+#endif
+
+#ifndef DISABLE_COLOR
+    add_to_funcs(do_page_up, MLINTER,
+	/* TRANSLATORS: Try to keep the next two strings at most 20 characters. */
+	N_("Prev Lint Msg"), IFSCHELP(nano_prevlint_msg), TOGETHER, VIEW);
+    add_to_funcs(do_page_down, MLINTER,
+	N_("Next Lint Msg"), IFSCHELP(nano_nextlint_msg), TOGETHER, VIEW);
+#endif
+
+    /* Start associating key combos with functions in specific menus. */
+
+    add_to_sclist(MMOST, "^G", 0, do_help_void, 0);
+    add_to_sclist(MMOST, "F1", 0, do_help_void, 0);
+    add_to_sclist(MMAIN|MHELP|MBROWSER, "^X", 0, do_exit, 0);
+    add_to_sclist(MMAIN|MHELP|MBROWSER, "F2", 0, do_exit, 0);
+    add_to_sclist(MMAIN, "^O", 0, do_writeout_void, 0);
+    add_to_sclist(MMAIN, "F3", 0, do_writeout_void, 0);
+    add_to_sclist(MMAIN, "^R", 0, do_insertfile_void, 0);
+    add_to_sclist(MMAIN, "F5", 0, do_insertfile_void, 0);
+    add_to_sclist(MMAIN, "Ins", 0, do_insertfile_void, 0);
+    add_to_sclist(MMAIN|MBROWSER, "^W", 0, do_search, 0);
+    add_to_sclist(MMAIN|MBROWSER, "F6", 0, do_search, 0);
+    add_to_sclist(MMAIN, "^\\", 0, do_replace, 0);
+    add_to_sclist(MMAIN, "M-R", 0, do_replace, 0);
+    add_to_sclist(MMAIN, "F14", 0, do_replace, 0);
+    add_to_sclist(MMOST, "^K", 0, do_cut_text_void, 0);
+    add_to_sclist(MMOST, "F9", 0, do_cut_text_void, 0);
+    add_to_sclist(MMAIN, "^U", 0, do_uncut_text, 0);
+    add_to_sclist(MMAIN, "F10", 0, do_uncut_text, 0);
+#ifndef DISABLE_JUSTIFY
+    add_to_sclist(MMAIN, "^J", 0, do_justify_void, 0);
+    add_to_sclist(MMAIN, "F4", 0, do_justify_void, 0);
+#endif
+#ifndef DISABLE_SPELLER
+    add_to_sclist(MMAIN, "^T", 0, do_spell, 0);
+    add_to_sclist(MMAIN, "F12", 0, do_spell, 0);
+#else
+#ifndef DISABLE_COLOR
+    add_to_sclist(MMAIN, "^T", 0, do_linter, 0);
+    add_to_sclist(MMAIN, "F12", 0, do_linter, 0);
+#endif
+#endif
+    add_to_sclist(MMAIN, "^C", 0, do_cursorpos_void, 0);
+    add_to_sclist(MMAIN, "F11", 0, do_cursorpos_void, 0);
+    add_to_sclist(MMAIN, "^_", 0, do_gotolinecolumn_void, 0);
+    add_to_sclist(MMAIN, "M-G", 0, do_gotolinecolumn_void, 0);
+    add_to_sclist(MMAIN, "F13", 0, do_gotolinecolumn_void, 0);
+    add_to_sclist(MMAIN|MHELP|MBROWSER|MLINTER, "^Y", 0, do_page_up, 0);
+    add_to_sclist(MMAIN|MHELP|MBROWSER|MLINTER, "F7", 0, do_page_up, 0);
+    add_to_sclist(MMAIN|MHELP|MBROWSER|MLINTER, "PgUp", KEY_PPAGE, do_page_up, 0);
+    add_to_sclist(MMAIN|MHELP|MBROWSER|MLINTER, "^V", 0, do_page_down, 0);
+    add_to_sclist(MMAIN|MHELP|MBROWSER|MLINTER, "F8", 0, do_page_down, 0);
+    add_to_sclist(MMAIN|MHELP|MBROWSER|MLINTER, "PgDn", KEY_NPAGE, do_page_down, 0);
+    add_to_sclist(MMAIN|MHELP, "M-\\", 0, do_first_line, 0);
+    add_to_sclist(MMAIN|MHELP, "M-|", 0, do_first_line, 0);
+    add_to_sclist(MMAIN|MHELP, "M-/", 0, do_last_line, 0);
+    add_to_sclist(MMAIN|MHELP, "M-?", 0, do_last_line, 0);
+    add_to_sclist(MMAIN|MBROWSER, "M-W", 0, do_research, 0);
+    add_to_sclist(MMAIN|MBROWSER, "F16", 0, do_research, 0);
+#ifndef NANO_TINY
+    add_to_sclist(MMAIN, "M-]", 0, do_find_bracket, 0);
+    add_to_sclist(MMAIN, "^^", 0, do_mark, 0);
+    add_to_sclist(MMAIN, "M-A", 0, do_mark, 0);
+    add_to_sclist(MMAIN, "F15", 0, do_mark, 0);
+    add_to_sclist(MMAIN, "M-^", 0, do_copy_text, 0);
+    add_to_sclist(MMAIN, "M-6", 0, do_copy_text, 0);
+    add_to_sclist(MMAIN, "M-}", 0, do_indent_void, 0);
+    add_to_sclist(MMAIN, "M-{", 0, do_unindent, 0);
+    add_to_sclist(MMAIN, "M-U", 0, do_undo, 0);
+    add_to_sclist(MMAIN, "M-E", 0, do_redo, 0);
+#endif
+#ifdef ENABLE_WORDCOMPLETION
+    add_to_sclist(MMAIN, "^]", 0, complete_a_word, 0);
+#endif
+#ifdef ENABLE_COMMENT
+    add_to_sclist(MMAIN, "M-3", 0, do_comment, 0);
+#endif
+    add_to_sclist(MMOST, "^B", 0, do_left, 0);
+    add_to_sclist(MMOST, "Left", KEY_LEFT, do_left, 0);
+    add_to_sclist(MMOST, "^F", 0, do_right, 0);
+    add_to_sclist(MMOST, "Right", KEY_RIGHT, do_right, 0);
+#ifdef ENABLE_UTF8
+    if (using_utf8()) {
+	add_to_sclist(MMOST, "^\xE2\x86\x90", CONTROL_LEFT, do_prev_word_void, 0);
+	add_to_sclist(MMOST, "^\xE2\x86\x92", CONTROL_RIGHT, do_next_word_void, 0);
+    } else
+#endif
+    {
+	add_to_sclist(MMOST, "^Left", CONTROL_LEFT, do_prev_word_void, 0);
+	add_to_sclist(MMOST, "^Right", CONTROL_RIGHT, do_next_word_void, 0);
+    }
+    add_to_sclist(MMOST, "M-Space", 0, do_prev_word_void, 0);
+    add_to_sclist(MMOST, "^Space", 0, do_next_word_void, 0);
+    add_to_sclist((MMOST & ~MBROWSER), "^A", 0, do_home_void, 0);
+    add_to_sclist((MMOST & ~MBROWSER), "Home", KEY_HOME, do_home_void, 0);
+    add_to_sclist((MMOST & ~MBROWSER), "^E", 0, do_end_void, 0);
+    add_to_sclist((MMOST & ~MBROWSER), "End", KEY_END, do_end_void, 0);
+    add_to_sclist(MMAIN|MHELP|MBROWSER, "^P", 0, do_up_void, 0);
+    add_to_sclist(MMAIN|MHELP|MBROWSER, "Up", KEY_UP, do_up_void, 0);
+    add_to_sclist(MMAIN|MHELP|MBROWSER, "^N", 0, do_down_void, 0);
+    add_to_sclist(MMAIN|MHELP|MBROWSER, "Down", KEY_DOWN, do_down_void, 0);
+#ifdef ENABLE_UTF8
+    if (using_utf8()) {
+	add_to_sclist(MMAIN, "^\xE2\x86\x91", CONTROL_UP, do_prev_block, 0);
+	add_to_sclist(MMAIN, "^\xE2\x86\x93", CONTROL_DOWN, do_next_block, 0);
+    } else
+#endif
+    {
+	add_to_sclist(MMAIN, "^Up", CONTROL_UP, do_prev_block, 0);
+	add_to_sclist(MMAIN, "^Down", CONTROL_DOWN, do_next_block, 0);
+    }
+    add_to_sclist(MMAIN, "M-7", 0, do_prev_block, 0);
+    add_to_sclist(MMAIN, "M-8", 0, do_next_block, 0);
+#ifndef DISABLE_JUSTIFY
+    add_to_sclist(MMAIN, "M-(", 0, do_para_begin_void, 0);
+    add_to_sclist(MMAIN, "M-9", 0, do_para_begin_void, 0);
+    add_to_sclist(MMAIN, "M-)", 0, do_para_end_void, 0);
+    add_to_sclist(MMAIN, "M-0", 0, do_para_end_void, 0);
+#endif
+#ifndef NANO_TINY
+    add_to_sclist(MMAIN, "M--", 0, do_scroll_up, 0);
+    add_to_sclist(MMAIN, "M-_", 0, do_scroll_up, 0);
+    add_to_sclist(MMAIN, "M-+", 0, do_scroll_down, 0);
+    add_to_sclist(MMAIN, "M-=", 0, do_scroll_down, 0);
+#endif
+#ifndef DISABLE_MULTIBUFFER
+    add_to_sclist(MMAIN, "M-<", 0, switch_to_prev_buffer_void, 0);
+    add_to_sclist(MMAIN, "M-,", 0, switch_to_prev_buffer_void, 0);
+    add_to_sclist(MMAIN, "M->", 0, switch_to_next_buffer_void, 0);
+    add_to_sclist(MMAIN, "M-.", 0, switch_to_next_buffer_void, 0);
+#endif
+    add_to_sclist(MMOST, "M-V", 0, do_verbatim_input, 0);
+#ifndef NANO_TINY
+    add_to_sclist(MMAIN, "M-T", 0, do_cut_till_eof, 0);
+    add_to_sclist(MMAIN, "M-D", 0, do_wordlinechar_count, 0);
+#endif
+#ifndef DISABLE_JUSTIFY
+    add_to_sclist(MMAIN|MWHEREIS, "M-J", 0, do_full_justify, 0);
+#endif
+    add_to_sclist(MMAIN|MHELP, "^L", 0, total_refresh, 0);
+    add_to_sclist(MMAIN, "^Z", 0, do_suspend_void, 0);
+
+#ifndef NANO_TINY
+    /* Group of "Appearance" toggles. */
+    add_to_sclist(MMAIN, "M-X", 0, do_toggle_void, NO_HELP);
+    add_to_sclist(MMAIN, "M-C", 0, do_toggle_void, CONST_UPDATE);
+    add_to_sclist(MMAIN, "M-O", 0, do_toggle_void, MORE_SPACE);
+    add_to_sclist(MMAIN, "M-S", 0, do_toggle_void, SMOOTH_SCROLL);
+    add_to_sclist(MMAIN, "M-$", 0, do_toggle_void, SOFTWRAP);
+#ifdef ENABLE_LINENUMBERS
+    add_to_sclist(MMAIN, "M-#", 0, do_toggle_void, LINE_NUMBERS);
+#endif
+    add_to_sclist(MMAIN, "M-P", 0, do_toggle_void, WHITESPACE_DISPLAY);
+#ifndef DISABLE_COLOR
+    add_to_sclist(MMAIN, "M-Y", 0, do_toggle_void, NO_COLOR_SYNTAX);
+#endif
+
+    /* Group of "Editing-behavior" toggles. */
+    add_to_sclist(MMAIN, "M-H", 0, do_toggle_void, SMART_HOME);
+    add_to_sclist(MMAIN, "M-I", 0, do_toggle_void, AUTOINDENT);
+    add_to_sclist(MMAIN, "M-K", 0, do_toggle_void, CUT_TO_END);
+#ifndef DISABLE_WRAPPING
+    add_to_sclist(MMAIN, "M-L", 0, do_toggle_void, NO_WRAP);
+#endif
+    add_to_sclist(MMAIN, "M-Q", 0, do_toggle_void, TABS_TO_SPACES);
+
+    /* Group of "Peripheral-feature" toggles. */
+    add_to_sclist(MMAIN, "M-B", 0, do_toggle_void, BACKUP_FILE);
+#ifndef DISABLE_MULTIBUFFER
+    add_to_sclist(MMAIN, "M-F", 0, do_toggle_void, MULTIBUFFER);
+#endif
+#ifndef DISABLE_MOUSE
+    add_to_sclist(MMAIN, "M-M", 0, do_toggle_void, USE_MOUSE);
+#endif
+    add_to_sclist(MMAIN, "M-N", 0, do_toggle_void, NO_CONVERT);
+    add_to_sclist(MMAIN, "M-Z", 0, do_toggle_void, SUSPEND);
+#endif /* !NANO_TINY */
+
+    add_to_sclist(MMAIN, "^Q", 0, xon_complaint, 0);
+    add_to_sclist(MMAIN, "^S", 0, xoff_complaint, 0);
+
+    add_to_sclist(((MMOST & ~MMAIN & ~MBROWSER) | MYESNO), "^C", 0, do_cancel, 0);
+
+    add_to_sclist(MWHEREIS|MREPLACE, "M-C", 0, case_sens_void, 0);
+    add_to_sclist(MWHEREIS|MREPLACE, "M-R", 0, regexp_void, 0);
+    add_to_sclist(MWHEREIS|MREPLACE, "M-B", 0, backwards_void, 0);
+    add_to_sclist(MWHEREIS|MREPLACE, "^R", 0, flip_replace_void, 0);
+    add_to_sclist(MWHEREIS|MREPLACE|MREPLACEWITH|MGOTOLINE, "^Y", 0, do_first_line, 0);
+    add_to_sclist(MWHEREIS|MREPLACE|MREPLACEWITH|MGOTOLINE, "^V", 0, do_last_line, 0);
+#ifndef DISABLE_JUSTIFY
+    add_to_sclist(MWHEREIS|MREPLACE|MREPLACEWITH, "^W", 0, do_para_begin_void, 0);
+    add_to_sclist(MWHEREIS|MREPLACE|MREPLACEWITH, "^O", 0, do_para_end_void, 0);
+#endif
+    add_to_sclist(MWHEREIS, "^T", 0, do_gotolinecolumn_void, 0);
+    add_to_sclist(MGOTOLINE, "^T", 0, gototext_void, 0);
+#ifndef DISABLE_HISTORIES
+    add_to_sclist(MWHEREIS|MREPLACE|MREPLACEWITH|MWHEREISFILE, "^P", 0, get_history_older_void, 0);
+    add_to_sclist(MWHEREIS|MREPLACE|MREPLACEWITH|MWHEREISFILE, "Up", KEY_UP, get_history_older_void, 0);
+    add_to_sclist(MWHEREIS|MREPLACE|MREPLACEWITH|MWHEREISFILE, "^N", 0, get_history_newer_void, 0);
+    add_to_sclist(MWHEREIS|MREPLACE|MREPLACEWITH|MWHEREISFILE, "Down", KEY_DOWN, get_history_newer_void, 0);
+#endif
+#ifndef DISABLE_BROWSER
+    add_to_sclist(MWHEREISFILE, "^Y", 0, do_first_file, 0);
+    add_to_sclist(MWHEREISFILE, "^V", 0, do_last_file, 0);
+    add_to_sclist(MBROWSER|MWHEREISFILE, "M-\\", 0, do_first_file, 0);
+    add_to_sclist(MBROWSER|MWHEREISFILE, "M-|", 0, do_first_file, 0);
+    add_to_sclist(MBROWSER|MWHEREISFILE, "M-/", 0, do_last_file, 0);
+    add_to_sclist(MBROWSER|MWHEREISFILE, "M-?", 0, do_last_file, 0);
+    add_to_sclist(MBROWSER, "Home", KEY_HOME, do_first_file, 0);
+    add_to_sclist(MBROWSER, "End", KEY_END, do_last_file, 0);
+    add_to_sclist(MBROWSER, "^_", 0, goto_dir_void, 0);
+    add_to_sclist(MBROWSER, "M-G", 0, goto_dir_void, 0);
+    add_to_sclist(MBROWSER, "F13", 0, goto_dir_void, 0);
+    add_to_sclist(MBROWSER, "^L", 0, total_refresh, 0);
+#endif
+    if (ISSET(TEMP_FILE))
+	add_to_sclist(MWRITEFILE, "^Q", 0, discard_buffer, 0);
+    add_to_sclist(MWRITEFILE, "M-D", 0, dos_format_void, 0);
+    add_to_sclist(MWRITEFILE, "M-M", 0, mac_format_void, 0);
+    if (!ISSET(RESTRICTED)) {
+	/* Don't allow Appending, Prepending, nor Backups in restricted mode. */
+	add_to_sclist(MWRITEFILE, "M-A", 0, append_void, 0);
+	add_to_sclist(MWRITEFILE, "M-P", 0, prepend_void, 0);
+	add_to_sclist(MWRITEFILE, "M-B", 0, backup_file_void, 0);
+#ifndef DISABLE_BROWSER
+	add_to_sclist(MWRITEFILE|MINSERTFILE, "^T", 0, to_files_void, 0);
+#endif
+	add_to_sclist(MINSERTFILE|MEXTCMD, "^X", 0, flip_execute_void, 0);
+	add_to_sclist(MINSERTFILE|MEXTCMD, "M-F", 0, new_buffer_void, 0);
+    }
+    add_to_sclist(MHELP|MBROWSER, "^C", 0, do_exit, 0);
+    /* Allow exiting from the file browser and the help viewer with
+     * the same key as they were entered. */
+#ifndef DISABLE_BROWSER
+    add_to_sclist(MBROWSER, "^T", 0, do_exit, 0);
+#endif
+#ifndef DISABLE_HELP
+    add_to_sclist(MHELP, "^G", 0, do_exit, 0);
+    add_to_sclist(MHELP, "Home", KEY_HOME, do_first_line, 0);
+    add_to_sclist(MHELP, "End", KEY_END, do_last_line, 0);
+#endif
+    add_to_sclist(MMOST, "^I", 0, do_tab, 0);
+    add_to_sclist(MMOST, "Tab", TAB_CODE, do_tab, 0);
+    add_to_sclist(MMOST, "^M", 0, do_enter, 0);
+    add_to_sclist(MMOST, "Enter", KEY_ENTER, do_enter, 0);
+    add_to_sclist(MMOST, "^D", 0, do_delete, 0);
+    add_to_sclist(MMOST, "Del", 0, do_delete, 0);
+    add_to_sclist(MMOST, "^H", 0, do_backspace, 0);
+    add_to_sclist(MMOST, "Bsp", KEY_BACKSPACE, do_backspace, 0);
+>>>>>>> origin/tomato-shibby-RT-AC
 
 #ifdef DEBUG
     print_sclist();
@@ -1362,6 +1986,7 @@ const subnfunc *sctofunc(sc *s)
    function to get a string for each flag */
 const char *flagtostr(int flag)
 {
+<<<<<<< HEAD
    switch (flag) {
         case NO_HELP:
             return N_("Help mode");
@@ -1399,6 +2024,49 @@ const char *flagtostr(int flag)
             return N_("Soft line wrapping");
         default:
             return "?????";
+=======
+    switch (flag) {
+	case NO_HELP:
+	    /* TRANSLATORS: The next seventeen strings are toggle descriptions;
+	     * they are best kept shorter than 40 characters, but may be longer. */
+	    return N_("Help mode");
+	case CONST_UPDATE:
+	    return N_("Constant cursor position display");
+	case MORE_SPACE:
+	    return N_("Use of one more line for editing");
+	case SMOOTH_SCROLL:
+	    return N_("Smooth scrolling");
+	case SOFTWRAP:
+	    return N_("Soft wrapping of overlong lines");
+	case WHITESPACE_DISPLAY:
+	    return N_("Whitespace display");
+	case NO_COLOR_SYNTAX:
+	    return N_("Color syntax highlighting");
+	case SMART_HOME:
+	    return N_("Smart home key");
+	case AUTOINDENT:
+	    return N_("Auto indent");
+	case CUT_TO_END:
+	    return N_("Cut to end");
+	case NO_WRAP:
+	    return N_("Hard wrapping of overlong lines");
+	case TABS_TO_SPACES:
+	    return N_("Conversion of typed tabs to spaces");
+	case BACKUP_FILE:
+	    return N_("Backup files");
+	case MULTIBUFFER:
+	    return N_("Reading file into separate buffer");
+	case USE_MOUSE:
+	    return N_("Mouse support");
+	case NO_CONVERT:
+	    return N_("No conversion from DOS/Mac format");
+	case SUSPEND:
+	    return N_("Suspension");
+	case LINE_NUMBERS:
+	    return N_("Line numbering");
+	default:
+	    return "?????";
+>>>>>>> origin/tomato-shibby-RT-AC
     }
 }
 #endif /* NANO_TINY */
@@ -1407,11 +2075,19 @@ const char *flagtostr(int flag)
     shortcut struct, complete with proper value for execute */
 sc *strtosc(int menu, char *input)
 {
+<<<<<<< HEAD
      sc *s;
 
     s = (sc *)nmalloc(sizeof(sc));
     s->execute = TRUE; /* overridden as needed below */
 
+=======
+    sc *s = nmalloc(sizeof(sc));
+
+#ifndef NANO_TINY
+    s->toggle = 0;
+#endif
+>>>>>>> origin/tomato-shibby-RT-AC
 
 #ifndef DISABLE_HELP
     if (!strcasecmp(input, "help"))
@@ -1428,6 +2104,7 @@ sc *strtosc(int menu, char *input)
     else if (!strcasecmp(input, "insert"))
 	s->scfunc = DO_INSERTFILE_VOID;
     else if (!strcasecmp(input, "whereis"))
+<<<<<<< HEAD
 	s->scfunc = DO_SEARCH;
     else if (!strcasecmp(input, "up"))
 	s->scfunc = DO_UP_VOID;
@@ -1439,17 +2116,36 @@ sc *strtosc(int menu, char *input)
     else if (!strcasecmp(input, "pagedown")
 	|| !strcasecmp(input, "nextpage"))
 	s->scfunc = DO_PAGE_DOWN;
+=======
+	s->scfunc = do_search;
+    else if (!strcasecmp(input, "searchagain") ||
+	     !strcasecmp(input, "research"))  /* Deprecated.  Remove in 2018. */
+	s->scfunc = do_research;
+#ifndef NANO_TINY
+    else if (!strcasecmp(input, "findprevious"))
+	s->scfunc = do_findprevious;
+    else if (!strcasecmp(input, "findnext"))
+	s->scfunc = do_findnext;
+#endif
+    else if (!strcasecmp(input, "replace"))
+	s->scfunc = do_replace;
+>>>>>>> origin/tomato-shibby-RT-AC
     else if (!strcasecmp(input, "cut"))
 	s->scfunc = DO_CUT_TEXT_VOID;
     else if (!strcasecmp(input, "uncut"))
 	s->scfunc = DO_UNCUT_TEXT;
     else if (!strcasecmp(input, "curpos") ||
+<<<<<<< HEAD
 	!strcasecmp(input, "cursorpos"))
 	s->scfunc = DO_CURSORPOS_VOID;
     else if (!strcasecmp(input, "firstline"))
 	s->scfunc = DO_FIRST_LINE;
     else if (!strcasecmp(input, "lastline"))
 	s->scfunc = DO_LAST_LINE;
+=======
+	     !strcasecmp(input, "cursorpos"))  /* Deprecated.  Remove in 2018. */
+	s->scfunc = do_cursorpos_void;
+>>>>>>> origin/tomato-shibby-RT-AC
     else if (!strcasecmp(input, "gotoline"))
 	s->scfunc = DO_GOTOLINECOLUMN_VOID;
     else if (!strcasecmp(input, "replace"))
@@ -1463,6 +2159,10 @@ sc *strtosc(int menu, char *input)
 	s->scfunc = DO_PARA_END_VOID;
     else if (!strcasecmp(input, "fulljustify"))
 	s->scfunc = DO_FULL_JUSTIFY;
+#endif
+#ifdef ENABLE_WORDCOMPLETION
+    else if (!strcasecmp(input, "complete"))
+	s->scfunc = complete_a_word;
 #endif
 #ifndef NANO_TINY
     else if (!strcasecmp(input, "mark"))
@@ -1481,11 +2181,23 @@ sc *strtosc(int menu, char *input)
     else if (!strcasecmp(input, "scrolldown"))
 	s->scfunc = DO_SCROLL_DOWN;
     else if (!strcasecmp(input, "nextword"))
+<<<<<<< HEAD
 	s->scfunc = DO_NEXT_WORD_VOID;
     else if (!strcasecmp(input, "suspend"))
 	s->scfunc = DO_SUSPEND_VOID;
     else if (!strcasecmp(input, "prevword"))
 	s->scfunc = DO_PREV_WORD_VOID;
+=======
+	s->scfunc = do_next_word_void;
+    else if (!strcasecmp(input, "cutwordleft"))
+	s->scfunc = do_cut_prev_word;
+    else if (!strcasecmp(input, "cutwordright"))
+	s->scfunc = do_cut_next_word;
+    else if (!strcasecmp(input, "prevblock"))
+	s->scfunc = do_prev_block;
+    else if (!strcasecmp(input, "nextblock"))
+	s->scfunc = do_next_block;
+>>>>>>> origin/tomato-shibby-RT-AC
     else if (!strcasecmp(input, "findbracket"))
 	s->scfunc = DO_FIND_BRACKET;
     else if (!strcasecmp(input, "wordcount"))
@@ -1580,10 +2292,27 @@ sc *strtosc(int menu, char *input)
 		!strcasecmp(input, "nextline"))
 	s->scfunc = DO_DOWN_VOID;
     else if (!strcasecmp(input, "home"))
+<<<<<<< HEAD
 	s->scfunc = DO_HOME;
     else if (!strcasecmp(input, "end"))
 	s->scfunc = DO_END;
 #ifdef ENABLE_MULTIBUFFER
+=======
+	s->scfunc = do_home_void;
+    else if (!strcasecmp(input, "end"))
+	s->scfunc = do_end_void;
+    else if (!strcasecmp(input, "pageup") ||
+	     !strcasecmp(input, "prevpage"))
+	s->scfunc = do_page_up;
+    else if (!strcasecmp(input, "pagedown") ||
+	     !strcasecmp(input, "nextpage"))
+	s->scfunc = do_page_down;
+    else if (!strcasecmp(input, "firstline"))
+	s->scfunc = do_first_line;
+    else if (!strcasecmp(input, "lastline"))
+	s->scfunc = do_last_line;
+#ifndef DISABLE_MULTIBUFFER
+>>>>>>> origin/tomato-shibby-RT-AC
     else if (!strcasecmp(input, "prevbuf"))
 	s->scfunc = SWITCH_TO_PREV_BUFFER_VOID;
     else if (!strcasecmp(input, "nextbuf"))
@@ -1600,6 +2329,7 @@ sc *strtosc(int menu, char *input)
     else if (!strcasecmp(input, "backspace"))
 	s->scfunc = DO_BACKSPACE;
     else if (!strcasecmp(input, "refresh"))
+<<<<<<< HEAD
 	s->scfunc = TOTAL_REFRESH;
     else if (!strcasecmp(input, "casesens")) {
 	s->scfunc =  CASE_SENS_MSG;
@@ -1649,6 +2379,111 @@ sc *strtosc(int menu, char *input)
 	return NULL;
     }
 
+=======
+	s->scfunc = total_refresh;
+    else if (!strcasecmp(input, "suspend"))
+	s->scfunc = do_suspend_void;
+    else if (!strcasecmp(input, "casesens"))
+	s->scfunc = case_sens_void;
+    else if (!strcasecmp(input, "regexp") ||
+	     !strcasecmp(input, "regex"))  /* Deprecated.  Remove in 2018. */
+	s->scfunc = regexp_void;
+    else if (!strcasecmp(input, "backwards"))
+	s->scfunc = backwards_void;
+    else if (!strcasecmp(input, "flipreplace") ||
+	     !strcasecmp(input, "dontreplace"))  /* Deprecated.  Remove in 2018. */
+	s->scfunc = flip_replace_void;
+    else if (!strcasecmp(input, "gototext"))
+	s->scfunc = gototext_void;
+#ifndef DISABLE_HISTORIES
+    else if (!strcasecmp(input, "prevhistory"))
+	s->scfunc = get_history_older_void;
+    else if (!strcasecmp(input, "nexthistory"))
+	s->scfunc = get_history_newer_void;
+#endif
+    else if (!strcasecmp(input, "dosformat"))
+	s->scfunc = dos_format_void;
+    else if (!strcasecmp(input, "macformat"))
+	s->scfunc = mac_format_void;
+    else if (!strcasecmp(input, "append"))
+	s->scfunc = append_void;
+    else if (!strcasecmp(input, "prepend"))
+	s->scfunc = prepend_void;
+    else if (!strcasecmp(input, "backup"))
+	s->scfunc = backup_file_void;
+#ifndef ENABLE_TINY
+    else if (!strcasecmp(input, "flipexecute"))
+	s->scfunc = flip_execute_void;
+#endif
+#ifndef DISABLE_MULTIBUFFER
+    else if (!strcasecmp(input, "flipnewbuffer") ||
+	     !strcasecmp(input, "newbuffer"))  /* Deprecated.  Remove in 2018. */
+	s->scfunc = new_buffer_void;
+#endif
+#ifndef DISABLE_BROWSER
+    else if (!strcasecmp(input, "tofiles") ||
+	     !strcasecmp(input, "browser"))
+	s->scfunc = to_files_void;
+    else if (!strcasecmp(input, "gotodir"))
+	s->scfunc = goto_dir_void;
+    else if (!strcasecmp(input, "firstfile"))
+	s->scfunc = do_first_file;
+    else if (!strcasecmp(input, "lastfile"))
+	s->scfunc = do_last_file;
+#endif
+    else {
+#ifndef NANO_TINY
+	s->scfunc = do_toggle_void;
+	if (!strcasecmp(input, "nohelp"))
+	    s->toggle = NO_HELP;
+	else if (!strcasecmp(input, "constupdate"))
+	    s->toggle = CONST_UPDATE;
+	else if (!strcasecmp(input, "morespace"))
+	    s->toggle = MORE_SPACE;
+	else if (!strcasecmp(input, "smoothscroll"))
+	    s->toggle = SMOOTH_SCROLL;
+	else if (!strcasecmp(input, "softwrap"))
+	    s->toggle = SOFTWRAP;
+	else if (!strcasecmp(input, "whitespacedisplay"))
+	    s->toggle = WHITESPACE_DISPLAY;
+#ifndef DISABLE_COLOR
+	else if (!strcasecmp(input, "nosyntax"))
+	    s->toggle = NO_COLOR_SYNTAX;
+#endif
+	else if (!strcasecmp(input, "smarthome"))
+	    s->toggle = SMART_HOME;
+	else if (!strcasecmp(input, "autoindent"))
+	    s->toggle = AUTOINDENT;
+	else if (!strcasecmp(input, "cuttoend"))
+	    s->toggle = CUT_TO_END;
+#ifndef DISABLE_WRAPPING
+	else if (!strcasecmp(input, "nowrap"))
+	    s->toggle = NO_WRAP;
+#endif
+	else if (!strcasecmp(input, "tabstospaces"))
+	    s->toggle = TABS_TO_SPACES;
+	else if (!strcasecmp(input, "backupfile"))
+	    s->toggle = BACKUP_FILE;
+#ifndef DISABLE_MULTIBUFFER
+	else if (!strcasecmp(input, "multibuffer"))
+	    s->toggle = MULTIBUFFER;
+#endif
+#ifndef DISABLE_MOUSE
+	else if (!strcasecmp(input, "mouse"))
+	    s->toggle = USE_MOUSE;
+#endif
+	else if (!strcasecmp(input, "noconvert"))
+	    s->toggle = NO_CONVERT;
+	else if (!strcasecmp(input, "suspendenable"))
+	    s->toggle = SUSPEND;
+	else
+#endif /* !NANO_TINY */
+	{
+	    free(s);
+	    return NULL;
+	}
+    }
+>>>>>>> origin/tomato-shibby-RT-AC
     return s;
 
 }
@@ -1665,9 +2500,15 @@ int strtomenu(char *input)
 	return MWHEREIS;
     else if (!strcasecmp(input, "replace"))
 	return MREPLACE;
+<<<<<<< HEAD
     else if (!strcasecmp(input, "replace2") ||
 		!strcasecmp(input, "replacewith"))
 	return MREPLACE2;
+=======
+    else if (!strcasecmp(input, "replace2") ||  /* Deprecated.  Remove in 2018. */
+	     !strcasecmp(input, "replacewith"))
+	return MREPLACEWITH;
+>>>>>>> origin/tomato-shibby-RT-AC
     else if (!strcasecmp(input, "gotoline"))
 	return MGOTOLINE;
     else if (!strcasecmp(input, "writeout"))
@@ -1705,14 +2546,18 @@ void thanks_for_all_the_fish(void)
     delwin(edit);
     delwin(bottomwin);
 
+    free(word_chars);
 #ifndef DISABLE_JUSTIFY
+<<<<<<< HEAD
     if (quotestr != NULL)
 	free(quotestr);
 #ifdef HAVE_REGEX_H
+=======
+    free(quotestr);
+>>>>>>> origin/tomato-shibby-RT-AC
     regfree(&quotereg);
     if (quoteerr != NULL)
 	free(quoteerr);
-#endif
 #endif
 #ifndef NANO_TINY
     if (backup_dir != NULL)
@@ -1732,6 +2577,7 @@ void thanks_for_all_the_fish(void)
     if (alt_speller != NULL)
 	free(alt_speller);
 #endif
+<<<<<<< HEAD
     if (answer != NULL)
 	free(answer);
     if (cutbuffer != NULL)
@@ -1741,6 +2587,9 @@ void thanks_for_all_the_fish(void)
 	free_filestruct(jusbuffer);
 #endif
 #ifdef DEBUG
+=======
+    free_filestruct(cutbuffer);
+>>>>>>> origin/tomato-shibby-RT-AC
     /* Free the memory associated with each open file buffer. */
     if (openfile != NULL)
 	free_openfilestruct(openfile);

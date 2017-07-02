@@ -25,15 +25,20 @@
  */
 
 #include "test.h"
-#include "strequal.h"
 #include "memdebug.h"
 
 static CURLcode send_request(CURL *curl, const char *url, int seq,
                              long auth_scheme, const char *userpwd)
 {
   CURLcode res;
+<<<<<<< HEAD
   char* full_url = malloc(strlen(url) + 4 + 1);
   if (!full_url) {
+=======
+  size_t len = strlen(url) + 4 + 1;
+  char *full_url = malloc(len);
+  if(!full_url) {
+>>>>>>> origin/tomato-shibby-RT-AC
     fprintf(stderr, "Not enough memory for full url\n");
     return CURLE_OUT_OF_MEMORY;
   }
@@ -71,11 +76,19 @@ static long parse_auth_name(const char *arg)
 {
   if (!arg)
     return CURLAUTH_NONE;
+<<<<<<< HEAD
   if (strequal(arg, "basic"))
     return CURLAUTH_BASIC;
   if (strequal(arg, "digest"))
     return CURLAUTH_DIGEST;
   if (strequal(arg, "ntlm"))
+=======
+  if(curl_strequal(arg, "basic"))
+    return CURLAUTH_BASIC;
+  if(curl_strequal(arg, "digest"))
+    return CURLAUTH_DIGEST;
+  if(curl_strequal(arg, "ntlm"))
+>>>>>>> origin/tomato-shibby-RT-AC
     return CURLAUTH_NTLM;
   return CURLAUTH_NONE;
 }
@@ -101,7 +114,12 @@ int test(char *url)
 
   /* Send wrong password, then right password */
 
+<<<<<<< HEAD
   if ((curl = curl_easy_init()) == NULL) {
+=======
+  curl = curl_easy_init();
+  if(!curl) {
+>>>>>>> origin/tomato-shibby-RT-AC
     fprintf(stderr, "curl_easy_init() failed\n");
     curl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;
@@ -120,8 +138,13 @@ int test(char *url)
   curl_easy_cleanup(curl);
 
   /* Send wrong password twice, then right password */
+<<<<<<< HEAD
 
   if ((curl = curl_easy_init()) == NULL) {
+=======
+  curl = curl_easy_init();
+  if(!curl) {
+>>>>>>> origin/tomato-shibby-RT-AC
     fprintf(stderr, "curl_easy_init() failed\n");
     curl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;

@@ -34,6 +34,25 @@ logger_open_syslog(struct ProxyContext_ * const context)
     return 0;
 }
 
+static int
+timestamp_fprint(FILE * const fp)
+{
+    char now_s[128];
+
+    time_t     now;
+    struct tm *tm;
+
+    if (time(&now) == (time_t) -1) {
+        fprintf(fp, "- ");
+        return -1;
+    }
+    tm = localtime(&now);
+    strftime(now_s, sizeof now_s, "%c", tm);
+    fprintf(fp, "%s ", now_s);
+
+    return 0;
+}
+
 int
 logger(struct ProxyContext_ * const context,
        const int crit, const char * const format, ...)
@@ -88,8 +107,17 @@ logger(struct ProxyContext_ * const context,
     }
     line[len++] = 0;
 #ifndef _WIN32
+<<<<<<< HEAD
     if (context != NULL && context->log_fp == NULL && context->daemonize) {
         syslog(crit, "%s", line);
+=======
+    if (context != NULL && context->log_fp == NULL && context->syslog != 0) {
+        if (context->syslog_prefix != NULL) {
+            syslog(crit, "%s %s", context->syslog_prefix, line);
+        } else {
+            syslog(crit, "%s", line);
+        }
+>>>>>>> origin/tomato-shibby-RT-AC
         return 0;
     }
 #endif
@@ -106,11 +134,16 @@ logger(struct ProxyContext_ * const context,
     assert(sizeof previous_line >= sizeof line);
     memcpy(previous_line, line, len);
     if (context == NULL || context->log_fp == NULL) {
-        log_fp = stdout;
+        log_fp = crit >= LOG_NOTICE ? stdout : stderr;
     } else {
         log_fp = context->log_fp;
     }
-    fprintf(log_fp, "%s%s\n", urgency, line);
+    timestamp_fprint(log_fp);
+    if (context != NULL && context->syslog_prefix) {
+        fprintf(log_fp, "%s%s %s\n", urgency, context->syslog_prefix, line);
+    } else {
+        fprintf(log_fp, "%s%s\n", urgency, line);
+    }
     fflush(log_fp);
 
     return 0;

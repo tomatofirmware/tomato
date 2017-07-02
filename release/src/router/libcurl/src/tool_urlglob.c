@@ -48,7 +48,7 @@ static GlobCode glob_fixed(URLGlob *glob, char *fixed, size_t len)
   pat->content.Set.ptr_s = 0;
   pat->globindex = -1;
 
-  pat->content.Set.elements = malloc(sizeof(char*));
+  pat->content.Set.elements = malloc(sizeof(char *));
 
   if(!pat->content.Set.elements)
     return GLOBERROR("out of memory", 0, GLOB_NO_MEM);
@@ -121,14 +121,14 @@ static GlobCode glob_set(URLGlob *glob, char **patternp,
       *buf = '\0';
       if(pat->content.Set.elements) {
         char **new_arr = realloc(pat->content.Set.elements,
-                                 (pat->content.Set.size + 1) * sizeof(char*));
+                                 (pat->content.Set.size + 1) * sizeof(char *));
         if(!new_arr)
           return GLOBERROR("out of memory", 0, GLOB_NO_MEM);
 
         pat->content.Set.elements = new_arr;
       }
       else
-        pat->content.Set.elements = malloc(sizeof(char*));
+        pat->content.Set.elements = malloc(sizeof(char *));
 
       if(!pat->content.Set.elements)
         return GLOBERROR("out of memory", 0, GLOB_NO_MEM);
@@ -191,12 +191,14 @@ static GlobCode glob_range(URLGlob *glob, char **patternp,
     /* character range detected */
     char min_c;
     char max_c;
-    int step=1;
+    char end_c;
+    unsigned long step = 1;
 
     pat->type = UPTCharRange;
 
-    rc = sscanf(pattern, "%c-%c", &min_c, &max_c);
+    rc = sscanf(pattern, "%c-%c%c", &min_c, &max_c, &end_c);
 
+<<<<<<< HEAD
     if((rc == 2) && (pattern[3] == ':')) {
       char *endp;
       unsigned long lstep;
@@ -209,26 +211,55 @@ static GlobCode glob_range(URLGlob *glob, char **patternp,
         step = (int)lstep;
         if(step > (max_c - min_c))
           step = -1;
+=======
+    if(rc == 3) {
+      if(end_c == ':') {
+        char *endp;
+        errno = 0;
+        step = strtoul(&pattern[4], &endp, 10);
+        if(errno || &pattern[4] == endp || *endp != ']')
+          step = 0;
+        else
+          pattern = endp+1;
+>>>>>>> origin/tomato-shibby-RT-AC
       }
+      else if(end_c != ']')
+        /* then this is wrong */
+        rc = 0;
+      else
+        /* end_c == ']' */
+        pattern += 4;
     }
-    else
-      pattern += 4;
 
     *posp += (pattern - *patternp);
 
+<<<<<<< HEAD
     if((rc != 2) || (min_c >= max_c) || ((max_c - min_c) > ('z' - 'a')) ||
        (step < 0) )
+=======
+    if(rc != 3 || !step || step > (unsigned)INT_MAX ||
+       (min_c == max_c && step != 1) ||
+       (min_c != max_c && (min_c > max_c || step > (unsigned)(max_c - min_c) ||
+                           (max_c - min_c) > ('z' - 'a'))))
+>>>>>>> origin/tomato-shibby-RT-AC
       /* the pattern is not well-formed */
       return GLOBERROR("bad range", *posp, GLOB_ERROR);
 
     /* if there was a ":[num]" thing, use that as step or else use 1 */
-    pat->content.CharRange.step = step;
+    pat->content.CharRange.step = (int)step;
     pat->content.CharRange.ptr_c = pat->content.CharRange.min_c = min_c;
     pat->content.CharRange.max_c = max_c;
 
+<<<<<<< HEAD
     if(multiply(amount, (pat->content.CharRange.max_c -
                          pat->content.CharRange.min_c + 1)))
       return GLOBERROR("range overflow", *posp, GLOB_ERROR);
+=======
+    if(multiply(amount, ((pat->content.CharRange.max_c -
+                          pat->content.CharRange.min_c) /
+                         pat->content.CharRange.step + 1)))
+      return GLOBERROR("range overflow", *posp, CURLE_URL_MALFORMAT);
+>>>>>>> origin/tomato-shibby-RT-AC
   }
   else if(ISDIGIT(*pattern)) {
     /* numeric range detected */
@@ -259,6 +290,12 @@ static GlobCode glob_range(URLGlob *glob, char **patternp,
         endp = NULL;
       else {
         pattern = endp+1;
+        while(*pattern && ISBLANK(*pattern))
+          pattern++;
+        if(!ISDIGIT(*pattern)) {
+          endp = NULL;
+          goto fail;
+        }
         errno = 0;
         max_n = strtoul(pattern, &endp, 10);
         if(errno || (*endp == ':')) {
@@ -279,9 +316,16 @@ static GlobCode glob_range(URLGlob *glob, char **patternp,
       }
     }
 
+    fail:
     *posp += (pattern - *patternp);
 
+<<<<<<< HEAD
     if(!endp || (min_n > max_n) || (step_n > (max_n - min_n)))
+=======
+    if(!endp || !step_n ||
+       (min_n == max_n && step_n != 1) ||
+       (min_n != max_n && (min_n > max_n || step_n > (max_n - min_n))))
+>>>>>>> origin/tomato-shibby-RT-AC
       /* the pattern is not well-formed */
       return GLOBERROR("bad range", *posp, GLOB_ERROR);
 
@@ -291,9 +335,16 @@ static GlobCode glob_range(URLGlob *glob, char **patternp,
     pat->content.NumRange.max_n = max_n;
     pat->content.NumRange.step = step_n;
 
+<<<<<<< HEAD
     if(multiply(amount, (pat->content.NumRange.max_n -
                          pat->content.NumRange.min_n + 1)))
       return GLOBERROR("range overflow", *posp, GLOB_ERROR);
+=======
+    if(multiply(amount, ((pat->content.NumRange.max_n -
+                          pat->content.NumRange.min_n) /
+                         pat->content.NumRange.step + 1)))
+      return GLOBERROR("range overflow", *posp, CURLE_URL_MALFORMAT);
+>>>>>>> origin/tomato-shibby-RT-AC
   }
   else
     return GLOBERROR("bad range specification", *posp, GLOB_ERROR);
@@ -401,13 +452,23 @@ static GlobCode glob_parse(URLGlob *glob, char *pattern,
       }
     }
 
+<<<<<<< HEAD
     if(++glob->size > GLOB_PATTERN_NUM)
       return GLOBERROR("too many globs", pos, GLOB_ERROR);
+=======
+    if(++glob->size >= GLOB_PATTERN_NUM)
+      return GLOBERROR("too many globs", pos, CURLE_URL_MALFORMAT);
+>>>>>>> origin/tomato-shibby-RT-AC
   }
   return res;
 }
 
+<<<<<<< HEAD
 int glob_url(URLGlob** glob, char* url, unsigned long *urlnum, FILE *error)
+=======
+CURLcode glob_url(URLGlob **glob, char *url, unsigned long *urlnum,
+                  FILE *error)
+>>>>>>> origin/tomato-shibby-RT-AC
 {
   /*
    * We can deal with any-size, just make a buffer with the same length
@@ -423,6 +484,7 @@ int glob_url(URLGlob** glob, char* url, unsigned long *urlnum, FILE *error)
   glob_buffer = malloc(strlen(url) + 1);
   if(!glob_buffer)
     return CURLE_OUT_OF_MEMORY;
+  glob_buffer[0]=0;
 
   glob_expand = calloc(1, sizeof(URLGlob));
   if(!glob_expand) {
@@ -502,8 +564,13 @@ int glob_next_url(char **globbed, URLGlob *glob)
     /* the < condition is required since i underflows! */
     for(i = glob->size - 1; carry && (i < glob->size); --i) {
       carry = FALSE;
+<<<<<<< HEAD
       pat = &glob->pattern[i];
       switch (pat->type) {
+=======
+      pat = &glob->pattern[glob->size - 1 - i];
+      switch(pat->type) {
+>>>>>>> origin/tomato-shibby-RT-AC
       case UPTSet:
         if((pat->content.Set.elements) &&
            (++pat->content.Set.ptr_s == pat->content.Set.size)) {
@@ -542,20 +609,25 @@ int glob_next_url(char **globbed, URLGlob *glob)
     switch(pat->type) {
     case UPTSet:
       if(pat->content.Set.elements) {
-        len = strlen(pat->content.Set.elements[pat->content.Set.ptr_s]);
         snprintf(buf, buflen, "%s",
                  pat->content.Set.elements[pat->content.Set.ptr_s]);
+        len = strlen(buf);
         buf += len;
         buflen -= len;
       }
       break;
     case UPTCharRange:
-      *buf++ = pat->content.CharRange.ptr_c;
+      if(buflen) {
+        *buf++ = pat->content.CharRange.ptr_c;
+        *buf = '\0';
+        buflen--;
+      }
       break;
     case UPTNumRange:
-      len = snprintf(buf, buflen, "%0*ld",
-                     pat->content.NumRange.padlength,
-                     pat->content.NumRange.ptr_n);
+      snprintf(buf, buflen, "%0*ld",
+               pat->content.NumRange.padlength,
+               pat->content.NumRange.ptr_n);
+      len = strlen(buf);
       buf += len;
       buflen -= len;
       break;
@@ -564,7 +636,6 @@ int glob_next_url(char **globbed, URLGlob *glob)
       return CURLE_FAILED_INIT;
     }
   }
-  *buf = '\0';
 
   *globbed = strdup(glob->glob_buffer);
   if(!*globbed)
@@ -613,7 +684,7 @@ int glob_match_url(char **result, char *filename, URLGlob *glob)
       }
 
       if(pat) {
-        switch (pat->type) {
+        switch(pat->type) {
         case UPTSet:
           if(pat->content.Set.elements) {
             appendthis = pat->content.Set.elements[pat->content.Set.ptr_s];
@@ -628,7 +699,7 @@ int glob_match_url(char **result, char *filename, URLGlob *glob)
           appendlen = 1;
           break;
         case UPTNumRange:
-          snprintf(numbuf, sizeof(numbuf), "%0*d",
+          snprintf(numbuf, sizeof(numbuf), "%0*lu",
                    pat->content.NumRange.padlength,
                    pat->content.NumRange.ptr_n);
           appendthis = numbuf;

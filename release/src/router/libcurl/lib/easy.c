@@ -50,7 +50,6 @@
 #include <sys/param.h>
 #endif
 
-#include "strequal.h"
 #include "urldata.h"
 #include <curl/curl.h>
 #include "transfer.h"
@@ -145,28 +144,6 @@ static CURLcode win32_init(void)
   return CURLE_OK;
 }
 
-#ifdef USE_LIBIDN
-/*
- * Initialise use of IDNA library.
- * It falls back to ASCII if $CHARSET isn't defined. This doesn't work for
- * idna_to_ascii_lz().
- */
-static void idna_init (void)
-{
-#ifdef WIN32
-  char buf[60];
-  UINT cp = GetACP();
-
-  if(!getenv("CHARSET") && cp > 0) {
-    snprintf(buf, sizeof(buf), "CHARSET=cp%u", cp);
-    putenv(buf);
-  }
-#else
-  /* to do? */
-#endif
-}
-#endif  /* USE_LIBIDN */
-
 /* true globals -- for curl_global_init() and curl_global_cleanup() */
 static unsigned int  initialized;
 static long          init_flags;
@@ -218,7 +195,7 @@ curl_calloc_callback Curl_ccalloc;
 #endif
 
 /**
- * curl_global_init() globally initializes cURL given a bitwise set of the
+ * curl_global_init() globally initializes curl given a bitwise set of the
  * different features of what to initialize.
  */
 CURLcode curl_global_init(long flags)
@@ -261,14 +238,20 @@ CURLcode curl_global_init(long flags)
   }
 #endif
 
+<<<<<<< HEAD
 #ifdef USE_LIBIDN
   idna_init();
 #endif
 
   if(Curl_resolver_global_init() != CURLE_OK) {
+=======
+  if(Curl_resolver_global_init()) {
+>>>>>>> origin/tomato-shibby-RT-AC
     DEBUGF(fprintf(stderr, "Error: resolver_global_init failed\n"));
     return CURLE_FAILED_INIT;
   }
+
+  (void)Curl_ipv6works();
 
 #if defined(USE_LIBSSH2) && defined(HAVE_LIBSSH2_INIT)
   if(libssh2_init(0)) {
@@ -285,8 +268,21 @@ CURLcode curl_global_init(long flags)
   return CURLE_OK;
 }
 
+<<<<<<< HEAD
+=======
+
+/**
+ * curl_global_init() globally initializes curl given a bitwise set of the
+ * different features of what to initialize.
+ */
+CURLcode curl_global_init(long flags)
+{
+  return global_init(flags, TRUE);
+}
+
+>>>>>>> origin/tomato-shibby-RT-AC
 /*
- * curl_global_init_mem() globally initializes cURL and also registers the
+ * curl_global_init_mem() globally initializes curl and also registers the
  * user provided callback routines.
  */
 CURLcode curl_global_init_mem(long flags, curl_malloc_callback m,
@@ -321,7 +317,7 @@ CURLcode curl_global_init_mem(long flags, curl_malloc_callback m,
 }
 
 /**
- * curl_global_cleanup() globally cleanups cURL, uses the value of
+ * curl_global_cleanup() globally cleanups curl, uses the value of
  * "init_flags" to determine what needs to be cleaned up and what doesn't.
  */
 void curl_global_cleanup(void)
@@ -355,10 +351,15 @@ void curl_global_cleanup(void)
  * curl_easy_init() is the external interface to alloc, setup and init an
  * easy handle that is returned. If anything goes wrong, NULL is returned.
  */
-CURL *curl_easy_init(void)
+struct Curl_easy *curl_easy_init(void)
 {
+<<<<<<< HEAD
   CURLcode res;
   struct SessionHandle *data;
+=======
+  CURLcode result;
+  struct Curl_easy *data;
+>>>>>>> origin/tomato-shibby-RT-AC
 
   /* Make sure we inited the global SSL stuff */
   if(!initialized) {
@@ -386,13 +387,17 @@ CURL *curl_easy_init(void)
  */
 
 #undef curl_easy_setopt
-CURLcode curl_easy_setopt(CURL *curl, CURLoption tag, ...)
+CURLcode curl_easy_setopt(struct Curl_easy *data, CURLoption tag, ...)
 {
   va_list arg;
+<<<<<<< HEAD
   struct SessionHandle *data = curl;
   CURLcode ret;
+=======
+  CURLcode result;
+>>>>>>> origin/tomato-shibby-RT-AC
 
-  if(!curl)
+  if(!data)
     return CURLE_BAD_FUNCTION_ARGUMENT;
 
   va_start(arg, tag);
@@ -424,7 +429,7 @@ struct events {
  * updated.
  */
 
-static int events_timer(CURLM *multi,    /* multi handle */
+static int events_timer(struct Curl_multi *multi,    /* multi handle */
                         long timeout_ms, /* see above */
                         void *userp)    /* private callback pointer */
 {
@@ -479,7 +484,7 @@ static short socketcb2poll(int pollmask)
  * Callback that gets called with information about socket activity to
  * monitor.
  */
-static int events_socket(CURL *easy,      /* easy handle */
+static int events_socket(struct Curl_easy *easy,      /* easy handle */
                          curl_socket_t s, /* socket */
                          int what,        /* see above */
                          void *userp,     /* private callback
@@ -549,7 +554,7 @@ static int events_socket(CURL *easy,      /* easy handle */
  *
  * Do the multi handle setups that only event-based transfers need.
  */
-static void events_setup(CURLM *multi, struct events *ev)
+static void events_setup(struct Curl_multi *multi, struct events *ev)
 {
   /* timer callback */
   curl_multi_setopt(multi, CURLMOPT_TIMERFUNCTION, events_timer);
@@ -650,7 +655,7 @@ static CURLcode wait_or_timeout(struct Curl_multi *multi, struct events *ev)
  *
  * Runs a transfer in a blocking manner using the events-based API
  */
-static CURLcode easy_events(CURLM *multi)
+static CURLcode easy_events(struct Curl_multi *multi)
 {
   struct events evs= {2, FALSE, 0, NULL, 0};
 
@@ -664,7 +669,7 @@ static CURLcode easy_events(CURLM *multi)
 #define easy_events(x) CURLE_NOT_BUILT_IN
 #endif
 
-static CURLcode easy_transfer(CURLM *multi)
+static CURLcode easy_transfer(struct Curl_multi *multi)
 {
   bool done = FALSE;
   CURLMcode mcode = CURLM_OK;
@@ -749,9 +754,9 @@ static CURLcode easy_transfer(CURLM *multi)
  * DEBUG: if 'events' is set TRUE, this function will use a replacement engine
  * instead of curl_multi_perform() and use curl_multi_socket_action().
  */
-static CURLcode easy_perform(struct SessionHandle *data, bool events)
+static CURLcode easy_perform(struct Curl_easy *data, bool events)
 {
-  CURLM *multi;
+  struct Curl_multi *multi;
   CURLMcode mcode;
   CURLcode code = CURLE_OK;
   SIGPIPE_VARIABLE(pipe_st);
@@ -811,9 +816,9 @@ static CURLcode easy_perform(struct SessionHandle *data, bool events)
  * curl_easy_perform() is the external interface that performs a blocking
  * transfer as previously setup.
  */
-CURLcode curl_easy_perform(CURL *easy)
+CURLcode curl_easy_perform(struct Curl_easy *data)
 {
-  return easy_perform(easy, FALSE);
+  return easy_perform(data, FALSE);
 }
 
 #ifdef CURLDEBUG
@@ -821,9 +826,9 @@ CURLcode curl_easy_perform(CURL *easy)
  * curl_easy_perform_ev() is the external interface that performs a blocking
  * transfer using the event-based API internally.
  */
-CURLcode curl_easy_perform_ev(CURL *easy)
+CURLcode curl_easy_perform_ev(struct Curl_easy *data)
 {
-  return easy_perform(easy, TRUE);
+  return easy_perform(data, TRUE);
 }
 
 #endif
@@ -832,9 +837,8 @@ CURLcode curl_easy_perform_ev(CURL *easy)
  * curl_easy_cleanup() is the external interface to cleaning/freeing the given
  * easy handle.
  */
-void curl_easy_cleanup(CURL *curl)
+void curl_easy_cleanup(struct Curl_easy *data)
 {
-  struct SessionHandle *data = (struct SessionHandle *)curl;
   SIGPIPE_VARIABLE(pipe_st);
 
   if(!data)
@@ -850,12 +854,16 @@ void curl_easy_cleanup(CURL *curl)
  * information from a performed transfer and similar.
  */
 #undef curl_easy_getinfo
-CURLcode curl_easy_getinfo(CURL *curl, CURLINFO info, ...)
+CURLcode curl_easy_getinfo(struct Curl_easy *data, CURLINFO info, ...)
 {
   va_list arg;
   void *paramp;
+<<<<<<< HEAD
   CURLcode ret;
   struct SessionHandle *data = (struct SessionHandle *)curl;
+=======
+  CURLcode result;
+>>>>>>> origin/tomato-shibby-RT-AC
 
   va_start(arg, info);
   paramp = va_arg(arg, void *);
@@ -871,11 +879,9 @@ CURLcode curl_easy_getinfo(CURL *curl, CURLINFO info, ...)
  * given input easy handle. The returned handle will be a new working handle
  * with all options set exactly as the input source handle.
  */
-CURL *curl_easy_duphandle(CURL *incurl)
+struct Curl_easy *curl_easy_duphandle(struct Curl_easy *data)
 {
-  struct SessionHandle *data=(struct SessionHandle *)incurl;
-
-  struct SessionHandle *outcurl = calloc(1, sizeof(struct SessionHandle));
+  struct Curl_easy *outcurl = calloc(1, sizeof(struct Curl_easy));
   if(NULL == outcurl)
     goto fail;
 
@@ -884,6 +890,11 @@ CURL *curl_easy_duphandle(CURL *incurl)
    * get setup on-demand in the code, as that would probably decrease
    * the likeliness of us forgetting to init a buffer here in the future.
    */
+  outcurl->set.buffer_size = data->set.buffer_size;
+  outcurl->state.buffer = malloc(CURL_BUFSIZE(outcurl->set.buffer_size) + 1);
+  if(!outcurl->state.buffer)
+    goto fail;
+
   outcurl->state.headerbuff = malloc(HEADERSIZE);
   if(!outcurl->state.headerbuff)
     goto fail;
@@ -941,6 +952,8 @@ CURL *curl_easy_duphandle(CURL *incurl)
 
   Curl_convert_setup(outcurl);
 
+  Curl_initinfo(outcurl);
+
   outcurl->magic = CURLEASY_MAGIC_NUMBER;
 
   /* we reach this point and thus we are OK */
@@ -952,6 +965,7 @@ CURL *curl_easy_duphandle(CURL *incurl)
   if(outcurl) {
     curl_slist_free_all(outcurl->change.cookielist);
     outcurl->change.cookielist = NULL;
+    Curl_safefree(outcurl->state.buffer);
     Curl_safefree(outcurl->state.headerbuff);
     Curl_safefree(outcurl->change.url);
     Curl_safefree(outcurl->change.referer);
@@ -966,10 +980,8 @@ CURL *curl_easy_duphandle(CURL *incurl)
  * curl_easy_reset() is an external interface that allows an app to re-
  * initialize a session handle to the default values.
  */
-void curl_easy_reset(CURL *curl)
+void curl_easy_reset(struct Curl_easy *data)
 {
-  struct SessionHandle *data = (struct SessionHandle *)curl;
-
   Curl_safefree(data->state.pathbuffer);
 
   data->state.path = NULL;
@@ -983,6 +995,9 @@ void curl_easy_reset(CURL *curl)
 
   /* zero out Progress data: */
   memset(&data->progress, 0, sizeof(struct Progress));
+
+  /* zero out PureInfo data: */
+  Curl_initinfo(data);
 
   data->progress.flags |= PGRS_HIDE;
   data->state.current_speed = -1; /* init to negative == impossible */
@@ -998,9 +1013,8 @@ void curl_easy_reset(CURL *curl)
  *
  * Action is a bitmask consisting of CURLPAUSE_* bits in curl/curl.h
  */
-CURLcode curl_easy_pause(CURL *curl, int action)
+CURLcode curl_easy_pause(struct Curl_easy *data, int action)
 {
-  struct SessionHandle *data = (struct SessionHandle *)curl;
   struct SingleRequest *k = &data->req;
   CURLcode result = CURLE_OK;
 
@@ -1092,13 +1106,13 @@ CURLcode curl_easy_pause(CURL *curl, int action)
   if(!result &&
      ((newstate&(KEEP_RECV_PAUSE|KEEP_SEND_PAUSE)) !=
       (KEEP_RECV_PAUSE|KEEP_SEND_PAUSE)) )
-    Curl_expire(data, 1); /* get this handle going again */
+    Curl_expire(data, 0); /* get this handle going again */
 
   return result;
 }
 
 
-static CURLcode easy_connection(struct SessionHandle *data,
+static CURLcode easy_connection(struct Curl_easy *data,
                                 curl_socket_t *sfd,
                                 struct connectdata **connp)
 {
@@ -1126,13 +1140,13 @@ static CURLcode easy_connection(struct SessionHandle *data,
  * curl_easy_perform() with CURLOPT_CONNECT_ONLY option.
  * Returns CURLE_OK on success, error code on error.
  */
-CURLcode curl_easy_recv(CURL *curl, void *buffer, size_t buflen, size_t *n)
+CURLcode curl_easy_recv(struct Curl_easy *data, void *buffer, size_t buflen,
+                        size_t *n)
 {
   curl_socket_t sfd;
   CURLcode ret;
   ssize_t n1;
   struct connectdata *c;
-  struct SessionHandle *data = (struct SessionHandle *)curl;
 
   ret = easy_connection(data, &sfd, &c);
   if(ret)
@@ -1153,14 +1167,13 @@ CURLcode curl_easy_recv(CURL *curl, void *buffer, size_t buflen, size_t *n)
  * Sends data over the connected socket. Use after successful
  * curl_easy_perform() with CURLOPT_CONNECT_ONLY option.
  */
-CURLcode curl_easy_send(CURL *curl, const void *buffer, size_t buflen,
-                        size_t *n)
+CURLcode curl_easy_send(struct Curl_easy *data, const void *buffer,
+                        size_t buflen, size_t *n)
 {
   curl_socket_t sfd;
   CURLcode ret;
   ssize_t n1;
   struct connectdata *c = NULL;
-  struct SessionHandle *data = (struct SessionHandle *)curl;
 
   ret = easy_connection(data, &sfd, &c);
   if(ret)

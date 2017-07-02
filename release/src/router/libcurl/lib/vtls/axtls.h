@@ -7,8 +7,13 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
+<<<<<<< HEAD
  * Copyright (C) 2010, DirecTV
  * contact: Eric Hu <ehu@directv.com>
+=======
+ * Copyright (C) 2010, DirecTV, Contact: Eric Hu <ehu@directv.com>
+ * Copyright (C) 2010 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+>>>>>>> origin/tomato-shibby-RT-AC
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -46,6 +51,15 @@ void Curl_axtls_session_free(void *ptr);
 size_t Curl_axtls_version(char *buffer, size_t size);
 int Curl_axtls_shutdown(struct connectdata *conn, int sockindex);
 int Curl_axtls_check_cxn(struct connectdata *conn);
+<<<<<<< HEAD
+=======
+CURLcode Curl_axtls_random(struct Curl_easy *data,
+                           unsigned char *entropy,
+                           size_t length);
+
+/* Set the API backend definition to axTLS */
+#define CURL_SSL_BACKEND CURLSSLBACKEND_AXTLS
+>>>>>>> origin/tomato-shibby-RT-AC
 
 /* API setup for axTLS */
 #define curlssl_init Curl_axtls_init

@@ -6,6 +6,7 @@
 
                                 How To Compile
 
+<<<<<<< HEAD
 Installing Binary Packages
 ==========================
 
@@ -1089,3 +1090,6 @@ Zlib         http://www.zlib.net/
 MingW        http://www.mingw.org/
 MinGW-w64    http://mingw-w64.sourceforge.net/
 OpenWatcom   http://www.openwatcom.org/
+=======
+see INSTALL.md
+>>>>>>> origin/tomato-shibby-RT-AC

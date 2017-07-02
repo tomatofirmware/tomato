@@ -817,6 +817,9 @@ _getopt_internal (argc, argv, optstring, longopts, longind, long_only)
 	int indfound = 0;
 	int option_index;
 
+	if (longopts == NULL)
+	  goto no_longs;
+
 	/* This is an option that requires an argument.  */
 	if (*nextchar != '\0')
 	  {

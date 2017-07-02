@@ -100,6 +100,7 @@ typedef struct _SockInfo {
 
 
 /* Die if we get a bad CURLMcode somewhere */
+<<<<<<< HEAD
 static void mcode_or_die(const char *where, CURLMcode code) {
   if ( CURLM_OK != code ) {
     const char *s;
@@ -112,6 +113,21 @@ static void mcode_or_die(const char *where, CURLMcode code) {
       case     CURLM_UNKNOWN_OPTION:     s="CURLM_UNKNOWN_OPTION";     break;
       case     CURLM_LAST:               s="CURLM_LAST";               break;
       default: s="CURLM_unknown";
+=======
+static void mcode_or_die(const char *where, CURLMcode code)
+{
+  if(CURLM_OK != code) {
+    const char *s;
+    switch(code) {
+    case     CURLM_BAD_HANDLE:         s="CURLM_BAD_HANDLE";         break;
+    case     CURLM_BAD_EASY_HANDLE:    s="CURLM_BAD_EASY_HANDLE";    break;
+    case     CURLM_OUT_OF_MEMORY:      s="CURLM_OUT_OF_MEMORY";      break;
+    case     CURLM_INTERNAL_ERROR:     s="CURLM_INTERNAL_ERROR";     break;
+    case     CURLM_BAD_SOCKET:         s="CURLM_BAD_SOCKET";         break;
+    case     CURLM_UNKNOWN_OPTION:     s="CURLM_UNKNOWN_OPTION";     break;
+    case     CURLM_LAST:               s="CURLM_LAST";               break;
+    default: s="CURLM_unknown";
+>>>>>>> origin/tomato-shibby-RT-AC
     }
     MSG_OUT("ERROR: %s returns %s\n", where, s);
     exit(code);
@@ -218,7 +234,8 @@ static void remsock(SockInfo *f)
 
 
 /* Assign information to a SockInfo structure */
-static void setsock(SockInfo*f, curl_socket_t s, CURL*e, int act, GlobalInfo*g)
+static void setsock(SockInfo *f, curl_socket_t s, CURL *e, int act,
+                    GlobalInfo *g)
 {
   GIOCondition kind =
      (act&CURL_POLL_IN?G_IO_IN:0)|(act&CURL_POLL_OUT?G_IO_OUT:0);
@@ -288,7 +305,12 @@ static size_t write_cb(void *ptr, size_t size, size_t nmemb, void *data)
 
 
 /* CURLOPT_PROGRESSFUNCTION */
+<<<<<<< HEAD
 static int prog_cb (void *p, double dltotal, double dlnow, double ult, double uln)
+=======
+static int prog_cb(void *p, double dltotal, double dlnow, double ult,
+                   double uln)
+>>>>>>> origin/tomato-shibby-RT-AC
 {
   ConnInfo *conn = (ConnInfo *)p;
   MSG_OUT("Progress: %s (%g/%g)\n", conn->url, dlnow, dltotal);
@@ -338,7 +360,7 @@ static void new_conn(char *url, GlobalInfo *g )
 
 
 /* This gets called by glib whenever data is received from the fifo */
-static gboolean fifo_cb (GIOChannel *ch, GIOCondition condition, gpointer data)
+static gboolean fifo_cb(GIOChannel *ch, GIOCondition condition, gpointer data)
 {
   #define BUF_SIZE 1024
   gsize len, tp;
@@ -390,6 +412,7 @@ static gboolean fifo_cb (GIOChannel *ch, GIOCondition condition, gpointer data)
 
 int init_fifo(void)
 {
+<<<<<<< HEAD
  struct stat st;
  const char *fifo = "hiper.fifo";
  int socket;
@@ -399,9 +422,22 @@ int init_fifo(void)
    errno = EEXIST;
    perror("lstat");
    exit (1);
+=======
+  struct stat st;
+  const char *fifo = "hiper.fifo";
+  int socket;
+
+  if(lstat (fifo, &st) == 0) {
+    if((st.st_mode & S_IFMT) == S_IFREG) {
+      errno = EEXIST;
+      perror("lstat");
+      exit(1);
+    }
+>>>>>>> origin/tomato-shibby-RT-AC
   }
  }
 
+<<<<<<< HEAD
  unlink (fifo);
  if (mkfifo (fifo, 0600) == -1) {
   perror("mkfifo");
@@ -417,6 +453,21 @@ int init_fifo(void)
  MSG_OUT("Now, pipe some URL's into > %s\n", fifo);
 
  return socket;
+=======
+  unlink(fifo);
+  if(mkfifo (fifo, 0600) == -1) {
+    perror("mkfifo");
+    exit(1);
+  }
+
+  socket = open(fifo, O_RDWR | O_NONBLOCK, 0);
+
+  if(socket == -1) {
+    perror("open");
+    exit(1);
+  }
+  MSG_OUT("Now, pipe some URL's into > %s\n", fifo);
+>>>>>>> origin/tomato-shibby-RT-AC
 
 }
 

@@ -51,3 +51,39 @@ curl release procedure - how to do a release
 [celebrate]
 
 - suitable beverage intake is encouraged for the festivities
+<<<<<<< HEAD
+=======
+
+curl release scheduling
+=======================
+
+Basics
+------
+
+We do releases every 8 weeks on Wednesdays. If critical problems arise, we can
+insert releases outside of the schedule or we can move the release date - but
+this is very rare.
+
+Each 8 week release cycle is split in two 4-week periods.
+
+- During the first 4 weeks after a release, we allow new features and changes
+  to curl and libcurl. If we accept any such changes, we bump the minor number
+  used for the next release.
+
+- During the second 4-week period we do not merge any features or changes, we
+  then only focus on fixing bugs and polishing things to make a solid coming
+  release.
+
+Coming dates
+------------
+
+Based on the description above, here are some planned release dates (at the
+time of this writing):
+
+- February 22, 2017 (version 7.53.0)
+- April 19, 2017
+- June 14, 2017
+- August 9, 2017
+- October 4, 2017
+- December 29, 2017
+>>>>>>> origin/tomato-shibby-RT-AC

@@ -89,9 +89,14 @@ int main(void)
 
 #ifdef WIN32
   WSADATA wsaData;
+<<<<<<< HEAD
   int initwsa;
 
   if((initwsa = WSAStartup(MAKEWORD(2,0), &wsaData)) != 0) {
+=======
+  int initwsa = WSAStartup(MAKEWORD(2, 0), &wsaData);
+  if(initwsa != 0) {
+>>>>>>> origin/tomato-shibby-RT-AC
     printf("WSAStartup failed: %d\n", initwsa);
     return 1;
   }
@@ -106,7 +111,12 @@ int main(void)
     curl_easy_setopt(curl, CURLOPT_URL, "http://99.99.99.99:9999");
 
     /* Create the socket "manually" */
+<<<<<<< HEAD
     if( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) == CURL_SOCKET_BAD ) {
+=======
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if(sockfd == CURL_SOCKET_BAD) {
+>>>>>>> origin/tomato-shibby-RT-AC
       printf("Error creating listening socket.\n");
       return 3;
     }
@@ -115,7 +125,12 @@ int main(void)
     servaddr.sin_family = AF_INET;
     servaddr.sin_port   = htons(PORTNUM);
 
+<<<<<<< HEAD
     if (INADDR_NONE == (servaddr.sin_addr.s_addr = inet_addr(IPADDR)))
+=======
+    servaddr.sin_addr.s_addr = inet_addr(IPADDR);
+    if(INADDR_NONE == servaddr.sin_addr.s_addr)
+>>>>>>> origin/tomato-shibby-RT-AC
       return 2;
 
     if(connect(sockfd,(struct sockaddr *) &servaddr, sizeof(servaddr)) ==

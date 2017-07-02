@@ -60,7 +60,11 @@ endif
 TARGET  = libcurl
 VERSION	= $(LIBCURL_VERSION)
 COPYR	= Copyright (C) $(LIBCURL_COPYRIGHT_STR)
+<<<<<<< HEAD
 DESCR	= cURL libcurl $(LIBCURL_VERSION_STR) ($(LIBARCH)) - http://curl.haxx.se
+=======
+DESCR	= curl libcurl $(LIBCURL_VERSION_STR) ($(LIBARCH)) - https://curl.haxx.se
+>>>>>>> origin/tomato-shibby-RT-AC
 MTSAFE	= YES
 STACK	= 64000
 SCREEN	= none

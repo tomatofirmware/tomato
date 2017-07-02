@@ -1,9 +1,321 @@
+<<<<<<< HEAD
 2010.11.22 - GNU nano 2.2.6 "Pimp my BBS" wants you to go to 
 		www.desertbus.org and donate a few bucks for the great 
 		Child's Play Charity!  This is just a small release to 
 		update a bug where restricted mode was not particularly 
 		restricted since key bindings were introduced. It also 
 		signals the return of win32 builds which now feature 
+=======
+2017.03.31 - GNU nano 2.8.0 "Axat" makes it easier to move around in
+		softwrapped lines: the Up and Down keys now step from
+		visual row to visual row instead of jumping between
+		logical lines, and the Home and End keys now move to
+		the start and end of a row, and only when already
+		there, then to the start and end of the logical line.
+		Furthermore, the screen can now scroll per row instead
+		of always per logical line.  On an entirely different
+		front: nano now makes use of gnulib, to make it build
+		on more platforms.  In short: there were many internal
+		changes, not many user-visible ones (apart form the
+		new softwrap navigation).  The conversion to gnulib
+		was done by Mike Frysinger, the softwrap overhaul by
+		David Ramsey.
+
+
+2017.02.23 - GNU nano 2.7.5 "Nijntje" can properly search and replace
+		the \B and \b regex anchors, correctly repaints things
+		when multiline regexes with identical start and end are
+		involved, fixes a crash with zero-length regex matches,
+		does replacements at the edges of a marked region right,
+		no longer hides double-width characters at the head of
+		softwrapped rows, displays at most three warnings at
+		startup, and documents the ability to read a file from
+		standard input.  Come tickle my ears.
+
+2017.01.10 - GNU nano 2.7.4 "Red dress" undoes deletions in an orderly
+		manner again (bug was introduced in previous version),
+		sets the preferred x position for vertical movements
+		more consistently, avoids some scrolling problems in
+		softwrap mode, installs the Info manual also when your
+		system lacks 'makeinfo', and corrects the behavior of
+		the beginning-of-word anchor (\<) in regex searches.
+
+2016.12.28 - GNU nano 2.7.3 "Ontbijtkoek" wipes away a handful of bugs:
+		your editor is now able to handle filenames that contain
+		newlines, avoids a brief flash of color when switching
+		between buffers that are governed by different syntaxes,
+		makes the Shift+Ctrl+Arrow keys select text again on a
+		Linux console, is more resistant against malformations
+		in the positionlog file, and does not crash when ^C is
+		typed on systems where it produces the code KEY_CANCEL.
+		Oh, and it no longer mistakenly warns about editing an
+		unlocked file just after saving a new one.  That's it.
+		Tastes great with thick butter.
+
+2016.12.12 - GNU nano 2.7.2 "Shemesh! Shemesh!" brings another feature:
+		the ability to complete with one keystroke (^] by default)
+		a fragment of a word to a full word existing elsewhere in
+		the current buffer.  Besides, this release fixes two bugs
+		related to using line numbers in softwrap mode, allows to
+		use the PageUp and PageDown keys together with Shift on
+		VTE-based terminals, stops the help lines from flickering
+		during interactive replacing, makes a "set fill" override
+		an earlier "set nowrap", properly restores the selected
+		region after an external spell check, and improves a few
+		other tidbits.  If you should find any more bugs, please
+		run 'man nano | grep bugs' and report them there.
+
+2016.10.29 - GNU nano 2.7.1 "Leuven" adds an often-asked-for feature: the
+		ability to display line numbers beside the text.  This can
+		be activated with -l or --linenumbers on the command line,
+		or with 'set linenumbers' in your nanorc, or toggled with
+		M-#.  The coloring of these numbers can be chosen via the
+		option 'set numbercolor'.  This release furthermore fixes
+		some bugs with scrolling in softwrap mode, is more strict
+		in the parsing of key rebindings, and marks a new buffer
+		as modified when the output of a command (^R ^X) has been
+		read into it.  Come and check it out!
+
+2016.09.01 - GNU nano 2.7.0 "Suni" adds a new feature: allowing text to be
+		selected by holding Shift together with the cursor keys.
+		Besides that, nano now works also when run in very tiny
+		terminals (down to one line, one column), and improves
+		the handling of the prompt in cramped spaces.  Not much,
+		but it's time to get it out there.
+
+
+2016.08.10 - nano 2.6.3 "Marika" makes the Ctrl+Arrow keys work also on
+		a Linux virtual console, takes as verbatim only the very
+		first keystroke after M-V, removes any lock files that it
+		holds when dying, doesn't abort when a word contains digits
+		(when using the default speller), fixes a small sorting bug
+		in the file browser, makes searching case-insensitively in
+		a UTF-8 locale a little faster, and doesn't enter invalid
+		bytes when holding down both Alt keys.  Santé!
+
+2016.07.28 - nano 2.6.2 "Le vent nous portera" adds two new features: the
+		keystrokes Ctrl+Up and Ctrl+Down for jumping between blocks
+		of text, and the option 'wordchars' for specifying which
+		characters (beside alphanumeric ones) should be considered
+		word-forming.  Further, it provides feedback during Unicode
+		input (M-V followed by a six-digit hexadecimal number which
+		must start with 0 or 10), avoids a crash when resizing the
+		window during Verbatim input, doesn't drop a keystroke after
+		having been suspended, and replaces the	beginning-of-line
+		anchor (^) just once per line.  There are also several tiny
+		improvements in screen rendering and key handling.  Come get
+		your hair tousled!
+
+2016.06.27 - nano 2.6.1 "Stampede" is chiefly a translation update, but also
+		adds one little feature (the ability to use negative numbers
+		with Go To Line: -1 meaning the first line from the bottom),
+		includes syntax highlighting for Rust, and fixes three tiny
+		bugs (but in such far corners of the editor that they aren't
+		even worth mentioning).
+
+2016.06.17 - nano 2.6.0 "Rubicon" fixes more than fifty little bugs -- and
+		some of them not so little.  It improves moving about in
+		the file browser, corrects failings of the internal spell
+		checker, adds a new feature (comment/uncomment lines, with
+		default binding M-3), makes some error messages clearer,
+		shows more of a file when positionlog is used and the cursor
+		is near the end, displays all error messages at startup if
+		there are multiple ones, does not misinterpret keystrokes
+		when typing very fast, is less eager to trim the filename
+		on narrow terminals, speeds up case-insensitive searches,
+		and allows to abort re-searches.  Among bunches of other
+		things.  It is worth the trouble to upgrade.
+
+
+2016.02.25 - GNU nano 2.5.3 "Alphys" is released.  This release
+		contains fixes for bugs like: stray cursor positioning
+		errors, many many memory leaks including file reading,
+		using the file browser, searching for multibyte characters,
+		history completion, and many other places.
+			New features include the ability to trim whitespace
+		from the ends of lines when justifying text, see nanorc(5)
+		option justifytrim for deets.  As always thank you for your
+		continued support of nano, and keep sparing.
+
+2016.02.12 - GNU nano 2.5.2 is carrying too many dogs.  This release includes
+		several fixes for various memory leaks, position history
+		size growth, and a long standing issue with using
+		nano under sudo creating root-owned files.  There are also
+		the usual bevy of documentation and other miscellaneous
+		fixes and touchups.  Upgrade today while supplies last,
+		operators are standing by!
+
+2016.01.11 - GNU nano 2.5.1 "Salzburg" is released.  It includes fixes
+		for a syntax-highlighting bug and a positionlog bug, it
+		disables a time-eating multiline regex in the C syntax,
+		and it adds an escape hatch to the WriteOut menu when
+		--tempfile is used: the discardbuffer command, ^Q.  It
+		also has translation updates for fifteen languages, and
+		a small fix in the softwrap code.  So... you are heartily
+		invited to upgrade.  Enjoy!
+
+2015.12.05 - GNU nano 2.5.0 "Karma", the first release of the 2.5 series,
+		is now available.  Please note that as of this release,
+		there will no longer be separate stable and unstable
+		branches.  The development team will prioritize bug fixes
+		as needed, and make new releases in proportion to the
+		severity of the bugs which are fixed.
+			This release includes all of the fixes now in
+		2.4.3, as well as color syntax highlighting improvements,
+		undo fixes, and many more improvements!  Thank you for
+		using nano!
+
+
+2015.11.18 - GNU nano 2.4.3 "Apocalypse" is now available for your
+		downloading pleasure.  This release includes a myriad
+		of fixes including several memory leaks, issues with
+		color syntax highlighting, search/replace, file
+		insertion and help menu bugs.  Many thanks to
+		Benno Schulenberg for tireless efforts on the vast
+		majority of fixes for some time now.  As always please
+		report bugs via the Savannah page, and remember to
+		Share and Enjoy.
+
+2015.07.05 - GNU nano 2.4.2 "Portorož" is released.  This release
+		includes several fixes, including the ability to resize
+		when in modes other than the main editing window,
+		proper displaying of invalid UTF-8 bytes, new syntax
+		definitions for Elisp, Guile, and PostgreSQL, and
+		better display of shortcuts in the help menu and file
+		browser.  Thanks for your patience and using nano!
+
+2015.04.14 - GNU nano 2.4.1 "Glitch Gremlin" is released.  This release
+		includes several fixes for issues with the file browser
+		menu, linter and formatter functions, spell checker,
+		undo/redo with some specific marked-cutting situations,
+		and some small improvements to the color syntax
+		highlighting definitions.  There are also various
+		documentation and code comment updates included, and
+		finally, fixes for compilation on non-GNU/Linux systems
+		and certain configure combinations.  Toasters!
+
+2015.03.22 - GNU nano 2.4.0 "lizf" is released.  This is the first
+		stable release in many years, and brings together many
+		new features from the 2.3 series, including:
+		a fully functional undo system (now enabled by default),
+		vim-compatible file locking, linter support, formatter
+		support, syntax highlighting flexibility, and many fixes
+		for issues reported since 2.2.  Many sincere thanks
+		to all of the bug reports, patches, well wishes and
+		contributions from everyone who has continued to
+		support us.  Thank you for using nano!
+
+
+2015.02.27 - GNU nano 2.3.99pre3 "Ashley" is released.  This is likely
+		to be the last release before the next major (2.4.0)
+		release.  Please test it out and send us any feedback
+		via the Savannah bug page for nano
+		(https://savannah.gnu.org/bugs/?group=nano).  This
+		release includes fixes for rebinding toggles via
+		nanorc, several memory alignment fixes, and documentation
+		and build updates.  As always thank you for using
+		nano - Share and Enjoy!
+
+2015.02.06 - GNU nano 2.3.99pre2 "Snowblind" is released.  This release
+		contains only fixes, including: a long-standing problem
+		with cutting in nano-tiny, several memory alignment
+		improvements, and issues with leftover file locks.  Please
+		keep reporting bugs so we can get a happy and healthy
+		2.4.0 soon.  Thanks for using nano!
+
+2015.01.06 - GNU nano 2.3.99pre1 "Junior" is released.  As the first
+		2.4 release candidate there will be fewer new features
+		but many bugfixes going forward.  This release contains
+		new support for language reformatters like Go's gofmt
+		command which takes the place of the spelling checker.
+		Fixes in this release include many syntax highlighting
+		fixes and improvements, and documentation formatting updates.
+		As always please report bugs via the Savannah bug page for
+		nano (https://savannah.gnu.org/bugs/?group=nano), so we can
+		release a super awesome and bug-free 2.4.0 soon!
+
+2014.07.17 - GNU nano 2.3.6 "Columbo" is released.  This release
+		contains a fix for installing internationalization
+		files.  Also included are scattered documentation
+		(in particular man page) fixes, and a few touchups
+		to syntax highlighting definitions.  Oh, just one
+		more thing, thanks for using nano!
+
+2014.07.11 - GNU nano 2.3.5 "lucky day" is released.  This release
+		contains many visible and under-the-hood fixes for
+		components such as file locking, more fixes to the
+		undo system, and you no longer have to explicitly ask
+		nano to have undo/redo support as it now defaults to
+		being enabled.  Other notable fixes include a better
+		handling of --tempfile mode, and better handling of
+		command line arguments when also attempting to specify
+		+<line number>.  As always, please file any bugs you
+		find at the Savannah page for nano, at
+		https://savannah.gnu.org/bugs/index.php?42639 and
+		thanks for using nano.
+
+2014.06.02 - GNU nano 2.3.4 won't leave you high, won't leave you dry.  This
+		release contains only a small number of fixes, but in
+		particular allows nano to compile on non-UTF-8 curses
+		implementations (i.e. libncursesw).  Other small fixes to
+		the undo implementation and the default syntax config are
+		also included.  As always, Share and Enjoy!
+
+2014.05.28 - GNU nano 2.3.3 is in its right place.  This release contains
+		many many improvements to the core system, including
+		substantial improvements to the undo/redo code, UTF-8
+		handling, the configure script, and display of shortcuts
+		on very wide terminals,  New features include the
+		ability to write to named pipes (--noread), as well as
+		linter support (see the nanorc man page for details).  Also
+		included are much improved syntax highlighting code, and
+		configurations for JSON, texinfo, Go, and a default syntax
+		for catch-all highlighting.  Finally, nano now has the
+		ability to set the color of the title bar, status bar, and
+		shortcut keys (e.g. "^X") and their descriptions.  Again
+		see the nanorc page for details.  There's much more, too
+		much to include here, but please keep those reports and
+		general feedback coming!  Thank you for helping us help
+		you help us all.
+
+2013.03.22 - GNU nano 2.3.2 "Annoy your coworkers for fun and profit" is
+		released.  This release introduces vim-style file locking
+		(though not backup/restore), useful when using nano
+		in a multi-editor environment.  Feedback is welcome if
+		you run into any issues with this new code.  Other new
+		features include additional support for word boundary
+		checking when cross compiling, fixes for trying to go to
+		an invalid line number, and the usual documentation
+		tweaks.
+
+2011.05.10 - GNU nano 2.3.1 "I'm in space" is released.  This
+		release includes some fixes for the new libmagic code, as
+		well as a fix for improper character counts when using
+		auto-indent.  Also included are new syntax highlighting
+		definitions for RPM spec and Lua files.  Thanks for
+		using nano and keep circulating the tapes.
+
+2011.02.26 - GNU nano 2.3.0 "Septic surprise" is released.  This first
+		release in the 2.3 unstable series brings several new
+		features.  First, libmagic support for syntax highlighting
+		has been added on top of the existing file extension
+		and header support already available.  Secondly, cursor
+		position can be saved between editing sessions with
+		the -P or --poslog command-line flag, or via "set poslog"
+		in your .nanorc.  Also included are some fixes for
+		compilation with g++, and better handling of issues
+		writing the backup file, which should reduce the need
+		for the "set allow_insecure_backup" nanorc option.
+		Don't stop, get it get it, don't stop, get it get it.
+
+
+2010.11.22 - GNU nano 2.2.6 "Pimp my BBS" wants you to go to
+		www.desertbus.org and donate a few bucks for the great
+		Child's Play Charity!  This is just a small release to
+		update a bug where restricted mode was not particularly
+		restricted since key bindings were introduced.  It also
+		signals the return of win32 builds which now feature
+>>>>>>> origin/tomato-shibby-RT-AC
 		nanorc support; please see the FAQ for details of how
 		to enable it, this feature is a bit of a kludge for now.   
 		Remember that when all else fails, USE SPACE JUMP.
@@ -262,7 +574,12 @@
 		https://savannah.gnu.org/bugs/?group=nano and
 		thanks for sticking with us!
 
+<<<<<<< HEAD
 2007.12.20- GNU nano 2.0.7 keeps its balance.  This release fixes
+=======
+
+2007.12.20 - GNU nano 2.0.7 keeps its balance.  This release fixes
+>>>>>>> origin/tomato-shibby-RT-AC
 		several bugs, among others: a segfault and several
 		cursor positioning problems when uncutting text or
 		inserting files into the current buffer; a problem where
@@ -284,12 +601,12 @@
 		under the GNU GPL version 3 or later and the GNU FDL
 		version 1.2 or later.  Have fun.
 
-2007.04.26- GNU nano 2.0.6 "that was quick" is released.  This release
+2007.04.26 - GNU nano 2.0.6 "that was quick" is released.  This release
 		fixes a potential segfault after justifying text marked
 		from the bottom up.  It also adds one more minor
 		documentation update.  Enjoy.
 
-2007.04.22- GNU nano 2.0.5 braces for impact.  Among other things, this
+2007.04.22 - GNU nano 2.0.5 braces for impact.  Among other things, this
 		release fixes various problems (including a segfault)
 		when trying to open or save a file in a directory
 		beginning with "~" that isn't a home directory; fixes a
@@ -396,7 +713,7 @@
 		properly at all times; lines of text containing tabs are
 		now wrapped at the right place; double-column characters
 		are now properly displayed when past the right edge of
-		the screen; invalid multi-line color regexes are now
+		the screen; invalid multiline color regexes are now
 		ignored; and so on.  Enjoy.
 
 2006.03.30 - GNU nano 1.3.11 awakens from its fever dream.  This release
@@ -732,7 +1049,7 @@
 		0.11.2 of gettext, building with automake 1.6, some new
 		code for displaying control characters, browser
 		improvements, a new backup file option (-B, --backup), a
-		new option to ignore rc files (-I,--ignorercfiles),
+		new option to ignore rc files (-I, --ignorercfiles),
 		compatibility with -pedantic, handling null characters
 		before EOF, a slightly sportier nanorc.sample and more.
 			Fixes are included included for justification,
@@ -766,19 +1083,27 @@
 		Also, the "show position" code now shows the starting
 		column as 1 instead of 0.  Have fun!
 
+<<<<<<< HEAD
 03/05/2002 - GNU nano 1.1.7 "lets change everything and see what breaks"
 		is released.  New features include new flags
 		-N,--noconvert to stop any file format conversion and
 		-Q, --quotestr for the new quoted text justification, a
 		new tempnam() implementation to avoid silly warnings,
+=======
+2002.03.05 - GNU nano 1.1.7 "let's change everything and see what breaks"
+		is released.  New features include the new flags
+		-N, --noconvert (to stop any file format conversion) and
+		-Q, --quotestr (for the new quoted text justification),
+		a new tempnam() implementation to avoid silly warnings,
+>>>>>>> origin/tomato-shibby-RT-AC
 		DOS and Mac file options in the Write File dialog,
-		multiple save files (file.1) for abnormal exits, ^C now
-		shows column as well as character position, and
-		multibuffer allows duplicate files, even unnamed ones.
-		Also, the static shortcut and toggle lengths are
-		history, nano now reads SYSCONFDIR/nanorc if rc file
-		support is enabled, and nano is now built with (and
-		requires for rebuilding) autoconf 2.5.
+		multiple save files (file.1) for abnormal exits,
+		^C now showing column as well as character position, and
+		multibuffer allowing duplicate files, even unnamed ones.
+		Also, the static shortcut and toggle lengths are history,
+		nano now reads SYSCONFDIR/nanorc if rc file support is
+		enabled, and nano is now built with (and for rebuilding
+		requires) autoconf 2.5.
 			This release also includes fixes for some memory
 		leaks, detecting DOS and Mac file format, justification,
 		suspending keys, search & replace under various
@@ -959,7 +1284,7 @@
 		nasty segfault when trying to insert one's home
 		directory (~), some checks for the NumLock key making
 		the keypad go awry, window size sanity checks, many
-		autoconf fixes, and support for the KDE konsole keypad
+		autoconf fixes, and support for the KDE Konsole keypad
 		layout.  Have fun.
 
 01/07/2001 - Nano 0.9.25 is the "Just one more feature I swear!"
@@ -1052,7 +1377,7 @@
 		New features include better (not yet perfect) binary
 		display support and toggle support for most of the
 		program flags (M-c, M-i, M-z, M-x, M-p, M-w, M-m, M-k
-		and M-e for -c, -i, -x, -p, -w, -k, and -R).
+		and M-e for -c, -i, -z, -x, -p, -w, -m, -k, and -R).
 
 08/09/2000 - Nano 0.9.16, after some struggling, is released.  This
 		release should fix a few of the holes that 0.9.15 dug.
@@ -1087,8 +1412,13 @@
 		other major changes, this should be the feature set for
 		nano 1.0, whenever it might be released =-)
 
+<<<<<<< HEAD
 07/07/2000 - Nano 0.9.12 (The "lucky day" release) is bursting with new
 		features, bug fixes, and yummy fruit flavor.  For
+=======
+2000.07.07 - Nano 0.9.12 (the "lucky day" release) is bursting with
+		new features, bug fixes, and yummy fruit flavor.  For
+>>>>>>> origin/tomato-shibby-RT-AC
 		changes, the alternate replace keystroke ^W^T is now
 		^W^R to be compatible with later versions of Pico.  ^W^T
 		is now goto line, again for Pico compatibility.  As for
@@ -1185,7 +1515,11 @@
 		path.  The bug was in the new code for checking whether
 		nano is invoked as 'pico'.
 
+<<<<<<< HEAD
 04/14/2000 - 0.9.1 has some more Pico compatibility built-in.  The
+=======
+2000.04.14 - Nano 0.9.1 has some more Pico compatibility built-in.  The
+>>>>>>> origin/tomato-shibby-RT-AC
 		option to switch to/from Search and Search/Replace (^T)
 		is now available, and nano now displays the more
 		Pico-like shortcut list when invoked as 'pico' (i.e. if

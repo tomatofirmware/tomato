@@ -90,6 +90,8 @@ followed by a long giving the length of the contents. Note that for
 followed by a filename, causes that file to be read and its contents used
 as data in this part. This part does \fInot\fP automatically become a file
 upload part simply because its data was read from a file.
+
+The specified file needs to kept around until the associated transfer is done.
 .IP CURLFORM_FILE
 followed by a filename, makes this part a file upload part. It sets the
 \fIfilename\fP field to the basename of the provided filename, it reads the
@@ -99,6 +101,14 @@ given file match one of the internally known file extensions.  For
 providing multiple \fBCURLFORM_FILE\fP arguments each followed by the filename
 (and each \fICURLFORM_FILE\fP is allowed to have a
 \fICURLFORM_CONTENTTYPE\fP).
+<<<<<<< HEAD
+=======
+
+The given upload file has to exist in its full in the file system already when
+the upload starts, as libcurl needs to read the correct file size beforehand.
+
+The specified file needs to kept around until the associated transfer is done.
+>>>>>>> origin/tomato-shibby-RT-AC
 .IP CURLFORM_CONTENTTYPE
 is used in combination with \fICURLFORM_FILE\fP. Followed by a pointer to a
 string which provides the content-type for this part, possibly instead of an
@@ -121,12 +131,22 @@ to the buffer to be uploaded. This buffer must not be freed until after
 is used in combination with \fICURLFORM_BUFFER\fP. The parameter is a
 long which gives the length of the buffer.
 .IP CURLFORM_STREAM
+<<<<<<< HEAD
 Tells libcurl to use the \fICURLOPT_READFUNCTION\fP callback to get data. The
 parameter you pass to \fICURLFORM_STREAM\fP is the pointer passed on to the
 read callback's fourth argument. If you want the part to look like a file
 upload one, set the \fICURLFORM_FILENAME\fP parameter as well. Note that when
 using \fICURLFORM_STREAM\fP, \fICURLFORM_CONTENTSLENGTH\fP must also be set
 with the total expected length of the part. (Option added in libcurl 7.18.2)
+=======
+Tells libcurl to use the \fICURLOPT_READFUNCTION(3)\fP callback to get
+data. The parameter you pass to \fICURLFORM_STREAM\fP is the pointer passed on
+to the read callback's fourth argument. If you want the part to look like a
+file upload one, set the \fICURLFORM_FILENAME\fP parameter as well. Note that
+when using \fICURLFORM_STREAM\fP, \fICURLFORM_CONTENTSLENGTH\fP must also be
+set with the total expected length of the part unless the formpost is sent
+chunked encoded. (Option added in libcurl 7.18.2)
+>>>>>>> origin/tomato-shibby-RT-AC
 .IP CURLFORM_ARRAY
 Another possibility to send options to curl_formadd() is the
 \fBCURLFORM_ARRAY\fP option, that passes a struct curl_forms array pointer as

@@ -28,9 +28,15 @@
 #include "sendf.h"
 
 OM_uint32 Curl_gss_init_sec_context(
+<<<<<<< HEAD
     struct SessionHandle *data,
     OM_uint32 * minor_status,
     gss_ctx_id_t * context,
+=======
+    struct Curl_easy *data,
+    OM_uint32 *minor_status,
+    gss_ctx_id_t *context,
+>>>>>>> origin/tomato-shibby-RT-AC
     gss_name_t target_name,
     gss_channel_bindings_t input_chan_bindings,
     gss_buffer_t input_token,
@@ -66,4 +72,59 @@ OM_uint32 Curl_gss_init_sec_context(
                               NULL /* time_rec */);
 }
 
+<<<<<<< HEAD
+=======
+#define GSS_LOG_BUFFER_LEN 1024
+static size_t display_gss_error(OM_uint32 status, int type,
+                                char *buf, size_t len) {
+  OM_uint32 maj_stat;
+  OM_uint32 min_stat;
+  OM_uint32 msg_ctx = 0;
+  gss_buffer_desc status_string;
+
+  do {
+    maj_stat = gss_display_status(&min_stat,
+                                  status,
+                                  type,
+                                  GSS_C_NO_OID,
+                                  &msg_ctx,
+                                  &status_string);
+    if(GSS_LOG_BUFFER_LEN > len + status_string.length + 3) {
+      len += snprintf(buf + len, GSS_LOG_BUFFER_LEN - len,
+                      "%.*s. ", (int)status_string.length,
+                      (char *)status_string.value);
+    }
+    gss_release_buffer(&min_stat, &status_string);
+  } while(!GSS_ERROR(maj_stat) && msg_ctx != 0);
+
+  return len;
+}
+
+/*
+ * Curl_gss_log_error()
+ *
+ * This is used to log a GSS-API error status.
+ *
+ * Parameters:
+ *
+ * data    [in] - The session handle.
+ * prefix  [in] - The prefix of the log message.
+ * major   [in] - The major status code.
+ * minor   [in] - The minor status code.
+ */
+void Curl_gss_log_error(struct Curl_easy *data, const char *prefix,
+                        OM_uint32 major, OM_uint32 minor)
+{
+  char buf[GSS_LOG_BUFFER_LEN];
+  size_t len = 0;
+
+  if(major != GSS_S_FAILURE)
+    len = display_gss_error(major, GSS_C_GSS_CODE, buf, len);
+
+  display_gss_error(minor, GSS_C_MECH_CODE, buf, len);
+
+  infof(data, "%s%s\n", prefix, buf);
+}
+
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif /* HAVE_GSSAPI */

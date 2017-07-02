@@ -26,7 +26,11 @@
 
 #ifdef __NOVELL_LIBC__
 /* For native LibC-based NLM we need to do nothing. */
+<<<<<<< HEAD
 int netware_init ( void )
+=======
+int netware_init(void)
+>>>>>>> origin/tomato-shibby-RT-AC
 {
   return 0;
 }
@@ -45,7 +49,11 @@ NETDB_DEFINE_CONTEXT
 #include <arpa/inet.h>
 NETINET_DEFINE_CONTEXT
 
+<<<<<<< HEAD
 int netware_init ( void )
+=======
+int netware_init(void)
+>>>>>>> origin/tomato-shibby-RT-AC
 {
   int rc = 0;
   unsigned int myHandle = GetNLMHandle();
@@ -72,13 +80,21 @@ int netware_init ( void )
 }
 
 /* dummy function to satisfy newer prelude */
+<<<<<<< HEAD
 int __init_environment ( void )
+=======
+int __init_environment(void)
+>>>>>>> origin/tomato-shibby-RT-AC
 {
   return 0;
 }
 
 /* dummy function to satisfy newer prelude */
+<<<<<<< HEAD
 int __deinit_environment ( void )
+=======
+int __deinit_environment(void)
+>>>>>>> origin/tomato-shibby-RT-AC
 {
   return 0;
 }

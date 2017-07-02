@@ -225,6 +225,10 @@ ifdef SSL
   INCLUDES += -I"$(OPENSSL_INCLUDE)"
   CFLAGS += -DUSE_SSLEAY -DUSE_OPENSSL
   curl_LDADD += -L"$(OPENSSL_LIBPATH)" $(OPENSSL_LIBS)
+else
+ifdef WINSSL
+  curl_LDADD += -lcrypt32
+endif
 endif
 ifdef ZLIB
   INCLUDES += -I"$(ZLIB_PATH)"

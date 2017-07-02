@@ -50,8 +50,12 @@ void handle_error(const char *file, int lineno, const char *msg){
 /* This array will store all of the mutexes available to OpenSSL. */
 static MUTEX_TYPE *mutex_buf= NULL;
 
+<<<<<<< HEAD
 
 static void locking_function(int mode, int n, const char * file, int line)
+=======
+static void locking_function(int mode, int n, const char *file, int line)
+>>>>>>> origin/tomato-shibby-RT-AC
 {
   if (mode & CRYPTO_LOCK)
     MUTEX_LOCK(mutex_buf[n]);

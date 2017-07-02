@@ -137,7 +137,7 @@ CFLAGS = $(CFLAGS) /DUSE_WINDOWS_SSPI /I$(WINDOWS_SDK_PATH)\include
 
 RELEASE_OBJS= \
 	nonblockr.obj \
-	rawstrr.obj \
+	strcaser.obj \
 	strtoofftr.obj \
 	warnless.obj \
 	tool_binmoder.obj \
@@ -182,7 +182,7 @@ RELEASE_OBJS= \
 
 DEBUG_OBJS= \
 	nonblockd.obj \
-	rawstrd.obj \
+	strcased.obj \
 	strtoofftd.obj \
 	warnlessd.obj \
 	tool_binmoded.obj \
@@ -357,8 +357,8 @@ debug: $(DEBUG_OBJS)
 ## Release
 nonblockr.obj: ../lib/nonblock.c
 	$(CCR) $(CFLAGS) /Fo"$@" ../lib/nonblock.c
-rawstrr.obj: ../lib/rawstr.c
-	$(CCR) $(CFLAGS) /Fo"$@" ../lib/rawstr.c
+strcaser.obj: ../lib/strcase.c
+	$(CCR) $(CFLAGS) /Fo"$@" ../lib/strcase.c
 strtoofftr.obj: ../lib/strtoofft.c
 	$(CCR) $(CFLAGS) /Fo"$@" ../lib/strtoofft.c
 warnless.obj: ../lib/warnless.c
@@ -445,8 +445,8 @@ curlr.res : curl.rc
 ## Debug
 nonblockd.obj: ../lib/nonblock.c
 	$(CCD) $(CFLAGS) /Fo"$@" ../lib/nonblock.c
-rawstrd.obj: ../lib/rawstr.c
-	$(CCD) $(CFLAGS) /Fo"$@" ../lib/rawstr.c
+strcased.obj: ../lib/strcase.c
+	$(CCD) $(CFLAGS) /Fo"$@" ../lib/strcase.c
 strtoofftd.obj: ../lib/strtoofft.c
 	$(CCD) $(CFLAGS) /Fo"$@" ../lib/strtoofft.c
 warnlessd.obj: ../lib/warnless.c

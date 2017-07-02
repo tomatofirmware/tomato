@@ -44,7 +44,7 @@ static void MD5_Init(MD5_CTX * ctx)
 }
 
 static void MD5_Update(MD5_CTX * ctx,
-                       const unsigned char * input,
+                       const unsigned char *input,
                        unsigned int inputLen)
 {
   md5_update(ctx, inputLen, input);
@@ -69,7 +69,7 @@ static void MD5_Init(MD5_CTX * ctx)
 }
 
 static void MD5_Update(MD5_CTX * ctx,
-                       const unsigned char * input,
+                       const unsigned char *input,
                        unsigned int inputLen)
 {
   gcry_md_write(*ctx, input, inputLen);
@@ -121,7 +121,7 @@ static void MD5_Final(unsigned char digest[16], MD5_CTX *ctx)
   CC_MD5_Final(digest, ctx);
 }
 
-#elif defined(_WIN32)
+#elif defined(_WIN32) && !defined(CURL_WINDOWS_APP)
 
 #include <wincrypt.h>
 
@@ -285,8 +285,16 @@ static void MD5_Update (struct md5_ctx *context,    /* context */
 {
   unsigned int i, bufindex, partLen;
 
+<<<<<<< HEAD
   /* Compute number of bytes mod 64 */
   bufindex = (unsigned int)((context->count[0] >> 3) & 0x3F);
+=======
+  saved_lo = ctx->lo;
+  ctx->lo = (saved_lo + size) & 0x1fffffff;
+  if(ctx->lo < saved_lo)
+    ctx->hi++;
+  ctx->hi += (MD5_u32plus)size >> 29;
+>>>>>>> origin/tomato-shibby-RT-AC
 
   /* Update number of bits */
   if((context->count[0] += ((UINT4)inputLen << 3))

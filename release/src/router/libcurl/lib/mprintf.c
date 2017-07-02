@@ -97,7 +97,8 @@
 #  define mp_uintmax_t unsigned long
 #endif
 
-#define BUFFSIZE 256 /* buffer for long-to-str and float-to-str calcs */
+#define BUFFSIZE 326 /* buffer for long-to-str and float-to-str calcs, should
+                        fit negative DBL_MAX (317 letters) */
 #define MAX_PARAMETERS 128 /* lame static limit */
 
 #ifdef __AMIGA__
@@ -232,10 +233,12 @@ static bool dprintf_IsQualifierNoDollar(const char *fmt)
  * Create an index with the type of each parameter entry and its
  * value (may vary in size)
  *
+ * Returns zero on success.
+ *
  ******************************************************************/
 
-static long dprintf_Pass1(const char *format, va_stack_t *vto, char **endpos,
-                          va_list arglist)
+static int dprintf_Pass1(const char *format, va_stack_t *vto, char **endpos,
+                         va_list arglist)
 {
   char *fmt = (char *)format;
   int param_num = 0;
@@ -306,7 +309,6 @@ static long dprintf_Pass1(const char *format, va_stack_t *vto, char **endpos,
           flags |= FLAGS_ALT;
           break;
         case '.':
-          flags |= FLAGS_PREC;
           if('*' == *fmt) {
             /* The precision is picked from a specified parameter */
 
@@ -397,6 +399,10 @@ static long dprintf_Pass1(const char *format, va_stack_t *vto, char **endpos,
       /* Handle the specifier */
 
       i = this_param - 1;
+
+      if((i < 0) || (i >= MAX_PARAMETERS))
+        /* out of allowed range */
+        return 1;
 
       switch (*fmt) {
       case 'S':
@@ -495,7 +501,7 @@ static long dprintf_Pass1(const char *format, va_stack_t *vto, char **endpos,
       vto[i + 1].data.num.as_signed = (mp_intmax_t)va_arg(arglist, int);
     }
 
-    switch (vto[i].type) {
+    switch(vto[i].type) {
     case FORMAT_STRING:
       vto[i].data.str = va_arg(arglist, char *);
       break;
@@ -548,7 +554,7 @@ static long dprintf_Pass1(const char *format, va_stack_t *vto, char **endpos,
     }
   }
 
-  return max_param;
+  return 0;
 
 }
 
@@ -581,7 +587,8 @@ static int dprintf_formatf(
   va_stack_t *p;
 
   /* Do the actual %-code parsing */
-  dprintf_Pass1(format, vto, endpos, ap_save);
+  if(dprintf_Pass1(format, vto, endpos, ap_save))
+    return -1;
 
   end = &endpos[0]; /* the initial end-position from the list dprintf_Pass1()
                        created for us */
@@ -663,7 +670,7 @@ static int dprintf_formatf(
 
     is_alt = (p->flags & FLAGS_ALT) ? 1 : 0;
 
-    switch (p->type) {
+    switch(p->type) {
     case FORMAT_INT:
       num = p->data.num.as_unsigned;
       if(p->flags & FLAGS_CHAR) {
@@ -892,12 +899,25 @@ static int dprintf_formatf(
         *fptr = 0;
 
         if(width >= 0) {
+          if(width >= (long)sizeof(work))
+            width = sizeof(work)-1;
           /* RECURSIVE USAGE */
           len = curl_msnprintf(fptr, left, "%ld", width);
           fptr += len;
           left -= len;
         }
         if(prec >= 0) {
+          /* for each digit in the integer part, we can have one less
+             precision */
+          size_t maxprec = sizeof(work) - 2;
+          double val = p->data.dnum;
+          while(val >= 10.0) {
+            val /= 10;
+            maxprec--;
+          }
+
+          if(prec > (long)maxprec)
+            prec = (long)maxprec-1;
           /* RECURSIVE USAGE */
           len = curl_msnprintf(fptr, left, ".%ld", prec);
           fptr += len;
@@ -917,7 +937,9 @@ static int dprintf_formatf(
         /* NOTE NOTE NOTE!! Not all sprintf implementations return number of
            output characters */
         (sprintf)(work, formatbuf, p->data.dnum);
-
+#ifdef CURLDEBUG
+        assert(strlen(work) <= sizeof(work));
+#endif
         for(fptr=work; *fptr; fptr++)
           OUTCHAR(*fptr);
       }
@@ -974,7 +996,7 @@ int curl_mvsnprintf(char *buffer, size_t maxlength, const char *format,
   info.max = maxlength;
 
   retcode = dprintf_formatf(&info, addbyter, format, ap_save);
-  if(info.max) {
+  if((retcode != -1) && info.max) {
     /* we terminate this with a zero byte */
     if(info.max == info.length)
       /* we're at maximum, scrap the last letter */
@@ -1011,16 +1033,19 @@ static int alloc_addbyter(int output, FILE *data)
     infop->len =0;
   }
   else if(infop->len+1 >= infop->alloc) {
-    char *newptr;
+    char *newptr = NULL;
+    size_t newsize = infop->alloc*2;
 
-    newptr = realloc(infop->buffer, infop->alloc*2);
+    /* detect wrap-around or other overflow problems */
+    if(newsize > infop->alloc)
+      newptr = realloc(infop->buffer, newsize);
 
     if(!newptr) {
       infop->fail = 1;
       return -1; /* fail */
     }
     infop->buffer = newptr;
-    infop->alloc *= 2;
+    infop->alloc = newsize;
   }
 
   infop->buffer[ infop->len ] = outc;

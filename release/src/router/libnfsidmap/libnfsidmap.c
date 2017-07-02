@@ -36,6 +36,8 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "config.h"
+
 #include <sys/types.h>
 #include <errno.h>
 #include <unistd.h>
@@ -50,6 +52,7 @@
 #include <syslog.h>
 #include <stdarg.h>
 #include <dlfcn.h>
+#include <ctype.h>
 #include "nfsidmap.h"
 #include "nfsidmap_internal.h"
 #include "cfg.h"
@@ -59,6 +62,8 @@ static struct conf_list *local_realms;
 int idmap_verbosity = 0;
 static struct mapping_plugin **nfs4_plugins = NULL;
 static struct mapping_plugin **gss_plugins = NULL;
+uid_t nobody_uid = (uid_t)-1;
+gid_t nobody_gid = (gid_t)-1;
 
 #ifndef PATH_PLUGINS
 #define PATH_PLUGINS "/usr/lib/libnfsidmap"
@@ -96,8 +101,12 @@ static char * toupper_str(char *s)
 static int id_as_chars(char *name, int *id)
 {
 	long int value = strtol(name, NULL, 10);
-	if (value == 0)
-		return 0;
+
+	if (value == 0) {
+		/* zero value ids are valid */
+		if (strcmp(name, "0") != 0)
+			return 0;
+	}
 	*id = (int)value;
 	return 1;
 }
@@ -207,7 +216,7 @@ out:
 		unload_plugins(plgns);
 	return ret;
 }
-int nfs4_cleanup_name_mapping()
+void nfs4_cleanup_name_mapping()
 {
 	if (nfs4_plugins)
 		unload_plugins(nfs4_plugins);
@@ -219,9 +228,9 @@ int nfs4_cleanup_name_mapping()
 int nfs4_init_name_mapping(char *conffile)
 {
 	int ret = -ENOENT;
-	char *method;
 	int dflt = 0;
 	struct conf_list *nfs4_methods, *gss_methods;
+	char *nobody_user, *nobody_group;
 
 	/* XXX: need to be able to reload configurations... */
 	if (nfs4_plugins) /* already succesfully initialized */
@@ -244,7 +253,7 @@ int nfs4_init_name_mapping(char *conffile)
 			default_domain = IDMAPD_DEFAULT_DOMAIN;
 		}
 	}
-	IDMAP_LOG(1, ("libnfsidmap: using%s domain: %s\n",
+	IDMAP_LOG(1, ("libnfsidmap: using%s domain: %s",
 		(dflt ? " (default)" : ""), default_domain));
 
 	/* Get list of "local equivalent" realms.  Meaning the list of realms
@@ -272,9 +281,31 @@ int nfs4_init_name_mapping(char *conffile)
 		local_realms->cnt++;
 	}
 
+	if (idmap_verbosity >= 1) {
+		struct conf_list_node *r;
+		char *buf = NULL;
+		int siz=0;
+
+		if (local_realms) {
+			TAILQ_FOREACH(r, &local_realms->fields, link) {
+				siz += (strlen(r->field)+4);
+			}
+			buf = malloc(siz);
+			if (buf) {
+				*buf = 0;
+				TAILQ_FOREACH(r, &local_realms->fields, link) {
+					sprintf(buf+strlen(buf), "'%s' ", r->field);
+				}
+				IDMAP_LOG(1, ("libnfsidmap: Realms list: %s", buf));
+				free(buf);
+			}
+		} else 
+			IDMAP_LOG(1, ("libnfsidmap: Realms list: <NULL> "));
+	}
+
 	nfs4_methods = conf_get_list("Translation", "Method");
 	if (nfs4_methods) {
-		IDMAP_LOG(1, ("libnfsidmap: processing 'Method' list\n"));
+		IDMAP_LOG(1, ("libnfsidmap: processing 'Method' list"));
 		if (load_plugins(nfs4_methods, &nfs4_plugins) == -1)
 			return -ENOENT;
 	} else {
@@ -292,10 +323,53 @@ int nfs4_init_name_mapping(char *conffile)
 
 	gss_methods = conf_get_list("Translation", "GSS-Methods");
 	if (gss_methods) {
-		IDMAP_LOG(1, ("libnfsidmap: processing 'GSS-Methods' list\n"));
+		IDMAP_LOG(1, ("libnfsidmap: processing 'GSS-Methods' list"));
 		if (load_plugins(gss_methods, &gss_plugins) == -1)
 			goto out;
 	}
+
+	nobody_user = conf_get_str("Mapping", "Nobody-User");
+	if (nobody_user) {
+		size_t buflen = sysconf(_SC_GETPW_R_SIZE_MAX);
+		struct passwd *buf;
+		struct passwd *pw = NULL;
+		int err;
+
+		buf = malloc(sizeof(*buf) + buflen);
+		if (buf) {
+			err = getpwnam_r(nobody_user, buf, ((char *)buf) + sizeof(*buf), buflen, &pw);
+			if (err == 0 && pw != NULL)
+				nobody_uid = pw->pw_uid;
+			else
+				IDMAP_LOG(1, ("libnfsidmap: Nobody-User (%s) not found: %s\n", 
+					nobody_user, strerror(errno)));
+			free(buf);
+		} else
+			IDMAP_LOG(0,("libnfsidmap: Nobody-User: no memory : %s\n", 
+					nobody_user, strerror(errno)));
+	}
+
+	nobody_group = conf_get_str("Mapping", "Nobody-Group");
+	if (nobody_group) {
+		size_t buflen = sysconf(_SC_GETGR_R_SIZE_MAX);
+		struct group *buf;
+		struct group *gr = NULL;
+		int err;
+
+		buf = malloc(sizeof(*buf) + buflen);
+		if (buf) {
+			err = getgrnam_r(nobody_group, buf, ((char *)buf) + sizeof(*buf), buflen, &gr);
+			if (err == 0 && gr != NULL)
+				nobody_gid = gr->gr_gid;
+			else
+				IDMAP_LOG(1, ("libnfsidmap: Nobody-Group (%s) not found: %s\n", 
+					nobody_group, strerror(errno)));
+			free(buf);
+		} else
+			IDMAP_LOG(0,("libnfsidmap: Nobody-Group: no memory : %s\n", 
+					nobody_group, strerror(errno)));
+	}
+
 	ret = 0;
 out:
 	if (ret) {
@@ -425,6 +499,18 @@ static int set_id_to_nobody(int *id, int is_uid)
 	int rc = 0;
 	const char name[] = "nobody@";
 	char nobody[strlen(name) + strlen(get_default_domain()) + 1];
+
+	/* First try to see whether a Nobody-User/Nobody-Group was
+         * configured, before we try to do a full lookup for the
+         * NFS nobody user. */
+	if (is_uid && nobody_uid != (uid_t)-1) {
+		*id = (int)nobody_uid;
+		return 0;
+	} else if (!is_uid && nobody_gid != (gid_t)-1) {
+		*id = (int)nobody_gid;
+		return 0;
+	}
+
 	strcpy(nobody, name);
 	strcat(nobody, get_default_domain());
 

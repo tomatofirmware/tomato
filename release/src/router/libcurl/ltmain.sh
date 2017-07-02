@@ -23,10 +23,77 @@
 # General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
+<<<<<<< HEAD
 # along with GNU Libtool; see the file COPYING.  If not, a copy
 # can be downloaded from http://www.gnu.org/licenses/gpl.html,
 # or obtained by writing to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+=======
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+PROGRAM=libtool
+PACKAGE=libtool
+VERSION="2.4.6 Debian-2.4.6-2"
+package_revision=2.4.6
+
+
+## ------ ##
+## Usage. ##
+## ------ ##
+
+# Run './libtool --help' for help with using this script from the
+# command line.
+
+
+## ------------------------------- ##
+## User overridable command paths. ##
+## ------------------------------- ##
+
+# After configure completes, it has a better idea of some of the
+# shell tools we need than the defaults used by the functions shared
+# with bootstrap, so set those here where they can still be over-
+# ridden by the user, but otherwise take precedence.
+
+: ${AUTOCONF="autoconf"}
+: ${AUTOMAKE="automake"}
+
+
+## -------------------------- ##
+## Source external libraries. ##
+## -------------------------- ##
+
+# Much of our low-level functionality needs to be sourced from external
+# libraries, which are installed to $pkgauxdir.
+
+# Set a version string for this script.
+scriptversion=2015-01-20.17; # UTC
+
+# General shell script boiler plate, and helper functions.
+# Written by Gary V. Vaughan, 2004
+
+# Copyright (C) 2004-2015 Free Software Foundation, Inc.
+# This is free software; see the source for copying conditions.  There is NO
+# warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+
+# As a special exception to the GNU General Public License, if you distribute
+# this file as part of a program or library that is built using GNU Libtool,
+# you may include this file under the same distribution terms that you use
+# for the rest of that program.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNES FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+>>>>>>> origin/tomato-shibby-RT-AC
 
 # Usage: $progname [OPTION]... [MODE-ARG]...
 #
@@ -860,8 +927,47 @@ func_append_quoted ()
 # func_arith arithmetic-term...
 func_arith ()
 {
+<<<<<<< HEAD
     func_arith_result=`expr "${@}"`
 } # func_arith may be replaced by extended shell implementation
+=======
+    $debug_cmd
+
+    func_usage_message
+    $ECHO "$long_help_message
+
+MODE must be one of the following:
+
+       clean           remove files from the build directory
+       compile         compile a source file into a libtool object
+       execute         automatically set library path, then run a program
+       finish          complete the installation of libtool libraries
+       install         install libraries or executables
+       link            create a library or an executable
+       uninstall       remove libraries from an installed directory
+
+MODE-ARGS vary depending on the MODE.  When passed as first option,
+'--mode=MODE' may be abbreviated as 'MODE' or a unique abbreviation of that.
+Try '$progname --help --mode=MODE' for a more detailed description of MODE.
+
+When reporting a bug, please describe a test case to reproduce it and
+include the following information:
+
+       host-triplet:   $host
+       shell:          $SHELL
+       compiler:       $LTCC
+       compiler flags: $LTCFLAGS
+       linker:         $LD (gnu? $with_gnu_ld)
+       version:        $progname $scriptversion Debian-2.4.6-2
+       automake:       `($AUTOMAKE --version) 2>/dev/null |$SED 1q`
+       autoconf:       `($AUTOCONF --version) 2>/dev/null |$SED 1q`
+
+Report bugs to <bug-libtool@gnu.org>.
+GNU libtool home page: <http://www.gnu.org/s/libtool/>.
+General help using GNU software: <http://www.gnu.org/gethelp/>."
+    exit 0
+}
+>>>>>>> origin/tomato-shibby-RT-AC
 
 
 # func_len string

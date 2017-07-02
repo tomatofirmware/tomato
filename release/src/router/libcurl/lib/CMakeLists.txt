@@ -106,7 +106,14 @@ endif()
 
 set_target_properties(${LIB_NAME} PROPERTIES COMPILE_DEFINITIONS BUILDING_LIBCURL)
 
+<<<<<<< HEAD
 setup_curl_dependencies(${LIB_NAME})
+=======
+if(HIDES_CURL_PRIVATE_SYMBOLS)
+  set_property(TARGET ${LIB_NAME} APPEND PROPERTY COMPILE_DEFINITIONS "CURL_HIDDEN_SYMBOLS")
+  set_property(TARGET ${LIB_NAME} APPEND PROPERTY COMPILE_FLAGS ${CURL_CFLAG_SYMBOLS_HIDE})
+endif()
+>>>>>>> origin/tomato-shibby-RT-AC
 
 # Remove the "lib" prefix since the library is already named "libcurl".
 set_target_properties(${LIB_NAME} PROPERTIES PREFIX "")

@@ -31,11 +31,16 @@ CURLcode Curl_proxyCONNECT(struct connectdata *conn,
 /* Default proxy timeout in milliseconds */
 #define PROXY_TIMEOUT (3600*1000)
 
-CURLcode Curl_proxy_connect(struct connectdata *conn);
+CURLcode Curl_proxy_connect(struct connectdata *conn, int sockindex);
 
 #else
+<<<<<<< HEAD
 #define Curl_proxyCONNECT(x,y,z,w) CURLE_NOT_BUILT_IN
 #define Curl_proxy_connect(x) CURLE_OK
+=======
+#define Curl_proxyCONNECT(x,y,z,w,v) CURLE_NOT_BUILT_IN
+#define Curl_proxy_connect(x,y) CURLE_OK
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif
 
 #endif /* HEADER_CURL_HTTP_PROXY_H */

@@ -68,10 +68,15 @@ PSecurityFunctionTable s_pSecFn = NULL;
  *
  * Once this function has been executed, Windows SSPI functions can be
  * called through the Security Service Provider Interface dispatch table.
+ *
+ * Parameters:
+ *
+ * None.
+ *
+ * Returns CURLE_OK on success.
  */
 CURLcode Curl_sspi_global_init(void)
 {
-  bool securityDll = FALSE;
   INITSECURITYINTERFACE_FN pInitSecurityInterface;
 
   /* If security interface is not yet initialized try to do this */
@@ -79,6 +84,7 @@ CURLcode Curl_sspi_global_init(void)
     /* Security Service Provider Interface (SSPI) functions are located in
      * security.dll on WinNT 4.0 and in secur32.dll on Win9x. Win2K and XP
      * have both these DLLs (security.dll forwards calls to secur32.dll) */
+<<<<<<< HEAD
     DWORD majorVersion = 4;
     DWORD platformId = VER_PLATFORM_WIN32_NT;
 
@@ -118,6 +124,12 @@ CURLcode Curl_sspi_global_init(void)
     /* Load SSPI dll into the address space of the calling process */
     if(securityDll)
       s_hSecDll = LoadLibrary(TEXT("security.dll"));
+=======
+
+    /* Load SSPI dll into the address space of the calling process */
+    if(Curl_verify_windows_version(4, 0, PLATFORM_WINNT, VERSION_EQUAL))
+      s_hSecDll = Curl_load_library(TEXT("security.dll"));
+>>>>>>> origin/tomato-shibby-RT-AC
     else
       s_hSecDll = LoadLibrary(TEXT("secur32.dll"));
     if(!s_hSecDll)
@@ -142,8 +154,11 @@ CURLcode Curl_sspi_global_init(void)
  * Curl_sspi_global_cleanup()
  *
  * This deinitializes the Security Service Provider Interface from libcurl.
+ *
+ * Parameters:
+ *
+ * None.
  */
-
 void Curl_sspi_global_cleanup(void)
 {
   if(s_hSecDll) {
@@ -245,6 +260,15 @@ CURLcode Curl_create_sspi_identity(const char *userp, const char *passwdp,
   return CURLE_OK;
 }
 
+/*
+ * Curl_sspi_free_identity()
+ *
+ * This is used to free the contents of a SSPI identifier structure.
+ *
+ * Parameters:
+ *
+ * identity [in/out] - The identity structure.
+ */
 void Curl_sspi_free_identity(SEC_WINNT_AUTH_IDENTITY *identity)
 {
   if(identity) {

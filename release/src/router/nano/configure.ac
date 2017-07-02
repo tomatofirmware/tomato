@@ -3,6 +3,7 @@
 # Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007
 # Free Software Foundation, Inc.
 #
+<<<<<<< HEAD
 # GNU nano is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the
 # Free Software Foundation; either version 3, or (at your option) any
@@ -27,18 +28,52 @@ AM_INIT_AUTOMAKE
 AC_CONFIG_HEADERS([config.h])
 
 AC_PREREQ(2.54)
+=======
+# GNU nano is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published
+# by the Free Software Foundation, either version 3 of the License,
+# or (at your option) any later version.
+#
+# GNU nano is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty
+# of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see http://www.gnu.org/licenses/.
+
+AC_INIT([GNU nano], [2.8.0], [nano-devel@gnu.org], [nano])
+AC_CONFIG_SRCDIR([src/nano.c])
+AC_CANONICAL_HOST
+AM_INIT_AUTOMAKE([1.14])
+AC_CONFIG_HEADERS([config.h])
+
+dnl Make sure the ONCE macros are available.
+
+AC_PREREQ([2.69])
+
+dnl Lie about gnulib features we don't use to speed up & shrink down.
+
+gl_cv_func_printf_directive_n=yes
+gl_cv_func_printf_infinite_long_double=yes
+gl_cv_func_printf_long_double=yes
+gl_cv_func_snprintf_directive_n=yes
+gl_cv_glob_lists_symlinks=yes
+>>>>>>> origin/tomato-shibby-RT-AC
 
 dnl Checks for programs.
 
 AC_GNU_SOURCE
 AC_PROG_CC
+gl_EARLY
+gl_INIT
 AC_PROG_LN_S
 AC_ISC_POSIX
 AC_SYS_LARGEFILE
 
 dnl Internationalization macros.
 
-AM_GNU_GETTEXT_VERSION(0.11.5)
+AM_GNU_GETTEXT_VERSION([0.18.3])
 AM_GNU_GETTEXT([external], [need-ngettext])
 AM_CONDITIONAL(USE_NLS, test x$USE_NLS = xyes)
 
@@ -49,8 +84,12 @@ AC_DEFINE_DIR([PKGDATADIR], [pkgdatadir], [Where data are placed to.])
 
 dnl Checks for header files.
 
+<<<<<<< HEAD
 AC_HEADER_STDC
 AC_CHECK_HEADERS(getopt.h libintl.h limits.h regex.h sys/param.h wchar.h wctype.h stdarg.h)
+=======
+AC_CHECK_HEADERS(libintl.h limits.h pwd.h termios.h sys/param.h)
+>>>>>>> origin/tomato-shibby-RT-AC
 
 dnl Checks for options.
 
@@ -60,6 +99,7 @@ AC_ARG_ENABLE(debug,
     AC_DEFINE(DEBUG, 1, [Define this to enable debug messages and assert warnings.]) debug_support=yes
 fi])
 
+<<<<<<< HEAD
 if test x$debug_support != xyes; then
     AC_DEFINE(NDEBUG, 1, [Shut up assert warnings :-)])
 fi
@@ -78,6 +118,38 @@ AC_ARG_ENABLE(tiny,
     AC_DEFINE(DISABLE_WRAPPING, 1, [Define this to disable all text wrapping.])
 fi])
 
+=======
+AC_ARG_ENABLE(color,
+AS_HELP_STRING([--disable-color], [Disable color and syntax highlighting]))
+if test "x$enable_nanorc" = xno; then
+    if test "x$enable_color" = xyes; then
+	AC_MSG_ERROR([--enable-color cannot work with --disable-nanorc])
+    else
+	# Disabling nanorc silently disables color support.
+	enable_color=no
+    fi
+fi
+if test "x$enable_color" = xno; then
+    AC_DEFINE(DISABLE_COLOR, 1, [Define this to disable syntax highlighting.])
+else
+    color_support=yes
+fi
+
+AC_ARG_ENABLE(comment,
+AS_HELP_STRING([--disable-comment], [Disable comment/uncomment functions]))
+if test "x$enable_tiny" = xyes; then
+    if test "x$enable_comment" = xyes; then
+	AC_MSG_ERROR([--enable-comment cannot work with --enable-tiny])
+    else
+	enable_comment=no
+    fi
+fi
+if test "x$disable_comment" != xyes; then
+    if test "x$enable_comment" != xno; then
+	AC_DEFINE(ENABLE_COMMENT, 1, [Define this to enable the comment/uncomment function.])
+    fi
+fi
+>>>>>>> origin/tomato-shibby-RT-AC
 
 AC_ARG_ENABLE(extra,
 [  --disable-extra          Disable extra features, currently only easter eggs],
@@ -106,6 +178,19 @@ AC_ARG_ENABLE(justify,
     AC_DEFINE(DISABLE_JUSTIFY, 1, [Define this to disable the justify routines.])
 fi])
 
+AC_ARG_ENABLE(linenumbers,
+AS_HELP_STRING([--disable-linenumbers], [Disable line numbering]))
+if test "x$enable_tiny" = xyes; then
+    if test "x$enable_linenumbers" != xyes; then
+	enable_linenumbers=no
+    fi
+fi
+if test "x$disable_linenumbers" != xyes; then
+    if test "x$enable_linenumbers" != xno; then
+	AC_DEFINE(ENABLE_LINENUMBERS, 1, [Define this to enable line numbering.])
+    fi
+fi
+
 AC_ARG_ENABLE(mouse,
 [  --disable-mouse         Disable mouse support (and -m flag)],
 [if test x$enableval != xyes; then
@@ -125,10 +210,32 @@ AC_ARG_ENABLE(speller,
 fi])
 
 AC_ARG_ENABLE(tabcomp,
+<<<<<<< HEAD
 [  --disable-tabcomp       Disable tab completion functions],
 [if test x$enableval != xyes; then
     AC_DEFINE(DISABLE_TABCOMP, 1, [Define to disable the tab completion functions for files and search strings.])
 fi])
+=======
+AS_HELP_STRING([--disable-tabcomp], [Disable tab completion functions]))
+if test "x$enable_tabcomp" = xno; then
+    AC_DEFINE(DISABLE_TABCOMP, 1, [Define this to disable the tab completion functions for filenames and search strings.])
+fi
+
+AC_ARG_ENABLE(wordcomp,
+AS_HELP_STRING([--disable-wordcomp], [Disable the word completion function]))
+if test "x$enable_tiny" = xyes; then
+    if test "x$enable_wordcomp" = xyes; then
+	AC_MSG_ERROR([--enable-wordcomp cannot work with --enable-tiny])
+    else
+	enable_wordcomp=no
+    fi
+fi
+if test "x$disable_wordcomp" != xyes; then
+    if test "x$enable_wordcomp" != xno; then
+	AC_DEFINE(ENABLE_WORDCOMPLETION, 1, [Define this to enable the word completion function.])
+    fi
+fi
+>>>>>>> origin/tomato-shibby-RT-AC
 
 AC_ARG_ENABLE(wrapping,
 [  --disable-wrapping      Disable all wrapping of text (and -w flag)],
@@ -415,6 +522,7 @@ fi])
 
 dnl Checks for functions.
 
+<<<<<<< HEAD
 AC_CHECK_FUNCS(getdelim getline isblank strcasecmp strcasestr strncasecmp strnlen vsnprintf)
 
 if test x$enable_utf8 != xno; then
@@ -428,14 +536,21 @@ if test x$ac_cv_func_vsnprintf = xno; then
 *** install the GLIB 2.x library which can be found at
 *** ftp://ftp.gtk.org/.]),
 	glib)
+=======
+if test "x$enable_utf8" != xno; then
+    AC_CHECK_FUNCS(iswalnum iswpunct mblen mbstowcs mbtowc wctomb)
+>>>>>>> origin/tomato-shibby-RT-AC
 fi
-
 dnl Checks for typedefs, structures, and compiler characteristics.
 
 dnl Checks for library functions.
 AC_TYPE_SIGNAL
+<<<<<<< HEAD
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS(getopt_long)
+=======
+
+>>>>>>> origin/tomato-shibby-RT-AC
 dnl Checks for libraries.
 
 if eval "test x$CURSES_LIB_NAME = x"; then
@@ -471,7 +586,19 @@ else
     AC_MSG_RESULT([Using $CURSES_LIB_NAME as the curses library])
 fi
 
+<<<<<<< HEAD
 AC_CHECK_LIB([$CURSES_LIB_NAME], use_default_colors, AC_DEFINE(HAVE_USE_DEFAULT_COLORS, 1, [Define this if your curses library has the use_default_colors() command.]))
+=======
+AC_CHECK_LIB([$CURSES_LIB_NAME], [use_default_colors],
+	     [AC_DEFINE(HAVE_USE_DEFAULT_COLORS, 1, [Define this if your curses library has the use_default_colors() command.])],
+	     [], [$CURSES_LIB])
+AC_CHECK_LIB([$CURSES_LIB_NAME], [set_escdelay],
+	     [AC_DEFINE(HAVE_SET_ESCDELAY, 1, [Define this if your curses library has the set_escdelay() function.])],
+	     [], [$CURSES_LIB])
+AC_CHECK_LIB([$CURSES_LIB_NAME], [key_defined],
+	     [AC_DEFINE(HAVE_KEY_DEFINED, 1, [Define this if your curses library has the key_defined() command.])],
+	     [], [$CURSES_LIB])
+>>>>>>> origin/tomato-shibby-RT-AC
 
 dnl Parse any configure options.
 
@@ -479,6 +606,7 @@ LIBS="$LIBS $CURSES_LIB"
 
 AC_SUBST(CURSES_LIB)
 
+<<<<<<< HEAD
 if test "x$GLIB_CFLAGS" != "x"; then
     CFLAGS="$CFLAGS $GLIB_CFLAGS"
 fi
@@ -487,17 +615,17 @@ if test "x$GLIB_LIBS" != "x"; then
 fi
 
 if test x$enable_utf8 != xno && \
+=======
+if test "x$enable_utf8" != xno && \
+>>>>>>> origin/tomato-shibby-RT-AC
     test x$CURSES_LIB_WIDE = xyes && \
     test x$ac_cv_func_iswalnum = xyes && \
     test x$ac_cv_func_iswpunct = xyes && \
-    (test x$ac_cv_func_iswblank = xyes || test x$ac_cv_func_iswspace = xyes) && \
-    test x$ac_cv_func_nl_langinfo = xyes && \
     test x$ac_cv_func_mblen = xyes && \
     test x$ac_cv_func_mbstowcs = xyes && \
     test x$ac_cv_func_mbtowc = xyes && \
-    test x$ac_cv_func_wctomb = xyes && \
-    test x$ac_cv_func_wcwidth = xyes; then
-	AC_DEFINE(ENABLE_UTF8, 1, [Define this if your system has sufficient UTF-8 support (a wide curses library, iswalnum(), iswpunct(), iswblank() or iswspace(), nl_langinfo, mblen(), mbstowcs(), mbtowc(), wctomb(), and wcwidth()).])
+    test x$ac_cv_func_wctomb = xyes; then
+	AC_DEFINE(ENABLE_UTF8, 1, [Define this if your system has sufficient UTF-8 support.])
 else
     if test x$enable_utf8 = xyes; then
 	AC_MSG_ERROR([
@@ -516,10 +644,43 @@ else
     fi
 fi
 
+<<<<<<< HEAD
 if test x$color_support = xyes; then
 	# now check for the end of word boundary support (/< and />)
 	AC_MSG_CHECKING([for GNU-style word boundary regex support])
 	AC_TRY_RUN([
+=======
+AC_CACHE_CHECK([for enhanced regular expression flag], nano_cv_flag_reg_extended,
+	       [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <regex.h>]],
+						   [[
+						     #ifndef REG_ENHANCED
+						     error: No REG_ENHANCED support!
+						     #endif
+						   ]])],
+				  [nano_cv_flag_reg_extended="REG_EXTENDED | REG_ENHANCED"],
+				  [nano_cv_flag_reg_extended="REG_EXTENDED"])])
+
+AC_DEFINE_UNQUOTED(NANO_REG_EXTENDED, $nano_cv_flag_reg_extended,
+		   [Flag(s) to use to get the full range of extended regular expressions])
+
+# Check for word-boundary support (/< and />).
+AC_MSG_CHECKING([for GNU-style word boundary regex support])
+AC_ARG_WITH(wordbounds,
+AS_HELP_STRING([--with-wordbounds], [Use GNU-style word boundary delimiters]),
+	[ case "$with_wordbounds" in
+	    no)
+		AC_MSG_RESULT(no)
+		;;
+	    *)
+		AC_MSG_RESULT(yes)
+		# We explicitly don't check if the user forced the option, because
+		# this is needed for cross compilers and we can't test the target.
+		AC_DEFINE(GNU_WORDBOUNDS, 1, [Define this if the system supports GNU-style word boundaries in regexes.]) gnu_wordbounds=yes,
+		;;
+	  esac
+	], [
+	    AC_TRY_RUN([
+>>>>>>> origin/tomato-shibby-RT-AC
 #ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
@@ -536,11 +697,22 @@ int main(void)
         return 1;
     return 0;
 }],
+<<<<<<< HEAD
 	AC_MSG_RESULT(yes)
 	AC_DEFINE(GNU_WORDBOUNDS, 1, [Define if the system supports GNU-style word boundaries in regexes.]) gnu_wordbounds=yes,
 	AC_MSG_RESULT(no),
         AC_MSG_WARN([*** Can't check for GNU-style word boundary support when cross-compiling])
 )
+=======
+	    AC_MSG_RESULT(yes)
+	    AC_DEFINE(GNU_WORDBOUNDS, 1, [Define this if the system supports GNU-style word boundaries in regexes.]) gnu_wordbounds=yes,
+	    AC_MSG_RESULT(no),
+	    AC_MSG_WARN([*** Can't check for GNU-style word boundary support when cross-compiling])
+	)
+])
+
+if test x$color_support = xyes; then
+>>>>>>> origin/tomato-shibby-RT-AC
 #    if test x$CURSES_LIB_NAME = xcurses; then
 	AC_MSG_CHECKING([whether _XOPEN_SOURCE_EXTENDED is needed])
 	AC_TRY_RUN([
@@ -598,18 +770,29 @@ else
 fi
 AM_CONDITIONAL(GROFF_HTML, test x$groff_html_support = xyes)
 
+<<<<<<< HEAD
+=======
+# Check whether this is a git repository.
+AC_MSG_CHECKING([whether building from git])
+if test -d .git ; then
+    AC_MSG_RESULT([yes])
+    from_git=yes
+else
+    AC_MSG_RESULT([no])
+    from_git=no
+fi
+AM_CONDITIONAL(BUILDING_FROM_GIT, test x$from_git = xyes)
+>>>>>>> origin/tomato-shibby-RT-AC
 
 AC_CONFIG_FILES([
 Makefile
 doc/Makefile
-doc/nanorc.sample
-doc/man/Makefile
-doc/man/fr/Makefile
-doc/syntax/Makefile
-doc/texinfo/Makefile
+doc/sample.nanorc
+lib/Makefile
 m4/Makefile
 po/Makefile.in
 src/Makefile
+syntax/Makefile
 nano.spec
 ])
 

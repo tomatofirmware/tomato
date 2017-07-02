@@ -48,7 +48,11 @@ static void my_lock(CURL *handle, curl_lock_data data, curl_lock_access laccess,
   (void)handle;
   (void)laccess;
 
+<<<<<<< HEAD
   switch ( data ) {
+=======
+  switch(data) {
+>>>>>>> origin/tomato-shibby-RT-AC
     case CURL_LOCK_DATA_SHARE:
       what = "share";
       break;
@@ -75,7 +79,11 @@ static void my_unlock(CURL *handle, curl_lock_data data, void *useptr )
   const char *what;
   struct userdata *user = (struct userdata *)useptr;
   (void)handle;
+<<<<<<< HEAD
   switch ( data ) {
+=======
+  switch(data) {
+>>>>>>> origin/tomato-shibby-RT-AC
     case CURL_LOCK_DATA_SHARE:
       what = "share";
       break;
@@ -104,7 +112,12 @@ static void *fire(void *ptr)
   CURL *curl;
   int i=0;
 
+<<<<<<< HEAD
   if ((curl = curl_easy_init()) == NULL) {
+=======
+  curl = curl_easy_init();
+  if(!curl) {
+>>>>>>> origin/tomato-shibby-RT-AC
     fprintf(stderr, "curl_easy_init() failed\n");
     return NULL;
   }
@@ -150,8 +163,14 @@ int test(char *URL)
   }
 
   /* prepare share */
+<<<<<<< HEAD
   printf( "SHARE_INIT\n" );
   if ((share = curl_share_init()) == NULL) {
+=======
+  printf("SHARE_INIT\n");
+  share = curl_share_init();
+  if(!share) {
+>>>>>>> origin/tomato-shibby-RT-AC
     fprintf(stderr, "curl_share_init() failed\n");
     curl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;
@@ -198,8 +217,14 @@ int test(char *URL)
 
 
   /* fetch a another one */
+<<<<<<< HEAD
   printf( "*** run %d\n", i );
   if ((curl = curl_easy_init()) == NULL) {
+=======
+  printf("*** run %d\n", i);
+  curl = curl_easy_init();
+  if(!curl) {
+>>>>>>> origin/tomato-shibby-RT-AC
     fprintf(stderr, "curl_easy_init() failed\n");
     curl_share_cleanup(share);
     curl_global_cleanup();

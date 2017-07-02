@@ -27,8 +27,13 @@
 /*
  * NTLM details:
  *
+<<<<<<< HEAD
  * http://davenport.sourceforge.net/ntlm.html
  * http://www.innovation.ch/java/ntlm.html
+=======
+ * https://davenport.sourceforge.io/ntlm.html
+ * https://www.innovation.ch/java/ntlm.html
+>>>>>>> origin/tomato-shibby-RT-AC
  */
 
 #ifdef USE_SSLEAY
@@ -74,6 +79,11 @@
 #  define MD5_DIGEST_LENGTH 16
 #  define MD4_DIGEST_LENGTH 16
 
+#elif defined(USE_MBEDTLS)
+
+#  include <mbedtls/des.h>
+#  include <mbedtls/md4.h>
+
 #elif defined(USE_NSS)
 
 #  include <nss.h>
@@ -93,8 +103,12 @@
 
 #include "urldata.h"
 #include "non-ascii.h"
+<<<<<<< HEAD
 #include "rawstr.h"
 #include "curl_memory.h"
+=======
+#include "strcase.h"
+>>>>>>> origin/tomato-shibby-RT-AC
 #include "curl_ntlm_core.h"
 #include "curl_md5.h"
 #include "curl_hmac.h"
@@ -171,6 +185,26 @@ static void setup_des_key(const unsigned char *key_56,
   char key[8];
   extend_key_56_to_64(key_56, key);
   gcry_cipher_setkey(*des, key, 8);
+}
+
+#elif defined(USE_MBEDTLS)
+
+static bool encrypt_des(const unsigned char *in, unsigned char *out,
+                        const unsigned char *key_56)
+{
+  mbedtls_des_context ctx;
+  char key[8];
+
+  /* Expand the 56-bit key to 64-bits */
+  extend_key_56_to_64(key_56, key);
+
+  /* Set the key parity to odd */
+  mbedtls_des_key_set_parity((unsigned char *) key);
+
+  /* Perform the encryption */
+  mbedtls_des_init(&ctx);
+  mbedtls_des_setkey_enc(&ctx, (unsigned char *) key);
+  return mbedtls_des_crypt_ecb(&ctx, in, out) == 0;
 }
 
 #elif defined(USE_NSS)
@@ -301,7 +335,12 @@ void Curl_ntlm_core_lm_resp(const unsigned char *keys,
   setup_des_key(keys + 14, &des);
   gcry_cipher_encrypt(des, results + 16, 8, plaintext, 8);
   gcry_cipher_close(des);
+<<<<<<< HEAD
 #elif defined(USE_NSS) || defined(USE_DARWINSSL)
+=======
+#elif defined(USE_MBEDTLS) || defined(USE_NSS) || defined(USE_DARWINSSL) \
+  || defined(USE_OS400CRYPTO) || defined(USE_WIN32_CRYPTO)
+>>>>>>> origin/tomato-shibby-RT-AC
   encrypt_des(plaintext, results, keys);
   encrypt_des(plaintext, results + 8, keys + 7);
   encrypt_des(plaintext, results + 16, keys + 14);
@@ -311,9 +350,15 @@ void Curl_ntlm_core_lm_resp(const unsigned char *keys,
 /*
  * Set up lanmanager hashed password
  */
+<<<<<<< HEAD
 void Curl_ntlm_core_mk_lm_hash(struct SessionHandle *data,
                                const char *password,
                                unsigned char *lmbuffer /* 21 bytes */)
+=======
+CURLcode Curl_ntlm_core_mk_lm_hash(struct Curl_easy *data,
+                                   const char *password,
+                                   unsigned char *lmbuffer /* 21 bytes */)
+>>>>>>> origin/tomato-shibby-RT-AC
 {
   CURLcode res;
   unsigned char pw[14];
@@ -364,7 +409,12 @@ void Curl_ntlm_core_mk_lm_hash(struct SessionHandle *data,
     setup_des_key(pw + 7, &des);
     gcry_cipher_encrypt(des, lmbuffer + 8, 8, magic, 8);
     gcry_cipher_close(des);
+<<<<<<< HEAD
 #elif defined(USE_NSS) || defined(USE_DARWINSSL)
+=======
+#elif defined(USE_MBEDTLS) || defined(USE_NSS) || defined(USE_DARWINSSL) \
+  || defined(USE_OS400CRYPTO) || defined(USE_WIN32_CRYPTO)
+>>>>>>> origin/tomato-shibby-RT-AC
     encrypt_des(magic, lmbuffer, pw);
     encrypt_des(magic, lmbuffer + 8, pw + 7);
 #endif
@@ -415,7 +465,7 @@ static void write64_le(const __int64 value, unsigned char *buffer)
 /*
  * Set up nt hashed passwords
  */
-CURLcode Curl_ntlm_core_mk_nt_hash(struct SessionHandle *data,
+CURLcode Curl_ntlm_core_mk_nt_hash(struct Curl_easy *data,
                                    const char *password,
                                    unsigned char *ntbuffer /* 21 bytes */)
 {
@@ -451,9 +501,15 @@ CURLcode Curl_ntlm_core_mk_nt_hash(struct SessionHandle *data,
     gcry_md_hd_t MD4pw;
     gcry_md_open(&MD4pw, GCRY_MD_MD4, 0);
     gcry_md_write(MD4pw, pw, 2 * len);
-    memcpy (ntbuffer, gcry_md_read (MD4pw, 0), MD4_DIGEST_LENGTH);
+    memcpy(ntbuffer, gcry_md_read(MD4pw, 0), MD4_DIGEST_LENGTH);
     gcry_md_close(MD4pw);
+<<<<<<< HEAD
 #elif defined(USE_NSS)
+=======
+#elif defined(USE_MBEDTLS)
+    mbedtls_md4(pw, 2 * len, ntbuffer);
+#elif defined(USE_NSS) || defined(USE_OS400CRYPTO)
+>>>>>>> origin/tomato-shibby-RT-AC
     Curl_md4it(ntbuffer, pw, 2 * len);
 #elif defined(USE_DARWINSSL)
     (void)CC_MD4(pw, (CC_LONG)(2 * len), ntbuffer);
@@ -587,8 +643,10 @@ CURLcode Curl_ntlm_core_mk_ntlmv2_resp(unsigned char *ntlmv2hash,
 
   /* Create the BLOB structure */
   snprintf((char *)ptr + NTLM_HMAC_MD5_LEN, NTLMv2_BLOB_LEN,
-           NTLMv2_BLOB_SIGNATURE
+           "%c%c%c%c"   /* NTLMv2_BLOB_SIGNATURE */
            "%c%c%c%c",  /* Reserved = 0 */
+           NTLMv2_BLOB_SIGNATURE[0], NTLMv2_BLOB_SIGNATURE[1],
+           NTLMv2_BLOB_SIGNATURE[2], NTLMv2_BLOB_SIGNATURE[3],
            0, 0, 0, 0);
 
   write64_le(tw, ptr + 24);

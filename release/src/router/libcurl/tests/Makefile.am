@@ -27,7 +27,12 @@ EXTRA_DIST = ftpserver.pl httpserver.pl secureserver.pl runtests.pl getpart.pm \
  FILEFORMAT README stunnel.pem memanalyze.pl testcurl.pl valgrind.pm ftp.pm   \
  sshserver.pl sshhelp.pm testcurl.1 runtests.1 $(HTMLPAGES) $(PDFPAGES) \
  serverhelp.pm tftpserver.pl rtspserver.pl directories.pm symbol-scan.pl \
+<<<<<<< HEAD
  CMakeLists.txt mem-include-scan.pl valgrind.supp http_pipe.py
+=======
+ CMakeLists.txt mem-include-scan.pl valgrind.supp http_pipe.py extern-scan.pl \
+ manpage-scan.pl nroff-scan.pl http2-server.pl
+>>>>>>> origin/tomato-shibby-RT-AC
 
 DISTCLEANFILES = configurehelp.pm
 
@@ -92,3 +97,16 @@ torture-test: perlcheck all
 	ps2pdf $$foo.ps $@; \
 	rm $$foo.ps; \
 	echo "converted $< to $@")
+<<<<<<< HEAD
+=======
+
+checksrc:
+	cd libtest && $(MAKE) checksrc
+	cd unit && $(MAKE) checksrc
+	cd server && $(MAKE) checksrc
+
+if CURLDEBUG
+# for debug builds, we scan the sources on all regular make invokes
+all-local: checksrc
+endif
+>>>>>>> origin/tomato-shibby-RT-AC

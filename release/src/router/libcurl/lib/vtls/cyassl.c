@@ -5,7 +5,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
+<<<<<<< HEAD
  * Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
+=======
+ * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+>>>>>>> origin/tomato-shibby-RT-AC
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -42,11 +46,17 @@
 #include "parsedate.h"
 #include "connect.h" /* for the connect timeout */
 #include "select.h"
+<<<<<<< HEAD
 #include "rawstr.h"
 
 #define _MPRINTF_REPLACE /* use our functions only */
 #include <curl/mprintf.h>
 #include "curl_memory.h"
+=======
+#include "strcase.h"
+#include "x509asn1.h"
+#include "curl_printf.h"
+>>>>>>> origin/tomato-shibby-RT-AC
 
 #include <cyassl/ssl.h>
 #ifdef HAVE_CYASSL_ERROR_SSL_H
@@ -66,9 +76,9 @@ static int do_file_type(const char *type)
 {
   if(!type || !type[0])
     return SSL_FILETYPE_PEM;
-  if(Curl_raw_equal(type, "PEM"))
+  if(strcasecompare(type, "PEM"))
     return SSL_FILETYPE_PEM;
-  if(Curl_raw_equal(type, "DER"))
+  if(strcasecompare(type, "DER"))
     return SSL_FILETYPE_ASN1;
   return -1;
 }
@@ -81,10 +91,15 @@ static CURLcode
 cyassl_connect_step1(struct connectdata *conn,
                      int sockindex)
 {
+<<<<<<< HEAD
   struct SessionHandle *data = conn->data;
+=======
+  char error_buffer[CYASSL_MAX_ERROR_SZ];
+  char *ciphers;
+  struct Curl_easy *data = conn->data;
+>>>>>>> origin/tomato-shibby-RT-AC
   struct ssl_connect_data* conssl = &conn->ssl[sockindex];
   SSL_METHOD* req_method = NULL;
-  void* ssl_sessionid = NULL;
   curl_socket_t sockfd = conn->sock[sockindex];
 
   if(conssl->state == ssl_connection_complete)
@@ -97,7 +112,7 @@ cyassl_connect_step1(struct connectdata *conn,
   }
 
   /* check to see if we've been told to use an explicit SSL/TLS version */
-  switch(data->set.ssl.version) {
+  switch(SSL_CONN_CONFIG(version)) {
   case CURL_SSLVERSION_DEFAULT:
     /* we try to figure out version */
     req_method = SSLv23_client_method();
@@ -116,8 +131,19 @@ cyassl_connect_step1(struct connectdata *conn,
   case CURL_SSLVERSION_TLSv1_2:
     req_method = TLSv1_2_client_method();
     break;
+  case CURL_SSLVERSION_TLSv1_3:
+    failf(data, "CyaSSL: TLS 1.3 is not yet supported");
+    return CURLE_SSL_CONNECT_ERROR;
   case CURL_SSLVERSION_SSLv3:
     req_method = SSLv3_client_method();
+<<<<<<< HEAD
+=======
+    use_sni(FALSE);
+#else
+    failf(data, "CyaSSL does not support SSLv3");
+    return CURLE_NOT_BUILT_IN;
+#endif
+>>>>>>> origin/tomato-shibby-RT-AC
     break;
   default:
     req_method = TLSv1_client_method();
@@ -137,6 +163,7 @@ cyassl_connect_step1(struct connectdata *conn,
     return CURLE_OUT_OF_MEMORY;
   }
 
+<<<<<<< HEAD
 #ifndef NO_FILESYSTEM
   /* load trusted cacert */
   if(data->set.str[STRING_SSL_CAFILE]) {
@@ -146,11 +173,52 @@ cyassl_connect_step1(struct connectdata *conn,
       if(data->set.ssl.verifypeer) {
         /* Fail if we insiste on successfully verifying the server. */
         failf(data,"error setting certificate verify locations:\n"
+=======
+  switch(SSL_CONN_CONFIG(version)) {
+  case CURL_SSLVERSION_DEFAULT:
+  case CURL_SSLVERSION_TLSv1:
+#if LIBCYASSL_VERSION_HEX > 0x03004006 /* > 3.4.6 */
+    /* Versions 3.3.0 to 3.4.6 we know the minimum protocol version is whatever
+    minimum version of TLS was built in and at least TLS 1.0. For later library
+    versions that could change (eg TLS 1.0 built in but defaults to TLS 1.1) so
+    we have this short circuit evaluation to find the minimum supported TLS
+    version. We use wolfSSL_CTX_SetMinVersion and not CyaSSL_SetMinVersion
+    because only the former will work before the user's CTX callback is called.
+    */
+    if((wolfSSL_CTX_SetMinVersion(conssl->ctx, WOLFSSL_TLSV1) != 1) &&
+       (wolfSSL_CTX_SetMinVersion(conssl->ctx, WOLFSSL_TLSV1_1) != 1) &&
+       (wolfSSL_CTX_SetMinVersion(conssl->ctx, WOLFSSL_TLSV1_2) != 1)) {
+      failf(data, "SSL: couldn't set the minimum protocol version");
+      return CURLE_SSL_CONNECT_ERROR;
+    }
+#endif
+    break;
+  }
+
+  ciphers = SSL_CONN_CONFIG(cipher_list);
+  if(ciphers) {
+    if(!SSL_CTX_set_cipher_list(conssl->ctx, ciphers)) {
+      failf(data, "failed setting cipher list: %s", ciphers);
+      return CURLE_SSL_CIPHER;
+    }
+    infof(data, "Cipher selection: %s\n", ciphers);
+  }
+
+#ifndef NO_FILESYSTEM
+  /* load trusted cacert */
+  if(SSL_CONN_CONFIG(CAfile)) {
+    if(1 != SSL_CTX_load_verify_locations(conssl->ctx,
+                                      SSL_CONN_CONFIG(CAfile),
+                                      SSL_CONN_CONFIG(CApath))) {
+      if(SSL_CONN_CONFIG(verifypeer)) {
+        /* Fail if we insist on successfully verifying the server. */
+        failf(data, "error setting certificate verify locations:\n"
+>>>>>>> origin/tomato-shibby-RT-AC
               "  CAfile: %s\n  CApath: %s",
-              data->set.str[STRING_SSL_CAFILE]?
-              data->set.str[STRING_SSL_CAFILE]: "none",
-              data->set.str[STRING_SSL_CAPATH]?
-              data->set.str[STRING_SSL_CAPATH] : "none");
+              SSL_CONN_CONFIG(CAfile)?
+              SSL_CONN_CONFIG(CAfile): "none",
+              SSL_CONN_CONFIG(CApath)?
+              SSL_CONN_CONFIG(CApath) : "none");
         return CURLE_SSL_CACERT_BADFILE;
       }
       else {
@@ -167,25 +235,25 @@ cyassl_connect_step1(struct connectdata *conn,
     infof(data,
           "  CAfile: %s\n"
           "  CApath: %s\n",
-          data->set.str[STRING_SSL_CAFILE] ? data->set.str[STRING_SSL_CAFILE]:
+          SSL_CONN_CONFIG(CAfile) ? SSL_CONN_CONFIG(CAfile):
           "none",
-          data->set.str[STRING_SSL_CAPATH] ? data->set.str[STRING_SSL_CAPATH]:
+          SSL_CONN_CONFIG(CApath) ? SSL_CONN_CONFIG(CApath):
           "none");
   }
 
   /* Load the client certificate, and private key */
-  if(data->set.str[STRING_CERT] && data->set.str[STRING_KEY]) {
-    int file_type = do_file_type(data->set.str[STRING_CERT_TYPE]);
+  if(SSL_SET_OPTION(cert) && SSL_SET_OPTION(key)) {
+    int file_type = do_file_type(SSL_SET_OPTION(cert_type));
 
-    if(SSL_CTX_use_certificate_file(conssl->ctx, data->set.str[STRING_CERT],
+    if(SSL_CTX_use_certificate_file(conssl->ctx, SSL_SET_OPTION(cert),
                                      file_type) != 1) {
       failf(data, "unable to use client certificate (no key or wrong pass"
             " phrase?)");
       return CURLE_SSL_CONNECT_ERROR;
     }
 
-    file_type = do_file_type(data->set.str[STRING_KEY_TYPE]);
-    if(SSL_CTX_use_PrivateKey_file(conssl->ctx, data->set.str[STRING_KEY],
+    file_type = do_file_type(SSL_SET_OPTION(key_type));
+    if(SSL_CTX_use_PrivateKey_file(conssl->ctx, SSL_SET_OPTION(key),
                                     file_type) != 1) {
       failf(data, "unable to set private key");
       return CURLE_SSL_CONNECT_ERROR;
@@ -202,9 +270,65 @@ cyassl_connect_step1(struct connectdata *conn,
    * anyway. In the latter case the result of the verification is checked with
    * SSL_get_verify_result() below. */
   SSL_CTX_set_verify(conssl->ctx,
-                     data->set.ssl.verifypeer?SSL_VERIFY_PEER:SSL_VERIFY_NONE,
+                     SSL_CONN_CONFIG(verifypeer)?SSL_VERIFY_PEER:
+                                                 SSL_VERIFY_NONE,
                      NULL);
 
+<<<<<<< HEAD
+=======
+#ifdef HAVE_SNI
+  if(sni) {
+    struct in_addr addr4;
+#ifdef ENABLE_IPV6
+    struct in6_addr addr6;
+#endif
+    const char * const hostname = SSL_IS_PROXY() ? conn->http_proxy.host.name :
+      conn->host.name;
+    size_t hostname_len = strlen(hostname);
+    if((hostname_len < USHRT_MAX) &&
+       (0 == Curl_inet_pton(AF_INET, hostname, &addr4)) &&
+#ifdef ENABLE_IPV6
+       (0 == Curl_inet_pton(AF_INET6, hostname, &addr6)) &&
+#endif
+       (CyaSSL_CTX_UseSNI(conssl->ctx, CYASSL_SNI_HOST_NAME, hostname,
+                          (unsigned short)hostname_len) != 1)) {
+      infof(data, "WARNING: failed to configure server name indication (SNI) "
+            "TLS extension\n");
+    }
+  }
+#endif
+
+#ifdef HAVE_SUPPORTED_CURVES
+  /* CyaSSL/wolfSSL does not send the supported ECC curves ext automatically:
+     https://github.com/wolfSSL/wolfssl/issues/366
+     The supported curves below are those also supported by OpenSSL 1.0.2 and
+     in the same order. */
+  CyaSSL_CTX_UseSupportedCurve(conssl->ctx, 0x17); /* secp256r1 */
+  CyaSSL_CTX_UseSupportedCurve(conssl->ctx, 0x19); /* secp521r1 */
+  CyaSSL_CTX_UseSupportedCurve(conssl->ctx, 0x18); /* secp384r1 */
+#endif
+
+  /* give application a chance to interfere with SSL set up. */
+  if(data->set.ssl.fsslctx) {
+    CURLcode result = CURLE_OK;
+    result = (*data->set.ssl.fsslctx)(data, conssl->ctx,
+                                      data->set.ssl.fsslctxp);
+    if(result) {
+      failf(data, "error signaled by ssl ctx callback");
+      return result;
+    }
+  }
+#ifdef NO_FILESYSTEM
+  else if(SSL_CONN_CONFIG(verifypeer)) {
+    failf(data, "SSL: Certificates couldn't be loaded because CyaSSL was built"
+          " with \"no filesystem\". Either disable peer verification"
+          " (insecure) or if you are building an application with libcurl you"
+          " can load certificates via CURLOPT_SSL_CTX_FUNCTION.");
+    return CURLE_SSL_CONNECT_ERROR;
+  }
+#endif
+
+>>>>>>> origin/tomato-shibby-RT-AC
   /* Let's make an SSL structure */
   if(conssl->handle)
     SSL_free(conssl->handle);
@@ -215,15 +339,32 @@ cyassl_connect_step1(struct connectdata *conn,
   }
 
   /* Check if there's a cached ID we can/should use here! */
+<<<<<<< HEAD
   if(!Curl_ssl_getsessionid(conn, &ssl_sessionid, NULL)) {
     /* we got a session id, use it! */
     if(!SSL_set_session(conssl->handle, ssl_sessionid)) {
       failf(data, "SSL: SSL_set_session failed: %s",
             ERR_error_string(SSL_get_error(conssl->handle, 0),NULL));
       return CURLE_SSL_CONNECT_ERROR;
+=======
+  if(data->set.general_ssl.sessionid) {
+    void *ssl_sessionid = NULL;
+
+    Curl_ssl_sessionid_lock(conn);
+    if(!Curl_ssl_getsessionid(conn, &ssl_sessionid, NULL, sockindex)) {
+      /* we got a session id, use it! */
+      if(!SSL_set_session(conssl->handle, ssl_sessionid)) {
+        Curl_ssl_sessionid_unlock(conn);
+        failf(data, "SSL: SSL_set_session failed: %s",
+              ERR_error_string(SSL_get_error(conssl->handle, 0),
+              error_buffer));
+        return CURLE_SSL_CONNECT_ERROR;
+      }
+      /* Informational message */
+      infof(data, "SSL re-using session ID\n");
+>>>>>>> origin/tomato-shibby-RT-AC
     }
-    /* Informational message */
-    infof (data, "SSL re-using session ID\n");
+    Curl_ssl_sessionid_unlock(conn);
   }
 
   /* pass the raw socket into the SSL layer */
@@ -242,8 +383,15 @@ cyassl_connect_step2(struct connectdata *conn,
                      int sockindex)
 {
   int ret = -1;
-  struct SessionHandle *data = conn->data;
+  struct Curl_easy *data = conn->data;
   struct ssl_connect_data* conssl = &conn->ssl[sockindex];
+  const char * const hostname = SSL_IS_PROXY() ? conn->http_proxy.host.name :
+    conn->host.name;
+  const char * const dispname = SSL_IS_PROXY() ?
+    conn->http_proxy.host.dispname : conn->host.dispname;
+  const char * const pinnedpubkey = SSL_IS_PROXY() ?
+                        data->set.str[STRING_SSL_PINNEDPUBLICKEY_PROXY] :
+                        data->set.str[STRING_SSL_PINNEDPUBLICKEY_ORIG];
 
   infof(data, "CyaSSL: Connecting to %s:%d\n",
         conn->host.name, conn->remote_port);
@@ -252,8 +400,8 @@ cyassl_connect_step2(struct connectdata *conn,
   conn->send[sockindex] = cyassl_send;
 
   /* Enable RFC2818 checks */
-  if(data->set.ssl.verifyhost) {
-    ret = CyaSSL_check_domain_name(conssl->handle, conn->host.name);
+  if(SSL_CONN_CONFIG(verifyhost)) {
+    ret = CyaSSL_check_domain_name(conssl->handle, hostname);
     if(ret == SSL_FAILURE)
       return CURLE_OUT_OF_MEMORY;
   }
@@ -277,28 +425,45 @@ cyassl_connect_step2(struct connectdata *conn,
     else if(DOMAIN_NAME_MISMATCH == detail) {
 #if 1
       failf(data, "\tsubject alt name(s) or common name do not match \"%s\"\n",
-            conn->host.dispname);
+            dispname);
       return CURLE_PEER_FAILED_VERIFICATION;
 #else
       /* When the CyaSSL_check_domain_name() is used and you desire to continue
-       * on a DOMAIN_NAME_MISMATCH, i.e. 'data->set.ssl.verifyhost == 0',
+       * on a DOMAIN_NAME_MISMATCH, i.e. 'conn->ssl_config.verifyhost == 0',
        * CyaSSL version 2.4.0 will fail with an INCOMPLETE_DATA error. The only
        * way to do this is currently to switch the CyaSSL_check_domain_name()
-       * in and out based on the 'data->set.ssl.verifyhost' value. */
-      if(data->set.ssl.verifyhost) {
+       * in and out based on the 'conn->ssl_config.verifyhost' value. */
+      if(SSL_CONN_CONFIG(verifyhost)) {
         failf(data,
               "\tsubject alt name(s) or common name do not match \"%s\"\n",
-              conn->host.dispname);
+              dispname);
         return CURLE_PEER_FAILED_VERIFICATION;
       }
       else {
         infof(data,
               "\tsubject alt name(s) and/or common name do not match \"%s\"\n",
-              conn->host.dispname);
+              dispname);
         return CURLE_OK;
       }
 #endif
     }
+<<<<<<< HEAD
+=======
+#if LIBCYASSL_VERSION_HEX >= 0x02007000 /* 2.7.0 */
+    else if(ASN_NO_SIGNER_E == detail) {
+      if(SSL_CONN_CONFIG(verifypeer)) {
+        failf(data, "\tCA signer not available for verification\n");
+        return CURLE_SSL_CACERT_BADFILE;
+      }
+      else {
+        /* Just continue with a warning if no strict certificate
+           verification is required. */
+        infof(data, "CA signer not available for verification, "
+                    "continuing anyway\n");
+      }
+    }
+#endif
+>>>>>>> origin/tomato-shibby-RT-AC
     else {
       failf(data, "SSL_connect failed with error %d: %s", detail,
           ERR_error_string(detail, error_buffer));
@@ -306,8 +471,97 @@ cyassl_connect_step2(struct connectdata *conn,
     }
   }
 
+<<<<<<< HEAD
+=======
+  if(pinnedpubkey) {
+#ifdef KEEP_PEER_CERT
+    X509 *x509;
+    const char *x509_der;
+    int x509_der_len;
+    curl_X509certificate x509_parsed;
+    curl_asn1Element *pubkey;
+    CURLcode result;
+
+    x509 = SSL_get_peer_certificate(conssl->handle);
+    if(!x509) {
+      failf(data, "SSL: failed retrieving server certificate");
+      return CURLE_SSL_PINNEDPUBKEYNOTMATCH;
+    }
+
+    x509_der = (const char *)CyaSSL_X509_get_der(x509, &x509_der_len);
+    if(!x509_der) {
+      failf(data, "SSL: failed retrieving ASN.1 server certificate");
+      return CURLE_SSL_PINNEDPUBKEYNOTMATCH;
+    }
+
+    memset(&x509_parsed, 0, sizeof x509_parsed);
+    if(Curl_parseX509(&x509_parsed, x509_der, x509_der + x509_der_len))
+      return CURLE_SSL_PINNEDPUBKEYNOTMATCH;
+
+    pubkey = &x509_parsed.subjectPublicKeyInfo;
+    if(!pubkey->header || pubkey->end <= pubkey->header) {
+      failf(data, "SSL: failed retrieving public key from server certificate");
+      return CURLE_SSL_PINNEDPUBKEYNOTMATCH;
+    }
+
+    result = Curl_pin_peer_pubkey(data,
+                                  pinnedpubkey,
+                                  (const unsigned char *)pubkey->header,
+                                  (size_t)(pubkey->end - pubkey->header));
+    if(result) {
+      failf(data, "SSL: public key does not match pinned public key!");
+      return result;
+    }
+#else
+    failf(data, "Library lacks pinning support built-in");
+    return CURLE_NOT_BUILT_IN;
+#endif
+  }
+
+#ifdef HAVE_ALPN
+  if(conn->bits.tls_enable_alpn) {
+    int rc;
+    char *protocol = NULL;
+    unsigned short protocol_len = 0;
+
+    rc = wolfSSL_ALPN_GetProtocol(conssl->handle, &protocol, &protocol_len);
+
+    if(rc == SSL_SUCCESS) {
+      infof(data, "ALPN, server accepted to use %.*s\n", protocol_len,
+            protocol);
+
+      if(protocol_len == ALPN_HTTP_1_1_LENGTH &&
+         !memcmp(protocol, ALPN_HTTP_1_1, ALPN_HTTP_1_1_LENGTH))
+        conn->negnpn = CURL_HTTP_VERSION_1_1;
+#ifdef USE_NGHTTP2
+      else if(data->set.httpversion >= CURL_HTTP_VERSION_2 &&
+              protocol_len == NGHTTP2_PROTO_VERSION_ID_LEN &&
+              !memcmp(protocol, NGHTTP2_PROTO_VERSION_ID,
+                      NGHTTP2_PROTO_VERSION_ID_LEN))
+        conn->negnpn = CURL_HTTP_VERSION_2;
+#endif
+      else
+        infof(data, "ALPN, unrecognized protocol %.*s\n", protocol_len,
+              protocol);
+    }
+    else if(rc == SSL_ALPN_NOT_FOUND)
+      infof(data, "ALPN, server did not agree to a protocol\n");
+    else {
+      failf(data, "ALPN, failure getting protocol, error %d", rc);
+      return CURLE_SSL_CONNECT_ERROR;
+    }
+  }
+#endif /* HAVE_ALPN */
+
+>>>>>>> origin/tomato-shibby-RT-AC
   conssl->connecting_state = ssl_connect_3;
+#if (LIBCYASSL_VERSION_HEX >= 0x03009010)
+  infof(data, "SSL connection using %s / %s\n",
+        wolfSSL_get_version(conssl->handle),
+        wolfSSL_get_cipher_name(conssl->handle));
+#else
   infof(data, "SSL connected\n");
+#endif
 
   return CURLE_OK;
 }
@@ -317,24 +571,39 @@ static CURLcode
 cyassl_connect_step3(struct connectdata *conn,
                      int sockindex)
 {
+<<<<<<< HEAD
   CURLcode retcode = CURLE_OK;
   void *old_ssl_sessionid=NULL;
   struct SessionHandle *data = conn->data;
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
   int incache;
   SSL_SESSION *our_ssl_sessionid;
+=======
+  CURLcode result = CURLE_OK;
+  struct Curl_easy *data = conn->data;
+  struct ssl_connect_data *connssl = &conn->ssl[sockindex];
+>>>>>>> origin/tomato-shibby-RT-AC
 
   DEBUGASSERT(ssl_connect_3 == connssl->connecting_state);
 
-  our_ssl_sessionid = SSL_get_session(connssl->handle);
+  if(data->set.general_ssl.sessionid) {
+    bool incache;
+    SSL_SESSION *our_ssl_sessionid;
+    void *old_ssl_sessionid = NULL;
 
-  incache = !(Curl_ssl_getsessionid(conn, &old_ssl_sessionid, NULL));
-  if(incache) {
-    if(old_ssl_sessionid != our_ssl_sessionid) {
-      infof(data, "old SSL session ID is stale, removing\n");
-      Curl_ssl_delsessionid(conn, old_ssl_sessionid);
-      incache = FALSE;
+    our_ssl_sessionid = SSL_get_session(connssl->handle);
+
+    Curl_ssl_sessionid_lock(conn);
+    incache = !(Curl_ssl_getsessionid(conn, &old_ssl_sessionid, NULL,
+                                      sockindex));
+    if(incache) {
+      if(old_ssl_sessionid != our_ssl_sessionid) {
+        infof(data, "old SSL session ID is stale, removing\n");
+        Curl_ssl_delsessionid(conn, old_ssl_sessionid);
+        incache = FALSE;
+      }
     }
+<<<<<<< HEAD
   }
   if(!incache) {
     retcode = Curl_ssl_addsessionid(conn, our_ssl_sessionid,
@@ -342,7 +611,19 @@ cyassl_connect_step3(struct connectdata *conn,
     if(retcode) {
       failf(data, "failed to store ssl session");
       return retcode;
+=======
+
+    if(!incache) {
+      result = Curl_ssl_addsessionid(conn, our_ssl_sessionid,
+                                     0 /* unknown size */, sockindex);
+      if(result) {
+        Curl_ssl_sessionid_unlock(conn);
+        failf(data, "failed to store ssl session");
+        return result;
+      }
+>>>>>>> origin/tomato-shibby-RT-AC
     }
+    Curl_ssl_sessionid_unlock(conn);
   }
 
   connssl->connecting_state = ssl_connect_done;
@@ -392,11 +673,11 @@ void Curl_cyassl_close(struct connectdata *conn, int sockindex)
 
   if(conssl->handle) {
     (void)SSL_shutdown(conssl->handle);
-    SSL_free (conssl->handle);
+    SSL_free(conssl->handle);
     conssl->handle = NULL;
   }
   if(conssl->ctx) {
-    SSL_CTX_free (conssl->ctx);
+    SSL_CTX_free(conssl->ctx);
     conssl->ctx = NULL;
   }
 }
@@ -479,7 +760,7 @@ int Curl_cyassl_shutdown(struct connectdata *conn, int sockindex)
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
 
   if(connssl->handle) {
-    SSL_free (connssl->handle);
+    SSL_free(connssl->handle);
     connssl->handle = NULL;
   }
   return retval;
@@ -492,11 +773,16 @@ cyassl_connect_common(struct connectdata *conn,
                       bool nonblocking,
                       bool *done)
 {
+<<<<<<< HEAD
   CURLcode retcode;
   struct SessionHandle *data = conn->data;
+=======
+  CURLcode result;
+  struct Curl_easy *data = conn->data;
+>>>>>>> origin/tomato-shibby-RT-AC
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
   curl_socket_t sockfd = conn->sock[sockindex];
-  long timeout_ms;
+  time_t timeout_ms;
   int what;
 
   /* check if the connection has already been established */
@@ -541,7 +827,8 @@ cyassl_connect_common(struct connectdata *conn,
       curl_socket_t readfd = ssl_connect_2_reading==
         connssl->connecting_state?sockfd:CURL_SOCKET_BAD;
 
-      what = Curl_socket_ready(readfd, writefd, nonblocking?0:timeout_ms);
+      what = Curl_socket_check(readfd, CURL_SOCKET_BAD, writefd,
+                               nonblocking?0:timeout_ms);
       if(what < 0) {
         /* fatal error */
         failf(data, "select/poll on SSL socket, errno: %d", SOCKERRNO);
@@ -624,4 +911,34 @@ Curl_cyassl_connect(struct connectdata *conn,
   return CURLE_OK;
 }
 
+<<<<<<< HEAD
+=======
+CURLcode Curl_cyassl_random(struct Curl_easy *data,
+                            unsigned char *entropy,
+                            size_t length)
+{
+  RNG rng;
+  (void)data;
+  if(InitRng(&rng))
+    return CURLE_FAILED_INIT;
+  if(length > UINT_MAX)
+    return CURLE_FAILED_INIT;
+  if(RNG_GenerateBlock(&rng, entropy, (unsigned)length))
+    return CURLE_FAILED_INIT;
+  return CURLE_OK;
+}
+
+void Curl_cyassl_sha256sum(const unsigned char *tmp, /* input */
+                      size_t tmplen,
+                      unsigned char *sha256sum /* output */,
+                      size_t unused)
+{
+  Sha256 SHA256pw;
+  (void)unused;
+  InitSha256(&SHA256pw);
+  Sha256Update(&SHA256pw, tmp, (word32)tmplen);
+  Sha256Final(&SHA256pw, sha256sum);
+}
+
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif

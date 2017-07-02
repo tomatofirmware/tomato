@@ -25,9 +25,14 @@
 #if !defined(CURL_DISABLE_HTTP) && !defined(CURL_DISABLE_CRYPTO_AUTH)
 
 #include "urldata.h"
+<<<<<<< HEAD
 #include "rawstr.h"
 #include "curl_base64.h"
 #include "curl_md5.h"
+=======
+#include "strcase.h"
+#include "vauth/vauth.h"
+>>>>>>> origin/tomato-shibby-RT-AC
 #include "http_digest.h"
 #include "strtok.h"
 #include "curl_memory.h"
@@ -126,6 +131,7 @@ CURLdigest Curl_input_digest(struct connectdata *conn,
                              const char *header) /* rest of the *-authenticate:
                                                     header */
 {
+<<<<<<< HEAD
   char *token = NULL;
   char *tmp = NULL;
   bool foundAuth = FALSE;
@@ -133,6 +139,12 @@ CURLdigest Curl_input_digest(struct connectdata *conn,
   struct SessionHandle *data=conn->data;
   bool before = FALSE; /* got a nonce before */
   struct digestdata *d;
+=======
+  struct Curl_easy *data = conn->data;
+
+  /* Point to the correct struct with this */
+  struct digestdata *digest;
+>>>>>>> origin/tomato-shibby-RT-AC
 
   if(proxy) {
     d = &data->state.proxydigest;
@@ -299,6 +311,7 @@ CURLcode Curl_output_digest(struct connectdata *conn,
                             const unsigned char *request,
                             const unsigned char *uripath)
 {
+<<<<<<< HEAD
   /* We have a Digest setup for this, use it!  Now, to get all the details for
      this sorted out, I must urge you dear friend to read up on the RFC2617
      section 3.2.2, */
@@ -312,6 +325,18 @@ CURLcode Curl_output_digest(struct connectdata *conn,
   char *cnonce = NULL;
   size_t cnonce_sz = 0;
   char *tmp = NULL;
+=======
+  CURLcode result;
+  struct Curl_easy *data = conn->data;
+  unsigned char *path = NULL;
+  char *tmp = NULL;
+  char *response;
+  size_t len;
+  bool have_chlg;
+
+  /* Point to the address of the pointer that holds the string to send to the
+     server, which is for a plain host or for a HTTP proxy */
+>>>>>>> origin/tomato-shibby-RT-AC
   char **allocuserpwd;
   size_t userlen;
   const char *userp;
@@ -336,8 +361,8 @@ CURLcode Curl_output_digest(struct connectdata *conn,
   if(proxy) {
     d = &data->state.proxydigest;
     allocuserpwd = &conn->allocptr.proxyuserpwd;
-    userp = conn->proxyuser;
-    passwdp = conn->proxypasswd;
+    userp = conn->http_proxy.user;
+    passwdp = conn->http_proxy.passwd;
     authp = &data->state.authproxy;
   }
   else {
@@ -438,6 +463,7 @@ CURLcode Curl_output_digest(struct connectdata *conn,
      http://www.fngtps.com/2006/09/http-authentication
   */
 
+<<<<<<< HEAD
   if(authp->iestyle && ((tmp = strchr((char *)uripath, '?')) != NULL))
     urilen = tmp - (char *)uripath;
   else
@@ -453,6 +479,17 @@ CURLcode Curl_output_digest(struct connectdata *conn,
     Curl_safefree(md5this);
     md5this = md5this2;
   }
+=======
+  if(authp->iestyle) {
+    tmp = strchr((char *)uripath, '?');
+    if(tmp) {
+      size_t urilen = tmp - (char *)uripath;
+      path = (unsigned char *) aprintf("%.*s", urilen, uripath);
+    }
+  }
+  if(!tmp)
+    path = (unsigned char *) strdup((char *) uripath);
+>>>>>>> origin/tomato-shibby-RT-AC
 
   if(!md5this)
     return CURLE_OUT_OF_MEMORY;
@@ -577,6 +614,7 @@ CURLcode Curl_output_digest(struct connectdata *conn,
   return CURLE_OK;
 }
 
+<<<<<<< HEAD
 static void digest_cleanup_one(struct digestdata *d)
 {
   Curl_safefree(d->nonce);
@@ -593,6 +631,9 @@ static void digest_cleanup_one(struct digestdata *d)
 
 
 void Curl_digest_cleanup(struct SessionHandle *data)
+=======
+void Curl_digest_cleanup(struct Curl_easy *data)
+>>>>>>> origin/tomato-shibby-RT-AC
 {
   digest_cleanup_one(&data->state.digest);
   digest_cleanup_one(&data->state.proxydigest);

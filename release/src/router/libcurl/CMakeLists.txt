@@ -5,7 +5,11 @@
 #                            | (__| |_| |  _ <| |___
 #                             \___|\___/|_| \_\_____|
 #
+<<<<<<< HEAD
 # Copyright (C) 1998 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
+=======
+# Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
+>>>>>>> origin/tomato-shibby-RT-AC
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
@@ -19,7 +23,7 @@
 # KIND, either express or implied.
 #
 ###########################################################################
-# cURL/libcurl CMake script
+# curl/libcurl CMake script
 # by Tetetest and Sukender (Benoit Neil)
 
 # TODO:
@@ -41,6 +45,11 @@
 cmake_minimum_required(VERSION 2.6.2 FATAL_ERROR)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake;${CMAKE_MODULE_PATH}")
 include(Utilities)
+<<<<<<< HEAD
+=======
+include(Macros)
+include(CMakeDependentOption)
+>>>>>>> origin/tomato-shibby-RT-AC
 
 project( CURL C )
 
@@ -80,10 +89,38 @@ set(OS "\"${CMAKE_SYSTEM_NAME}\"")
 include_directories(${PROJECT_BINARY_DIR}/include/curl)
 include_directories( ${CURL_SOURCE_DIR}/include )
 
-option(BUILD_CURL_EXE "Set to ON to build cURL executable." ON)
-option(BUILD_CURL_TESTS "Set to ON to build cURL tests." ON)
+option(BUILD_CURL_EXE "Set to ON to build curl executable." ON)
 option(CURL_STATICLIB "Set to ON to build libcurl with static linking." OFF)
+<<<<<<< HEAD
 option(CURL_USE_ARES "Set to ON to enable c-ares support" OFF)
+=======
+option(ENABLE_ARES "Set to ON to enable c-ares support" OFF)
+if(WIN32)
+  CMAKE_DEPENDENT_OPTION(ENABLE_THREADED_RESOLVER
+                         "Set to ON to enable threaded DNS lookup"
+                         ON "NOT ENABLE_ARES"
+                         OFF)
+else()
+  option(ENABLE_THREADED_RESOLVER "Set to ON to enable POSIX threaded DNS lookup" OFF)
+endif()
+option(ENABLE_DEBUG "Set to ON to enable curl debug features" OFF)
+option(ENABLE_CURLDEBUG "Set to ON to build with TrackMemory feature enabled" OFF)
+
+if (ENABLE_DEBUG)
+  # DEBUGBUILD will be defined only for Debug builds
+  if(NOT CMAKE_VERSION VERSION_LESS 3.0)
+    set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS $<$<CONFIG:Debug>:DEBUGBUILD>)
+  else()
+    set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS_DEBUG DEBUGBUILD)
+  endif()
+  set(ENABLE_CURLDEBUG ON)
+endif()
+
+if (ENABLE_CURLDEBUG)
+  set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS CURLDEBUG)
+endif()
+
+>>>>>>> origin/tomato-shibby-RT-AC
 # initialize CURL_LIBS
 set(CURL_LIBS "")
 
@@ -94,19 +131,12 @@ if(CURL_USE_ARES)
   set(CURL_LIBS ${CURL_LIBS} ${CARES_LIBRARY})
 endif()
 
-option(BUILD_DASHBOARD_REPORTS "Set to ON to activate reporting of cURL builds here http://www.cdash.org/CDashPublic/index.php?project=CURL" OFF)
-if(BUILD_DASHBOARD_REPORTS)
-  #INCLUDE(Dart)
-  include(CTest)
-endif(BUILD_DASHBOARD_REPORTS)
-
 if(MSVC)
   option(BUILD_RELEASE_DEBUG_DIRS "Set OFF to build each configuration to a separate directory" OFF)
   mark_as_advanced(BUILD_RELEASE_DEBUG_DIRS)
 endif()
 
-option(CURL_HIDDEN_SYMBOLS "Set to ON to hide libcurl internal symbols (=hide all symbols that aren't officially external)." ON)
-mark_as_advanced(CURL_HIDDEN_SYMBOLS)
+include(CurlSymbolHiding)
 
 # IF(WIN32)
 # OPTION(CURL_WINDOWS_SSPI "Use windows libraries to allow NTLM authentication without openssl" ON)
@@ -180,6 +210,7 @@ include (CheckTypeSize)
 
 # On windows preload settings
 if(WIN32)
+<<<<<<< HEAD
   include(${CMAKE_CURRENT_SOURCE_DIR}/CMake/Platforms/WindowsCache.cmake)
 endif(WIN32)
 
@@ -192,6 +223,27 @@ macro(CHECK_LIBRARY_EXISTS_CONCAT LIBRARY SYMBOL VARIABLE)
     set(CURL_LIBS ${LIBRARY} ${CURL_LIBS})
   endif(${VARIABLE})
 endmacro(CHECK_LIBRARY_EXISTS_CONCAT)
+=======
+  set(CMAKE_REQUIRED_DEFINITIONS "${CMAKE_REQUIRED_DEFINITIONS} -D_WINSOCKAPI_=")
+  include(${CMAKE_CURRENT_SOURCE_DIR}/CMake/Platforms/WindowsCache.cmake)
+endif(WIN32)
+
+if(ENABLE_THREADED_RESOLVER)
+  if(WIN32)
+    set(USE_THREADS_WIN32 ON)
+  else()
+    check_include_file_concat("pthread.h" HAVE_PTHREAD_H)
+    if(HAVE_PTHREAD_H)
+      set(CMAKE_THREAD_PREFER_PTHREAD 1)
+      find_package(Threads)
+      if(CMAKE_USE_PTHREADS_INIT)
+        set(CURL_LIBS ${CURL_LIBS} ${CMAKE_THREAD_LIBS_INIT})
+        set(USE_THREADS_POSIX 1)
+      endif()
+    endif()
+  endif()
+endif()
+>>>>>>> origin/tomato-shibby-RT-AC
 
 # Check for all needed libraries
 check_library_exists_concat("dl"     dlopen       HAVE_LIBDL)
@@ -214,6 +266,7 @@ check_library_exists_concat("winmm"  getch        HAVE_LIBWINMM)
 check_library_exists("wldap32" cldap_open "" HAVE_WLDAP32)
 
 if(WIN32)
+<<<<<<< HEAD
   set(CURL_DEFAULT_DISABLE_LDAP OFF)
   # some windows compilers do not have wldap32
   if(NOT HAVE_WLDAP32)
@@ -222,6 +275,139 @@ if(WIN32)
     option(CURL_LDAP_WIN "Use Windows LDAP implementation" OFF)
   else()
     option(CURL_LDAP_WIN "Use Windows LDAP implementation" ON)
+=======
+  CMAKE_DEPENDENT_OPTION(CURL_WINDOWS_SSPI "Use windows libraries to allow NTLM authentication without openssl" ON
+    "NOT CMAKE_USE_OPENSSL" OFF)
+  mark_as_advanced(CURL_WINDOWS_SSPI)
+endif()
+
+set(USE_OPENSSL OFF)
+set(HAVE_LIBCRYPTO OFF)
+set(HAVE_LIBSSL OFF)
+
+if(CMAKE_USE_OPENSSL)
+  find_package(OpenSSL)
+  if(OPENSSL_FOUND)
+    list(APPEND CURL_LIBS ${OPENSSL_LIBRARIES})
+    set(USE_OPENSSL ON)
+    set(HAVE_LIBCRYPTO ON)
+    set(HAVE_LIBSSL ON)
+    include_directories(${OPENSSL_INCLUDE_DIR})
+    set(CMAKE_REQUIRED_INCLUDES ${OPENSSL_INCLUDE_DIR})
+    check_include_file("openssl/crypto.h" HAVE_OPENSSL_CRYPTO_H)
+    check_include_file("openssl/engine.h" HAVE_OPENSSL_ENGINE_H)
+    check_include_file("openssl/err.h"    HAVE_OPENSSL_ERR_H)
+    check_include_file("openssl/pem.h"    HAVE_OPENSSL_PEM_H)
+    check_include_file("openssl/pkcs12.h" HAVE_OPENSSL_PKCS12_H)
+    check_include_file("openssl/rsa.h"    HAVE_OPENSSL_RSA_H)
+    check_include_file("openssl/ssl.h"    HAVE_OPENSSL_SSL_H)
+    check_include_file("openssl/x509.h"   HAVE_OPENSSL_X509_H)
+    check_include_file("openssl/rand.h"   HAVE_OPENSSL_RAND_H)
+  elseif(WIN32)
+    set(CURL_WINDOWS_SSPI ON)
+  endif()
+endif()
+
+option(USE_NGHTTP2 "Use Nghttp2 library" OFF)
+if(USE_NGHTTP2)
+  find_package(NGHTTP2 REQUIRED)
+  include_directories(${NGHTTP2_INCLUDE_DIRS})
+  list(APPEND CURL_LIBS ${NGHTTP2_LIBRARIES})
+endif()
+
+if(NOT CURL_DISABLE_LDAP)
+  if(WIN32)
+    option(USE_WIN32_LDAP "Use Windows LDAP implementation" ON)
+    if(USE_WIN32_LDAP)
+      check_library_exists_concat("wldap32" cldap_open HAVE_WLDAP32)
+      if(NOT HAVE_WLDAP32)
+        set(USE_WIN32_LDAP OFF)
+      endif()
+    endif()
+  endif()
+
+  option(CMAKE_USE_OPENLDAP "Use OpenLDAP code." OFF)
+  mark_as_advanced(CMAKE_USE_OPENLDAP)
+  set(CMAKE_LDAP_LIB "ldap" CACHE STRING "Name or full path to ldap library")
+  set(CMAKE_LBER_LIB "lber" CACHE STRING "Name or full path to lber library")
+
+  if(CMAKE_USE_OPENLDAP AND USE_WIN32_LDAP)
+    message(FATAL_ERROR "Cannot use USE_WIN32_LDAP and CMAKE_USE_OPENLDAP at the same time")
+  endif()
+
+  # Now that we know, we're not using windows LDAP...
+  if(USE_WIN32_LDAP)
+    check_include_file_concat("winldap.h" HAVE_WINLDAP_H)
+    check_include_file_concat("winber.h"  HAVE_WINBER_H)
+  else()
+    # Check for LDAP
+    set(CMAKE_REQUIRED_LIBRARIES ${OPENSSL_LIBRARIES})
+    check_library_exists_concat(${CMAKE_LDAP_LIB} ldap_init HAVE_LIBLDAP)
+    check_library_exists_concat(${CMAKE_LBER_LIB} ber_init HAVE_LIBLBER)
+
+    set(CMAKE_REQUIRED_INCLUDES_BAK ${CMAKE_REQUIRED_INCLUDES})
+    set(CMAKE_LDAP_INCLUDE_DIR "" CACHE STRING "Path to LDAP include directory")
+    if(CMAKE_LDAP_INCLUDE_DIR)
+      list(APPEND CMAKE_REQUIRED_INCLUDES ${CMAKE_LDAP_INCLUDE_DIR})
+    endif()
+    check_include_file_concat("ldap.h"           HAVE_LDAP_H)
+    check_include_file_concat("lber.h"           HAVE_LBER_H)
+
+    if(NOT HAVE_LDAP_H)
+      message(STATUS "LDAP_H not found CURL_DISABLE_LDAP set ON")
+      set(CURL_DISABLE_LDAP ON CACHE BOOL "" FORCE)
+      set(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES_BAK}) #LDAP includes won't be used
+    elseif(NOT HAVE_LIBLDAP)
+      message(STATUS "LDAP library '${CMAKE_LDAP_LIB}' not found CURL_DISABLE_LDAP set ON")
+      set(CURL_DISABLE_LDAP ON CACHE BOOL "" FORCE)
+      set(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES_BAK}) #LDAP includes won't be used
+    else()
+      if(CMAKE_USE_OPENLDAP)
+        set(USE_OPENLDAP ON)
+      endif()
+      if(CMAKE_LDAP_INCLUDE_DIR)
+        include_directories(${CMAKE_LDAP_INCLUDE_DIR})
+      endif()
+      set(NEED_LBER_H ON)
+      set(_HEADER_LIST)
+      if(HAVE_WINDOWS_H)
+        list(APPEND _HEADER_LIST "windows.h")
+      endif()
+      if(HAVE_SYS_TYPES_H)
+        list(APPEND _HEADER_LIST "sys/types.h")
+      endif()
+      list(APPEND _HEADER_LIST "ldap.h")
+
+      set(_SRC_STRING "")
+      foreach(_HEADER ${_HEADER_LIST})
+        set(_INCLUDE_STRING "${_INCLUDE_STRING}#include <${_HEADER}>\n")
+      endforeach()
+
+      set(_SRC_STRING
+        "
+        ${_INCLUDE_STRING}
+        int main(int argc, char ** argv)
+        {
+          BerValue *bvp = NULL;
+          BerElement *bep = ber_init(bvp);
+          ber_free(bep, 1);
+          return 0;
+        }"
+      )
+      set(CMAKE_REQUIRED_DEFINITIONS "${CMAKE_REQUIRED_DEFINITIONS} -DLDAP_DEPRECATED=1")
+      list(APPEND CMAKE_REQUIRED_LIBRARIES ${CMAKE_LDAP_LIB})
+      if(HAVE_LIBLBER)
+        list(APPEND CMAKE_REQUIRED_LIBRARIES ${CMAKE_LBER_LIB})
+      endif()
+      check_c_source_compiles("${_SRC_STRING}" NOT_NEED_LBER_H)
+
+      if(NOT_NEED_LBER_H)
+        set(NEED_LBER_H OFF)
+      else()
+        set(CURL_TEST_DEFINES "${CURL_TEST_DEFINES} -DNEED_LBER_H")
+      endif()
+    endif()
+>>>>>>> origin/tomato-shibby-RT-AC
   endif()
   mark_as_advanced(CURL_LDAP_WIN)
 endif()
@@ -232,7 +418,7 @@ endif()
 # ENDIF(NOT CURL_SPECIAL_LIBZ)
 
 # Check for idn
-check_library_exists_concat("idn" idna_to_ascii_lz HAVE_LIBIDN)
+check_library_exists_concat("idn2" idn2_lookup_ul HAVE_LIBIDN2)
 
 # Check for LDAP
 check_library_exists_concat("ldap" ldap_init HAVE_LIBLDAP)
@@ -243,10 +429,14 @@ check_library_exists_concat("ldap" ldap_init HAVE_LIBLDAP)
 # Check for symbol dlopen (same as HAVE_LIBDL)
 check_library_exists("${CURL_LIBS}" dlopen "" HAVE_DLOPEN)
 
+<<<<<<< HEAD
 # For other tests to use the same libraries
 set(CMAKE_REQUIRED_LIBRARIES ${CURL_LIBS})
 
 option(CURL_ZLIB "Set to ON to enable building cURL with zlib support." ON)
+=======
+option(CURL_ZLIB "Set to ON to enable building curl with zlib support." ON)
+>>>>>>> origin/tomato-shibby-RT-AC
 set(HAVE_LIBZ OFF)
 set(HAVE_ZLIB_H OFF)
 set(HAVE_ZLIB OFF)
@@ -297,6 +487,24 @@ endmacro(CHECK_INCLUDE_FILE_CONCAT)
 if(NOT UNIX)
   check_include_file_concat("ws2tcpip.h"     HAVE_WS2TCPIP_H)
   check_include_file_concat("winsock2.h"     HAVE_WINSOCK2_H)
+<<<<<<< HEAD
+=======
+  if(CURL_WINDOWS_SSPI)
+    set(CMAKE_REQUIRED_DEFINITIONS "${CMAKE_REQUIRED_DEFINITIONS} -DSECURITY_WIN32")
+    check_include_file_concat("sspi.h"       HAVE_SSPI_H)
+    if(HAVE_SSPI_H)
+      check_include_file_concat("schannel.h" HAVE_SCHANNEL_H)
+      set(USE_WINDOWS_SSPI ON)
+      if(HAVE_SCHANNEL_H)
+        set(USE_SCHANNEL ON)
+        set(SSL_ENABLED ON)
+        set(CURL_LIBS ${CURL_LIBS} "crypt32")
+      endif()
+    endif()
+  elseif(USE_OPENSSL)
+    set(CURL_LIBS ${CURL_LIBS} "crypt32")
+  endif()
+>>>>>>> origin/tomato-shibby-RT-AC
 endif(NOT UNIX)
 check_include_file_concat("stdio.h"          HAVE_STDIO_H)
 if(NOT UNIX)
@@ -319,6 +527,7 @@ check_include_file_concat("sys/types.h"      HAVE_SYS_TYPES_H)
 check_include_file_concat("sys/uio.h"        HAVE_SYS_UIO_H)
 check_include_file_concat("sys/un.h"         HAVE_SYS_UN_H)
 check_include_file_concat("sys/utime.h"      HAVE_SYS_UTIME_H)
+check_include_file_concat("sys/xattr.h"      HAVE_SYS_XATTR_H)
 check_include_file_concat("alloca.h"         HAVE_ALLOCA_H)
 check_include_file_concat("arpa/inet.h"      HAVE_ARPA_INET_H)
 check_include_file_concat("arpa/tftp.h"      HAVE_ARPA_TFTP_H)
@@ -328,10 +537,14 @@ check_include_file_concat("des.h"            HAVE_DES_H)
 check_include_file_concat("err.h"            HAVE_ERR_H)
 check_include_file_concat("errno.h"          HAVE_ERRNO_H)
 check_include_file_concat("fcntl.h"          HAVE_FCNTL_H)
+<<<<<<< HEAD
 check_include_file_concat("gssapi/gssapi.h"  HAVE_GSSAPI_GSSAPI_H)
 check_include_file_concat("gssapi/gssapi_generic.h" HAVE_GSSAPI_GSSAPI_GENERIC_H)
 check_include_file_concat("gssapi/gssapi_krb5.h" HAVE_GSSAPI_GSSAPI_KRB5_H)
 check_include_file_concat("idn-free.h"       HAVE_IDN_FREE_H)
+=======
+check_include_file_concat("idn2.h"           HAVE_IDN2_H)
+>>>>>>> origin/tomato-shibby-RT-AC
 check_include_file_concat("ifaddrs.h"        HAVE_IFADDRS_H)
 check_include_file_concat("io.h"             HAVE_IO_H)
 check_include_file_concat("krb.h"            HAVE_KRB_H)
@@ -372,7 +585,6 @@ check_include_file_concat("stropts.h"        HAVE_STROPTS_H)
 check_include_file_concat("termio.h"         HAVE_TERMIO_H)
 check_include_file_concat("termios.h"        HAVE_TERMIOS_H)
 check_include_file_concat("time.h"           HAVE_TIME_H)
-check_include_file_concat("tld.h"            HAVE_TLD_H)
 check_include_file_concat("unistd.h"         HAVE_UNISTD_H)
 check_include_file_concat("utime.h"          HAVE_UTIME_H)
 check_include_file_concat("x509.h"           HAVE_X509_H)
@@ -387,6 +599,7 @@ check_include_file_concat("netinet/if_ether.h" HAVE_NETINET_IF_ETHER_H)
 check_include_file_concat("stdint.h"        HAVE_STDINT_H)
 check_include_file_concat("sockio.h"        HAVE_SOCKIO_H)
 check_include_file_concat("sys/utsname.h"   HAVE_SYS_UTSNAME_H)
+<<<<<<< HEAD
 check_include_file_concat("idna.h"          HAVE_IDNA_H)
 
 if(NOT HAVE_LDAP_H)
@@ -401,6 +614,8 @@ if(CURL_DISABLE_LDAP)
     set(CURL_DISABLE_LDAPS ON CACHE BOOL "" FORCE)
   endif()
 endif()
+=======
+>>>>>>> origin/tomato-shibby-RT-AC
 
 check_type_size(size_t  SIZEOF_SIZE_T)
 check_type_size(ssize_t  SIZEOF_SSIZE_T)
@@ -419,6 +634,7 @@ if(NOT HAVE_SIZEOF_SSIZE_T)
     set(ssize_t __int64)
   endif(NOT ssize_t AND SIZEOF___INT64 EQUAL SIZEOF_SIZE_T)
 endif(NOT HAVE_SIZEOF_SSIZE_T)
+# off_t is sized later, after the HAVE_FILE_OFFSET_BITS test
 
 # Different sizeofs, etc.
 
@@ -475,7 +691,11 @@ mark_as_advanced(RANDOM_FILE)
 # Check for some functions that are used
 check_symbol_exists(basename      "${CURL_INCLUDES}" HAVE_BASENAME)
 check_symbol_exists(socket        "${CURL_INCLUDES}" HAVE_SOCKET)
-check_symbol_exists(poll          "${CURL_INCLUDES}" HAVE_POLL)
+# poll on macOS is unreliable, it first did not exist, then was broken until
+# fixed in 10.9 only to break again in 10.12.
+if(NOT APPLE)
+  check_symbol_exists(poll        "${CURL_INCLUDES}" HAVE_POLL)
+endif()
 check_symbol_exists(select        "${CURL_INCLUDES}" HAVE_SELECT)
 check_symbol_exists(strdup        "${CURL_INCLUDES}" HAVE_STRDUP)
 check_symbol_exists(strstr        "${CURL_INCLUDES}" HAVE_STRSTR)
@@ -511,8 +731,6 @@ if(CMAKE_USE_OPENSSL)
   check_symbol_exists(RAND_status   "${CURL_INCLUDES}" HAVE_RAND_STATUS)
   check_symbol_exists(RAND_screen   "${CURL_INCLUDES}" HAVE_RAND_SCREEN)
   check_symbol_exists(RAND_egd      "${CURL_INCLUDES}" HAVE_RAND_EGD)
-  check_symbol_exists(CRYPTO_cleanup_all_ex_data "${CURL_INCLUDES}"
-    HAVE_CRYPTO_CLEANUP_ALL_EX_DATA)
   if(HAVE_LIBCRYPTO AND HAVE_LIBSSL)
     set(USE_OPENSSL 1)
     set(USE_SSLEAY 1)
@@ -542,9 +760,6 @@ check_symbol_exists(pipe           "${CURL_INCLUDES}" HAVE_PIPE)
 check_symbol_exists(ftruncate      "${CURL_INCLUDES}" HAVE_FTRUNCATE)
 check_symbol_exists(getprotobyname "${CURL_INCLUDES}" HAVE_GETPROTOBYNAME)
 check_symbol_exists(getrlimit      "${CURL_INCLUDES}" HAVE_GETRLIMIT)
-check_symbol_exists(idn_free       "${CURL_INCLUDES}" HAVE_IDN_FREE)
-check_symbol_exists(idna_strerror  "${CURL_INCLUDES}" HAVE_IDNA_STRERROR)
-check_symbol_exists(tld_strerror   "${CURL_INCLUDES}" HAVE_TLD_STRERROR)
 check_symbol_exists(setlocale      "${CURL_INCLUDES}" HAVE_SETLOCALE)
 check_symbol_exists(setrlimit      "${CURL_INCLUDES}" HAVE_SETRLIMIT)
 check_symbol_exists(fcntl          "${CURL_INCLUDES}" HAVE_FCNTL)
@@ -553,6 +768,13 @@ check_symbol_exists(setsockopt     "${CURL_INCLUDES}" HAVE_SETSOCKOPT)
 
 # symbol exists in win32, but function does not.
 check_function_exists(inet_pton HAVE_INET_PTON)
+
+check_symbol_exists(fsetxattr "${CURL_INCLUDES}" HAVE_FSETXATTR)
+if(HAVE_FSETXATTR)
+  foreach(CURL_TEST HAVE_FSETXATTR_5 HAVE_FSETXATTR_6)
+    curl_internal_test_run(${CURL_TEST})
+  endforeach(CURL_TEST)
+endif(HAVE_FSETXATTR)
 
 # sigaction and sigsetjmp are special. Use special mechanism for
 # detecting those, but only if previous attempt failed.
@@ -680,9 +902,14 @@ foreach(CURL_TEST
     )
   curl_internal_test(${CURL_TEST})
 endforeach(CURL_TEST)
+
 if(HAVE_FILE_OFFSET_BITS)
   set(_FILE_OFFSET_BITS 64)
+  set(CMAKE_REQUIRED_FLAGS "-D_FILE_OFFSET_BITS=64")
 endif(HAVE_FILE_OFFSET_BITS)
+check_type_size("off_t"  SIZEOF_OFF_T)
+set(CMAKE_REQUIRED_FLAGS)
+
 foreach(CURL_TEST
     HAVE_GLIBC_STRERROR_R
     HAVE_POSIX_STRERROR_R
@@ -743,16 +970,6 @@ if(NOT CURL_SPECIAL_LIBZ)
     set(HAVE_LIBZ 0)
   endif(NOT HAVE_ZLIB_H)
 endif(NOT CURL_SPECIAL_LIBZ)
-
-if(_FILE_OFFSET_BITS)
-  set(_FILE_OFFSET_BITS 64)
-endif(_FILE_OFFSET_BITS)
-set(CMAKE_REQUIRED_FLAGS "-D_FILE_OFFSET_BITS=64")
-set(CMAKE_EXTRA_INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/curl/curl.h")
-check_type_size("curl_off_t" SIZEOF_CURL_OFF_T)
-set(CMAKE_EXTRA_INCLUDE_FILES)
-set(CMAKE_REQUIRED_FLAGS)
-
 
 # Check for nonblocking
 set(HAVE_DISABLED_NONBLOCKING 1)
@@ -826,6 +1043,11 @@ if(WIN32)
   add_definitions(-D_WIN32_WINNT=0x0501)
 endif(WIN32)
 
+# For windows, all compilers used by cmake should support large files
+if(WIN32)
+  set(USE_WIN32_LARGE_FILES ON)
+endif(WIN32)
+
 if(MSVC)
   add_definitions(-D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE)
 endif(MSVC)
@@ -868,10 +1090,146 @@ add_subdirectory(lib)
 if(BUILD_CURL_EXE)
   add_subdirectory(src)
 endif()
-if(BUILD_CURL_TESTS)
+
+include(CTest)
+if(BUILD_TESTING)
   add_subdirectory(tests)
 endif()
 
+<<<<<<< HEAD
+=======
+# TODO support GNUTLS, NSS, POLARSSL, AXTLS, CYASSL, WINSSL, DARWINSSL
+if(USE_OPENSSL)
+  set(SSL_ENABLED 1)
+endif()
+
+# Helper to populate a list (_items) with a label when conditions (the remaining
+# args) are satisfied
+function(_add_if label)
+  # TODO need to disable policy CMP0054 (CMake 3.1) to allow this indirection
+  if(${ARGN})
+    set(_items ${_items} "${label}" PARENT_SCOPE)
+  endif()
+endfunction()
+
+# Clear list and try to detect available features
+set(_items)
+_add_if("WinSSL"        SSL_ENABLED AND USE_WINDOWS_SSPI)
+_add_if("OpenSSL"       SSL_ENABLED AND USE_OPENSSL)
+_add_if("IPv6"          ENABLE_IPV6)
+_add_if("unix-sockets"  USE_UNIX_SOCKETS)
+_add_if("libz"          HAVE_LIBZ)
+_add_if("AsynchDNS"     USE_ARES OR USE_THREADS_POSIX OR USE_THREADS_WIN32)
+_add_if("IDN"           HAVE_LIBIDN2)
+_add_if("Largefile"     (CURL_SIZEOF_CURL_OFF_T GREATER 4) AND
+                        ((SIZEOF_OFF_T GREATER 4) OR USE_WIN32_LARGE_FILES))
+# TODO SSP1 (WinSSL) check is missing
+_add_if("SSPI"          USE_WINDOWS_SSPI)
+_add_if("GSS-API"       HAVE_GSSAPI)
+# TODO SSP1 missing for SPNEGO
+_add_if("SPNEGO"        NOT CURL_DISABLE_CRYPTO_AUTH AND
+                        (HAVE_GSSAPI OR USE_WINDOWS_SSPI))
+_add_if("Kerberos"      NOT CURL_DISABLE_CRYPTO_AUTH AND
+                        (HAVE_GSSAPI OR USE_WINDOWS_SSPI))
+# NTLM support requires crypto function adaptions from various SSL libs
+# TODO alternative SSL libs tests for SSP1, GNUTLS, NSS, DARWINSSL
+if(NOT CURL_DISABLE_CRYPTO_AUTH AND (USE_OPENSSL OR
+   USE_WINDOWS_SSPI OR GNUTLS_ENABLED OR NSS_ENABLED OR DARWINSSL_ENABLED))
+  _add_if("NTLM"        1)
+  # TODO missing option (autoconf: --enable-ntlm-wb)
+  _add_if("NTLM_WB"     NOT CURL_DISABLE_HTTP AND NTLM_WB_ENABLED)
+endif()
+# TODO missing option (--enable-tls-srp), depends on GNUTLS_SRP/OPENSSL_SRP
+_add_if("TLS-SRP"       USE_TLS_SRP)
+# TODO option --with-nghttp2 tests for nghttp2 lib and nghttp2/nghttp2.h header
+_add_if("HTTP2"         USE_NGHTTP2)
+string(REPLACE ";" " " SUPPORT_FEATURES "${_items}")
+message(STATUS "Enabled features: ${SUPPORT_FEATURES}")
+
+# Clear list and try to detect available protocols
+set(_items)
+_add_if("HTTP"          NOT CURL_DISABLE_HTTP)
+_add_if("HTTPS"         NOT CURL_DISABLE_HTTP AND SSL_ENABLED)
+_add_if("FTP"           NOT CURL_DISABLE_FTP)
+_add_if("FTPS"          NOT CURL_DISABLE_FTP AND SSL_ENABLED)
+_add_if("FILE"          NOT CURL_DISABLE_FILE)
+_add_if("TELNET"        NOT CURL_DISABLE_TELNET)
+_add_if("LDAP"          NOT CURL_DISABLE_LDAP)
+# CURL_DISABLE_LDAP implies CURL_DISABLE_LDAPS
+# TODO check HAVE_LDAP_SSL (in autoconf this is enabled with --enable-ldaps)
+_add_if("LDAPS"         NOT CURL_DISABLE_LDAPS AND
+                        ((USE_OPENLDAP AND SSL_ENABLED) OR
+                        (NOT USE_OPENLDAP AND HAVE_LDAP_SSL)))
+_add_if("DICT"          NOT CURL_DISABLE_DICT)
+_add_if("TFTP"          NOT CURL_DISABLE_TFTP)
+_add_if("GOPHER"        NOT CURL_DISABLE_GOPHER)
+_add_if("POP3"          NOT CURL_DISABLE_POP3)
+_add_if("POP3S"         NOT CURL_DISABLE_POP3 AND SSL_ENABLED)
+_add_if("IMAP"          NOT CURL_DISABLE_IMAP)
+_add_if("IMAPS"         NOT CURL_DISABLE_IMAP AND SSL_ENABLED)
+_add_if("SMTP"          NOT CURL_DISABLE_SMTP)
+_add_if("SMTPS"         NOT CURL_DISABLE_SMTP AND SSL_ENABLED)
+_add_if("SCP"           USE_LIBSSH2)
+_add_if("SFTP"          USE_LIBSSH2)
+_add_if("RTSP"          NOT CURL_DISABLE_RTSP)
+_add_if("RTMP"          USE_LIBRTMP)
+list(SORT _items)
+string(REPLACE ";" " " SUPPORT_PROTOCOLS "${_items}")
+message(STATUS "Enabled protocols: ${SUPPORT_PROTOCOLS}")
+
+# curl-config needs the following options to be set.
+set(CC                      "${CMAKE_C_COMPILER}")
+# TODO probably put a -D... options here?
+set(CONFIGURE_OPTIONS       "")
+# TODO when to set "-DCURL_STATICLIB" for CPPFLAG_CURL_STATICLIB?
+set(CPPFLAG_CURL_STATICLIB  "")
+# TODO need to set this (see CURL_CHECK_CA_BUNDLE in acinclude.m4)
+set(CURL_CA_BUNDLE          "")
+set(CURLVERSION             "${CURL_VERSION}")
+set(ENABLE_SHARED           "yes")
+if(CURL_STATICLIB)
+  set(ENABLE_STATIC         "yes")
+else()
+  set(ENABLE_STATIC         "no")
+endif()
+set(exec_prefix             "\${prefix}")
+set(includedir              "\${prefix}/include")
+set(LDFLAGS                 "${CMAKE_SHARED_LINKER_FLAGS}")
+set(LIBCURL_LIBS            "")
+set(libdir                  "${CMAKE_INSTALL_PREFIX}/lib")
+foreach(_lib ${CMAKE_C_IMPLICIT_LINK_LIBRARIES} ${CURL_LIBS})
+  if(_lib MATCHES ".*/.*")
+    set(LIBCURL_LIBS          "${LIBCURL_LIBS} ${_lib}")
+  else()
+    set(LIBCURL_LIBS          "${LIBCURL_LIBS} -l${_lib}")
+  endif()
+endforeach()
+# "a" (Linux) or "lib" (Windows)
+string(REPLACE "." "" libext "${CMAKE_STATIC_LIBRARY_SUFFIX}")
+set(prefix                  "${CMAKE_INSTALL_PREFIX}")
+# Set this to "yes" to append all libraries on which -lcurl is dependent
+set(REQUIRE_LIB_DEPS        "no")
+# SUPPORT_FEATURES
+# SUPPORT_PROTOCOLS
+set(VERSIONNUM              "${CURL_VERSION_NUM}")
+
+# Finally generate a "curl-config" matching this config
+configure_file("${CURL_SOURCE_DIR}/curl-config.in"
+               "${CURL_BINARY_DIR}/curl-config" @ONLY)
+install(FILES "${CURL_BINARY_DIR}/curl-config"
+        DESTINATION bin
+        PERMISSIONS
+          OWNER_READ OWNER_WRITE OWNER_EXECUTE
+          GROUP_READ GROUP_EXECUTE
+          WORLD_READ WORLD_EXECUTE)
+
+# Finally generate a pkg-config file matching this config
+configure_file("${CURL_SOURCE_DIR}/libcurl.pc.in"
+               "${CURL_BINARY_DIR}/libcurl.pc" @ONLY)
+install(FILES "${CURL_BINARY_DIR}/libcurl.pc"
+        DESTINATION lib/pkgconfig)
+
+>>>>>>> origin/tomato-shibby-RT-AC
 # This needs to be run very last so other parts of the scripts can take advantage of this.
 if(NOT CURL_CONFIG_HAS_BEEN_RUN_BEFORE)
   set(CURL_CONFIG_HAS_BEEN_RUN_BEFORE 1 CACHE INTERNAL "Flag to track whether this is the first time running CMake or if CMake has been configured before")

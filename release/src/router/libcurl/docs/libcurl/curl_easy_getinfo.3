@@ -52,8 +52,16 @@ has been received. Note that a proxy's CONNECT response should be read with
 
 Support for SMTP responses added in 7.25.0.
 .IP CURLINFO_HTTP_CONNECTCODE
+<<<<<<< HEAD
 Pass a pointer to a long to receive the last received proxy response code to a
 CONNECT request.
+=======
+Last proxy CONNECT response code.
+See \fICURLINFO_HTTP_CONNECTCODE(3)\fP
+.IP CURLINFO_HTTP_VERSION
+The http version used in the connection.
+See \fICURLINFO_HTTP_VERSION(3)\fP
+>>>>>>> origin/tomato-shibby-RT-AC
 .IP CURLINFO_FILETIME
 Pass a pointer to a long to receive the remote time of the retrieved document
 (in number of seconds since 1 jan 1970 in the GMT/UTC time zone). If you get
@@ -126,9 +134,17 @@ Pass a pointer to a long to receive the total size of the issued
 requests. This is so far only for HTTP requests. Note that this may be more
 than one request if FOLLOWLOCATION is true.
 .IP CURLINFO_SSL_VERIFYRESULT
+<<<<<<< HEAD
 Pass a pointer to a long to receive the result of the certification
 verification that was requested (using the CURLOPT_SSL_VERIFYPEER option to
 \fIcurl_easy_setopt(3)\fP).
+=======
+Certificate verification result.
+See \fICURLINFO_SSL_VERIFYRESULT(3)\fP
+.IP CURLINFO_PROXY_SSL_VERIFYRESULT
+Proxy certificate verification result.
+See \fICURLINFO_PROXY_SSL_VERIFYRESULT(3)\fP
+>>>>>>> origin/tomato-shibby-RT-AC
 .IP CURLINFO_SSL_ENGINES
 Pass the address of a 'struct curl_slist *' to receive a linked-list of
 OpenSSL crypto-engines supported. Note that engines are normally implemented
@@ -260,9 +276,20 @@ unimplemented).\fP
 Applications wishing to resume an RTSP session on another connection should
 retrieve this info before closing the active connection.
 .IP CURLINFO_RTSP_CSEQ_RECV
+<<<<<<< HEAD
 Pass a pointer to a long to receive the most recently received CSeq from the
 server. If your application encounters a \fICURLE_RTSP_CSEQ_ERROR\fP then you
 may wish to troubleshoot and/or fix the CSeq mismatch by peeking at this value.
+=======
+RTSP CSeq last received.
+See \fICURLINFO_RTSP_CSEQ_RECV(3)\fP
+.IP CURLINFO_PROTOCOL
+The protocol used for the connection. (Added in 7.52.0)
+See \fICURLINFO_PROTOCOL(3)\fP
+.IP CURLINFO_SCHEME
+The scheme used for the connection. (Added in 7.52.0)
+See \fICURLINFO_SCHEME(3)\fP
+>>>>>>> origin/tomato-shibby-RT-AC
 .SH TIMES
 .nf
 An overview of the six time values available from curl_easy_getinfo()

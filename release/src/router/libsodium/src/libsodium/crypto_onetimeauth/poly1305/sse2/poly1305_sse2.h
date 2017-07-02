@@ -3,6 +3,10 @@
 
 #include <stddef.h>
 
+<<<<<<< HEAD
+=======
+#include "../onetimeauth_poly1305.h"
+>>>>>>> origin/tomato-shibby-RT-AC
 #include "crypto_onetimeauth_poly1305.h"
 
 extern struct crypto_onetimeauth_poly1305_implementation

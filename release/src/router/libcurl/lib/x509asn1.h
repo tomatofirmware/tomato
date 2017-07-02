@@ -8,7 +8,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
+<<<<<<< HEAD
  * Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
+=======
+ * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
+>>>>>>> origin/tomato-shibby-RT-AC
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -25,13 +29,21 @@
 
 #include "curl_setup.h"
 
+<<<<<<< HEAD
 #if defined(USE_QSOSSL) || defined(USE_GSKIT) || defined(USE_NSS)
+=======
+#if defined(USE_GSKIT) || defined(USE_NSS) || defined(USE_GNUTLS) || \
+    defined(USE_CYASSL) || defined(USE_SCHANNEL)
+>>>>>>> origin/tomato-shibby-RT-AC
 
 #include "urldata.h"
 
 /*
  * Constants.
  */
+
+/* Largest supported ASN.1 structure. */
+#define CURL_ASN1_MAX                   ((size_t) 0x40000)      /* 256K */
 
 /* ASN.1 classes. */
 #define CURL_ASN1_UNIVERSAL             0
@@ -114,6 +126,7 @@ typedef struct {
  * Prototypes.
  */
 
+<<<<<<< HEAD
 const char * Curl_getASN1Element(curl_asn1Element * elem,
                                  const char * beg, const char * end);
 const char * Curl_ASN1tostr(curl_asn1Element * elem, int type);
@@ -126,4 +139,17 @@ CURLcode Curl_verifyhost(struct connectdata * conn,
                          const char * beg, const char * end);
 
 #endif /* USE_QSOSSL or USE_GSKIT or USE_NSS */
+=======
+const char *Curl_getASN1Element(curl_asn1Element *elem,
+                                 const char *beg, const char *end);
+const char *Curl_ASN1tostr(curl_asn1Element *elem, int type);
+const char *Curl_DNtostr(curl_asn1Element *dn);
+int Curl_parseX509(curl_X509certificate *cert,
+                   const char *beg, const char *end);
+CURLcode Curl_extract_certinfo(struct connectdata *conn, int certnum,
+                               const char *beg, const char *end);
+CURLcode Curl_verifyhost(struct connectdata *conn,
+                         const char *beg, const char *end);
+#endif /* USE_GSKIT or USE_NSS or USE_GNUTLS or USE_CYASSL or USE_SCHANNEL */
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif /* HEADER_CURL_X509ASN1_H */

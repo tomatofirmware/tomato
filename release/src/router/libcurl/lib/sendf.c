@@ -48,7 +48,7 @@
  * blocks of data.  Remaining, bare CRs are changed to LFs.  The possibly new
  * size of the data is returned.
  */
-static size_t convert_lineends(struct SessionHandle *data,
+static size_t convert_lineends(struct Curl_easy *data,
                                char *startPtr, size_t size)
 {
   char *inPtr, *outPtr;
@@ -123,9 +123,109 @@ static size_t convert_lineends(struct SessionHandle *data,
 }
 #endif /* CURL_DO_LINEEND_CONV */
 
+<<<<<<< HEAD
+=======
+#ifdef USE_RECV_BEFORE_SEND_WORKAROUND
+bool Curl_recv_has_postponed_data(struct connectdata *conn, int sockindex)
+{
+  struct postponed_data * const psnd = &(conn->postponed[sockindex]);
+  return psnd->buffer && psnd->allocated_size &&
+         psnd->recv_size > psnd->recv_processed;
+}
+
+static void pre_receive_plain(struct connectdata *conn, int num)
+{
+  const curl_socket_t sockfd = conn->sock[num];
+  struct postponed_data * const psnd = &(conn->postponed[num]);
+  size_t bytestorecv = psnd->allocated_size - psnd->recv_size;
+  /* WinSock will destroy unread received data if send() is
+     failed.
+     To avoid lossage of received data, recv() must be
+     performed before every send() if any incoming data is
+     available. However, skip this, if buffer is already full. */
+  if((conn->handler->protocol&PROTO_FAMILY_HTTP) != 0 &&
+     conn->recv[num] == Curl_recv_plain &&
+     (!psnd->buffer || bytestorecv)) {
+    const int readymask = Curl_socket_check(sockfd, CURL_SOCKET_BAD,
+                                            CURL_SOCKET_BAD, 0);
+    if(readymask != -1 && (readymask & CURL_CSELECT_IN) != 0) {
+      /* Have some incoming data */
+      if(!psnd->buffer) {
+        /* Use buffer double default size for intermediate buffer */
+        psnd->allocated_size = 2 * BUFSIZE;
+        psnd->buffer = malloc(psnd->allocated_size);
+        psnd->recv_size = 0;
+        psnd->recv_processed = 0;
+#ifdef DEBUGBUILD
+        psnd->bindsock = sockfd; /* Used only for DEBUGASSERT */
+#endif /* DEBUGBUILD */
+        bytestorecv = psnd->allocated_size;
+      }
+      if(psnd->buffer) {
+        ssize_t recvedbytes;
+        DEBUGASSERT(psnd->bindsock == sockfd);
+        recvedbytes = sread(sockfd, psnd->buffer + psnd->recv_size,
+                            bytestorecv);
+        if(recvedbytes > 0)
+          psnd->recv_size += recvedbytes;
+      }
+      else
+        psnd->allocated_size = 0;
+    }
+  }
+}
+
+static ssize_t get_pre_recved(struct connectdata *conn, int num, char *buf,
+                              size_t len)
+{
+  struct postponed_data * const psnd = &(conn->postponed[num]);
+  size_t copysize;
+  if(!psnd->buffer)
+    return 0;
+
+  DEBUGASSERT(psnd->allocated_size > 0);
+  DEBUGASSERT(psnd->recv_size <= psnd->allocated_size);
+  DEBUGASSERT(psnd->recv_processed <= psnd->recv_size);
+  /* Check and process data that already received and storied in internal
+     intermediate buffer */
+  if(psnd->recv_size > psnd->recv_processed) {
+    DEBUGASSERT(psnd->bindsock == conn->sock[num]);
+    copysize = CURLMIN(len, psnd->recv_size - psnd->recv_processed);
+    memcpy(buf, psnd->buffer + psnd->recv_processed, copysize);
+    psnd->recv_processed += copysize;
+  }
+  else
+    copysize = 0; /* buffer was allocated, but nothing was received */
+
+  /* Free intermediate buffer if it has no unprocessed data */
+  if(psnd->recv_processed == psnd->recv_size) {
+    free(psnd->buffer);
+    psnd->buffer = NULL;
+    psnd->allocated_size = 0;
+    psnd->recv_size = 0;
+    psnd->recv_processed = 0;
+#ifdef DEBUGBUILD
+    psnd->bindsock = CURL_SOCKET_BAD;
+#endif /* DEBUGBUILD */
+  }
+  return (ssize_t)copysize;
+}
+#else  /* ! USE_RECV_BEFORE_SEND_WORKAROUND */
+/* Use "do-nothing" macros instead of functions when workaround not used */
+bool Curl_recv_has_postponed_data(struct connectdata *conn, int sockindex)
+{
+  (void)conn;
+  (void)sockindex;
+  return false;
+}
+#define pre_receive_plain(c,n) do {} WHILE_FALSE
+#define get_pre_recved(c,n,b,l) 0
+#endif /* ! USE_RECV_BEFORE_SEND_WORKAROUND */
+
+>>>>>>> origin/tomato-shibby-RT-AC
 /* Curl_infof() is for info message along the way */
 
-void Curl_infof(struct SessionHandle *data, const char *fmt, ...)
+void Curl_infof(struct Curl_easy *data, const char *fmt, ...)
 {
   if(data && data->set.verbose) {
     va_list ap;
@@ -143,7 +243,7 @@ void Curl_infof(struct SessionHandle *data, const char *fmt, ...)
  * The message SHALL NOT include any LF or CR.
  */
 
-void Curl_failf(struct SessionHandle *data, const char *fmt, ...)
+void Curl_failf(struct Curl_easy *data, const char *fmt, ...)
 {
   va_list ap;
   size_t len;
@@ -171,7 +271,7 @@ void Curl_failf(struct SessionHandle *data, const char *fmt, ...)
 CURLcode Curl_sendf(curl_socket_t sockfd, struct connectdata *conn,
                     const char *fmt, ...)
 {
-  struct SessionHandle *data = conn->data;
+  struct Curl_easy *data = conn->data;
   ssize_t bytes_written;
   size_t write_len;
   CURLcode res = CURLE_OK;
@@ -344,7 +444,7 @@ ssize_t Curl_recv_plain(struct connectdata *conn, int num, char *buf,
   return nread;
 }
 
-static CURLcode pausewrite(struct SessionHandle *data,
+static CURLcode pausewrite(struct Curl_easy *data,
                            int type, /* what type of data */
                            const char *ptr,
                            size_t len)
@@ -383,6 +483,7 @@ static CURLcode pausewrite(struct SessionHandle *data,
    local character encoding.  This is a problem and should be changed in
    the future to leave the original data alone.
  */
+<<<<<<< HEAD
 CURLcode Curl_client_write(struct connectdata *conn,
                            int type,
                            char *ptr,
@@ -390,6 +491,16 @@ CURLcode Curl_client_write(struct connectdata *conn,
 {
   struct SessionHandle *data = conn->data;
   size_t wrote;
+=======
+CURLcode Curl_client_chop_write(struct connectdata *conn,
+                                int type,
+                                char *ptr,
+                                size_t len)
+{
+  struct Curl_easy *data = conn->data;
+  curl_write_callback writeheader = NULL;
+  curl_write_callback writebody = NULL;
+>>>>>>> origin/tomato-shibby-RT-AC
 
   if(0 == len)
     len = strlen(ptr);
@@ -444,12 +555,26 @@ CURLcode Curl_client_write(struct connectdata *conn,
       wrote = len;
     }
 
+<<<<<<< HEAD
     if(CURL_WRITEFUNC_PAUSE == wrote) {
       if(conn->handler->flags & PROTOPT_NONETWORK) {
         /* Protocols that work without network cannot be paused. This is
            actually only FILE:// just now, and it can't pause since the
            transfer isn't done using the "normal" procedure. */
         failf(data, "Write callback asked for PAUSE when not supported!");
+=======
+    if(writeheader) {
+      size_t wrote = writeheader(ptr, 1, chunklen, data->set.writeheader);
+
+      if(CURL_WRITEFUNC_PAUSE == wrote)
+        /* here we pass in the HEADER bit only since if this was body as well
+           then it was passed already and clearly that didn't trigger the
+           pause, so this is saved for later with the HEADER bit only */
+        return pausewrite(data, CLIENTWRITE_HEADER, ptr, len);
+
+      if(wrote != chunklen) {
+        failf(data, "Failed writing header");
+>>>>>>> origin/tomato-shibby-RT-AC
         return CURLE_WRITE_ERROR;
       }
       else
@@ -461,6 +586,7 @@ CURLcode Curl_client_write(struct connectdata *conn,
     }
   }
 
+<<<<<<< HEAD
   if((type & CLIENTWRITE_HEADER) &&
      (data->set.fwrite_header || data->set.writeheader) ) {
     /*
@@ -483,6 +609,45 @@ CURLcode Curl_client_write(struct connectdata *conn,
     if(wrote != len) {
       failf (data, "Failed writing header");
       return CURLE_WRITE_ERROR;
+=======
+  return CURLE_OK;
+}
+
+
+/* Curl_client_write() sends data to the write callback(s)
+
+   The bit pattern defines to what "streams" to write to. Body and/or header.
+   The defines are in sendf.h of course.
+
+   If CURL_DO_LINEEND_CONV is enabled, data is converted IN PLACE to the
+   local character encoding.  This is a problem and should be changed in
+   the future to leave the original data alone.
+ */
+CURLcode Curl_client_write(struct connectdata *conn,
+                           int type,
+                           char *ptr,
+                           size_t len)
+{
+  struct Curl_easy *data = conn->data;
+
+  if(0 == len)
+    len = strlen(ptr);
+
+  /* FTP data may need conversion. */
+  if((type & CLIENTWRITE_BODY) &&
+    (conn->handler->protocol & PROTO_FAMILY_FTP) &&
+    conn->proto.ftpc.transfertype == 'A') {
+    /* convert from the network encoding */
+    CURLcode result = Curl_convert_from_network(data, ptr, len);
+    /* Curl_convert_from_network calls failf if unsuccessful */
+    if(result)
+      return result;
+
+#ifdef CURL_DO_LINEEND_CONV
+    /* convert end-of-line markers */
+    len = convert_lineends(data, ptr, len);
+#endif /* CURL_DO_LINEEND_CONV */
+>>>>>>> origin/tomato-shibby-RT-AC
     }
   }
 
@@ -554,7 +719,7 @@ CURLcode Curl_read(struct connectdata *conn, /* connection data */
     }
     /* If we come here, it means that there is no data to read from the buffer,
      * so we read from the socket */
-    bytesfromsocket = CURLMIN(sizerequested, BUFSIZE * sizeof (char));
+    bytesfromsocket = CURLMIN(sizerequested, BUFSIZE * sizeof(char));
     buffertofill = conn->master_buffer;
   }
   else {
@@ -580,7 +745,7 @@ CURLcode Curl_read(struct connectdata *conn, /* connection data */
 }
 
 /* return 0 on success */
-static int showit(struct SessionHandle *data, curl_infotype type,
+static int showit(struct Curl_easy *data, curl_infotype type,
                   char *ptr, size_t size)
 {
   static const char s_infotype[CURLINFO_END][3] = {
@@ -649,7 +814,7 @@ static int showit(struct SessionHandle *data, curl_infotype type,
   return 0;
 }
 
-int Curl_debug(struct SessionHandle *data, curl_infotype type,
+int Curl_debug(struct Curl_easy *data, curl_infotype type,
                char *ptr, size_t size,
                struct connectdata *conn)
 {
@@ -658,7 +823,7 @@ int Curl_debug(struct SessionHandle *data, curl_infotype type,
     char buffer[160];
     const char *t=NULL;
     const char *w="Data";
-    switch (type) {
+    switch(type) {
     case CURLINFO_HEADER_IN:
       w = "Header";
     case CURLINFO_DATA_IN:

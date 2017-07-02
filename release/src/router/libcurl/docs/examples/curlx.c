@@ -125,6 +125,7 @@ static const char *curlx_usage[]={
 /* This is a context that we pass to all callbacks */
 
 typedef struct sslctxparm_st {
+<<<<<<< HEAD
   unsigned char * p12file ;
   const char * pst ;
   PKCS12 * p12 ;
@@ -134,6 +135,17 @@ typedef struct sslctxparm_st {
   CURL * curl;
   BIO * errorbio;
   int accesstype ;
+=======
+  unsigned char *p12file;
+  const char *pst;
+  PKCS12 *p12;
+  EVP_PKEY *pkey;
+  X509 *usercert;
+  STACK_OF(X509) * ca;
+  CURL *curl;
+  BIO *errorbio;
+  int accesstype;
+>>>>>>> origin/tomato-shibby-RT-AC
   int verbose;
 
 } sslctxparm;
@@ -187,6 +199,7 @@ static int ssl_app_verify_callback(X509_STORE_CTX *ctx, void *arg)
   if (p->verbose > 2)
     BIO_printf(p->errorbio,"entering ssl_app_verify_callback\n");
 
+<<<<<<< HEAD
   if ((ok= X509_verify_cert(ctx)) && ctx->cert) {
     unsigned char * accessinfo ;
     if (p->verbose > 1)
@@ -195,6 +208,17 @@ static int ssl_app_verify_callback(X509_STORE_CTX *ctx, void *arg)
     if (accessinfo = my_get_ext(ctx->cert,p->accesstype ,NID_sinfo_access)) {
       if (p->verbose)
         BIO_printf(p->errorbio,"Setting URL from SIA to: %s\n", accessinfo);
+=======
+  if((ok= X509_verify_cert(ctx)) && ctx->cert) {
+    unsigned char *accessinfo;
+    if(p->verbose > 1)
+      X509_print_ex(p->errorbio, ctx->cert, 0, 0);
+
+    accessinfo = my_get_ext(ctx->cert, p->accesstype, NID_sinfo_access);
+    if(accessinfo) {
+      if(p->verbose)
+        BIO_printf(p->errorbio, "Setting URL from SIA to: %s\n", accessinfo);
+>>>>>>> origin/tomato-shibby-RT-AC
 
       curl_easy_setopt(p->curl, CURLOPT_URL,accessinfo);
     }
@@ -219,10 +243,17 @@ static int ssl_app_verify_callback(X509_STORE_CTX *ctx, void *arg)
    - an application verification callback (the function above)
 */
 
+<<<<<<< HEAD
 static CURLcode sslctxfun(CURL * curl, void * sslctx, void * parm) {
 
   sslctxparm * p = (sslctxparm *) parm;
   SSL_CTX * ctx = (SSL_CTX *) sslctx ;
+=======
+static CURLcode sslctxfun(CURL *curl, void *sslctx, void *parm)
+{
+  sslctxparm *p = (sslctxparm *) parm;
+  SSL_CTX *ctx = (SSL_CTX *) sslctx;
+>>>>>>> origin/tomato-shibby-RT-AC
 
   if (!SSL_CTX_use_certificate(ctx,p->usercert)) {
     BIO_printf(p->errorbio, "SSL_CTX_use_certificate problem\n"); goto err;
@@ -260,6 +291,7 @@ int main(int argc, char **argv) {
   BIO* in=NULL;
   BIO* out=NULL;
 
+<<<<<<< HEAD
   char * outfile = NULL;
   char * infile = NULL ;
 
@@ -271,19 +303,32 @@ int main(int argc, char **argv) {
   const char** pp;
   unsigned char* hostporturl = NULL;
   BIO * p12bio ;
+=======
+  char *outfile = NULL;
+  char *infile = NULL;
+
+  int tabLength=100;
+  char *binaryptr;
+  char *mimetype;
+  char *mimetypeaccept=NULL;
+  char *contenttype;
+  const char **pp;
+  unsigned char *hostporturl = NULL;
+  BIO *p12bio;
+>>>>>>> origin/tomato-shibby-RT-AC
   char **args = argv + 1;
-  unsigned char * serverurl;
+  unsigned char *serverurl;
   sslctxparm p;
   char *response;
 
   CURLcode res;
-  struct curl_slist * headers=NULL;
+  struct curl_slist *headers=NULL;
   int badarg=0;
 
   binaryptr = malloc(tabLength);
 
   p.verbose = 0;
-  p.errorbio = BIO_new_fp (stderr, BIO_NOCLOSE);
+  p.errorbio = BIO_new_fp(stderr, BIO_NOCLOSE);
 
   curl_global_init(CURL_GLOBAL_DEFAULT);
 
@@ -323,12 +368,29 @@ int main(int argc, char **argv) {
     } else if (strcmp(*args,"-acceptmime") == 0) {
       if (args[1]) {
         mimetypeaccept = *(++args);
+<<<<<<< HEAD
       } else badarg=1;
     } else if (strcmp(*args,"-accesstype") == 0) {
       if (args[1]) {
         if ((p.accesstype = OBJ_obj2nid(OBJ_txt2obj(*++args,0))) == 0) badarg=1;
       } else badarg=1;
     } else if (strcmp(*args,"-verbose") == 0) {
+=======
+      }
+      else
+        badarg=1;
+    }
+    else if(strcmp(*args, "-accesstype") == 0) {
+      if(args[1]) {
+        p.accesstype = OBJ_obj2nid(OBJ_txt2obj(*++args, 0));
+        if(p.accesstype == 0)
+          badarg=1;
+      }
+      else
+        badarg=1;
+    }
+    else if(strcmp(*args, "-verbose") == 0) {
+>>>>>>> origin/tomato-shibby-RT-AC
       p.verbose++;
     } else badarg=1;
     args++;
@@ -372,13 +434,19 @@ int main(int argc, char **argv) {
   }
 
 
-  p.errorbio = BIO_new_fp (stderr, BIO_NOCLOSE);
+  p.errorbio = BIO_new_fp(stderr, BIO_NOCLOSE);
 
+<<<<<<< HEAD
   if (!(p.curl = curl_easy_init())) {
+=======
+  p.curl = curl_easy_init();
+  if(!p.curl) {
+>>>>>>> origin/tomato-shibby-RT-AC
     BIO_printf(p.errorbio, "Cannot init curl lib\n");
     goto err;
   }
 
+<<<<<<< HEAD
 
 
   if (!(p12bio = BIO_new_file(p.p12file , "rb"))) {
@@ -386,6 +454,17 @@ int main(int argc, char **argv) {
   }
   if (!(p.p12 = d2i_PKCS12_bio (p12bio, NULL))) {
     BIO_printf(p.errorbio, "Cannot decode P12 structure %s\n", p.p12file); goto err;
+=======
+  p12bio = BIO_new_file(p.p12file, "rb");
+  if(!p12bio) {
+    BIO_printf(p.errorbio, "Error opening P12 file %s\n", p.p12file);
+    goto err;
+  }
+  p.p12 = d2i_PKCS12_bio(p12bio, NULL);
+  if(!p.p12) {
+    BIO_printf(p.errorbio, "Cannot decode P12 structure %s\n", p.p12file);
+    goto err;
+>>>>>>> origin/tomato-shibby-RT-AC
   }
 
   p.ca= NULL;
@@ -406,17 +485,35 @@ int main(int argc, char **argv) {
     serverurl = malloc(9+strlen(hostporturl));
     sprintf(serverurl,"https://%s",hostporturl);
   }
+<<<<<<< HEAD
   else if (p.accesstype != 0) { /* see whether we can find an AIA or SIA for a given access type */
     if (!(serverurl = my_get_ext(p.usercert,p.accesstype,NID_info_access))) {
+=======
+  else if(p.accesstype != 0) { /* see whether we can find an AIA or SIA for a
+                                  given access type */
+    serverurl = my_get_ext(p.usercert, p.accesstype, NID_info_access);
+    if(!serverurl) {
+>>>>>>> origin/tomato-shibby-RT-AC
       int j=0;
       BIO_printf(p.errorbio,"no service URL in user cert "
                  "cherching in others certificats\n");
+<<<<<<< HEAD
       for (j=0;j<sk_X509_num(p.ca);j++) {
         if ((serverurl = my_get_ext(sk_X509_value(p.ca,j),p.accesstype,
                                     NID_info_access)))
           break;
         if ((serverurl = my_get_ext(sk_X509_value(p.ca,j),p.accesstype,
                                     NID_sinfo_access)))
+=======
+      for(j=0; j<sk_X509_num(p.ca); j++) {
+        serverurl = my_get_ext(sk_X509_value(p.ca, j), p.accesstype,
+                               NID_info_access);
+        if(serverurl)
+          break;
+        serverurl = my_get_ext(sk_X509_value(p.ca, j), p.accesstype,
+                               NID_sinfo_access);
+        if(serverurl)
+>>>>>>> origin/tomato-shibby-RT-AC
           break;
       }
     }
@@ -464,7 +561,11 @@ int main(int argc, char **argv) {
 
   {
     int lu; int i=0;
+<<<<<<< HEAD
     while ((lu = BIO_read (in,&binaryptr[i],tabLength-i)) >0 ) {
+=======
+    while((lu = BIO_read(in, &binaryptr[i], tabLength-i)) >0) {
+>>>>>>> origin/tomato-shibby-RT-AC
       i+=lu;
       if (i== tabLength) {
         tabLength+=100;

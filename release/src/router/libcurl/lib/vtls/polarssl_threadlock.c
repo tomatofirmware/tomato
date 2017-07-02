@@ -5,6 +5,10 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
+<<<<<<< HEAD
+=======
+ * Copyright (C) 2013-2016, Daniel Stenberg, <daniel@haxx.se>, et al.
+>>>>>>> origin/tomato-shibby-RT-AC
  * Copyright (C) 2010, 2011, Hoi-Ho Chan, <hoiho.chan@gmail.com>
  * Copyright (C) 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
@@ -55,7 +59,7 @@ int polarsslthreadlock_thread_setup(void)
   int i;
   int ret;
 
-  mutex_buf = malloc(NUMT * sizeof(POLARSSL_MUTEX_T));
+  mutex_buf = calloc(NUMT * sizeof(POLARSSL_MUTEX_T), 1);
   if(!mutex_buf)
     return 0;     /* error, no number of threads defined */
 

@@ -27,8 +27,13 @@
 /*
  * NTLM details:
  *
+<<<<<<< HEAD:release/src/router/libcurl/lib/curl_ntlm_msgs.c
  * http://davenport.sourceforge.net/ntlm.html
  * http://www.innovation.ch/java/ntlm.html
+=======
+ * https://davenport.sourceforge.io/ntlm.html
+ * https://www.innovation.ch/java/ntlm.html
+>>>>>>> origin/tomato-shibby-RT-AC:release/src/router/libcurl/lib/vauth/ntlm.c
  */
 
 #define DEBUG_ME 0
@@ -41,10 +46,18 @@
 #include "curl_gethostname.h"
 #include "curl_multibyte.h"
 #include "warnless.h"
+<<<<<<< HEAD:release/src/router/libcurl/lib/curl_ntlm_msgs.c
 #include "curl_memory.h"
 
 #ifdef USE_WINDOWS_SSPI
 #  include "curl_sspi.h"
+=======
+#include "rand.h"
+#include "vtls/vtls.h"
+
+#ifdef USE_NSS
+#include "vtls/nssg.h" /* for Curl_nss_force_init() */
+>>>>>>> origin/tomato-shibby-RT-AC:release/src/router/libcurl/lib/vauth/ntlm.c
 #endif
 
 #include "vtls/vtls.h"
@@ -184,10 +197,17 @@ static unsigned int readshort_le(unsigned char *buf)
  *
  * Returns CURLE_OK on success.
  */
+<<<<<<< HEAD:release/src/router/libcurl/lib/curl_ntlm_msgs.c
 CURLcode Curl_ntlm_decode_type2_target(struct SessionHandle *data,
                                        unsigned char *buffer,
                                        size_t size,
                                        struct ntlmdata *ntlm)
+=======
+static CURLcode ntlm_decode_type2_target(struct Curl_easy *data,
+                                         unsigned char *buffer,
+                                         size_t size,
+                                         struct ntlmdata *ntlm)
+>>>>>>> origin/tomato-shibby-RT-AC:release/src/router/libcurl/lib/vauth/ntlm.c
 {
   unsigned int target_info_len = 0;
   unsigned int target_info_offset = 0;
@@ -239,7 +259,25 @@ CURLcode Curl_ntlm_decode_type2_target(struct SessionHandle *data,
 */
 
 /*
+<<<<<<< HEAD:release/src/router/libcurl/lib/curl_ntlm_msgs.c
  * Curl_ntlm_decode_type2_message()
+=======
+ * Curl_auth_is_ntlm_supported()
+ *
+ * This is used to evaluate if NTLM is supported.
+ *
+ * Parameters: None
+ *
+ * Returns TRUE as NTLM as handled by libcurl.
+ */
+bool Curl_auth_is_ntlm_supported(void)
+{
+  return TRUE;
+}
+
+/*
+ * Curl_auth_decode_ntlm_type2_message()
+>>>>>>> origin/tomato-shibby-RT-AC:release/src/router/libcurl/lib/vauth/ntlm.c
  *
  * This is used to decode a ntlm type-2 message received from a HTTP or SASL
  * based (such as SMTP, POP3 or IMAP) server. The message is first decoded
@@ -255,9 +293,15 @@ CURLcode Curl_ntlm_decode_type2_target(struct SessionHandle *data,
  *
  * Returns CURLE_OK on success.
  */
+<<<<<<< HEAD:release/src/router/libcurl/lib/curl_ntlm_msgs.c
 CURLcode Curl_ntlm_decode_type2_message(struct SessionHandle *data,
                                         const char *header,
                                         struct ntlmdata *ntlm)
+=======
+CURLcode Curl_auth_decode_ntlm_type2_message(struct Curl_easy *data,
+                                             const char *type2msg,
+                                             struct ntlmdata *ntlm)
+>>>>>>> origin/tomato-shibby-RT-AC:release/src/router/libcurl/lib/vauth/ntlm.c
 {
 #ifndef USE_WINDOWS_SSPI
   static const char type2_marker[] = { 0x02, 0x00, 0x00, 0x00 };
@@ -577,12 +621,21 @@ CURLcode Curl_ntlm_create_type1_message(const char *userp,
  *
  * Returns CURLE_OK on success.
  */
+<<<<<<< HEAD:release/src/router/libcurl/lib/curl_ntlm_msgs.c
 CURLcode Curl_ntlm_create_type3_message(struct SessionHandle *data,
                                         const char *userp,
                                         const char *passwdp,
                                         struct ntlmdata *ntlm,
                                         char **outptr,
                                         size_t *outlen)
+=======
+CURLcode Curl_auth_create_ntlm_type3_message(struct Curl_easy *data,
+                                             const char *userp,
+                                             const char *passwdp,
+                                             struct ntlmdata *ntlm,
+                                             char **outptr, size_t *outlen)
+
+>>>>>>> origin/tomato-shibby-RT-AC:release/src/router/libcurl/lib/vauth/ntlm.c
 {
   /* NTLM type-3 message structure:
 
@@ -706,6 +759,7 @@ CURLcode Curl_ntlm_create_type3_message(struct SessionHandle *data,
     unsigned char entropy[8];
     unsigned char ntlmv2hash[0x18];
 
+<<<<<<< HEAD:release/src/router/libcurl/lib/curl_ntlm_msgs.c
 #if defined(DEBUGBUILD)
     /* Use static client nonce in debug (Test Suite) builds */
     memcpy(entropy, "12345678", sizeof(entropy));
@@ -713,6 +767,11 @@ CURLcode Curl_ntlm_create_type3_message(struct SessionHandle *data,
     /* Create an 8 byte random client nonce */
     Curl_ssl_random(data, entropy, sizeof(entropy));
 #endif
+=======
+    result = Curl_rand(data, &entropy[0], 2);
+    if(result)
+      return result;
+>>>>>>> origin/tomato-shibby-RT-AC:release/src/router/libcurl/lib/vauth/ntlm.c
 
     res = Curl_ntlm_core_mk_nt_hash(data, passwdp, ntbuffer);
     if(res)
@@ -749,7 +808,13 @@ CURLcode Curl_ntlm_create_type3_message(struct SessionHandle *data,
     unsigned char entropy[8];
 
     /* Need to create 8 bytes random data */
+<<<<<<< HEAD:release/src/router/libcurl/lib/curl_ntlm_msgs.c
     Curl_ssl_random(data, entropy, sizeof(entropy));
+=======
+    result = Curl_rand(data, &entropy[0], 2);
+    if(result)
+      return result;
+>>>>>>> origin/tomato-shibby-RT-AC:release/src/router/libcurl/lib/vauth/ntlm.c
 
     /* 8 bytes random data as challenge in lmresp */
     memcpy(lmresp, entropy, 8);
@@ -794,7 +859,7 @@ CURLcode Curl_ntlm_create_type3_message(struct SessionHandle *data,
     Curl_ntlm_core_lm_resp(lmbuffer, &ntlm->nonce[0], lmresp);
     /* A safer but less compatible alternative is:
      *   Curl_ntlm_core_lm_resp(ntbuffer, &ntlm->nonce[0], lmresp);
-     * See http://davenport.sourceforge.net/ntlm.html#ntlmVersion2 */
+     * See https://davenport.sourceforge.io/ntlm.html#ntlmVersion2 */
   }
 
   if(unicode) {

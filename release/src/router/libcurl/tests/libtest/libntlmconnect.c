@@ -37,7 +37,7 @@ static CURL *easy[MAX_EASY_HANDLES];
 static curl_socket_t sockets[MAX_EASY_HANDLES];
 static int res = 0;
 
-static size_t callback(char* ptr, size_t size, size_t nmemb, void* data)
+static size_t callback(char *ptr, size_t size, size_t nmemb, void *data)
 {
   ssize_t idx = ((CURL **) data) - easy;
   curl_socket_t sock;
@@ -103,7 +103,12 @@ int test(char *url)
   int i, j;
   int num_handles = 0;
   enum HandleState state = ReadyForNewHandle;
+<<<<<<< HEAD
   char* full_url = malloc(strlen(url) + 4 + 1);
+=======
+  size_t urllen = strlen(url) + 4 + 1;
+  char *full_url = malloc(urllen);
+>>>>>>> origin/tomato-shibby-RT-AC
 
   start_test_timing();
 

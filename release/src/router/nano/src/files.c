@@ -1,23 +1,31 @@
 /* $Id: files.c 4520 2010-11-12 06:23:14Z astyanax $ */
 /**************************************************************************
- *   files.c                                                              *
+ *   files.c  --  This file is part of GNU nano.                          *
  *                                                                        *
  *   Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,  *
+<<<<<<< HEAD
  *   2008, 2009 Free Software Foundation, Inc.                            *
  *   This program is free software; you can redistribute it and/or modify *
  *   it under the terms of the GNU General Public License as published by *
  *   the Free Software Foundation; either version 3, or (at your option)  *
  *   any later version.                                                   *
+=======
+ *   2008, 2009, 2010, 2011, 2013, 2014 Free Software Foundation, Inc.    *
+ *   Copyright (C) 2015, 2016 Benno Schulenberg                           *
+>>>>>>> origin/tomato-shibby-RT-AC
  *                                                                        *
- *   This program is distributed in the hope that it will be useful, but  *
- *   WITHOUT ANY WARRANTY; without even the implied warranty of           *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU    *
- *   General Public License for more details.                             *
+ *   GNU nano is free software: you can redistribute it and/or modify     *
+ *   it under the terms of the GNU General Public License as published    *
+ *   by the Free Software Foundation, either version 3 of the License,    *
+ *   or (at your option) any later version.                               *
+ *                                                                        *
+ *   GNU nano is distributed in the hope that it will be useful,          *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty          *
+ *   of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.              *
+ *   See the GNU General Public License for more details.                 *
  *                                                                        *
  *   You should have received a copy of the GNU General Public License    *
- *   along with this program; if not, write to the Free Software          *
- *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA            *
- *   02110-1301, USA.                                                     *
+ *   along with this program.  If not, see http://www.gnu.org/licenses/.  *
  *                                                                        *
  **************************************************************************/
 
@@ -30,10 +38,47 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <ctype.h>
+#ifdef HAVE_PWD_H
 #include <pwd.h>
+<<<<<<< HEAD
 
 /* Add an entry to the openfile openfilestruct.  This should only be
  * called from open_buffer(). */
+=======
+#endif
+#include <libgen.h>
+
+#define LOCKBUFSIZE 8192
+
+/* Verify that the containing directory of the given filename exists. */
+bool has_valid_path(const char *filename)
+{
+    char *namecopy = mallocstrcpy(NULL, filename);
+    char *parentdir = dirname(namecopy);
+    struct stat parentinfo;
+    bool validity = FALSE;
+
+    if (stat(parentdir, &parentinfo) == -1) {
+	if (errno == ENOENT)
+	    statusline(ALERT, _("Directory '%s' does not exist"), parentdir);
+	else
+	    statusline(ALERT, _("Path '%s': %s"), parentdir, strerror(errno));
+    } else if (!S_ISDIR(parentinfo.st_mode))
+	statusline(ALERT, _("Path '%s' is not a directory"), parentdir);
+    else if (access(parentdir, X_OK) == -1)
+	statusline(ALERT, _("Path '%s' is not accessible"), parentdir);
+    else if (ISSET(LOCKING) && access(parentdir, W_OK) == -1)
+	statusline(MILD, _("Directory '%s' is not writable"), parentdir);
+    else
+	validity = TRUE;
+
+    free(namecopy);
+
+    return validity;
+}
+
+/* Add an entry to the circular list of openfile structs. */
+>>>>>>> origin/tomato-shibby-RT-AC
 void make_new_buffer(void)
 {
     /* If there are no entries in openfile, make the first one and
@@ -61,7 +106,6 @@ void initialize_buffer(void)
 
     initialize_buffer_text();
 
-    openfile->current_x = 0;
     openfile->placewewant = 0;
     openfile->current_y = 0;
 
@@ -71,6 +115,7 @@ void initialize_buffer(void)
 
     openfile->mark_begin = NULL;
     openfile->mark_begin_x = 0;
+    openfile->kind_of_mark = SOFTMARK;
 
     openfile->fmt = NIX_FILE;
 
@@ -96,29 +141,317 @@ void initialize_buffer_text(void)
     openfile->edittop = openfile->fileage;
     openfile->current = openfile->fileage;
 
+<<<<<<< HEAD
 #ifdef ENABLE_COLOR
     openfile->fileage->multidata = NULL;
 #endif
 
     openfile->totsize = 0;
+=======
+    openfile->firstcolumn = 0;
+    openfile->current_x = 0;
+    openfile->totsize = 0;
+}
+
+/* Mark the current file as modified if it isn't already, and then
+ * update the titlebar to display the file's new status. */
+void set_modified(void)
+{
+    if (openfile->modified)
+	return;
+
+    openfile->modified = TRUE;
+    titlebar(NULL);
+
+#ifndef NANO_TINY
+    if (!ISSET(LOCKING) || openfile->filename[0] == '\0')
+	return;
+
+    if (openfile->lock_filename != NULL) {
+	char *fullname = get_full_path(openfile->filename);
+
+	write_lockfile(openfile->lock_filename, fullname, TRUE);
+	free(fullname);
+    }
+#endif
+}
+
+#ifndef NANO_TINY
+/* Actually write the lockfile.  This function will ALWAYS annihilate
+ * any previous version of the file.  We'll borrow INSECURE_BACKUP here
+ * to decide about lockfile paranoia here as well...
+ *
+ * Args:
+ *     lockfilename: file name for lock
+ *     origfilename: name of the file the lock is for
+ *     modified: whether to set the modified bit in the file
+ *
+ * Returns 1 on success, and 0 on failure (but continue anyway). */
+int write_lockfile(const char *lockfilename, const char *origfilename, bool modified)
+{
+#ifdef HAVE_PWD_H
+    int cflags, fd;
+    FILE *filestream;
+    pid_t mypid;
+    uid_t myuid;
+    struct passwd *mypwuid;
+    struct stat fileinfo;
+    char *lockdata = charalloc(1024);
+    char myhostname[32];
+    size_t lockdatalen = 1024;
+    size_t wroteamt;
+
+    mypid = getpid();
+    myuid = geteuid();
+
+    /* First run things that might fail before blowing away the old state. */
+    if ((mypwuid = getpwuid(myuid)) == NULL) {
+	/* TRANSLATORS: Keep the next eight messages at most 76 characters. */
+	statusline(MILD, _("Couldn't determine my identity for lock file "
+				"(getpwuid() failed)"));
+	goto free_the_data;
+    }
+
+    if (gethostname(myhostname, 31) < 0) {
+	if (errno == ENAMETOOLONG)
+	    myhostname[31] = '\0';
+	else {
+	    statusline(MILD, _("Couldn't determine hostname for lock file: %s"),
+			strerror(errno));
+	    goto free_the_data;
+	}
+    }
+
+    /* If the lockfile exists, try to delete it. */
+    if (stat(lockfilename, &fileinfo) != -1)
+	if (delete_lockfile(lockfilename) < 0)
+	    goto free_the_data;
+
+    if (ISSET(INSECURE_BACKUP))
+	cflags = O_WRONLY | O_CREAT | O_APPEND;
+    else
+	cflags = O_WRONLY | O_CREAT | O_EXCL | O_APPEND;
+
+    /* Try to create the lockfile. */
+    fd = open(lockfilename, cflags,
+		S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+    if (fd < 0) {
+	statusline(MILD, _("Error writing lock file %s: %s"),
+			lockfilename, strerror(errno));
+	goto free_the_data;
+    }
+
+    /* Try to associate a stream with the now open lockfile. */
+    filestream = fdopen(fd, "wb");
+
+    if (filestream == NULL) {
+	statusline(MILD, _("Error writing lock file %s: %s"), lockfilename,
+			strerror(errno));
+	goto free_the_data;
+    }
+
+    /* This is the lock data we will store:
+     *
+     * byte 0        - 0x62
+     * byte 1        - 0x30
+     * bytes 2-12    - program name which created the lock
+     * bytes 24-27   - PID (little endian) of creator process
+     * bytes 28-44   - username of who created the lock
+     * bytes 68-100  - hostname of where the lock was created
+     * bytes 108-876 - filename the lock is for
+     * byte 1007     - 0x55 if file is modified
+     *
+     * Looks like VIM also stores undo state in this file, so we're
+     * gonna have to figure out how to slap a 'OMG don't use recover on
+     * our lockfile' message in here...
+     *
+     * This is likely very wrong, so this is a WIP. */
+    memset(lockdata, 0, lockdatalen);
+    lockdata[0] = 0x62;
+    lockdata[1] = 0x30;
+    lockdata[24] = mypid % 256;
+    lockdata[25] = (mypid / 256) % 256;
+    lockdata[26] = (mypid / (256 * 256)) % 256;
+    lockdata[27] = mypid / (256 * 256 * 256);
+    snprintf(&lockdata[2], 11, "nano %s", VERSION);
+    strncpy(&lockdata[28], mypwuid->pw_name, 16);
+    strncpy(&lockdata[68], myhostname, 31);
+    if (origfilename != NULL)
+	strncpy(&lockdata[108], origfilename, 768);
+    if (modified == TRUE)
+	lockdata[1007] = 0x55;
+
+    wroteamt = fwrite(lockdata, sizeof(char), lockdatalen, filestream);
+    if (wroteamt < lockdatalen) {
+	statusline(MILD, _("Error writing lock file %s: %s"),
+			lockfilename, ferror(filestream));
+	goto free_the_data;
+    }
+
+#ifdef DEBUG
+    fprintf(stderr, "In write_lockfile(), write successful (wrote %lu bytes)\n", (unsigned long)wroteamt);
+#endif
+
+    if (fclose(filestream) == EOF) {
+	statusline(MILD, _("Error writing lock file %s: %s"),
+			lockfilename, strerror(errno));
+	goto free_the_data;
+    }
+
+    openfile->lock_filename = (char *) lockfilename;
+
+    free(lockdata);
+    return 1;
+
+  free_the_data:
+    free(lockdata);
+    return 0;
+#else
+    return 1;
+#endif
+}
+
+/* Delete the lockfile.  Return -1 if unsuccessful, and 1 otherwise. */
+int delete_lockfile(const char *lockfilename)
+{
+    if (unlink(lockfilename) < 0 && errno != ENOENT) {
+	statusline(MILD, _("Error deleting lock file %s: %s"), lockfilename,
+			strerror(errno));
+	return -1;
+    }
+    return 1;
+}
+
+/* Deal with lockfiles.  Return -1 on refusing to override the lockfile,
+ * and 1 on successfully creating it; 0 means we were not successful in
+ * creating the lockfile but we should continue to load the file. */
+int do_lockfile(const char *filename)
+{
+    char *namecopy = (char *) mallocstrcpy(NULL, filename);
+    char *secondcopy = (char *) mallocstrcpy(NULL, filename);
+    size_t locknamesize = strlen(filename) + strlen(locking_prefix)
+		+ strlen(locking_suffix) + 3;
+    char *lockfilename = charalloc(locknamesize);
+    static char lockprog[11], lockuser[17];
+    struct stat fileinfo;
+    int lockfd, lockpid, retval = -1;
+
+    snprintf(lockfilename, locknamesize, "%s/%s%s%s", dirname(namecopy),
+		locking_prefix, basename(secondcopy), locking_suffix);
+    free(secondcopy);
+#ifdef DEBUG
+    fprintf(stderr, "lock file name is %s\n", lockfilename);
+#endif
+    if (stat(lockfilename, &fileinfo) != -1) {
+	size_t readtot = 0;
+	size_t readamt = 0;
+	char *lockbuf, *question, *pidstring, *postedname, *promptstr;
+	int room, response;
+
+	if ((lockfd = open(lockfilename, O_RDONLY)) < 0) {
+	    statusline(MILD, _("Error opening lock file %s: %s"),
+			lockfilename, strerror(errno));
+	    goto free_the_name;
+	}
+
+	lockbuf = charalloc(LOCKBUFSIZE);
+	do {
+	    readamt = read(lockfd, &lockbuf[readtot], LOCKBUFSIZE - readtot);
+	    readtot += readamt;
+	} while (readamt > 0 && readtot < LOCKBUFSIZE);
+
+	close(lockfd);
+
+	if (readtot < 48) {
+	    statusline(MILD, _("Error reading lock file %s: "
+			"Not enough data read"), lockfilename);
+	    free(lockbuf);
+	    goto free_the_name;
+	}
+
+	strncpy(lockprog, &lockbuf[2], 10);
+	lockpid = (((unsigned char)lockbuf[27] * 256 + (unsigned char)lockbuf[26]) * 256 +
+			(unsigned char)lockbuf[25]) * 256 + (unsigned char)lockbuf[24];
+	strncpy(lockuser, &lockbuf[28], 16);
+	free(lockbuf);
+
+	pidstring = charalloc(11);
+	sprintf (pidstring, "%u", (unsigned int)lockpid);
+
+#ifdef DEBUG
+	fprintf(stderr, "lockpid = %d\n", lockpid);
+	fprintf(stderr, "program name which created this lock file should be %s\n", lockprog);
+	fprintf(stderr, "user which created this lock file should be %s\n", lockuser);
+#endif
+	/* TRANSLATORS: The second %s is the name of the user, the third that of the editor. */
+	question = _("File %s is being edited (by %s with %s, PID %s); continue?");
+	room = COLS - strlenpt(question) + 7 - strlenpt(lockuser) -
+				strlenpt(lockprog) - strlenpt(pidstring);
+	if (room < 4)
+	    postedname = mallocstrcpy(NULL, "_");
+	else if (room < strlenpt(filename)) {
+	    char *fragment = display_string(filename,
+				strlenpt(filename) - room + 3, room, FALSE);
+	    postedname = charalloc(strlen(fragment) + 4);
+	    strcpy(postedname, "...");
+	    strcat(postedname, fragment);
+	    free(fragment);
+	} else
+	    postedname = mallocstrcpy(NULL, filename);
+
+	/* Allow extra space for username (14), program name (8), PID (8),
+	 * and terminating \0 (1), minus the %s (2) for the file name. */
+	promptstr = charalloc(strlen(question) + 29 + strlen(postedname));
+	sprintf(promptstr, question, postedname, lockuser, lockprog, pidstring);
+	free(postedname);
+	free(pidstring);
+
+	response = do_yesno_prompt(FALSE, promptstr);
+	free(promptstr);
+
+	if (response < 1) {
+	    blank_statusbar();
+	    goto free_the_name;
+	}
+    }
+
+    retval = write_lockfile(lockfilename, filename, FALSE);
+
+  free_the_name:
+    free(namecopy);
+    if (retval < 1)
+	free(lockfilename);
+
+    return retval;
+>>>>>>> origin/tomato-shibby-RT-AC
 }
 
 /* If it's not "", filename is a file to open.  We make a new buffer, if
  * necessary, and then open and read the file, if applicable. */
 void open_buffer(const char *filename, bool undoable)
 {
+<<<<<<< HEAD
     bool new_buffer = (openfile == NULL
 #ifdef ENABLE_MULTIBUFFER
 	 || ISSET(MULTIBUFFER)
 #endif
 	);
 	/* Whether we load into this buffer or a new one. */
+=======
+    bool new_buffer = (openfile == NULL || ISSET(MULTIBUFFER));
+	/* Whether we load into the current buffer or a new one. */
+    char *realname;
+	/* The filename after tilde expansion. */
+>>>>>>> origin/tomato-shibby-RT-AC
     FILE *f;
     int rc;
 	/* rc == -2 means that we have a new file.  -1 means that the
 	 * open() failed.  0 means that the open() succeeded. */
 
     assert(filename != NULL);
+
+    /* Display newlines in filenames as ^J. */
+    as_an_at = FALSE;
 
 #ifndef DISABLE_OPERATINGDIR
     if (check_operating_dir(filename, FALSE)) {
@@ -203,6 +536,39 @@ void replace_buffer(const char *filename)
     openfile->current_x = 0;
     openfile->placewewant = 0;
 }
+
+#ifndef NANO_TINY
+/* Open the specified file, and if that succeeds, blow away the text of
+ * the current buffer at the given coordinates and read the file
+ * contents into its place. */
+void replace_marked_buffer(const char *filename, filestruct *top, size_t top_x,
+	filestruct *bot, size_t bot_x)
+{
+    FILE *f;
+    int descriptor;
+    bool old_no_newlines = ISSET(NO_NEWLINES);
+    filestruct *trash_top = NULL;
+    filestruct *trash_bot = NULL;
+
+    descriptor = open_file(filename, FALSE, TRUE, &f);
+
+    if (descriptor < 0)
+	return;
+
+    /* Don't add a magicline when replacing text in the buffer. */
+    SET(NO_NEWLINES);
+
+    /* Throw away the text under the mark, and insert the processed file
+     * where the marked text was. */
+    extract_buffer(&trash_top, &trash_bot, top, top_x, bot, bot_x);
+    free_filestruct(trash_top);
+    read_file(f, descriptor, filename, FALSE, TRUE);
+
+    /* Restore the magicline behavior now that we're done fiddling. */
+    if (!old_no_newlines)
+	UNSET(NO_NEWLINES);
+}
+#endif /* !ENABLE_TINY */
 #endif /* !DISABLE_SPELLER */
 
 /* Update the screen to account for the current buffer. */
@@ -217,7 +583,7 @@ void display_buffer(void)
     color_init();
 #endif
 
-    /* Update the edit window. */
+    /* Update the content of the edit window straightaway. */
     edit_refresh();
 }
 
@@ -241,6 +607,14 @@ void switch_to_prevnext_buffer(bool next_buf)
 
 #ifdef DEBUG
     fprintf(stderr, "filename is %s\n", openfile->filename);
+#endif
+
+#ifndef NANO_TINY
+    /* When not in softwrap mode, make sure firstcolumn is zero.  It might
+     * be nonzero if we had softwrap mode on while in this buffer, and then
+     * turned softwrap mode off while in a different buffer. */
+    if (!ISSET(SOFTWRAP))
+	openfile->firstcolumn = 0;
 #endif
 
     /* Update the screen to account for the current buffer. */
@@ -332,6 +706,7 @@ int is_file_writable(const char *filename)
     return ans;
 }
 
+<<<<<<< HEAD
 /* We make a new line of text from buf.  buf is length buf_len.  If
  * first_line_ins is TRUE, then we put the new line at the top of the
  * file.  Otherwise, we assume prevnode is the last line of the file,
@@ -343,8 +718,15 @@ filestruct *read_line(char *buf, filestruct *prevnode, bool
 
     /* Convert nulls to newlines.  buf_len is the string's real
      * length. */
+=======
+/* Encode any NUL bytes in the given line of text, which is of length buf_len,
+ * and return a dynamically allocated copy of the resultant string. */
+char *encode_data(char *buf, size_t buf_len)
+{
+>>>>>>> origin/tomato-shibby-RT-AC
     unsunder(buf, buf_len);
 
+<<<<<<< HEAD
     assert(openfile->fileage != NULL && strlen(buf) == buf_len);
 
     fileptr->data = mallocstrcpy(NULL, buf);
@@ -385,19 +767,35 @@ filestruct *read_line(char *buf, filestruct *prevnode, bool
     }
 
     return fileptr;
+=======
+    return mallocstrcpy(NULL, buf);
+>>>>>>> origin/tomato-shibby-RT-AC
 }
 
 /* Read an open file into the current buffer.  f should be set to the
  * open file, and filename should be set to the name of the file.
+<<<<<<< HEAD
  * undoable  means do we want to create undo records to try and undo this.
  * Will also attempt to check file writability if fd > 0 and checkwritable == TRUE
  */
 void read_file(FILE *f, int fd, const char *filename, bool undoable, bool checkwritable)
+=======
+ * undoable means do we want to create undo records to try and undo
+ * this.  Will also attempt to check file writability if fd > 0 and
+ * checkwritable == TRUE. */
+void read_file(FILE *f, int fd, const char *filename, bool undoable,
+		bool checkwritable)
+>>>>>>> origin/tomato-shibby-RT-AC
 {
+    ssize_t was_lineno = openfile->current->lineno;
+	/* The line number where we start the insertion. */
+    size_t was_leftedge = 0;
+	/* The leftedge where we start the insertion. */
     size_t num_lines = 0;
 	/* The number of lines in the file. */
     size_t len = 0;
 	/* The length of the current line of the file. */
+<<<<<<< HEAD
     size_t i = 0;
 	/* The position in the current line of the file. */
     size_t bufx = MAX_BUF_SIZE;
@@ -410,17 +808,27 @@ void read_file(FILE *f, int fd, const char *filename, bool undoable, bool checkw
 	/* The current line of the file. */
     bool first_line_ins = FALSE;
 	/* Whether we're inserting with the cursor on the first line. */
+=======
+    char input = '\0';
+	/* The current input character. */
+    char *buf;
+	/* The buffer in which we assemble each line of the file. */
+    size_t bufx = MAX_BUF_SIZE;
+	/* The allocated size of the line buffer; increased as needed. */
+    filestruct *topline;
+	/* The top of the new buffer where we store the read file. */
+    filestruct *bottomline;
+	/* The bottom of the new buffer. */
+>>>>>>> origin/tomato-shibby-RT-AC
     int input_int;
 	/* The current value we read from the file, whether an input
 	 * character or EOF. */
     bool writable = TRUE;
-	/* Is the file writable (if we care) */
+	/* Whether the file is writable (in case we care). */
 #ifndef NANO_TINY
     int format = 0;
 	/* 0 = *nix, 1 = DOS, 2 = Mac, 3 = both DOS and Mac. */
 #endif
-
-    assert(openfile->fileage != NULL && openfile->current != NULL);
 
     buf = charalloc(bufx);
     buf[0] = '\0';
@@ -428,14 +836,25 @@ void read_file(FILE *f, int fd, const char *filename, bool undoable, bool checkw
 #ifndef NANO_TINY
     if (undoable)
 	add_undo(INSERT);
+
+    if (ISSET(SOFTWRAP))
+	was_leftedge = (xplustabs() / editwincols) * editwincols;
 #endif
 
+<<<<<<< HEAD
     if (openfile->current == openfile->fileage)
 	first_line_ins = TRUE;
     else
 	fileptr = openfile->current->prev;
 
     /* Read the entire file into the filestruct. */
+=======
+    /* Create an empty buffer. */
+    topline = make_new_node(NULL);
+    bottomline = topline;
+
+    /* Read the entire file into the new buffer. */
+>>>>>>> origin/tomato-shibby-RT-AC
     while ((input_int = getc(f)) != EOF) {
 	input = (char)input_int;
 
@@ -452,6 +871,7 @@ void read_file(FILE *f, int fd, const char *filename, bool undoable, bool checkw
 		if (format == 0 || format == 2)
 		    format++;
 	    }
+<<<<<<< HEAD
 #endif
 
 	    /* Read in the line properly. */
@@ -465,6 +885,8 @@ void read_file(FILE *f, int fd, const char *filename, bool undoable, bool checkw
 	    buf[0] = '\0';
 	    i = 0;
 #ifndef NANO_TINY
+=======
+>>>>>>> origin/tomato-shibby-RT-AC
 	/* If it's a Mac file ('\r' without '\n' on the first line if we
 	 * think it's a *nix file, or on any line otherwise), and file
 	 * conversion isn't disabled, handle it! */
@@ -475,6 +897,7 @@ void read_file(FILE *f, int fd, const char *filename, bool undoable, bool checkw
 	     * set format to both DOS and Mac. */
 	    if (format == 0 || format == 1)
 		format += 2;
+<<<<<<< HEAD
 
 	    /* Read in the line properly. */
 	    fileptr = read_line(buf, fileptr, &first_line_ins, len);
@@ -488,6 +911,8 @@ void read_file(FILE *f, int fd, const char *filename, bool undoable, bool checkw
 	    buf[0] = input;
 	    buf[1] = '\0';
 	    i = 1;
+=======
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif
 	} else {
 	    /* Calculate the total length of the line.  It might have
@@ -503,11 +928,37 @@ void read_file(FILE *f, int fd, const char *filename, bool undoable, bool checkw
 		bufx += MAX_BUF_SIZE;
 		buf = charealloc(buf, bufx);
 	    }
+<<<<<<< HEAD
 
 	    buf[i] = input;
 	    buf[i + 1] = '\0';
 	    i++;
+=======
+	    continue;
+>>>>>>> origin/tomato-shibby-RT-AC
 	}
+
+#ifndef NANO_TINY
+	/* If it's a DOS or Mac line, strip the '\r' from it. */
+	if (len > 0 && buf[len - 1] == '\r' && !ISSET(NO_CONVERT))
+	    buf[--len] = '\0';
+#endif
+
+	/* Store the data and make a new line. */
+	bottomline->data = encode_data(buf, len);
+	bottomline->next = make_new_node(bottomline);
+	bottomline = bottomline->next;
+	num_lines++;
+
+	/* Reset the length in preparation for the next line. */
+	len = 0;
+
+#ifndef NANO_TINY
+	/* If it happens to be a Mac line, store the character after the \r
+	 * as the first character of the next line. */
+	if (input != '\n')
+	    buf[len++] = input;
+#endif
     }
 
     /* Perhaps this could use some better handling. */
@@ -519,6 +970,7 @@ void read_file(FILE *f, int fd, const char *filename, bool undoable, bool checkw
 	writable = is_file_writable(filename);
     }
 
+<<<<<<< HEAD
 #ifndef NANO_TINY
     /* If file conversion isn't disabled and the last character in this
      * file is '\r', read it in properly as a Mac format line. */
@@ -546,9 +998,27 @@ void read_file(FILE *f, int fd, const char *filename, bool undoable, bool checkw
 	fileptr = read_line(buf, fileptr, &first_line_ins, len);
 	num_lines++;
     }
+=======
+    /* If the file ended with newline, or it was entirely empty, make the
+     * last line blank.  Otherwise, put the last read data in. */
+    if (len == 0)
+	bottomline->data = mallocstrcpy(NULL, "");
+    else {
+	bool mac_line_needs_newline = FALSE;
 
-    free(buf);
+#ifndef NANO_TINY
+	/* If the final character is '\r', and file conversion isn't disabled,
+	 * set format to Mac if we currently think the file is a *nix file, or
+	 * to DOS-and-Mac if we currently think it is a DOS file. */
+	if (buf[len - 1] == '\r' && !ISSET(NO_CONVERT)) {
+	    if (format < 2)
+		format += 2;
+>>>>>>> origin/tomato-shibby-RT-AC
 
+	    /* Strip the carriage return. */
+	    buf[--len] = '\0';
+
+<<<<<<< HEAD
     /* If we didn't get a file and we don't already have one, open a
      * blank buffer. */
     if (fileptr == NULL)
@@ -593,8 +1063,17 @@ void read_file(FILE *f, int fd, const char *filename, bool undoable, bool checkw
 		if (fileptr->next != NULL)
 		    free(fileptr->next);
 	    }
+=======
+	    /* Indicate we need to put a blank line in after this one. */
+	    mac_line_needs_newline = TRUE;
+>>>>>>> origin/tomato-shibby-RT-AC
 	}
+#endif
+	/* Store the data of the final line. */
+	bottomline->data = encode_data(buf, len);
+	num_lines++;
 
+<<<<<<< HEAD
 	/* Attach the line at current after the line at fileptr. */
 	if (fileptr != NULL) {
 	    fileptr->next = openfile->current;
@@ -608,21 +1087,24 @@ void read_file(FILE *f, int fd, const char *filename, bool undoable, bool checkw
 
     openfile->totsize += get_totsize(openfile->fileage,
 	openfile->filebot);
-
-    /* If the NO_NEWLINES flag isn't set, and text has been added to
-     * the magicline (i.e. a file that doesn't end in a newline has been
-     * inserted at the end of the current buffer), add a new magicline,
-     * and move the current line down to it. */
-    if (!ISSET(NO_NEWLINES) && openfile->filebot->data[0] != '\0') {
-	new_magicline();
-	openfile->current = openfile->filebot;
-	openfile->current_x = 0;
+=======
+	if (mac_line_needs_newline) {
+	    bottomline->next = make_new_node(bottomline);
+	    bottomline = bottomline->next;
+	    bottomline->data = mallocstrcpy(NULL, "");
+	}
     }
 
-    /* Set the current place we want to the end of the last line of the
-     * file we inserted. */
+    free(buf);
+>>>>>>> origin/tomato-shibby-RT-AC
+
+    /* Insert the just read buffer into the current one. */
+    ingraft_buffer(topline);
+
+    /* Set the desired x position at the end of what was inserted. */
     openfile->placewewant = xplustabs();
 
+<<<<<<< HEAD
 #ifndef NANO_TINY
     if (undoable)
 	update_undo(INSERT);
@@ -659,6 +1141,42 @@ void read_file(FILE *f, int fd, const char *filename, bool undoable, bool checkw
 		"Read %lu lines (Converted from DOS format - Warning: No write permission)",
 		(unsigned long)num_lines), (unsigned long)num_lines);
     } else
+=======
+    if (!writable)
+	statusline(ALERT, _("File '%s' is unwritable"), filename);
+#ifndef NANO_TINY
+    else if (format == 3) {
+	/* TRANSLATORS: Keep the next four messages at most 78 characters. */
+	statusline(HUSH, P_("Read %lu line (Converted from DOS and Mac format)",
+			"Read %lu lines (Converted from DOS and Mac format)",
+			(unsigned long)num_lines), (unsigned long)num_lines);
+    } else if (format == 2) {
+	openfile->fmt = MAC_FILE;
+	statusline(HUSH, P_("Read %lu line (Converted from Mac format)",
+			"Read %lu lines (Converted from Mac format)",
+			(unsigned long)num_lines), (unsigned long)num_lines);
+    } else if (format == 1) {
+	openfile->fmt = DOS_FILE;
+	statusline(HUSH, P_("Read %lu line (Converted from DOS format)",
+			"Read %lu lines (Converted from DOS format)",
+			(unsigned long)num_lines), (unsigned long)num_lines);
+    }
+#endif
+    else
+	statusline(HUSH, P_("Read %lu line", "Read %lu lines",
+			(unsigned long)num_lines), (unsigned long)num_lines);
+
+    /* If we inserted less than a screenful, don't center the cursor. */
+    if (less_than_a_screenful(was_lineno, was_leftedge))
+	focusing = FALSE;
+
+#ifndef NANO_TINY
+    if (undoable)
+	update_undo(INSERT);
+
+    if (ISSET(MAKE_IT_UNIX))
+	openfile->fmt = NIX_FILE;
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif
 	if (writable)
 	    statusbar(P_("Read %lu line", "Read %lu lines",
@@ -669,14 +1187,17 @@ void read_file(FILE *f, int fd, const char *filename, bool undoable, bool checkw
 		(unsigned long)num_lines), (unsigned long)num_lines);
 }
 
-/* Open the file (and decide if it exists).  If newfie is TRUE, display
- * "New File" if the file is missing.  Otherwise, say "[filename] not
- * found".
- *
+/* Open the file with the given name.  If the file does not exist, display
+ * "New File" if newfie is TRUE, and say "File not found" otherwise.
  * Return -2 if we say "New File", -1 if the file isn't opened, and the
+<<<<<<< HEAD
  * fd opened otherwise.  The file might still have an error while reading 
  * with a 0 return value.  *f is set to the opened file. */
 int open_file(const char *filename, bool newfie, FILE **f)
+=======
+ * obtained fd otherwise.  *f is set to the opened file. */
+int open_file(const char *filename, bool newfie, bool quiet, FILE **f)
+>>>>>>> origin/tomato-shibby-RT-AC
 {
     struct stat fileinfo, fileinfo2;
     int fd;
@@ -688,6 +1209,7 @@ int open_file(const char *filename, bool newfie, FILE **f)
     full_filename = get_full_path(filename);
 
     /* Okay, if we can't stat the path due to a component's
+<<<<<<< HEAD
        permissions, just try the relative one */
     if (full_filename == NULL 
 	|| (stat(full_filename, &fileinfo) == -1 && stat(filename, &fileinfo2) != -1))
@@ -725,6 +1247,43 @@ int open_file(const char *filename, bool newfie, FILE **f)
  	return -1;
      } else {
 	/* The file is A-OK.  Open it. */
+=======
+     * permissions, just try the relative one. */
+    if (full_filename == NULL || (stat(full_filename, &fileinfo) == -1 &&
+					stat(filename, &fileinfo2) != -1))
+	full_filename = mallocstrcpy(full_filename, filename);
+
+    if (stat(full_filename, &fileinfo) == -1) {
+	if (newfie) {
+	    if (!quiet)
+		statusbar(_("New File"));
+	    free(full_filename);
+	    return -2;
+	}
+
+	statusline(ALERT, _("File \"%s\" not found"), filename);
+	free(full_filename);
+	return -1;
+    }
+
+    /* Don't open directories, character files, or block files. */
+    if (S_ISDIR(fileinfo.st_mode) || S_ISCHR(fileinfo.st_mode) ||
+				S_ISBLK(fileinfo.st_mode)) {
+	statusline(ALERT, S_ISDIR(fileinfo.st_mode) ?
+			_("\"%s\" is a directory") :
+			_("\"%s\" is a device file"), filename);
+	free(full_filename);
+	return -1;
+    }
+
+    /* Try opening the file. */
+    fd = open(full_filename, O_RDONLY);
+
+    if (fd == -1)
+	statusline(ALERT, _("Error reading %s: %s"), filename, strerror(errno));
+    else {
+	/* The file is A-OK.  Associate a stream with it. */
+>>>>>>> origin/tomato-shibby-RT-AC
 	*f = fdopen(fd, "rb");
 
 	if (*f == NULL) {
@@ -775,42 +1334,43 @@ char *get_next_filename(const char *name, const char *suffix)
 	sprintf(buf + namelen + suffixlen, ".%lu", i);
     }
 
-    /* We get here only if there is no possible save file.  Blank out
-     * the filename to indicate this. */
-    null_at(&buf, 0);
+    /* There is no possible save file: blank out the filename. */
+    *buf = '\0';
 
     return buf;
 }
 
-/* Insert a file into a new buffer if the MULTIBUFFER flag is set, or
- * into the current buffer if it isn't.  If execute is TRUE, insert the
- * output of an executed command instead of a file. */
-void do_insertfile(
-#ifndef NANO_TINY
-	bool execute
-#else
-	void
-#endif
-	)
+/* Insert a file into the current buffer, or into a new buffer when
+ * the MULTIBUFFER flag is set. */
+void do_insertfile(void)
 {
     int i;
     const char *msg;
     char *ans = mallocstrcpy(NULL, "");
 	/* The last answer the user typed at the statusbar prompt. */
+<<<<<<< HEAD
     filestruct *edittop_save = openfile->edittop;
     size_t current_x_save = openfile->current_x;
     ssize_t current_y_save = openfile->current_y;
     bool edittop_inside = FALSE, meta_key = FALSE, func_key = FALSE;
     const sc *s;
+=======
+>>>>>>> origin/tomato-shibby-RT-AC
 #ifndef NANO_TINY
-    bool right_side_up = FALSE, single_line = FALSE;
+    bool execute = FALSE;
 #endif
 
+<<<<<<< HEAD
     currmenu = MINSERTFILE;
+=======
+    /* Display newlines in filenames as ^J. */
+    as_an_at = FALSE;
+>>>>>>> origin/tomato-shibby-RT-AC
 
     while (TRUE) {
 #ifndef NANO_TINY
 	if (execute) {
+<<<<<<< HEAD
 	    msg =
 #ifdef ENABLE_MULTIBUFFER
 		ISSET(MULTIBUFFER) ?
@@ -826,13 +1386,28 @@ void do_insertfile(
 #endif
 		_("File to insert [from %s] ");
 #ifndef NANO_TINY
+=======
+#ifndef DISABLE_MULTIBUFFER
+	    if (ISSET(MULTIBUFFER))
+		/* TRANSLATORS: The next four messages are prompts. */
+		msg = _("Command to execute in new buffer");
+	    else
+#endif
+		msg = _("Command to execute");
+	} else
+#endif /* NANO_TINY */
+	{
+#ifndef DISABLE_MULTIBUFFER
+	    if (ISSET(MULTIBUFFER))
+		msg = _("File to insert into new buffer [from %s]");
+	    else
+#endif
+		msg = _("File to insert [from %s]");
+>>>>>>> origin/tomato-shibby-RT-AC
 	}
 #endif
 
-	i = do_prompt(TRUE,
-#ifndef DISABLE_TABCOMP
-		TRUE,
-#endif
+	i = do_prompt(TRUE, TRUE,
 #ifndef NANO_TINY
 		execute ? MEXTCMD :
 #endif
@@ -843,12 +1418,12 @@ void do_insertfile(
 #endif
 		edit_refresh, msg,
 #ifndef DISABLE_OPERATINGDIR
-		operating_dir != NULL && strcmp(operating_dir,
-		".") != 0 ? operating_dir :
+		operating_dir != NULL ? operating_dir :
 #endif
 		"./");
 
 	/* If we're in multibuffer mode and the filename or command is
+<<<<<<< HEAD
 	 * blank, open a new buffer instead of canceling.  If the
 	 * filename or command begins with a newline (i.e. an encoded
 	 * null), treat it as though it's blank. */
@@ -871,6 +1446,24 @@ void do_insertfile(
 
 	    if (s && s->scfunc == NEW_BUFFER_MSG) {
 		/* Don't allow toggling if we're in view mode. */
+=======
+	 * blank, open a new buffer instead of canceling. */
+	if (i == -1 || (i == -2 && !ISSET(MULTIBUFFER))) {
+	    statusbar(_("Cancelled"));
+	    break;
+	} else {
+	    ssize_t was_current_lineno = openfile->current->lineno;
+	    size_t was_current_x = openfile->current_x;
+#if !defined(NANO_TINY) || !defined(DISABLE_BROWSER)
+	    functionptrtype func = func_from_key(&i);
+#endif
+	    given = mallocstrcpy(given, answer);
+
+#ifndef NANO_TINY
+#ifndef DISABLE_MULTIBUFFER
+	    if (func == new_buffer_void) {
+		/* Don't allow toggling when in view mode. */
+>>>>>>> origin/tomato-shibby-RT-AC
 		if (!ISSET(VIEW_MODE))
 		    TOGGLE(MULTIBUFFER);
 		continue;
@@ -889,16 +1482,21 @@ void do_insertfile(
 	    if (s && s->scfunc == TO_FILES_MSG) {
 		char *tmp = do_browse_from(answer);
 
+<<<<<<< HEAD
 		if (tmp == NULL)
+=======
+		/* If no file was chosen, go back to the prompt. */
+		if (chosen == NULL)
+>>>>>>> origin/tomato-shibby-RT-AC
 		    continue;
 
-		/* We have a file now.  Indicate this. */
 		free(answer);
 		answer = tmp;
 
 		i = 0;
 	    }
 #endif
+<<<<<<< HEAD
 
 	    /* If we don't have a file yet, go back to the statusbar
 	     * prompt. */
@@ -949,29 +1547,46 @@ void do_insertfile(
 #ifndef NANO_TINY
 	    if (execute) {
 #ifdef ENABLE_MULTIBUFFER
+=======
+	    /* If we don't have a file yet, go back to the prompt. */
+	    if (i != 0 && (!ISSET(MULTIBUFFER) || i != -2))
+		continue;
+
+#ifndef NANO_TINY
+	    if (execute) {
+#ifndef DISABLE_MULTIBUFFER
+		/* When in multibuffer mode, first open a blank buffer. */
+>>>>>>> origin/tomato-shibby-RT-AC
 		if (ISSET(MULTIBUFFER))
-		    /* Open a blank buffer. */
 		    open_buffer("", FALSE);
 #endif
-
 		/* Save the command's output in the current buffer. */
 		execute_command(answer);
 
+<<<<<<< HEAD
 #ifdef ENABLE_MULTIBUFFER
+=======
+#ifndef DISABLE_MULTIBUFFER
+		/* If this is a new buffer, put the cursor at the top. */
+>>>>>>> origin/tomato-shibby-RT-AC
 		if (ISSET(MULTIBUFFER)) {
-		    /* Move back to the beginning of the first line of
-		     * the buffer. */
 		    openfile->current = openfile->fileage;
 		    openfile->current_x = 0;
 		    openfile->placewewant = 0;
+
+		    set_modified();
 		}
 #endif
 	    } else {
 #endif /* !NANO_TINY */
 		/* Make sure the path to the file specified in answer is
 		 * tilde-expanded. */
+<<<<<<< HEAD
 		answer = mallocstrassn(answer,
 			real_dir_from_tilde(answer));
+=======
+		answer = free_and_assign(answer, real_dir_from_tilde(answer));
+>>>>>>> origin/tomato-shibby-RT-AC
 
 		/* Save the file specified in answer in the current
 		 * buffer. */
@@ -979,15 +1594,24 @@ void do_insertfile(
 #ifndef NANO_TINY
 	    }
 #endif
+<<<<<<< HEAD
 
 #ifdef ENABLE_MULTIBUFFER
 	    if (ISSET(MULTIBUFFER))
 		/* Update the screen to account for the current
 		 * buffer. */
+=======
+		    if (has_old_position(answer, &priorline, &priorcol))
+			do_gotolinecolumn(priorline, priorcol, FALSE, FALSE);
+		}
+#endif /* !DISABLE_HISTORIES */
+		/* Update stuff to account for the current buffer. */
+>>>>>>> origin/tomato-shibby-RT-AC
 		display_buffer();
 	    else
 #endif
 	    {
+<<<<<<< HEAD
 		filestruct *top_save = openfile->fileage;
 
 		/* If we were at the top of the edit window before, set
@@ -1048,9 +1672,17 @@ void do_insertfile(
 
 		/* Mark the file as modified. */
 		set_modified();
+=======
+		/* Mark the file as modified if it changed. */
+		if (openfile->current->lineno != was_current_lineno ||
+			openfile->current_x != was_current_x)
+		    set_modified();
+>>>>>>> origin/tomato-shibby-RT-AC
 
-		/* Update the screen. */
-		edit_refresh();
+		/* Update the cursor position to account for inserted lines. */
+		reset_cursor();
+
+		refresh_needed = TRUE;
 	    }
 
 	    break;
@@ -1061,11 +1693,10 @@ void do_insertfile(
     free(ans);
 }
 
-/* Insert a file into a new buffer or the current buffer, depending on
- * whether the MULTIBUFFER flag is set.  If we're in view mode, only
- * allow inserting a file into a new buffer. */
+/* If the current mode of operation allows it, go insert a file. */
 void do_insertfile_void(void)
 {
+<<<<<<< HEAD
 
     if (ISSET(RESTRICTED)) {
         nano_disabled_msg();
@@ -1074,9 +1705,15 @@ void do_insertfile_void(void)
 
 #ifdef ENABLE_MULTIBUFFER
     if (ISSET(VIEW_MODE) && !ISSET(MULTIBUFFER))
+=======
+    if (ISSET(RESTRICTED))
+	show_restricted_warning();
+#ifndef DISABLE_MULTIBUFFER
+    else if (ISSET(VIEW_MODE) && !ISSET(MULTIBUFFER))
+>>>>>>> origin/tomato-shibby-RT-AC
 	statusbar(_("Key invalid in non-multibuffer mode"));
-    else
 #endif
+<<<<<<< HEAD
 	do_insertfile(
 #ifndef NANO_TINY
 		FALSE
@@ -1084,6 +1721,10 @@ void do_insertfile_void(void)
 		);
 
     display_main_list();
+=======
+    else
+	do_insertfile();
+>>>>>>> origin/tomato-shibby-RT-AC
 }
 
 /* When passed "[relative path]" or "[relative path][filename]" in
@@ -1095,8 +1736,13 @@ void do_insertfile_void(void)
 char *get_full_path(const char *origpath)
 {
     struct stat fileinfo;
+<<<<<<< HEAD
     char *d_here, *d_there, *d_there_file = NULL;
     const char *last_slash;
+=======
+    char *currentdir, *d_here, *d_there, *d_there_file = NULL;
+    char *last_slash;
+>>>>>>> origin/tomato-shibby-RT-AC
     bool path_only;
 
     if (origpath == NULL)
@@ -1117,8 +1763,6 @@ char *get_full_path(const char *origpath)
 
     /* If we succeeded, canonicalize it in d_here. */
     if (d_here != NULL) {
-	align(&d_here);
-
 	/* If the current directory isn't "/", tack a slash onto the end
 	 * of it. */
 	if (strcmp(d_here, "/") != 0) {
@@ -1164,7 +1808,7 @@ char *get_full_path(const char *origpath)
 	    d_there_file = mallocstrcpy(NULL, last_slash + 1);
 
 	/* Remove the filename portion of the answer from d_there. */
-	null_at(&d_there, last_slash - d_there + 1);
+	*(last_slash + 1) = '\0';
 
 	/* Go to the path specified in d_there. */
 	if (chdir(d_there) == -1) {
@@ -1179,8 +1823,6 @@ char *get_full_path(const char *origpath)
 
 	    /* If we succeeded, canonicalize it in d_there. */
 	    if (d_there != NULL) {
-		align(&d_there);
-
 		/* If the current directory isn't "/", tack a slash onto
 		 * the end of it. */
 		if (strcmp(d_there, "/") != 0) {
@@ -1304,6 +1946,7 @@ void init_operating_dir(void)
 
     full_operating_dir = get_full_path(operating_dir);
 
+<<<<<<< HEAD
     /* If get_full_path() failed or the operating directory is
      * inaccessible, unset operating_dir. */
     if (full_operating_dir == NULL || chdir(full_operating_dir) == -1) {
@@ -1312,6 +1955,13 @@ void init_operating_dir(void)
 	free(operating_dir);
 	operating_dir = NULL;
     }
+=======
+    /* If the operating directory is inaccessible, fail. */
+    if (full_operating_dir == NULL || chdir(full_operating_dir) == -1)
+	die(_("Invalid operating directory\n"));
+
+    snuggly_fit(&full_operating_dir);
+>>>>>>> origin/tomato-shibby-RT-AC
 }
 
 /* Check to see if we're inside the operating directory.  Return FALSE
@@ -1385,6 +2035,7 @@ void init_backup_dir(void)
     } else {
 	free(backup_dir);
 	backup_dir = full_backup_dir;
+	snuggly_fit(&backup_dir);
     }
 }
 #endif
@@ -1428,15 +2079,15 @@ int copy_file(FILE *inn, FILE *out)
  *
  * tmp means we are writing a temporary file in a secure fashion.  We
  * use it when spell checking or dumping the file on an error.  If
- * append is APPEND, it means we are appending instead of overwriting.
- * If append is PREPEND, it means we are prepending instead of
+ * method is APPEND, it means we are appending instead of overwriting.
+ * If method is PREPEND, it means we are prepending instead of
  * overwriting.  If nonamechange is TRUE, we don't change the current
- * filename.  nonamechange is ignored if tmp is FALSE, we're appending,
- * or we're prepending.
+ * filename.  nonamechange is irrelevant when appending or prepending,
+ * or when writing a temporary file.
  *
  * Return TRUE on success or FALSE on error. */
-bool write_file(const char *name, FILE *f_open, bool tmp, append_type
-	append, bool nonamechange)
+bool write_file(const char *name, FILE *f_open, bool tmp,
+	kind_of_writing_type method, bool nonamechange)
 {
     bool retval = FALSE;
 	/* Instead of returning in this function, you should always
@@ -1465,8 +2116,6 @@ bool write_file(const char *name, FILE *f_open, bool tmp, append_type
     char *tempname = NULL;
 	/* The temp file name we write to on prepend. */
     int backup_cflags;
-
-    assert(name != NULL);
 
     if (*name == '\0')
 	return -1;
@@ -1519,9 +2168,15 @@ bool write_file(const char *name, FILE *f_open, bool tmp, append_type
      * aren't appending, prepending, or writing a selection, we backup
      * only if the file has not been modified by someone else since nano
      * opened it. */
+<<<<<<< HEAD
     if (ISSET(BACKUP_FILE) && !tmp && realexists && ((append !=
 	OVERWRITE || openfile->mark_set) || (openfile->current_stat &&
 	openfile->current_stat->st_mtime == st.st_mtime))) {
+=======
+    if (ISSET(BACKUP_FILE) && !tmp && realexists && openfile->current_stat &&
+		(method != OVERWRITE || openfile->mark_set ||
+		openfile->current_stat->st_mtime == st.st_mtime)) {
+>>>>>>> origin/tomato-shibby-RT-AC
 	int backup_fd;
 	FILE *backup_file;
 	char *backupname;
@@ -1700,7 +2355,7 @@ bool write_file(const char *name, FILE *f_open, bool tmp, append_type
     }
 
     /* If we're prepending, copy the file to a temp file. */
-    if (append == PREPEND) {
+    if (method == PREPEND) {
 	int fd_source;
 	FILE *f_source = NULL;
 
@@ -1718,8 +2373,13 @@ bool write_file(const char *name, FILE *f_open, bool tmp, append_type
 	tempname = safe_tempfile(&f);
 
 	if (tempname == NULL) {
+<<<<<<< HEAD
 	    statusbar(_("Error writing temp file: %s"),
 		strerror(errno));
+=======
+	    statusline(ALERT, _("Error writing temp file: %s"),
+			strerror(errno));
+>>>>>>> origin/tomato-shibby-RT-AC
 	    goto cleanup_and_exit;
 	}
 
@@ -1740,9 +2400,15 @@ bool write_file(const char *name, FILE *f_open, bool tmp, append_type
 	    }
 	}
 
+<<<<<<< HEAD
 	if (copy_file(f_source, f) != 0) {
 	    statusbar(_("Error writing %s: %s"), tempname,
 		strerror(errno));
+=======
+	if (f_source == NULL || copy_file(f_source, f) != 0) {
+	    statusline(ALERT, _("Error writing temp file: %s"),
+			strerror(errno));
+>>>>>>> origin/tomato-shibby-RT-AC
 	    unlink(tempname);
 	    goto cleanup_and_exit;
 	}
@@ -1751,7 +2417,7 @@ bool write_file(const char *name, FILE *f_open, bool tmp, append_type
     if (f_open == NULL) {
 	/* Now open the file in place.  Use O_EXCL if tmp is TRUE.  This
 	 * is copied from joe, because wiggy says so *shrug*. */
-	fd = open(realname, O_WRONLY | O_CREAT | ((append == APPEND) ?
+	fd = open(realname, O_WRONLY | O_CREAT | ((method == APPEND) ?
 		O_APPEND : (tmp ? O_EXCL : O_TRUNC)), S_IRUSR |
 		S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 
@@ -1760,28 +2426,34 @@ bool write_file(const char *name, FILE *f_open, bool tmp, append_type
 
 	/* If we couldn't open the file, give up. */
 	if (fd == -1) {
+<<<<<<< HEAD
 	    statusbar(_("Error writing %s: %s"), realname,
 		strerror(errno));
 
 	    /* tempname has been set only if we're prepending. */
+=======
+	    statusline(ALERT, _("Error writing %s: %s"), realname,
+			strerror(errno));
+>>>>>>> origin/tomato-shibby-RT-AC
 	    if (tempname != NULL)
 		unlink(tempname);
 	    goto cleanup_and_exit;
 	}
 
-	f = fdopen(fd, (append == APPEND) ? "ab" : "wb");
+	f = fdopen(fd, (method == APPEND) ? "ab" : "wb");
 
 	if (f == NULL) {
+<<<<<<< HEAD
 	    statusbar(_("Error writing %s: %s"), realname,
 		strerror(errno));
+=======
+	    statusline(ALERT, _("Error writing %s: %s"), realname,
+			strerror(errno));
+>>>>>>> origin/tomato-shibby-RT-AC
 	    close(fd);
 	    goto cleanup_and_exit;
 	}
     }
-
-    /* There might not be a magicline.  There won't be when writing out
-     * a selection. */
-    assert(openfile->fileage != NULL && openfile->filebot != NULL);
 
     while (fileptr != NULL) {
 	size_t data_len = strlen(fileptr->data), size;
@@ -1796,8 +2468,13 @@ bool write_file(const char *name, FILE *f_open, bool tmp, append_type
 	unsunder(fileptr->data, data_len);
 
 	if (size < data_len) {
+<<<<<<< HEAD
 	    statusbar(_("Error writing %s: %s"), realname,
 		strerror(errno));
+=======
+	    statusline(ALERT, _("Error writing %s: %s"), realname,
+			strerror(errno));
+>>>>>>> origin/tomato-shibby-RT-AC
 	    fclose(f);
 	    goto cleanup_and_exit;
 	}
@@ -1814,8 +2491,13 @@ bool write_file(const char *name, FILE *f_open, bool tmp, append_type
 	    if (openfile->fmt == DOS_FILE || openfile->fmt ==
 		MAC_FILE) {
 		if (putc('\r', f) == EOF) {
+<<<<<<< HEAD
 		    statusbar(_("Error writing %s: %s"), realname,
 			strerror(errno));
+=======
+		    statusline(ALERT, _("Error writing %s: %s"), realname,
+				strerror(errno));
+>>>>>>> origin/tomato-shibby-RT-AC
 		    fclose(f);
 		    goto cleanup_and_exit;
 		}
@@ -1824,8 +2506,13 @@ bool write_file(const char *name, FILE *f_open, bool tmp, append_type
 	    if (openfile->fmt != MAC_FILE) {
 #endif
 		if (putc('\n', f) == EOF) {
+<<<<<<< HEAD
 		    statusbar(_("Error writing %s: %s"), realname,
 			strerror(errno));
+=======
+		    statusline(ALERT, _("Error writing %s: %s"), realname,
+				strerror(errno));
+>>>>>>> origin/tomato-shibby-RT-AC
 		    fclose(f);
 		    goto cleanup_and_exit;
 		}
@@ -1839,7 +2526,7 @@ bool write_file(const char *name, FILE *f_open, bool tmp, append_type
     }
 
     /* If we're prepending, open the temp file, and append it to f. */
-    if (append == PREPEND) {
+    if (method == PREPEND) {
 	int fd_source;
 	FILE *f_source = NULL;
 
@@ -1859,12 +2546,19 @@ bool write_file(const char *name, FILE *f_open, bool tmp, append_type
 	    goto cleanup_and_exit;
 	}
 
+<<<<<<< HEAD
 	if (copy_file(f_source, f) == -1 || unlink(tempname) == -1) {
 	    statusbar(_("Error writing %s: %s"), realname,
 		strerror(errno));
+=======
+	if (copy_file(f_source, f) == -1) {
+	    statusline(ALERT, _("Error writing %s: %s"), realname,
+			strerror(errno));
+>>>>>>> origin/tomato-shibby-RT-AC
 	    goto cleanup_and_exit;
 	}
     } else if (fclose(f) != 0) {
+<<<<<<< HEAD
 	    statusbar(_("Error writing %s: %s"), realname,
 		strerror(errno));
 	    goto cleanup_and_exit;
@@ -1886,6 +2580,38 @@ bool write_file(const char *name, FILE *f_open, bool tmp, append_type
 	    if (openfile->colorstrings != NULL &&
 		!ISSET(NO_COLOR_SYNTAX))
 		edit_refresh();
+=======
+	statusline(ALERT, _("Error writing %s: %s"), realname,
+			strerror(errno));
+	goto cleanup_and_exit;
+    }
+
+    if (method == OVERWRITE && !tmp) {
+	/* If we must set the filename, and it changed, adjust things. */
+	if (!nonamechange && strcmp(openfile->filename, realname) != 0) {
+#ifndef DISABLE_COLOR
+	    char *oldname = openfile->syntax ? openfile->syntax->name : "";
+	    filestruct *line = openfile->fileage;
+#endif
+	    openfile->filename = mallocstrcpy(openfile->filename, realname);
+
+#ifndef DISABLE_COLOR
+	    /* See if the applicable syntax has changed. */
+	    color_update();
+	    color_init();
+
+	    char *newname = openfile->syntax ? openfile->syntax->name : "";
+
+	    /* If the syntax changed, discard and recompute the multidata. */
+	    if (strcmp(oldname, newname) != 0) {
+		for (; line != NULL; line = line->next) {
+		    free(line->multidata);
+		    line->multidata = NULL;
+		}
+		precalc_multicolorinfo();
+		refresh_needed = TRUE;
+	    }
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif
 	}
 
@@ -1918,7 +2644,7 @@ bool write_file(const char *name, FILE *f_open, bool tmp, append_type
 /* Write a marked selection from a file out to disk.  Return TRUE on
  * success or FALSE on error. */
 bool write_marked_file(const char *name, FILE *f_open, bool tmp,
-	append_type append)
+	kind_of_writing_type method)
 {
     bool retval;
     bool old_modified = openfile->modified;
@@ -1928,10 +2654,14 @@ bool write_marked_file(const char *name, FILE *f_open, bool tmp,
     filestruct *top, *bot;
     size_t top_x, bot_x;
 
+<<<<<<< HEAD
     assert(openfile->mark_set);
 
     /* Partition the filestruct so that it contains only the marked
      * text. */
+=======
+    /* Partition the filestruct so that it contains only the marked text. */
+>>>>>>> origin/tomato-shibby-RT-AC
     mark_order((const filestruct **)&top, &top_x,
 	(const filestruct **)&bot, &bot_x, NULL);
     filepart = partition_filestruct(top, top_x, bot, bot_x);
@@ -1944,7 +2674,7 @@ bool write_marked_file(const char *name, FILE *f_open, bool tmp,
 	(added_magicline = (openfile->filebot->data[0] != '\0')))
 	new_magicline();
 
-    retval = write_file(name, f_open, tmp, append, TRUE);
+    retval = write_file(name, f_open, tmp, method, TRUE);
 
     /* If the NO_NEWLINES flag isn't set, and we added a magicline,
      * remove it now. */
@@ -1969,10 +2699,20 @@ bool write_marked_file(const char *name, FILE *f_open, bool tmp,
 bool do_writeout(bool exiting)
 {
     int i;
+<<<<<<< HEAD
     append_type append = OVERWRITE;
     char *ans;
 	/* The last answer the user typed at the statusbar prompt. */
 #ifdef NANO_EXTRA
+=======
+    bool result = FALSE;
+    kind_of_writing_type method = OVERWRITE;
+    char *given;
+	/* The filename we offer, or what the user typed so far. */
+    bool maychange = (openfile->filename[0] == '\0');
+	/* Whether it's okay to save the file under a different name. */
+#ifndef DISABLE_EXTRA
+>>>>>>> origin/tomato-shibby-RT-AC
     static bool did_credits = FALSE;
 #endif
     bool retval = FALSE, meta_key = FALSE, func_key = FALSE;
@@ -1980,6 +2720,7 @@ bool do_writeout(bool exiting)
 
     currmenu = MWRITEFILE;
 
+<<<<<<< HEAD
     if (exiting && openfile->filename[0] != '\0' && ISSET(TEMP_FILE)) {
 	retval = write_file(openfile->filename, NULL, FALSE, OVERWRITE,
 		FALSE);
@@ -1987,6 +2728,15 @@ bool do_writeout(bool exiting)
 	/* Write succeeded. */
 	if (retval)
 	    return retval;
+=======
+    /* Display newlines in filenames as ^J. */
+    as_an_at = FALSE;
+
+    if (exiting && ISSET(TEMP_FILE) && openfile->filename[0] != '\0') {
+	if (write_file(openfile->filename, NULL, FALSE, OVERWRITE, FALSE))
+	    return 1;
+	/* If writing the file failed, go on to prompt for a new name. */
+>>>>>>> origin/tomato-shibby-RT-AC
     }
 
     ans = mallocstrcpy(NULL,
@@ -2010,6 +2760,7 @@ bool do_writeout(bool exiting)
 	 * Selection to File" prompt.  This function is disabled, since
 	 * it allows reading from or writing to files not specified on
 	 * the command line. */
+<<<<<<< HEAD
 	if (!ISSET(RESTRICTED) && !exiting && openfile->mark_set)
 	    msg = (append == PREPEND) ?
 		_("Prepend Selection to File") : (append == APPEND) ?
@@ -2032,6 +2783,26 @@ bool do_writeout(bool exiting)
 		MWRITEFILE, ans,
 		&meta_key, &func_key,
 #ifndef NANO_TINY
+=======
+	if (openfile->mark_set && !exiting && !ISSET(RESTRICTED))
+	    /* TRANSLATORS: The next six strings are prompts. */
+	    msg = (method == PREPEND) ? _("Prepend Selection to File") :
+			(method == APPEND) ? _("Append Selection to File") :
+			_("Write Selection to File");
+	else
+#endif /* !NANO_TINY */
+	    msg = (method == PREPEND) ? _("File Name to Prepend to") :
+			(method == APPEND) ? _("File Name to Append to") :
+			_("File Name to Write");
+
+	present_path = mallocstrcpy(present_path, "./");
+
+	/* If we're using restricted mode, and the filename isn't blank,
+	 * disable tab completion. */
+	i = do_prompt(!ISSET(RESTRICTED) || openfile->filename[0] == '\0',
+		TRUE, MWRITEFILE, given,
+#ifndef DISABLE_HISTORIES
+>>>>>>> origin/tomato-shibby-RT-AC
 		NULL,
 #endif
 		edit_refresh, "%s%s%s", msg,
@@ -2042,9 +2813,7 @@ bool do_writeout(bool exiting)
 #endif
 		);
 
-	/* If the filename or command begins with a newline (i.e. an
-	 * encoded null), treat it as though it's blank. */
-	if (i < 0 || *answer == '\n') {
+	if (i < 0) {
 	    statusbar(_("Cancelled"));
 	    retval = FALSE;
 	    break;
@@ -2078,11 +2847,19 @@ bool do_writeout(bool exiting)
 		continue;
 	    } else
 #endif /* !NANO_TINY */
+<<<<<<< HEAD
 	    if (s && s->scfunc ==  PREPEND_MSG) {
 		append = (append == PREPEND) ? OVERWRITE : PREPEND;
 		continue;
 	    } else if (s && s->scfunc ==  APPEND_MSG) {
 		append = (append == APPEND) ? OVERWRITE : APPEND;
+=======
+	    if (func == prepend_void) {
+		method = (method == PREPEND) ? OVERWRITE : PREPEND;
+		continue;
+	    } else if (func == append_void) {
+		method = (method == APPEND) ? OVERWRITE : APPEND;
+>>>>>>> origin/tomato-shibby-RT-AC
 		continue;
 	    } else if (s && s->scfunc == DO_HELP_VOID) {
 		continue;
@@ -2108,15 +2885,10 @@ bool do_writeout(bool exiting)
 	    }
 #endif
 
-	    if (append == OVERWRITE) {
-		size_t answer_len = strlen(answer);
+	    if (method == OVERWRITE) {
 		bool name_exists, do_warning;
 		char *full_answer, *full_filename;
 		struct stat st;
-
-		/* Convert newlines to nulls, just before we get the
-		 * full path. */
-		sunder(answer);
 
 		full_answer = get_full_path(answer);
 		full_filename = get_full_path(openfile->filename);
@@ -2129,6 +2901,7 @@ bool do_writeout(bool exiting)
 			answer : full_answer, (full_filename == NULL) ?
 			openfile->filename : full_filename) != 0);
 
+<<<<<<< HEAD
 		/* Convert nulls to newlines.  answer_len is the
 		 * string's real length. */
 		unsunder(answer, answer_len);
@@ -2137,16 +2910,21 @@ bool do_writeout(bool exiting)
 		    free(full_filename);
 		if (full_answer != NULL)
 		    free(full_answer);
+=======
+		free(full_filename);
+		free(full_answer);
+>>>>>>> origin/tomato-shibby-RT-AC
 
 		if (do_warning) {
-		    /* If we're using restricted mode, we aren't allowed
-		     * to overwrite an existing file with the current
-		     * file.  We also aren't allowed to change the name
-		     * of the current file if it has one, because that
-		     * would allow reading from or writing to files not
-		     * specified on the command line. */
-		    if (ISSET(RESTRICTED))
+		    /* When in restricted mode, we aren't allowed to overwrite
+		     * an existing file with the current buffer, nor to change
+		     * the name of the current file if it already has one. */
+		    if (ISSET(RESTRICTED)) {
+			/* TRANSLATORS: Restricted mode forbids overwriting. */
+			warn_and_shortly_pause(_("File exists -- "
+					"cannot overwrite"));
 			continue;
+		    }
 
 		    if (name_exists) {
 			i = do_yesno_prompt(FALSE,
@@ -2178,21 +2956,32 @@ bool do_writeout(bool exiting)
 
 	    }
 
+<<<<<<< HEAD
 	    /* Convert newlines to nulls, just before we save the
 	     * file. */
 	    sunder(answer);
 	    align(&answer);
 
+=======
+>>>>>>> origin/tomato-shibby-RT-AC
 	    /* Here's where we allow the selected text to be written to
 	     * a separate file.  If we're using restricted mode, this
 	     * function is disabled, since it allows reading from or
 	     * writing to files not specified on the command line. */
 	    retval =
 #ifndef NANO_TINY
+<<<<<<< HEAD
 		(!ISSET(RESTRICTED) && !exiting && openfile->mark_set) ?
 		write_marked_file(answer, NULL, FALSE, append) :
 #endif
 		write_file(answer, NULL, FALSE, append, FALSE);
+=======
+	    if (openfile->mark_set && !exiting && !ISSET(RESTRICTED))
+		result = write_marked_file(answer, NULL, FALSE, method);
+	    else
+#endif
+		result = write_file(answer, NULL, FALSE, method, FALSE);
+>>>>>>> origin/tomato-shibby-RT-AC
 
 	    break;
 	}
@@ -2217,8 +3006,6 @@ char *real_dir_from_tilde(const char *buf)
 {
     char *retval;
 
-    assert(buf != NULL);
-
     if (*buf == '~') {
 	size_t i = 1;
 	char *tilde_dir;
@@ -2232,6 +3019,7 @@ char *real_dir_from_tilde(const char *buf)
 	    get_homedir();
 	    tilde_dir = mallocstrcpy(NULL, homedir);
 	} else {
+#ifdef HAVE_PWD_H
 	    const struct passwd *userdata;
 
 	    tilde_dir = mallocstrncpy(NULL, buf, i + 1);
@@ -2244,6 +3032,9 @@ char *real_dir_from_tilde(const char *buf)
 	    endpwent();
 	    if (userdata != NULL)
 		tilde_dir = mallocstrcpy(tilde_dir, userdata->pw_dir);
+#else
+	    tilde_dir = strdup("");
+#endif
 	}
 
 	retval = charalloc(strlen(tilde_dir) + strlen(buf + i) + 1);
@@ -2299,8 +3090,6 @@ bool is_dir(const char *buf)
     struct stat fileinfo;
     bool retval;
 
-    assert(buf != NULL);
-
     dirptr = real_dir_from_tilde(buf);
 
     retval = (stat(dirptr, &fileinfo) != -1 &&
@@ -2335,11 +3124,13 @@ char **username_tab_completion(const char *buf, size_t *num_matches,
 	size_t buf_len)
 {
     char **matches = NULL;
-    const struct passwd *userdata;
 
     assert(buf != NULL && num_matches != NULL && buf_len > 0);
 
     *num_matches = 0;
+
+#ifdef HAVE_PWD_H
+    const struct passwd *userdata;
 
     while ((userdata = getpwent()) != NULL) {
 	if (strncmp(userdata->pw_name, buf + 1, buf_len - 1) == 0) {
@@ -2362,6 +3153,7 @@ char **username_tab_completion(const char *buf, size_t *num_matches,
 	}
     }
     endpwent();
+#endif
 
     return matches;
 }
@@ -2383,7 +3175,7 @@ char **cwd_tab_completion(const char *buf, bool allow_files, size_t
     assert(dirname != NULL && num_matches != NULL);
 
     *num_matches = 0;
-    null_at(&dirname, buf_len);
+    dirname[buf_len] = '\0';
 
     /* Okie, if there's a / in the buffer, strip out the directory
      * part. */
@@ -2502,13 +3294,20 @@ char *input_tab(char *buf, bool allow_files, size_t *place, bool
 	size_t match, common_len = 0;
 	char *mzero;
 	const char *lastslash = revstrstr(buf, "/", buf + *place);
+<<<<<<< HEAD
 	size_t lastslash_len = (lastslash == NULL) ? 0 :
 		lastslash - buf + 1;
 	char *match1_mb = charalloc(mb_cur_max() + 1);
 	char *match2_mb = charalloc(mb_cur_max() + 1);
 	int match1_mb_len, match2_mb_len;
+=======
+	size_t lastslash_len = (lastslash == NULL) ? 0 : lastslash - buf + 1;
+	char char1[mb_cur_max()], char2[mb_cur_max()];
+	int len1, len2;
+>>>>>>> origin/tomato-shibby-RT-AC
 
 	while (TRUE) {
+<<<<<<< HEAD
 	    for (match = 1; match < num_matches; match++) {
 		/* Get the number of single-byte characters that all the
 		 * matches have in common. */
@@ -2519,18 +3318,32 @@ char *input_tab(char *buf, bool allow_files, size_t *place, bool
 		match1_mb[match1_mb_len] = '\0';
 		match2_mb[match2_mb_len] = '\0';
 		if (strcmp(match1_mb, match2_mb) != 0)
+=======
+	    len1 = parse_mbchar(matches[0] + common_len, char1, NULL);
+
+	    for (match = 1; match < num_matches; match++) {
+		len2 = parse_mbchar(matches[match] + common_len, char2, NULL);
+
+		if (len1 != len2 || strncmp(char1, char2, len2) != 0)
+>>>>>>> origin/tomato-shibby-RT-AC
 		    break;
 	    }
 
 	    if (match < num_matches || matches[0][common_len] == '\0')
 		break;
 
+<<<<<<< HEAD
 	    common_len += parse_mbchar(buf + common_len, NULL, NULL);
 	}
 
 	free(match1_mb);
 	free(match2_mb);
 
+=======
+	    common_len += len1;
+	}
+
+>>>>>>> origin/tomato-shibby-RT-AC
 	mzero = charalloc(lastslash_len + common_len + 1);
 
 	strncpy(mzero, buf, lastslash_len);
@@ -2662,7 +3475,24 @@ const char *tail(const char *foo)
  * freed. */
 char *histfilename(void)
 {
+<<<<<<< HEAD
     char *nanohist = NULL;
+=======
+    return construct_filename("/.nano/search_history");
+}
+
+/* Construct the legacy history filename. */
+/* (To be removed in 2018.) */
+char *legacyhistfilename(void)
+{
+    return construct_filename("/.nano_history");
+}
+
+char *poshistfilename(void)
+{
+    return construct_filename("/.nano/filepos_history");
+}
+>>>>>>> origin/tomato-shibby-RT-AC
 
     if (homedir != NULL) {
 	size_t homelen = strlen(homedir);
@@ -2679,6 +3509,24 @@ char *histfilename(void)
 void load_history(void)
 {
     char *nanohist = histfilename();
+<<<<<<< HEAD
+=======
+    char *legacyhist = legacyhistfilename();
+    struct stat hstat;
+
+    /* If there is an old history file, migrate it. */
+    /* (To be removed in 2018.) */
+    if (stat(legacyhist, &hstat) != -1 && stat(nanohist, &hstat) == -1) {
+	if (rename(legacyhist, nanohist) == -1)
+	    history_error(N_("Detected a legacy nano history file (%s) which I tried to move\n"
+			     "to the preferred location (%s) but encountered an error: %s"),
+				legacyhist, nanohist, strerror(errno));
+	else
+	    history_error(N_("Detected a legacy nano history file (%s) which I moved\n"
+			     "to the preferred location (%s)\n(see the nano FAQ about this change)"),
+				legacyhist, nanohist);
+    }
+>>>>>>> origin/tomato-shibby-RT-AC
 
     /* Assume do_rcfile() has reported a missing home directory. */
     if (nanohist != NULL) {
@@ -2704,12 +3552,10 @@ void load_history(void)
 	    size_t buf_len = 0;
 	    ssize_t read;
 
-	    while ((read = getline(&line, &buf_len, hist)) >= 0) {
-		if (read > 0 && line[read - 1] == '\n') {
-		    read--;
-		    line[read] = '\0';
-		}
+	    while ((read = getline(&line, &buf_len, hist)) > 0) {
+		line[--read] = '\0';
 		if (read > 0) {
+		    /* Encode any embedded NUL as 0x0A. */
 		    unsunder(line, read);
 		    update_history(history, line);
 		} else
@@ -2723,22 +3569,23 @@ void load_history(void)
     }
 }
 
-/* Write the lines of a history list, starting with the line at h, to
+/* Write the lines of a history list, starting with the line at head, to
  * the open file at hist.  Return TRUE if the write succeeded, and FALSE
  * otherwise. */
-bool writehist(FILE *hist, filestruct *h)
+bool writehist(FILE *hist, const filestruct *head)
 {
-    filestruct *p;
+    const filestruct *item;
 
-    /* Write a history list from the oldest entry to the newest.  Assume
-     * the last history entry is a blank line. */
-    for (p = h; p != NULL; p = p->next) {
-	size_t p_len = strlen(p->data);
+    /* Write a history list, from the oldest item to the newest. */
+    for (item = head; item != NULL; item = item->next) {
+	size_t length = strlen(item->data);
 
-	sunder(p->data);
+	/* Decode 0x0A bytes as embedded NULs. */
+	sunder(item->data);
 
-	if (fwrite(p->data, sizeof(char), p_len, hist) < p_len ||
-		putc('\n', hist) == EOF)
+	if (fwrite(item->data, sizeof(char), length, hist) < length)
+	    return FALSE;
+	if (putc('\n', hist) == EOF)
 	    return FALSE;
     }
 
@@ -2779,4 +3626,210 @@ void save_history(void)
 	free(nanohist);
     }
 }
+<<<<<<< HEAD
 #endif /* !NANO_TINY && ENABLE_NANORC */
+=======
+
+/* Save the recorded last file positions to ~/.nano/filepos_history. */
+void save_poshistory(void)
+{
+    char *poshist = poshistfilename();
+    poshiststruct *posptr;
+    FILE *hist;
+
+    if (poshist == NULL)
+	return;
+
+    hist = fopen(poshist, "wb");
+
+    if (hist == NULL)
+	fprintf(stderr, _("Error writing %s: %s\n"), poshist, strerror(errno));
+    else {
+	/* Don't allow others to read or write the history file. */
+	chmod(poshist, S_IRUSR | S_IWUSR);
+
+	for (posptr = position_history; posptr != NULL; posptr = posptr->next) {
+	    char *path_and_place;
+	    size_t length;
+
+	    /* Assume 20 decimal positions each for line and column number,
+	     * plus two spaces, plus the line feed, plus the null byte. */
+	    path_and_place = charalloc(strlen(posptr->filename) + 44);
+	    sprintf(path_and_place, "%s %ld %ld\n", posptr->filename,
+			(long)posptr->lineno, (long)posptr->xno);
+	    length = strlen(path_and_place);
+
+	    /* Encode newlines in filenames as nulls. */
+	    sunder(path_and_place);
+	    /* Restore the terminating newline. */
+	    path_and_place[length - 1] = '\n';
+
+	    if (fwrite(path_and_place, sizeof(char), length, hist) < length)
+		fprintf(stderr, _("Error writing %s: %s\n"),
+					poshist, strerror(errno));
+	    free(path_and_place);
+	}
+	fclose(hist);
+    }
+    free(poshist);
+}
+
+/* Update the recorded last file positions, given a filename, a line
+ * and a column.  If no entry is found, add a new one at the end. */
+void update_poshistory(char *filename, ssize_t lineno, ssize_t xpos)
+{
+    poshiststruct *posptr, *theone, *posprev = NULL;
+    char *fullpath = get_full_path(filename);
+
+    if (fullpath == NULL || fullpath[strlen(fullpath) - 1] == '/') {
+	free(fullpath);
+	return;
+    }
+
+    /* Look for a matching filename in the list. */
+    for (posptr = position_history; posptr != NULL; posptr = posptr->next) {
+	if (!strcmp(posptr->filename, fullpath))
+	    break;
+	posprev = posptr;
+    }
+
+    /* Don't record files that have the default cursor position. */
+    if (lineno == 1 && xpos == 1) {
+	if (posptr != NULL) {
+	    if (posprev == NULL)
+		position_history = posptr->next;
+	    else
+		posprev->next = posptr->next;
+	    free(posptr->filename);
+	    free(posptr);
+	}
+	free(fullpath);
+	return;
+    }
+
+    theone = posptr;
+
+    /* If we didn't find it, make a new node; otherwise, if we're
+     * not at the end, move the matching one to the end. */
+    if (theone == NULL) {
+	theone = (poshiststruct *)nmalloc(sizeof(poshiststruct));
+	theone->filename = mallocstrcpy(NULL, fullpath);
+	if (position_history == NULL)
+	    position_history = theone;
+	else
+	    posprev->next = theone;
+    } else if (posptr->next != NULL) {
+	if (posprev == NULL)
+	    position_history = posptr->next;
+	else
+	    posprev->next = posptr->next;
+	while (posptr->next != NULL)
+	    posptr = posptr->next;
+	posptr->next = theone;
+    }
+
+    /* Store the last cursor position. */
+    theone->lineno = lineno;
+    theone->xno = xpos;
+    theone->next = NULL;
+
+    free(fullpath);
+}
+
+/* Check whether the given file matches an existing entry in the recorded
+ * last file positions.  If not, return FALSE.  If yes, return TRUE and
+ * set line and column to the retrieved values. */
+bool has_old_position(const char *file, ssize_t *line, ssize_t *column)
+{
+    poshiststruct *posptr = position_history;
+    char *fullpath = get_full_path(file);
+
+    if (fullpath == NULL)
+	return FALSE;
+
+    while (posptr != NULL && strcmp(posptr->filename, fullpath) != 0)
+	posptr = posptr->next;
+
+    free(fullpath);
+
+    if (posptr == NULL)
+        return FALSE;
+
+    *line = posptr->lineno;
+    *column = posptr->xno;
+    return TRUE;
+}
+
+/* Load the recorded file positions from ~/.nano/filepos_history. */
+void load_poshistory(void)
+{
+    char *poshist = poshistfilename();
+    FILE *hist;
+
+    /* If the home directory is missing, do_rcfile() will have reported it. */
+    if (poshist == NULL)
+	return;
+
+    hist = fopen(poshist, "rb");
+
+    if (hist == NULL) {
+	if (errno != ENOENT) {
+	    /* When reading failed, don't save history when we quit. */
+	    UNSET(POS_HISTORY);
+	    history_error(N_("Error reading %s: %s"), poshist, strerror(errno));
+	}
+    } else {
+	char *line = NULL, *lineptr, *xptr;
+	size_t buf_len = 0;
+	ssize_t read, count = 0;
+	poshiststruct *record_ptr = NULL, *newrecord;
+
+	/* Read and parse each line, and store the extracted data. */
+	while ((read = getline(&line, &buf_len, hist)) > 5) {
+	    /* Decode nulls as embedded newlines. */
+	    unsunder(line, read);
+
+	    /* Find where the x index and line number are in the line. */
+	    xptr = revstrstr(line, " ", line + read - 3);
+	    if (xptr == NULL)
+		continue;
+	    lineptr = revstrstr(line, " ", xptr - 2);
+	    if (lineptr == NULL)
+		continue;
+
+	    /* Now separate the three elements of the line. */
+	    *(xptr++) = '\0';
+	    *(lineptr++) = '\0';
+
+	    /* Create a new position record. */
+	    newrecord = (poshiststruct *)nmalloc(sizeof(poshiststruct));
+	    newrecord->filename = mallocstrcpy(NULL, line);
+	    newrecord->lineno = atoi(lineptr);
+	    newrecord->xno = atoi(xptr);
+	    newrecord->next = NULL;
+
+	    /* Add the record to the list. */
+	    if (position_history == NULL)
+		position_history = newrecord;
+	    else
+		record_ptr->next = newrecord;
+
+	    record_ptr = newrecord;
+
+	    /* Impose a limit, so the file will not grow indefinitely. */
+	    if (++count > 200) {
+		poshiststruct *drop_record = position_history;
+
+		position_history = position_history->next;
+
+		free(drop_record->filename);
+		free(drop_record);
+	    }
+	}
+	fclose(hist);
+	free(line);
+    }
+    free(poshist);
+}
+#endif /* !DISABLE_HISTORIES */
+>>>>>>> origin/tomato-shibby-RT-AC

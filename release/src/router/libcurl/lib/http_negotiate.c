@@ -32,9 +32,12 @@
 
 #include "urldata.h"
 #include "sendf.h"
+<<<<<<< HEAD
 #include "curl_gssapi.h"
 #include "rawstr.h"
 #include "curl_base64.h"
+=======
+>>>>>>> origin/tomato-shibby-RT-AC
 #include "http_negotiate.h"
 #include "curl_memory.h"
 #include "url.h"
@@ -61,6 +64,7 @@
 static int
 get_gss_name(struct connectdata *conn, bool proxy, gss_name_t *server)
 {
+<<<<<<< HEAD
   struct negotiatedata *neg_ctx = proxy?&conn->data->state.proxyneg:
     &conn->data->state.negotiate;
   OM_uint32 major_status, minor_status;
@@ -105,6 +109,10 @@ log_gss_error(struct connectdata *conn, OM_uint32 error_status,
   OM_uint32 msg_ctx = 0;
   gss_buffer_desc status_string;
   char buf[1024];
+=======
+  CURLcode result;
+  struct Curl_easy *data = conn->data;
+>>>>>>> origin/tomato-shibby-RT-AC
   size_t len;
 
   snprintf(buf, sizeof(buf), "%s", prefix);
@@ -127,6 +135,7 @@ log_gss_error(struct connectdata *conn, OM_uint32 error_status,
   infof(conn->data, "%s\n", buf);
 }
 
+<<<<<<< HEAD
 /* returning zero (0) means success, everything else is treated as "failure"
    with no care exactly what the failure was */
 int Curl_input_negotiate(struct connectdata *conn, bool proxy,
@@ -160,6 +169,15 @@ int Curl_input_negotiate(struct connectdata *conn, bool proxy,
     if(neg_ctx->gss != gss) {
       return -1;
     }
+=======
+  if(proxy) {
+    userp = conn->http_proxy.user;
+    passwdp = conn->http_proxy.passwd;
+    service = data->set.str[STRING_PROXY_SERVICE_NAME] ?
+              data->set.str[STRING_PROXY_SERVICE_NAME] : "HTTP";
+    host = conn->http_proxy.host.name;
+    neg_ctx = &data->state.proxyneg;
+>>>>>>> origin/tomato-shibby-RT-AC
   }
   else {
     neg_ctx->protocol = protocol;
@@ -264,8 +282,19 @@ int Curl_input_negotiate(struct connectdata *conn, bool proxy,
     return -1;
   }
 
+<<<<<<< HEAD
   neg_ctx->output_token = output_token;
   return 0;
+=======
+  /* Initilise the security context and decode our challenge */
+  result = Curl_auth_decode_spnego_message(data, userp, passwdp, service,
+                                           host, header, neg_ctx);
+
+  if(result)
+    Curl_auth_spnego_cleanup(neg_ctx);
+
+  return result;
+>>>>>>> origin/tomato-shibby-RT-AC
 }
 
 
@@ -360,6 +389,7 @@ CURLcode Curl_output_negotiate(struct connectdata *conn, bool proxy)
   return (userp == NULL) ? CURLE_OUT_OF_MEMORY : CURLE_OK;
 }
 
+<<<<<<< HEAD
 static void cleanup(struct negotiatedata *neg_ctx)
 {
   OM_uint32 minor_status;
@@ -376,6 +406,9 @@ static void cleanup(struct negotiatedata *neg_ctx)
 }
 
 void Curl_cleanup_negotiate(struct SessionHandle *data)
+=======
+void Curl_cleanup_negotiate(struct Curl_easy *data)
+>>>>>>> origin/tomato-shibby-RT-AC
 {
   cleanup(&data->state.negotiate);
   cleanup(&data->state.proxyneg);

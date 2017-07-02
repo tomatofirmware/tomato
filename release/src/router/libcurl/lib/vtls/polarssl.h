@@ -26,8 +26,14 @@
 #ifdef USE_POLARSSL
 
 /* Called on first use PolarSSL, setup threading if supported */
+<<<<<<< HEAD
 int  polarssl_init(void);
 void polarssl_cleanup(void);
+=======
+int  Curl_polarssl_init(void);
+void Curl_polarssl_cleanup(void);
+int Curl_polarssl_data_pending(const struct connectdata *conn, int sockindex);
+>>>>>>> origin/tomato-shibby-RT-AC
 
 
 CURLcode Curl_polarssl_connect(struct connectdata *conn, int sockindex);
@@ -60,8 +66,19 @@ int Curl_polarssl_shutdown(struct connectdata *conn, int sockindex);
 #define curlssl_set_engine_default(x) (x=x, CURLE_NOT_BUILT_IN)
 #define curlssl_engines_list(x) (x=x, (struct curl_slist *)NULL)
 #define curlssl_version Curl_polarssl_version
+<<<<<<< HEAD
 #define curlssl_check_cxn(x) (x=x, -1)
 #define curlssl_data_pending(x,y) (x=x, y=y, 0)
+=======
+#define curlssl_check_cxn(x) ((void)x, -1)
+#define curlssl_data_pending(x,y) Curl_polarssl_data_pending(x, y)
+#define curlssl_sha256sum(a,b,c,d) sha256(a,b,c,0)
+
+/* This might cause libcurl to use a weeker random!
+   TODO: implement proper use of Polarssl's CTR-DRBG or HMAC-DRBG and use that
+*/
+#define curlssl_random(x,y,z) ((void)x, (void)y, (void)z, CURLE_NOT_BUILT_IN)
+>>>>>>> origin/tomato-shibby-RT-AC
 
 #endif /* USE_POLARSSL */
 #endif /* HEADER_CURL_POLARSSL_H */

@@ -5,7 +5,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
+<<<<<<< HEAD
  * Copyright (C) 1998 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
+=======
+ * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
+>>>>>>> origin/tomato-shibby-RT-AC
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -45,6 +49,15 @@
 const NameValue setopt_nv_CURLPROXY[] = {
   NV(CURLPROXY_HTTP),
   NV(CURLPROXY_HTTP_1_0),
+  NV(CURLPROXY_HTTPS),
+  NV(CURLPROXY_SOCKS4),
+  NV(CURLPROXY_SOCKS5),
+  NV(CURLPROXY_SOCKS4A),
+  NV(CURLPROXY_SOCKS5_HOSTNAME),
+  NVEND,
+};
+
+const NameValue setopt_nv_CURL_SOCKS_PROXY[] = {
   NV(CURLPROXY_SOCKS4),
   NV(CURLPROXY_SOCKS5),
   NV(CURLPROXY_SOCKS4A),
@@ -81,6 +94,7 @@ const NameValue setopt_nv_CURL_SSLVERSION[] = {
   NV(CURL_SSLVERSION_TLSv1_0),
   NV(CURL_SSLVERSION_TLSv1_1),
   NV(CURL_SSLVERSION_TLSv1_2),
+  NV(CURL_SSLVERSION_TLSv1_3),
   NVEND,
 };
 
@@ -147,6 +161,9 @@ static const NameValue setopt_nv_CURLNONZERODEFAULTS[] = {
   NV1(CURLOPT_SSL_VERIFYHOST, 1),
   NV1(CURLOPT_SSL_ENABLE_NPN, 1),
   NV1(CURLOPT_SSL_ENABLE_ALPN, 1),
+  NV1(CURLOPT_TCP_NODELAY, 1),
+  NV1(CURLOPT_PROXY_SSL_VERIFYPEER, 1),
+  NV1(CURLOPT_PROXY_SSL_VERIFYHOST, 1),
   NVEND
 };
 

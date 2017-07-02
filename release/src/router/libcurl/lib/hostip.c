@@ -179,7 +179,7 @@ Curl_printable_address(const Curl_addrinfo *ai, char *buf, size_t bufsize)
   const struct in6_addr *ipaddr6;
 #endif
 
-  switch (ai->ai_family) {
+  switch(ai->ai_family) {
     case AF_INET:
       sa4 = (const void *)ai->ai_addr;
       ipaddr4 = &sa4->sin_addr;
@@ -260,7 +260,7 @@ hostcache_prune(struct curl_hash *hostcache, long cache_timeout, time_t now)
  * Library-wide function for pruning the DNS cache. This function takes and
  * returns the appropriate locks.
  */
-void Curl_hostcache_prune(struct SessionHandle *data)
+void Curl_hostcache_prune(struct Curl_easy *data)
 {
   time_t now;
 
@@ -289,7 +289,22 @@ void Curl_hostcache_prune(struct SessionHandle *data)
 static int
 remove_entry_if_stale(struct SessionHandle *data, struct Curl_dns_entry *dns)
 {
+<<<<<<< HEAD
   struct hostcache_prune_data user;
+=======
+  char *entry_id = NULL;
+  struct Curl_dns_entry *dns = NULL;
+  size_t entry_len;
+  struct Curl_easy *data = conn->data;
+
+  /* Create an entry id, based upon the hostname and port */
+  entry_id = create_hostcache_id(hostname, port);
+  /* If we can't create the entry id, fail */
+  if(!entry_id)
+    return dns;
+
+  entry_len = strlen(entry_id);
+>>>>>>> origin/tomato-shibby-RT-AC
 
   if(!dns || (data->set.dns_cache_timeout == -1) || !data->dns.hostcache ||
      dns->inuse)
@@ -310,6 +325,38 @@ remove_entry_if_stale(struct SessionHandle *data, struct Curl_dns_entry *dns)
   return 1;
 }
 
+<<<<<<< HEAD
+=======
+/*
+ * Curl_fetch_addr() fetches a 'Curl_dns_entry' already in the DNS cache.
+ *
+ * Curl_resolv() checks initially and multi_runsingle() checks each time
+ * it discovers the handle in the state WAITRESOLVE whether the hostname
+ * has already been resolved and the address has already been stored in
+ * the DNS cache. This short circuits waiting for a lot of pending
+ * lookups for the same hostname requested by different handles.
+ *
+ * Returns the Curl_dns_entry entry pointer or NULL if not in the cache.
+ *
+ * The returned data *MUST* be "unlocked" with Curl_resolv_unlock() after
+ * use, or we'll leak memory!
+ */
+struct Curl_dns_entry *
+Curl_fetch_addr(struct connectdata *conn,
+                const char *hostname,
+                int port)
+{
+  struct Curl_easy *data = conn->data;
+  struct Curl_dns_entry *dns = NULL;
+
+  if(data->share)
+    Curl_share_lock(data, CURL_LOCK_DATA_DNS, CURL_LOCK_ACCESS_SINGLE);
+
+  dns = fetch_addr(conn, hostname, port);
+
+  if(dns)
+    dns->inuse++; /* we use it! */
+>>>>>>> origin/tomato-shibby-RT-AC
 
 #ifdef HAVE_SIGSETJMP
 /* Beware this is a global and unique instance. This is used to store the
@@ -329,7 +376,7 @@ sigjmp_buf curl_jmpenv;
  * Returns the Curl_dns_entry entry pointer or NULL if the storage failed.
  */
 struct Curl_dns_entry *
-Curl_cache_addr(struct SessionHandle *data,
+Curl_cache_addr(struct Curl_easy *data,
                 Curl_addrinfo *addr,
                 const char *hostname,
                 int port)
@@ -405,8 +452,12 @@ int Curl_resolv(struct connectdata *conn,
 {
   char *entry_id = NULL;
   struct Curl_dns_entry *dns = NULL;
+<<<<<<< HEAD
   size_t entry_len;
   struct SessionHandle *data = conn->data;
+=======
+  struct Curl_easy *data = conn->data;
+>>>>>>> origin/tomato-shibby-RT-AC
   CURLcode result;
   int rc = CURLRESOLV_ERROR; /* default to failure */
 
@@ -546,7 +597,7 @@ int Curl_resolv_timeout(struct connectdata *conn,
                         const char *hostname,
                         int port,
                         struct Curl_dns_entry **entry,
-                        long timeoutms)
+                        time_t timeoutms)
 {
 #ifdef USE_ALARM_TIMEOUT
 #ifdef HAVE_SIGACTION
@@ -560,7 +611,7 @@ int Curl_resolv_timeout(struct connectdata *conn,
 #endif /* HAVE_SIGACTION */
   volatile long timeout;
   volatile unsigned int prev_alarm = 0;
-  struct SessionHandle *data = conn->data;
+  struct Curl_easy *data = conn->data;
 #endif /* USE_ALARM_TIMEOUT */
   int rc;
 
@@ -581,10 +632,14 @@ int Curl_resolv_timeout(struct connectdata *conn,
     /* USE_ALARM_TIMEOUT defined, but no timeout actually requested */
     return Curl_resolv(conn, hostname, port, entry);
 
-  if(timeout < 1000)
+  if(timeout < 1000) {
     /* The alarm() function only provides integer second resolution, so if
        we want to wait less than one second we must bail out already now. */
+    failf(data,
+        "remaining timeout of %ld too small to resolve via SIGALRM method",
+        timeout);
     return CURLRESOLV_TIMEDOUT;
+<<<<<<< HEAD
 
   /*************************************************************
    * Set signal handler to catch SIGALRM
@@ -612,6 +667,9 @@ int Curl_resolv_timeout(struct connectdata *conn,
      will abort system calls */
   prev_alarm = alarm(curlx_sltoui(timeout/1000L));
 
+=======
+  }
+>>>>>>> origin/tomato-shibby-RT-AC
   /* This allows us to time-out from the name resolver, as the timeout
      will generate a signal and we will siglongjmp() from that here.
      This technique has problems (see alarmfunc).
@@ -693,7 +751,7 @@ clean_up:
  *
  * May be called with 'data' == NULL for global cache.
  */
-void Curl_resolv_unlock(struct SessionHandle *data, struct Curl_dns_entry *dns)
+void Curl_resolv_unlock(struct Curl_easy *data, struct Curl_dns_entry *dns)
 {
   DEBUGASSERT(dns && (dns->inuse>0));
 
@@ -752,7 +810,7 @@ static int hostcache_inuse(void *data, void *hc)
  * can be done!
  */
 
-void Curl_hostcache_clean(struct SessionHandle *data,
+void Curl_hostcache_clean(struct Curl_easy *data,
                           struct curl_hash *hash)
 {
   /* Entries added to the hostcache with the CURLOPT_RESOLVE function are
@@ -763,7 +821,7 @@ void Curl_hostcache_clean(struct SessionHandle *data,
 }
 
 
-CURLcode Curl_loadhostpairs(struct SessionHandle *data)
+CURLcode Curl_loadhostpairs(struct Curl_easy *data)
 {
   struct curl_slist *hostp;
   char hostname[256];

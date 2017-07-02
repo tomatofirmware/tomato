@@ -161,9 +161,42 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 advapi32.lib wldap32.lib ws2_32.lib /nologo /dll /incremental:no /debug /machine:I386 /out:"..\..\..\..\build\Win32\VC6\DLL Debug - DLL Windows SSPI\libcurld.dll" /pdbtype:con /fixed:no
-# ADD LINK32 advapi32.lib wldap32.lib ws2_32.lib /nologo /dll /incremental:no /debug /machine:I386 /out:"..\..\..\..\build\Win32\VC6\DLL Debug - DLL Windows SSPI\libcurld.dll" /pdbtype:con /fixed:no
+# ADD BASE LINK32 advapi32.lib wldap32.lib ws2_32.lib crypt32.lib /nologo /dll /incremental:no /debug /machine:I386 /out:"..\..\..\..\build\Win32\VC6\DLL Debug - DLL Windows SSPI\libcurld.dll" /pdbtype:con /fixed:no
+# ADD LINK32 advapi32.lib wldap32.lib ws2_32.lib crypt32.lib /nologo /dll /incremental:no /debug /machine:I386 /out:"..\..\..\..\build\Win32\VC6\DLL Debug - DLL Windows SSPI\libcurld.dll" /pdbtype:con /fixed:no
 
+<<<<<<< HEAD
+=======
+!ELSEIF  "$(CFG)" == "libcurl - Win32 DLL Debug DLL Windows SSPI DLL WinIDN"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 1
+# PROP BASE Output_Dir "..\..\..\..\build\Win32\VC6\DLL Debug - DLL Windows SSPI - DLL WinIDN"
+# PROP BASE Intermediate_Dir "..\..\..\..\build\Win32\VC6\DLL Debug - DLL Windows SSPI - DLL WinIDN\lib"
+# PROP BASE Ignore_Export_Lib 0
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 1
+# PROP Output_Dir "..\..\..\..\build\Win32\VC6\DLL Debug - DLL Windows SSPI - DLL WinIDN"
+# PROP Intermediate_Dir "..\..\..\..\build\Win32\VC6\DLL Debug - DLL Windows SSPI - DLL WinIDN\lib"
+# PROP Ignore_Export_Lib 0
+# PROP Target_Dir ""
+CPP=cl.exe
+# ADD BASE CPP /nologo /MDd /W4 /Zi /Od /I "$(ProgramFiles)\Microsoft Platform SDK\Include" /I "..\..\..\..\include" /I "..\..\..\..\lib" /D "_DEBUG" /D "BUILDING_LIBCURL" /D "DEBUGBUILD" /D "USE_WINDOWS_SSPI" /D "USE_SCHANNEL" /D "USE_WIN32_IDN" /D "WANT_IDN_PROTOTYPES" /FD /EHsc /GZ /c
+# ADD CPP /nologo /MDd /W4 /Zi /Od /I "$(ProgramFiles)\Microsoft Platform SDK\Include" /I "..\..\..\..\include" /I "..\..\..\..\lib" /D "_DEBUG" /D "BUILDING_LIBCURL" /D "DEBUGBUILD" /D "USE_WINDOWS_SSPI" /D "USE_SCHANNEL" /D "USE_WIN32_IDN" /D "WANT_IDN_PROTOTYPES" /FD /EHsc /GZ /c
+MTL=midl.exe
+# ADD BASE MTL /nologo /D "_DEBUG" /win32
+# ADD MTL /nologo /D "_DEBUG" /win32
+RSC=rc.exe
+# ADD BASE RSC /l 0x409 /d "_DEBUG"
+# ADD RSC /l 0x409 /d "_DEBUG"
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+LINK32=link.exe
+# ADD BASE LINK32 advapi32.lib normaliz.lib wldap32.lib ws2_32.lib crypt32.lib /nologo /dll /incremental:no /debug /machine:I386 /out:"..\..\..\..\build\Win32\VC6\DLL Debug - DLL Windows SSPI - DLL WinIDN\libcurld.dll" /pdbtype:con /fixed:no
+# ADD LINK32 advapi32.lib normaliz.lib wldap32.lib ws2_32.lib crypt32.lib /nologo /dll /incremental:no /debug /machine:I386 /out:"..\..\..\..\build\Win32\VC6\DLL Debug - DLL Windows SSPI - DLL WinIDN\libcurld.dll" /pdbtype:con /fixed:no
+
+>>>>>>> origin/tomato-shibby-RT-AC
 !ELSEIF  "$(CFG)" == "libcurl - Win32 DLL Release"
 
 # PROP BASE Use_MFC 0
@@ -280,9 +313,42 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 advapi32.lib wldap32.lib ws2_32.lib /nologo /dll /pdb:none /machine:I386 /fixed:no /release
-# ADD LINK32 advapi32.lib wldap32.lib ws2_32.lib /nologo /dll /pdb:none /machine:I386 /fixed:no /release
+# ADD BASE LINK32 advapi32.lib wldap32.lib ws2_32.lib crypt32.lib /nologo /dll /pdb:none /machine:I386 /fixed:no /release
+# ADD LINK32 advapi32.lib wldap32.lib ws2_32.lib crypt32.lib /nologo /dll /pdb:none /machine:I386 /fixed:no /release
 
+<<<<<<< HEAD
+=======
+!ELSEIF  "$(CFG)" == "libcurl - Win32 DLL Release DLL Windows SSPI DLL WinIDN"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 0
+# PROP BASE Output_Dir "..\..\..\..\build\Win32\VC6\DLL Release - DLL Windows SSPI - DLL WinIDN"
+# PROP BASE Intermediate_Dir "..\..\..\..\build\Win32\VC6\DLL Release - DLL Windows SSPI - DLL WinIDN\lib"
+# PROP BASE Ignore_Export_Lib 0
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 0
+# PROP Output_Dir "..\..\..\..\build\Win32\VC6\DLL Release - DLL Windows SSPI - DLL WinIDN"
+# PROP Intermediate_Dir "..\..\..\..\build\Win32\VC6\DLL Release - DLL Windows SSPI - DLL WinIDN\lib"
+# PROP Ignore_Export_Lib 0
+# PROP Target_Dir ""
+CPP=cl.exe
+# ADD BASE CPP /nologo /MD /W4 /O2 /I "$(ProgramFiles)\Microsoft Platform SDK\Include" /I "..\..\..\..\include" /I "..\..\..\..\lib" /D "NDEBUG" /D "BUILDING_LIBCURL" /D "USE_WINDOWS_SSPI" /D "USE_SCHANNEL" /D "USE_WIN32_IDN" /D "WANT_IDN_PROTOTYPES" /FD /EHsc /c
+# ADD CPP /nologo /MD /W4 /O2 /I "$(ProgramFiles)\Microsoft Platform SDK\Include" /I "..\..\..\..\include" /I "..\..\..\..\lib" /D "NDEBUG" /D "BUILDING_LIBCURL" /D "USE_WINDOWS_SSPI" /D "USE_SCHANNEL" /D "USE_WIN32_IDN" /D "WANT_IDN_PROTOTYPES" /FD /EHsc /c
+MTL=midl.exe
+# ADD BASE MTL /nologo /D "NDEBUG" /win32
+# ADD MTL /nologo /D "NDEBUG" /win32
+RSC=rc.exe
+# ADD BASE RSC /l 0x409 /d "NDEBUG"
+# ADD RSC /l 0x409 /d "NDEBUG"
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+LINK32=link.exe
+# ADD BASE LINK32 advapi32.lib normaliz.lib wldap32.lib ws2_32.lib crypt32.lib /nologo /dll /pdb:none /machine:I386 /fixed:no /release
+# ADD LINK32 advapi32.lib normaliz.lib wldap32.lib ws2_32.lib crypt32.lib /nologo /dll /pdb:none /machine:I386 /fixed:no /release
+
+>>>>>>> origin/tomato-shibby-RT-AC
 !ELSEIF  "$(CFG)" == "libcurl - Win32 LIB Debug"
 
 # PROP BASE Use_MFC 0
@@ -904,7 +970,7 @@ SOURCE=..\..\..\..\lib\progress.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\..\lib\rawstr.c
+SOURCE=..\..\..\..\lib\rand.c
 # End Source File
 # Begin Source File
 
@@ -960,11 +1026,11 @@ SOURCE=..\..\..\..\lib\ssh.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\..\lib\strdup.c
+SOURCE=..\..\..\..\lib\strcase.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\..\lib\strequal.c
+SOURCE=..\..\..\..\lib\strdup.c
 # End Source File
 # Begin Source File
 
@@ -1344,7 +1410,7 @@ SOURCE=..\..\..\..\lib\progress.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\..\lib\rawstr.h
+SOURCE=..\..\..\..\lib\rand.h
 # End Source File
 # Begin Source File
 
@@ -1400,11 +1466,11 @@ SOURCE=..\..\..\..\lib\ssh.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\..\lib\strdup.h
+SOURCE=..\..\..\..\lib\strcase.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\..\lib\strequal.h
+SOURCE=..\..\..\..\lib\strdup.h
 # End Source File
 # Begin Source File
 

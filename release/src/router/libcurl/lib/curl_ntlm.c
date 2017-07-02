@@ -27,17 +27,27 @@
 /*
  * NTLM details:
  *
+<<<<<<< HEAD:release/src/router/libcurl/lib/curl_ntlm.c
  * http://davenport.sourceforge.net/ntlm.html
  * http://www.innovation.ch/java/ntlm.html
+=======
+ * https://davenport.sourceforge.io/ntlm.html
+ * https://www.innovation.ch/java/ntlm.html
+>>>>>>> origin/tomato-shibby-RT-AC:release/src/router/libcurl/lib/http_ntlm.c
  */
 
 #define DEBUG_ME 0
 
 #include "urldata.h"
 #include "sendf.h"
+<<<<<<< HEAD:release/src/router/libcurl/lib/curl_ntlm.c
 #include "rawstr.h"
 #include "curl_ntlm.h"
 #include "curl_ntlm_msgs.h"
+=======
+#include "strcase.h"
+#include "http_ntlm.h"
+>>>>>>> origin/tomato-shibby-RT-AC:release/src/router/libcurl/lib/http_ntlm.c
 #include "curl_ntlm_wb.h"
 #include "url.h"
 #include "curl_memory.h"
@@ -141,8 +151,8 @@ CURLcode Curl_output_ntlm(struct connectdata *conn,
 
   if(proxy) {
     allocuserpwd = &conn->allocptr.proxyuserpwd;
-    userp = conn->proxyuser;
-    passwdp = conn->proxypasswd;
+    userp = conn->http_proxy.user;
+    passwdp = conn->http_proxy.passwd;
     ntlm = &conn->proxyntlm;
     authp = &conn->data->state.authproxy;
   }

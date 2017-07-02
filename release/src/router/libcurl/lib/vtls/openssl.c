@@ -5,7 +5,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
+<<<<<<< HEAD
  * Copyright (C) 1998 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
+=======
+ * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+>>>>>>> origin/tomato-shibby-RT-AC
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -44,10 +48,9 @@
 #include "openssl.h"
 #include "connect.h"
 #include "slist.h"
-#include "strequal.h"
 #include "select.h"
 #include "vtls.h"
-#include "rawstr.h"
+#include "strcase.h"
 #include "hostcheck.h"
 
 #define _MPRINTF_REPLACE /* use the internal *printf() functions */
@@ -91,6 +94,7 @@
 #undef HAVE_USERDATA_IN_PWD_CALLBACK
 #endif
 
+<<<<<<< HEAD
 #if OPENSSL_VERSION_NUMBER >= 0x00907001L
 /* ENGINE_load_private_key() takes four arguments */
 #define HAVE_ENGINE_LOAD_FOUR_ARGS
@@ -106,16 +110,47 @@
 #else
 /* OpenSSL/SSLEay does not have PKCS12 support */
 #undef HAVE_PKCS12_SUPPORT
+=======
+#if (OPENSSL_VERSION_NUMBER >= 0x10000000L)
+#define HAVE_ERR_REMOVE_THREAD_STATE 1
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif
 
 #if OPENSSL_VERSION_NUMBER >= 0x00906001L
 #define HAVE_ERR_ERROR_STRING_N 1
 #endif
 
+<<<<<<< HEAD
 #if OPENSSL_VERSION_NUMBER >= 0x00909000L
 #define SSL_METHOD_QUAL const
 #else
 #define SSL_METHOD_QUAL
+=======
+#if (OPENSSL_VERSION_NUMBER >= 0x10100000L) && /* OpenSSL 1.1.0+ */ \
+  !defined(LIBRESSL_VERSION_NUMBER)
+#define SSLEAY_VERSION_NUMBER OPENSSL_VERSION_NUMBER
+#define HAVE_X509_GET0_EXTENSIONS 1 /* added in 1.1.0 -pre1 */
+#define HAVE_OPAQUE_EVP_PKEY 1 /* since 1.1.0 -pre3 */
+#define HAVE_OPAQUE_RSA_DSA_DH 1 /* since 1.1.0 -pre5 */
+#define CONST_EXTS const
+#define CONST_ASN1_BIT_STRING const
+#define HAVE_ERR_REMOVE_THREAD_STATE_DEPRECATED 1
+#else
+/* For OpenSSL before 1.1.0 */
+#define ASN1_STRING_get0_data(x) ASN1_STRING_data(x)
+#define X509_get0_notBefore(x) X509_get_notBefore(x)
+#define X509_get0_notAfter(x) X509_get_notAfter(x)
+#define CONST_EXTS /* nope */
+#define CONST_ASN1_BIT_STRING /* nope */
+#ifdef LIBRESSL_VERSION_NUMBER
+static unsigned long OpenSSL_version_num(void)
+{
+  return LIBRESSL_VERSION_NUMBER;
+}
+#else
+#define OpenSSL_version_num() SSLeay()
+#endif
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif
 
 #if OPENSSL_VERSION_NUMBER >= 0x00907000L
@@ -125,8 +160,20 @@
 #define X509_STORE_set_flags(x,y) Curl_nop_stmt
 #endif
 
+<<<<<<< HEAD
 #if OPENSSL_VERSION_NUMBER >= 0x10000000L
 #define HAVE_ERR_REMOVE_THREAD_STATE 1
+=======
+#if OPENSSL_VERSION_NUMBER >= 0x10002003L && \
+  OPENSSL_VERSION_NUMBER <= 0x10002FFFL && \
+  !defined(OPENSSL_NO_COMP)
+#define HAVE_SSL_COMP_FREE_COMPRESSION_METHODS 1
+#endif
+
+#if (OPENSSL_VERSION_NUMBER < 0x0090808fL)
+/* not present in older OpenSSL */
+#define OPENSSL_load_builtin_modules(x)
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif
 
 #ifndef HAVE_SSLV2_CLIENT_METHOD
@@ -168,39 +215,34 @@ static int passwd_callback(char *buf, int num, int encrypting
 }
 
 /*
- * rand_enough() is a function that returns TRUE if we have seeded the random
- * engine properly. We use some preprocessor magic to provide a seed_enough()
- * macro to use, just to prevent a compiler warning on this function if we
- * pass in an argument that is never used.
+ * rand_enough() returns TRUE if we have seeded the random engine properly.
  */
-
-#ifdef HAVE_RAND_STATUS
-#define seed_enough(x) rand_enough()
 static bool rand_enough(void)
 {
   return (0 != RAND_status()) ? TRUE : FALSE;
 }
-#else
-#define seed_enough(x) rand_enough(x)
-static bool rand_enough(int nread)
-{
-  /* this is a very silly decision to make */
-  return (nread > 500) ? TRUE : FALSE;
-}
-#endif
 
-static int ossl_seed(struct SessionHandle *data)
+static CURLcode Curl_ossl_seed(struct Curl_easy *data)
 {
+  /* we have the "SSL is seeded" boolean static to prevent multiple
+     time-consuming seedings in vain */
+  static bool ssl_seeded = FALSE;
   char *buf = data->state.buffer; /* point to the big buffer */
   int nread=0;
 
-  /* Q: should we add support for a random file name as a libcurl option?
-     A: Yes, it is here */
+  if(ssl_seeded)
+    return CURLE_OK;
+
+  if(rand_enough()) {
+    /* OpenSSL 1.1.0+ will return here */
+    ssl_seeded = TRUE;
+    return CURLE_OK;
+  }
 
 #ifndef RANDOM_FILE
   /* if RANDOM_FILE isn't defined, we only perform this if an option tells
      us to! */
-  if(data->set.ssl.random_file)
+  if(data->set.str[STRING_SSL_RANDOM_FILE])
 #define RANDOM_FILE "" /* doesn't matter won't be used */
 #endif
   {
@@ -209,7 +251,7 @@ static int ossl_seed(struct SessionHandle *data)
                              data->set.str[STRING_SSL_RANDOM_FILE]:
                              RANDOM_FILE),
                             RAND_LOAD_LENGTH);
-    if(seed_enough(nread))
+    if(rand_enough())
       return nread;
   }
 
@@ -229,7 +271,7 @@ static int ossl_seed(struct SessionHandle *data)
                        data->set.str[STRING_SSL_EGDSOCKET]:EGD_SOCKET);
     if(-1 != ret) {
       nread += ret;
-      if(seed_enough(nread))
+      if(rand_enough())
         return nread;
     }
   }
@@ -240,9 +282,10 @@ static int ossl_seed(struct SessionHandle *data)
   do {
     unsigned char randb[64];
     int len = sizeof(randb);
-    RAND_bytes(randb, len);
+    if(!RAND_bytes(randb, len))
+      break;
     RAND_add(randb, len, (len >> 1));
-  } while(!RAND_status());
+  } while(!rand_enough());
 
   /* generates a default path for the random seed file */
   buf[0]=0; /* blank it first */
@@ -250,11 +293,12 @@ static int ossl_seed(struct SessionHandle *data)
   if(buf[0]) {
     /* we got a file name to try */
     nread += RAND_load_file(buf, RAND_LOAD_LENGTH);
-    if(seed_enough(nread))
+    if(rand_enough())
       return nread;
   }
 
   infof(data, "libcurl is now using a weak random seed!\n");
+<<<<<<< HEAD
   return nread;
 }
 
@@ -270,6 +314,9 @@ int Curl_ossl_seed(struct SessionHandle *data)
     ssl_seeded = TRUE;
   }
   return 0;
+=======
+  return CURLE_SSL_CONNECT_ERROR; /* confusing error code */
+>>>>>>> origin/tomato-shibby-RT-AC
 }
 
 
@@ -283,13 +330,13 @@ static int do_file_type(const char *type)
 {
   if(!type || !type[0])
     return SSL_FILETYPE_PEM;
-  if(Curl_raw_equal(type, "PEM"))
+  if(strcasecompare(type, "PEM"))
     return SSL_FILETYPE_PEM;
-  if(Curl_raw_equal(type, "DER"))
+  if(strcasecompare(type, "DER"))
     return SSL_FILETYPE_ASN1;
-  if(Curl_raw_equal(type, "ENG"))
+  if(strcasecompare(type, "ENG"))
     return SSL_FILETYPE_ENGINE;
-  if(Curl_raw_equal(type, "P12"))
+  if(strcasecompare(type, "P12"))
     return SSL_FILETYPE_PKCS12;
   return -1;
 }
@@ -306,9 +353,14 @@ static int ssl_ui_reader(UI *ui, UI_STRING *uis)
   switch(UI_get_string_type(uis)) {
   case UIT_PROMPT:
   case UIT_VERIFY:
+<<<<<<< HEAD
     password = (const char*)UI_get0_user_data(ui);
     if(NULL != password &&
        UI_get_input_flags(uis) & UI_INPUT_FLAG_DEFAULT_PWD) {
+=======
+    password = (const char *)UI_get0_user_data(ui);
+    if(password && (UI_get_input_flags(uis) & UI_INPUT_FLAG_DEFAULT_PWD)) {
+>>>>>>> origin/tomato-shibby-RT-AC
       UI_set_result(ui, uis, password);
       return 1;
     }
@@ -343,9 +395,10 @@ int cert_stuff(struct connectdata *conn,
                char *cert_file,
                const char *cert_type,
                char *key_file,
-               const char *key_type)
+               const char *key_type,
+               char *key_passwd)
 {
-  struct SessionHandle *data = conn->data;
+  struct Curl_easy *data = conn->data;
 
   int file_type = do_file_type(cert_type);
 
@@ -354,6 +407,7 @@ int cert_stuff(struct connectdata *conn,
     X509 *x509;
     int cert_done = 0;
 
+<<<<<<< HEAD
     if(data->set.str[STRING_KEY_PASSWD]) {
 #ifndef HAVE_USERDATA_IN_PWD_CALLBACK
       /*
@@ -372,6 +426,11 @@ int cert_stuff(struct connectdata *conn,
       SSL_CTX_set_default_passwd_cb_userdata(ctx,
                                              data->set.str[STRING_KEY_PASSWD]);
 #endif
+=======
+    if(key_passwd) {
+      /* set the password in the callback userdata */
+      SSL_CTX_set_default_passwd_cb_userdata(ctx, key_passwd);
+>>>>>>> origin/tomato-shibby-RT-AC
       /* Set passwd callback: */
       SSL_CTX_set_default_passwd_cb(ctx, passwd_callback);
     }
@@ -478,7 +537,7 @@ int cert_stuff(struct connectdata *conn,
 
       PKCS12_PBE_add();
 
-      if(!PKCS12_parse(p12, data->set.str[STRING_KEY_PASSWD], &pri, &x509,
+      if(!PKCS12_parse(p12, key_passwd, &pri, &x509,
                        &ca)) {
         failf(data,
               "could not parse PKCS12 file, check password, OpenSSL error %s",
@@ -511,20 +570,24 @@ int cert_stuff(struct connectdata *conn,
           /*
            * Note that sk_X509_pop() is used below to make sure the cert is
            * removed from the stack properly before getting passed to
-           * SSL_CTX_add_extra_chain_cert(). Previously we used
-           * sk_X509_value() instead, but then we'd clean it in the subsequent
-           * sk_X509_pop_free() call.
+           * SSL_CTX_add_extra_chain_cert(), which takes ownership. Previously
+           * we used sk_X509_value() instead, but then we'd clean it in the
+           * subsequent sk_X509_pop_free() call.
            */
           X509 *x = sk_X509_pop(ca);
+<<<<<<< HEAD
           if(!SSL_CTX_add_extra_chain_cert(ctx, x)) {
             failf(data, "cannot add certificate to certificate chain");
+=======
+          if(!SSL_CTX_add_client_CA(ctx, x)) {
+            X509_free(x);
+            failf(data, "cannot add certificate to client CA list");
+>>>>>>> origin/tomato-shibby-RT-AC
             goto fail;
           }
-          /* SSL_CTX_add_client_CA() seems to work with either sk_* function,
-           * presumably because it duplicates what we pass to it.
-           */
-          if(!SSL_CTX_add_client_CA(ctx, x)) {
-            failf(data, "cannot add certificate to client CA list");
+          if(!SSL_CTX_add_extra_chain_cert(ctx, x)) {
+            X509_free(x);
+            failf(data, "cannot add certificate to certificate chain");
             goto fail;
           }
         }
@@ -572,9 +635,16 @@ int cert_stuff(struct connectdata *conn,
         if(data->state.engine) {
 #ifdef HAVE_ENGINE_LOAD_FOUR_ARGS
           UI_METHOD *ui_method =
+<<<<<<< HEAD
             UI_create_method((char *)"cURL user interface");
           if(NULL == ui_method) {
             failf(data, "unable do create OpenSSL user-interface method");
+=======
+            UI_create_method((char *)"curl user interface");
+          if(!ui_method) {
+            failf(data, "unable do create " OSSL_PACKAGE
+                  " user-interface method");
+>>>>>>> origin/tomato-shibby-RT-AC
             return 0;
           }
           UI_method_set_opener(ui_method, UI_method_get_opener(UI_OpenSSL()));
@@ -587,9 +657,13 @@ int cert_stuff(struct connectdata *conn,
             ENGINE_load_private_key(data->state.engine,key_file,
 #ifdef HAVE_ENGINE_LOAD_FOUR_ARGS
                                     ui_method,
+<<<<<<< HEAD
 #endif
                                     data->set.str[STRING_KEY_PASSWD]);
 #ifdef HAVE_ENGINE_LOAD_FOUR_ARGS
+=======
+                                    key_passwd);
+>>>>>>> origin/tomato-shibby-RT-AC
           UI_destroy_method(ui_method);
 #endif
           if(!priv_key) {
@@ -703,7 +777,7 @@ int cert_verify_callback(int ok, X509_STORE_CTX *ctx)
 
 /* Return error string for last OpenSSL error
  */
-static char *SSL_strerror(unsigned long error, char *buf, size_t size)
+static char *ossl_strerror(unsigned long error, char *buf, size_t size)
 {
 #ifdef HAVE_ERR_ERROR_STRING_N
   /* OpenSSL 0.9.6 and later has a function named
@@ -732,6 +806,29 @@ int Curl_ossl_init(void)
   ENGINE_load_builtin_engines();
 #endif
 
+<<<<<<< HEAD
+=======
+  /* OPENSSL_config(NULL); is "strongly recommended" to use but unfortunately
+     that function makes an exit() call on wrongly formatted config files
+     which makes it hard to use in some situations. OPENSSL_config() itself
+     calls CONF_modules_load_file() and we use that instead and we ignore
+     its return code! */
+
+  /* CONF_MFLAGS_DEFAULT_SECTION introduced some time between 0.9.8b and
+     0.9.8e */
+#ifndef CONF_MFLAGS_DEFAULT_SECTION
+#define CONF_MFLAGS_DEFAULT_SECTION 0x0
+#endif
+
+  CONF_modules_load_file(NULL, NULL,
+                         CONF_MFLAGS_DEFAULT_SECTION|
+                         CONF_MFLAGS_IGNORE_MISSING_FILE);
+
+#if (OPENSSL_VERSION_NUMBER >= 0x10100000L) && \
+    !defined(LIBRESSL_VERSION_NUMBER)
+  /* OpenSSL 1.1.0+ takes care of initialization itself */
+#else
+>>>>>>> origin/tomato-shibby-RT-AC
   /* Lets get nice error messages */
   SSL_load_error_strings();
 
@@ -740,6 +837,7 @@ int Curl_ossl_init(void)
     return 0;
 
   OpenSSL_add_all_algorithms();
+#endif
 
   return 1;
 }
@@ -751,17 +849,17 @@ int Curl_ossl_init(void)
 /* Global cleanup */
 void Curl_ossl_cleanup(void)
 {
+#if (OPENSSL_VERSION_NUMBER >= 0x10100000L) && \
+    !defined(LIBRESSL_VERSION_NUMBER)
+  /* OpenSSL 1.1 deprecates all these cleanup functions and
+     turns them into no-ops in OpenSSL 1.0 compatibility mode */
+#else
   /* Free ciphers and digests lists */
   EVP_cleanup();
 
 #ifdef HAVE_ENGINE_CLEANUP
   /* Free engine list */
   ENGINE_cleanup();
-#endif
-
-#ifdef HAVE_CRYPTO_CLEANUP_ALL_EX_DATA
-  /* Free OpenSSL ex_data table */
-  CRYPTO_cleanup_all_ex_data();
 #endif
 
   /* Free OpenSSL error strings */
@@ -773,6 +871,17 @@ void Curl_ossl_cleanup(void)
 #else
   ERR_remove_state(0);
 #endif
+<<<<<<< HEAD
+=======
+
+  /* Free all memory allocated by all configuration modules */
+  CONF_modules_free();
+
+#ifdef HAVE_SSL_COMP_FREE_COMPRESSION_METHODS
+  SSL_COMP_free_compression_methods();
+#endif
+#endif
+>>>>>>> origin/tomato-shibby-RT-AC
 }
 
 /*
@@ -800,7 +909,7 @@ int Curl_ossl_check_cxn(struct connectdata *conn)
 
 /* Selects an OpenSSL crypto engine
  */
-CURLcode Curl_ossl_set_engine(struct SessionHandle *data, const char *engine)
+CURLcode Curl_ossl_set_engine(struct Curl_easy *data, const char *engine)
 {
 #if defined(USE_SSLEAY) && defined(HAVE_OPENSSL_ENGINE_H)
   ENGINE *e;
@@ -831,7 +940,7 @@ CURLcode Curl_ossl_set_engine(struct SessionHandle *data, const char *engine)
 
     ENGINE_free(e);
     failf(data, "Failed to initialise SSL Engine '%s':\n%s",
-          engine, SSL_strerror(ERR_get_error(), buf, sizeof(buf)));
+          engine, ossl_strerror(ERR_get_error(), buf, sizeof(buf)));
     return CURLE_SSL_ENGINE_INITFAILED;
   }
   data->state.engine = e;
@@ -845,7 +954,7 @@ CURLcode Curl_ossl_set_engine(struct SessionHandle *data, const char *engine)
 
 /* Sets engine as default for all SSL operations
  */
-CURLcode Curl_ossl_set_engine_default(struct SessionHandle *data)
+CURLcode Curl_ossl_set_engine_default(struct Curl_easy *data)
 {
 #ifdef HAVE_OPENSSL_ENGINE_H
   if(data->state.engine) {
@@ -867,7 +976,7 @@ CURLcode Curl_ossl_set_engine_default(struct SessionHandle *data)
 
 /* Return list of OpenSSL crypto engine names.
  */
-struct curl_slist *Curl_ossl_engines_list(struct SessionHandle *data)
+struct curl_slist *Curl_ossl_engines_list(struct Curl_easy *data)
 {
   struct curl_slist *list = NULL;
 #if defined(USE_SSLEAY) && defined(HAVE_OPENSSL_ENGINE_H)
@@ -888,24 +997,28 @@ struct curl_slist *Curl_ossl_engines_list(struct SessionHandle *data)
 }
 
 
+static void ossl_close(struct ssl_connect_data *connssl)
+{
+  if(connssl->handle) {
+    (void)SSL_shutdown(connssl->handle);
+    SSL_set_connect_state(connssl->handle);
+
+    SSL_free(connssl->handle);
+    connssl->handle = NULL;
+  }
+  if(connssl->ctx) {
+    SSL_CTX_free(connssl->ctx);
+    connssl->ctx = NULL;
+  }
+}
+
 /*
  * This function is called when an SSL connection is closed.
  */
 void Curl_ossl_close(struct connectdata *conn, int sockindex)
 {
-  struct ssl_connect_data *connssl = &conn->ssl[sockindex];
-
-  if(connssl->handle) {
-    (void)SSL_shutdown(connssl->handle);
-    SSL_set_connect_state(connssl->handle);
-
-    SSL_free (connssl->handle);
-    connssl->handle = NULL;
-  }
-  if(connssl->ctx) {
-    SSL_CTX_free (connssl->ctx);
-    connssl->ctx = NULL;
-  }
+  ossl_close(&conn->ssl[sockindex]);
+  ossl_close(&conn->proxy_ssl[sockindex]);
 }
 
 /*
@@ -916,9 +1029,9 @@ int Curl_ossl_shutdown(struct connectdata *conn, int sockindex)
 {
   int retval = 0;
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
-  struct SessionHandle *data = conn->data;
-  char buf[120]; /* We will use this for the OpenSSL error buffer, so it has
-                    to be at least 120 bytes long. */
+  struct Curl_easy *data = conn->data;
+  char buf[256]; /* We will use this for the OpenSSL error buffer, so it has
+                    to be at least 256 bytes long. */
   unsigned long sslerror;
   ssize_t nread;
   int buffsize;
@@ -936,8 +1049,8 @@ int Curl_ossl_shutdown(struct connectdata *conn, int sockindex)
   if(connssl->handle) {
     buffsize = (int)sizeof(buf);
     while(!done) {
-      int what = Curl_socket_ready(conn->sock[sockindex],
-                                   CURL_SOCKET_BAD, SSL_SHUTDOWN_TIMEOUT);
+      int what = SOCKET_READABLE(conn->sock[sockindex],
+                                 SSL_SHUTDOWN_TIMEOUT);
       if(what > 0) {
         ERR_clear_error();
 
@@ -966,8 +1079,13 @@ int Curl_ossl_shutdown(struct connectdata *conn, int sockindex)
         default:
           /* openssl/ssl.h says "look at error stack/return value/errno" */
           sslerror = ERR_get_error();
+<<<<<<< HEAD
           failf(conn->data, "SSL read: %s, errno %d",
                 ERR_error_string(sslerror, buf),
+=======
+          failf(conn->data, OSSL_PACKAGE " SSL read: %s, errno %d",
+                ossl_strerror(sslerror, buf, sizeof(buf)),
+>>>>>>> origin/tomato-shibby-RT-AC
                 SOCKERRNO);
           done = 1;
           break;
@@ -1003,7 +1121,7 @@ int Curl_ossl_shutdown(struct connectdata *conn, int sockindex)
 #endif
     }
 
-    SSL_free (connssl->handle);
+    SSL_free(connssl->handle);
     connssl->handle = NULL;
   }
   return retval;
@@ -1019,7 +1137,11 @@ void Curl_ossl_session_free(void *ptr)
  * This function is called when the 'data' struct is going away. Close
  * down everything and free all resources!
  */
+<<<<<<< HEAD
 int Curl_ossl_close_all(struct SessionHandle *data)
+=======
+void Curl_ossl_close_all(struct Curl_easy *data)
+>>>>>>> origin/tomato-shibby-RT-AC
 {
 #ifdef HAVE_OPENSSL_ENGINE_H
   if(data->state.engine) {
@@ -1030,6 +1152,7 @@ int Curl_ossl_close_all(struct SessionHandle *data)
 #else
   (void)data;
 #endif
+<<<<<<< HEAD
   return 0;
 }
 
@@ -1074,6 +1197,16 @@ static int asn1_output(const ASN1_UTCTIME *tm,
            year+1900, month, day, hour, minute, second, (gmt?"GMT":""));
 
   return 0;
+=======
+#if !defined(HAVE_ERR_REMOVE_THREAD_STATE_DEPRECATED) && \
+  defined(HAVE_ERR_REMOVE_THREAD_STATE)
+  /* OpenSSL 1.0.1 and 1.0.2 build an error queue that is stored per-thread
+     so we need to clean it here in case the thread will be killed. All OpenSSL
+     code should extract the error in association with the error so clearing
+     this queue here should be harmless at worst. */
+  ERR_remove_thread_state(NULL);
+#endif
+>>>>>>> origin/tomato-shibby-RT-AC
 }
 
 /* ====================================================== */
@@ -1107,24 +1240,34 @@ static CURLcode verifyhost(struct connectdata *conn,
                        means mismatch */
   int target = GEN_DNS; /* target type, GEN_DNS or GEN_IPADD */
   size_t addrlen = 0;
-  struct SessionHandle *data = conn->data;
+  struct Curl_easy *data = conn->data;
   STACK_OF(GENERAL_NAME) *altnames;
 #ifdef ENABLE_IPV6
   struct in6_addr addr;
 #else
   struct in_addr addr;
 #endif
+<<<<<<< HEAD
   CURLcode res = CURLE_OK;
+=======
+  CURLcode result = CURLE_OK;
+  bool dNSName = FALSE; /* if a dNSName field exists in the cert */
+  bool iPAddress = FALSE; /* if a iPAddress field exists in the cert */
+  const char * const hostname = SSL_IS_PROXY() ? conn->http_proxy.host.name :
+    conn->host.name;
+  const char * const dispname = SSL_IS_PROXY() ?
+    conn->http_proxy.host.dispname : conn->host.dispname;
+>>>>>>> origin/tomato-shibby-RT-AC
 
 #ifdef ENABLE_IPV6
   if(conn->bits.ipv6_ip &&
-     Curl_inet_pton(AF_INET6, conn->host.name, &addr)) {
+     Curl_inet_pton(AF_INET6, hostname, &addr)) {
     target = GEN_IPADD;
     addrlen = sizeof(struct in6_addr);
   }
   else
 #endif
-    if(Curl_inet_pton(AF_INET, conn->host.name, &addr)) {
+    if(Curl_inet_pton(AF_INET, hostname, &addr)) {
       target = GEN_IPADD;
       addrlen = sizeof(struct in_addr);
     }
@@ -1135,20 +1278,32 @@ static CURLcode verifyhost(struct connectdata *conn,
   if(altnames) {
     int numalts;
     int i;
+    bool dnsmatched = FALSE;
+    bool ipmatched = FALSE;
 
     /* get amount of alternatives, RFC2459 claims there MUST be at least
        one, but we don't depend on it... */
     numalts = sk_GENERAL_NAME_num(altnames);
 
+<<<<<<< HEAD
     /* loop through all alternatives while none has matched */
     for(i=0; (i<numalts) && (matched != 1); i++) {
+=======
+    /* loop through all alternatives - until a dnsmatch */
+    for(i=0; (i < numalts) && !dnsmatched; i++) {
+>>>>>>> origin/tomato-shibby-RT-AC
       /* get a handle to alternative name number i */
       const GENERAL_NAME *check = sk_GENERAL_NAME_value(altnames, i);
+
+      if(check->type == GEN_DNS)
+        dNSName = TRUE;
+      else if(check->type == GEN_IPADD)
+        iPAddress = TRUE;
 
       /* only check alternatives of the same type the target is */
       if(check->type == target) {
         /* get data and length */
-        const char *altptr = (char *)ASN1_STRING_data(check->d.ia5);
+        const char *altptr = (char *)ASN1_STRING_get0_data(check->d.ia5);
         size_t altlen = (size_t) ASN1_STRING_length(check->d.ia5);
 
         switch(target) {
@@ -1166,26 +1321,48 @@ static CURLcode verifyhost(struct connectdata *conn,
           if((altlen == strlen(altptr)) &&
              /* if this isn't true, there was an embedded zero in the name
                 string and we cannot match it. */
+<<<<<<< HEAD
              Curl_cert_hostcheck(altptr, conn->host.name))
             matched = 1;
           else
             matched = 0;
+=======
+             Curl_cert_hostcheck(altptr, hostname)) {
+            dnsmatched = TRUE;
+            infof(data,
+                  " subjectAltName: host \"%s\" matched cert's \"%s\"\n",
+                  dispname, altptr);
+          }
+>>>>>>> origin/tomato-shibby-RT-AC
           break;
 
         case GEN_IPADD: /* IP address comparison */
           /* compare alternative IP address if the data chunk is the same size
              our server IP address is */
+<<<<<<< HEAD
           if((altlen == addrlen) && !memcmp(altptr, &addr, altlen))
             matched = 1;
           else
             matched = 0;
+=======
+          if((altlen == addrlen) && !memcmp(altptr, &addr, altlen)) {
+            ipmatched = TRUE;
+            infof(data,
+                  " subjectAltName: host \"%s\" matched cert's IP address!\n",
+                  dispname);
+          }
+>>>>>>> origin/tomato-shibby-RT-AC
           break;
         }
       }
     }
     GENERAL_NAMES_free(altnames);
+
+    if(dnsmatched || ipmatched)
+      matched = TRUE;
   }
 
+<<<<<<< HEAD
   if(matched == 1)
     /* an alternative name matched the server hostname */
     infof(data, "\t subjectAltName: %s matched\n", conn->host.dispname);
@@ -1196,6 +1373,16 @@ static CURLcode verifyhost(struct connectdata *conn,
     failf(data, "SSL: no alternative certificate subject name matches "
           "target host name '%s'", conn->host.dispname);
     res = CURLE_PEER_FAILED_VERIFICATION;
+=======
+  if(matched)
+    /* an alternative name matched */
+    ;
+  else if(dNSName || iPAddress) {
+    infof(data, " subjectAltName does not match %s\n", dispname);
+    failf(data, "SSL: no alternative certificate subject name matches "
+          "target host name '%s'", dispname);
+    result = CURLE_PEER_FAILED_VERIFICATION;
+>>>>>>> origin/tomato-shibby-RT-AC
   }
   else {
     /* we have to look to the last occurrence of a commonName in the
@@ -1230,7 +1417,7 @@ static CURLcode verifyhost(struct connectdata *conn,
           if(j >= 0) {
             peer_CN = OPENSSL_malloc(j+1);
             if(peer_CN) {
-              memcpy(peer_CN, ASN1_STRING_data(tmp), j);
+              memcpy(peer_CN, ASN1_STRING_get0_data(tmp), j);
               peer_CN[j] = '\0';
             }
           }
@@ -1267,10 +1454,15 @@ static CURLcode verifyhost(struct connectdata *conn,
             "SSL: unable to obtain common name from peer certificate");
       res = CURLE_PEER_FAILED_VERIFICATION;
     }
-    else if(!Curl_cert_hostcheck((const char *)peer_CN, conn->host.name)) {
+    else if(!Curl_cert_hostcheck((const char *)peer_CN, hostname)) {
       failf(data, "SSL: certificate subject name '%s' does not match "
+<<<<<<< HEAD
             "target host name '%s'", peer_CN, conn->host.dispname);
       res = CURLE_PEER_FAILED_VERIFICATION;
+=======
+            "target host name '%s'", peer_CN, dispname);
+      result = CURLE_PEER_FAILED_VERIFICATION;
+>>>>>>> origin/tomato-shibby-RT-AC
     }
     else {
       infof(data, "\t common name: %s (matched)\n", peer_CN);
@@ -1278,7 +1470,139 @@ static CURLcode verifyhost(struct connectdata *conn,
     if(peer_CN)
       OPENSSL_free(peer_CN);
   }
+<<<<<<< HEAD
   return res;
+=======
+
+  return result;
+}
+
+#if (OPENSSL_VERSION_NUMBER >= 0x0090808fL) && !defined(OPENSSL_NO_TLSEXT) && \
+    !defined(OPENSSL_NO_OCSP)
+static CURLcode verifystatus(struct connectdata *conn,
+                             struct ssl_connect_data *connssl)
+{
+  int i, ocsp_status;
+  const unsigned char *p;
+  CURLcode result = CURLE_OK;
+  struct Curl_easy *data = conn->data;
+
+  OCSP_RESPONSE *rsp = NULL;
+  OCSP_BASICRESP *br = NULL;
+  X509_STORE     *st = NULL;
+  STACK_OF(X509) *ch = NULL;
+
+  long len = SSL_get_tlsext_status_ocsp_resp(connssl->handle, &p);
+
+  if(!p) {
+    failf(data, "No OCSP response received");
+    result = CURLE_SSL_INVALIDCERTSTATUS;
+    goto end;
+  }
+
+  rsp = d2i_OCSP_RESPONSE(NULL, &p, len);
+  if(!rsp) {
+    failf(data, "Invalid OCSP response");
+    result = CURLE_SSL_INVALIDCERTSTATUS;
+    goto end;
+  }
+
+  ocsp_status = OCSP_response_status(rsp);
+  if(ocsp_status != OCSP_RESPONSE_STATUS_SUCCESSFUL) {
+    failf(data, "Invalid OCSP response status: %s (%d)",
+          OCSP_response_status_str(ocsp_status), ocsp_status);
+    result = CURLE_SSL_INVALIDCERTSTATUS;
+    goto end;
+  }
+
+  br = OCSP_response_get1_basic(rsp);
+  if(!br) {
+    failf(data, "Invalid OCSP response");
+    result = CURLE_SSL_INVALIDCERTSTATUS;
+    goto end;
+  }
+
+  ch = SSL_get_peer_cert_chain(connssl->handle);
+  st = SSL_CTX_get_cert_store(connssl->ctx);
+
+#if ((OPENSSL_VERSION_NUMBER <= 0x1000201fL) /* Fixed after 1.0.2a */ || \
+     defined(LIBRESSL_VERSION_NUMBER))
+  /* The authorized responder cert in the OCSP response MUST be signed by the
+     peer cert's issuer (see RFC6960 section 4.2.2.2). If that's a root cert,
+     no problem, but if it's an intermediate cert OpenSSL has a bug where it
+     expects this issuer to be present in the chain embedded in the OCSP
+     response. So we add it if necessary. */
+
+  /* First make sure the peer cert chain includes both a peer and an issuer,
+     and the OCSP response contains a responder cert. */
+  if(sk_X509_num(ch) >= 2 && sk_X509_num(br->certs) >= 1) {
+    X509 *responder = sk_X509_value(br->certs, sk_X509_num(br->certs) - 1);
+
+    /* Find issuer of responder cert and add it to the OCSP response chain */
+    for(i = 0; i < sk_X509_num(ch); i++) {
+      X509 *issuer = sk_X509_value(ch, i);
+      if(X509_check_issued(issuer, responder) == X509_V_OK) {
+        if(!OCSP_basic_add1_cert(br, issuer)) {
+          failf(data, "Could not add issuer cert to OCSP response");
+          result = CURLE_SSL_INVALIDCERTSTATUS;
+          goto end;
+        }
+      }
+    }
+  }
+#endif
+
+  if(OCSP_basic_verify(br, ch, st, 0) <= 0) {
+    failf(data, "OCSP response verification failed");
+    result = CURLE_SSL_INVALIDCERTSTATUS;
+    goto end;
+  }
+
+  for(i = 0; i < OCSP_resp_count(br); i++) {
+    int cert_status, crl_reason;
+    OCSP_SINGLERESP *single = NULL;
+
+    ASN1_GENERALIZEDTIME *rev, *thisupd, *nextupd;
+
+    single = OCSP_resp_get0(br, i);
+    if(!single)
+      continue;
+
+    cert_status = OCSP_single_get0_status(single, &crl_reason, &rev,
+                                          &thisupd, &nextupd);
+
+    if(!OCSP_check_validity(thisupd, nextupd, 300L, -1L)) {
+      failf(data, "OCSP response has expired");
+      result = CURLE_SSL_INVALIDCERTSTATUS;
+      goto end;
+    }
+
+    infof(data, "SSL certificate status: %s (%d)\n",
+          OCSP_cert_status_str(cert_status), cert_status);
+
+    switch(cert_status) {
+      case V_OCSP_CERTSTATUS_GOOD:
+        break;
+
+      case V_OCSP_CERTSTATUS_REVOKED:
+        result = CURLE_SSL_INVALIDCERTSTATUS;
+
+        failf(data, "SSL certificate revocation reason: %s (%d)",
+              OCSP_crl_reason_str(crl_reason), crl_reason);
+        goto end;
+
+      case V_OCSP_CERTSTATUS_UNKNOWN:
+        result = CURLE_SSL_INVALIDCERTSTATUS;
+        goto end;
+    }
+  }
+
+end:
+  if(br) OCSP_BASICRESP_free(br);
+  OCSP_RESPONSE_free(rsp);
+
+  return result;
+>>>>>>> origin/tomato-shibby-RT-AC
 }
 #endif /* USE_SSLEAY */
 
@@ -1289,7 +1613,7 @@ static CURLcode verifyhost(struct connectdata *conn,
 static const char *ssl_msg_type(int ssl_ver, int msg)
 {
   if(ssl_ver == SSL2_VERSION_MAJOR) {
-    switch (msg) {
+    switch(msg) {
       case SSL2_MT_ERROR:
         return "Error";
       case SSL2_MT_CLIENT_HELLO:
@@ -1310,8 +1634,15 @@ static const char *ssl_msg_type(int ssl_ver, int msg)
         return "Client CERT";
     }
   }
+<<<<<<< HEAD
   else if(ssl_ver == SSL3_VERSION_MAJOR) {
     switch (msg) {
+=======
+  else
+#endif
+  if(ssl_ver == SSL3_VERSION_MAJOR) {
+    switch(msg) {
+>>>>>>> origin/tomato-shibby-RT-AC
       case SSL3_MT_HELLO_REQUEST:
         return "Hello request";
       case SSL3_MT_CLIENT_HELLO:
@@ -1355,7 +1686,7 @@ static void ssl_tls_trace(int direction, int ssl_ver, int content_type,
                           const void *buf, size_t len, const SSL *ssl,
                           struct connectdata *conn)
 {
-  struct SessionHandle *data;
+  struct Curl_easy *data;
   const char *msg_name, *tls_rt_name;
   char ssl_buf[1024];
   int  ver, msg_type, txt_len;
@@ -1369,6 +1700,7 @@ static void ssl_tls_trace(int direction, int ssl_ver, int content_type,
   ver = (ssl_ver == SSL2_VERSION_MAJOR ? '2' :
          ssl_ver == SSL3_VERSION_MAJOR ? '3' : '?');
 
+<<<<<<< HEAD
   /* SSLv2 doesn't seem to have TLS record-type headers, so OpenSSL
    * always pass-up content-type as 0. But the interesting message-type
    * is at 'buf[0]'.
@@ -1380,6 +1712,61 @@ static void ssl_tls_trace(int direction, int ssl_ver, int content_type,
 
   msg_type = *(char*)buf;
   msg_name = ssl_msg_type(ssl_ver, msg_type);
+=======
+  switch(ssl_ver) {
+#ifdef SSL2_VERSION /* removed in recent versions */
+  case SSL2_VERSION:
+    verstr = "SSLv2";
+    break;
+#endif
+#ifdef SSL3_VERSION
+  case SSL3_VERSION:
+    verstr = "SSLv3";
+    break;
+#endif
+  case TLS1_VERSION:
+    verstr = "TLSv1.0";
+    break;
+#ifdef TLS1_1_VERSION
+  case TLS1_1_VERSION:
+    verstr = "TLSv1.1";
+    break;
+#endif
+#ifdef TLS1_2_VERSION
+  case TLS1_2_VERSION:
+    verstr = "TLSv1.2";
+    break;
+#endif
+#ifdef TLS1_3_VERSION
+  case TLS1_3_VERSION:
+    verstr = "TLSv1.3";
+    break;
+#endif
+  case 0:
+    break;
+  default:
+    snprintf(unknown, sizeof(unknown), "(%x)", ssl_ver);
+    verstr = unknown;
+    break;
+  }
+
+  if(ssl_ver) {
+    /* the info given when the version is zero is not that useful for us */
+
+    ssl_ver >>= 8; /* check the upper 8 bits only below */
+
+    /* SSLv2 doesn't seem to have TLS record-type headers, so OpenSSL
+     * always pass-up content-type as 0. But the interesting message-type
+     * is at 'buf[0]'.
+     */
+    if(ssl_ver == SSL3_VERSION_MAJOR && content_type)
+      tls_rt_name = tls_rt_type(content_type);
+    else
+      tls_rt_name = "";
+
+    msg_type = *(char *)buf;
+    msg_name = ssl_msg_type(ssl_ver, msg_type);
+>>>>>>> origin/tomato-shibby-RT-AC
 
   txt_len = snprintf(ssl_buf, sizeof(ssl_buf), "SSLv%c, %s%s (%d):\n",
                      ver, tls_rt_name, msg_name, msg_type);
@@ -1453,7 +1840,15 @@ get_ssl_version_txt(SSL_SESSION *session)
   if(NULL == session)
     return "";
 
+<<<<<<< HEAD
   switch(session->ssl_version) {
+=======
+  switch(SSL_version(ssl)) {
+#ifdef TLS1_3_VERSION
+  case TLS1_3_VERSION:
+    return "TLSv1.3";
+#endif
+>>>>>>> origin/tomato-shibby-RT-AC
 #if OPENSSL_VERSION_NUMBER >= 0x1000100FL
   case TLS1_2_VERSION:
     return "TLSv1.2";
@@ -1477,10 +1872,16 @@ ossl_connect_step1(struct connectdata *conn,
 {
   CURLcode retcode = CURLE_OK;
   char *ciphers;
+<<<<<<< HEAD
   struct SessionHandle *data = conn->data;
   SSL_METHOD_QUAL SSL_METHOD *req_method=NULL;
   void *ssl_sessionid=NULL;
   X509_LOOKUP *lookup=NULL;
+=======
+  struct Curl_easy *data = conn->data;
+  SSL_METHOD_QUAL SSL_METHOD *req_method = NULL;
+  X509_LOOKUP *lookup = NULL;
+>>>>>>> origin/tomato-shibby-RT-AC
   curl_socket_t sockfd = conn->sock[sockindex];
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
   long ctx_options;
@@ -1492,26 +1893,45 @@ ossl_connect_step1(struct connectdata *conn,
   struct in_addr addr;
 #endif
 #endif
+<<<<<<< HEAD
 #ifdef HAS_ALPN
   unsigned char protocols[128];
 #endif
+=======
+  long * const certverifyresult = SSL_IS_PROXY() ?
+    &data->set.proxy_ssl.certverifyresult : &data->set.ssl.certverifyresult;
+  const long int ssl_version = SSL_CONN_CONFIG(version);
+#ifdef USE_TLS_SRP
+  const enum CURL_TLSAUTH ssl_authtype = SSL_SET_OPTION(authtype);
+#endif
+  char * const ssl_cert = SSL_SET_OPTION(cert);
+  const char * const ssl_cert_type = SSL_SET_OPTION(cert_type);
+  const char * const ssl_cafile = SSL_CONN_CONFIG(CAfile);
+  const char * const ssl_capath = SSL_CONN_CONFIG(CApath);
+  const bool verifypeer = SSL_CONN_CONFIG(verifypeer);
+  const char * const ssl_crlfile = SSL_SET_OPTION(CRLfile);
+  const char * const hostname = SSL_IS_PROXY() ? conn->http_proxy.host.name :
+    conn->host.name;
+>>>>>>> origin/tomato-shibby-RT-AC
 
   DEBUGASSERT(ssl_connect_1 == connssl->connecting_state);
 
   /* Make funny stuff to get random input */
-  Curl_ossl_seed(data);
+  result = Curl_ossl_seed(data);
+  if(result)
+    return result;
 
-  data->set.ssl.certverifyresult = !X509_V_OK;
+  *certverifyresult = !X509_V_OK;
 
   /* check to see if we've been told to use an explicit SSL/TLS version */
 
-  switch(data->set.ssl.version) {
-  default:
+  switch(ssl_version) {
   case CURL_SSLVERSION_DEFAULT:
   case CURL_SSLVERSION_TLSv1:
   case CURL_SSLVERSION_TLSv1_0:
   case CURL_SSLVERSION_TLSv1_1:
   case CURL_SSLVERSION_TLSv1_2:
+  case CURL_SSLVERSION_TLSv1_3:
     /* it will be handled later with the context options */
     req_method = SSLv23_client_method();
     use_sni(TRUE);
@@ -1522,7 +1942,7 @@ ossl_connect_step1(struct connectdata *conn,
     return CURLE_NOT_BUILT_IN;
 #else
 #ifdef USE_TLS_SRP
-    if(data->set.ssl.authtype == CURL_TLSAUTH_SRP)
+    if(ssl_authtype == CURL_TLSAUTH_SRP)
       return CURLE_SSL_CONNECT_ERROR;
 #endif
     req_method = SSLv2_client_method();
@@ -1531,12 +1951,19 @@ ossl_connect_step1(struct connectdata *conn,
 #endif
   case CURL_SSLVERSION_SSLv3:
 #ifdef USE_TLS_SRP
-    if(data->set.ssl.authtype == CURL_TLSAUTH_SRP)
+    if(ssl_authtype == CURL_TLSAUTH_SRP)
       return CURLE_SSL_CONNECT_ERROR;
 #endif
     req_method = SSLv3_client_method();
     use_sni(FALSE);
     break;
+<<<<<<< HEAD
+=======
+#endif
+  default:
+    failf(data, "Unrecognized parameter passed via CURLOPT_SSLVERSION");
+    return CURLE_SSL_CONNECT_ERROR;
+>>>>>>> origin/tomato-shibby-RT-AC
   }
 
   if(connssl->ctx)
@@ -1622,15 +2049,20 @@ ossl_connect_step1(struct connectdata *conn,
 #ifdef SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS
   /* unless the user explicitly ask to allow the protocol vulnerability we
      use the work-around */
-  if(!conn->data->set.ssl_enable_beast)
+  if(!SSL_SET_OPTION(enable_beast))
     ctx_options &= ~SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS;
 #endif
 
+<<<<<<< HEAD
   switch(data->set.ssl.version) {
   case CURL_SSLVERSION_DEFAULT:
     ctx_options |= SSL_OP_NO_SSLv2;
+=======
+  switch(ssl_version) {
+  case CURL_SSLVERSION_SSLv3:
+>>>>>>> origin/tomato-shibby-RT-AC
 #ifdef USE_TLS_SRP
-    if(data->set.ssl.authtype == CURL_TLSAUTH_SRP) {
+    if(ssl_authtype == CURL_TLSAUTH_SRP) {
       infof(data, "Set version TLSv1.x for SRP authorisation\n");
       ctx_options |= SSL_OP_NO_SSLv3;
     }
@@ -1643,6 +2075,9 @@ ossl_connect_step1(struct connectdata *conn,
 #if OPENSSL_VERSION_NUMBER >= 0x1000100FL
     ctx_options |= SSL_OP_NO_TLSv1_1;
     ctx_options |= SSL_OP_NO_TLSv1_2;
+#ifdef TLS1_3_VERSION
+    ctx_options |= SSL_OP_NO_TLSv1_3;
+#endif
 #endif
     break;
 
@@ -1657,38 +2092,75 @@ ossl_connect_step1(struct connectdata *conn,
 #if OPENSSL_VERSION_NUMBER >= 0x1000100FL
     ctx_options |= SSL_OP_NO_TLSv1_1;
     ctx_options |= SSL_OP_NO_TLSv1_2;
+#ifdef TLS1_3_VERSION
+    ctx_options |= SSL_OP_NO_TLSv1_3;
+#endif
 #endif
     break;
 
-#if OPENSSL_VERSION_NUMBER >= 0x1000100FL
   case CURL_SSLVERSION_TLSv1_1:
+#if OPENSSL_VERSION_NUMBER >= 0x1000100FL
     ctx_options |= SSL_OP_NO_SSLv2;
     ctx_options |= SSL_OP_NO_SSLv3;
     ctx_options |= SSL_OP_NO_TLSv1;
     ctx_options |= SSL_OP_NO_TLSv1_2;
+#ifdef TLS1_3_VERSION
+    ctx_options |= SSL_OP_NO_TLSv1_3;
+#endif
     break;
+#else
+    failf(data, OSSL_PACKAGE " was built without TLS 1.1 support");
+    return CURLE_NOT_BUILT_IN;
+#endif
 
   case CURL_SSLVERSION_TLSv1_2:
+#if OPENSSL_VERSION_NUMBER >= 0x1000100FL
     ctx_options |= SSL_OP_NO_SSLv2;
     ctx_options |= SSL_OP_NO_SSLv3;
     ctx_options |= SSL_OP_NO_TLSv1;
     ctx_options |= SSL_OP_NO_TLSv1_1;
+#ifdef TLS1_3_VERSION
+    ctx_options |= SSL_OP_NO_TLSv1_3;
+#endif
     break;
+#else
+    failf(data, OSSL_PACKAGE " was built without TLS 1.2 support");
+    return CURLE_NOT_BUILT_IN;
 #endif
 
-#ifndef OPENSSL_NO_SSL2
+  case CURL_SSLVERSION_TLSv1_3:
+#ifdef TLS1_3_VERSION
+    SSL_CTX_set_max_proto_version(connssl->ctx, TLS1_3_VERSION);
+    ctx_options |= SSL_OP_NO_SSLv2;
+    ctx_options |= SSL_OP_NO_SSLv3;
+    ctx_options |= SSL_OP_NO_TLSv1;
+    ctx_options |= SSL_OP_NO_TLSv1_1;
+    ctx_options |= SSL_OP_NO_TLSv1_2;
+    break;
+#else
+    failf(data, OSSL_PACKAGE " was built without TLS 1.3 support");
+    return CURLE_NOT_BUILT_IN;
+#endif
+
   case CURL_SSLVERSION_SSLv2:
+#ifndef OPENSSL_NO_SSL2
     ctx_options |= SSL_OP_NO_SSLv3;
     ctx_options |= SSL_OP_NO_TLSv1;
 #if OPENSSL_VERSION_NUMBER >= 0x1000100FL
     ctx_options |= SSL_OP_NO_TLSv1_1;
     ctx_options |= SSL_OP_NO_TLSv1_2;
+#ifdef TLS1_3_VERSION
+    ctx_options |= SSL_OP_NO_TLSv1_3;
+#endif
 #endif
     break;
+#else
+    failf(data, OSSL_PACKAGE " was built without SSLv2 support");
+    return CURLE_NOT_BUILT_IN;
 #endif
 
   default:
-    failf(data, "Unsupported SSL protocol version");
+    failf(data, "Unrecognized parameter passed via CURLOPT_SSLVERSION");
     return CURLE_SSL_CONNECT_ERROR;
   }
 
@@ -1724,19 +2196,16 @@ ossl_connect_step1(struct connectdata *conn,
   }
 #endif
 
-  if(data->set.str[STRING_CERT] || data->set.str[STRING_CERT_TYPE]) {
-    if(!cert_stuff(conn,
-                   connssl->ctx,
-                   data->set.str[STRING_CERT],
-                   data->set.str[STRING_CERT_TYPE],
-                   data->set.str[STRING_KEY],
-                   data->set.str[STRING_KEY_TYPE])) {
+  if(ssl_cert || ssl_cert_type) {
+    if(!cert_stuff(conn, connssl->ctx, ssl_cert, ssl_cert_type,
+                   SSL_SET_OPTION(key), SSL_SET_OPTION(key_type),
+                   SSL_SET_OPTION(key_passwd))) {
       /* failf() is already done in cert_stuff() */
       return CURLE_SSL_CERTPROBLEM;
     }
   }
 
-  ciphers = data->set.str[STRING_SSL_CIPHER_LIST];
+  ciphers = SSL_CONN_CONFIG(cipher_list);
   if(!ciphers)
     ciphers = (char *)DEFAULT_CIPHER_SELECTION;
   if(!SSL_CTX_set_cipher_list(connssl->ctx, ciphers)) {
@@ -1745,18 +2214,24 @@ ossl_connect_step1(struct connectdata *conn,
   }
 
 #ifdef USE_TLS_SRP
-  if(data->set.ssl.authtype == CURL_TLSAUTH_SRP) {
-    infof(data, "Using TLS-SRP username: %s\n", data->set.ssl.username);
+  if(ssl_authtype == CURL_TLSAUTH_SRP) {
+    char * const ssl_username = SSL_SET_OPTION(username);
 
-    if(!SSL_CTX_set_srp_username(connssl->ctx, data->set.ssl.username)) {
+    infof(data, "Using TLS-SRP username: %s\n", ssl_username);
+
+    if(!SSL_CTX_set_srp_username(connssl->ctx, ssl_username)) {
       failf(data, "Unable to set SRP user name");
       return CURLE_BAD_FUNCTION_ARGUMENT;
     }
+<<<<<<< HEAD
     if(!SSL_CTX_set_srp_password(connssl->ctx,data->set.ssl.password)) {
+=======
+    if(!SSL_CTX_set_srp_password(connssl->ctx, SSL_SET_OPTION(password))) {
+>>>>>>> origin/tomato-shibby-RT-AC
       failf(data, "failed setting SRP password");
       return CURLE_BAD_FUNCTION_ARGUMENT;
     }
-    if(!data->set.str[STRING_SSL_CIPHER_LIST]) {
+    if(!SSL_CONN_CONFIG(cipher_list)) {
       infof(data, "Setting cipher list SRP\n");
 
       if(!SSL_CTX_set_cipher_list(connssl->ctx, "SRP")) {
@@ -1766,20 +2241,17 @@ ossl_connect_step1(struct connectdata *conn,
     }
   }
 #endif
-  if(data->set.str[STRING_SSL_CAFILE] || data->set.str[STRING_SSL_CAPATH]) {
+
+  if(ssl_cafile || ssl_capath) {
     /* tell SSL where to find CA certificates that are used to verify
        the servers certificate. */
-    if(!SSL_CTX_load_verify_locations(connssl->ctx,
-                                       data->set.str[STRING_SSL_CAFILE],
-                                       data->set.str[STRING_SSL_CAPATH])) {
-      if(data->set.ssl.verifypeer) {
+    if(!SSL_CTX_load_verify_locations(connssl->ctx, ssl_cafile, ssl_capath)) {
+      if(verifypeer) {
         /* Fail if we insist on successfully verifying the server. */
         failf(data,"error setting certificate verify locations:\n"
               "  CAfile: %s\n  CApath: %s",
-              data->set.str[STRING_SSL_CAFILE]?
-              data->set.str[STRING_SSL_CAFILE]: "none",
-              data->set.str[STRING_SSL_CAPATH]?
-              data->set.str[STRING_SSL_CAPATH] : "none");
+              ssl_cafile ? ssl_cafile : "none",
+              ssl_capath ? ssl_capath : "none");
         return CURLE_SSL_CACERT_BADFILE;
       }
       else {
@@ -1796,22 +2268,35 @@ ossl_connect_step1(struct connectdata *conn,
     infof(data,
           "  CAfile: %s\n"
           "  CApath: %s\n",
-          data->set.str[STRING_SSL_CAFILE] ? data->set.str[STRING_SSL_CAFILE]:
-          "none",
-          data->set.str[STRING_SSL_CAPATH] ? data->set.str[STRING_SSL_CAPATH]:
-          "none");
+          ssl_cafile ? ssl_cafile : "none",
+          ssl_capath ? ssl_capath : "none");
   }
+<<<<<<< HEAD
+=======
+#ifdef CURL_CA_FALLBACK
+  else if(verifypeer) {
+    /* verfying the peer without any CA certificates won't
+       work so use openssl's built in default as fallback */
+    SSL_CTX_set_default_verify_paths(connssl->ctx);
+  }
+#endif
+>>>>>>> origin/tomato-shibby-RT-AC
 
-  if(data->set.str[STRING_SSL_CRLFILE]) {
+  if(ssl_crlfile) {
     /* tell SSL where to find CRL file that is used to check certificate
      * revocation */
     lookup=X509_STORE_add_lookup(SSL_CTX_get_cert_store(connssl->ctx),
                                  X509_LOOKUP_file());
     if(!lookup ||
+<<<<<<< HEAD
        (!X509_load_crl_file(lookup,data->set.str[STRING_SSL_CRLFILE],
                             X509_FILETYPE_PEM)) ) {
       failf(data,"error loading CRL file: %s",
             data->set.str[STRING_SSL_CRLFILE]);
+=======
+       (!X509_load_crl_file(lookup, ssl_crlfile, X509_FILETYPE_PEM)) ) {
+      failf(data, "error loading CRL file: %s", ssl_crlfile);
+>>>>>>> origin/tomato-shibby-RT-AC
       return CURLE_SSL_CRL_BADFILE;
     }
     else {
@@ -1820,18 +2305,37 @@ ossl_connect_step1(struct connectdata *conn,
       X509_STORE_set_flags(SSL_CTX_get_cert_store(connssl->ctx),
                            X509_V_FLAG_CRL_CHECK|X509_V_FLAG_CRL_CHECK_ALL);
     }
-    infof(data,
-          "  CRLfile: %s\n", data->set.str[STRING_SSL_CRLFILE] ?
-          data->set.str[STRING_SSL_CRLFILE]: "none");
+    infof(data, "  CRLfile: %s\n", ssl_crlfile);
   }
 
+<<<<<<< HEAD
+=======
+  /* Try building a chain using issuers in the trusted store first to avoid
+  problems with server-sent legacy intermediates.
+  Newer versions of OpenSSL do alternate chain checking by default which
+  gives us the same fix without as much of a performance hit (slight), so we
+  prefer that if available.
+  https://rt.openssl.org/Ticket/Display.html?id=3621&user=guest&pass=guest
+  */
+#if defined(X509_V_FLAG_TRUSTED_FIRST) && !defined(X509_V_FLAG_NO_ALT_CHAINS)
+  if(verifypeer) {
+    X509_STORE_set_flags(SSL_CTX_get_cert_store(connssl->ctx),
+                         X509_V_FLAG_TRUSTED_FIRST);
+  }
+#endif
+
+>>>>>>> origin/tomato-shibby-RT-AC
   /* SSL always tries to verify the peer, this only says whether it should
    * fail to connect if the verification fails, or if it should continue
    * anyway. In the latter case the result of the verification is checked with
    * SSL_get_verify_result() below. */
   SSL_CTX_set_verify(connssl->ctx,
+<<<<<<< HEAD
                      data->set.ssl.verifypeer?SSL_VERIFY_PEER:SSL_VERIFY_NONE,
                      cert_verify_callback);
+=======
+                     verifypeer ? SSL_VERIFY_PEER : SSL_VERIFY_NONE, NULL);
+>>>>>>> origin/tomato-shibby-RT-AC
 
   /* give application a chance to interfere with SSL set up. */
   if(data->set.ssl.fsslctx) {
@@ -1851,35 +2355,68 @@ ossl_connect_step1(struct connectdata *conn,
     failf(data, "SSL: couldn't create a context (handle)!");
     return CURLE_OUT_OF_MEMORY;
   }
+<<<<<<< HEAD
+=======
+
+#if (OPENSSL_VERSION_NUMBER >= 0x0090808fL) && !defined(OPENSSL_NO_TLSEXT) && \
+    !defined(OPENSSL_NO_OCSP)
+  if(SSL_CONN_CONFIG(verifystatus))
+    SSL_set_tlsext_status_type(connssl->handle, TLSEXT_STATUSTYPE_ocsp);
+#endif
+
+>>>>>>> origin/tomato-shibby-RT-AC
   SSL_set_connect_state(connssl->handle);
 
   connssl->server_cert = 0x0;
-
 #ifdef SSL_CTRL_SET_TLSEXT_HOSTNAME
-  if((0 == Curl_inet_pton(AF_INET, conn->host.name, &addr)) &&
+  if((0 == Curl_inet_pton(AF_INET, hostname, &addr)) &&
 #ifdef ENABLE_IPV6
-     (0 == Curl_inet_pton(AF_INET6, conn->host.name, &addr)) &&
+     (0 == Curl_inet_pton(AF_INET6, hostname, &addr)) &&
 #endif
      sni &&
-     !SSL_set_tlsext_host_name(connssl->handle, conn->host.name))
+     !SSL_set_tlsext_host_name(connssl->handle, hostname))
     infof(data, "WARNING: failed to configure server name indication (SNI) "
           "TLS extension\n");
 #endif
 
   /* Check if there's a cached ID we can/should use here! */
+<<<<<<< HEAD
   if(!Curl_ssl_getsessionid(conn, &ssl_sessionid, NULL)) {
     /* we got a session id, use it! */
     if(!SSL_set_session(connssl->handle, ssl_sessionid)) {
       failf(data, "SSL: SSL_set_session failed: %s",
             ERR_error_string(ERR_get_error(),NULL));
       return CURLE_SSL_CONNECT_ERROR;
+=======
+  if(data->set.general_ssl.sessionid) {
+    void *ssl_sessionid = NULL;
+
+    Curl_ssl_sessionid_lock(conn);
+    if(!Curl_ssl_getsessionid(conn, &ssl_sessionid, NULL, sockindex)) {
+      /* we got a session id, use it! */
+      if(!SSL_set_session(connssl->handle, ssl_sessionid)) {
+        Curl_ssl_sessionid_unlock(conn);
+        failf(data, "SSL: SSL_set_session failed: %s",
+              ERR_error_string(ERR_get_error(), NULL));
+        return CURLE_SSL_CONNECT_ERROR;
+      }
+      /* Informational message */
+      infof(data, "SSL re-using session ID\n");
+>>>>>>> origin/tomato-shibby-RT-AC
     }
-    /* Informational message */
-    infof (data, "SSL re-using session ID\n");
+    Curl_ssl_sessionid_unlock(conn);
   }
 
-  /* pass the raw socket into the SSL layers */
-  if(!SSL_set_fd(connssl->handle, (int)sockfd)) {
+  if(conn->proxy_ssl[sockindex].use) {
+    BIO *const bio = BIO_new(BIO_f_ssl());
+    DEBUGASSERT(ssl_connection_complete == conn->proxy_ssl[sockindex].state);
+    DEBUGASSERT(conn->proxy_ssl[sockindex].handle != NULL);
+    DEBUGASSERT(bio != NULL);
+    BIO_set_ssl(bio, conn->proxy_ssl[sockindex].handle, FALSE);
+    SSL_set_bio(connssl->handle, bio, bio);
+  }
+  else if(!SSL_set_fd(connssl->handle, (int)sockfd)) {
+    /* pass the raw socket into the SSL layers */
     failf(data, "SSL: SSL_set_fd failed: %s",
           ERR_error_string(ERR_get_error(),NULL));
     return CURLE_SSL_CONNECT_ERROR;
@@ -1892,12 +2429,14 @@ ossl_connect_step1(struct connectdata *conn,
 static CURLcode
 ossl_connect_step2(struct connectdata *conn, int sockindex)
 {
-  struct SessionHandle *data = conn->data;
+  struct Curl_easy *data = conn->data;
   int err;
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
+  long * const certverifyresult = SSL_IS_PROXY() ?
+    &data->set.proxy_ssl.certverifyresult : &data->set.ssl.certverifyresult;
   DEBUGASSERT(ssl_connect_2 == connssl->connecting_state
-             || ssl_connect_2_reading == connssl->connecting_state
-             || ssl_connect_2_writing == connssl->connecting_state);
+              || ssl_connect_2_reading == connssl->connecting_state
+              || ssl_connect_2_writing == connssl->connecting_state);
 
   ERR_clear_error();
 
@@ -1950,11 +2489,13 @@ ossl_connect_step2(struct connectdata *conn, int sockindex)
 
         lerr = SSL_get_verify_result(connssl->handle);
         if(lerr != X509_V_OK) {
+          *certverifyresult = lerr;
           snprintf(error_buffer, sizeof(error_buffer),
                    "SSL certificate problem: %s",
                    X509_verify_cert_error_string(lerr));
         }
         else
+<<<<<<< HEAD
           cert_problem = "SSL certificate problem, verify that the CA cert is"
             " OK.";
 
@@ -1963,6 +2504,15 @@ ossl_connect_step2(struct connectdata *conn, int sockindex)
         rc = CURLE_SSL_CONNECT_ERROR;
         SSL_strerror(errdetail, error_buffer, sizeof(error_buffer));
         break;
+=======
+          /* strcpy() is fine here as long as the string fits within
+             error_buffer */
+          strcpy(error_buffer, "SSL certificate verification failed");
+      }
+      else {
+        result = CURLE_SSL_CONNECT_ERROR;
+        ossl_strerror(errdetail, error_buffer, sizeof(error_buffer));
+>>>>>>> origin/tomato-shibby-RT-AC
       }
 
       /* detail is already set to the SSL error above */
@@ -1971,10 +2521,20 @@ ossl_connect_step2(struct connectdata *conn, int sockindex)
        * (RST connection etc.), OpenSSL gives no explanation whatsoever and
        * the SO_ERROR is also lost.
        */
+<<<<<<< HEAD
       if(CURLE_SSL_CONNECT_ERROR == rc && errdetail == 0) {
         failf(data, "Unknown SSL protocol error in connection to %s:%ld ",
               conn->host.name, conn->remote_port);
         return rc;
+=======
+      if(CURLE_SSL_CONNECT_ERROR == result && errdetail == 0) {
+        const char * const hostname = SSL_IS_PROXY() ?
+          conn->http_proxy.host.name : conn->host.name;
+        const long int port = SSL_IS_PROXY() ? conn->port : conn->remote_port;
+        failf(data, "Unknown SSL protocol error in connection to %s:%ld ",
+              hostname, port);
+        return result;
+>>>>>>> origin/tomato-shibby-RT-AC
       }
       /* Could be a CERT problem */
 
@@ -1995,8 +2555,13 @@ ossl_connect_step2(struct connectdata *conn, int sockindex)
     /* Sets data and len to negotiated protocol, len is 0 if no protocol was
      * negotiated
      */
+<<<<<<< HEAD
     if(data->set.ssl_enable_alpn) {
       const unsigned char* neg_protocol;
+=======
+    if(conn->bits.tls_enable_alpn) {
+      const unsigned char *neg_protocol;
+>>>>>>> origin/tomato-shibby-RT-AC
       unsigned int len;
       SSL_get0_alpn_selected(connssl->handle, &neg_protocol, &len);
       if(len != 0) {
@@ -2025,7 +2590,8 @@ static int asn1_object_dump(ASN1_OBJECT *a, char *buf, size_t len)
 {
   int i, ilen;
 
-  if((ilen = (int)len) < 0)
+  ilen = (int)len;
+  if(ilen < 0)
     return 1; /* buffer too big */
 
   i = i2t_ASN1_OBJECT(buf, ilen, a);
@@ -2036,12 +2602,32 @@ static int asn1_object_dump(ASN1_OBJECT *a, char *buf, size_t len)
   return 0;
 }
 
+<<<<<<< HEAD
 static void pubkey_show(struct SessionHandle *data,
                         int num,
                         const char *type,
                         const char *name,
                         unsigned char *raw,
                         int len)
+=======
+#define push_certinfo(_label, _num) \
+do {                              \
+  long info_len = BIO_get_mem_data(mem, &ptr); \
+  Curl_ssl_push_certinfo_len(data, _num, _label, ptr, info_len); \
+  if(1!=BIO_reset(mem))                                          \
+    break;                                                       \
+} WHILE_FALSE
+
+static void pubkey_show(struct Curl_easy *data,
+                        BIO *mem,
+                        int num,
+                        const char *type,
+                        const char *name,
+#ifdef HAVE_OPAQUE_RSA_DSA_DH
+                        const
+#endif
+                        BIGNUM *bn)
+>>>>>>> origin/tomato-shibby-RT-AC
 {
   size_t left;
   int i;
@@ -2076,9 +2662,9 @@ do {                              \
   } \
 } WHILE_FALSE
 
-static int X509V3_ext(struct SessionHandle *data,
+static int X509V3_ext(struct Curl_easy *data,
                       int certnum,
-                      STACK_OF(X509_EXTENSION) *exts)
+                      CONST_EXTS STACK_OF(X509_EXTENSION) *exts)
 {
   int i;
   size_t j;
@@ -2182,8 +2768,12 @@ static CURLcode get_cert_chain(struct connectdata *conn,
 {
   STACK_OF(X509) *sk;
   int i;
+<<<<<<< HEAD
   char *bufp;
   struct SessionHandle *data = conn->data;
+=======
+  struct Curl_easy *data = conn->data;
+>>>>>>> origin/tomato-shibby-RT-AC
   int numcerts;
 
   bufp = malloc(CERTBUFFERSIZE);
@@ -2219,6 +2809,10 @@ static CURLcode get_cert_chain(struct connectdata *conn,
     EVP_PKEY *pubkey=NULL;
     int j;
     char *ptr;
+<<<<<<< HEAD
+=======
+    CONST_ASN1_BIT_STRING ASN1_BIT_STRING *psig = NULL;
+>>>>>>> origin/tomato-shibby-RT-AC
 
     (void)x509_name_oneline(X509_get_subject_name(x), bufp, CERTBUFFERSIZE);
     infof(data, "%2d Subject: %s\n", i, bufp);
@@ -2233,6 +2827,7 @@ static CURLcode get_cert_chain(struct connectdata *conn,
     snprintf(bufp, CERTBUFFERSIZE, "%lx", value);
     Curl_ssl_push_certinfo(data, i, "Version", bufp); /* hex */
 
+<<<<<<< HEAD
     num=X509_get_serialNumber(x);
     if(num->length <= 4) {
       value = ASN1_INTEGER_get(num);
@@ -2253,6 +2848,28 @@ static CURLcode get_cert_chain(struct connectdata *conn,
                  ((j+1 == num->length)?'\n':':'));
         ptr += 3;
         left-=4;
+=======
+    num = X509_get_serialNumber(x);
+    if(num->type == V_ASN1_NEG_INTEGER)
+      BIO_puts(mem, "-");
+    for(j = 0; j < num->length; j++)
+      BIO_printf(mem, "%02x", num->data[j]);
+    push_certinfo("Serial Number", i);
+
+#if defined(HAVE_X509_GET0_SIGNATURE) && defined(HAVE_X509_GET0_EXTENSIONS)
+    {
+      const X509_ALGOR *palg = NULL;
+      ASN1_STRING *a = ASN1_STRING_new();
+      if(a) {
+        X509_get0_signature(&psig, &palg, x);
+        X509_signature_print(mem, palg, a);
+        ASN1_STRING_free(a);
+
+        if(palg) {
+          i2a_ASN1_OBJECT(mem, palg->algorithm);
+          push_certinfo("Public Key Algorithm", i);
+        }
+>>>>>>> origin/tomato-shibby-RT-AC
       }
       if(num->length)
         infof(data,"   Serial Number: %s\n", bufp);
@@ -2270,6 +2887,7 @@ static CURLcode get_cert_chain(struct connectdata *conn,
       Curl_ssl_push_certinfo(data, i, "Signature Algorithm", bufp);
     }
 
+<<<<<<< HEAD
     certdate = X509_get_notBefore(x);
     asn1_output(certdate, bufp, CERTBUFFERSIZE);
     infof(data, "   Start date: %s\n", bufp);
@@ -2285,6 +2903,13 @@ static CURLcode get_cert_chain(struct connectdata *conn,
       infof(data, "   Public Key Algorithm: %s\n", bufp);
       Curl_ssl_push_certinfo(data, i, "Public Key Algorithm", bufp);
     }
+=======
+    ASN1_TIME_print(mem, X509_get0_notBefore(x));
+    push_certinfo("Start date", i);
+
+    ASN1_TIME_print(mem, X509_get0_notAfter(x));
+    push_certinfo("Expire date", i);
+>>>>>>> origin/tomato-shibby-RT-AC
 
     pubkey = X509_get_pubkey(x);
     if(!pubkey)
@@ -2292,11 +2917,50 @@ static CURLcode get_cert_chain(struct connectdata *conn,
     else {
       switch(pubkey->type) {
       case EVP_PKEY_RSA:
+<<<<<<< HEAD
         infof(data,  "   RSA Public Key (%d bits)\n",
               BN_num_bits(pubkey->pkey.rsa->n));
         snprintf(bufp, CERTBUFFERSIZE, "%d", BN_num_bits(pubkey->pkey.rsa->n));
         Curl_ssl_push_certinfo(data, i, "RSA Public Key", bufp);
 
+=======
+      {
+        RSA *rsa;
+#ifdef HAVE_OPAQUE_EVP_PKEY
+        rsa = EVP_PKEY_get0_RSA(pubkey);
+#else
+        rsa = pubkey->pkey.rsa;
+#endif
+
+#ifdef HAVE_OPAQUE_RSA_DSA_DH
+        {
+          const BIGNUM *n;
+          const BIGNUM *e;
+          const BIGNUM *d;
+          const BIGNUM *p;
+          const BIGNUM *q;
+          const BIGNUM *dmp1;
+          const BIGNUM *dmq1;
+          const BIGNUM *iqmp;
+
+          RSA_get0_key(rsa, &n, &e, &d);
+          RSA_get0_factors(rsa, &p, &q);
+          RSA_get0_crt_params(rsa, &dmp1, &dmq1, &iqmp);
+          BN_print(mem, n);
+          push_certinfo("RSA Public Key", i);
+          print_pubkey_BN(rsa, n, i);
+          print_pubkey_BN(rsa, e, i);
+          print_pubkey_BN(rsa, d, i);
+          print_pubkey_BN(rsa, p, i);
+          print_pubkey_BN(rsa, q, i);
+          print_pubkey_BN(rsa, dmp1, i);
+          print_pubkey_BN(rsa, dmq1, i);
+          print_pubkey_BN(rsa, iqmp, i);
+        }
+#else
+        BIO_printf(mem, "%d", BN_num_bits(rsa->n));
+        push_certinfo("RSA Public Key", i);
+>>>>>>> origin/tomato-shibby-RT-AC
         print_pubkey_BN(rsa, n, i);
         print_pubkey_BN(rsa, e, i);
         print_pubkey_BN(rsa, d, i);
@@ -2307,6 +2971,34 @@ static CURLcode get_cert_chain(struct connectdata *conn,
         print_pubkey_BN(rsa, iqmp, i);
         break;
       case EVP_PKEY_DSA:
+<<<<<<< HEAD
+=======
+      {
+        DSA *dsa;
+#ifdef HAVE_OPAQUE_EVP_PKEY
+        dsa = EVP_PKEY_get0_DSA(pubkey);
+#else
+        dsa = pubkey->pkey.dsa;
+#endif
+#ifdef HAVE_OPAQUE_RSA_DSA_DH
+        {
+          const BIGNUM *p;
+          const BIGNUM *q;
+          const BIGNUM *g;
+          const BIGNUM *priv_key;
+          const BIGNUM *pub_key;
+
+          DSA_get0_pqg(dsa, &p, &q, &g);
+          DSA_get0_key(dsa, &pub_key, &priv_key);
+
+          print_pubkey_BN(dsa, p, i);
+          print_pubkey_BN(dsa, q, i);
+          print_pubkey_BN(dsa, g, i);
+          print_pubkey_BN(dsa, priv_key, i);
+          print_pubkey_BN(dsa, pub_key, i);
+        }
+#else
+>>>>>>> origin/tomato-shibby-RT-AC
         print_pubkey_BN(dsa, p, i);
         print_pubkey_BN(dsa, q, i);
         print_pubkey_BN(dsa, g, i);
@@ -2314,6 +3006,32 @@ static CURLcode get_cert_chain(struct connectdata *conn,
         print_pubkey_BN(dsa, pub_key, i);
         break;
       case EVP_PKEY_DH:
+<<<<<<< HEAD
+=======
+      {
+        DH *dh;
+#ifdef HAVE_OPAQUE_EVP_PKEY
+        dh = EVP_PKEY_get0_DH(pubkey);
+#else
+        dh = pubkey->pkey.dh;
+#endif
+#ifdef HAVE_OPAQUE_RSA_DSA_DH
+        {
+          const BIGNUM *p;
+          const BIGNUM *q;
+          const BIGNUM *g;
+          const BIGNUM *priv_key;
+          const BIGNUM *pub_key;
+          DH_get0_pqg(dh, &p, &q, &g);
+          DH_get0_key(dh, &pub_key, &priv_key);
+          print_pubkey_BN(dh, p, i);
+          print_pubkey_BN(dh, q, i);
+          print_pubkey_BN(dh, g, i);
+          print_pubkey_BN(dh, priv_key, i);
+          print_pubkey_BN(dh, pub_key, i);
+       }
+#else
+>>>>>>> origin/tomato-shibby-RT-AC
         print_pubkey_BN(dh, p, i);
         print_pubkey_BN(dh, g, i);
         print_pubkey_BN(dh, priv_key, i);
@@ -2341,6 +3059,69 @@ static CURLcode get_cert_chain(struct connectdata *conn,
 }
 
 /*
+<<<<<<< HEAD
+=======
+ * Heavily modified from:
+ * https://www.owasp.org/index.php/Certificate_and_Public_Key_Pinning#OpenSSL
+ */
+static CURLcode pkp_pin_peer_pubkey(struct Curl_easy *data, X509* cert,
+                                    const char *pinnedpubkey)
+{
+  /* Scratch */
+  int len1 = 0, len2 = 0;
+  unsigned char *buff1 = NULL, *temp = NULL;
+
+  /* Result is returned to caller */
+  CURLcode result = CURLE_SSL_PINNEDPUBKEYNOTMATCH;
+
+  /* if a path wasn't specified, don't pin */
+  if(!pinnedpubkey)
+    return CURLE_OK;
+
+  if(!cert)
+    return result;
+
+  do {
+    /* Begin Gyrations to get the subjectPublicKeyInfo     */
+    /* Thanks to Viktor Dukhovni on the OpenSSL mailing list */
+
+    /* https://groups.google.com/group/mailing.openssl.users/browse_thread
+     /thread/d61858dae102c6c7 */
+    len1 = i2d_X509_PUBKEY(X509_get_X509_PUBKEY(cert), NULL);
+    if(len1 < 1)
+      break; /* failed */
+
+    /* https://www.openssl.org/docs/crypto/buffer.html */
+    buff1 = temp = malloc(len1);
+    if(!buff1)
+      break; /* failed */
+
+    /* https://www.openssl.org/docs/crypto/d2i_X509.html */
+    len2 = i2d_X509_PUBKEY(X509_get_X509_PUBKEY(cert), &temp);
+
+    /*
+     * These checks are verifying we got back the same values as when we
+     * sized the buffer. It's pretty weak since they should always be the
+     * same. But it gives us something to test.
+     */
+    if((len1 != len2) || !temp || ((temp - buff1) != len1))
+      break; /* failed */
+
+    /* End Gyrations */
+
+    /* The one good exit point */
+    result = Curl_pin_peer_pubkey(data, pinnedpubkey, buff1, len1);
+  } while(0);
+
+  /* https://www.openssl.org/docs/crypto/buffer.html */
+  if(buff1)
+    free(buff1);
+
+  return result;
+}
+
+/*
+>>>>>>> origin/tomato-shibby-RT-AC
  * Get the server cert, verify it and show it etc, only call failf() if the
  * 'strict' argument is TRUE as otherwise all this is for informational
  * purposes only!
@@ -2354,12 +3135,24 @@ static CURLcode servercert(struct connectdata *conn,
 {
   CURLcode retcode = CURLE_OK;
   int rc;
+<<<<<<< HEAD
   long lerr;
   ASN1_TIME *certdate;
   struct SessionHandle *data = conn->data;
   X509 *issuer;
   FILE *fp;
   char *buffer = data->state.buffer;
+=======
+  long lerr, len;
+  struct Curl_easy *data = conn->data;
+  X509 *issuer;
+  FILE *fp;
+  char *buffer = data->state.buffer;
+  const char *ptr;
+  long * const certverifyresult = SSL_IS_PROXY() ?
+    &data->set.proxy_ssl.certverifyresult : &data->set.ssl.certverifyresult;
+  BIO *mem = BIO_new(BIO_s_mem());
+>>>>>>> origin/tomato-shibby-RT-AC
 
   if(data->set.ssl.certinfo)
     /* we've been asked to gather certificate info! */
@@ -2371,12 +3164,18 @@ static CURLcode servercert(struct connectdata *conn,
       failf(data, "SSL: couldn't get peer certificate!");
     return CURLE_PEER_FAILED_VERIFICATION;
   }
+<<<<<<< HEAD
   infof (data, "Server certificate:\n");
+=======
+
+  infof(data, "%s certificate:\n", SSL_IS_PROXY() ? "Proxy" : "Server");
+>>>>>>> origin/tomato-shibby-RT-AC
 
   rc = x509_name_oneline(X509_get_subject_name(connssl->server_cert),
                          buffer, BUFSIZE);
   infof(data, "\t subject: %s\n", rc?"[NONE]":buffer);
 
+<<<<<<< HEAD
   certdate = X509_get_notBefore(connssl->server_cert);
   asn1_output(certdate, buffer, BUFSIZE);
   infof(data, "\t start date: %s\n", buffer);
@@ -2388,6 +3187,23 @@ static CURLcode servercert(struct connectdata *conn,
   if(data->set.ssl.verifyhost) {
     retcode = verifyhost(conn, connssl->server_cert);
     if(retcode) {
+=======
+  ASN1_TIME_print(mem, X509_get0_notBefore(connssl->server_cert));
+  len = BIO_get_mem_data(mem, (char **) &ptr);
+  infof(data, " start date: %.*s\n", len, ptr);
+  rc = BIO_reset(mem);
+
+  ASN1_TIME_print(mem, X509_get0_notAfter(connssl->server_cert));
+  len = BIO_get_mem_data(mem, (char **) &ptr);
+  infof(data, " expire date: %.*s\n", len, ptr);
+  rc = BIO_reset(mem);
+
+  BIO_free(mem);
+
+  if(SSL_CONN_CONFIG(verifyhost)) {
+    result = verifyhost(conn, connssl->server_cert);
+    if(result) {
+>>>>>>> origin/tomato-shibby-RT-AC
       X509_free(connssl->server_cert);
       connssl->server_cert = NULL;
       return retcode;
@@ -2408,12 +3224,17 @@ static CURLcode servercert(struct connectdata *conn,
        deallocating the certificate. */
 
     /* e.g. match issuer name with provided issuer certificate */
+<<<<<<< HEAD
     if(data->set.str[STRING_SSL_ISSUERCERT]) {
       fp=fopen(data->set.str[STRING_SSL_ISSUERCERT],"r");
+=======
+    if(SSL_SET_OPTION(issuercert)) {
+      fp = fopen(SSL_SET_OPTION(issuercert), FOPEN_READTEXT);
+>>>>>>> origin/tomato-shibby-RT-AC
       if(!fp) {
         if(strict)
           failf(data, "SSL: Unable to open issuer cert (%s)",
-                data->set.str[STRING_SSL_ISSUERCERT]);
+                SSL_SET_OPTION(issuercert));
         X509_free(connssl->server_cert);
         connssl->server_cert = NULL;
         return CURLE_SSL_ISSUER_ERROR;
@@ -2422,7 +3243,7 @@ static CURLcode servercert(struct connectdata *conn,
       if(!issuer) {
         if(strict)
           failf(data, "SSL: Unable to read issuer cert (%s)",
-                data->set.str[STRING_SSL_ISSUERCERT]);
+                SSL_SET_OPTION(issuercert));
         X509_free(connssl->server_cert);
         X509_free(issuer);
         fclose(fp);
@@ -2432,12 +3253,13 @@ static CURLcode servercert(struct connectdata *conn,
       if(X509_check_issued(issuer,connssl->server_cert) != X509_V_OK) {
         if(strict)
           failf(data, "SSL: Certificate issuer check failed (%s)",
-                data->set.str[STRING_SSL_ISSUERCERT]);
+                SSL_SET_OPTION(issuercert));
         X509_free(connssl->server_cert);
         X509_free(issuer);
         connssl->server_cert = NULL;
         return CURLE_SSL_ISSUER_ERROR;
       }
+<<<<<<< HEAD
       infof(data, "\t SSL certificate issuer check ok (%s)\n",
             data->set.str[STRING_SSL_ISSUERCERT]);
       X509_free(issuer);
@@ -2447,6 +3269,18 @@ static CURLcode servercert(struct connectdata *conn,
       SSL_get_verify_result(connssl->handle);
     if(data->set.ssl.certverifyresult != X509_V_OK) {
       if(data->set.ssl.verifypeer) {
+=======
+
+      infof(data, " SSL certificate issuer check ok (%s)\n",
+            SSL_SET_OPTION(issuercert));
+      X509_free(issuer);
+    }
+
+    lerr = *certverifyresult = SSL_get_verify_result(connssl->handle);
+
+    if(*certverifyresult != X509_V_OK) {
+      if(SSL_CONN_CONFIG(verifypeer)) {
+>>>>>>> origin/tomato-shibby-RT-AC
         /* We probably never reach this, because SSL_connect() will fail
            and we return earlier if verifypeer is set? */
         if(strict)
@@ -2460,7 +3294,35 @@ static CURLcode servercert(struct connectdata *conn,
               X509_verify_cert_error_string(lerr), lerr);
     }
     else
+<<<<<<< HEAD
       infof(data, "\t SSL certificate verify ok.\n");
+=======
+      infof(data, " SSL certificate verify ok.\n");
+  }
+
+#if (OPENSSL_VERSION_NUMBER >= 0x0090808fL) && !defined(OPENSSL_NO_TLSEXT) && \
+    !defined(OPENSSL_NO_OCSP)
+  if(SSL_CONN_CONFIG(verifystatus)) {
+    result = verifystatus(conn, connssl);
+    if(result) {
+      X509_free(connssl->server_cert);
+      connssl->server_cert = NULL;
+      return result;
+    }
+  }
+#endif
+
+  if(!strict)
+    /* when not strict, we don't bother about the verify cert problems */
+    result = CURLE_OK;
+
+  ptr = SSL_IS_PROXY() ? data->set.str[STRING_SSL_PINNEDPUBLICKEY_PROXY] :
+                         data->set.str[STRING_SSL_PINNEDPUBLICKEY_ORIG];
+  if(!result && ptr) {
+    result = pkp_pin_peer_pubkey(data, connssl->server_cert, ptr);
+    if(result)
+      failf(data, "SSL: public key does not match pinned public key!");
+>>>>>>> origin/tomato-shibby-RT-AC
   }
 
   X509_free(connssl->server_cert);
@@ -2475,6 +3337,7 @@ static CURLcode
 ossl_connect_step3(struct connectdata *conn,
                    int sockindex)
 {
+<<<<<<< HEAD
   CURLcode retcode = CURLE_OK;
   void *old_ssl_sessionid=NULL;
   struct SessionHandle *data = conn->data;
@@ -2527,6 +3390,53 @@ ossl_connect_step3(struct connectdata *conn,
      * This does not free the session as refcount remains > 0
      */
     SSL_SESSION_free(our_ssl_sessionid);
+=======
+  CURLcode result = CURLE_OK;
+  struct Curl_easy *data = conn->data;
+  struct ssl_connect_data *connssl = &conn->ssl[sockindex];
+
+  DEBUGASSERT(ssl_connect_3 == connssl->connecting_state);
+
+  if(data->set.general_ssl.sessionid) {
+    bool incache;
+    SSL_SESSION *our_ssl_sessionid;
+    void *old_ssl_sessionid = NULL;
+
+    our_ssl_sessionid = SSL_get1_session(connssl->handle);
+
+    /* SSL_get1_session() will increment the reference count and the session
+        will stay in memory until explicitly freed with SSL_SESSION_free(3),
+        regardless of its state. */
+
+    Curl_ssl_sessionid_lock(conn);
+    incache = !(Curl_ssl_getsessionid(conn, &old_ssl_sessionid, NULL,
+                                      sockindex));
+    if(incache) {
+      if(old_ssl_sessionid != our_ssl_sessionid) {
+        infof(data, "old SSL session ID is stale, removing\n");
+        Curl_ssl_delsessionid(conn, old_ssl_sessionid);
+        incache = FALSE;
+      }
+    }
+
+    if(!incache) {
+      result = Curl_ssl_addsessionid(conn, our_ssl_sessionid,
+                                      0 /* unknown size */, sockindex);
+      if(result) {
+        Curl_ssl_sessionid_unlock(conn);
+        failf(data, "failed to store ssl session");
+        return result;
+      }
+    }
+    else {
+      /* Session was incache, so refcount already incremented earlier.
+        * Avoid further increments with each SSL_get1_session() call.
+        * This does not free the session as refcount remains > 0
+        */
+      SSL_SESSION_free(our_ssl_sessionid);
+    }
+    Curl_ssl_sessionid_unlock(conn);
+>>>>>>> origin/tomato-shibby-RT-AC
   }
 #endif
 
@@ -2537,10 +3447,15 @@ ossl_connect_step3(struct connectdata *conn,
    * operations.
    */
 
+<<<<<<< HEAD
   if(!data->set.ssl.verifypeer && !data->set.ssl.verifyhost)
     (void)servercert(conn, connssl, FALSE);
   else
     retcode = servercert(conn, connssl, TRUE);
+=======
+  result = servercert(conn, connssl, (SSL_CONN_CONFIG(verifypeer) ||
+                                      SSL_CONN_CONFIG(verifyhost)));
+>>>>>>> origin/tomato-shibby-RT-AC
 
   if(CURLE_OK == retcode)
     connssl->connecting_state = ssl_connect_done;
@@ -2556,11 +3471,16 @@ ossl_connect_common(struct connectdata *conn,
                     bool nonblocking,
                     bool *done)
 {
+<<<<<<< HEAD
   CURLcode retcode;
   struct SessionHandle *data = conn->data;
+=======
+  CURLcode result;
+  struct Curl_easy *data = conn->data;
+>>>>>>> origin/tomato-shibby-RT-AC
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
   curl_socket_t sockfd = conn->sock[sockindex];
-  long timeout_ms;
+  time_t timeout_ms;
   int what;
 
   /* check if the connection has already been established */
@@ -2605,7 +3525,8 @@ ossl_connect_common(struct connectdata *conn,
       curl_socket_t readfd = ssl_connect_2_reading==
         connssl->connecting_state?sockfd:CURL_SOCKET_BAD;
 
-      what = Curl_socket_ready(readfd, writefd, nonblocking?0:timeout_ms);
+      what = Curl_socket_check(readfd, CURL_SOCKET_BAD, writefd,
+                               nonblocking?0:timeout_ms);
       if(what < 0) {
         /* fatal error */
         failf(data, "select/poll on SSL socket, errno: %d", SOCKERRNO);
@@ -2691,7 +3612,10 @@ bool Curl_ossl_data_pending(const struct connectdata *conn,
 {
   if(conn->ssl[connindex].handle)
     /* SSL is in use */
-    return (0 != SSL_pending(conn->ssl[connindex].handle)) ? TRUE : FALSE;
+    return (0 != SSL_pending(conn->ssl[connindex].handle) ||
+           (conn->proxy_ssl[connindex].handle &&
+            0 != SSL_pending(conn->proxy_ssl[connindex].handle))) ?
+           TRUE : FALSE;
   else
     return FALSE;
 }
@@ -2705,7 +3629,7 @@ static ssize_t ossl_send(struct connectdata *conn,
   /* SSL_write() is said to return 'int' while write() and send() returns
      'size_t' */
   int err;
-  char error_buffer[120]; /* OpenSSL documents that this must be at least 120
+  char error_buffer[256]; /* OpenSSL documents that this must be at least 256
                              bytes long. */
   unsigned long sslerror;
   int memlen;
@@ -2736,8 +3660,18 @@ static ssize_t ossl_send(struct connectdata *conn,
       /*  A failure in the SSL library occurred, usually a protocol error.
           The OpenSSL error queue contains more information on the error. */
       sslerror = ERR_get_error();
-      failf(conn->data, "SSL_write() error: %s",
-            ERR_error_string(sslerror, error_buffer));
+      if(ERR_GET_LIB(sslerror) == ERR_LIB_SSL &&
+         ERR_GET_REASON(sslerror) == SSL_R_BIO_NOT_SET &&
+         conn->ssl[sockindex].state == ssl_connection_complete &&
+         conn->proxy_ssl[sockindex].state == ssl_connection_complete) {
+        char ver[120];
+        Curl_ossl_version(ver, 120);
+        failf(conn->data, "Error: %s does not support double SSL tunneling.",
+              ver);
+      }
+      else
+        failf(conn->data, "SSL_write() error: %s",
+              ossl_strerror(sslerror, error_buffer, sizeof(error_buffer)));
       *curlcode = CURLE_SEND_ERROR;
       return -1;
     }
@@ -2755,8 +3689,8 @@ static ssize_t ossl_recv(struct connectdata *conn, /* connection data */
                          size_t buffersize,        /* max amount to read */
                          CURLcode *curlcode)
 {
-  char error_buffer[120]; /* OpenSSL documents that this must be at
-                             least 120 bytes long. */
+  char error_buffer[256]; /* OpenSSL documents that this must be at
+                             least 256 bytes long. */
   unsigned long sslerror;
   ssize_t nread;
   int buffsize;
@@ -2787,7 +3721,7 @@ static ssize_t ossl_recv(struct connectdata *conn, /* connection data */
         /* If the return code was negative or there actually is an error in the
            queue */
         failf(conn->data, "SSL read: %s, errno %d",
-              ERR_error_string(sslerror, error_buffer),
+              ossl_strerror(sslerror, error_buffer, sizeof(error_buffer)),
               SOCKERRNO);
         *curlcode = CURLE_RECV_ERROR;
         return -1;
@@ -2799,6 +3733,7 @@ static ssize_t ossl_recv(struct connectdata *conn, /* connection data */
 
 size_t Curl_ossl_version(char *buffer, size_t size)
 {
+<<<<<<< HEAD
 #ifdef YASSL_VERSION
   /* yassl provides an OpenSSL API compatibility layer so it looks identical
      to OpenSSL in all other aspects */
@@ -2818,6 +3753,30 @@ size_t Curl_ossl_version(char *buffer, size_t size)
     else {
       if(ssleay_value&0xff0) {
         sub[0]=(char)(((ssleay_value>>4)&0xff) + 'a' -1);
+=======
+#ifdef OPENSSL_IS_BORINGSSL
+  return snprintf(buffer, size, OSSL_PACKAGE);
+#else /* OPENSSL_IS_BORINGSSL */
+  char sub[3];
+  unsigned long ssleay_value;
+  sub[2]='\0';
+  sub[1]='\0';
+  ssleay_value=OpenSSL_version_num();
+  if(ssleay_value < 0x906000) {
+    ssleay_value=SSLEAY_VERSION_NUMBER;
+    sub[0]='\0';
+  }
+  else {
+    if(ssleay_value&0xff0) {
+      int minor_ver = (ssleay_value >> 4) & 0xff;
+      if(minor_ver > 26) {
+        /* handle extended version introduced for 0.9.8za */
+        sub[1] = (char) ((minor_ver - 1) % 26 + 'a' + 1);
+        sub[0] = 'z';
+      }
+      else {
+        sub[0] = (char) (minor_ver + 'a' - 1);
+>>>>>>> origin/tomato-shibby-RT-AC
       }
       else
         sub[0]='\0';
@@ -2859,11 +3818,30 @@ size_t Curl_ossl_version(char *buffer, size_t size)
 #endif /* YASSL_VERSION */
 }
 
+<<<<<<< HEAD
 void Curl_ossl_random(struct SessionHandle *data, unsigned char *entropy,
                       size_t length)
 {
   Curl_ossl_seed(data); /* Initiate the seed if not already done */
   RAND_bytes(entropy, curlx_uztosi(length));
+=======
+/* can be called with data == NULL */
+CURLcode Curl_ossl_random(struct Curl_easy *data, unsigned char *entropy,
+                          size_t length)
+{
+  int rc;
+  if(data) {
+    if(Curl_ossl_seed(data)) /* Initiate the seed if not already done */
+      return CURLE_FAILED_INIT; /* couldn't seed for some reason */
+  }
+  else {
+    if(!rand_enough())
+      return CURLE_FAILED_INIT;
+  }
+  /* RAND_bytes() returns 1 on success, 0 otherwise.  */
+  rc = RAND_bytes(entropy, curlx_uztosi(length));
+  return (rc == 1 ? CURLE_OK : CURLE_FAILED_INIT);
+>>>>>>> origin/tomato-shibby-RT-AC
 }
 
 void Curl_ossl_md5sum(unsigned char *tmp, /* input */

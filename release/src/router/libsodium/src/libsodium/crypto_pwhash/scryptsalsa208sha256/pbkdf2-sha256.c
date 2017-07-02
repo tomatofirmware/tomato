@@ -24,15 +24,20 @@
  * SUCH DAMAGE.
  */
 
-#include <stdlib.h>
-#include <sys/types.h>
-
+#include <limits.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
+
+#include <sys/types.h>
 
 #include "crypto_auth_hmacsha256.h"
 #include "pbkdf2-sha256.h"
+<<<<<<< HEAD
 #include "sysendian.h"
+=======
+#include "private/common.h"
+>>>>>>> origin/tomato-shibby-RT-AC
 #include "utils.h"
 
 /**
@@ -41,21 +46,23 @@
  * write the output to buf.  The value dkLen must be at most 32 * (2^32 - 1).
  */
 void
-PBKDF2_SHA256(const uint8_t * passwd, size_t passwdlen, const uint8_t * salt,
-              size_t saltlen, uint64_t c, uint8_t * buf, size_t dkLen)
+PBKDF2_SHA256(const uint8_t *passwd, size_t passwdlen, const uint8_t *salt,
+              size_t saltlen, uint64_t c, uint8_t *buf, size_t dkLen)
 {
     crypto_auth_hmacsha256_state PShctx, hctx;
-    size_t          i;
-    uint8_t         ivec[4];
-    uint8_t         U[32];
-    uint8_t         T[32];
-    uint64_t        j;
-    int             k;
-    size_t          clen;
+    size_t                       i;
+    uint8_t                      ivec[4];
+    uint8_t                      U[32];
+    uint8_t                      T[32];
+    uint64_t                     j;
+    int                          k;
+    size_t                       clen;
 
+#if SIZE_MAX > 0x1fffffffe0ULL
     if (dkLen > 0x1fffffffe0ULL) {
         abort();
     }
+#endif
     crypto_auth_hmacsha256_init(&PShctx, passwd, passwdlen);
     crypto_auth_hmacsha256_update(&PShctx, salt, saltlen);
 

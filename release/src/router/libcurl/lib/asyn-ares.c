@@ -171,7 +171,7 @@ int Curl_resolver_duphandle(void **to, void *from)
   return CURLE_OK;
 }
 
-static void destroy_async_data (struct Curl_async *async);
+static void destroy_async_data(struct Curl_async *async);
 
 /*
  * Cancel all possibly still on-going resolves for this connection.
@@ -186,7 +186,7 @@ void Curl_resolver_cancel(struct connectdata *conn)
 /*
  * destroy_async_data() cleans up async resolver data.
  */
-static void destroy_async_data (struct Curl_async *async)
+static void destroy_async_data(struct Curl_async *async)
 {
   if(async->hostname)
     free(async->hostname);
@@ -252,7 +252,7 @@ int Curl_resolver_getsock(struct connectdata *conn,
 
 static int waitperform(struct connectdata *conn, int timeout_ms)
 {
-  struct SessionHandle *data = conn->data;
+  struct Curl_easy *data = conn->data;
   int nfds;
   int bitmask;
   ares_socket_t socks[ARES_GETSOCK_MAXNUM];
@@ -312,7 +312,7 @@ static int waitperform(struct connectdata *conn, int timeout_ms)
 CURLcode Curl_resolver_is_resolved(struct connectdata *conn,
                                    struct Curl_dns_entry **dns)
 {
-  struct SessionHandle *data = conn->data;
+  struct Curl_easy *data = conn->data;
   struct ResolverResults *res = (struct ResolverResults *)
     conn->async.os_specific;
   CURLcode rc = CURLE_OK;
@@ -355,8 +355,13 @@ CURLcode Curl_resolver_is_resolved(struct connectdata *conn,
 CURLcode Curl_resolver_wait_resolv(struct connectdata *conn,
                                    struct Curl_dns_entry **entry)
 {
+<<<<<<< HEAD
   CURLcode rc=CURLE_OK;
   struct SessionHandle *data = conn->data;
+=======
+  CURLcode result = CURLE_OK;
+  struct Curl_easy *data = conn->data;
+>>>>>>> origin/tomato-shibby-RT-AC
   long timeout;
   struct timeval now = Curl_tvnow();
   struct Curl_dns_entry *temp_entry;
@@ -495,7 +500,7 @@ Curl_addrinfo *Curl_resolver_getaddrinfo(struct connectdata *conn,
                                          int *waitp)
 {
   char *bufp;
-  struct SessionHandle *data = conn->data;
+  struct Curl_easy *data = conn->data;
   struct in_addr in;
   int family = PF_INET;
 #ifdef ENABLE_IPV6 /* CURLRES_IPV6 */
@@ -586,7 +591,7 @@ Curl_addrinfo *Curl_resolver_getaddrinfo(struct connectdata *conn,
   return NULL; /* no struct yet */
 }
 
-CURLcode Curl_set_dns_servers(struct SessionHandle *data,
+CURLcode Curl_set_dns_servers(struct Curl_easy *data,
                               char *servers)
 {
   CURLcode result = CURLE_NOT_BUILT_IN;
@@ -624,7 +629,7 @@ CURLcode Curl_set_dns_servers(struct SessionHandle *data,
   return result;
 }
 
-CURLcode Curl_set_dns_interface(struct SessionHandle *data,
+CURLcode Curl_set_dns_interface(struct Curl_easy *data,
                                 const char *interf)
 {
 #if (ARES_VERSION >= 0x010704)
@@ -641,7 +646,7 @@ CURLcode Curl_set_dns_interface(struct SessionHandle *data,
 #endif
 }
 
-CURLcode Curl_set_dns_local_ip4(struct SessionHandle *data,
+CURLcode Curl_set_dns_local_ip4(struct Curl_easy *data,
                                 const char *local_ip4)
 {
 #if (ARES_VERSION >= 0x010704)
@@ -666,7 +671,7 @@ CURLcode Curl_set_dns_local_ip4(struct SessionHandle *data,
 #endif
 }
 
-CURLcode Curl_set_dns_local_ip6(struct SessionHandle *data,
+CURLcode Curl_set_dns_local_ip6(struct Curl_easy *data,
                                 const char *local_ip6)
 {
 #if (ARES_VERSION >= 0x010704)

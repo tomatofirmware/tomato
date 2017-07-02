@@ -5,7 +5,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
+<<<<<<< HEAD
  * Copyright (C) 1998 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
+=======
+ * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
+>>>>>>> origin/tomato-shibby-RT-AC
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -73,9 +77,9 @@ int tool_debug_cb(CURL *handle, curl_infotype type,
 
   if(!config->trace_stream) {
     /* open for append */
-    if(curlx_strequal("-", config->trace_dump))
+    if(!strcmp("-", config->trace_dump))
       config->trace_stream = stdout;
-    else if(curlx_strequal("%", config->trace_dump))
+    else if(!strcmp("%", config->trace_dump))
       /* Ok, this is somewhat hackish but we do it undocumented for now */
       config->trace_stream = config->errors;  /* aka stderr */
     else {
@@ -182,7 +186,7 @@ int tool_debug_cb(CURL *handle, curl_infotype type,
   }
 #endif /* CURL_DOES_CONVERSIONS */
 
-  switch (type) {
+  switch(type) {
   case CURLINFO_TEXT:
     fprintf(output, "%s== Info: %s", timebuf, data);
   default: /* in case a new one is introduced to shock us */

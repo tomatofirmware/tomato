@@ -2665,8 +2665,13 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+<<<<<<< HEAD:release/src/router/libcurl/projects/Windows/VC9/src/curlsrc.vcproj
 				AdditionalDependencies="ws2_32.lib wldap32.lib libcurld.lib libeay32.lib ssleay32.lib"
 				OutputFile="$(OutDir)\curld.exe"
+=======
+				AdditionalDependencies="ws2_32.lib wldap32.lib crypt32.lib libcurld.lib"
+				OutputFile="$(OutDir)\$(ProjectName)d.exe"
+>>>>>>> origin/tomato-shibby-RT-AC:release/src/router/libcurl/projects/Windows/VC9/src/curl.vcproj
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\..\build\Win32\VC9\$(ConfigurationName);..\..\..\..\..\openssl\build\Win32\VC9\DLL Debug"
@@ -2759,8 +2764,13 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+<<<<<<< HEAD:release/src/router/libcurl/projects/Windows/VC9/src/curlsrc.vcproj
 				AdditionalDependencies="ws2_32.lib wldap32.lib libcurld.lib libeay32.lib ssleay32.lib"
 				OutputFile="$(OutDir)\curld.exe"
+=======
+				AdditionalDependencies="ws2_32.lib wldap32.lib crypt32.lib libcurld.lib"
+				OutputFile="$(OutDir)\$(ProjectName)d.exe"
+>>>>>>> origin/tomato-shibby-RT-AC:release/src/router/libcurl/projects/Windows/VC9/src/curl.vcproj
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\..\build\Win64\VC9\$(ConfigurationName);..\..\..\..\..\openssl\build\Win64\VC9\DLL Debug"
@@ -2852,8 +2862,13 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+<<<<<<< HEAD:release/src/router/libcurl/projects/Windows/VC9/src/curlsrc.vcproj
 				AdditionalDependencies="ws2_32.lib wldap32.lib libcurl.lib libeay32.lib ssleay32.lib"
 				OutputFile="$(OutDir)\curl.exe"
+=======
+				AdditionalDependencies="ws2_32.lib wldap32.lib crypt32.lib libcurl.lib"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
+>>>>>>> origin/tomato-shibby-RT-AC:release/src/router/libcurl/projects/Windows/VC9/src/curl.vcproj
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\..\build\Win32\VC9\$(ConfigurationName);..\..\..\..\..\openssl\build\Win32\VC9\DLL Release"
@@ -2944,8 +2959,13 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+<<<<<<< HEAD:release/src/router/libcurl/projects/Windows/VC9/src/curlsrc.vcproj
 				AdditionalDependencies="ws2_32.lib wldap32.lib libcurl.lib libeay32.lib ssleay32.lib"
 				OutputFile="$(OutDir)\curl.exe"
+=======
+				AdditionalDependencies="ws2_32.lib wldap32.lib crypt32.lib libcurl.lib"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
+>>>>>>> origin/tomato-shibby-RT-AC:release/src/router/libcurl/projects/Windows/VC9/src/curl.vcproj
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\..\build\Win64\VC9\$(ConfigurationName);..\..\..\..\..\openssl\build\Win64\VC9\DLL Release"
@@ -3405,8 +3425,13 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+<<<<<<< HEAD:release/src/router/libcurl/projects/Windows/VC9/src/curlsrc.vcproj
 				AdditionalDependencies="ws2_32.lib wldap32.lib libcurld.lib"
 				OutputFile="$(OutDir)\curld.exe"
+=======
+				AdditionalDependencies="ws2_32.lib wldap32.lib crypt32.lib normaliz.lib libcurld.lib"
+				OutputFile="$(OutDir)\$(ProjectName)d.exe"
+>>>>>>> origin/tomato-shibby-RT-AC:release/src/router/libcurl/projects/Windows/VC9/src/curl.vcproj
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\..\build\Win32\VC9\$(ConfigurationName)"
@@ -3499,8 +3524,13 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+<<<<<<< HEAD:release/src/router/libcurl/projects/Windows/VC9/src/curlsrc.vcproj
 				AdditionalDependencies="ws2_32.lib wldap32.lib libcurld.lib"
 				OutputFile="$(OutDir)\curld.exe"
+=======
+				AdditionalDependencies="ws2_32.lib wldap32.lib crypt32.lib normaliz.lib libcurld.lib"
+				OutputFile="$(OutDir)\$(ProjectName)d.exe"
+>>>>>>> origin/tomato-shibby-RT-AC:release/src/router/libcurl/projects/Windows/VC9/src/curl.vcproj
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\..\build\Win64\VC9\$(ConfigurationName)"
@@ -3592,8 +3622,13 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+<<<<<<< HEAD:release/src/router/libcurl/projects/Windows/VC9/src/curlsrc.vcproj
 				AdditionalDependencies="ws2_32.lib wldap32.lib libcurl.lib"
 				OutputFile="$(OutDir)\curl.exe"
+=======
+				AdditionalDependencies="ws2_32.lib wldap32.lib crypt32.lib normaliz.lib libcurl.lib"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
+>>>>>>> origin/tomato-shibby-RT-AC:release/src/router/libcurl/projects/Windows/VC9/src/curl.vcproj
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\..\build\Win32\VC9\$(ConfigurationName)"
@@ -3684,8 +3719,13 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+<<<<<<< HEAD:release/src/router/libcurl/projects/Windows/VC9/src/curlsrc.vcproj
 				AdditionalDependencies="ws2_32.lib wldap32.lib libcurl.lib"
 				OutputFile="$(OutDir)\curl.exe"
+=======
+				AdditionalDependencies="ws2_32.lib wldap32.lib crypt32.lib normaliz.lib libcurl.lib"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
+>>>>>>> origin/tomato-shibby-RT-AC:release/src/router/libcurl/projects/Windows/VC9/src/curl.vcproj
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\..\build\Win64\VC9\$(ConfigurationName)"
@@ -3730,10 +3770,13 @@
 				>
 			</File>
 			<File
+<<<<<<< HEAD:release/src/router/libcurl/projects/Windows/VC9/src/curlsrc.vcproj
 				RelativePath="..\..\..\..\lib\rawstr.c"
 				>
 			</File>
 			<File
+=======
+>>>>>>> origin/tomato-shibby-RT-AC:release/src/router/libcurl/projects/Windows/VC9/src/curl.vcproj
 				RelativePath="..\..\..\..\lib\strtoofft.c"
 				>
 			</File>
@@ -3906,12 +3949,17 @@
 				>
 			</File>
 			<File
+<<<<<<< HEAD:release/src/router/libcurl/projects/Windows/VC9/src/curlsrc.vcproj
 				RelativePath="..\..\..\..\lib\rawstr.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\..\lib\setup.h"
 				>
+=======
+				RelativePath="..\..\..\..\lib\strtoofft.h"
+			>
+>>>>>>> origin/tomato-shibby-RT-AC:release/src/router/libcurl/projects/Windows/VC9/src/curl.vcproj
 			</File>
 			<File
 				RelativePath="..\..\..\..\lib\strtoofft.h"

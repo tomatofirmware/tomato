@@ -77,6 +77,9 @@ struct OperationConfig {
   char *tls_username;
   char *tls_password;
   char *tls_authtype;
+  char *proxy_tls_username;
+  char *proxy_tls_password;
+  char *proxy_tls_authtype;
   char *proxyuserpwd;
   char *proxy;
   int proxyver;             /* set to CURLPROXY_HTTP* define */
@@ -105,14 +108,27 @@ struct OperationConfig {
   struct getout *url_get;   /* point to the node to fill in URL */
   struct getout *url_out;   /* point to the node to fill in outfile */
   char *cipher_list;
+  char *proxy_cipher_list;
   char *cert;
+  char *proxy_cert;
   char *cert_type;
+  char *proxy_cert_type;
   char *cacert;
+  char *proxy_cacert;
   char *capath;
+  char *proxy_capath;
   char *crlfile;
+<<<<<<< HEAD
+=======
+  char *proxy_crlfile;
+  char *pinnedpubkey;
+>>>>>>> origin/tomato-shibby-RT-AC
   char *key;
+  char *proxy_key;
   char *key_type;
+  char *proxy_key_type;
   char *key_passwd;
+  char *proxy_key_passwd;
   char *pubkey;
   char *hostpubmd5;
   char *engine;
@@ -125,6 +141,12 @@ struct OperationConfig {
   bool globoff;
   bool use_httpget;
   bool insecure_ok;         /* set TRUE to allow insecure SSL connects */
+<<<<<<< HEAD
+=======
+  bool proxy_insecure_ok;   /* set TRUE to allow insecure SSL connects
+                               for proxy */
+  bool verifystatus;
+>>>>>>> origin/tomato-shibby-RT-AC
   bool create_dirs;
   bool ftp_create_dirs;
   bool ftp_skip_ip;
@@ -139,6 +161,7 @@ struct OperationConfig {
   struct curl_slist *postquote;
   struct curl_slist *prequote;
   long ssl_version;
+  long proxy_ssl_version;
   long ip_version;
   curl_TimeCond timecond;
   time_t condtime;
@@ -159,6 +182,7 @@ struct OperationConfig {
   bool ftp_ssl_control;
   bool ftp_ssl_ccc;
   int ftp_ssl_ccc_mode;
+<<<<<<< HEAD
 
   char *socksproxy;         /* set to server string */
   int socksver;             /* set to CURLPROXY_SOCKS* define */
@@ -166,9 +190,19 @@ struct OperationConfig {
                                  * default rcmd */
   int socks5_gssapi_nec ;   /* The NEC reference server does not protect
                              * the encryption type exchange */
+=======
+  char *preproxy;
+  int socks5_gssapi_nec;    /* The NEC reference server does not protect the
+                               encryption type exchange */
+  char *proxy_service_name; /* set authentication service name for HTTP and
+                               SOCKS5 proxies */
+  char *service_name;       /* set authentication service name for DIGEST-MD5,
+                               Kerberos 5 and SPNEGO */
+>>>>>>> origin/tomato-shibby-RT-AC
 
   bool tcp_nodelay;
   long req_retry;           /* number of retries */
+  bool retry_connrefused;   /* set connection refused as a transient error */
   long retry_delay;         /* delay between retries (in seconds) */
   long retry_maxtime;       /* maximum time to keep retrying */
 
@@ -193,6 +227,13 @@ struct OperationConfig {
   bool xattr;               /* store metadata in extended attributes */
   long gssapi_delegation;
   bool ssl_allow_beast;     /* allow this SSL vulnerability */
+<<<<<<< HEAD
+=======
+  bool proxy_ssl_allow_beast; /* allow this SSL vulnerability for proxy*/
+
+  bool ssl_no_revoke;       /* disable SSL certificate revocation checks */
+  /*bool proxy_ssl_no_revoke; */
+>>>>>>> origin/tomato-shibby-RT-AC
 
   bool use_metalink;        /* process given URLs as metalink XML file */
   metalinkfile *metalinkfile_list; /* point to the first node */
@@ -200,10 +241,21 @@ struct OperationConfig {
 #ifdef CURLDEBUG
   bool test_event_based;
 #endif
+<<<<<<< HEAD
   char *xoauth2_bearer;       /* XOAUTH2 bearer token */
   bool nonpn;                 /* enable/disable TLS NPN extension */
   bool noalpn;                /* enable/disable TLS ALPN extension */
 
+=======
+  char *oauth_bearer;             /* OAuth 2.0 bearer token */
+  bool nonpn;                     /* enable/disable TLS NPN extension */
+  bool noalpn;                    /* enable/disable TLS ALPN extension */
+  char *unix_socket_path;         /* path to Unix domain socket */
+  bool abstract_unix_socket;      /* path to an abstract Unix domain socket */
+  bool falsestart;
+  bool path_as_is;
+  double expect100timeout;
+>>>>>>> origin/tomato-shibby-RT-AC
   struct GlobalConfig *global;
   struct OperationConfig *prev;
   struct OperationConfig *next; /* Always last in the struct */
@@ -226,7 +278,7 @@ struct GlobalConfig {
   bool tracetime;                 /* include timestamp? */
   int progressmode;               /* CURL_PROGRESS_BAR / CURL_PROGRESS_STATS */
   char *libcurl;                  /* Output libcurl code to this file name */
-
+  bool fail_early;                /* exit on first transfer error */
   struct OperationConfig *first;
   struct OperationConfig *current;
   struct OperationConfig *last;   /* Always last in the struct */

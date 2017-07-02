@@ -123,12 +123,12 @@ sexp_iterator_get_uint32(struct sexp_iterator *iterator,
  */
 int
 sexp_iterator_check_type(struct sexp_iterator *iterator,
-			 const uint8_t *type);
+			 const char *type);
 
-const uint8_t *
+const char *
 sexp_iterator_check_types(struct sexp_iterator *iterator,
 			  unsigned ntypes,
-			  const uint8_t * const *types);
+			  const char * const *types);
 
 /* Current element must be a list. Looks up element of type
  *
@@ -142,7 +142,7 @@ sexp_iterator_check_types(struct sexp_iterator *iterator,
 int
 sexp_iterator_assoc(struct sexp_iterator *iterator,
 		    unsigned nkeys,
-		    const uint8_t * const *keys,
+		    const char * const *keys,
 		    struct sexp_iterator *values);
 
 
@@ -198,12 +198,6 @@ sexp_transport_format(struct nettle_buffer *buffer,
 unsigned
 sexp_transport_vformat(struct nettle_buffer *buffer,
 		       const char *format, va_list args);
-
-/* Classification for advanced syntax. */
-extern const char
-sexp_token_chars[0x80];
-
-#define TOKEN_CHAR(c) ((c) < 0x80 && sexp_token_chars[(c)])
 
 #ifdef __cplusplus
 }

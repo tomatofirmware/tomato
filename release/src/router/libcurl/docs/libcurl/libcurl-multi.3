@@ -42,7 +42,14 @@ and when to ask libcurl to get/send data.
 complicated for the application.
 
 3. Enable the application to wait for action on its own file descriptors and
+<<<<<<< HEAD
 curl's file descriptors simultaneous easily.
+=======
+curl's file descriptors simultaneously.
+
+4. Enable event-based handling and scaling transfers up to and beyond
+thousands of parallel connections.
+>>>>>>> origin/tomato-shibby-RT-AC
 .SH "ONE MULTI HANDLE MANY EASY HANDLES"
 To use the multi interface, you must first create a 'multi handle' with
 \fIcurl_multi_init(3)\fP. This handle is then used as input to all further
@@ -136,6 +143,24 @@ are.
 The CURLMOPT_TIMERFUNCTION callback is called to set a timeout. When that
 timeout expires, your application should call the
 \fIcurl_multi_socket_action(3)\fP function saying it was due to a timeout.
+<<<<<<< HEAD
+=======
+
+This API is typically used with an event-driven underlying functionality (like
+libevent, libev, kqueue, epoll or similar) with which the application
+"subscribes" on socket changes. This allows applications and libcurl to much
+better scale upward and beyond thousands of simultaneous transfers without
+losing performance.
+
+When you've added your initial set of handles, you call
+\fIcurl_multi_socket_action(3)\fP with CURL_SOCKET_TIMEOUT set in the sockfd
+argument, and you'll get callbacks call that sets you up and you then continue
+to call \fIcurl_multi_socket_action(3)\fP accordingly when you get activity on
+the sockets you've been asked to wait on, or if the timeout timer expires.
+
+You can poll \fIcurl_multi_info_read(3)\fP to see if any transfer has
+completed, as it then has a message saying so.
+>>>>>>> origin/tomato-shibby-RT-AC
 .SH "BLOCKING"
 A few areas in the code are still using blocking code, even when used from the
 multi interface. While we certainly want and intend for these to get fixed in
@@ -143,7 +168,6 @@ the future, you should be aware of the following current restrictions:
 
 .nf
  - Name resolves unless the c-ares or threaded-resolver backends are used
- - NSS SSL connections
  - HTTP proxy CONNECT operations
  - SOCKS proxy handshakes
  - file:// transfers

@@ -3,14 +3,18 @@
 [DNSCrypt](http://dnscrypt.org)
 ===============================
 
-A protocol for securing communications between a client and a DNS resolver.
+DNSCrypt is a protocol for securing communications between a client
+and a DNS resolver, using high-speed high-security elliptic-curve
+cryptography.
 
-Disclaimer
-----------
+While not providing end-to-end security, it protects the local network, which
+is often the weakest point of the chain, against man-in-the-middle attacks.
 
-`dnscrypt-proxy` verifies that responses you get from a DNS provider have been
-actually sent by that provider, and haven't been tampered with.
+`dnscrypt-proxy` is a client-implementation of the protocol. It
+requires a [DNSCrypt server](https://www.dnscrypt.org/#dnscrypt-server) on
+the other end.
 
+<<<<<<< HEAD
 This is not a VPN. It doesn't mask your IP address, and if you are
 using it with a public DNS service, be aware that it will (and has to)
 decrypt your queries.
@@ -32,15 +36,19 @@ The DNSCrypt protocol uses high-speed high-security elliptic-curve
 cryptography and is very similar to [DNSCurve](http://dnscurve.org/),
 but focuses on securing communications between a client and its first-level
 resolver.
+=======
+Online documentation
+--------------------
+>>>>>>> origin/tomato-shibby-RT-AC
 
-While not providing end-to-end security, it protects the local
-network, which is often the weakest point of the chain, against
-man-in-the-middle attacks.
+* [dnscrypt-proxy documentation](https://github.com/jedisct1/dnscrypt-proxy/wiki/)
+* [dnscrypt website](https://dnscrypt.org).
 
 Download and integrity check
 ----------------------------
 
 dnscrypt-proxy can be downloaded here:
+<<<<<<< HEAD
 [dnscrypt-proxy download](http://download.dnscrypt.org/dnscrypt-proxy/)
 
 Note: dnscrypt.org is now blocked by the Great Firewall of China. But
@@ -233,11 +241,13 @@ for more information on DNSCrypt on Windows.
 
 Using DNSCrypt in combination with a DNS cache
 ----------------------------------------------
+=======
+[dnscrypt-proxy download](https://download.dnscrypt.org/dnscrypt-proxy/).
+>>>>>>> origin/tomato-shibby-RT-AC
 
-The DNSCrypt proxy is **not** a DNS cache. This means that incoming
-queries will **not** be cached and every single query will require a
-round-trip to the upstream resolver.
+Signatures can be verified with [Minisign](https://jedisct1.github.io/minisign/):
 
+<<<<<<< HEAD
 For optimal performance, the recommended way of running DNSCrypt is to
 run it as a forwarder for a local DNS cache, like `unbound` or
 `powerdns-recursor`.
@@ -365,63 +375,22 @@ This tool can be useful for starting some services before
 `dnscrypt-proxy`.
 
 Queries made by `hostip` are not authenticated.
+=======
+    $ minisign -VP RWQf6LRCGA9i53mlYecO4IzT51TGPpvWucNSCh1CBM0QTaLn73Y7GFO3 -m dnscrypt-proxy-1.9.4.tar.bz2
+>>>>>>> origin/tomato-shibby-RT-AC
 
 Plugins
 -------
 
-`dnscrypt-proxy` can be extended with plugins. A plugin acts as a
-filter that can locally inspect and modify queries and responses.
+Aside from implementing the protocol, dnscrypt-proxy can be extended
+with plug-ins, and gives a lot of control on the local DNS traffic:
 
-The plugin API is documented in the `README-PLUGINS.markdown` file.
-
-Any number of plugins can be combined (chained) by repeating the
-`--plugin` command-line switch.
-
-The default distribution ships with some example plugins:
-
-* `libdcplugin_example_ldns_aaaa_blocking`: Directly return an empty
-response to AAAA queries
-
-Example usage:
-
-    # dnscrypt-proxy ... \
-    --plugin libdcplugin_example_ldns_aaaa_blocking.la
-
-If IPv6 connectivity is not available on your network, this plugin
-avoids waiting for responses about IPv6 addresses from upstream
-resolvers. This can improve your web browsing experience.
-
-* `libdcplugin_example_ldns_blocking`: Block specific domains and IP
-addresses.
-
-This plugin returns a REFUSED response if the query name is in a
-list of blacklisted names, or if at least one of the returned
-IP addresses happens to be in a list of blacklisted IPs.
-
-Recognized switches are:
-
-    --domains=<file>
-    --ips=<file>
-
-A file should list one entry per line.
-
-IPv4 and IPv6 addresses are supported.
-For names, leading and trailing wildcards (`*`) are also supported
-(e.g. `*xxx*`, `*.example.com`, `ads.*`)
-
-    # dnscrypt-proxy ... \
-    --plugin libdcplugin_example,--ips=/etc/blk-ips,--domains=/etc/blk-names
-
-* `libdcplugin_example-logging`: Log client queries
-
-This plugin logs the client queries to the standard output (default)
-or to a file.
-
-    # dnscrypt-proxy ... \
-    --plugin libdcplugin_example_logging,/var/log/dns.log
-
-* Extra plugins
-
-Additional plugins can be found on Github:
-[Masquerade plugin](https://github.com/gchehab/dnscrypt-plugin-masquerade),
-[GeoIP plugin](https://github.com/jedisct1/dnscrypt-plugin-geoip-block).
+- Review the DNS traffic originating from your network in real time,
+and detect compromised hosts and applications phoning home.
+- Locally block ads, trackers, malware, spam, and any website whose
+domain names or IP addresses match a set of rules you define.
+- Prevent queries for local zones from being leaked.
+- Reduce latency by caching resposes and avoiding requesting IPv6
+addresses on IPv4-only networks.
+- Force traffic to use TCP, to route it through TCP-only tunnels or
+Tor.

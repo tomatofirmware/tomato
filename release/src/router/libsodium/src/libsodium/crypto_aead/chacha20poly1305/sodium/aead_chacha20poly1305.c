@@ -7,6 +7,7 @@
 #include "crypto_onetimeauth_poly1305.h"
 #include "crypto_stream_chacha20.h"
 #include "crypto_verify_16.h"
+#include "randombytes.h"
 #include "utils.h"
 
 static unsigned char _pad0[16];
@@ -169,9 +170,18 @@ crypto_aead_chacha20poly1305_decrypt(unsigned char *m,
     crypto_onetimeauth_poly1305_final(&state, mac);
     sodium_memzero(&state, sizeof state);
 
+<<<<<<< HEAD
     (void) sizeof(int[sizeof mac == 16U ? 1 : -1]);
     ret = crypto_verify_16(mac, c + mlen);
     sodium_memzero(mac, sizeof mac);
+=======
+    COMPILER_ASSERT(sizeof computed_mac == 16U);
+    ret = crypto_verify_16(computed_mac, mac);
+    sodium_memzero(computed_mac, sizeof computed_mac);
+    if (m == NULL) {
+        return ret;
+    }
+>>>>>>> origin/tomato-shibby-RT-AC
     if (ret != 0) {
         memset(m, 0, mlen);
         return -1;
@@ -229,9 +239,18 @@ crypto_aead_chacha20poly1305_ietf_decrypt(unsigned char *m,
     crypto_onetimeauth_poly1305_final(&state, mac);
     sodium_memzero(&state, sizeof state);
 
+<<<<<<< HEAD
     (void) sizeof(int[sizeof mac == 16U ? 1 : -1]);
     ret = crypto_verify_16(mac, c + mlen);
     sodium_memzero(mac, sizeof mac);
+=======
+    COMPILER_ASSERT(sizeof computed_mac == 16U);
+    ret = crypto_verify_16(computed_mac, mac);
+    sodium_memzero(computed_mac, sizeof computed_mac);
+    if (m == NULL) {
+        return ret;
+    }
+>>>>>>> origin/tomato-shibby-RT-AC
     if (ret != 0) {
         memset(m, 0, mlen);
         return -1;
@@ -240,30 +259,78 @@ crypto_aead_chacha20poly1305_ietf_decrypt(unsigned char *m,
     if (mlen_p != NULL) {
         *mlen_p = mlen;
     }
+<<<<<<< HEAD
     return 0;
+=======
+    return ret;
 }
 
 size_t
-crypto_aead_chacha20poly1305_keybytes(void) {
+crypto_aead_chacha20poly1305_ietf_keybytes(void)
+{
+    return crypto_aead_chacha20poly1305_ietf_KEYBYTES;
+}
+
+size_t
+crypto_aead_chacha20poly1305_ietf_npubbytes(void)
+{
+    return crypto_aead_chacha20poly1305_ietf_NPUBBYTES;
+}
+
+size_t
+crypto_aead_chacha20poly1305_ietf_nsecbytes(void)
+{
+    return crypto_aead_chacha20poly1305_ietf_NSECBYTES;
+}
+
+size_t
+crypto_aead_chacha20poly1305_ietf_abytes(void)
+{
+    return crypto_aead_chacha20poly1305_ietf_ABYTES;
+>>>>>>> origin/tomato-shibby-RT-AC
+}
+
+void
+crypto_aead_chacha20poly1305_ietf_keygen(unsigned char k[crypto_aead_chacha20poly1305_ietf_KEYBYTES])
+{
+    randombytes_buf(k, crypto_aead_chacha20poly1305_ietf_KEYBYTES);
+}
+
+size_t
+crypto_aead_chacha20poly1305_keybytes(void)
+{
     return crypto_aead_chacha20poly1305_KEYBYTES;
 }
 
 size_t
-crypto_aead_chacha20poly1305_npubbytes(void) {
+crypto_aead_chacha20poly1305_npubbytes(void)
+{
     return crypto_aead_chacha20poly1305_NPUBBYTES;
 }
 
 size_t
+<<<<<<< HEAD
 crypto_aead_chacha20poly1305_ietf_npubbytes(void) {
     return crypto_aead_chacha20poly1305_IETF_NPUBBYTES;
 }
 
 size_t
 crypto_aead_chacha20poly1305_nsecbytes(void) {
+=======
+crypto_aead_chacha20poly1305_nsecbytes(void)
+{
+>>>>>>> origin/tomato-shibby-RT-AC
     return crypto_aead_chacha20poly1305_NSECBYTES;
 }
 
 size_t
-crypto_aead_chacha20poly1305_abytes(void) {
+crypto_aead_chacha20poly1305_abytes(void)
+{
     return crypto_aead_chacha20poly1305_ABYTES;
+}
+
+void
+crypto_aead_chacha20poly1305_keygen(unsigned char k[crypto_aead_chacha20poly1305_KEYBYTES])
+{
+    randombytes_buf(k, crypto_aead_chacha20poly1305_KEYBYTES);
 }

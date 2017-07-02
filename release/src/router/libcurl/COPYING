@@ -1,6 +1,11 @@
 COPYRIGHT AND PERMISSION NOTICE
 
+<<<<<<< HEAD
 Copyright (c) 1996 - 2014, Daniel Stenberg, <daniel@haxx.se>.
+=======
+Copyright (c) 1996 - 2017, Daniel Stenberg, <daniel@haxx.se>, and many
+contributors, see the THANKS file.
+>>>>>>> origin/tomato-shibby-RT-AC
 
 All rights reserved.
 

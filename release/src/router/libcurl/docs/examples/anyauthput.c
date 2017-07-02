@@ -140,13 +140,21 @@ int main(int argc, char **argv)
     curl_easy_setopt(curl, CURLOPT_READFUNCTION, read_callback);
 
     /* which file to upload */
+<<<<<<< HEAD
     curl_easy_setopt(curl, CURLOPT_READDATA, (void*)hd);
+=======
+    curl_easy_setopt(curl, CURLOPT_READDATA, (void *)&hd);
+>>>>>>> origin/tomato-shibby-RT-AC
 
     /* set the ioctl function */
     curl_easy_setopt(curl, CURLOPT_IOCTLFUNCTION, my_ioctl);
 
     /* pass the file descriptor to the ioctl callback as well */
+<<<<<<< HEAD
     curl_easy_setopt(curl, CURLOPT_IOCTLDATA, (void*)hd);
+=======
+    curl_easy_setopt(curl, CURLOPT_IOCTLDATA, (void *)&hd);
+>>>>>>> origin/tomato-shibby-RT-AC
 
     /* enable "uploading" (which means PUT when doing HTTP) */
     curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L) ;

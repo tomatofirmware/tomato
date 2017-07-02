@@ -1,23 +1,34 @@
 /* $Id: text.c 4520 2010-11-12 06:23:14Z astyanax $ */ 
 /**************************************************************************
- *   text.c                                                               *
+ *   text.c  --  This file is part of GNU nano.                           *
  *                                                                        *
  *   Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,  *
+<<<<<<< HEAD
  *   2008, 2009 Free Software Foundation, Inc.                            *
  *   This program is free software; you can redistribute it and/or modify *
  *   it under the terms of the GNU General Public License as published by *
  *   the Free Software Foundation; either version 3, or (at your option)  *
  *   any later version.                                                   *
+=======
+ *   2008, 2009, 2010, 2011, 2013, 2014 Free Software Foundation, Inc.    *
+ *   Copyright (C) 2014, 2015 Mark Majeres                                *
+ *   Copyright (C) 2016 Mike Scalora                                      *
+ *   Copyright (C) 2015, 2016 Benno Schulenberg                           *
+ *   Copyright (C) 2016 Sumedh Pendurkar                                  *
+>>>>>>> origin/tomato-shibby-RT-AC
  *                                                                        *
- *   This program is distributed in the hope that it will be useful, but  *
- *   WITHOUT ANY WARRANTY; without even the implied warranty of           *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU    *
- *   General Public License for more details.                             *
+ *   GNU nano is free software: you can redistribute it and/or modify     *
+ *   it under the terms of the GNU General Public License as published    *
+ *   by the Free Software Foundation, either version 3 of the License,    *
+ *   or (at your option) any later version.                               *
+ *                                                                        *
+ *   GNU nano is distributed in the hope that it will be useful,          *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty          *
+ *   of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.              *
+ *   See the GNU General Public License for more details.                 *
  *                                                                        *
  *   You should have received a copy of the GNU General Public License    *
- *   along with this program; if not, write to the Free Software          *
- *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA            *
- *   02110-1301, USA.                                                     *
+ *   along with this program.  If not, see http://www.gnu.org/licenses/.  *
  *                                                                        *
  **************************************************************************/
 
@@ -41,8 +52,17 @@ static bool prepend_wrap = FALSE;
 	/* Should we prepend wrapped text to the next line? */
 #endif
 #ifndef DISABLE_JUSTIFY
+static filestruct *jusbuffer = NULL;
+	/* The buffer where we store unjustified text. */
 static filestruct *jusbottom = NULL;
-	/* Pointer to the end of the justify buffer. */
+	/* A pointer to the end of the buffer with unjustified text. */
+#endif
+
+#ifdef ENABLE_WORDCOMPLETION
+static int pletion_x = 0;
+	/* The x position in pletion_line of the last found completion. */
+static completion_word *list_of_completions;
+	/* A linked list of the completions that have been attepmted. */
 #endif
 
 #ifndef NANO_TINY
@@ -50,15 +70,17 @@ static filestruct *jusbottom = NULL;
 void do_mark(void)
 {
     openfile->mark_set = !openfile->mark_set;
+
     if (openfile->mark_set) {
 	statusbar(_("Mark Set"));
 	openfile->mark_begin = openfile->current;
 	openfile->mark_begin_x = openfile->current_x;
+	openfile->kind_of_mark = HARDMARK;
     } else {
 	statusbar(_("Mark Unset"));
 	openfile->mark_begin = NULL;
 	openfile->mark_begin_x = 0;
-	edit_refresh();
+	refresh_needed = TRUE;
     }
 }
 #endif /* !NANO_TINY */
@@ -66,10 +88,15 @@ void do_mark(void)
 /* Delete the character under the cursor. */
 void do_delete(void)
 {
+<<<<<<< HEAD
     size_t orig_lenpt = 0;
 
 #ifndef NANO_TINY
     update_undo(DEL);
+=======
+#ifndef NANO_TINY
+    size_t orig_rows = 0;
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif
 
     assert(openfile->current != NULL && openfile->current->data != NULL && openfile->current_x <= strlen(openfile->current->data));
@@ -77,18 +104,30 @@ void do_delete(void)
     openfile->placewewant = xplustabs();
 
     if (openfile->current->data[openfile->current_x] != '\0') {
+<<<<<<< HEAD
 	int char_buf_len = parse_mbchar(openfile->current->data +
 		openfile->current_x, NULL, NULL);
+=======
+	/* We're in the middle of a line: delete the current character. */
+	int char_len = parse_mbchar(openfile->current->data +
+					openfile->current_x, NULL, NULL);
+>>>>>>> origin/tomato-shibby-RT-AC
 	size_t line_len = strlen(openfile->current->data +
 		openfile->current_x);
 
 	assert(openfile->current_x < strlen(openfile->current->data));
 
 	if (ISSET(SOFTWRAP))
+<<<<<<< HEAD
 	    orig_lenpt = strlenpt(openfile->current->data);
+=======
+	    orig_rows = strlenpt(openfile->current->data) / editwincols;
+#endif
+>>>>>>> origin/tomato-shibby-RT-AC
 
 	/* Let's get dangerous. */
 	charmove(&openfile->current->data[openfile->current_x],
+<<<<<<< HEAD
 		&openfile->current->data[openfile->current_x +
 		char_buf_len], line_len - char_buf_len + 1);
 
@@ -99,6 +138,18 @@ void do_delete(void)
 		openfile->current && openfile->current_x <
 		openfile->mark_begin_x)
 	    openfile->mark_begin_x -= char_buf_len;
+=======
+		&openfile->current->data[openfile->current_x + char_len],
+		line_len - char_len + 1);
+	null_at(&openfile->current->data, openfile->current_x +
+		line_len - char_len);
+
+#ifndef NANO_TINY
+	/* Adjust the mark if it is after the cursor on the current line. */
+	if (openfile->mark_set && openfile->mark_begin == openfile->current &&
+				openfile->mark_begin_x > openfile->current_x)
+	    openfile->mark_begin_x -= char_len;
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif
 	openfile->totsize--;
     } else if (openfile->current != openfile->filebot) {
@@ -139,9 +190,19 @@ void do_delete(void)
     } else
 	return;
 
+<<<<<<< HEAD
     if (ISSET(SOFTWRAP) && edit_refresh_needed == FALSE)
 	if (strlenpt(openfile->current->data) / COLS != orig_lenpt / COLS)
 	    edit_refresh_needed  = TRUE;
+=======
+#ifndef NANO_TINY
+    /* If the number of screen rows that a softwrapped line occupies
+     * has changed, we need a full refresh. */
+    if (ISSET(SOFTWRAP) && refresh_needed == FALSE &&
+		strlenpt(openfile->current->data) / editwincols != orig_rows)
+	refresh_needed = TRUE;
+#endif
+>>>>>>> origin/tomato-shibby-RT-AC
 
     set_modified();
 
@@ -338,6 +399,13 @@ void do_indent(ssize_t cols)
 	free(line_indent);
 
     if (indent_changed) {
+<<<<<<< HEAD
+=======
+	/* Throw away the undo stack, to prevent making mistakes when
+	 * the user tries to undo something in the reindented text. */
+	discard_until(NULL, openfile);
+
+>>>>>>> origin/tomato-shibby-RT-AC
 	/* Mark the file as modified. */
 	set_modified();
 
@@ -359,6 +427,196 @@ void do_unindent(void)
 {
     do_indent(-tabsize);
 }
+<<<<<<< HEAD
+=======
+#endif /* !NANO_TINY */
+
+/* Test whether the string is empty or consists of only blanks. */
+bool white_string(const char *s)
+{
+    while (*s != '\0' && (is_blank_mbchar(s) || *s == '\r'))
+	s += move_mbright(s, 0);
+
+    return !*s;
+}
+
+#ifdef ENABLE_COMMENT
+/* Comment or uncomment the current line or the marked lines. */
+void do_comment()
+{
+    const char *comment_seq = "#";
+    undo_type action = UNCOMMENT;
+    filestruct *top, *bot, *f;
+    size_t top_x, bot_x;
+    bool empty, all_empty = TRUE;
+
+    assert(openfile->current != NULL && openfile->current->data != NULL);
+
+#ifndef DISABLE_COLOR
+    if (openfile->syntax && openfile->syntax->comment)
+	comment_seq = openfile->syntax->comment;
+
+    /* Does the syntax not allow comments? */
+    if (strlen(comment_seq) == 0) {
+	statusbar(_("Commenting is not supported for this file type"));
+	return;
+    }
+#endif
+
+    /* Determine which lines to work on. */
+    if (openfile->mark_set)
+	mark_order((const filestruct **)&top, &top_x,
+			(const filestruct **)&bot, &bot_x, NULL);
+    else {
+	top = openfile->current;
+	bot = top;
+    }
+
+    /* If only the magic line is selected, don't do anything. */
+    if (top == bot && bot == openfile->filebot && !ISSET(NO_NEWLINES)) {
+	statusbar(_("Cannot comment past end of file"));
+	return;
+    }
+
+    /* Figure out whether to comment or uncomment the selected line or lines. */
+    for (f = top; f != bot->next; f = f->next) {
+	empty = white_string(f->data);
+
+	/* If this line is not blank and not commented, we comment all. */
+	if (!empty && !comment_line(PREFLIGHT, f, comment_seq)) {
+	    action = COMMENT;
+	    break;
+	}
+	all_empty = all_empty && empty;
+    }
+
+    /* If all selected lines are blank, we comment them. */
+    action = all_empty ? COMMENT : action;
+
+    add_undo(action);
+
+    /* Store the comment sequence used for the operation, because it could
+     * change when the file name changes; we need to know what it was. */
+    openfile->current_undo->strdata = mallocstrcpy(NULL, comment_seq);
+
+    /* Process the selected line or lines. */
+    for (f = top; f != bot->next; f = f->next) {
+	/* Comment/uncomment a line, and add undo data when line changed. */
+	if (comment_line(action, f, comment_seq))
+	    update_comment_undo(f->lineno);
+    }
+
+    set_modified();
+    refresh_needed = TRUE;
+}
+
+/* Test whether the given line can be uncommented, or add or remove a comment,
+ * depending on action.  Return TRUE if the line is uncommentable, or when
+ * anything was added or removed; FALSE otherwise. */
+bool comment_line(undo_type action, filestruct *f, const char *comment_seq)
+{
+    size_t comment_seq_len = strlen(comment_seq);
+    const char *post_seq = strchr(comment_seq, '|');
+	/* The postfix, if this is a bracketing type comment sequence. */
+    size_t pre_len = post_seq ? post_seq++ - comment_seq : comment_seq_len;
+	/* Length of prefix. */
+    size_t post_len = post_seq ? comment_seq_len - pre_len - 1 : 0;
+	/* Length of postfix. */
+    size_t line_len = strlen(f->data);
+
+    if (!ISSET(NO_NEWLINES) && f == openfile->filebot)
+	return FALSE;
+
+    if (action == COMMENT) {
+	/* Make room for the comment sequence(s), move the text right and
+	 * copy them in. */
+	f->data = charealloc(f->data, line_len + pre_len + post_len + 1);
+	charmove(&f->data[pre_len], f->data, line_len);
+	charmove(f->data, comment_seq, pre_len);
+	if (post_len)
+	    charmove(&f->data[pre_len + line_len], post_seq, post_len);
+	f->data[pre_len + line_len + post_len] = '\0';
+
+	openfile->totsize += pre_len + post_len;
+
+	/* If needed, adjust the position of the mark and of the cursor. */
+	if (openfile->mark_set && f == openfile->mark_begin)
+	    openfile->mark_begin_x += pre_len;
+	if (f == openfile->current) {
+	    openfile->current_x += pre_len;
+	    openfile->placewewant = xplustabs();
+	}
+
+	return TRUE;
+    }
+
+    /* If the line is commented, report it as uncommentable, or uncomment it. */
+    if (strncmp(f->data, comment_seq, pre_len) == 0 && (post_len == 0 ||
+		strcmp(&f->data[line_len - post_len], post_seq) == 0)) {
+
+	if (action == PREFLIGHT)
+	    return TRUE;
+
+	/* Erase the comment prefix by moving the non-comment part. */
+	charmove(f->data, &f->data[pre_len], line_len - pre_len);
+	/* Truncate the postfix if there was one. */
+	f->data[line_len - pre_len - post_len] = '\0';
+
+	openfile->totsize -= pre_len + post_len;
+
+	/* If needed, adjust the position of the mark and then the cursor. */
+	if (openfile->mark_set && f == openfile->mark_begin) {
+	    if (openfile->mark_begin_x < pre_len)
+		openfile->mark_begin_x = 0;
+	    else
+		openfile->mark_begin_x -= pre_len;
+	}
+	if (f == openfile->current) {
+	    if (openfile->current_x < pre_len)
+		openfile->current_x = 0;
+	    else
+		openfile->current_x -= pre_len;
+	    openfile->placewewant = xplustabs();
+	}
+
+	return TRUE;
+    }
+
+    return FALSE;
+}
+
+/* Perform an undo or redo for a comment or uncomment action. */
+void handle_comment_action(undo *u, bool undoing, bool add_comment)
+{
+    undo_group *group = u->grouping;
+
+    /* When redoing, reposition the cursor and let the commenter adjust it. */
+    if (!undoing)
+	goto_line_posx(u->lineno, u->begin);
+
+    while (group) {
+	filestruct *f = fsfromline(group->top_line);
+
+	while (f && f->lineno <= group->bottom_line) {
+	    comment_line(undoing ^ add_comment ?
+				COMMENT : UNCOMMENT, f, u->strdata);
+	    f = f->next;
+	}
+	group = group->next;
+    }
+
+    /* When undoing, reposition the cursor to the recorded location. */
+    if (undoing)
+	goto_line_posx(u->lineno, u->begin);
+
+    refresh_needed = TRUE;
+}
+#endif /* ENABLE_COMMENT */
+
+#ifndef NANO_TINY
+#define redo_paste undo_cut
+#define undo_paste redo_cut
+>>>>>>> origin/tomato-shibby-RT-AC
 
 /* undo a cut, or re-do an uncut */
 void undo_cut(undo *u)
@@ -379,9 +637,13 @@ void undo_cut(undo *u)
     else
 	do_gotolinecolumn(u->lineno, u->begin+1, FALSE, FALSE, FALSE, FALSE);
 
+<<<<<<< HEAD
     copy_from_filestruct(cutbuffer, cutbottom);
     free_filestruct(cutbuffer);
     cutbuffer = NULL;
+=======
+    copy_from_buffer(u->cutbuffer);
+>>>>>>> origin/tomato-shibby-RT-AC
 
 }
 
@@ -532,6 +794,7 @@ void do_undo(void)
 	undidmsg = _("text insert");
 	cutbuffer = NULL;
 	cutbottom = NULL;
+<<<<<<< HEAD
 	/* When we updated mark_begin_lineno in update_undo, it was effectively how many line
 	   were inserted due to being partitioned before read_file was called.  So we
 	   add its value here */
@@ -540,6 +803,14 @@ void do_undo(void)
 	openfile->mark_set = TRUE;
 	do_gotolinecolumn(u->lineno, u->begin+1, FALSE, FALSE, FALSE, FALSE);
 	cut_marked();
+=======
+	openfile->mark_begin = fsfromline(u->mark_begin_lineno);
+	openfile->mark_begin_x = u->mark_begin_x;
+	openfile->mark_set = TRUE;
+	goto_line_posx(u->lineno, u->begin);
+	cut_marked(NULL);
+	free_filestruct(u->cutbuffer);
+>>>>>>> origin/tomato-shibby-RT-AC
 	u->cutbuffer = cutbuffer;
 	u->cutbottom = cutbottom;
 	cutbuffer = oldcutbuffer;
@@ -556,13 +827,31 @@ void do_undo(void)
     default:
 	undidmsg = _("Internal error: unknown type.  Please save your work");
 	break;
+<<<<<<< HEAD
+=======
+    }
+
+    if (undidmsg && !pletion_line)
+	statusline(HUSH, _("Undid action (%s)"), undidmsg);
+>>>>>>> origin/tomato-shibby-RT-AC
 
     }
     renumber(f);
+<<<<<<< HEAD
     do_gotolinecolumn(u->lineno, u->begin, FALSE, FALSE, FALSE, TRUE);
     statusbar(_("Undid action (%s)"), undidmsg);
     openfile->current_undo = openfile->current_undo->next;
     openfile->last_action = OTHER;
+=======
+
+    openfile->current_undo = openfile->current_undo->next;
+    openfile->last_action = OTHER;
+    openfile->mark_set = FALSE;
+    openfile->placewewant = xplustabs();
+
+    openfile->totsize = u->wassize;
+    set_modified();
+>>>>>>> origin/tomato-shibby-RT-AC
 }
 
 void do_redo(void)
@@ -583,6 +872,7 @@ void do_redo(void)
 	return;
     }
 
+<<<<<<< HEAD
     if (u->lineno <= f->lineno)
         for (; f->prev != NULL && f->lineno != u->lineno; f = f->prev)
 	    ;
@@ -591,6 +881,10 @@ void do_redo(void)
 	    ;
     if (f->lineno != u->lineno) {
         statusbar(_("Internal error: can't match line %d.  Please save your work"), u->lineno);
+=======
+    f = fsfromline(u->mark_begin_lineno);
+    if (!f)
+>>>>>>> origin/tomato-shibby-RT-AC
 	return;
     }
 #ifdef DEBUG
@@ -662,10 +956,27 @@ void do_redo(void)
 	f->data = data;
 	break;
     case INSERT:
+<<<<<<< HEAD
 	undidmsg = _("text insert");
 	do_gotolinecolumn(u->lineno, u->begin+1, FALSE, FALSE, FALSE, FALSE);
         copy_from_filestruct(u->cutbuffer, u->cutbottom);
 	openfile->placewewant = xplustabs();
+=======
+	redidmsg = _("text insert");
+	goto_line_posx(u->lineno, u->begin);
+	copy_from_buffer(u->cutbuffer);
+	free_filestruct(u->cutbuffer);
+	u->cutbuffer = NULL;
+	break;
+#ifdef ENABLE_COMMENT
+    case COMMENT:
+	handle_comment_action(u, FALSE, TRUE);
+	redidmsg = _("comment");
+	break;
+    case UNCOMMENT:
+	handle_comment_action(u, FALSE, FALSE);
+	redidmsg = _("uncomment");
+>>>>>>> origin/tomato-shibby-RT-AC
 	break;
     default:
 	undidmsg = _("Internal error: unknown type.  Please save your work");
@@ -677,12 +988,25 @@ void do_redo(void)
 
     openfile->current_undo = u;
     openfile->last_action = OTHER;
+<<<<<<< HEAD
 
 }
 #endif /* !NANO_TINY */
 
 /* Someone hits Enter *gasp!* */
 void do_enter(bool undoing)
+=======
+    openfile->mark_set = FALSE;
+    openfile->placewewant = xplustabs();
+
+    openfile->totsize = u->newsize;
+    set_modified();
+}
+#endif /* !NANO_TINY */
+
+/* Break the current line at the cursor position. */
+void do_enter(void)
+>>>>>>> origin/tomato-shibby-RT-AC
 {
     filestruct *newnode = make_new_node(openfile->current);
     size_t extra = 0;
@@ -694,37 +1018,45 @@ void do_enter(bool undoing)
 	add_undo(ENTER);
 
 
-    /* Do auto-indenting, like the neolithic Turbo Pascal editor. */
     if (ISSET(AUTOINDENT)) {
-	/* If we are breaking the line in the indentation, the new
-	 * indentation should have only current_x characters, and
-	 * current_x should not change. */
 	extra = indent_length(openfile->current->data);
+
+	/* If we are breaking the line in the indentation, limit the new
+	 * indentation to the current x position. */
 	if (extra > openfile->current_x)
 	    extra = openfile->current_x;
     }
 #endif
     newnode->data = charalloc(strlen(openfile->current->data +
-	openfile->current_x) + extra + 1);
+					openfile->current_x) + extra + 1);
     strcpy(&newnode->data[extra], openfile->current->data +
-	openfile->current_x);
+					openfile->current_x);
 #ifndef NANO_TINY
     if (ISSET(AUTOINDENT)) {
+	/* Copy the whitespace from the current line to the new one. */
 	strncpy(newnode->data, openfile->current->data, extra);
 	openfile->totsize += mbstrlen(newnode->data);
     }
 #endif
+
     null_at(&openfile->current->data, openfile->current_x);
+
 #ifndef NANO_TINY
+<<<<<<< HEAD
     if (openfile->mark_set && openfile->current ==
 	openfile->mark_begin && openfile->current_x <
 	openfile->mark_begin_x) {
+=======
+    /* Adjust the mark if it was on the current line after the cursor. */
+    if (openfile->mark_set && openfile->current == openfile->mark_begin &&
+		openfile->current_x < openfile->mark_begin_x) {
+>>>>>>> origin/tomato-shibby-RT-AC
 	openfile->mark_begin = newnode;
 	openfile->mark_begin_x += extra - openfile->current_x;
     }
 #endif
-    openfile->current_x = extra;
 
+<<<<<<< HEAD
     if (openfile->current == openfile->filebot)
 	openfile->filebot = newnode;
     splice_node(openfile->current, newnode,
@@ -732,13 +1064,29 @@ void do_enter(bool undoing)
 
     renumber(openfile->current);
     openfile->current = newnode;
+=======
+    splice_node(openfile->current, newnode);
+    renumber(newnode);
+>>>>>>> origin/tomato-shibby-RT-AC
+
+    openfile->current = newnode;
+    openfile->current_x = extra;
+    openfile->placewewant = xplustabs();
 
     openfile->totsize++;
     set_modified();
 
+<<<<<<< HEAD
     openfile->placewewant = xplustabs();
 
     edit_refresh_needed = TRUE;
+=======
+#ifndef NANO_TINY
+    update_undo(ENTER);
+#endif
+
+    refresh_needed = TRUE;
+>>>>>>> origin/tomato-shibby-RT-AC
 }
 
 #ifndef NANO_TINY
@@ -835,8 +1183,42 @@ bool execute_command(const char *command)
     return TRUE;
 }
 
+<<<<<<< HEAD
 /* Add a new undo struct to the top of the current pile */
 void add_undo(undo_type current_action)
+=======
+/* Discard undo items that are newer than the given one, or all if NULL. */
+void discard_until(const undo *thisitem, openfilestruct *thefile)
+{
+    undo *dropit = thefile->undotop;
+    undo_group *group;
+
+    while (dropit != NULL && dropit != thisitem) {
+	thefile->undotop = dropit->next;
+	free(dropit->strdata);
+	free_filestruct(dropit->cutbuffer);
+#ifdef ENABLE_COMMENT
+	group = dropit->grouping;
+	while (group != NULL) {
+	    undo_group *next = group->next;
+	    free(group);
+	    group = next;
+	}
+#endif
+	free(dropit);
+	dropit = thefile->undotop;
+    }
+
+    /* Adjust the pointer to the top of the undo stack. */
+    thefile->current_undo = (undo *)thisitem;
+
+    /* Prevent a chain of editing actions from continuing. */
+    thefile->last_action = OTHER;
+}
+
+/* Add a new undo struct to the top of the current pile. */
+void add_undo(undo_type action)
+>>>>>>> origin/tomato-shibby-RT-AC
 {
     undo *u;
     char *data;
@@ -892,11 +1274,29 @@ void add_undo(undo_type current_action)
         data[1] = '\0';
         u->strdata = data;
 	break;
+<<<<<<< HEAD
     case DEL:
 	if (u->begin != strlen(fs->current->data)) {
             data = mallocstrncpy(NULL, &fs->current->data[u->begin], 2);
             data[1] = '\0';
             u->strdata = data;
+=======
+    case BACK:
+	/* If the next line is the magic line, don't ever undo this
+	 * backspace, as it won't actually have deleted anything. */
+	if (openfile->current->next == openfile->filebot &&
+			openfile->current->data[0] != '\0')
+	    u->xflags = WAS_FINAL_BACKSPACE;
+    case DEL:
+	if (openfile->current->data[openfile->current_x] != '\0') {
+	    char *char_buf = charalloc(mb_cur_max() + 1);
+	    int char_len = parse_mbchar(&openfile->current->data[u->begin],
+						char_buf, NULL);
+	    char_buf[char_len] = '\0';
+	    u->strdata = char_buf;
+	    if (u->type == BACK)
+		u->mark_begin_x += char_len;
+>>>>>>> origin/tomato-shibby-RT-AC
 	    break;
 	}
 	/* Else purposely fall into unsplit code */
@@ -998,6 +1398,7 @@ void update_undo(undo_type action)
     switch (u->type) {
     case ADD:
 #ifdef DEBUG
+<<<<<<< HEAD
         fprintf(stderr, "fs->current->data = \"%s\", current_x = %lu, u->begin = %d\n",
 			fs->current->data, (unsigned long) fs->current_x, u->begin);
 #endif
@@ -1006,10 +1407,19 @@ void update_undo(undo_type action)
         data[len-2] = fs->current->data[fs->current_x];
         data[len-1] = '\0';
         u->strdata = (char *) data;
+=======
+	fprintf(stderr, "  >> openfile->current->data = \"%s\", current_x = %lu, u->begin = %lu\n",
+			openfile->current->data, (unsigned long)openfile->current_x, (unsigned long)u->begin);
+#endif
+	char *char_buf = charalloc(mb_cur_max());
+	int char_len = parse_mbchar(&openfile->current->data[u->mark_begin_x], char_buf, NULL);
+	u->strdata = addstrings(u->strdata, u->strdata ? strlen(u->strdata) : 0, char_buf, char_len);
+>>>>>>> origin/tomato-shibby-RT-AC
 #ifdef DEBUG
 	fprintf(stderr, "current undo data now \"%s\"\n", u->strdata);
 #endif
 	break;
+<<<<<<< HEAD
     case DEL:
 	len = strlen(u->strdata) + 2;
 	assert(len > 2);
@@ -1044,6 +1454,25 @@ void update_undo(undo_type action)
 	} else {
 	    /* They deleted something else on the line */
 	    add_undo(DEL);
+=======
+    }
+    case BACK:
+    case DEL: {
+	char *char_buf = charalloc(mb_cur_max());
+	int char_len = parse_mbchar(&openfile->current->data[openfile->current_x], char_buf, NULL);
+	if (openfile->current_x == u->begin) {
+	    /* They deleted more: add removed character after earlier stuff. */
+	    u->strdata = addstrings(u->strdata, strlen(u->strdata), char_buf, char_len);
+	    u->mark_begin_x = openfile->current_x;
+	} else if (openfile->current_x == u->begin - char_len) {
+	    /* They backspaced further: add removed character before earlier. */
+	    u->strdata = addstrings(char_buf, char_len, u->strdata, strlen(u->strdata));
+	    u->begin = openfile->current_x;
+	} else {
+	    /* They deleted *elsewhere* on the line: start a new undo item. */
+	    free(char_buf);
+	    add_undo(u->type);
+>>>>>>> origin/tomato-shibby-RT-AC
 	    return;
 	}
 #ifdef DEBUG
@@ -1066,6 +1495,14 @@ void update_undo(undo_type action)
 	break;
     case INSERT:
 	u->mark_begin_lineno = openfile->current->lineno;
+<<<<<<< HEAD
+=======
+	u->mark_begin_x = openfile->current_x;
+	break;
+    case ENTER:
+	u->strdata = mallocstrcpy(NULL, openfile->current->data);
+	u->mark_begin_x = openfile->current_x;
+>>>>>>> origin/tomato-shibby-RT-AC
 	break;
 #ifndef DISABLE_WRAPPING
     case SPLIT:
@@ -1152,11 +1589,7 @@ bool do_wrap(filestruct *line, bool undoing)
     line_len = strlen(line->data);
 
     /* Find the last blank where we can break the line. */
-    wrap_loc = break_line(line->data, fill
-#ifndef DISABLE_HELP
-	, FALSE
-#endif
-	);
+    wrap_loc = break_line(line->data, fill, FALSE);
 
     /* If we couldn't break the line, or we've reached the end of it, we
      * don't wrap. */
@@ -1346,6 +1779,7 @@ bool do_wrap(filestruct *line, bool undoing)
  * that the display length to there is at most (goal + 1).  If there is
  * no such blank, then we find the first blank.  We then take the last
  * blank in that group of blanks.  The terminating '\0' counts as a
+<<<<<<< HEAD
  * blank, as does a '\n' if newline is TRUE. */
 ssize_t break_line(const char *line, ssize_t goal
 #ifndef DISABLE_HELP
@@ -1366,29 +1800,45 @@ ssize_t break_line(const char *line, ssize_t goal
 
     while (*line != '\0' && goal >= cur_pos) {
 	line_len = parse_mbchar(line, NULL, &cur_pos);
+=======
+ * blank, as does a '\n' if snap_at_nl is TRUE. */
+ssize_t break_line(const char *line, ssize_t goal, bool snap_at_nl)
+{
+    ssize_t lastblank = -1;
+	/* The index of the last blank we found. */
+    ssize_t index = 0;
+	/* The index of the character we are looking at. */
+    size_t column = 0;
+	/* The column position that corresponds with index. */
+    int char_len = 0;
+	/* The length of the current character, in bytes. */
+>>>>>>> origin/tomato-shibby-RT-AC
 
-	if (is_blank_mbchar(line)
-#ifndef DISABLE_HELP
-		|| (newln && *line == '\n')
-#endif
-		) {
-	    blank_loc = cur_loc;
+    /* Find the last blank that does not overshoot the target column. */
+    while (*line != '\0' && column <= goal) {
+	if (is_blank_mbchar(line) || (snap_at_nl && *line == '\n')) {
+	    lastblank = index;
 
-#ifndef DISABLE_HELP
-	    if (newln && *line == '\n')
+	    if (*line == '\n')
 		break;
-#endif
 	}
 
+<<<<<<< HEAD
 	line += line_len;
 	cur_loc += line_len;
+=======
+	char_len = parse_mbchar(line, NULL, &column);
+	line += char_len;
+	index += char_len;
+>>>>>>> origin/tomato-shibby-RT-AC
     }
 
-    if (goal >= cur_pos)
-	/* In fact, the whole line displays shorter than goal. */
-	return cur_loc;
+    /* If the whole line displays shorter than goal, we're done. */
+    if (column <= goal)
+	return index;
 
 #ifndef DISABLE_HELP
+<<<<<<< HEAD
     if (newln && blank_loc <= 0) {
        /* If blank was not found or was found only first character,
         * force line break. */
@@ -1418,11 +1868,31 @@ ssize_t break_line(const char *line, ssize_t goal
 
 	    line += line_len;
 	    cur_loc += line_len;
+=======
+    /* If we're wrapping a help text and no blank was found, or was
+     * found only as the first character, force a line break. */
+    if (snap_at_nl && lastblank < 1)
+	return (index - char_len);
+#endif
+
+    /* If no blank was found within the goal width, seek one after it. */
+    if (lastblank < 0) {
+	while (*line != '\0') {
+	    if (is_blank_mbchar(line))
+		lastblank = index;
+	    else if (lastblank > 0)
+		return lastblank;
+
+	    char_len = parse_mbchar(line, NULL, NULL);
+	    line += char_len;
+	    index += char_len;
+>>>>>>> origin/tomato-shibby-RT-AC
 	}
 
 	return -1;
     }
 
+<<<<<<< HEAD
     /* Move to the last blank after blank_loc, if there is one. */
     line -= cur_loc;
     line += blank_loc;
@@ -1443,9 +1913,21 @@ ssize_t break_line(const char *line, ssize_t goal
 
 	line += line_len;
 	blank_loc += line_len;
+=======
+    /* Move the pointer back to the last blank, and then step beyond it. */
+    line = line - index + lastblank;
+    char_len = parse_mbchar(line, NULL, NULL);
+    line += char_len;
+
+    /* Skip any consecutive blanks after the last blank. */
+    while (*line != '\0' && is_blank_mbchar(line)) {
+	lastblank += char_len;
+	char_len = parse_mbchar(line, NULL, NULL);
+	line += char_len;
+>>>>>>> origin/tomato-shibby-RT-AC
     }
 
-    return blank_loc;
+    return lastblank;
 }
 #endif /* !DISABLE_HELP || !DISABLE_WRAPJUSTIFY */
 
@@ -1635,13 +2117,9 @@ void justify_format(filestruct *paragraph, size_t skip)
 
 /* The "quote part" of a line is the largest initial substring matching
  * the quote string.  This function returns the length of the quote part
- * of the given line.
- *
- * Note that if !HAVE_REGEX_H then we match concatenated copies of
- * quotestr. */
+ * of the given line. */
 size_t quote_length(const char *line)
 {
-#ifdef HAVE_REGEX_H
     regmatch_t matches;
     int rc = regexec(&quotereg, line, 1, &matches, 0);
 
@@ -1650,14 +2128,6 @@ size_t quote_length(const char *line)
     /* matches.rm_so should be 0, since the quote string should start
      * with the caret ^. */
     return matches.rm_eo;
-#else	/* !HAVE_REGEX_H */
-    size_t qdepth = 0;
-
-    /* Compute quote depth level. */
-    while (strncmp(line + qdepth, quotestr, quotelen) == 0)
-	qdepth += quotelen;
-    return qdepth;
-#endif	/* !HAVE_REGEX_H */
 }
 
 /* a_line and b_line are lines of text.  The quotation part of a_line is
@@ -1734,12 +2204,9 @@ bool begpar(const filestruct *const foo)
 
     /* Case 2) or 5) or 4). */
     if (foo->prev->data[quote_len + temp_id_len] == '\0' ||
-	(quote_len == 0 && indent_len > 0
-#ifndef NANO_TINY
-	&& !ISSET(AUTOINDENT)
-#endif
-	) || !indents_match(foo->prev->data + quote_len, temp_id_len,
-	foo->data + quote_len, indent_len))
+		(quote_len == 0 && indent_len > 0 && !ISSET(AUTOINDENT)) ||
+		!indents_match(foo->prev->data + quote_len, temp_id_len,
+				foo->data + quote_len, indent_len))
 	return TRUE;
 
     return FALSE;
@@ -1799,12 +2266,21 @@ void backup_lines(filestruct *first_line, size_t par_len)
 
     /* Move the paragraph from the current buffer's filestruct to the
      * justify buffer. */
+<<<<<<< HEAD
     move_to_filestruct(&jusbuffer, &jusbottom, top, 0, bot,
 	(i == 1 && bot == openfile->filebot) ? strlen(bot->data) : 0);
 
     /* Copy the paragraph back to the current buffer's filestruct from
      * the justify buffer. */
     copy_from_filestruct(jusbuffer, jusbottom);
+=======
+    extract_buffer(&jusbuffer, &jusbottom, top, 0, bot,
+		(i == 1 && bot == openfile->filebot) ? strlen(bot->data) : 0);
+
+    /* Copy the paragraph back to the current buffer's filestruct from
+     * the justify buffer. */
+    copy_from_buffer(jusbuffer);
+>>>>>>> origin/tomato-shibby-RT-AC
 
     /* Move upward from the last line of the paragraph to the first
      * line, putting first_line, edittop, current, and mark_begin at the
@@ -1861,16 +2337,11 @@ bool find_paragraph(size_t *const quote, size_t *const par)
 	/* Number of lines in the paragraph we search for. */
     filestruct *current_save;
 	/* The line at the beginning of the paragraph we search for. */
-    ssize_t current_y_save;
-	/* The y-coordinate at the beginning of the paragraph we search
-	 * for. */
 
-#ifdef HAVE_REGEX_H
     if (quoterc != 0) {
 	statusbar(_("Bad quote string %s: %s"), quotestr, quoteerr);
 	return FALSE;
     }
-#endif
 
     assert(openfile->current != NULL);
 
@@ -1912,7 +2383,6 @@ bool find_paragraph(size_t *const quote, size_t *const par)
      * of lines in this paragraph. */
     quote_len = quote_length(openfile->current->data);
     current_save = openfile->current;
-    current_y_save = openfile->current_y;
     do_para_end(FALSE);
     par_len = openfile->current->lineno - current_save->lineno;
 
@@ -1923,7 +2393,6 @@ bool find_paragraph(size_t *const quote, size_t *const par)
     if (openfile->current_x > 0)
 	par_len++;
     openfile->current = current_save;
-    openfile->current_y = current_y_save;
 
     /* Save the values of quote_len and par_len. */
     assert(quote != NULL && par != NULL);
@@ -1951,10 +2420,14 @@ void do_justify(bool full_justify)
     /* We save these variables to be restored if the user
      * unjustifies. */
     filestruct *edittop_save = openfile->edittop;
+    size_t firstcolumn_save = openfile->firstcolumn;
     filestruct *current_save = openfile->current;
     size_t current_x_save = openfile->current_x;
+<<<<<<< HEAD
     size_t pww_save = openfile->placewewant;
     size_t totsize_save = openfile->totsize;
+=======
+>>>>>>> origin/tomato-shibby-RT-AC
 #ifndef NANO_TINY
     filestruct *mark_begin_save = openfile->mark_begin;
     size_t mark_begin_x_save = openfile->mark_begin_x;
@@ -2035,8 +2508,7 @@ void do_justify(bool full_justify)
 	if (first_par_line == NULL) {
 	    backup_lines(openfile->current, full_justify ?
 		openfile->filebot->lineno - openfile->current->lineno +
-		((openfile->filebot->data[0] != '\0') ? 1 : 0) :
-		par_len);
+		((openfile->filebot->data[0] != '\0') ? 1 : 0) : par_len);
 	    first_par_line = openfile->current;
 	}
 
@@ -2092,8 +2564,12 @@ void do_justify(bool full_justify)
 
 	    /* We're just about to tack the next line onto this one.  If
 	     * this line isn't empty, make sure it ends in a space. */
+<<<<<<< HEAD
 	    if (line_len > 0 &&
 		openfile->current->data[line_len - 1] != ' ') {
+=======
+	    if (line_len > 0 && openfile->current->data[line_len - 1] != ' ') {
+>>>>>>> origin/tomato-shibby-RT-AC
 		line_len++;
 		openfile->current->data =
 			charealloc(openfile->current->data,
@@ -2116,10 +2592,15 @@ void do_justify(bool full_justify)
 		openfile->filebot = openfile->current;
 
 #ifndef NANO_TINY
+<<<<<<< HEAD
 	    /* Adjust the mark coordinates to compensate for the change
 	     * in the next line. */
 	    if (openfile->mark_set && openfile->mark_begin ==
 		next_line) {
+=======
+	    /* If needed, adjust the coordinates of the mark. */
+	    if (openfile->mark_set && openfile->mark_begin == next_line) {
+>>>>>>> origin/tomato-shibby-RT-AC
 		openfile->mark_begin = openfile->current;
 		openfile->mark_begin_x += line_len - indent_len;
 	    }
@@ -2151,11 +2632,7 @@ void do_justify(bool full_justify)
 	    /* If this line is too long, try to wrap it to the next line
 	     * to make it short enough. */
 	    break_pos = break_line(openfile->current->data + indent_len,
-		fill - strnlenpt(openfile->current->data, indent_len)
-#ifndef DISABLE_HELP
-		, FALSE
-#endif
-		);
+		fill - strnlenpt(openfile->current->data, indent_len), FALSE);
 
 	    /* We can't break the line, or don't need to, so get out. */
 	    if (break_pos == -1 || break_pos + indent_len == line_len)
@@ -2177,11 +2654,7 @@ void do_justify(bool full_justify)
 	    /* If this paragraph is non-quoted, and autoindent isn't
 	     * turned on, set the indentation length to zero so that the
 	     * indentation is treated as part of the line. */
-	    if (quote_len == 0
-#ifndef NANO_TINY
-		&& !ISSET(AUTOINDENT)
-#endif
-		)
+	    if (quote_len == 0 && !ISSET(AUTOINDENT))
 		indent_len = 0;
 
 	    /* Copy the text after where we're going to break the
@@ -2208,6 +2681,16 @@ void do_justify(bool full_justify)
 #endif
 
 	    /* Break the current line. */
+<<<<<<< HEAD
+=======
+	    if (ISSET(JUSTIFY_TRIM)) {
+		while (break_pos > 0 &&
+			is_blank_mbchar(&openfile->current->data[break_pos - 1])) {
+		    break_pos--;
+		    openfile->totsize--;
+		}
+	    }
+>>>>>>> origin/tomato-shibby-RT-AC
 	    null_at(&openfile->current->data, break_pos);
 
 	    /* If the current line is the last line of the file, move
@@ -2217,7 +2700,6 @@ void do_justify(bool full_justify)
 
 	    /* Go to the next line. */
 	    par_len--;
-	    openfile->current_y++;
 	    openfile->current = openfile->current->next;
 	}
 
@@ -2228,14 +2710,12 @@ void do_justify(bool full_justify)
 	/* Go to the next line, if possible.  If there is no next line,
 	 * move to the end of the current line. */
 	if (openfile->current != openfile->filebot) {
-	    openfile->current_y++;
 	    openfile->current = openfile->current->next;
 	} else
 	    openfile->current_x = strlen(openfile->current->data);
 
-	/* Renumber the lines of the now-justified current paragraph,
-	 * since both find_paragraph() and edit_refresh() need the line
-	 * numbers to be right. */
+	/* Renumber the now-justified paragraph, since both refreshing the
+	 * edit window and finding a paragraph need correct line numbers. */
 	renumber(curr_first_par_line);
 
 	/* We've just finished justifying the paragraph.  If we're not
@@ -2247,9 +2727,8 @@ void do_justify(bool full_justify)
     }
 
     /* We are now done justifying the paragraph or the file, so clean
-     * up.  current_y and totsize have been maintained above.  If we
-     * actually justified something, set last_par_line to the new end of
-     * the paragraph. */
+     * up.  totsize has been maintained above.  If we actually justified
+     * something, set last_par_line to the new end of the paragraph. */
     if (first_par_line != NULL)
 	last_par_line = openfile->current;
 
@@ -2269,12 +2748,13 @@ void do_justify(bool full_justify)
     /* If constant cursor position display is on, make sure the current
      * cursor position will be properly displayed on the statusbar. */
     if (ISSET(CONST_UPDATE))
-	do_cursorpos(TRUE);
+	do_cursorpos(FALSE);
 
     /* Display the shortcut list with UnJustify. */
     shortcut_init(TRUE);
     display_main_list();
 
+<<<<<<< HEAD
     /* Now get a keystroke and see if it's unjustify.  If not, put back
      * the keystroke and return. */
     kbinput = do_input(&meta_key, &func_key, &s_or_t, &ran_func,
@@ -2284,9 +2764,19 @@ void do_justify(bool full_justify)
     if (s && s->scfunc == DO_UNCUT_TEXT) {
 	/* Splice the justify buffer back into the file, but only if we
 	 * actually justified something. */
+=======
+    if (func == do_uncut_text
+#ifndef NANO_TINY
+			|| func == do_undo
+#endif
+		) {
+	/* If we actually justified something, then splice the preserved
+	 * unjustified text back into the file, */
+>>>>>>> origin/tomato-shibby-RT-AC
 	if (first_par_line != NULL) {
-	    filestruct *top_save;
+	    filestruct *trash = NULL, *dummy = NULL;
 
+<<<<<<< HEAD
 	    /* Partition the filestruct so that it contains only the
 	     * text of the justified paragraph. */
 	    filepart = partition_filestruct(first_par_line, 0,
@@ -2311,11 +2801,25 @@ void do_justify(bool full_justify)
 	    renumber(top_save);
 
 	    /* Restore the justify we just did (ungrateful user!). */
+=======
+	    /* Throw away the justified paragraph, and replace it with
+	     * the preserved unjustified text. */
+	    extract_buffer(&trash, &dummy, first_par_line, 0, last_par_line,
+			filebot_inpar ? strlen(last_par_line->data) : 0);
+	    free_filestruct(trash);
+	    ingraft_buffer(jusbuffer);
+
+	    /* Restore the old position and the mark. */
+>>>>>>> origin/tomato-shibby-RT-AC
 	    openfile->edittop = edittop_save;
+	    openfile->firstcolumn = firstcolumn_save;
 	    openfile->current = current_save;
 	    openfile->current_x = current_x_save;
+<<<<<<< HEAD
 	    openfile->placewewant = pww_save;
 	    openfile->totsize = totsize_save;
+=======
+>>>>>>> origin/tomato-shibby-RT-AC
 #ifndef NANO_TINY
 	    if (openfile->mark_set) {
 		openfile->mark_begin = mark_begin_save;
@@ -2323,21 +2827,38 @@ void do_justify(bool full_justify)
 	    }
 #endif
 	    openfile->modified = modified_save;
-
-	    /* Clear the justify buffer. */
-	    jusbuffer = NULL;
-
 	    if (!openfile->modified)
 		titlebar(NULL);
+<<<<<<< HEAD
 	    edit_refresh_needed = TRUE;
 	}
     } else {
 	unget_kbinput(kbinput, meta_key, func_key);
 
 	/* Blow away the text in the justify buffer. */
+=======
+
+	    refresh_needed = TRUE;
+	}
+    } else {
+	/* Put the keystroke back into the queue. */
+	unget_kbinput(kbinput, meta_key);
+
+	/* Set the desired screen column (always zero, except at EOF). */
+	openfile->placewewant = xplustabs();
+
+#ifndef NANO_TINY
+	/* Throw away the entire undo stack, to prevent a crash when
+	 * the user tries to undo something in the justified text. */
+	discard_until(NULL, openfile);
+#endif
+	/* Blow away the unjustified text. */
+>>>>>>> origin/tomato-shibby-RT-AC
 	free_filestruct(jusbuffer);
-	jusbuffer = NULL;
     }
+
+    /* Mark the buffer for unjustified text as empty. */
+    jusbuffer = NULL;
 
     blank_statusbar();
 
@@ -2364,10 +2885,16 @@ void do_full_justify(void)
  * return FALSE if the user cancels. */
 bool do_int_spell_fix(const char *word)
 {
+<<<<<<< HEAD
     char *save_search, *save_replace;
     size_t match_len, current_x_save = openfile->current_x;
     size_t pww_save = openfile->placewewant;
     bool meta_key = FALSE, func_key = FALSE;
+=======
+    char *save_search, *exp_word;
+    size_t firstcolumn_save = openfile->firstcolumn;
+    size_t current_x_save = openfile->current_x;
+>>>>>>> origin/tomato-shibby-RT-AC
     filestruct *edittop_save = openfile->edittop;
     filestruct *current_save = openfile->current;
 	/* Save where we are. */
@@ -2391,17 +2918,17 @@ bool do_int_spell_fix(const char *word)
     size_t top_x, bot_x;
 #endif
 
+<<<<<<< HEAD
     /* Make sure spell-check is case sensitive. */
-    SET(CASE_SENSITIVE);
+=======
+    /* Save the settings of the global flags. */
+    memcpy(stash, flags, sizeof(flags));
 
-#ifndef NANO_TINY
-    /* Make sure spell-check goes forward only. */
+    /* Do the spell checking case sensitive, forward, and without regexes. */
+>>>>>>> origin/tomato-shibby-RT-AC
+    SET(CASE_SENSITIVE);
     UNSET(BACKWARDS_SEARCH);
-#endif
-#ifdef HAVE_REGEX_H
-    /* Make sure spell-check doesn't use regular expressions. */
     UNSET(USE_REGEXP);
-#endif
 
     /* Save the current search/replace strings. */
     search_init_globals();
@@ -2420,14 +2947,34 @@ bool do_int_spell_fix(const char *word)
 	 * added when we're done correcting misspelled words; and
 	 * turn the mark off. */
 	mark_order((const filestruct **)&top, &top_x,
+<<<<<<< HEAD
 	    (const filestruct **)&bot, &bot_x, &right_side_up);
 	filepart = partition_filestruct(top, top_x, bot, bot_x);
 	if (!ISSET(NO_NEWLINES))
 	    added_magicline = (openfile->filebot->data[0] != '\0');
 	openfile->mark_set = FALSE;
+=======
+			(const filestruct **)&bot, &bot_x, &right_side_up);
+	/* If the region is marked normally, swap the end points, so that
+	 * (current, current_x) (where searching starts) is at the top. */
+	if (right_side_up) {
+	    openfile->current = top;
+	    openfile->current_x = top_x;
+	    openfile->mark_begin = bot;
+	    openfile->mark_begin_x = bot_x;
+	}
+	openfile->mark_set = FALSE;
+    } else
+#endif
+    /* Otherwise, start from the top of the file. */
+    {
+	openfile->current = openfile->fileage;
+	openfile->current_x = 0;
+>>>>>>> origin/tomato-shibby-RT-AC
     }
 #endif
 
+<<<<<<< HEAD
     /* Start from the top of the file. */
     openfile->edittop = openfile->fileage;
     openfile->current = openfile->fileage;
@@ -2446,9 +2993,25 @@ bool do_int_spell_fix(const char *word)
 		openfile->current_x + match_len) - xpt, FALSE);
 
 	    edit_refresh();
+=======
+    /* Find the first whole occurrence of word. */
+    result = findnextstr(word, TRUE, TRUE, NULL, FALSE, NULL, 0);
+
+    /* If the word isn't found, alert the user; if it is, allow correction. */
+    if (result == 0) {
+	statusline(ALERT, _("Unfindable word: %s"), word);
+	lastmessage = HUSH;
+	proceed = TRUE;
+	napms(2800);
+    } else if (result == 1) {
+	exp_word = display_string(openfile->current->data, xplustabs(),
+					strlenpt(word), FALSE);
+	edit_refresh();
+>>>>>>> origin/tomato-shibby-RT-AC
 
 	    do_replace_highlight(TRUE, exp_word);
 
+<<<<<<< HEAD
 	    /* Allow all instances of the word to be corrected. */
 	    canceled = (do_prompt(FALSE,
 #ifndef DISABLE_TABCOMP
@@ -2458,6 +3021,12 @@ bool do_int_spell_fix(const char *word)
 		&meta_key, &func_key,
 #ifndef NANO_TINY
 		NULL,
+=======
+	/* Let the user supply a correctly spelled alternative. */
+	proceed = (do_prompt(FALSE, FALSE, MSPELL, word,
+#ifndef DISABLE_HISTORIES
+				NULL,
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif
 		edit_refresh, _("Edit a replacement")) == -1);
 
@@ -2465,11 +3034,21 @@ bool do_int_spell_fix(const char *word)
 
 	    free(exp_word);
 
+<<<<<<< HEAD
 	    if (!canceled && strcmp(word, answer) != 0) {
 		openfile->current_x--;
 		do_replace_loop(TRUE, &canceled, openfile->current,
 			&openfile->current_x, word);
 	    }
+=======
+	/* If a replacement was given, go through all occurrences. */
+	if (proceed && strcmp(word, answer) != 0) {
+#ifndef NANO_TINY
+	    /* Replacements should happen only in the marked region. */
+	    openfile->mark_set = old_mark_set;
+#endif
+	    do_replace_loop(word, TRUE, current_save, &current_x_save);
+>>>>>>> origin/tomato-shibby-RT-AC
 
 	    break;
 	}
@@ -2509,9 +3088,13 @@ bool do_int_spell_fix(const char *word)
 
     /* Restore where we were. */
     openfile->edittop = edittop_save;
+<<<<<<< HEAD
     openfile->current = current_save;
     openfile->current_x = current_x_save;
     openfile->placewewant = pww_save;
+=======
+    openfile->firstcolumn = firstcolumn_save;
+>>>>>>> origin/tomato-shibby-RT-AC
 
     /* Restore case sensitivity setting. */
     if (!case_sens_set)
@@ -2720,12 +3303,20 @@ const char *do_alt_speller(char *tempfile_name)
     int alt_spell_status;
     size_t current_x_save = openfile->current_x;
     size_t pww_save = openfile->placewewant;
+<<<<<<< HEAD
     ssize_t current_y_save = openfile->current_y;
     ssize_t lineno_save = openfile->current->lineno;
+=======
+    ssize_t lineno_save = openfile->current->lineno;
+    bool was_at_eol = (openfile->current->data[openfile->current_x] == '\0');
+    struct stat spellfileinfo;
+    time_t timestamp;
+>>>>>>> origin/tomato-shibby-RT-AC
     pid_t pid_spell;
     char *ptr;
     static int arglen = 3;
     static char **spellargs = NULL;
+<<<<<<< HEAD
 #ifndef NANO_TINY
     bool old_mark_set = openfile->mark_set;
     bool added_magicline = FALSE;
@@ -2760,6 +3351,21 @@ const char *do_alt_speller(char *tempfile_name)
     endwin();
 
     /* Set up an argument list to pass execvp(). */
+=======
+
+    /* Get the timestamp and the size of the temporary file. */
+    stat(tempfile_name, &spellfileinfo);
+    timestamp = spellfileinfo.st_mtime;
+
+    /* If the number of bytes to check is zero, get out. */
+    if (spellfileinfo.st_size == 0)
+	return NULL;
+
+    /* Exit from curses mode. */
+    endwin();
+
+    /* Set up the argument list to pass to execvp(). */
+>>>>>>> origin/tomato-shibby-RT-AC
     if (spellargs == NULL) {
 	spellargs = (char **)nmalloc(arglen * sizeof(char *));
 
@@ -2774,17 +3380,13 @@ const char *do_alt_speller(char *tempfile_name)
     }
     spellargs[arglen - 2] = tempfile_name;
 
-    /* Start a new process for the alternate speller. */
+    /* Fork a child process and run the alternate spell program in it. */
     if ((pid_spell = fork()) == 0) {
-	/* Start alternate spell program; we are using $PATH. */
 	execvp(spellargs[0], spellargs);
 
-	/* Should not be reached, if alternate speller is found!!! */
+	/* Terminate the child process if no alternate speller is found. */
 	exit(1);
-    }
-
-    /* If we couldn't fork, get out. */
-    if (pid_spell < 0)
+    } else if (pid_spell < 0)
 	return _("Could not fork");
 
 #ifndef NANO_TINY
@@ -2802,6 +3404,7 @@ const char *do_alt_speller(char *tempfile_name)
     /* Restore the terminal to its previous state. */
     terminal_init();
 
+<<<<<<< HEAD
     /* Turn the cursor back on for sure. */
     curs_set(1);
 
@@ -2902,6 +3505,59 @@ const char *do_alt_speller(char *tempfile_name)
     /* Go back to the old position, and mark the file as modified. */
     do_gotopos(lineno_save, current_x_save, current_y_save, pww_save);
     set_modified();
+=======
+    if (!WIFEXITED(alt_spell_status) || WEXITSTATUS(alt_spell_status) != 0)
+	return invocation_error(alt_speller);
+
+#ifndef NANO_TINY
+    /* Replace the marked text (or the entire text) of the current buffer
+     * with the spell-checked text. */
+    if (openfile->mark_set) {
+	filestruct *top, *bot;
+	size_t top_x, bot_x;
+	bool right_side_up;
+	ssize_t was_mark_lineno = openfile->mark_begin->lineno;
+
+	openfile->mark_set = FALSE;
+
+	mark_order((const filestruct **)&top, &top_x,
+			(const filestruct **)&bot, &bot_x, &right_side_up);
+
+	replace_marked_buffer(tempfile_name, top, top_x, bot, bot_x);
+
+	/* Adjust the end point of the marked region for any change in
+	 * length of the region's last line. */
+	if (right_side_up)
+	    current_x_save = openfile->current_x;
+	else
+	    openfile->mark_begin_x = openfile->current_x;
+
+	/* Restore the mark's position and turn it back on. */
+	openfile->mark_begin = fsfromline(was_mark_lineno);
+	openfile->mark_set = TRUE;
+    } else
+#endif
+	replace_buffer(tempfile_name);
+
+    /* Go back to the old position. */
+    goto_line_posx(lineno_save, current_x_save);
+    if (was_at_eol || openfile->current_x > strlen(openfile->current->data))
+	openfile->current_x = strlen(openfile->current->data);
+    openfile->placewewant = pww_save;
+    adjust_viewport(STATIONARY);
+
+    /* Stat the temporary file again, and mark the buffer as modified only
+     * if this file was changed since it was written. */
+    stat(tempfile_name, &spellfileinfo);
+    if (spellfileinfo.st_mtime != timestamp) {
+	set_modified();
+#ifndef NANO_TINY
+	/* Flush the undo stack, to avoid making a mess when the user
+	 * tries to undo things in spell-corrected lines. */
+	discard_until(NULL, openfile);
+#endif
+    }
+>>>>>>> origin/tomato-shibby-RT-AC
 
 #ifndef NANO_TINY
     /* Handle a pending SIGWINCH again. */
@@ -2926,7 +3582,11 @@ void do_spell(void)
     }
 
     if (temp == NULL) {
+<<<<<<< HEAD
 	statusbar(_("Error writing temp file: %s"), strerror(errno));
+=======
+	statusline(ALERT, _("Error writing temp file: %s"), strerror(errno));
+>>>>>>> origin/tomato-shibby-RT-AC
 	return;
     }
 
@@ -2938,7 +3598,11 @@ void do_spell(void)
 	write_file(temp, temp_file, TRUE, OVERWRITE, FALSE);
 
     if (!status) {
+<<<<<<< HEAD
 	statusbar(_("Error writing temp file: %s"), strerror(errno));
+=======
+	statusline(ALERT, _("Error writing temp file: %s"), strerror(errno));
+>>>>>>> origin/tomato-shibby-RT-AC
 	free(temp);
 	return;
     }
@@ -2966,6 +3630,441 @@ void do_spell(void)
 }
 #endif /* !DISABLE_SPELLER */
 
+<<<<<<< HEAD
+=======
+#ifndef DISABLE_COLOR
+/* Run a linting program on the current buffer.  Return NULL for normal
+ * termination, and the error string otherwise. */
+void do_linter(void)
+{
+    char *read_buff, *read_buff_ptr, *read_buff_word, *ptr;
+    size_t pipe_buff_size, read_buff_size, read_buff_read, bytesread;
+    size_t parsesuccess = 0;
+    int lint_status, lint_fd[2];
+    pid_t pid_lint;
+    static int arglen = 3;
+    static char **lintargs = NULL;
+    char *lintcopy, *convendptr = NULL;
+    lintstruct *lints = NULL, *tmplint = NULL, *curlint = NULL;
+
+    if (ISSET(RESTRICTED)) {
+	show_restricted_warning();
+	return;
+    }
+
+    if (!openfile->syntax || !openfile->syntax->linter) {
+	statusbar(_("No linter defined for this type of file!"));
+	return;
+    }
+
+    if (openfile->modified) {
+	int i = do_yesno_prompt(FALSE, _("Save modified buffer before linting?"));
+
+	if (i == -1) {
+	    statusbar(_("Cancelled"));
+	    return;
+	} else if (i == 1 && (do_writeout(FALSE) != TRUE))
+	    return;
+    }
+
+    lintcopy = mallocstrcpy(NULL, openfile->syntax->linter);
+    /* Create a pipe up front. */
+    if (pipe(lint_fd) == -1) {
+	statusbar(_("Could not create pipe"));
+	return;
+    }
+
+    blank_bottombars();
+    statusbar(_("Invoking linter, please wait"));
+
+    /* Set up an argument list to pass to execvp(). */
+    if (lintargs == NULL) {
+	lintargs = (char **)nmalloc(arglen * sizeof(char *));
+
+	lintargs[0] = strtok(lintcopy, " ");
+	while ((ptr = strtok(NULL, " ")) != NULL) {
+	    arglen++;
+	    lintargs = (char **)nrealloc(lintargs, arglen * sizeof(char *));
+	    lintargs[arglen - 3] = ptr;
+	}
+	lintargs[arglen - 1] = NULL;
+    }
+    lintargs[arglen - 2] = openfile->filename;
+
+    /* Start a new process to run the linter in. */
+    if ((pid_lint = fork()) == 0) {
+
+	/* Child continues here (i.e. the future linting process). */
+	close(lint_fd[0]);
+
+	/* Send the linter's standard output + err to the pipe. */
+	if (dup2(lint_fd[1], STDOUT_FILENO) != STDOUT_FILENO)
+	    exit(9);
+	if (dup2(lint_fd[1], STDERR_FILENO) != STDERR_FILENO)
+	    exit(9);
+
+	close(lint_fd[1]);
+
+	/* Start the linter program; we are using $PATH. */
+	execvp(lintargs[0], lintargs);
+
+	/* This is only reached when the linter is not found. */
+	exit(9);
+    }
+
+    /* Parent continues here. */
+    close(lint_fd[1]);
+
+    /* If the child process was not forked successfully... */
+    if (pid_lint < 0) {
+	close(lint_fd[0]);
+	statusbar(_("Could not fork"));
+	return;
+    }
+
+    /* Get the system pipe buffer size. */
+    if ((pipe_buff_size = fpathconf(lint_fd[0], _PC_PIPE_BUF)) < 1) {
+	close(lint_fd[0]);
+	statusbar(_("Could not get size of pipe buffer"));
+	return;
+    }
+
+    /* Read in the returned syntax errors. */
+    read_buff_read = 0;
+    read_buff_size = pipe_buff_size + 1;
+    read_buff = read_buff_ptr = charalloc(read_buff_size);
+
+    while ((bytesread = read(lint_fd[0], read_buff_ptr, pipe_buff_size)) > 0) {
+#ifdef DEBUG
+	fprintf(stderr, "text.c:do_linter:%ld bytes (%s)\n", (long)bytesread, read_buff_ptr);
+#endif
+	read_buff_read += bytesread;
+	read_buff_size += pipe_buff_size;
+	read_buff = read_buff_ptr = charealloc(read_buff, read_buff_size);
+	read_buff_ptr += read_buff_read;
+    }
+
+    *read_buff_ptr = '\0';
+    close(lint_fd[0]);
+
+#ifdef DEBUG
+		fprintf(stderr, "text.c:do_lint:Raw output: %s\n", read_buff);
+#endif
+
+    /* Process the linter output. */
+    read_buff_word = read_buff_ptr = read_buff;
+
+    while (*read_buff_ptr != '\0') {
+	if ((*read_buff_ptr == '\r') || (*read_buff_ptr == '\n')) {
+	    *read_buff_ptr = '\0';
+	    if (read_buff_word != read_buff_ptr) {
+		char *filename = NULL, *linestr = NULL, *maybecol = NULL;
+		char *message = mallocstrcpy(NULL, read_buff_word);
+
+		/* At the moment we're assuming the following formats:
+		 *
+		 * filenameorcategory:line:column:message (e.g. splint)
+		 * filenameorcategory:line:message        (e.g. pyflakes)
+		 * filenameorcategory:line,col:message    (e.g. pylint)
+		 *
+		 * This could be turned into some scanf() based parser,
+		 * but ugh. */
+		if ((filename = strtok(read_buff_word, ":")) != NULL) {
+		    if ((linestr = strtok(NULL, ":")) != NULL) {
+			if ((maybecol = strtok(NULL, ":")) != NULL) {
+			    ssize_t tmplineno = 0, tmpcolno = 0;
+			    char *tmplinecol;
+
+			    tmplineno = strtol(linestr, NULL, 10);
+			    if (tmplineno <= 0) {
+				read_buff_ptr++;
+				free(message);
+				continue;
+			    }
+
+			    tmpcolno = strtol(maybecol, &convendptr, 10);
+			    if (*convendptr != '\0') {
+				/* Previous field might still be
+				 * line,col format. */
+				strtok(linestr, ",");
+				if ((tmplinecol = strtok(NULL, ",")) != NULL)
+				    tmpcolno = strtol(tmplinecol, NULL, 10);
+			    }
+
+#ifdef DEBUG
+			    fprintf(stderr, "text.c:do_lint:Successful parse! %ld:%ld:%s\n", (long)tmplineno, (long)tmpcolno, message);
+#endif
+			    /* Nice.  We have a lint message we can use. */
+			    parsesuccess++;
+			    tmplint = curlint;
+			    curlint = nmalloc(sizeof(lintstruct));
+			    curlint->next = NULL;
+			    curlint->prev = tmplint;
+			    if (curlint->prev != NULL)
+				curlint->prev->next = curlint;
+			    curlint->msg = mallocstrcpy(NULL, message);
+			    curlint->lineno = tmplineno;
+			    curlint->colno = tmpcolno;
+			    curlint->filename = mallocstrcpy(NULL, filename);
+
+			    if (lints == NULL)
+				lints = curlint;
+			}
+		    }
+		} else
+		    free(message);
+	    }
+	    read_buff_word = read_buff_ptr + 1;
+	}
+	read_buff_ptr++;
+    }
+
+    /* Process the end of the linting process. */
+    waitpid(pid_lint, &lint_status, 0);
+
+    if (!WIFEXITED(lint_status) || WEXITSTATUS(lint_status) > 2) {
+	statusbar(invocation_error(openfile->syntax->linter));
+	return;
+    }
+
+    free(read_buff);
+
+    if (parsesuccess == 0) {
+	statusline(HUSH, _("Got 0 parsable lines from command: %s"),
+			openfile->syntax->linter);
+	return;
+    }
+
+    bottombars(MLINTER);
+    tmplint = NULL;
+    curlint = lints;
+
+    while (TRUE) {
+	int kbinput;
+	functionptrtype func;
+
+	if (tmplint != curlint) {
+#ifndef NANO_TINY
+	    struct stat lintfileinfo;
+
+	  new_lint_loop:
+	    if (stat(curlint->filename, &lintfileinfo) != -1) {
+		if (openfile->current_stat->st_ino != lintfileinfo.st_ino) {
+		    openfilestruct *tmpof = openfile;
+		    while (tmpof != openfile->next) {
+			if (tmpof->current_stat->st_ino == lintfileinfo.st_ino)
+			    break;
+			tmpof = tmpof->next;
+		    }
+		    if (tmpof->current_stat->st_ino != lintfileinfo.st_ino) {
+			char *msg = charalloc(1024 + strlen(curlint->filename));
+			int i;
+
+			sprintf(msg, _("This message is for unopened file %s,"
+					" open it in a new buffer?"),
+				curlint->filename);
+			i = do_yesno_prompt(FALSE, msg);
+			free(msg);
+			if (i == -1) {
+			    statusbar(_("Cancelled"));
+			    goto free_lints_and_return;
+			} else if (i == 1) {
+			    SET(MULTIBUFFER);
+			    open_buffer(curlint->filename, FALSE);
+			} else {
+			    char *dontwantfile = curlint->filename;
+
+			    while (curlint != NULL && !strcmp(curlint->filename, dontwantfile))
+				curlint = curlint->next;
+			    if (curlint == NULL) {
+				statusbar(_("No more errors in unopened files, cancelling"));
+				break;
+			    } else
+				goto new_lint_loop;
+			}
+		    } else
+			openfile = tmpof;
+		}
+	    }
+#endif /* !NANO_TINY */
+	    do_gotolinecolumn(curlint->lineno, curlint->colno, FALSE, FALSE);
+	    titlebar(NULL);
+	    edit_refresh();
+	    statusbar(curlint->msg);
+	    bottombars(MLINTER);
+	}
+
+	/* Place and show the cursor to indicate the affected line. */
+	reset_cursor();
+	wnoutrefresh(edit);
+	curs_set(1);
+
+	kbinput = get_kbinput(bottomwin);
+
+#ifndef NANO_TINY
+	if (kbinput == KEY_WINCH)
+	    continue;
+#endif
+	func = func_from_key(&kbinput);
+	tmplint = curlint;
+
+	if (func == do_cancel)
+	    break;
+	else if (func == do_help_void) {
+	    tmplint = NULL;
+	    do_help_void();
+	} else if (func == do_page_down) {
+	    if (curlint->next != NULL)
+		curlint = curlint->next;
+	    else
+		statusbar(_("At last message"));
+	} else if (func == do_page_up) {
+	    if (curlint->prev != NULL)
+		curlint = curlint->prev;
+	    else
+		statusbar(_("At first message"));
+	}
+    }
+
+    blank_statusbar();
+
+#ifndef NANO_TINY
+  free_lints_and_return:
+#endif
+    for (curlint = lints; curlint != NULL;) {
+	tmplint = curlint;
+	curlint = curlint->next;
+	free(tmplint->msg);
+	free(tmplint->filename);
+	free(tmplint);
+    }
+}
+
+#ifndef DISABLE_SPELLER
+/* Run a formatter for the current syntax.  This expects the formatter
+ * to be non-interactive and operate on a file in-place, which we'll
+ * pass it on the command line. */
+void do_formatter(void)
+{
+    bool status;
+    FILE *temp_file;
+    int format_status;
+    ssize_t lineno_save = openfile->current->lineno;
+    size_t current_x_save = openfile->current_x;
+    size_t pww_save = openfile->placewewant;
+    bool was_at_eol = (openfile->current->data[openfile->current_x] == '\0');
+    pid_t pid_format;
+    static int arglen = 3;
+    static char **formatargs = NULL;
+    char *temp, *ptr, *finalstatus = NULL;
+
+    if (openfile->totsize == 0) {
+	statusbar(_("Finished"));
+	return;
+    }
+
+    temp = safe_tempfile(&temp_file);
+
+    if (temp == NULL) {
+	statusline(ALERT, _("Error writing temp file: %s"), strerror(errno));
+	return;
+    }
+
+    /* We're not supporting partial formatting, oi vey. */
+    openfile->mark_set = FALSE;
+    status = write_file(temp, temp_file, TRUE, OVERWRITE, FALSE);
+
+    if (!status) {
+	statusline(ALERT, _("Error writing temp file: %s"), strerror(errno));
+	free(temp);
+	return;
+    }
+
+    blank_bottombars();
+    statusbar(_("Invoking formatter, please wait"));
+
+    /* Set up an argument list to pass to execvp(). */
+    if (formatargs == NULL) {
+	formatargs = (char **)nmalloc(arglen * sizeof(char *));
+
+	formatargs[0] = strtok(openfile->syntax->formatter, " ");
+	while ((ptr = strtok(NULL, " ")) != NULL) {
+	    arglen++;
+	    formatargs = (char **)nrealloc(formatargs, arglen *	sizeof(char *));
+	    formatargs[arglen - 3] = ptr;
+	}
+	formatargs[arglen - 1] = NULL;
+    }
+    formatargs[arglen - 2] = temp;
+
+    /* Start a new process for the formatter. */
+    if ((pid_format = fork()) == 0) {
+	/* Start the formatting program; we are using $PATH. */
+	execvp(formatargs[0], formatargs);
+
+	/* Should not be reached, if the formatter is found! */
+	exit(1);
+    }
+
+    /* If we couldn't fork, get out. */
+    if (pid_format < 0) {
+	statusbar(_("Could not fork"));
+	unlink(temp);
+	free(temp);
+	return;
+    }
+
+#ifndef NANO_TINY
+    /* Block SIGWINCHes so the formatter doesn't get any. */
+    allow_sigwinch(FALSE);
+#endif
+
+    /* Wait for the formatter to finish. */
+    wait(&format_status);
+
+    if (!WIFEXITED(format_status) || WEXITSTATUS(format_status) != 0)
+	finalstatus = invocation_error(openfile->syntax->formatter);
+    else {
+	/* Replace the text of the current buffer with the formatted text. */
+	replace_buffer(temp);
+
+	/* Restore the cursor position. */
+	goto_line_posx(lineno_save, current_x_save);
+	if (was_at_eol || openfile->current_x > strlen(openfile->current->data))
+	    openfile->current_x = strlen(openfile->current->data);
+	openfile->placewewant = pww_save;
+	adjust_viewport(STATIONARY);
+
+	set_modified();
+
+	/* Flush the undo stack, to avoid a mess or crash when
+	 * the user tries to undo things in reformatted lines. */
+	discard_until(NULL, openfile);
+
+	finalstatus = _("Finished formatting");
+    }
+
+    unlink(temp);
+    free(temp);
+
+#ifndef NANO_TINY
+    /* Unblock SIGWINCHes again. */
+    allow_sigwinch(TRUE);
+#endif
+
+    statusbar(finalstatus);
+
+    /* If there were error messages, allow the user some time to read them. */
+    if (WIFEXITED(format_status) && WEXITSTATUS(format_status) == 2)
+	sleep(4);
+
+    /* If there were any messages, clear them off. */
+    total_refresh();
+}
+#endif /* !DISABLE_SPELLER */
+#endif /* !DISABLE_COLOR */
+
+>>>>>>> origin/tomato-shibby-RT-AC
 #ifndef NANO_TINY
 /* Our own version of "wc".  Note that its character counts are in
  * multibyte characters instead of single-byte characters. */
@@ -3047,11 +4146,9 @@ void do_verbatim_input(void)
     /* Read in all the verbatim characters. */
     kbinput = get_verbatim_kbinput(edit, &kbinput_len);
 
-    /* If constant cursor position display is on, make sure the current
-     * cursor position will be properly displayed on the statusbar.
-     * Otherwise, blank the statusbar. */
+    /* Unsuppress cursor-position display or blank the statusbar. */
     if (ISSET(CONST_UPDATE))
-	do_cursorpos(TRUE);
+	do_cursorpos(FALSE);
     else {
 	blank_statusbar();
 	wnoutrefresh(bottomwin);
@@ -3072,3 +4169,181 @@ void do_verbatim_input(void)
     free(output);
 }
 
+<<<<<<< HEAD
+=======
+#ifdef ENABLE_WORDCOMPLETION
+/* Copy the found completion candidate. */
+char *copy_completion(char *check_line, int start)
+{
+    char *word;
+    int position = start, len_of_word = 0, index = 0;
+
+    /* Find the length of the word by travelling to its end. */
+    while (is_word_mbchar(&check_line[position], FALSE)) {
+	int next = move_mbright(check_line, position);
+	len_of_word += next - position;
+	position = next;
+    }
+
+    word = (char *)nmalloc((len_of_word + 1) * sizeof(char));
+
+    /* Simply copy the word. */
+    while (index < len_of_word)
+	word[index++] = check_line[start++];
+
+    word[index] = '\0';
+    return word;
+}
+
+/* Look at the fragment the user has typed, then search the current buffer for
+ * the first word that starts with this fragment, and tentatively complete the
+ * fragment.  If the user types 'Complete' again, search and paste the next
+ * possible completion. */
+void complete_a_word(void)
+{
+    char *shard, *completion = NULL;
+    int start_of_shard, shard_length = 0;
+    int i = 0, j = 0;
+    completion_word *some_word;
+#ifndef DISABLE_WRAPPING
+    bool was_set_wrapping = !ISSET(NO_WRAP);
+#endif
+
+    /* If this is a fresh completion attempt... */
+    if (pletion_line == NULL) {
+	/* Clear the list of words of a previous completion run. */
+	while (list_of_completions != NULL) {
+	    completion_word *dropit = list_of_completions;
+	    list_of_completions = list_of_completions->next;
+	    free(dropit->word);
+	    free(dropit);
+	}
+
+	/* Prevent a completion from being merged with typed text. */
+	openfile->last_action = OTHER;
+
+	/* Initialize the starting point for searching. */
+	pletion_line = openfile->fileage;
+	pletion_x = 0;
+
+	/* Wipe the "No further matches" message. */
+	blank_statusbar();
+	wnoutrefresh(bottomwin);
+    } else {
+	/* Remove the attempted completion from the buffer. */
+	do_undo();
+    }
+
+    /* Find the start of the fragment that the user typed. */
+    start_of_shard = openfile->current_x;
+    while (start_of_shard > 0) {
+	int step_left = move_mbleft(openfile->current->data, start_of_shard);
+
+	if (!is_word_mbchar(&openfile->current->data[step_left], FALSE))
+	    break;
+	start_of_shard = step_left;
+    }
+
+    /* If there is no word fragment before the cursor, do nothing. */
+    if (start_of_shard == openfile->current_x) {
+	pletion_line = NULL;
+	return;
+    }
+
+    shard = (char *)nmalloc((openfile->current_x - start_of_shard + 1) * sizeof(char));
+
+    /* Copy the fragment that has to be searched for. */
+    while (start_of_shard < openfile->current_x)
+	shard[shard_length++] = openfile->current->data[start_of_shard++];
+    shard[shard_length] = '\0';
+
+    /* Run through all of the lines in the buffer, looking for shard. */
+    while (pletion_line != NULL) {
+	int threshold = strlen(pletion_line->data) - shard_length - 1;
+		/* The point where we can stop searching for shard. */
+
+	/* Traverse the whole line, looking for shard. */
+	for (i = pletion_x; i < threshold; i++) {
+	    /* If the first byte doesn't match, run on. */
+	    if (pletion_line->data[i] != shard[0])
+		continue;
+
+	    /* Compare the rest of the bytes in shard. */
+	    for (j = 1; j < shard_length; j++)
+		if (pletion_line->data[i + j] != shard[j])
+		    break;
+
+	    /* If not all of the bytes matched, continue searching. */
+	    if (j < shard_length)
+		continue;
+
+	    /* If the found match is not /longer/ than shard, skip it. */
+	    if (!is_word_mbchar(&pletion_line->data[i + j], FALSE))
+		continue;
+
+	    /* If the match is not a separate word, skip it. */
+	    if (i > 0 && is_word_mbchar(&pletion_line->data[
+				move_mbleft(pletion_line->data, i)], FALSE))
+		continue;
+
+	    /* If this match is the shard itself, ignore it. */
+	    if (pletion_line == openfile->current &&
+			i == openfile->current_x - shard_length)
+		continue;
+
+	    completion = copy_completion(pletion_line->data, i);
+
+	    /* Look among earlier attempted completions for a duplicate. */
+	    some_word = list_of_completions;
+	    while (some_word && strcmp(some_word->word, completion) != 0)
+		some_word = some_word->next;
+
+	    /* If we've already tried this word, skip it. */
+	    if (some_word != NULL) {
+		free(completion);
+		continue;
+	    }
+
+	    /* Add the found word to the list of completions. */
+	    some_word = (completion_word *)nmalloc(sizeof(completion_word));
+	    some_word->word = completion;
+	    some_word->next = list_of_completions;
+	    list_of_completions = some_word;
+
+#ifndef DISABLE_WRAPPING
+	    /* Temporarily disable wrapping so only one undo item is added. */
+	    SET(NO_WRAP);
+#endif
+	    /* Inject the completion into the buffer. */
+	    do_output(&completion[shard_length],
+			strlen(completion) - shard_length, FALSE);
+#ifndef DISABLE_WRAPPING
+	    /* If needed, reenable wrapping and wrap the current line. */
+	    if (was_set_wrapping) {
+		UNSET(NO_WRAP);
+		do_wrap(openfile->current);
+	    }
+#endif
+	    /* Set the position for a possible next search attempt. */
+	    pletion_x = ++i;
+
+	    free(shard);
+	    return;
+	}
+
+	pletion_line = pletion_line->next;
+	pletion_x = 0;
+    }
+
+    /* The search has reached the end of the file. */
+    if (list_of_completions != NULL) {
+	statusline(ALERT, _("No further matches"));
+	refresh_needed = TRUE;
+    } else
+	/* TRANSLATORS: Shown when there are zero possible completions. */
+	statusline(ALERT, _("No matches"));
+
+    free(shard);
+}
+#endif /* ENABLE_WORDCOMPLETION */
+>>>>>>> origin/tomato-shibby-RT-AC

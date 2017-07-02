@@ -5,7 +5,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
+<<<<<<< HEAD
  * Copyright (C) 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
+=======
+ * Copyright (C) 2012 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+>>>>>>> origin/tomato-shibby-RT-AC
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -40,8 +44,8 @@
  * Note:
  *  For the sake of simplicity, URL is hard coded to "www.google.com"
  *
- * This is purely a demo app, all retrieved data is simply discarded by the write
- * callback.
+ * This is purely a demo app, all retrieved data is simply discarded by the
+ * write callback.
  */
 
 
@@ -84,14 +88,17 @@ static int multi_timer_cb(CURLM *multi, long timeout_ms, GlobalInfo *g)
   /* cancel running timer */
   timer.cancel();
 
+<<<<<<< HEAD
   if ( timeout_ms > 0 )
   {
+=======
+  if(timeout_ms > 0) {
+>>>>>>> origin/tomato-shibby-RT-AC
     /* update timer */
     timer.expires_from_now(boost::posix_time::millisec(timeout_ms));
     timer.async_wait(boost::bind(&timer_cb, _1, g));
   }
-  else
-  {
+  else {
     /* call timeout function immediately */
     boost::system::error_code error; /*success*/
     timer_cb(error, g);
@@ -103,6 +110,7 @@ static int multi_timer_cb(CURLM *multi, long timeout_ms, GlobalInfo *g)
 /* Die if we get a bad CURLMcode somewhere */
 static void mcode_or_die(const char *where, CURLMcode code)
 {
+<<<<<<< HEAD
   if ( CURLM_OK != code )
   {
     const char *s;
@@ -116,6 +124,25 @@ static void mcode_or_die(const char *where, CURLMcode code)
     case CURLM_UNKNOWN_OPTION:     s="CURLM_UNKNOWN_OPTION";     break;
     case CURLM_LAST:               s="CURLM_LAST";               break;
     default: s="CURLM_unknown";
+=======
+  if(CURLM_OK != code) {
+    const char *s;
+    switch(code) {
+    case CURLM_CALL_MULTI_PERFORM:
+      s = "CURLM_CALL_MULTI_PERFORM";
+      break;
+    case CURLM_BAD_HANDLE:
+      s = "CURLM_BAD_HANDLE";
+      break;
+    case CURLM_BAD_EASY_HANDLE:
+      s = "CURLM_BAD_EASY_HANDLE";
+      break;
+    case CURLM_OUT_OF_MEMORY:
+      s = "CURLM_OUT_OF_MEMORY";
+      break;
+    case CURLM_INTERNAL_ERROR:
+      s = "CURLM_INTERNAL_ERROR";
+>>>>>>> origin/tomato-shibby-RT-AC
       break;
     case     CURLM_BAD_SOCKET:         s="CURLM_BAD_SOCKET";
       fprintf(MSG_OUT, "\nERROR: %s returns %s", where, s);
@@ -139,10 +166,15 @@ static void check_multi_info(GlobalInfo *g)
 
   fprintf(MSG_OUT, "\nREMAINING: %d", g->still_running);
 
+<<<<<<< HEAD
   while ((msg = curl_multi_info_read(g->multi, &msgs_left)))
   {
     if (msg->msg == CURLMSG_DONE)
     {
+=======
+  while((msg = curl_multi_info_read(g->multi, &msgs_left))) {
+    if(msg->msg == CURLMSG_DONE) {
+>>>>>>> origin/tomato-shibby-RT-AC
       easy = msg->easy_handle;
       res = msg->data.result;
       curl_easy_getinfo(easy, CURLINFO_PRIVATE, &conn);
@@ -157,32 +189,77 @@ static void check_multi_info(GlobalInfo *g)
 }
 
 /* Called by asio when there is an action on a socket */
+<<<<<<< HEAD
 static void event_cb(GlobalInfo * g, boost::asio::ip::tcp::socket * tcp_socket, int action)
 {
   fprintf(MSG_OUT, "\nevent_cb: action=%d", action);
 
   CURLMcode rc;
   rc = curl_multi_socket_action(g->multi, tcp_socket->native_handle(), action, &g->still_running);
+=======
+static void event_cb(GlobalInfo *g, boost::asio::ip::tcp::socket *tcp_socket,
+                     int action, const boost::system::error_code & error,
+                     int *fdp)
+{
+  fprintf(MSG_OUT, "\nevent_cb: action=%d", action);
 
-  mcode_or_die("event_cb: curl_multi_socket_action", rc);
-  check_multi_info(g);
+  /* make sure the event matches what are wanted */
+  if(*fdp == action || *fdp == CURL_POLL_INOUT) {
+    curl_socket_t s = tcp_socket->native_handle();
+    CURLMcode rc;
+    if(error)
+      action = CURL_CSELECT_ERR;
+    rc = curl_multi_socket_action(g->multi, s, action, &g->still_running);
+>>>>>>> origin/tomato-shibby-RT-AC
 
+    mcode_or_die("event_cb: curl_multi_socket_action", rc);
+    check_multi_info(g);
+
+    if(g->still_running <= 0) {
+      fprintf(MSG_OUT, "\nlast transfer done, kill timeout");
+      timer.cancel();
+    }
+
+<<<<<<< HEAD
   if ( g->still_running <= 0 )
   {
     fprintf(MSG_OUT, "\nlast transfer done, kill timeout");
     timer.cancel();
+=======
+    /* keep on watching.
+     * the socket may have been closed and/or fdp may have been changed
+     * in curl_multi_socket_action(), so check them both */
+    if(!error && socket_map.find(s) != socket_map.end() &&
+       (*fdp == action || *fdp == CURL_POLL_INOUT)) {
+      if(action == CURL_POLL_IN) {
+        tcp_socket->async_read_some(boost::asio::null_buffers(),
+                                    boost::bind(&event_cb, g, tcp_socket,
+                                                action, _1, fdp));
+      }
+      if(action == CURL_POLL_OUT) {
+        tcp_socket->async_write_some(boost::asio::null_buffers(),
+                                     boost::bind(&event_cb, g, tcp_socket,
+                                                 action, _1, fdp));
+      }
+    }
+>>>>>>> origin/tomato-shibby-RT-AC
   }
 }
 
 /* Called by asio when our timeout expires */
 static void timer_cb(const boost::system::error_code & error, GlobalInfo *g)
 {
+<<<<<<< HEAD
   if ( !error)
   {
+=======
+  if(!error) {
+>>>>>>> origin/tomato-shibby-RT-AC
     fprintf(MSG_OUT, "\ntimer_cb: ");
 
     CURLMcode rc;
-    rc = curl_multi_socket_action(g->multi, CURL_SOCKET_TIMEOUT, 0, &g->still_running);
+    rc = curl_multi_socket_action(g->multi, CURL_SOCKET_TIMEOUT, 0,
+                                  &g->still_running);
 
     mcode_or_die("timer_cb: curl_multi_socket_action", rc);
     check_multi_info(g);
@@ -194,20 +271,30 @@ static void remsock(int *f, GlobalInfo *g)
 {
   fprintf(MSG_OUT, "\nremsock: ");
 
+<<<<<<< HEAD
   if ( f )
   {
+=======
+  if(f) {
+>>>>>>> origin/tomato-shibby-RT-AC
     free(f);
   }
 }
 
-static void setsock(int *fdp, curl_socket_t s, CURL*e, int act, GlobalInfo*g)
+static void setsock(int *fdp, curl_socket_t s, CURL *e, int act, int oldact,
+                    GlobalInfo *g)
 {
   fprintf(MSG_OUT, "\nsetsock: socket=%d, act=%d, fdp=%p", s, act, fdp);
 
-  std::map<curl_socket_t, boost::asio::ip::tcp::socket *>::iterator it = socket_map.find(s);
+  std::map<curl_socket_t, boost::asio::ip::tcp::socket *>::iterator it =
+    socket_map.find(s);
 
+<<<<<<< HEAD
   if ( it == socket_map.end() )
   {
+=======
+  if(it == socket_map.end()) {
+>>>>>>> origin/tomato-shibby-RT-AC
     fprintf(MSG_OUT, "\nsocket %d is a c-ares socket, ignoring", s);
     return;
   }
@@ -216,6 +303,7 @@ static void setsock(int *fdp, curl_socket_t s, CURL*e, int act, GlobalInfo*g)
 
   *fdp = act;
 
+<<<<<<< HEAD
   if ( act == CURL_POLL_IN )
   {
     fprintf(MSG_OUT, "\nwatching for socket to become readable");
@@ -247,6 +335,36 @@ static void setsock(int *fdp, curl_socket_t s, CURL*e, int act, GlobalInfo*g)
                               boost::bind(&event_cb, g,
                                 tcp_socket,
                                 act));
+=======
+  if(act == CURL_POLL_IN) {
+    fprintf(MSG_OUT, "\nwatching for socket to become readable");
+    if(oldact != CURL_POLL_IN && oldact != CURL_POLL_INOUT) {
+      tcp_socket->async_read_some(boost::asio::null_buffers(),
+                                  boost::bind(&event_cb, g, tcp_socket,
+                                              CURL_POLL_IN, _1, fdp));
+    }
+  }
+  else if(act == CURL_POLL_OUT) {
+    fprintf(MSG_OUT, "\nwatching for socket to become writable");
+    if(oldact != CURL_POLL_OUT && oldact != CURL_POLL_INOUT) {
+      tcp_socket->async_write_some(boost::asio::null_buffers(),
+                                   boost::bind(&event_cb, g, tcp_socket,
+                                               CURL_POLL_OUT, _1, fdp));
+    }
+  }
+  else if(act == CURL_POLL_INOUT) {
+    fprintf(MSG_OUT, "\nwatching for socket to become readable & writable");
+    if(oldact != CURL_POLL_IN && oldact != CURL_POLL_INOUT) {
+      tcp_socket->async_read_some(boost::asio::null_buffers(),
+                                  boost::bind(&event_cb, g, tcp_socket,
+                                              CURL_POLL_IN, _1, fdp));
+    }
+    if(oldact != CURL_POLL_OUT && oldact != CURL_POLL_INOUT) {
+      tcp_socket->async_write_some(boost::asio::null_buffers(),
+                                   boost::bind(&event_cb, g, tcp_socket,
+                                               CURL_POLL_OUT, _1, fdp));
+    }
+>>>>>>> origin/tomato-shibby-RT-AC
   }
 }
 
@@ -255,7 +373,7 @@ static void addsock(curl_socket_t s, CURL *easy, int action, GlobalInfo *g)
 {
   int *fdp = (int *)calloc(sizeof(int), 1); /* fdp is used to store current action */
 
-  setsock(fdp, s, easy, action, g);
+  setsock(fdp, s, easy, action, 0, g);
   curl_multi_assign(g->multi, s, fdp);
 }
 
@@ -271,6 +389,7 @@ static int sock_cb(CURL *e, curl_socket_t s, int what, void *cbp, void *sockp)
   fprintf(MSG_OUT,
           "\nsocket callback: s=%d e=%p what=%s ", s, e, whatstr[what]);
 
+<<<<<<< HEAD
   if ( what == CURL_POLL_REMOVE )
   {
     fprintf(MSG_OUT, "\n");
@@ -280,15 +399,22 @@ static int sock_cb(CURL *e, curl_socket_t s, int what, void *cbp, void *sockp)
   {
     if ( !actionp )
     {
+=======
+  if(what == CURL_POLL_REMOVE) {
+    fprintf(MSG_OUT, "\n");
+    remsock(actionp, g);
+  }
+  else {
+    if(!actionp) {
+>>>>>>> origin/tomato-shibby-RT-AC
       fprintf(MSG_OUT, "\nAdding data: %s", whatstr[what]);
       addsock(s, e, what, g);
     }
-    else
-    {
+    else {
       fprintf(MSG_OUT,
               "\nChanging action from %s to %s",
               whatstr[*actionp], whatstr[what]);
-      setsock(actionp, s, e, what, g);
+      setsock(actionp, s, e, what, *actionp, g);
     }
   }
   return 0;
@@ -298,9 +424,12 @@ static int sock_cb(CURL *e, curl_socket_t s, int what, void *cbp, void *sockp)
 /* CURLOPT_WRITEFUNCTION */
 static size_t write_cb(void *ptr, size_t size, size_t nmemb, void *data)
 {
-
   size_t written = size * nmemb;
+<<<<<<< HEAD
   char* pBuffer = (char*)malloc(written + 1);
+=======
+  char *pBuffer = (char *)malloc(written + 1);
+>>>>>>> origin/tomato-shibby-RT-AC
 
   strncpy(pBuffer, (const char *)ptr, written);
   pBuffer [written] = '\0';
@@ -336,29 +465,42 @@ static curl_socket_t opensocket(void *clientp,
 
   curl_socket_t sockfd = CURL_SOCKET_BAD;
 
+<<<<<<< HEAD
   /* restrict to ipv4 */
   if (purpose == CURLSOCKTYPE_IPCXN && address->family == AF_INET)
   {
+=======
+  /* restrict to IPv4 */
+  if(purpose == CURLSOCKTYPE_IPCXN && address->family == AF_INET) {
+>>>>>>> origin/tomato-shibby-RT-AC
     /* create a tcp socket object */
-    boost::asio::ip::tcp::socket *tcp_socket = new boost::asio::ip::tcp::socket(io_service);
+    boost::asio::ip::tcp::socket *tcp_socket =
+      new boost::asio::ip::tcp::socket(io_service);
 
     /* open it and get the native handle*/
     boost::system::error_code ec;
     tcp_socket->open(boost::asio::ip::tcp::v4(), ec);
 
+<<<<<<< HEAD
     if (ec)
     {
       //An error occurred
       std::cout << std::endl << "Couldn't open socket [" << ec << "][" << ec.message() << "]";
+=======
+    if(ec) {
+      /* An error occurred */
+      std::cout << std::endl << "Couldn't open socket [" << ec << "][" <<
+        ec.message() << "]";
+>>>>>>> origin/tomato-shibby-RT-AC
       fprintf(MSG_OUT, "\nERROR: Returning CURL_SOCKET_BAD to signal error");
     }
-    else
-    {
+    else {
       sockfd = tcp_socket->native_handle();
       fprintf(MSG_OUT, "\nOpened socket %d", sockfd);
 
       /* save it for monitoring */
-      socket_map.insert(std::pair<curl_socket_t, boost::asio::ip::tcp::socket *>(sockfd, tcp_socket));
+      socket_map.insert(std::pair<curl_socket_t,
+                        boost::asio::ip::tcp::socket *>(sockfd, tcp_socket));
     }
   }
 
@@ -370,10 +512,15 @@ static int closesocket(void *clientp, curl_socket_t item)
 {
   fprintf(MSG_OUT, "\nclosesocket : %d", item);
 
-  std::map<curl_socket_t, boost::asio::ip::tcp::socket *>::iterator it = socket_map.find(item);
+  std::map<curl_socket_t, boost::asio::ip::tcp::socket *>::iterator it =
+    socket_map.find(item);
 
+<<<<<<< HEAD
   if ( it != socket_map.end() )
   {
+=======
+  if(it != socket_map.end()) {
+>>>>>>> origin/tomato-shibby-RT-AC
     delete it->second;
     socket_map.erase(it);
   }
@@ -392,9 +539,13 @@ static void new_conn(char *url, GlobalInfo *g )
   conn->error[0]='\0';
 
   conn->easy = curl_easy_init();
+<<<<<<< HEAD
 
   if ( !conn->easy )
   {
+=======
+  if(!conn->easy) {
+>>>>>>> origin/tomato-shibby-RT-AC
     fprintf(MSG_OUT, "\ncurl_easy_init() failed, exiting!");
     exit(2);
   }

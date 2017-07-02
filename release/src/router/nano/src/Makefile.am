@@ -1,7 +1,30 @@
+<<<<<<< HEAD
 localedir = $(datadir)/locale
 INCLUDES = -DLOCALEDIR=\"$(localedir)\" -DSYSCONFDIR=\"$(sysconfdir)\"
 
 ACLOCAL_AMFLAGS = -I m4
+=======
+AM_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\" -DSYSCONFDIR=\"$(sysconfdir)\" \
+	-I$(top_builddir)/lib -I$(top_srcdir)/lib
+
+CLEANFILES = revision.h
+
+if BUILDING_FROM_GIT
+SOMETHING = "REVISION \"$(shell git describe --tags 2>/dev/null)\""
+else
+SOMETHING = "NOTHING \"from tarball\""
+endif
+
+nano.o: revision.h
+winio.o: revision.h
+
+revision.h: update_revision
+	@[ -f $@ ] || touch $@
+	@echo "#define $(SOMETHING)" | cmp -s $@ - || \
+	echo "#define $(SOMETHING)" > $@
+
+.PHONY: update_revision
+>>>>>>> origin/tomato-shibby-RT-AC
 
 bin_PROGRAMS = 	nano
 nano_SOURCES =	browser.c \
@@ -22,7 +45,7 @@ nano_SOURCES =	browser.c \
 		utils.c \
 		winio.c 
 
-nano_LDADD = @GLIB_LIBS@ @LIBINTL@
+nano_LDADD = @LIBINTL@ $(top_builddir)/lib/libgnu.a
 
 install-exec-hook:
 	cd $(DESTDIR)$(bindir) && rm -f rnano && $(LN_S) nano rnano

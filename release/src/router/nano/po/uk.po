@@ -1,6 +1,7 @@
 # l10n file 4 nano, ukrainian language
 # Copyright (C) 2001 Free Software Foundation, Inc.
 # Sergey A. Ribalchenko <fisher@obu.ck.ua>, 2001.
+<<<<<<< HEAD
 #
 msgid ""
 msgstr ""
@@ -9,24 +10,56 @@ msgstr ""
 "POT-Creation-Date: 2010-11-22 06:34-0500\n"
 "PO-Revision-Date: 2003-02-17 10:51+0300\n"
 "Last-Translator: Sergey A. Ribalchenko <fisher@obu.ck.ua>\n"
+=======
+# Yuri Chornoivan <yurchor@ukr.net>, 2014, 2015, 2016, 2017.
+msgid ""
+msgstr ""
+"Project-Id-Version: nano 2.8.0-pre1\n"
+"Report-Msgid-Bugs-To: nano-devel@gnu.org\n"
+"POT-Creation-Date: 2017-03-31 11:02+0200\n"
+"PO-Revision-Date: 2017-03-24 21:34+0200\n"
+"Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
+>>>>>>> origin/tomato-shibby-RT-AC
 "Language-Team: Ukrainian <translation-team-uk@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=koi8-u\n"
 "Content-Transfer-Encoding: 8bit\n"
+<<<<<<< HEAD
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
 "10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 
 #: src/browser.c:220
 #, fuzzy
+=======
+"X-Bugs: Report translation errors to the Language-Team address.\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Generator: Lokalize 1.5\n"
+
+#: src/browser.c:72
+#, c-format
+msgid "Cannot open directory: %s"
+msgstr "п²п╣ п╡п╢п╟п╩п╬я│я▐ п╡я√п╢п╨я─п╦я┌п╦ п╨п╟я┌п╟п╩п╬пЁ: %s"
+
+#. TRANSLATORS: This is a prompt.
+#: src/browser.c:227
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Go To Directory"
 msgstr "До Директор╕╖"
 
+<<<<<<< HEAD
 #: src/browser.c:233 src/browser.c:830 src/files.c:860 src/files.c:2048
 #: src/nano.c:1060 src/search.c:220 src/search.c:314 src/search.c:975
 #: src/search.c:1040
+=======
+#: src/browser.c:230 src/browser.c:686 src/files.c:1107 src/files.c:2159
+#: src/nano.c:1084 src/search.c:172 src/search.c:254 src/search.c:776
+#: src/search.c:837 src/text.c:3057 src/text.c:3262
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Cancelled"
 msgstr "Скасовано"
 
+<<<<<<< HEAD
 #: src/browser.c:266 src/browser.c:314
 #, c-format
 msgid "Can't go outside of %s in restricted mode"
@@ -41,15 +74,42 @@ msgid "Error reading %s: %s"
 msgstr "Поганий рядок цитування %s: %s"
 
 #: src/browser.c:303
+=======
+#. TRANSLATORS: This refers to the confining effect of the
+#. * option --operatingdir, not of --restricted.
+#: src/browser.c:247 src/browser.c:279
+#, c-format
+msgid "Can't go outside of %s"
+msgstr "п²п╣ п╪п╬п╤я┐ п╡п╦п╧я┌п╦ п╥п╟ п╪п╣п╤я√ %s"
+
+#: src/browser.c:270
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Can't move up a directory"
 msgstr "Не можу перем╕стити директор╕ю"
 
+<<<<<<< HEAD
 #. TRANSLATORS: Try to keep this at most 7
 #. * characters.
 #: src/browser.c:665 src/browser.c:674
+=======
+#: src/browser.c:286 src/files.c:997 src/files.c:1003 src/files.c:1671
+#: src/files.c:1796 src/files.c:1840 src/files.c:1860 src/files.c:1972
+#: src/files.c:2872 src/files.c:3105 src/rcfile.c:561 src/rcfile.c:1262
+#, c-format
+msgid "Error reading %s: %s"
+msgstr "п÷п╬п╪п╦п╩п╨п╟ п©я√п╢ я┤п╟я│ я│п©я─п╬п╠п╦ я┤п╦я┌п╟п╫п╫я▐ %s: %s"
+
+#: src/browser.c:366
+msgid "The working directory has disappeared"
+msgstr "п═п╬п╠п╬я┤п╦п╧ п╨п╟я┌п╟п╩п╬пЁ п╥п╫п╦п╨"
+
+#. TRANSLATORS: Try to keep this at most 7 characters.
+#: src/browser.c:554 src/browser.c:561
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "(dir)"
 msgstr ""
 
+<<<<<<< HEAD
 #. TRANSLATORS: Try to keep this at most 12
 #. * characters.
 #: src/browser.c:671
@@ -57,6 +117,21 @@ msgid "(parent dir)"
 msgstr ""
 
 #: src/browser.c:801 src/search.c:185
+=======
+#. TRANSLATORS: Try to keep this at most 12 characters.
+#: src/browser.c:558
+msgid "(parent dir)"
+msgstr "(п╠п╟я┌я▄п╨. п╨п╟я┌.)"
+
+#. TRANSLATORS: Try to keep this at most 7 characters.
+#. * If necessary, you can leave out the parentheses.
+#: src/browser.c:588
+msgid "(huge)"
+msgstr "(п╡п╣п╩.)"
+
+#. TRANSLATORS: This is the main search prompt.
+#: src/browser.c:675 src/search.c:152
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Search"
 msgstr "Пошук"
 
@@ -79,15 +154,24 @@ msgid " [Backwards]"
 msgstr " [Назад]"
 
 # message
+<<<<<<< HEAD
 #: src/browser.c:909 src/browser.c:917 src/search.c:395
+=======
+#: src/browser.c:717 src/search.c:329
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Search Wrapped"
 msgstr "Д╕сталися к╕нця файла, почали спочатку"
 
+<<<<<<< HEAD
 #: src/browser.c:1006 src/browser.c:1039 src/search.c:514 src/search.c:517
 #: src/search.c:574 src/search.c:577
+=======
+#: src/browser.c:727 src/search.c:455
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "This is the only occurrence"
 msgstr "Це ╓дине сп╕впад╕ння"
 
+<<<<<<< HEAD
 #: src/browser.c:1042 src/search.c:583
 msgid "No current search pattern"
 msgstr ""
@@ -99,26 +183,148 @@ msgstr "Не можу вставити файл поза %s"
 
 #: src/files.c:234
 #, fuzzy
+=======
+#: src/browser.c:771 src/search.c:422
+msgid "No current search pattern"
+msgstr "п²п╣п╪п╟я■ п©п╬я┌п╬я┤п╫п╬пЁп╬ п╥я─п╟п╥п╨п╟ п╢п╩я▐ п©п╬я┬я┐п╨я┐"
+
+#: src/color.c:181
+#, c-format
+msgid "Unknown syntax name: %s"
+msgstr "п²п╣п╡я√п╢п╬п╪п╟ п╫п╟п╥п╡п╟ я│п╦п╫я┌п╟п╨я│п╦я│я┐: %s"
+
+#: src/color.c:242
+#, c-format
+msgid "magic_load() failed: %s"
+msgstr "п÷п╬п╪п╦п╩п╨п╟ magic_load(): %s"
+
+#: src/color.c:246
+#, c-format
+msgid "magic_file(%s) failed: %s"
+msgstr "п÷п╬п╪п╦п╩п╨п╟ magic_file(%s): %s"
+
+#: src/files.c:49
+#, c-format
+msgid "Directory '%s' does not exist"
+msgstr "п п╟я┌п╟п╩п╬пЁя┐ б╚%sб╩ п╫п╣ я√я│п╫я┐я■"
+
+#: src/files.c:51
+#, c-format
+msgid "Path '%s': %s"
+msgstr "п╗п╩я▐я┘ б╚%sб╩: %s"
+
+#: src/files.c:53
+#, c-format
+msgid "Path '%s' is not a directory"
+msgstr "п╗п╩я▐я┘ б╚%sб╩ п╫п╣ я■ п╟п╢я─п╣я│п╬я▌ п╨п╟я┌п╟п╩п╬пЁя┐"
+
+#: src/files.c:55
+#, c-format
+msgid "Path '%s' is not accessible"
+msgstr "п╗п╩я▐я┘ б╚%sб╩ п╫п╣п╢п╬я│я┌я┐п©п╫п╦п╧"
+
+#: src/files.c:57
+#, c-format
+msgid "Directory '%s' is not writable"
+msgstr "п п╟я┌п╟п╩п╬пЁ б╚%sб╩ п╫п╣п©я─п╦п╢п╟я┌п╫п╦п╧ п╢п╬ п╥п╟п©п╦я│я┐"
+
+#. TRANSLATORS: Keep the next eight messages at most 76 characters.
+#: src/files.c:192
+msgid "Couldn't determine my identity for lock file (getpwuid() failed)"
+msgstr "п²п╣ п╡п╢п╟п╩п╬я│я▐ п╡п╦п╥п╫п╟я┤п╦я┌п╦ п©я─п╬я└я√п╩я▄ п╢п╩я▐ я└п╟п╧п╩п╟ п╠п╩п╬п╨я┐п╡п╟п╫п╫я▐ (п©п╬п╪п╦п╩п╨п╟ getpwuid())"
+
+#: src/files.c:201
+#, c-format
+msgid "Couldn't determine hostname for lock file: %s"
+msgstr "п²п╣ п╡п╢п╟п╩п╬я│я▐ п╡п╦п╥п╫п╟я┤п╦я┌п╦ п╫п╟п╥п╡я┐ п╡я┐п╥п╩п╟ п╢п╩я▐ я└п╟п╧п╩п╟ п╠п╩п╬п╨я┐п╡п╟п╫п╫я▐: %s"
+
+#: src/files.c:221 src/files.c:230 src/files.c:268 src/files.c:278
+#, c-format
+msgid "Error writing lock file %s: %s"
+msgstr "п÷п╬п╪п╦п╩п╨п╟ п©я√п╢ я┤п╟я│ я│п©я─п╬п╠п╦ п╥п╟п©п╦я│п╟я┌п╦ я└п╟п╧п╩ п╠п╩п╬п╨я┐п╡п╟п╫п╫я▐ %s: %s"
+
+#: src/files.c:300
+#, c-format
+msgid "Error deleting lock file %s: %s"
+msgstr "п÷п╬п╪п╦п╩п╨п╟ п©я√п╢ я┤п╟я│ я│п©я─п╬п╠п╦ п╡п╦п╩я┐я┤п╦я┌п╦ я└п╟п╧п╩ п╠п╩п╬п╨я┐п╡п╟п╫п╫я▐ %s: %s"
+
+#: src/files.c:334
+#, c-format
+msgid "Error opening lock file %s: %s"
+msgstr "п÷п╬п╪п╦п╩п╨п╟ п©я√п╢ я┤п╟я│ я│п©я─п╬п╠п╦ п╡я√п╢п╨я─п╦я┌п╦ я└п╟п╧п╩ п╠п╩п╬п╨я┐п╡п╟п╫п╫я▐ %s: %s"
+
+#: src/files.c:348
+#, c-format
+msgid "Error reading lock file %s: Not enough data read"
+msgstr ""
+"п÷п╬п╪п╦п╩п╨п╟ п©я√п╢ я┤п╟я│ я│п©я─п╬п╠п╦ п©я─п╬я┤п╦я┌п╟я┌п╦ п╢п╟п╫я√ п╥ я└п╟п╧п╩п╟ п╠п╩п╬п╨я┐п╡п╟п╫п╫я▐ %s: п©я─п╬я┤п╦я┌п╟п╫п╬ "
+"п╫п╣п╢п╬я│я┌п╟я┌п╫я▄п╬ п╢п╟п╫п╦я┘"
+
+#. TRANSLATORS: The second %s is the name of the user, the third that of the editor.
+#: src/files.c:369
+#, c-format
+msgid "File %s is being edited (by %s with %s, PID %s); continue?"
+msgstr ""
+"п═п╣п╢п╟пЁя┐п╡п╟п╫п╫я▐ я└п╟п╧п╩п╟ %s п╡п╤п╣ п╡п╦п╨п╬п╫я┐я■я┌я▄я│я▐ (%s п╥п╟ п╢п╬п©п╬п╪п╬пЁп╬я▌ %s, PID %s); "
+"п©я─п╬п╢п╬п╡п╤п╦я┌п╦?"
+
+#: src/files.c:446
+#, c-format
+msgid "Can't insert file from outside of %s"
+msgstr "п²п╣ п╪п╬п╤я┐ п╡я│я┌п╟п╡п╦я┌п╦ я└п╟п╧п╩ п©п╬п╥п╟ %s"
+
+#: src/files.c:461 src/files.c:987 src/rcfile.c:540
+#, c-format
+msgid "\"%s\" is a directory"
+msgstr "б╚%sб╩ я■ п╨п╟я┌п╟п╩п╬пЁп╬п╪"
+
+#: src/files.c:463
+#, c-format
+msgid "\"%s\" is not a normal file"
+msgstr "б╚%sб╩ п╫п╣ я■ п╥п╡п╦я┤п╟п╧п╫п╦п╪ я└п╟п╧п╩п╬п╪"
+
+#: src/files.c:620
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "No more open file buffers"
 msgstr "Б╕льш нема в╕дкритих файл╕в"
 
+<<<<<<< HEAD
 #: src/files.c:250
+=======
+#: src/files.c:643
+>>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Switched to %s"
 msgstr "Перемкнуто до %s"
 
+<<<<<<< HEAD
 #: src/files.c:251 src/global.c:469 src/winio.c:2168
+=======
+#: src/files.c:645 src/global.c:985 src/winio.c:1982
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "New Buffer"
 msgstr "Новий Буфер"
 
+<<<<<<< HEAD
 #: src/files.c:633
 #, fuzzy, c-format
+=======
+#: src/files.c:913
+#, c-format
+msgid "File '%s' is unwritable"
+msgstr "п╓п╟п╧п╩ б╚%sб╩ п╫п╣п©я─п╦п╢п╟я┌п╫п╦п╧ п╢п╬ п╥п╟п©п╦я│я┐"
+
+#. TRANSLATORS: Keep the next four messages at most 78 characters.
+#: src/files.c:917
+#, c-format
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Read %lu line (Converted from DOS and Mac format)"
 msgid_plural "Read %lu lines (Converted from DOS and Mac format)"
 msgstr[0] "Прочитано %d рядок (перетворено з формату Mac)"
 msgstr[1] "Прочитано %d рядка (перетворених з формату Mac)"
 msgstr[2] "Прочитано %d рядк╕в (перетворених з формату Mac)"
 
+<<<<<<< HEAD
 #: src/files.c:638
 #, fuzzy, c-format
 msgid ""
@@ -133,12 +339,17 @@ msgstr[2] "Прочитано %d рядк╕в (перетворених з формату Mac)"
 
 #: src/files.c:644
 #, fuzzy, c-format
+=======
+#: src/files.c:922
+#, c-format
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Read %lu line (Converted from Mac format)"
 msgid_plural "Read %lu lines (Converted from Mac format)"
 msgstr[0] "Прочитано %d рядок (перетворено з формату Mac)"
 msgstr[1] "Прочитано %d рядка (перетворених з формату Mac)"
 msgstr[2] "Прочитано %d рядк╕в (перетворених з формату Mac)"
 
+<<<<<<< HEAD
 #: src/files.c:648
 #, fuzzy, c-format
 msgid ""
@@ -151,12 +362,17 @@ msgstr[2] "Прочитано %d рядк╕в (перетворених з формату Mac)"
 
 #: src/files.c:654
 #, fuzzy, c-format
+=======
+#: src/files.c:927
+#, c-format
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Read %lu line (Converted from DOS format)"
 msgid_plural "Read %lu lines (Converted from DOS format)"
 msgstr[0] "Прочитано %d рядок (перетворено з формату DOS)"
 msgstr[1] "Прочитано %d рядка (перетворених з формату DOS)"
 msgstr[2] "Прочитано %d рядк╕в (перетворених з формату DOS)"
 
+<<<<<<< HEAD
 #: src/files.c:658
 #, fuzzy, c-format
 msgid ""
@@ -169,6 +385,10 @@ msgstr[2] "Прочитано %d рядк╕в (перетворених з формату DOS)"
 
 #: src/files.c:664
 #, fuzzy, c-format
+=======
+#: src/files.c:933
+#, c-format
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Read %lu line"
 msgid_plural "Read %lu lines"
 msgstr[0] "Прочитано %d рядок"
@@ -183,20 +403,32 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
+<<<<<<< HEAD
 #: src/files.c:700 src/files.c:736
 msgid "Reading File"
 msgstr "Чита╓мо файл.."
 
 #: src/files.c:706
+=======
+#: src/files.c:973
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "New File"
 msgstr "Новий файл"
 
+<<<<<<< HEAD
 #: src/files.c:709
+=======
+#: src/files.c:978
+>>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "\"%s\" not found"
 msgstr "\"%s\" не знайдено"
 
+<<<<<<< HEAD
 #: src/files.c:717 src/rcfile.c:559 src/rcfile.c:1154 src/rcfile.c:1195
+=======
+#: src/files.c:988 src/rcfile.c:541
+>>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "\"%s\" is a directory"
 msgstr "Файл \"%s\" ╓ директор╕╓ю"
@@ -206,6 +438,7 @@ msgstr "Файл \"%s\" ╓ директор╕╓ю"
 msgid "\"%s\" is a device file"
 msgstr "Файл \"%s\" ╓ файлом пристрою"
 
+<<<<<<< HEAD
 #: src/files.c:817
 #, fuzzy, c-format
 msgid "Command to execute in new buffer [from %s] "
@@ -232,6 +465,46 @@ msgid "Key invalid in non-multibuffer mode"
 msgstr "Нев╕рна кнопка в не-мультибуферному режим╕"
 
 #: src/files.c:1486
+=======
+#: src/files.c:1006
+msgid "Reading File"
+msgstr "п╖п╦я┌п╟я■п╪п╬ я└п╟п╧п╩"
+
+#. TRANSLATORS: The next four messages are prompts.
+#: src/files.c:1073
+msgid "Command to execute in new buffer"
+msgstr "п п╬п╪п╟п╫п╢п╟, я▐п╨я┐ я│п╩я√п╢ п╡п╦п╨п╬п╫п╟я┌п╦ я┐ п╫п╬п╡п╬п╪я┐ п╠я┐я└п╣я─я√"
+
+#: src/files.c:1076
+msgid "Command to execute"
+msgstr "п п╬п╪п╟п╫п╢п╟, я▐п╨я┐ я│п╩я√п╢ п╡п╦п╨п╬п╫п╟я┌п╦"
+
+#: src/files.c:1082
+#, c-format
+msgid "File to insert into new buffer [from %s]"
+msgstr "п╓п╟п╧п╩ п╢п╩я▐ п╡я│я┌п╟п╡п╩я▐п╫п╫я▐ (п╢п╬ п╫п╬п╡п╬пЁп╬ п╠я┐я└п╣я─п╟) [п╡я√п╢ %s]"
+
+#: src/files.c:1085
+#, c-format
+msgid "File to insert [from %s]"
+msgstr "п╓п╟п╧п╩ п╢п╩я▐ п╡я│я┌п╟п╡п╩я▐п╫п╫я▐ [п╡я√п╢ %s]"
+
+#: src/files.c:1224
+msgid "Key invalid in non-multibuffer mode"
+msgstr "п п╩п╟п╡я√я┬п╟ п╫п╣п╢я√п╧я│п╫п╟ я┐ п╫п╣ п╪я┐п╩я▄я┌п╦п╠я┐я└п╣я─п╫п╬п╪я┐ я─п╣п╤п╦п╪я√"
+
+#: src/files.c:1444
+msgid "Invalid operating directory\n"
+msgstr "п²п╣п╨п╬я─п╣п╨я┌п╫п╦п╧ я─п╬п╠п╬я┤п╦п╧ п╨п╟я┌п╟п╩п╬пЁ\n"
+
+#: src/files.c:1510
+msgid "Failed to write backup file; continue saving? (Say N if unsure.) "
+msgstr ""
+"п²п╣ п╡п╢п╟п╩п╬я│я▐ п╥п╟п©п╦я│п╟я┌п╦ п╢п╟п╫я√ п╢п╬ я└п╟п╧п╩п╟ я─п╣п╥п╣я─п╡п╫п╬я≈ п╨п╬п©я√я≈, п©я─п╬п╢п╬п╡п╤п╦я┌п╦ я│п©я─п╬п╠я┐ "
+"п╥п╠п╣я─п╣пЁя┌п╦ п╢п╟п╫я√? (п²п╟я┌п╦я│п╫я√я┌я▄ N, я▐п╨я┴п╬ п╫п╣ п©п╣п╡п╫я√.) "
+
+#: src/files.c:1627
+>>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Can't write outside of %s"
 msgstr "Не можу записати поза %s"
@@ -240,12 +513,18 @@ msgstr "Не можу записати поза %s"
 msgid "Cannot prepend or append to a symlink with --nofollow set"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/files.c:1581 src/files.c:1603 src/files.c:1621 src/files.c:1632
 #: src/files.c:1640 src/files.c:1667
+=======
+#: src/files.c:1710 src/files.c:1735 src/files.c:1753 src/files.c:1766
+#: src/files.c:1777 src/files.c:1805
+>>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Error writing backup file %s: %s"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/files.c:1582 src/nano.c:701
 #, fuzzy
 msgid "Too many backup files?"
@@ -257,10 +536,29 @@ msgstr ""
 #: src/files.c:1799 src/files.c:1817 src/files.c:1827 src/files.c:1863
 #: src/files.c:1868 src/files.c:2764 src/files.c:2773
 #, fuzzy, c-format
+=======
+#: src/files.c:1711 src/nano.c:663
+msgid "Too many backup files?"
+msgstr "п≈п╟п╠п╟пЁп╟я┌п╬ я└п╟п╧п╩я√п╡ я─п╣п╥п╣я─п╡п╫п╦я┘ п╨п╬п©я√п╧?"
+
+#: src/files.c:1849 src/files.c:1871 src/text.c:2987 src/text.c:2999
+#: src/text.c:3362 src/text.c:3371
+#, c-format
+msgid "Error writing temp file: %s"
+msgstr "п÷п╬п╪п╦п╩п╨п╟ п©я√п╢ я┤п╟я│ я│п©я─п╬п╠п╦ п╥п╟п©п╦я│п╟я┌п╦ п╢п╬ я┌п╦п╪я┤п╟я│п╬п╡п╬пЁп╬ я└п╟п╧п╩п╟: %s"
+
+#: src/files.c:1890 src/files.c:1900 src/files.c:1920 src/files.c:1937
+#: src/files.c:1947 src/files.c:1979 src/files.c:1986
+#, c-format
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Error writing %s: %s"
 msgstr "Поганий рядок цитування %s: %s"
 
+<<<<<<< HEAD
 #: src/files.c:1721 src/text.c:2929 src/text.c:2941
+=======
+#: src/files.c:2025
+>>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Error writing temp file: %s"
 msgstr ""
@@ -273,38 +571,72 @@ msgstr[0] "Записано %d рядок"
 msgstr[1] "Записано %d рядка"
 msgstr[2] "Записано %d рядк╕в"
 
+<<<<<<< HEAD
 #: src/files.c:2004
+=======
+#: src/files.c:2121
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid " [DOS Format]"
 msgstr " [формат DOS]"
 
+<<<<<<< HEAD
 #: src/files.c:2005
+=======
+#: src/files.c:2122
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid " [Mac Format]"
 msgstr " [формат Mac]"
 
+<<<<<<< HEAD
 #: src/files.c:2007
+=======
+#: src/files.c:2124
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid " [Backup]"
 msgstr " [Резерв]"
 
+<<<<<<< HEAD
 #: src/files.c:2015
+=======
+#. TRANSLATORS: The next six strings are prompts.
+#: src/files.c:2132
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Prepend Selection to File"
 msgstr "Додати Вид╕лене до файлу (в початок файла)"
 
+<<<<<<< HEAD
 #: src/files.c:2016
+=======
+#: src/files.c:2133
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Append Selection to File"
 msgstr "Додати Вид╕лене до файлу"
 
+<<<<<<< HEAD
 #: src/files.c:2017
+=======
+#: src/files.c:2134
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Write Selection to File"
 msgstr "Записати Вид╕лене до файлу"
 
+<<<<<<< HEAD
 #: src/files.c:2020
+=======
+#: src/files.c:2137
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "File Name to Prepend to"
 msgstr "╤м'я файлу для додавання"
 
+<<<<<<< HEAD
 #: src/files.c:2021
+=======
+#: src/files.c:2138
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "File Name to Append to"
 msgstr "╤м'я файлу для додавання"
 
+<<<<<<< HEAD
 #: src/files.c:2022
 msgid "File Name to Write"
 msgstr "╤м'я файлу до запису"
@@ -320,14 +652,49 @@ msgstr ""
 
 #: src/files.c:2173
 msgid "File was modified since you opened it, continue saving ? "
+=======
+#: src/files.c:2139
+msgid "File Name to Write"
+msgstr "п²п╟п╥п╡п╟ я└п╟п╧п╩п╟ п╢п╩я▐ п╥п╟п©п╦я│я┐п╡п╟п╫п╫я▐"
+
+#: src/files.c:2168
+msgid "Save modified buffer anyway? "
+msgstr "п≈п╠п╣я─п╣пЁя┌п╦ п╥п╪я√п╫п╣п╫п╦п╧ п╠я┐я└п╣я─ п©п╬п©я─п╦ п╡я│п╣? "
+
+#. TRANSLATORS: Restricted mode forbids overwriting.
+#: src/files.c:2261
+msgid "File exists -- cannot overwrite"
+msgstr "п╓п╟п╧п╩ п╡п╤п╣ я√я│п╫я┐я■ - п©п╣я─п╣п╥п╟п©п╦я│ п╫п╣п╪п╬п╤п╩п╦п╡п╦п╧"
+
+#: src/files.c:2271
+msgid "Save file under DIFFERENT NAME? "
+msgstr "п≈п╠п╣я─п╣пЁя┌п╦ я└п╟п╧п╩ п╥ п├п²п╗п·п╝ п²п░п≈п▓п·п╝? "
+
+#: src/files.c:2279
+#, c-format
+msgid "File \"%s\" exists; OVERWRITE? "
+msgstr "п╓п╟п╧п╩ б╚%sб╩ п╡п╤п╣ я√я│п╫я┐я■, п÷п∙п═п∙п≈п░п÷п≤п║п░п╒п≤? "
+
+#: src/files.c:2300
+msgid "File was modified since you opened it; continue saving? "
+>>>>>>> origin/tomato-shibby-RT-AC
 msgstr ""
 
+<<<<<<< HEAD
 #: src/files.c:2611
+=======
+#: src/files.c:2725
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "(more)"
 msgstr "(дал╕)"
 
+<<<<<<< HEAD
 #: src/files.c:2694 src/rcfile.c:1220
 #, fuzzy, c-format
+=======
+#: src/files.c:2810
+#, c-format
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid ""
 "\n"
 "Press Enter to continue starting nano.\n"
@@ -335,6 +702,7 @@ msgstr ""
 "\n"
 "Нажм╕ть Enter щоб продовжити завантаження nano\n"
 
+<<<<<<< HEAD
 #. TRANSLATORS: Try to keep the next five strings at most 10 characters.
 #: src/global.c:415 src/prompt.c:1288
 msgid "Cancel"
@@ -440,13 +808,107 @@ msgid "Where Is"
 msgstr "Пошук"
 
 #: src/global.c:483
+=======
+#: src/files.c:2826
+#, c-format
+msgid ""
+"Unable to create directory %s: %s\n"
+"It is required for saving/loading search history or cursor positions.\n"
+msgstr ""
+"п²п╣ п╡п╢п╟п╩п╬я│я▐ я│я┌п╡п╬я─п╦я┌п╦ п╨п╟я┌п╟п╩п╬пЁ %s: %s\n"
+"п╕п╣п╧ п╨п╟я┌п╟п╩п╬пЁ п©п╬я┌я─я√п╠п╣п╫ п╢п╩я▐ п╥п╠п╣я─я√пЁп╟п╫п╫я▐ я┌п╟ п╥п╟п╡п╟п╫я┌п╟п╤п╣п╫п╫я▐ п╤я┐я─п╫п╟п╩я┐ п©п╬я┬я┐п╨я┐ п╟п╠п╬ п╢п╟п╫п╦я┘ "
+"я┴п╬п╢п╬ п©п╬п╥п╦я├я√я≈ п╨я┐я─я│п╬я─п╟.\n"
+
+#: src/files.c:2833
+#, c-format
+msgid ""
+"Path %s is not a directory and needs to be.\n"
+"Nano will be unable to load or save search history or cursor positions.\n"
+msgstr ""
+"п░п╢я─п╣я│п╟ %s п╫п╣ я■ п╟п╢я─п╣я│п╬я▌ п╨п╟я┌п╟п╩п╬пЁя┐, я┘п╬я┤п╟ п╪п╟я■ п╫п╣я▌ п╠я┐я┌п╦.\n"
+"Nano п╫п╣ п╥п╪п╬п╤п╣ п╥п╟п╡п╟п╫я┌п╟п╤я┐п╡п╟я┌п╦ п╟п╠п╬ п╥п╠п╣я─я√пЁп╟я┌п╦ п╢п╟п╫я√ я┴п╬п╢п╬ п╤я┐я─п╫п╟п╩я┐ п©п╬я┬я┐п╨я┐ я┌п╟ "
+"п©п╬п╥п╦я├я√п╧ п╨я┐я─я│п╬я─п╟.\n"
+
+#: src/files.c:2855
+#, c-format
+msgid ""
+"Detected a legacy nano history file (%s) which I tried to move\n"
+"to the preferred location (%s) but encountered an error: %s"
+msgstr ""
+"п▓п╦я▐п╡п╩п╣п╫п╬ п╥п╟я│я┌п╟я─я√п╩п╦п╧ я└п╟п╧п╩ п╤я┐я─п╫п╟п╩я┐ (%s). п▓п╦п╨п╬п╫п╟п╫п╬ я│п©я─п╬п╠я┐ п©п╣я─п╣п╫п╣я│я┌п╦\n"
+"п╧п╬пЁп╬ п╢п╬ п╠п╟п╤п╟п╫п╬пЁп╬ п╪я√я│я├я▐ (%s), п╡я┌я√п╪, я│я┌п╟п╩п╟я│я▐ п©п╬п╪п╦п╩п╨п╟: %s"
+
+#: src/files.c:2859
+#, c-format
+msgid ""
+"Detected a legacy nano history file (%s) which I moved\n"
+"to the preferred location (%s)\n"
+"(see the nano FAQ about this change)"
+msgstr ""
+"п▓п╦я▐п╡п╩п╣п╫п╬ п╥п╟я│я┌п╟я─я√п╩п╦п╧ я└п╟п╧п╩ п╤я┐я─п╫п╟п╩я┐ nano (%s), я▐п╨п╦п╧ п©п╣я─п╣п╫п╣я│п╣п╫п╬ п╢п╬\n"
+"п╡я√п╢п©п╬п╡я√п╢п╫п╬пЁп╬ п╪я√я│я├я▐ (%s)\n"
+"(п╢п╦п╡. б╚п÷п╬я┬п╦я─п╣п╫я√ п©п╦я┌п╟п╫п╫я▐б╩ я┴п╬п╢п╬ nano, я┴п╬п╠ п╢я√п╥п╫п╟я┌п╦я│я▐ п╠я√п╩я▄я┬п╣ п©я─п╬ я├я▌ п╥п╪я√п╫я┐)"
+
+#: src/files.c:2941 src/files.c:2949 src/files.c:2972 src/files.c:2994
+#, c-format
+msgid "Error writing %s: %s\n"
+msgstr "п÷п╬п╪п╦п╩п╨п╟ п©я√п╢ я┤п╟я│ я│п©я─п╬п╠п╦ п╥п╟п©п╦я│п╟я┌п╦ %s: %s\n"
+
+#. TRANSLATORS: Try to keep the next fifteen strings at most 10 characters.
+#: src/global.c:452
+msgid "Exit"
+msgstr "п▓п╦я┘я√п╢"
+
+#: src/global.c:453
+msgid "Close"
+msgstr "п≈п╟п╨я─п╦я┌п╦"
+
+#: src/global.c:454
+msgid "Uncut Text"
+msgstr "п║п╨п╟я│п▓п╦я─я√п╥"
+
+#: src/global.c:456
+msgid "Unjustify"
+msgstr "п║п╨п╟я│п▓п╦я─я√п╡п╫"
+
+#: src/global.c:462
+msgid "Read File"
+msgstr "п╖п╦я┌. я└п╟п╧п╩"
+
+#: src/global.c:463
+msgid "Where Is"
+msgstr "п÷п╬я┬я┐п╨"
+
+#: src/global.c:464
+msgid "Replace"
+msgstr "п≈п╟п╪я√п╫п╟"
+
+#: src/global.c:465
+msgid "Go To Line"
+msgstr "п■п╬ п═я▐п╢п╨п╟"
+
+#: src/global.c:466
+msgid "Prev Line"
+msgstr "п÷п╬п©п═я▐п╢п╬п╨"
+
+#: src/global.c:467
+msgid "Next Line"
+msgstr "п²п╟я│я┌п═я▐п╢п╬п╨"
+
+#: src/global.c:468
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Prev Page"
 msgstr "Поп.Стор."
 
+<<<<<<< HEAD
 #: src/global.c:484
+=======
+#: src/global.c:469
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Next Page"
 msgstr "Наст.Стор."
 
+<<<<<<< HEAD
 #: src/global.c:485
 msgid "First Line"
 msgstr "Перший Рядок"
@@ -469,13 +931,25 @@ msgstr ""
 
 #: src/global.c:491
 #, fuzzy
+=======
+#: src/global.c:471
+msgid "Justify"
+msgstr "п▓п╦я─я√п╡п╫я▐я┌п╦"
+
+#: src/global.c:472
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "FullJstify"
 msgstr "Вир╕внювання"
 
+<<<<<<< HEAD
 #: src/global.c:493
+=======
+#: src/global.c:474
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Refresh"
 msgstr "Перемалювати"
 
+<<<<<<< HEAD
 #: src/global.c:495
 #, fuzzy
 msgid "Insert File"
@@ -486,36 +960,71 @@ msgid "Go To Line"
 msgstr "До Рядка"
 
 #: src/global.c:500
-msgid "Justify the current paragraph"
-msgstr "Вир╕вняти поточний абзац"
+=======
+#. TRANSLATORS: Try to keep this string at most 12 characters.
+#: src/global.c:476
+msgid "WhereIs Next"
+msgstr "п≈п╫п╟п╧я┌п╦ п╢п╟п╩я√"
 
 #. TRANSLATORS: The next long series of strings are shortcut descriptions;
 #. * they are best kept shorter than 56 characters, but may be longer.
+#: src/global.c:482
+>>>>>>> origin/tomato-shibby-RT-AC
+msgid "Justify the current paragraph"
+msgstr "Вир╕вняти поточний абзац"
+
+<<<<<<< HEAD
+#. TRANSLATORS: The next long series of strings are shortcut descriptions;
+#. * they are best kept shorter than 56 characters, but may be longer.
 #: src/global.c:505
+=======
+#: src/global.c:484
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Cancel the current function"
 msgstr "Скасувати поточну функц╕ю"
 
+<<<<<<< HEAD
 #: src/global.c:506
+=======
+#: src/global.c:485
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Display this help text"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/global.c:509
 #, fuzzy
+=======
+#: src/global.c:488
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Close the current file buffer / Exit from nano"
 msgstr "Закрити завантажений зараз файл/Вийти ╕з nano"
 
+<<<<<<< HEAD
 #: src/global.c:511
+=======
+#: src/global.c:490
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Exit from nano"
 msgstr "Вих╕д з nano"
 
+<<<<<<< HEAD
 #: src/global.c:515
+=======
+#: src/global.c:494
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Write the current file to disk"
 msgstr "Записати поточний файл на диск"
 
+<<<<<<< HEAD
 #: src/global.c:517
+=======
+#: src/global.c:496
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Insert another file into the current one"
 msgstr "Вставити ╕нший файл до поточного"
 
+<<<<<<< HEAD
 #: src/global.c:519
 #, fuzzy
 msgid "Search for a string or a regular expression"
@@ -532,27 +1041,75 @@ msgid "Go to next screen"
 msgstr "Перейти до наступного екрану"
 
 #: src/global.c:523
+=======
+#: src/global.c:498
+msgid "Search for a string or a regular expression"
+msgstr "п╗я┐п╨п╟я┌п╦ я─я▐п╢п╬п╨ п╟п╠п╬ я└п╬я─п╪п╟п╩я▄п╫п╦п╧ п╡п╦я─п╟п╥"
+
+#: src/global.c:500
+msgid "Search for a string"
+msgstr "п╗я┐п╨п╟я┌п╦ я─я▐п╢п╬п╨"
+
+#: src/global.c:501
+msgid "Refresh the file list"
+msgstr "п·я│п╡я√п╤п╦я┌п╦ я│п©п╦я│п╬п╨ я└п╟п╧п╩я√п╡"
+
+#: src/global.c:503
+msgid "Go to lefthand column"
+msgstr "п÷п╣я─п╣п╧я┌п╦ п╢п╬ я│я┌п╬п╡п©я┤п╦п╨п╟ п╩я√п╡п╬я─я┐я┤"
+
+#: src/global.c:504
+msgid "Go to righthand column"
+msgstr "п÷п╣я─п╣п╧я┌п╦ п╢п╬ я│я┌п╬п╡п©я┤п╦п╨п╟ п©я─п╟п╡п╬я─я┐я┤"
+
+#: src/global.c:507
+msgid "Go one screenful up"
+msgstr "п²п╟ п╬п╢п╦п╫ п╣п╨я─п╟п╫ п╡пЁп╬я─я┐"
+
+#: src/global.c:508
+msgid "Go one screenful down"
+msgstr "п²п╟ п╬п╢п╦п╫ п╣п╨я─п╟п╫ п╡п╫п╦п╥"
+
+#: src/global.c:510
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Cut the current line and store it in the cutbuffer"
 msgstr "Вир╕зати поточний рядок та пом╕стити його до \"кишен╕\""
 
+<<<<<<< HEAD
 #: src/global.c:525
+=======
+#: src/global.c:512
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Uncut from the cutbuffer into the current line"
 msgstr "Скасувати вир╕зання та вставити зм╕ст \"кишен╕\" до поточного рядка"
 
+<<<<<<< HEAD
 #: src/global.c:527
 #, fuzzy
+=======
+#: src/global.c:513
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Display the position of the cursor"
 msgstr "Показати позиц╕ю курсора"
 
+<<<<<<< HEAD
 #: src/global.c:529
+=======
+#: src/global.c:515
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Invoke the spell checker, if available"
 msgstr "Викликати програму пошуку друкарських помилок (якщо ╓)"
 
+<<<<<<< HEAD
 #: src/global.c:531
 #, fuzzy
+=======
+#: src/global.c:517
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Replace a string or a regular expression"
 msgstr "Формальн╕ вирази (regexp)"
 
+<<<<<<< HEAD
 #: src/global.c:532
 #, fuzzy
 msgid "Go to line and column number"
@@ -569,32 +1126,72 @@ msgstr ""
 
 #: src/global.c:537
 #, fuzzy
+=======
+#: src/global.c:518
+msgid "Go to line and column number"
+msgstr "п÷п╣я─п╣п╧я┌п╦ п╢п╬ я─я▐п╢п╨п╟ я√ п©п╬п╥п╦я├я√я≈"
+
+#: src/global.c:519
+msgid "Repeat the last search"
+msgstr "п÷п╬п╡я┌п╬я─п╦я┌п╦ п╬я│я┌п╟п╫п╫я√п╧ п©п╬я┬я┐п╨"
+
+#: src/global.c:521
+msgid "Mark text starting from the cursor position"
+msgstr "п÷п╬п╥п╫п╟я┤п╦я┌п╦ я┌п╣п╨я│я┌, п©п╬я┤п╦п╫п╟я▌я┤п╦ п╥ п©п╬я┌п╬я┤п╫п╬я≈ п©п╬п╥п╦я├я√я≈ п╨я┐я─я│п╬я─п╟"
+
+#: src/global.c:523
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Copy the current line and store it in the cutbuffer"
 msgstr "Вир╕зати поточний рядок та пом╕стити його до \"кишен╕\""
 
+<<<<<<< HEAD
 #: src/global.c:538
 #, fuzzy
+=======
+#: src/global.c:524
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Indent the current line"
 msgstr "Додати до поточного файлу"
 
+<<<<<<< HEAD
 #: src/global.c:539
 #, fuzzy
 msgid "Unindent the current line"
 msgstr "Додати до поточного файлу"
 
 #: src/global.c:540
+=======
+#: src/global.c:525
+msgid "Unindent the current line"
+msgstr "п▓п╦п╩я┐я┤п╦я┌п╦ п╡я√п╢я│я┌я┐п© п╢п╩я▐ п©п╬я┌п╬я┤п╫п╬пЁп╬ я─я▐п╢п╨п╟"
+
+#: src/global.c:526
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Undo the last operation"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/global.c:541
 msgid "Redo the last undone operation"
 msgstr ""
 
 #: src/global.c:543
 #, fuzzy
+=======
+#: src/global.c:527
+msgid "Redo the last undone operation"
+msgstr "п▓я√п╢п╫п╬п╡п╦я┌п╦ п╬я│я┌п╟п╫п╫я▌ я│п╨п╟я│п╬п╡п╟п╫я┐ п╢я√я▌"
+
+#: src/global.c:529
+msgid "Go back one character"
+msgstr "п²п╟п╥п╟п╢ п╫п╟ п╬п╢п╦п╫ я│п╦п╪п╡п╬п╩"
+
+#: src/global.c:530
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Go forward one character"
 msgstr "Вперед на одну л╕теру"
 
+<<<<<<< HEAD
 #: src/global.c:544
 #, fuzzy
 msgid "Go back one character"
@@ -602,6 +1199,13 @@ msgstr "Назад на одну л╕теру"
 
 #: src/global.c:546
 #, fuzzy
+=======
+#: src/global.c:531
+msgid "Go back one word"
+msgstr "п²п╟п╥п╟п╢ п╫п╟ п╬п╢п╫п╣ я│п╩п╬п╡п╬"
+
+#: src/global.c:532
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Go forward one word"
 msgstr "Вперед на одне слово"
 
@@ -610,178 +1214,371 @@ msgstr "Вперед на одне слово"
 msgid "Go back one word"
 msgstr "Назад на одне слово"
 
+<<<<<<< HEAD
 #: src/global.c:549
 #, fuzzy
+=======
+#: src/global.c:533
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Go to previous line"
 msgstr "Перейти до попереднього екрану"
 
+<<<<<<< HEAD
 #: src/global.c:550
 #, fuzzy
+=======
+#: src/global.c:534
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Go to next line"
 msgstr "Перем╕ститися на рядок нижче"
 
+<<<<<<< HEAD
 #: src/global.c:551
 #, fuzzy
+=======
+#: src/global.c:535
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Go to beginning of current line"
 msgstr "Перем╕ститися до початку поточного рядка"
 
+<<<<<<< HEAD
 #: src/global.c:552
 #, fuzzy
+=======
+#: src/global.c:536
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Go to end of current line"
 msgstr "Перем╕ститися на к╕нець поточного рядка"
 
+<<<<<<< HEAD
 #: src/global.c:555
+=======
+#: src/global.c:537
+msgid "Go to previous block of text"
+msgstr "п÷п╬п╡п╣я─п╫я┐я┌п╦я│я▐ п╢п╬ п©п╬п©п╣я─п╣п╢п╫я▄п╬пЁп╬ п╠п╩п╬п╨я┐ я┌п╣п╨я│я┌я┐"
+
+#: src/global.c:538
+msgid "Go to next block of text"
+msgstr "п÷п╣я─п╣п╧я┌п╦ п╢п╬ п╫п╟я│я┌я┐п©п╫п╬пЁп╬ п╠п╩п╬п╨я┐ я┌п╣п╨я│я┌я┐"
+
+#: src/global.c:541
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Go to beginning of paragraph; then of previous paragraph"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/global.c:557
+=======
+#: src/global.c:543
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Go just beyond end of paragraph; then of next paragraph"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/global.c:560
+=======
+#: src/global.c:545
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Go to the first line of the file"
 msgstr "Перем╕ститися до першого рядка файлу"
 
+<<<<<<< HEAD
 #: src/global.c:562
+=======
+#: src/global.c:546
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Go to the last line of the file"
 msgstr "Перем╕ститися до останнього рядка файлу"
 
+<<<<<<< HEAD
 #: src/global.c:564
 #, fuzzy
+=======
+#: src/global.c:548
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Go to the matching bracket"
 msgstr "Нема в╕дпов╕дно╖ дужки"
 
+<<<<<<< HEAD
 #: src/global.c:566
+=======
+#: src/global.c:550
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Scroll up one line without scrolling the cursor"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/global.c:568
+=======
+#: src/global.c:552
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Scroll down one line without scrolling the cursor"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/global.c:572
 #, fuzzy
+=======
+#: src/global.c:555
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Switch to the previous file buffer"
 msgstr "Перейти до попереднього екрану"
 
+<<<<<<< HEAD
 #: src/global.c:574
+=======
+#: src/global.c:556
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Switch to the next file buffer"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/global.c:577
+=======
+#: src/global.c:558
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Insert the next keystroke verbatim"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/global.c:579
 #, fuzzy
+=======
+#: src/global.c:559
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Insert a tab at the cursor position"
 msgstr "Вставити символ CR (повернення гол╕вки) в поз. курсора"
 
+<<<<<<< HEAD
 #: src/global.c:581
 #, fuzzy
+=======
+#: src/global.c:560
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Insert a newline at the cursor position"
 msgstr "Вставити символ CR (повернення гол╕вки) в поз. курсора"
 
+<<<<<<< HEAD
 #: src/global.c:583
+=======
+#: src/global.c:561
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Delete the character under the cursor"
 msgstr "Видалити л╕теру п╕д курсором"
 
+<<<<<<< HEAD
 #: src/global.c:585
 msgid "Delete the character to the left of the cursor"
 msgstr "Видалити л╕теру зл╕ва в╕д курсора"
 
 #: src/global.c:588
 #, fuzzy
+=======
+#: src/global.c:563
+msgid "Delete the character to the left of the cursor"
+msgstr "п▓п╦п╢п╟п╩п╦я┌п╦ п╩я√я┌п╣я─я┐ п╥п╩я√п╡п╟ п╡я√п╢ п╨я┐я─я│п╬я─п╟"
+
+#: src/global.c:566
+msgid "Cut backward from cursor to word start"
+msgstr "п▓п╦я─я√п╥п╟я┌п╦ п╫п╟п╥п╟п╢ п╡я√п╢ п╨я┐я─я│п╬я─п╟ п╢п╬ п©п╬я┤п╟я┌п╨я┐ я│п╩п╬п╡п╟"
+
+#: src/global.c:568
+msgid "Cut forward from cursor to next word start"
+msgstr "п▓п╦я─я√п╥п╟я┌п╦ п╡п©п╣я─п╣п╢ п╡я√п╢ п╨я┐я─я│п╬я─п╟ п╢п╬ п©п╬я┤п╟я┌п╨я┐ я│п╩п╬п╡п╟"
+
+#: src/global.c:570
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Cut from the cursor position to the end of the file"
 msgstr "Скасувати вир╕зання та вставити зм╕ст \"кишен╕\" до поточного рядка"
 
+<<<<<<< HEAD
 #: src/global.c:591
 #, fuzzy
+=======
+#: src/global.c:573
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Justify the entire file"
 msgstr "Вир╕вняти поточний абзац"
 
+<<<<<<< HEAD
 #: src/global.c:595
+=======
+#: src/global.c:577
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Count the number of words, lines, and characters"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/global.c:598
+=======
+#: src/global.c:580
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Refresh (redraw) the current screen"
 msgstr "Перемалювати поточний екран"
 
+<<<<<<< HEAD
 #: src/global.c:600
 msgid "Suspend the editor (if suspend is enabled)"
 msgstr ""
 
 #: src/global.c:603
 #, fuzzy
+=======
+#: src/global.c:582
+msgid "Suspend the editor (if suspension is enabled)"
+msgstr "п÷я─п╦п╥я┐п©п╦п╫п╦я┌п╦ я─п╣п╢п╟п╨я┌п╬я─ (я▐п╨я┴п╬ я┐п╡я√п╪п╨п╫п╣п╫п╬ п©я─п╦п╥я┐п©п╦п╫п╣п╫п╫я▐)"
+
+#: src/global.c:584
+msgid "Try and complete the current word"
+msgstr "п║п©я─п╬п╠я┐п╡п╟я┌п╦ п╢п╬п©п╬п╡п╫п╦я┌п╦ п©п╬я┌п╬я┤п╫п╣ я│п╩п╬п╡п╬"
+
+#: src/global.c:588
+msgid "Comment/uncomment the current line or marked lines"
+msgstr "п■п╬п╢п╟я┌п╦/п≈п╫я▐я┌п╦ п╨п╬п╪п╣п╫я┌я┐п╡п╟п╫п╫я▐ п©п╬я┌п╬я┤п╫п╬пЁп╬ я─я▐п╢п╨п╟ п╟п╠п╬ п©п╬п╥п╫п╟я┤п╣п╫п╦я┘ я─я▐п╢п╨я√п╡"
+
+#: src/global.c:591
+msgid "Save file without prompting"
+msgstr "п≈п╠п╣я─п╣пЁя┌п╦ я└п╟п╧п╩ п╠п╣п╥ п╥п╟п©п╦я┌п╟п╫я▄"
+
+#: src/global.c:592
+msgid "Search next occurrence backward"
+msgstr "п╗я┐п╨п╟я┌п╦ п╡я√п╢п©п╬п╡я√п╢п╫п╦п╨ я┐ п╫п╟п©я─я▐п╪п╨я┐ п╢п╬ п©п╬я┤п╟я┌п╨я┐"
+
+#: src/global.c:593
+msgid "Search next occurrence forward"
+msgstr "п╗я┐п╨п╟я┌п╦ п╡я√п╢п©п╬п╡я√п╢п╫п╦п╨ я┐ п╫п╟п©я─я▐п╪п╨я┐ п╢п╬ п╨я√п╫я├я▐"
+
+#: src/global.c:596
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Toggle the case sensitivity of the search"
 msgstr "Регистрозалежний пошук"
 
+<<<<<<< HEAD
 #: src/global.c:605
 #, fuzzy
+=======
+#: src/global.c:598
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Reverse the direction of the search"
 msgstr "Показати позиц╕ю курсора"
 
+<<<<<<< HEAD
 #: src/global.c:609
 #, fuzzy
+=======
+#: src/global.c:600
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Toggle the use of regular expressions"
 msgstr "Формальн╕ вирази (regexp)"
 
+<<<<<<< HEAD
 #: src/global.c:613
 #, fuzzy
+=======
+#: src/global.c:603
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Recall the previous search/replace string"
 msgstr "Редагувати попередн╕й рядок пошуку/зам╕ни"
 
+<<<<<<< HEAD
 #: src/global.c:615
 #, fuzzy
+=======
+#: src/global.c:605
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Recall the next search/replace string"
 msgstr "Редагувати попередн╕й рядок пошуку/зам╕ни"
 
+<<<<<<< HEAD
 #: src/global.c:618
+=======
+#: src/global.c:608
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Go to file browser"
 msgstr "До переглядача файл╕в"
 
+<<<<<<< HEAD
 #: src/global.c:621
 #, fuzzy
+=======
+#: src/global.c:611
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Toggle the use of DOS format"
 msgstr "Запис файлу у формат╕ DOS"
 
+<<<<<<< HEAD
 #: src/global.c:622
 #, fuzzy
+=======
+#: src/global.c:612
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Toggle the use of Mac format"
 msgstr "Запис файлу у формат╕ Mac"
 
+<<<<<<< HEAD
 #: src/global.c:624
+=======
+#: src/global.c:613
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Toggle appending"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/global.c:625
+=======
+#: src/global.c:614
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Toggle prepending"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/global.c:628
+=======
+#: src/global.c:615
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Toggle backing up of the original file"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/global.c:629
+=======
+#: src/global.c:616
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Execute external command"
 msgstr "Виконати зовн╕шню команду"
 
+<<<<<<< HEAD
 #: src/global.c:633
 #, fuzzy
+=======
+#: src/global.c:618
+msgid "Close buffer without saving it"
+msgstr "п≈п╟п╨я─п╦я┌п╦ п╠я┐я└п╣я─ п╠п╣п╥ п╧п╬пЁп╬ п╥п╠п╣я─п╣п╤п╣п╫п╫я▐"
+
+#: src/global.c:620
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Toggle the use of a new buffer"
 msgstr "Перемикнути режим вставки в новий буфер"
 
+<<<<<<< HEAD
 #: src/global.c:636
 #, fuzzy
+=======
+#: src/global.c:623
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Exit from the file browser"
 msgstr "До переглядача файл╕в"
 
+<<<<<<< HEAD
 #: src/global.c:638
 #, fuzzy
+=======
+#: src/global.c:624
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Go to the first file in the list"
 msgstr "Перем╕ститися до першого рядка файлу"
 
+<<<<<<< HEAD
 #: src/global.c:640
 #, fuzzy
 msgid "Go to the last file in the list"
@@ -823,9 +1620,62 @@ msgstr "Чит. Файл"
 
 #. TRANSLATORS: Try to keep this at most 10 characters.
 #: src/global.c:713
+=======
+#: src/global.c:625
+msgid "Go to the last file in the list"
+msgstr "п÷п╣я─п╣п╧я┌п╦ п╢п╬ п╬я│я┌п╟п╫п╫я▄п╬пЁп╬ я└п╟п╧п╩п╟ я┐ я│п©п╦я│п╨я┐"
+
+#: src/global.c:626
+msgid "Go to the previous file in the list"
+msgstr "п÷п╣я─п╣п╧я┌п╦ п╢п╬ п©п╬п©п╣я─п╣п╢п╫я▄п╬пЁп╬ я└п╟п╧п╩п╟ я┐ я│п©п╦я│п╨я┐"
+
+#: src/global.c:627
+msgid "Go to the next file in the list"
+msgstr "п÷п╣я─п╣п╧я┌п╦ п╢п╬ п╫п╟я│я┌я┐п©п╫п╬пЁп╬ я└п╟п╧п╩п╟ я┐ я│п©п╦я│п╨я┐"
+
+#: src/global.c:628
+msgid "Go to directory"
+msgstr "п■п╬ п╨п╟я┌п╟п╩п╬пЁя┐"
+
+#: src/global.c:631
+msgid "Invoke the linter, if available"
+msgstr "п▓п╦п╨п╩п╦п╨п╟я┌п╦ linter, я▐п╨я┴п╬ п╢п╬я│я┌я┐п©п╫п╦п╧"
+
+#: src/global.c:632
+msgid "Go to previous linter msg"
+msgstr "п■п╬ п©п╬п©п╣я─п╣п╢п╫я▄п╬пЁп╬ п©п╬п╡. linter"
+
+#: src/global.c:633
+msgid "Go to next linter msg"
+msgstr "п÷п╣я─п╣п╧я┌п╦ п╢п╬ п╫п╟я│я┌я┐п©п╫п╬пЁп╬ п©п╬п╡я√п╢п╬п╪п╩п╣п╫п╫я▐ linter"
+
+#: src/global.c:635
+msgid "Invoke formatter, if available"
+msgstr "п▓п╦п╨п╩п╦п╨п╟я┌п╦ formatter, я▐п╨я┴п╬ п╢п╬я│я┌я┐п©п╫п╦п╧"
+
+#. TRANSLATORS: Try to keep the following strings at most 10 characters.
+#: src/global.c:650
+msgid "Get Help"
+msgstr "п■п╬п╡я√п╢п╨п╟"
+
+#: src/global.c:653 src/prompt.c:734
+msgid "Cancel"
+msgstr "п║п╨п╟я│я┐п╡п╟я┌п╦"
+
+#: src/global.c:666
+msgid "Write Out"
+msgstr "п▓п╦п©п╦я│п╟я┌п╦"
+
+#: src/global.c:702
+msgid "Go To Dir"
+msgstr "п■п╬ п╨п╟я┌п╟п╩п╬пЁя┐"
+
+#: src/global.c:717
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Cut Text"
 msgstr "Вир╕зати"
 
+<<<<<<< HEAD
 #. TRANSLATORS: Try to keep this at most 10 characters.
 #: src/global.c:718
 msgid "UnJustify"
@@ -879,17 +1729,89 @@ msgid "Forward"
 msgstr "Вперед"
 
 #: src/global.c:806 src/global.c:810
+=======
+#: src/global.c:732
+msgid "To Spell"
+msgstr "п÷я─п╟п╡п╬п©п╦я│"
+
+#: src/global.c:736
+msgid "To Linter"
+msgstr "п■п╬ linter"
+
+#: src/global.c:739
+msgid "Formatter"
+msgstr "Formatter"
+
+#: src/global.c:745
+msgid "Cur Pos"
+msgstr "п÷п╬п╥п╦я├я√я▐"
+
+#: src/global.c:757
+msgid "Undo"
+msgstr "п║п╨п╟я│я┐п╡п╟я┌п╦"
+
+#: src/global.c:759
+msgid "Redo"
+msgstr "п÷п╬п╡я┌п╬я─п╦я┌п╦"
+
+#: src/global.c:762
+msgid "Mark Text"
+msgstr "п÷п╬п╪я√я┌п╦я┌п╦"
+
+#: src/global.c:764
+msgid "Copy Text"
+msgstr "п║п╨п╬п©я√я▌п╡п╟я┌п╦ я┌п╣п╨я│я┌"
+
+#: src/global.c:768
+msgid "Case Sens"
+msgstr "п═п╣пЁп≈п╟п╩п╣п╤"
+
+#: src/global.c:770
+msgid "Regexp"
+msgstr "п╓п╬я─п╪п▓п╦я─"
+
+#: src/global.c:772
+msgid "Backwards"
+msgstr "п²п╟п╥п╟п╢"
+
+#: src/global.c:778
+msgid "No Replace"
+msgstr "п²п╣ п≈п╟п╪я√я┴п╟я┌п╦"
+
+#: src/global.c:790
+msgid "To Bracket"
+msgstr "п■п╬ п╢я┐п╤п╨п╦"
+
+#: src/global.c:796
+msgid "Previous"
+msgstr "п²п╟п╥п╟п╢"
+
+#: src/global.c:798
+msgid "Next"
+msgstr "п■п╟п╩я√"
+
+#: src/global.c:802 src/global.c:807
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Back"
 msgstr "Назад"
 
+<<<<<<< HEAD
 #: src/global.c:817
 msgid "Next Word"
 msgstr "НастСлово"
 
 #: src/global.c:820
+=======
+#: src/global.c:804 src/global.c:809
+msgid "Forward"
+msgstr "п▓п©п╣я─п╣п╢"
+
+#: src/global.c:813
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Prev Word"
 msgstr "ПопСлово"
 
+<<<<<<< HEAD
 #: src/global.c:824
 #, fuzzy
 msgid "Prev Line"
@@ -901,9 +1823,17 @@ msgid "Next Line"
 msgstr "Наступний файл"
 
 #: src/global.c:830
+=======
+#: src/global.c:815
+msgid "Next Word"
+msgstr "п²п╟я│я┌п║п╩п╬п╡п╬"
+
+#: src/global.c:818
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Home"
 msgstr "Початок"
 
+<<<<<<< HEAD
 #: src/global.c:833
 msgid "End"
 msgstr "К╕нець"
@@ -923,11 +1853,53 @@ msgstr ""
 #: src/global.c:856
 msgid "Previous File"
 msgstr "Попередн╕й Файл"
+=======
+#: src/global.c:820
+msgid "End"
+msgstr "п я√п╫п╣я├я▄"
+
+#: src/global.c:828
+msgid "Scroll Up"
+msgstr "п⌠п╬я─я┌п╟я┌п╦ п╡пЁп╬я─я┐"
+
+#: src/global.c:830
+msgid "Scroll Down"
+msgstr "п⌠п╬я─я┌п╟я┌п╦ п╡п╫п╦п╥"
+
+#: src/global.c:834
+msgid "Prev Block"
+msgstr "п÷п╬п©. п╠п╩п╬п╨"
+
+#: src/global.c:836
+msgid "Next Block"
+msgstr "п²п╟я│я┌. п╠п╩п╬п╨"
+
+#: src/global.c:839
+msgid "Beg of Par"
+msgstr "п÷п╬я┤.п╟п╠п╥п╟я├я┐"
+
+#: src/global.c:841
+msgid "End of Par"
+msgstr "п я√п╫.п╟п╠п╥п╟я├я┐"
+
+#: src/global.c:850
+msgid "First Line"
+msgstr "п÷п╣я─я┬п╦п╧ п═я▐п╢п╬п╨"
+
+#: src/global.c:852
+msgid "Last Line"
+msgstr "п·я│я┌п╟п╫п╫я√п╧ п═я▐п╢п╬п╨"
+
+#: src/global.c:856
+msgid "Prev File"
+msgstr "п÷п╬п©. я└п╟п╧п╩"
+>>>>>>> origin/tomato-shibby-RT-AC
 
 #: src/global.c:858
 msgid "Next File"
 msgstr "Наступний файл"
 
+<<<<<<< HEAD
 #. TRANSLATORS: This is displayed when the next keystroke will be
 #. * inserted verbatim.
 #: src/global.c:862 src/text.c:3045
@@ -935,93 +1907,292 @@ msgid "Verbatim Input"
 msgstr ""
 
 #: src/global.c:867
+=======
+#: src/global.c:874
+msgid "Verbatim"
+msgstr "п▒я┐п╨п╡п╟п╩я▄п╫п╬"
+
+#: src/global.c:877
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Tab"
 msgstr "Табуляц╕я"
 
+<<<<<<< HEAD
 #: src/global.c:870
+=======
+#: src/global.c:879
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Enter"
 msgstr "Ввод"
 
+<<<<<<< HEAD
 #: src/global.c:873
+=======
+#: src/global.c:882
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Delete"
 msgstr "Видалити"
 
+<<<<<<< HEAD
 #: src/global.c:876
+=======
+#: src/global.c:884
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Backspace"
 msgstr "Заб╕й"
 
+<<<<<<< HEAD
 #: src/global.c:893
+=======
+#. TRANSLATORS: The next two strings refer to cutting words.
+#: src/global.c:895
+msgid "Cut Left"
+msgstr "п▓п╦я─я√п╥п╟я┌п╦ п╩я√п╡п╬я─я┐я┤"
+
+#: src/global.c:897
+msgid "Cut Right"
+msgstr "п▓п╦я─я√п╥п╟я┌п╦ п©я─п╟п╡п╬я─я┐я┤"
+
+#: src/global.c:899
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "CutTillEnd"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/global.c:906
 msgid "Word Count"
 msgstr ""
 
 #: src/global.c:1367
+=======
+#: src/global.c:909
+msgid "Word Count"
+msgstr "п я√п╩я▄п╨я√я│я┌я▄ я│п╩я√п╡"
+
+#: src/global.c:916
+msgid "Suspend"
+msgstr "п÷я─п╦п╥я┐п©п╦п╫п╨п╟ -"
+
+#: src/global.c:920
+msgid "Indent Text"
+msgstr "п▓я√п╢я│я┌я┐п©"
+
+#: src/global.c:922
+msgid "Unindent Text"
+msgstr "п║п╨п╟я│п▓я√п╢я│я┌"
+
+#: src/global.c:926
+msgid "Complete"
+msgstr "п≈п╟п╡п╣я─я┬п╣п╫п╬"
+
+#: src/global.c:930
+msgid "Comment Lines"
+msgstr "п≈п╟п╨п╬п╪п╣п╫я┌я┐п╡п╟я┌п╦ я─я▐п╢п╨п╦"
+
+#: src/global.c:934
+msgid "Save"
+msgstr "п≈п╠п╣я─п╣пЁя┌п╦"
+
+#: src/global.c:940
+msgid "PrevHstory"
+msgstr "п÷п╬п©п√я┐я─п╫п╟п╩"
+
+#: src/global.c:943
+msgid "NextHstory"
+msgstr "п²п╟я│я┌п√я┐я─п╫п╟п╩"
+
+#: src/global.c:952
+msgid "Go To Text"
+msgstr "п■п╬ я┌п╣п╨я│я┌я┐"
+
+#: src/global.c:956
+msgid "DOS Format"
+msgstr "я└п╬я─п╪п╟я┌ DOS"
+
+#: src/global.c:958
+msgid "Mac Format"
+msgstr "я└п╬я─п╪п╟я┌ Mac"
+
+#: src/global.c:966
+msgid "Append"
+msgstr "п■п╬п╢п╟я┌п╦"
+
+#: src/global.c:968
+msgid "Prepend"
+msgstr "п■п╬п╢п╟я┌п╦(0)"
+
+#: src/global.c:971
+msgid "Backup File"
+msgstr "п≈я─п╬п╠п╦я┌п╦ я─п╣п╥п╣я─п╡п╫я┐ п╨п╬п©я√я▌"
+
+#: src/global.c:978
+msgid "Execute Command"
+msgstr "п▓п╦п╨п╬п╫п╟я┌п╦ п╨п╬п╪п╟п╫п╢я┐"
+
+#: src/global.c:993
+msgid "To Files"
+msgstr "п■п╬ п╓п╟п╧п╩я√п╡"
+
+#: src/global.c:1001
+msgid "First File"
+msgstr "п÷п╣я─я┬п╦п╧ я└п╟п╧п╩"
+
+#: src/global.c:1003
+msgid "Last File"
+msgstr "п·я│я┌. я└п╟п╧п╩"
+
+#: src/global.c:1007
+msgid "Discard buffer"
+msgstr "п▓я√п╢п╨п╦п╫я┐я┌п╦ п╠я┐я└п╣я─"
+
+#: src/global.c:1016
+msgid "Left Column"
+msgstr "п⌡я√п╡п╦п╧ я│я┌п╬п╡п©я┤п╦п╨"
+
+#: src/global.c:1018
+msgid "Right Column"
+msgstr "п÷я─п╟п╡п╦п╧ я│я┌п╬п╡п©я┤п╦п╨"
+
+#. TRANSLATORS: Try to keep the next two strings at most 20 characters.
+#: src/global.c:1025
+msgid "Prev Lint Msg"
+msgstr "п÷п╬п©. п©п╬п╡. lint"
+
+#: src/global.c:1027
+msgid "Next Lint Msg"
+msgstr "п²п╟я│я┌. п©п╬п╡. lint"
+
+#. TRANSLATORS: The next seventeen strings are toggle descriptions;
+#. * they are best kept shorter than 40 characters, but may be longer.
+#: src/global.c:1318
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Help mode"
 msgstr "Режим допомоги"
 
+<<<<<<< HEAD
 #: src/global.c:1369
 #, fuzzy
+=======
+#: src/global.c:1320
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Constant cursor position display"
 msgstr "Пост╕йна позиц╕я курсора"
 
+<<<<<<< HEAD
 #: src/global.c:1371
+=======
+#: src/global.c:1322
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Use of one more line for editing"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/global.c:1373
+=======
+#: src/global.c:1324
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Smooth scrolling"
 msgstr "Плавна прокрутка"
 
+<<<<<<< HEAD
 #: src/global.c:1375
+=======
+#: src/global.c:1326
+msgid "Soft wrapping of overlong lines"
+msgstr "п°Б─≥я▐п╨п╣ п©п╣я─п╣п╫п╣я│п╣п╫п╫я▐ п╫п╟п╢я┌п╬ п╢п╬п╡пЁп╦я┘ я─я▐п╢п╨я√п╡"
+
+#: src/global.c:1328
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Whitespace display"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/global.c:1377
+=======
+#: src/global.c:1330
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Color syntax highlighting"
 msgstr "П╕дсв╕чування синтаксису кольором"
 
+<<<<<<< HEAD
 #: src/global.c:1379
+=======
+#: src/global.c:1332
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Smart home key"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/global.c:1381
+=======
+#: src/global.c:1334
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Auto indent"
 msgstr "Авто-вир╕внювання"
 
+<<<<<<< HEAD
 #: src/global.c:1383
+=======
+#: src/global.c:1336
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Cut to end"
 msgstr "Вир╕зати до к╕нця"
 
+<<<<<<< HEAD
 #: src/global.c:1385
 msgid "Long line wrapping"
 msgstr ""
 
 #: src/global.c:1387
+=======
+#: src/global.c:1338
+msgid "Hard wrapping of overlong lines"
+msgstr "п√п╬я─я│я┌п╨п╣ п©п╣я─п╣п╫п╣я│п╣п╫п╫я▐ п╫п╟п╢п╥п╡п╦я┤п╟п╧п╫п╬ п╢п╬п╡пЁп╦я┘ я─я▐п╢п╨я√п╡"
+
+#: src/global.c:1340
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Conversion of typed tabs to spaces"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/global.c:1389
 #, fuzzy
+=======
+#: src/global.c:1342
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Backup files"
 msgstr "Зробити резервну коп╕ю"
 
+<<<<<<< HEAD
 #: src/global.c:1391
 msgid "Multiple file buffers"
 msgstr "Дек╕лька файлових буфер╕в"
 
 #: src/global.c:1393
+=======
+#: src/global.c:1344
+msgid "Reading file into separate buffer"
+msgstr "п╖п╦я┌п╟я■п╪п╬ я└п╟п╧п╩ п╢п╬ п╬п╨я─п╣п╪п╬пЁп╬ п╠я┐я└п╣я─п╟"
+
+#: src/global.c:1346
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Mouse support"
 msgstr "П╕дтримка миш╕"
 
+<<<<<<< HEAD
 #: src/global.c:1395
+=======
+#: src/global.c:1348
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "No conversion from DOS/Mac format"
 msgstr "Нема перетворювання ╕з DOS/Mac формату"
 
+<<<<<<< HEAD
 #: src/global.c:1397
 #, fuzzy
+=======
+#: src/global.c:1350
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Suspension"
 msgstr "Призупинка -"
 
@@ -1029,8 +2200,16 @@ msgstr "Призупинка -"
 msgid "Soft line wrapping"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/help.c:236
 #, fuzzy
+=======
+#: src/global.c:1352
+msgid "Line numbering"
+msgstr "п²я┐п╪п╣я─п╟я├я√я▐ я─я▐п╢п╨я√п╡"
+
+#: src/help.c:211
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid ""
 "Search Command Help Text\n"
 "\n"
@@ -1329,6 +2508,7 @@ msgid ""
 "\n"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/help.c:407 src/help.c:483
 msgid "enable/disable"
 msgstr "дозволити/заборонити"
@@ -1339,6 +2519,25 @@ msgid "Key invalid in view mode"
 msgstr "Нев╕рна кнопка в режим╕ VIEW"
 
 #: src/nano.c:695
+=======
+#: src/help.c:380 src/help.c:461
+msgid "enable/disable"
+msgstr "п╢п╬п╥п╡п╬п╩п╦я┌п╦/п╥п╟п╠п╬я─п╬п╫п╦я┌п╦"
+
+#: src/nano.c:534
+msgid "Key is invalid in view mode"
+msgstr "п²п╣п╨п╬я─п╣п╨я┌п╫п╟ п╨п╩п╟п╡я√я┬п╟ я┐ я─п╣п╤п╦п╪я√ п©п╣я─п╣пЁп╩я▐п╢я┐"
+
+#: src/nano.c:540
+msgid "This function is disabled in restricted mode"
+msgstr "п╕я▌ я└я┐п╫п╨я├я√я▌ п╡п╦п╪п╨п╫п╣п╫п╬ я┐ п╬п╠п╪п╣п╤п╣п╫п╬п╪я┐ я─п╣п╤п╦п╪я√"
+
+#: src/nano.c:548
+msgid "Help is not available"
+msgstr "п■п╬п╡я√п╢п╨п╟ п╫п╣п╢п╬я│я┌я┐п©п╫п╟"
+
+#: src/nano.c:657
+>>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid ""
 "\n"
@@ -1347,8 +2546,13 @@ msgstr ""
 "\n"
 "Буфер записано до %s\n"
 
+<<<<<<< HEAD
 #: src/nano.c:697
 #, fuzzy, c-format
+=======
+#: src/nano.c:659
+#, c-format
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid ""
 "\n"
 "Buffer not written to %s: %s\n"
@@ -1356,8 +2560,13 @@ msgstr ""
 "\n"
 "Буфер записано до %s\n"
 
+<<<<<<< HEAD
 #: src/nano.c:700
 #, fuzzy, c-format
+=======
+#: src/nano.c:662
+#, c-format
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid ""
 "\n"
 "Buffer not written: %s\n"
@@ -1365,16 +2574,21 @@ msgstr ""
 "\n"
 "Буфер записано до %s\n"
 
+<<<<<<< HEAD
 #: src/nano.c:723
 msgid "Window size is too small for nano...\n"
 msgstr "Розм╕р в╕кна замалий для Nano...\n"
 
 #: src/nano.c:816
+=======
+#: src/nano.c:777
+>>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid ""
-"Usage: nano [OPTIONS] [[+LINE,COLUMN] FILE]...\n"
+"Usage: nano [OPTIONS] [[+LINE[,COLUMN]] FILE]...\n"
 "\n"
 msgstr ""
+<<<<<<< HEAD
 
 #: src/nano.c:819
 #, fuzzy, c-format
@@ -1401,31 +2615,86 @@ msgstr "Почати з рядка номер РЯДОК"
 
 #: src/nano.c:828
 #, fuzzy
+=======
+"п п╬я─п╦я│я┌я┐п╡п╟п╫п╫я▐: nano [п÷п░п═п░п°п∙п╒п═п≤] [[+п═п╞п■п·п [,п÷п·п≈п≤п╕п├п╞]] п╓п░п≥п⌡]...\n"
+"\n"
+
+#. TRANSLATORS: The next two strings are part of the --help output.
+#. * It's best to keep its lines within 80 characters.
+#: src/nano.c:780
+#, c-format
+msgid ""
+"To place the cursor on a specific line of a file, put the line number with\n"
+"a '+' before the filename.  The column number can be added after a comma.\n"
+msgstr ""
+"п╘п╬п╠ я─п╬п╥я┌п╟я┬я┐п╡п╟я┌п╦ п╨я┐я─я│п╬я─ я┐ п©п╣п╡п╫п╬п╪я┐ я─я▐п╢п╨я┐ я└п╟п╧п╩п╟, п╡п╨п╟п╤я√я┌я▄ п╫п╬п╪п╣я─ я─я▐п╢п╨п╟ я√п╥ б╚+б╩\n"
+"п©п╣я─п╣п╢ п╫п╟п╥п╡п╬я▌ я└п╟п╧п╩п╟. п÷п╬п╥п╦я├я√я▌ я┐ я─я▐п╢п╨я┐ п╪п╬п╤п╫п╟ п╡п╨п╟п╥п╟я┌п╦ п©я√я│п╩я▐ п╨п╬п╪п╦.\n"
+
+#: src/nano.c:782
+#, c-format
+msgid ""
+"When the first filename is '-', nano reads data from standard input.\n"
+"\n"
+msgstr ""
+"п╞п╨я┴п╬ п©п╣я─я┬п╬я▌ п╫п╟п╥п╡п╬я▌ я└п╟п╧п╩п╟ я■ б╚-б╩, nano я┤п╦я┌п╟я┌п╦п╪п╣ п╢п╟п╫я√ п╥я√ я│я┌п╟п╫п╢п╟я─я┌п╫п╬пЁп╬ п╢п╤п╣я─п╣п╩п╟ "
+"п╡п╡п╣п╢п╣п╫п╫я▐.\n"
+"\n"
+
+#: src/nano.c:783
+#, c-format
+msgid "Option\t\tGNU long option\t\tMeaning\n"
+msgstr "п÷п╟я─п╟п╪п╣я┌я─\t\tп■п╬п╡пЁп╟ я└п╬я─п╪п╟\t\tп÷я─п╦п╥п╫п╟я┤п╣п╫п╫я▐\n"
+
+#. TRANSLATORS: The next forty or so strings are option descriptions
+#. * for the --help output.  Try to keep them at most 40 characters.
+#: src/nano.c:788
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Enable smart home key"
 msgstr "Дозволити мишу"
 
+<<<<<<< HEAD
 #: src/nano.c:829
 #, fuzzy
+=======
+#: src/nano.c:790
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Save backups of existing files"
 msgstr "Робити резервн╕ коп╕╖ ╕снуючих файл╕в при запису"
 
+<<<<<<< HEAD
 #: src/nano.c:830
 #, fuzzy
+=======
+#: src/nano.c:791
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "-C <dir>"
 msgstr "-o [дир]"
 
+<<<<<<< HEAD
 #: src/nano.c:830
+=======
+#: src/nano.c:791
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "--backupdir=<dir>"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/nano.c:831
+=======
+#: src/nano.c:792
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Directory for saving unique backup files"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/nano.c:834
+=======
+#: src/nano.c:795
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Use bold instead of reverse video text"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/nano.c:837
 msgid "Convert typed tabs to spaces"
 msgstr ""
@@ -1435,79 +2704,163 @@ msgid "Enable multiple file buffers"
 msgstr "Дозволити дек╕лька файлових буфер╕в"
 
 #: src/nano.c:845
+=======
+#: src/nano.c:797
+msgid "Convert typed tabs to spaces"
+msgstr "п÷п╣я─п╣я┌п╡п╬я─я▌п╡п╟я┌п╦ я┌п╟п╠я┐п╩я▐я├я√я≈ я┐ п©я─п╬п╠я√п╩п╦"
+
+#: src/nano.c:802
+msgid "Read a file into a new buffer by default"
+msgstr "п╒п╦п©п╬п╡п╬ я┤п╦я┌п╟я┌п╦ я└п╟п╧п╩ п╢п╬ п╫п╬п╡п╬пЁп╬ п╠я┐я└п╣я─п╟"
+
+#: src/nano.c:805
+msgid "Use (vim-style) lock files"
+msgstr "п▓п╦п╨п╬я─п╦я│я┌п╬п╡я┐п╡п╟я┌п╦ я└п╟п╧п╩п╦ п╠п╩п╬п╨я┐п╡п╟п╫п╫я▐ (я▐п╨ я┐ vim)"
+
+#: src/nano.c:810
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Log & read search/replace string history"
 msgstr "Вести журнал та читати ╕стор╕ю умов пошуку/зам╕ни"
 
+<<<<<<< HEAD
 #: src/nano.c:848
+=======
+#: src/nano.c:814
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Don't look at nanorc files"
 msgstr "Не дивитися в nanorc файли"
 
+<<<<<<< HEAD
 #: src/nano.c:851
+=======
+#: src/nano.c:817
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Fix numeric keypad key confusion problem"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/nano.c:853
+=======
+#: src/nano.c:819
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Don't add newlines to the ends of files"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/nano.c:856
+=======
+#: src/nano.c:822
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Don't convert files from DOS/Mac format"
 msgstr "Нема перетворювання ╕з DOS/Mac формату"
 
+<<<<<<< HEAD
 #: src/nano.c:858
 msgid "Use one more line for editing"
 msgstr ""
 
 #: src/nano.c:860
 #, fuzzy
+=======
+#: src/nano.c:824
+msgid "Use one more line for editing"
+msgstr "п▓п╦п╨п╬я─п╦я│я┌п╬п╡я┐п╡п╟я┌п╦ п╢п╬п╢п╟я┌п╨п╬п╡п╦п╧ я─я▐п╢п╬п╨ п╢п╩я▐ я─п╣п╢п╟пЁя┐п╡п╟п╫п╫я▐"
+
+#: src/nano.c:828
+msgid "Log & read location of cursor position"
+msgstr "п≈п╟п©п╦я│я┐п╡п╟я┌п╦ п╢п╬ п╤я┐я─п╫п╟п╩я┐ я√ я┤п╦я┌п╟я┌п╦ п©п╬п╥п╦я├я√я▌ п╨я┐я─я│п╬я─п╟"
+
+#: src/nano.c:831
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "-Q <str>"
 msgstr "-Q [рядок]"
 
+<<<<<<< HEAD
 #: src/nano.c:860
 #, fuzzy
+=======
+#: src/nano.c:831
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "--quotestr=<str>"
 msgstr "--quotestr=[рядок]"
 
+<<<<<<< HEAD
 #: src/nano.c:861
 #, fuzzy
+=======
+#: src/nano.c:831
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Quoting string"
 msgstr "Рядок посилання, по замовченню \"> \""
 
+<<<<<<< HEAD
 #: src/nano.c:863
+=======
+#: src/nano.c:834
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Restricted mode"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/nano.c:866
+=======
+#: src/nano.c:836
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Scroll by line instead of half-screen"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/nano.c:868
 #, fuzzy
+=======
+#: src/nano.c:838
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "-T <#cols>"
 msgstr "-r [#стовп]"
 
+<<<<<<< HEAD
 #: src/nano.c:868
 #, fuzzy
+=======
+#: src/nano.c:838
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "--tabsize=<#cols>"
 msgstr "--tabsize=[чис]"
 
+<<<<<<< HEAD
 #: src/nano.c:869
 #, fuzzy
+=======
+#: src/nano.c:839
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Set width of a tab to #cols columns"
 msgstr "Встановити розм╕р табуляц╕╖ =чис"
 
+<<<<<<< HEAD
 #: src/nano.c:871
+=======
+#: src/nano.c:841
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Do quick statusbar blanking"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/nano.c:874
+=======
+#: src/nano.c:843
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Print version information and exit"
 msgstr "Показати верс╕ю та вийти"
 
+<<<<<<< HEAD
 #: src/nano.c:877
+=======
+#: src/nano.c:846
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Detect word boundaries more accurately"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/nano.c:880
 #, fuzzy
 msgid "-Y <str>"
@@ -1520,26 +2873,74 @@ msgstr "--syntax [рядок]"
 
 #: src/nano.c:881
 #, fuzzy
+=======
+#: src/nano.c:847
+msgid "-X <str>"
+msgstr "-X <я─я▐п╢>"
+
+#: src/nano.c:847
+msgid "--wordchars=<str>"
+msgstr "--wordchars=<я─я▐п╢>"
+
+#: src/nano.c:848
+msgid "Which other characters are word parts"
+msgstr "п╞п╨я√ я√п╫я┬я√ я│п╦п╪п╡п╬п╩п╦ я■ я┤п╟я│я┌п╦п╫п╟п╪п╦ я│п╩я√п╡"
+
+#: src/nano.c:852
+msgid "-Y <name>"
+msgstr "-Y <п╫п╟п╥п╡п╟>"
+
+#: src/nano.c:852
+msgid "--syntax=<name>"
+msgstr "--syntax=<п╫п╟п╥п╡п╟>"
+
+#: src/nano.c:853
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Syntax definition to use for coloring"
 msgstr "Визначення синтаксису до використання"
 
+<<<<<<< HEAD
 #: src/nano.c:883
+=======
+#: src/nano.c:855
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Constantly show cursor position"
 msgstr "Пост╕йно показувати позиц╕ю курсора"
 
+<<<<<<< HEAD
 #: src/nano.c:885
 msgid "Fix Backspace/Delete confusion problem"
 msgstr ""
 
 #: src/nano.c:888
+=======
+#: src/nano.c:857
+msgid "Fix Backspace/Delete confusion problem"
+msgstr "п▓п╦п©я─п╟п╡п╦я┌п╦ п©я─п╬п╠п╩п╣п╪я┐ Backspace/Delete"
+
+#: src/nano.c:860
+msgid "Show cursor in file browser"
+msgstr "п÷п╬п╨п╟п╥я┐п╡п╟я┌п╦ п╨я┐я─я│п╬я─ я┐ п©п╣я─п╣пЁп╩я▐п╢п╟я┤я√ я└п╟п╧п╩я√п╡"
+
+#: src/nano.c:862
+msgid "Show this help text and exit"
+msgstr "п÷п╬п╨п╟п╥п╟я┌п╦ я┌п╣п╨я│я┌ я├я√я■я≈ п╢п╬п╡я√п╢п╨п╦ я√ п╥п╟п╡п╣я─я┬п╦я┌п╦ я─п╬п╠п╬я┌я┐"
+
+#: src/nano.c:864
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Automatically indent new lines"
 msgstr "Автоматично вир╕внювати нов╕ рядки"
 
+<<<<<<< HEAD
 #: src/nano.c:889
 #, fuzzy
+=======
+#: src/nano.c:865
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Cut from cursor to end of line"
 msgstr "Дозволити ^K вир╕зати в╕д курсора до к╕нця рядка"
 
+<<<<<<< HEAD
 #: src/nano.c:892
 msgid "Don't follow symbolic links, overwrite"
 msgstr "Не йти за с╕мл╕нками, але переписувати"
@@ -1551,100 +2952,201 @@ msgstr "Дозволити мишу"
 
 #: src/nano.c:897
 #, fuzzy
+=======
+#: src/nano.c:868
+msgid "Show line numbers in front of the text"
+msgstr "п÷п╬п╨п╟п╥я┐п╡п╟я┌п╦ п╫п╬п╪п╣я─п╦ я─я▐п╢п╨я√п╡ п©п╣я─п╣п╢ я┌п╣п╨я│я┌п╬п╪"
+
+#: src/nano.c:871
+msgid "Enable the use of the mouse"
+msgstr "п■п╬п╥п╡п╬п╩п╦я┌п╦ п╡п╦п╨п╬я─п╦я│я┌п╟п╫п╫я▐ п╪п╦я┬я√"
+
+#: src/nano.c:873
+msgid "Do not read the file (only write it)"
+msgstr "п²п╣ я┤п╦я┌п╟я┌п╦ я└п╟п╧п╩ (п╩п╦я┬п╣ п╥п╟п©п╦я│я┐п╡п╟я┌п╦ п╢п╬ п╫я▄п╬пЁп╬)"
+
+#: src/nano.c:875
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "-o <dir>"
 msgstr "-o [дир]"
 
+<<<<<<< HEAD
 #: src/nano.c:897
 #, fuzzy
+=======
+#: src/nano.c:875
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "--operatingdir=<dir>"
 msgstr "--operatingdir=[дир]"
 
+<<<<<<< HEAD
 #: src/nano.c:898
+=======
+#: src/nano.c:876
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Set operating directory"
 msgstr "Встановити робочий каталог"
 
+<<<<<<< HEAD
 #: src/nano.c:901
+=======
+#: src/nano.c:878
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Preserve XON (^Q) and XOFF (^S) keys"
 msgstr "Зберегти клав╕ши XON (^Q) та XOFF (^S)"
 
+<<<<<<< HEAD
 #: src/nano.c:903
+=======
+#: src/nano.c:882
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Silently ignore startup issues like rc file errors"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/nano.c:905
 #, fuzzy
+=======
+#: src/nano.c:885
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "-r <#cols>"
 msgstr "-r [#стовп]"
 
+<<<<<<< HEAD
 #: src/nano.c:905
 #, fuzzy
+=======
+#: src/nano.c:885
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "--fill=<#cols>"
 msgstr "--fill=[#стовп]"
 
+<<<<<<< HEAD
 #: src/nano.c:906
 msgid "Set wrapping point at column #cols"
 msgstr ""
 
 #: src/nano.c:909
 #, fuzzy
+=======
+#: src/nano.c:886
+msgid "Set hard-wrapping point at column #cols"
+msgstr "п▓я│я┌п╟п╫п╬п╡п╦я┌п╦ п╥п╫п╟я┤п╣п╫п╫я▐ п©п╬п╥п╦я├я√я≈ п╤п╬я─я│я┌п╨п╬пЁп╬ п©п╣я─п╣п╫п╣я│п╣п╫п╫я▐ #п©п╬п╥"
+
+#: src/nano.c:890
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "-s <prog>"
 msgstr "-s [прог]"
 
+<<<<<<< HEAD
 #: src/nano.c:909
 #, fuzzy
+=======
+#: src/nano.c:890
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "--speller=<prog>"
 msgstr "--speller=[прог]"
 
+<<<<<<< HEAD
 #: src/nano.c:910
+=======
+#: src/nano.c:891
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Enable alternate speller"
 msgstr "Альтернативна програма перев╕рки правопису"
 
+<<<<<<< HEAD
 #: src/nano.c:913
+=======
+#: src/nano.c:893
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Auto save on exit, don't prompt"
 msgstr "АвтоЗапис при виход╕, без запитань"
 
+<<<<<<< HEAD
 #: src/nano.c:915
 msgid "Allow generic undo [EXPERIMENTAL]"
 msgstr ""
 
 #: src/nano.c:918
 #, fuzzy
+=======
+#: src/nano.c:895
+msgid "Save a file by default in Unix format"
+msgstr "п╒п╦п©п╬п╡п╬ п╥п╠п╣я─я√пЁп╟я┌п╦ я└п╟п╧п╩ я┐ я└п╬я─п╪п╟я┌я√ Unix"
+
+#: src/nano.c:897
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "View mode (read-only)"
 msgstr "Режим переглядання (т╕льки читання)"
 
+<<<<<<< HEAD
 #: src/nano.c:920
 msgid "Don't wrap long lines"
 msgstr "Не загортати довг╕ рядки"
 
 #: src/nano.c:922
 #, fuzzy
+=======
+#: src/nano.c:899
+msgid "Don't hard-wrap long lines"
+msgstr "п²п╣ п©п╣я─п╣п╫п╬я│п╦я┌п╦ п╫п╟п╢я┌п╬ п╢п╬п╡пЁя√ я─я▐п╢п╨п╦ п╤п╬я─я│я┌п╨п╬"
+
+#: src/nano.c:901
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Don't show the two help lines"
 msgstr "Не показувати в╕кно допомоги"
 
+<<<<<<< HEAD
 #: src/nano.c:923
 #, fuzzy
+=======
+#: src/nano.c:903
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Enable suspension"
 msgstr "Дозволити призупинку"
 
+<<<<<<< HEAD
 #: src/nano.c:924
+=======
+#: src/nano.c:905
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Enable soft line wrapping"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/nano.c:928
 msgid "(ignored, for Pico compatibility)"
 msgstr "(╕гноровано, для сум╕сност╕ ╕з Pico)"
 
 #: src/nano.c:938
+=======
+#: src/nano.c:917
+#, c-format
+msgid " GNU nano, version %s\n"
+msgstr " GNU nano п╡п╣я─я│я√я≈ %s\n"
+
+#: src/nano.c:920
+>>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid " GNU nano version %s (compiled %s, %s)\n"
 msgstr " GNU nano верс╕╖ %s (з╕бране %s, %s)\n"
 
+<<<<<<< HEAD
 #: src/nano.c:943
 #, c-format
 msgid " Email: nano@nano-editor.org\tWeb: http://www.nano-editor.org/"
 msgstr " Е-пошта: nano@nano-editor.org\tТенета: http://www.nano-editor.org"
 
 #: src/nano.c:944
+=======
+#: src/nano.c:922
+#, c-format
+msgid " Email: nano@nano-editor.org\tWeb: https://nano-editor.org/"
+msgstr " п∙п╩. п©п╬я┬я┌п╟: nano@nano-editor.org\tп├п╫я┌п╣я─п╫п╣я┌: https://nano-editor.org/"
+
+#: src/nano.c:923
+>>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid ""
 "\n"
@@ -1653,6 +3155,7 @@ msgstr ""
 "\n"
 " З╕брано з опц╕ями:"
 
+<<<<<<< HEAD
 #: src/nano.c:1022
 msgid "Sorry, support for this function has been disabled"
 msgstr "Вибачте, п╕дтримка ц╕╓╖ функц╕╖ було заборонено"
@@ -1662,92 +3165,216 @@ msgid "Save modified buffer (ANSWERING \"No\" WILL DESTROY CHANGES) ? "
 msgstr "Зберегти зм╕нений буфер (В╕дпов╕дь \"Н╕\" СКАСУ╢ ВС╤ ЗМ╤НИ) ? "
 
 #: src/nano.c:1088
+=======
+#: src/nano.c:1069
+msgid "No file name"
+msgstr "п²п╣п╪п╟я■ п╫п╟п╥п╡п╦ я└п╟п╧п╩п╟"
+
+#: src/nano.c:1071
+msgid "Save modified buffer?  (Answering \"No\" will DISCARD changes.) "
+msgstr "п≈п╠п╣я─п╣пЁя┌п╦ п╥п╪я√п╫п╦ я┐ п╠я┐я└п╣я─я√? (п▓я√п╢п©п╬п╡я√п╢я▄ б╚п²я√б╩ п©я─п╦п╥п╡п╣п╢п╣ п╢п╬ п▓п╒п═п░п╒п≤ п╥п╪я√п╫.) "
+
+#: src/nano.c:1132
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Couldn't reopen stdin from keyboard, sorry\n"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/nano.c:1114
+=======
+#: src/nano.c:1156
+>>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Reading from stdin, ^C to abort\n"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/nano.c:1182
+=======
+#: src/nano.c:1230
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Received SIGHUP or SIGTERM\n"
 msgstr "Прийнято SIGHUP або SIGTERM\n"
 
+<<<<<<< HEAD
 #: src/nano.c:1204
 #, fuzzy, c-format
 msgid "Use \"fg\" to return to nano.\n"
 msgstr "Користуйтеся командою \"fg\" для того, щоб повернутися до nano"
 
 #: src/nano.c:1386
+=======
+#: src/nano.c:1246
+#, c-format
+msgid "Use \"fg\" to return to nano.\n"
+msgstr "п▓п╦п╨п╬я─п╦я│я┌п╬п╡я┐п╧я┌п╣ б╚fgб╩ п╢п╩я▐ п©п╬п╡п╣я─п╫п╣п╫п╫я▐ я┐ nano\n"
+
+#: src/nano.c:1272
+msgid "Suspension is not enabled"
+msgstr "п÷я─п╦п╥я┐п©п╦п╫п╣п╫п╫я▐ п╫п╣ я┐п╡я√п╪п╨п╫п╣п╫п╬"
+
+#: src/nano.c:1424
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "enabled"
 msgstr "дозволено"
 
+<<<<<<< HEAD
 #: src/nano.c:1387
+=======
+#: src/nano.c:1424
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "disabled"
 msgstr "заборонено"
 
+<<<<<<< HEAD
 #: src/nano.c:1548 src/winio.c:1256
 msgid "Unknown Command"
 msgstr ""
 
 #: src/nano.c:1674
 #, fuzzy
+=======
+#: src/nano.c:1561
+msgid "Unbound key"
+msgstr "п²п╣п©п╬п╡Б─≥я▐п╥п╟п╫п╟ п╨п╬п╪п╠я√п╫п╟я├я√я▐"
+
+#: src/nano.c:1564
+msgid "Unbindable key: M-["
+msgstr "п²п╣п©п╬п╡Б─≥я▐п╥п╟п╫п╟ п╨п╬п╪п╠я√п╫п╟я├я√я▐: M-["
+
+#: src/nano.c:1566
+#, c-format
+msgid "Unbound key: M-%c"
+msgstr "п²п╣п©п╬п╡Б─≥я▐п╥п╟п╫п╟ п╨п╬п╪п╠я√п╫п╟я├я√я▐: M-%c"
+
+#: src/nano.c:1568
+#, c-format
+msgid "Unbound key: ^%c"
+msgstr "п²п╣п©п╬п╡Б─≥я▐п╥п╟п╫п╟ п╨п╬п╪п╠я√п╫п╟я├я√я▐: ^%c"
+
+#: src/nano.c:1570
+#, c-format
+msgid "Unbound key: %c"
+msgstr "п²п╣п©п╬п╡Б─≥я▐п╥п╟п╫п╟ п╨п╬п╪п╠я√п╫п╟я├я√я▐: %c"
+
+#: src/nano.c:1743
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "XON ignored, mumble mumble"
 msgstr "XON игноровано, мур-мур-мур"
 
+<<<<<<< HEAD
 #: src/nano.c:1679
 #, fuzzy
+=======
+#: src/nano.c:1748
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "XOFF ignored, mumble mumble"
 msgstr "XOFF игноровано, прим-п╕м-п╕м"
 
+<<<<<<< HEAD
 #: src/nano.c:2209 src/rcfile.c:1100
 #, fuzzy, c-format
+=======
+#: src/nano.c:2121 src/rcfile.c:1218
+#, c-format
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Requested tab size \"%s\" is invalid"
 msgstr "запрошений розм╕р табуляц╕╖ %d ╓ некоректним"
 
+<<<<<<< HEAD
 #: src/nano.c:2268 src/rcfile.c:1025
 #, fuzzy, c-format
 msgid "Requested fill size \"%s\" is invalid"
 msgstr "запитаний розм╕р заповнення %d ╓ некоректним"
+=======
+#: src/nano.c:2188 src/rcfile.c:1155
+#, c-format
+msgid "Requested fill size \"%s\" is invalid"
+msgstr "п²п╟п╢я√я│п╩п╟п╫п╬ п╥п╟п©п╦я┌ п╫п╟ п╫п╣п╨п╬я─п╣п╨я┌п╫п╦п╧ я─п╬п╥п╪я√я─ п╥п╟п©п╬п╡п╫п╣п╫п╫я▐ б╚%sб╩"
+
+#: src/nano.c:2242
+#, c-format
+msgid "Type '%s -h' for a list of available options.\n"
+msgstr "п▓п╡п╣п╢я√я┌я▄ п╨п╬п╪п╟п╫п╢я┐ б╚%s -hб╩, я┴п╬п╠ п╬я┌я─п╦п╪п╟я┌п╦ я│п©п╦я│п╬п╨ п╢п╬я│я┌я┐п©п╫п╦я┘ п©п╟я─п╟п╪п╣я┌я─я√п╡.\n"
+>>>>>>> origin/tomato-shibby-RT-AC
+
+#: src/nano.c:2546 src/nano.c:2572 src/search.c:855
+msgid "Invalid line or column number"
+msgstr "п²п╣п╨п╬я─п╣п╨я┌п╫п╦п╧ п╫п╬п╪п╣я─ я─я▐п╢п╨п╟ п╟п╠п╬ п©п╬п╥п╦я├я√я≈"
 
 #. TRANSLATORS: For the next three strings, if possible, specify
 #. * the single-byte shortcuts for both your language and English.
+<<<<<<< HEAD
 #. * For example, in French: "OoYy" for "Oui".
 #: src/prompt.c:1259
+=======
+#. * For example, in French: "OoYy", for both "Oui" and "Yes".
+#: src/prompt.c:696
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Yy"
 msgstr "YyТт"
 
+<<<<<<< HEAD
 #: src/prompt.c:1260
+=======
+#: src/prompt.c:697
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Nn"
 msgstr "NnНн"
 
+<<<<<<< HEAD
 #: src/prompt.c:1261
+=======
+#: src/prompt.c:698
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Aa"
 msgstr "AaВв"
 
+<<<<<<< HEAD
 #: src/prompt.c:1275
+=======
+#: src/prompt.c:721
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Yes"
 msgstr "Так"
 
+<<<<<<< HEAD
 #: src/prompt.c:1280
+=======
+#: src/prompt.c:726
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "All"
 msgstr "Все"
 
+<<<<<<< HEAD
 #: src/prompt.c:1285
+=======
+#: src/prompt.c:731
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "No"
 msgstr "Н╕"
 
+<<<<<<< HEAD
 #: src/rcfile.c:130
 #, fuzzy, c-format
+=======
+#: src/rcfile.c:154
+#, c-format
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Error in %s on line %lu: "
 msgstr "Помилка в %s у рядку %d: "
 
+<<<<<<< HEAD
 #: src/rcfile.c:185
 #, fuzzy, c-format
+=======
+#: src/rcfile.c:213
+#, c-format
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Argument '%s' has an unterminated \""
 msgstr "аргумент %s ма╓ зак╕нчуватися на \""
 
+<<<<<<< HEAD
 #: src/rcfile.c:212 src/rcfile.c:264 src/rcfile.c:711 src/rcfile.c:768
 #: src/rcfile.c:821
 #, fuzzy
@@ -1761,13 +3388,35 @@ msgid "Bad regex \"%s\": %s"
 msgstr "Не в╕рний регулярний вираз \"%s\": %s"
 
 #: src/rcfile.c:258
+=======
+#: src/rcfile.c:241 src/rcfile.c:693 src/rcfile.c:748 src/rcfile.c:852
+msgid "Regex strings must begin and end with a \" character"
+msgstr ""
+"п═я▐п╢п╨п╦ я└п╬я─п╪п╟п╩я▄п╫п╦я┘ п╡п╦я─п╟п╥я√п╡ п©п╬п╡п╦п╫п╫я√ п©п╬я┤п╦п╫п╟я┌п╦я│я▐ я┌п╟ п╥п╟п╨я√п╫я┤я┐п╡п╟я┌п╦я│я▐ п╩п╟п©п╨п╟п╪п╦ (\")"
+
+#: src/rcfile.c:267 src/search.c:54
+#, c-format
+msgid "Bad regex \"%s\": %s"
+msgstr "п²п╣ п╡я√я─п╫п╦п╧ я└п╬я─п╪п╟п╩я▄п╫п╦п╧ п╡п╦я─п╟п╥ б╚%sб╩: %s"
+
+#: src/rcfile.c:289
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Missing syntax name"
 msgstr "В╕дсутня назва синтаксису"
 
+<<<<<<< HEAD
 #: src/rcfile.c:316
+=======
+#: src/rcfile.c:298
+msgid "A syntax name must be quoted"
+msgstr "п²п╟п╥п╡я┐ я│п╦п╫я┌п╟п╨я│п╦я│я┐ я│п╩я√п╢ п╡п╨п╟п╥я┐п╡п╟я┌п╦ я┐ п╩п╟п©п╨п╟я┘"
+
+#: src/rcfile.c:307
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "The \"none\" syntax is reserved"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/rcfile.c:323
 msgid "The \"default\" syntax must take no extensions"
 msgstr ""
@@ -1779,8 +3428,39 @@ msgstr "В╕дсутня назва синтаксису"
 
 #: src/rcfile.c:398 src/rcfile.c:499
 msgid "keybindings must begin with \"^\", \"M\", or \"F\""
+=======
+#: src/rcfile.c:337
+msgid "The \"default\" syntax does not accept extensions"
+msgstr "п║п╦п╫я┌п╟п╨я│п╦я│ б╚defaultб╩ п╫п╣ п╪п╬п╤п╣ п╪п╟я┌п╦ я─п╬п╥я┬п╦я─п╣п╫я▄"
+
+#: src/rcfile.c:377
+msgid "Missing key name"
+msgstr "п▓я√п╢я│я┐я┌п╫я▐ п╫п╟п╥п╡п╟ п╨п╩п╟п╡я√я┬я√"
+
+#: src/rcfile.c:386 src/rcfile.c:397
+msgid "Key name is too short"
+msgstr "п²п╟п╥п╡п╟ п╨п╩п╟п╡я√я┬я√ я■ п╫п╟п╢я┌п╬ п╨п╬я─п╬я┌п╨п╬я▌"
+
+#: src/rcfile.c:407
+msgid "Key name must begin with \"^\", \"M\", or \"F\""
+msgstr "п²п╟п╥п╡п╟ п╨п╩п╟п╡я√я┬я√ п╪п╟я■ п©п╬я┤п╦п╫п╟я┌п╦я│я▐ п╥ б╚^б╩, б╚Mб╩ п╟п╠п╬ б╚Fб╩"
+
+#: src/rcfile.c:415
+#, c-format
+msgid "Key name %s is invalid"
+msgstr "п²п╟п╥п╡п╟ п╨п╩я▌я┤п╟ %s я■ п╫п╣п╨п╬я─п╣п╨я┌п╫п╬я▌"
+
+#: src/rcfile.c:424
+msgid "Must specify a function to bind the key to"
+msgstr "п■п╩я▐ п©я─п╦п╡Б─≥я▐п╥я┐п╡п╟п╫п╫я▐ п╨п╩п╟п╡я√я┬я√ я│п╩я√п╢ п╡п╨п╟п╥п╟я┌п╦ я└я┐п╫п╨я├я√я▌"
+
+#. TRANSLATORS: Do not translate the word "all".
+#: src/rcfile.c:434
+msgid "Must specify a menu (or \"all\") in which to bind/unbind the key"
+>>>>>>> origin/tomato-shibby-RT-AC
 msgstr ""
 
+<<<<<<< HEAD
 #: src/rcfile.c:407
 msgid "Must specify function to bind key to"
 msgstr ""
@@ -1800,12 +3480,40 @@ msgid "Could not map name \"%s\" to a menu"
 msgstr "Не можу виконати \"%s\""
 
 #: src/rcfile.c:454
+=======
+#: src/rcfile.c:441
+#, c-format
+msgid "Cannot map name \"%s\" to a function"
+msgstr "п²п╣ п╪п╬п╤п╫п╟ п©п╬п╡Б─≥я▐п╥п╟я┌п╦ п╫п╟п╥п╡я┐ б╚%sб╩ п╥ я└я┐п╫п╨я├я√я■я▌"
+
+#: src/rcfile.c:448
+#, c-format
+msgid "Cannot map name \"%s\" to a menu"
+msgstr "п²п╣п╪п╬п╤п╩п╦п╡п╬ п©п╬п╡Б─≥я▐п╥п╟я┌п╦ п╫п╟п╥п╡я┐ б╚%sб╩ п╥ п╪п╣п╫я▌"
+
+#: src/rcfile.c:482
+#, c-format
+msgid "Function '%s' does not exist in menu '%s'"
+msgstr "пё п╪п╣п╫я▌ б╚%2$sб╩ п╫п╣п╪п╟я■ п©я┐п╫п╨я┌я┐ б╚%1$sб╩"
+
+#: src/rcfile.c:492
+#, c-format
+msgid "Sorry, keystroke \"%s\" may not be rebound"
+msgstr "п▓п╦п╠п╟я┤я┌п╣, п©я─п╦п╥п╫п╟я┤п╣п╫п╫я▐ б╚%sб╩ п╥п╪я√п╫я▌п╡п╟я┌п╦ п╫п╣ п╪п╬п╤п╫п╟"
+
+#: src/rcfile.c:596
+>>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Sorry, keystr \"%s\" is an illegal binding"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/rcfile.c:625
 #, fuzzy, c-format
+=======
+#: src/rcfile.c:635
+#, c-format
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid ""
 "Color \"%s\" not understood.\n"
 "Valid colors are \"green\", \"red\", \"blue\",\n"
@@ -1818,6 +3526,7 @@ msgstr ""
 "\"white\", \"yellow\", \"cyan\", \"magenta\" та \n"
 "\"black\", з опц╕ональним преф╕ксом \"bright\".\n"
 
+<<<<<<< HEAD
 #: src/rcfile.c:647
 #, fuzzy
 msgid "Cannot add a color command without a syntax command"
@@ -1846,21 +3555,77 @@ msgid "Cannot add a header regex without a syntax command"
 msgstr "Не можу додати команду кольору без рядка синтаксису"
 
 #: src/rcfile.c:874
+=======
+#: src/rcfile.c:656 src/rcfile.c:823 src/rcfile.c:886
+#, c-format
+msgid "A '%s' command requires a preceding 'syntax' command"
+msgstr ""
+"п▓п╦п╨п╬я─п╦я│я┌п╟п╫п╫я▐ п╨п╬п╪п╟п╫п╢п╦ б╚%sб╩ п©п╬я┌я─п╣п╠я┐я■ п©п╬п©п╣я─п╣п╢п╫я▄п╬пЁп╬ п╡п╦п╨п╬я─п╦я│я┌п╟п╫п╫я▐ п╨п╬п╪п╟п╫п╢п╦ б╚syntaxб╩"
+
+#: src/rcfile.c:662
+msgid "Missing color name"
+msgstr "п▓я√п╢я│я┐я┌п╫я▐ п╫п╟п╥п╡п╟ п╨п╬п╩я▄п╬я─я┐"
+
+#: src/rcfile.c:672 src/rcfile.c:835
+#, c-format
+msgid "Missing regex string after '%s' command"
+msgstr "п²п╣ п╡п╦я│я┌п╟я┤п╟я■ я─я▐п╢п╨п╟ я└п╬я─п╪п╟п╩я▄п╫п╬пЁп╬ п╡п╦я─п╟п╥я┐ п©я√я│п╩я▐ п╨п╬п╪п╟п╫п╢п╦ б╚%sб╩"
+
+#: src/rcfile.c:704 src/rcfile.c:758
+msgid "Empty regex string"
+msgstr "п÷п╬я─п╬п╤п╫я√п╧ я└п╬я─п╪п╟п╩я▄п╫п╦п╧ п╡п╦я─п╟п╥"
+
+#: src/rcfile.c:742
+msgid "\"start=\" requires a corresponding \"end=\""
+msgstr "\"start=\" п©п╬я┌я─п╣п╠я┐я■ п╡я√п╢п©п╬п╡я√п╢п╫п╬пЁп╬ \"end=\""
+
+#: src/rcfile.c:796
+#, c-format
+msgid "Background color \"%s\" cannot be bright"
+msgstr "п п╬п╩я√я─ я┌п╩п╟ б╚%sб╩ п╫п╣ п╪п╬п╤п╣ п╠я┐я┌п╦ я│п╡я√я┌п╩п╦п╪"
+
+#: src/rcfile.c:830
+#, c-format
+msgid "The \"default\" syntax does not accept '%s' regexes"
+msgstr "п║п╦п╫я┌п╟п╨я│п╦я│ б╚defaultб╩ п╫п╣ п╪п╬п╤п╣ п╡п╦п╨п╬я─п╦я│я┌п╬п╡я┐п╡п╟я┌п╦ я└п╬я─п╪п╟п╩я▄п╫я√ п╡п╦я─п╟п╥п╦ б╚%sб╩"
+
+#: src/rcfile.c:891
+#, c-format
+msgid "Missing command after '%s'"
+msgstr "п²п╣ п╡п╦я│я┌п╟я┤п╟я■ п╨п╬п╪п╟п╫п╢п╦ п©я√я│п╩я▐ б╚%sб╩"
+
+#: src/rcfile.c:907
+#, c-format
+msgid "Argument of '%s' lacks closing \""
+msgstr "п░я─пЁя┐п╪п╣п╫я┌ б╚%sб╩, п╫п╣ п╡п╦я│я┌п╟я┤п╟я■ п╥п╟п╡п╣я─я┬п╟п╩я▄п╫п╬я≈ \""
+
+#: src/rcfile.c:938
+>>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Fatal error: no keys mapped for function \"%s\""
 msgstr ""
 
+<<<<<<< HEAD
 #: src/rcfile.c:876
+=======
+#: src/rcfile.c:940
+#, c-format
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid ""
 "Exiting.  Please use nano with the -I option if needed to adjust your nanorc "
 "settings\n"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/rcfile.c:926 src/rcfile.c:935 src/rcfile.c:945
+=======
+#: src/rcfile.c:995
+>>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Command \"%s\" not allowed in included file"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/rcfile.c:951 src/rcfile.c:1128
 #, c-format
 msgid "Syntax \"%s\" has no color commands"
@@ -1886,23 +3651,77 @@ msgid "Option is not a valid multibyte string"
 msgstr ""
 
 #: src/rcfile.c:1038 src/rcfile.c:1066 src/rcfile.c:1075
+=======
+#: src/rcfile.c:1017 src/rcfile.c:1229
+#, c-format
+msgid "Syntax \"%s\" has no color commands"
+msgstr "п║п╦п╫я┌п╟п╨я│п╦я│ б╚%sб╩ п╫п╣ п╪п╟я■ п╨п╬п╩я√я─п╫п╦я┘ п╨п╬п╪п╟п╫п╢"
+
+#: src/rcfile.c:1048
+#, c-format
+msgid "Command \"%s\" not allowed in included file"
+msgstr "п п╬п╪п╟п╫п╢п╟ б╚%sб╩ п╫п╣ п╢п╬п╥п╡п╬п╩п╣п╫п╟ я┐ п╡п╨п╩я▌я┤п╣п╫п╬п╪я┐ я└п╟п╧п╩я√"
+
+#: src/rcfile.c:1063
+#, c-format
+msgid "Command \"%s\" not understood"
+msgstr "п²п╣ п╥я─п╬п╥я┐п╪я√п╩п╟ п╨п╬п╪п╟п╫п╢п╟ б╚%sб╩"
+
+#: src/rcfile.c:1075
+msgid "Missing option"
+msgstr "п÷я─п╬п©я┐я┴п╣п╫п╬ п©п╟я─п╟п╪п╣я┌я─"
+
+#: src/rcfile.c:1089
+#, c-format
+msgid "Unknown option \"%s\""
+msgstr "п²п╣п╡я√п╢п╬п╪п╦п╧ п©п╟я─п╟п╪п╣я┌я─ б╚%sб╩"
+
+#: src/rcfile.c:1102
+#, c-format
+msgid "Cannot unset option \"%s\""
+msgstr "п²п╣п╪п╬п╤п╩п╦п╡п╬ я│п╨п╟я│я┐п╡п╟я┌п╦ п╡п╦п╥п╫п╟я┤п╣п╫п╫я▐ п©п╟я─п╟п╪п╣я┌я─п╟ б╚%sб╩"
+
+#: src/rcfile.c:1114
+#, c-format
+msgid "Option \"%s\" requires an argument"
+msgstr "п·п©я├я√я▐ б╚%sб╩ п╡п╦п╪п╟пЁп╟я■ п╟я─пЁя┐п╪п╣п╫я┌"
+
+#: src/rcfile.c:1130
+msgid "Argument is not a valid multibyte string"
+msgstr "п░я─пЁя┐п╪п╣п╫я┌ п╫п╣ я■ п╨п╬я─п╣п╨я┌п╫п╦п╪ п╠п╟пЁп╟я┌п╬п╠п╟п╧я┌п╬п╡п╦п╪ я─я▐п╢п╨п╬п╪"
+
+#: src/rcfile.c:1167 src/rcfile.c:1188 src/rcfile.c:1195
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Non-blank characters required"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/rcfile.c:1048
+=======
+#: src/rcfile.c:1174
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Two single-column characters required"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/rcfile.c:1114
 #, fuzzy, c-format
 msgid "Cannot unset flag \"%s\""
 msgstr "скиньте флаг %d!\n"
 
 #: src/rcfile.c:1123
+=======
+#: src/rcfile.c:1283
+msgid "I can't find my home directory!  Wah!"
+msgstr "п╞ п╫п╣ п╪п╬п╤я┐ п╥п╫п╟п╧я┌п╦ я│п╡п╬я▌ п╢п╬п╪я√п╡п╨я┐! п√п╟я┘!"
+
+#: src/rcfile.c:1298
+>>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Unknown flag \"%s\""
 msgstr ""
 
+<<<<<<< HEAD
 #: src/rcfile.c:1182
 msgid "I can't find my home directory!  Wah!"
 msgstr "Я не можу знайти свою дом╕вку! Жах!"
@@ -1914,56 +3733,141 @@ msgstr "\"%s\" не знайдено"
 
 #: src/search.c:205
 #, fuzzy
+=======
+#: src/search.c:87
+#, c-format
+msgid "\"%.*s%s\" not found"
+msgstr "\"%.*s%s\" п╫п╣ п╥п╫п╟п╧п╢п╣п╫п╬"
+
+#. TRANSLATORS: The next three modify the search prompt.
+#: src/search.c:154
+msgid " [Case Sensitive]"
+msgstr " [п═п╣пЁп≈п╟п╩п╣п╤]"
+
+#: src/search.c:155
+msgid " [Regexp]"
+msgstr " [п╓п╬я─п╪п▓п╦я─]"
+
+#: src/search.c:156
+msgid " [Backwards]"
+msgstr " [п²п╟п╥п╟п╢]"
+
+#. TRANSLATORS: The next two modify the search prompt.
+#: src/search.c:159
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid " (to replace) in selection"
 msgstr " (до зам╕ни)"
 
+<<<<<<< HEAD
 #: src/search.c:207
 msgid " (to replace)"
 msgstr " (до зам╕ни)"
 
 #: src/search.c:784
+=======
+#: src/search.c:161
+msgid " (to replace)"
+msgstr " (п╢п╬ п╥п╟п╪я√п╫п╦)"
+
+#. TRANSLATORS: This is shown when searching takes
+#. * more than half a second.
+#: src/search.c:264
+msgid "Searching..."
+msgstr "п╗я┐п╨п╟я■п╪п╬Б─╕"
+
+#. TRANSLATORS: This is a prompt.
+#: src/search.c:628
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Replace this instance?"
 msgstr "Зам╕нити цей прим╕рник?"
 
+<<<<<<< HEAD
 #: src/search.c:962
+=======
+#. TRANSLATORS: This is a prompt.
+#: src/search.c:765
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Replace with"
 msgstr "Зам╕нити на"
 
+<<<<<<< HEAD
 #: src/search.c:1004
 #, fuzzy, c-format
+=======
+#: src/search.c:797
+#, c-format
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Replaced %lu occurrence"
 msgid_plural "Replaced %lu occurrences"
 msgstr[0] "Зам╕нено %d входження"
 msgstr[1] "Зам╕нен╕ %d входження"
 msgstr[2] "Зам╕нено %d входжень"
 
+<<<<<<< HEAD
 #: src/search.c:1034
 #, fuzzy
+=======
+#. TRANSLATORS: This is a prompt.
+#: src/search.c:833
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Enter line number, column number"
 msgstr "Введ╕ть номер рядка"
 
+<<<<<<< HEAD
 #: src/search.c:1061
 msgid "Invalid line or column number"
 msgstr ""
 
 #: src/search.c:1214
+=======
+#: src/search.c:1019
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Not a bracket"
 msgstr "Не дужка"
 
+<<<<<<< HEAD
 #: src/search.c:1281
+=======
+#: src/search.c:1085
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "No matching bracket"
 msgstr "Нема в╕дпов╕дно╖ дужки"
 
+<<<<<<< HEAD
 #: src/text.c:54
+=======
+#: src/text.c:66
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Mark Set"
 msgstr "М╕тку встановлено"
 
+<<<<<<< HEAD
 #: src/text.c:58
 #, fuzzy
 msgid "Mark Unset"
 msgstr "М╕тку знято"
 
 #: src/text.c:443
+=======
+#: src/text.c:71
+msgid "Mark Unset"
+msgstr "п°я√я┌п╨я┐ п╥п╫я▐я┌п╬"
+
+#: src/text.c:83
+#, c-format
+msgid "Error invoking \"%s\""
+msgstr "п÷п╬п╪п╦п╩п╨п╟ п╡п╦п╨п╬п╫п╟п╫п╫я▐ б╚%sб╩"
+
+#: src/text.c:476
+msgid "Commenting is not supported for this file type"
+msgstr "п■п╬п╢п╟п╡п╟п╫п╫я▐ п╨п╬п╪п╣п╫я┌п╟я─я√п╡ я┐ я└п╟п╧п╩п╟я┘ я├я▄п╬пЁп╬ я┌п╦п©я┐ п╫п╣ п©п╣я─п╣п╢п╠п╟я┤п╣п╫п╬"
+
+#: src/text.c:492
+msgid "Cannot comment past end of file"
+msgstr "п²п╣ п╪п╬п╤п╫п╟ п╥п╟п╨п╬п╪п╣п╫я┌я┐п╡п╟я┌п╦ п╢п╟п╫я√ п╥п╟ п╨я√п╫я├п╣п╪ я└п╟п╧п╩п╟"
+
+#: src/text.c:685
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Nothing in undo buffer!"
 msgstr ""
 
@@ -1972,12 +3876,22 @@ msgstr ""
 msgid "Internal error: can't match line %d.  Please save your work"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/text.c:466 src/text.c:603
+=======
+#. TRANSLATORS: Eight of the next nine strings describe actions
+#. * that are undone or redone.  It are all nouns, not verbs.
+#: src/text.c:703 src/text.c:732 src/text.c:864 src/text.c:905
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "text add"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/text.c:475 src/text.c:613
 #, fuzzy
+=======
+#: src/text.c:713 src/text.c:875
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "text delete"
 msgstr "Наступний файл"
 
@@ -1985,62 +3899,130 @@ msgstr "Наступний файл"
 msgid "line wrap"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/text.c:503 src/text.c:636
+=======
+#: src/text.c:736 src/text.c:914
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "line join"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/text.c:514 src/text.c:651
+=======
+#: src/text.c:755 src/text.c:930
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "text cut"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/text.c:518 src/text.c:655
 msgid "text uncut"
+=======
+#: src/text.c:760 src/text.c:934
+msgid "text uncut"
+msgstr "я│п╨п╟я│я┐п╡п╟п╫п╫я▐ п╬п╠я─я√п╥п╨п╦ я┌п╣п╨я│я┌я┐"
+
+#: src/text.c:766 src/text.c:910
+msgid "Internal error: line is missing.  Please save your work."
+>>>>>>> origin/tomato-shibby-RT-AC
 msgstr ""
 
+<<<<<<< HEAD
 #: src/text.c:522 src/text.c:622
 msgid "line break"
 msgstr ""
 
 #: src/text.c:532 src/text.c:665
 #, fuzzy
+=======
+#: src/text.c:770 src/text.c:884
+msgid "line break"
+msgstr "я─п╬п╥я─п╦п╡ я─я▐п╢п╨п╟"
+
+#: src/text.c:780 src/text.c:954
+msgid "comment"
+msgstr "п╥п╟п╨п╬п╪п╣п╫я┌я┐п╡п╟я┌п╦"
+
+#: src/text.c:784 src/text.c:958
+msgid "uncomment"
+msgstr "я─п╬п╥п╨п╬п╪п╣п╫я┌я┐п╡п╟я┌п╦"
+
+#: src/text.c:788 src/text.c:945
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "text insert"
 msgstr "Наступний файл"
 
+<<<<<<< HEAD
 #: src/text.c:550 src/text.c:659
 #, fuzzy
+=======
+#: src/text.c:805 src/text.c:938
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "text replace"
 msgstr " (до зам╕ни)"
 
+<<<<<<< HEAD
 #: src/text.c:557 src/text.c:671
 msgid "Internal error: unknown type.  Please save your work"
 msgstr ""
 
 #: src/text.c:563
+=======
+#: src/text.c:812 src/text.c:962 src/text.c:1283 src/text.c:1447
+msgid "Internal error: unknown type.  Please save your work."
+msgstr "п▓п╫я┐я┌я─я√я┬п╫я▐ п©п╬п╪п╦п╩п╨п╟: п╫п╣п╡я√п╢п╬п╪п╦п╧ я┌п╦п©. п≈п╠п╣я─п╣п╤я√я┌я▄ я│п╡п╬я▌ я─п╬п╠п╬я┌я┐"
+
+#: src/text.c:818
+>>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Undid action (%s)"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/text.c:578
+=======
+#: src/text.c:839
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Nothing to re-do!"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/text.c:582
 msgid "Internal error: Redo setup failed.  Please save your work"
+=======
+#: src/text.c:848
+msgid "Internal error: cannot set up redo.  Please save your work."
+>>>>>>> origin/tomato-shibby-RT-AC
 msgstr ""
 
+<<<<<<< HEAD
 #: src/text.c:676
+=======
+#: src/text.c:968
+>>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Redid action (%s)"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/text.c:766
 msgid "Could not pipe"
 msgstr "Не можу працювати ╕з каналом (pipe)"
 
 #: src/text.c:793 src/text.c:2636 src/text.c:2788
+=======
+#: src/text.c:1062 src/text.c:2680 src/text.c:3066
+msgid "Could not create pipe"
+msgstr "п²п╣ п╪п╬п╤я┐ я│я┌п╡п╬я─п╦я┌п╦ п╨п╟п╫п╟п╩ (pipe)"
+
+#: src/text.c:1088 src/text.c:2767 src/text.c:2894 src/text.c:3114
+#: src/text.c:3404
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Could not fork"
 msgstr "Не можу зробити fork()"
 
+<<<<<<< HEAD
 #: src/text.c:941
 msgid "Internal error: can't setup uncut.  Please save your work."
 msgstr ""
@@ -2050,38 +4032,76 @@ msgid "Internal error: unknown type.  Please save your work."
 msgstr ""
 
 #: src/text.c:1870
+=======
+#: src/text.c:2078
+>>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Bad quote string %s: %s"
 msgstr "Поганий рядок цитування %s: %s"
 
+<<<<<<< HEAD
 #: src/text.c:2267
+=======
+#: src/text.c:2443
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Can now UnJustify!"
 msgstr "Можу зараз же СкасВир╕внювання!"
 
+<<<<<<< HEAD
 #: src/text.c:2462
+=======
+#: src/text.c:2596
+#, c-format
+msgid "Unfindable word: %s"
+msgstr "п²п╣п©я─п╦п╢п╟я┌п╫п╣ п╢п╬ п©п╬я┬я┐п╨я┐ я│п╩п╬п╡п╬: %s"
+
+#: src/text.c:2612
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Edit a replacement"
 msgstr "Редагувати зам╕ну"
 
+<<<<<<< HEAD
 #: src/text.c:2548
 msgid "Could not create pipe"
 msgstr "Не можу створити канал (pipe)"
 
 #: src/text.c:2550
+=======
+#. TRANSLATORS: Shown after fixing misspellings in one word.
+#: src/text.c:2627
+msgid "Next word..."
+msgstr "п²п╟я│я┌я┐п©п╫п╣ я│п╩п╬п╡п╬Б─╕"
+
+#: src/text.c:2682
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Creating misspelled word list, please wait..."
 msgstr "Створюю перел╕к орфограф╕чних помилок, зажд╕ть б-ласка..."
 
+<<<<<<< HEAD
 #: src/text.c:2642
+=======
+#: src/text.c:2773 src/text.c:3121
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Could not get size of pipe buffer"
 msgstr "Не можу отримати розм╕р буферу каналу"
 
+<<<<<<< HEAD
 #: src/text.c:2693
+=======
+#: src/text.c:2822
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Error invoking \"spell\""
 msgstr "Помилка виконання \"spell\""
 
+<<<<<<< HEAD
 #: src/text.c:2696
+=======
+#: src/text.c:2825
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Error invoking \"sort -f\""
 msgstr "Помилка виконання \"sort -f\""
 
+<<<<<<< HEAD
 #: src/text.c:2699
 msgid "Error invoking \"uniq\""
 msgstr "Помилка виконання \"uniq\""
@@ -2106,15 +4126,93 @@ msgid "Spell checking failed: %s: %s"
 msgstr "Перев╕рка орфограф╕╖ не вдалася: %s"
 
 #: src/text.c:3030
+=======
+#: src/text.c:2828
+msgid "Error invoking \"uniq\""
+msgstr "п÷п╬п╪п╦п╩п╨п╟ п╡п╦п╨п╬п╫п╟п╫п╫я▐ \"uniq\""
+
+#: src/text.c:3005
+msgid "Invoking spell checker, please wait"
+msgstr "п▓п╦п╨п╩п╦п╨п╟я■п╪п╬ п©я─п╬пЁя─п╟п╪я┐ п╢п╩я▐ п©п╬я┬я┐п╨я┐ п╢я─я┐п╨п╟я─я│я▄п╨п╦я┘ п©п╬п╪п╦п╩п╬п╨, п╥п╟я┤п╣п╨п╟п╧я┌п╣"
+
+#: src/text.c:3019
+#, c-format
+msgid "Spell checking failed: %s"
+msgstr "п÷п╣я─п╣п╡я√я─п╨п╟ п╬я─я└п╬пЁя─п╟я└я√я≈ п╫п╣ п╡п╢п╟п╩п╟я│я▐: %s"
+
+#: src/text.c:3021
+#, c-format
+msgid "Spell checking failed: %s: %s"
+msgstr "п²п╣ п╡п╢п╟п╩п╬я│я▄ п©п╣я─п╣п╡я√я─п╦я┌п╦ п╬я─я└п╬пЁя─п╟я└я√я▌: %s: %s"
+
+#: src/text.c:3024
+msgid "Finished checking spelling"
+msgstr "п÷п╣я─п╣п╡я√я─п╨я┐ п╬я─я└п╬пЁя─п╟я└я√я≈ п╥п╟п╡п╣я─я┬п╣п╫п╬"
+
+#: src/text.c:3049
+msgid "No linter defined for this type of file!"
+msgstr "п■п╩я▐ я├я▄п╬пЁп╬ я┌п╦п©я┐ я└п╟п╧п╩я√п╡ п╫п╣ п╡п╦п╥п╫п╟я┤п╣п╫п╬ п╬п╠я─п╬п╠п╫п╦п╨п╟!"
+
+#: src/text.c:3054
+msgid "Save modified buffer before linting?"
+msgstr "п≈п╠п╣я─п╣пЁя┌п╦ п╥п╪я√п╫п╣п╫п╦п╧ п╠я┐я└п╣я─ п©п╣я─п╣п╢ п╬п╠я─п╬п╠п╨п╬я▌?"
+
+#: src/text.c:3071
+msgid "Invoking linter, please wait"
+msgstr "п▓п╦п╨п╩п╦п╨п╟я■п╪п╬ linter, п╥п╟я┤п╣п╨п╟п╧я┌п╣"
+
+#: src/text.c:3226
+#, c-format
+msgid "Got 0 parsable lines from command: %s"
+msgstr "п▓я√п╢ п╨п╬п╪п╟п╫п╢п╦ п╬я┌я─п╦п╪п╟п╫п╬ 0 п©я─п╦п╢п╟я┌п╫п╦я┘ я─я▐п╢п╨я√п╡: %s"
+
+#: src/text.c:3256
+#, c-format
+msgid "This message is for unopened file %s, open it in a new buffer?"
+msgstr ""
+"п╕п╣ п©п╬п╡я√п╢п╬п╪п╩п╣п╫п╫я▐ п©п╬п╡Б─≥я▐п╥п╟п╫п╬ я√п╥ п╫п╣п╡я√п╢п╨я─п╦я┌п╦п╪ я└п╟п╧п╩п╬п╪ %s. п▓я√п╢п╨я─п╦я┌п╦ п╧п╬пЁп╬ я┐ п╫п╬п╡п╬п╪я┐ "
+"п╠я┐я└п╣я─я√?"
+
+#: src/text.c:3273
+msgid "No more errors in unopened files, cancelling"
+msgstr "пё п╫п╣п╡я√п╢п╨я─п╦я┌п╦я┘ я└п╟п╧п╩п╟я┘ п╫п╣п╪п╟я■ п╠я√п╩я▄я┬п╣ п©п╬п╪п╦п╩п╬п╨, я│п╨п╟я│п╬п╡я┐я■п╪п╬ п╢я√я▌"
+
+#: src/text.c:3313
+msgid "At last message"
+msgstr "п²п╟ п╬я│я┌п╟п╫п╫я▄п╬п╪я┐ п©п╬п╡я√п╢п╬п╪п╩п╣п╫п╫я√"
+
+#: src/text.c:3318
+msgid "At first message"
+msgstr "п²п╟ п©п╣я─я┬п╬п╪я┐ п©п╬п╡я√п╢п╬п╪п╩п╣п╫п╫я√"
+
+#: src/text.c:3355
+msgid "Finished"
+msgstr "п≈п╟п╡п╣я─я┬п╣п╫п╬"
+
+#: src/text.c:3377
+msgid "Invoking formatter, please wait"
+msgstr "п▓п╦п╨п╩п╦п╨п╟я■п╪п╬ formatter, п╥п╟я┤п╣п╨п╟п╧я┌п╣"
+
+#: src/text.c:3437
+msgid "Finished formatting"
+msgstr "п╓п╬я─п╪п╟я┌я┐п╡п╟п╫п╫я▐ п╥п╟п╡п╣я─я┬п╣п╫п╬"
+
+#: src/text.c:3519
+>>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "%sWords: %lu  Lines: %ld  Chars: %lu"
 msgstr ""
 
+<<<<<<< HEAD
 #: src/text.c:3031
 #, fuzzy
+=======
+#: src/text.c:3520
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "In Selection:  "
 msgstr "Додати Вид╕лене до файлу"
 
+<<<<<<< HEAD
 #: src/utils.c:405 src/utils.c:417
 msgid "nano is out of memory!"
 msgstr "невистача╓ в╕льно╖ пам'ят╕ для nano!"
@@ -2127,14 +4225,69 @@ msgstr ""
 
 #: src/winio.c:2149 src/winio.c:2153
 #, fuzzy
+=======
+#. TRANSLATORS: This is displayed when the next keystroke will be
+#. * inserted verbatim.
+#: src/text.c:3534
+msgid "Verbatim Input"
+msgstr "п▒я┐п╨п╡п╟п╩я▄п╫п╦п╧ п╡п╡я√п╢"
+
+#: src/text.c:3730
+msgid "No further matches"
+msgstr "п■п╟п╩я√ п╫п╣п╪п╟я■ п╡я√п╢п©п╬п╡я√п╢п╫п╦п╨я√п╡"
+
+#. TRANSLATORS: Shown when there are zero possible completions.
+#: src/text.c:3734
+msgid "No matches"
+msgstr "п²п╣п╪п╟я■ п╡я√п╢п©п╬п╡я√п╢п╫п╦п╨я√п╡"
+
+#: src/utils.c:323 src/utils.c:335
+msgid "nano is out of memory!"
+msgstr "п╫п╣ п╡п╦я│я┌п╟я┤п╟я■ п╡я√п╩я▄п╫п╬я≈ п©п╟п╪'я▐я┌я√ п╢п╩я▐ nano!"
+
+#: src/utils.c:512
+#, c-format
+msgid "Internal error: can't match line %ld.  Please save your work."
+msgstr ""
+"п▓п╫я┐я┌я─я√я┬п╫я▐ п©п╬п╪п╦п╩п╨п╟: п╫п╣ п╡п╢п╟п╩п╬я│я▐ п╡я│я┌п╟п╫п╬п╡п╦я┌п╦ п╡я√п╢п©п╬п╡я√п╢п╫я√я│я┌я▄ я─я▐п╢п╨п╟ %ld. п≈п╠п╣я─п╣п╤я√я┌я▄ "
+"я─п╣п╥я┐п╩я▄я┌п╟я┌п╦ п╡п╟я┬п╬я≈ я─п╬п╠п╬я┌п╦."
+
+#. TRANSLATORS: This refers to a sequence of escape codes
+#. * (from the keyboard) that nano does not know about.
+#: src/winio.c:1197
+msgid "Unknown sequence"
+msgstr "п²п╣п╡я√п╢п╬п╪п╟ п©п╬я│п╩я√п╢п╬п╡п╫я√я│я┌я▄"
+
+#. TRANSLATORS: This is shown while a six-digit hexadecimal
+#. * Unicode character code (%s) is being typed in.
+#: src/winio.c:1361
+#, c-format
+msgid "Unicode Input: %s"
+msgstr "п▓п╡п╣п╢п╣п╫п╫я▐ Unicode: %s"
+
+#: src/winio.c:1977
+msgid "DIR:"
+msgstr "п п╟я┌.:"
+
+#: src/winio.c:1985
+msgid "File:"
+msgstr "п╓п╟п╧п╩:"
+
+#: src/winio.c:1989 src/winio.c:1993
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Modified"
 msgstr " Зм╕нено "
 
+<<<<<<< HEAD
 #: src/winio.c:2150
 #, fuzzy
+=======
+#: src/winio.c:1991
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "View"
 msgstr " Перегляд "
 
+<<<<<<< HEAD
 #: src/winio.c:2164
 #, fuzzy
 msgid "DIR:"
@@ -2151,39 +4304,84 @@ msgid "line %ld/%ld (%d%%), col %lu/%lu (%d%%), char %lu/%lu (%d%%)"
 msgstr "рядок %ld/%ld (%d%%), стовпчик %lu/%lu (%d%%, л╕тера %lu/%ld (%d%%)"
 
 #: src/winio.c:3492
+=======
+#: src/winio.c:2119
+msgid "Further warnings were suppressed"
+msgstr "п÷п╬п╢п╟п╩я▄я┬я√ п©п╬п©п╣я─п╣п╢п╤п╣п╫п╫я▐ п╫п╣ п©п╬п╨п╟п╥п╟п╫п╬"
+
+#: src/winio.c:3184
+#, c-format
+msgid "line %ld/%ld (%d%%), col %lu/%lu (%d%%), char %lu/%lu (%d%%)"
+msgstr "я─я▐п╢п╬п╨ %ld/%ld (%d%%), п©п╬п╥п╦я├я√я▐ %lu/%lu (%d%%), я│п╦п╪п╡п╬п╩ %lu/%lu (%d%%)"
+
+#: src/winio.c:3317
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "The nano text editor"
 msgstr "Текстовий редактор nano"
 
+<<<<<<< HEAD
 #: src/winio.c:3493
 #, fuzzy
+=======
+#: src/winio.c:3318
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "version"
 msgstr "верс╕я "
 
+<<<<<<< HEAD
 #: src/winio.c:3494
+=======
+#: src/winio.c:3319
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Brought to you by:"
 msgstr "Створено для Вас:"
 
+<<<<<<< HEAD
 #: src/winio.c:3495
+=======
+#: src/winio.c:3320
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Special thanks to:"
 msgstr "Особлива подяка:"
 
+<<<<<<< HEAD
 #: src/winio.c:3496
 msgid "The Free Software Foundation"
 msgstr "The Free Software Foundation (Фонд В╕льного Програмного забезпечення)"
 
 #: src/winio.c:3497
+=======
+#: src/winio.c:3321
+msgid "The Free Software Foundation"
+msgstr "The Free Software Foundation (п╓п╬п╫п╢ п▓я√п╩я▄п╫п╬пЁп╬ п÷я─п╬пЁя─п╟п╪п╫п╬пЁп╬ п╥п╟п╠п╣п╥п©п╣я┤п╣п╫п╫я▐)"
+
+#: src/winio.c:3322
+msgid "the many translators and the TP"
+msgstr "п╠п╟пЁп╟я┌я▄п╬п╪ п©п╣я─п╣п╨п╩п╟п╢п╟я┤п╟п╪ я┌п╟ TP"
+
+#: src/winio.c:3323
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "For ncurses:"
 msgstr "Для ncurses:"
 
+<<<<<<< HEAD
 #: src/winio.c:3498
+=======
+#: src/winio.c:3324
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "and anyone else we forgot..."
 msgstr "та ╕ншим кого ми забули..."
 
+<<<<<<< HEAD
 #: src/winio.c:3499
 #, fuzzy
+=======
+#: src/winio.c:3325
+>>>>>>> origin/tomato-shibby-RT-AC
 msgid "Thank you for using nano!"
 msgstr "Дяку╓мо Вам за те, що обрали nano!\n"
 
+<<<<<<< HEAD
 #~ msgid "add_to_cutbuffer() called with inptr->data = %s\n"
 #~ msgstr "add_to_cutbuffer() викликано з inptr->data = %s\n"
 
@@ -2322,6 +4520,36 @@ msgstr "Дяку╓мо Вам за те, що обрали nano!\n"
 
 #~ msgid "Space"
 #~ msgstr "Проб╕л"
+=======
+#~ msgid "Option\t\tMeaning\n"
+#~ msgstr "п÷п╟я─п╟п╪п╣я┌я─\t\tп÷я─п╦п╥п╫п╟я┤п╣п╫п╫я▐\n"
+
+#~ msgid "+LINE,COLUMN"
+#~ msgstr "+п═п╞п■п·п ,п║п╒п·п▓п÷п╖п≤п "
+
+#~ msgid "Start at line LINE, column COLUMN"
+#~ msgstr "п÷п╬я┤п╟я┌п╦ п╥я√ п╡п╨п╟п╥п╟п╫п╬пЁп╬ я─я▐п╢п╨п╟ я┌п╟ п©п╬п╥п╦я├я√я≈"
+
+#~ msgid "-Y <str>"
+#~ msgstr "-Y <я─я▐п╢>"
+
+#~ msgid ""
+#~ "Warning: Modifying a file which is not locked, check directory permission?"
+#~ msgstr ""
+#~ "п÷п╬п©п╣я─п╣п╢п╤п╣п╫п╫я▐: п╡п╫п╬я│п╦п╪п╬ п╥п╪я√п╫п╦ п╢п╬ я└п╟п╧п╩п╟, я▐п╨п╦п╧ п╫п╣ п╥п╟п╠п╩п╬п╨п╬п╡п╟п╫п╬, Б─■ п©п╣я─п╣п╡я√я─п╦я┌п╦ "
+#~ "п©я─п╟п╡п╟ п╢п╬я│я┌я┐п©я┐ п╢п╬ п╨п╟я┌п╟п╩п╬пЁя┐?"
+
+#~ msgid "Internal error: can't match line %d.  Please save your work."
+#~ msgstr ""
+#~ "п▓п╫я┐я┌я─я√я┬п╫я▐ п©п╬п╪п╦п╩п╨п╟: п╫п╣ п╡п╢п╟п╩п╬я│я▐ п╡я│я┌п╟п╫п╬п╡п╦я┌п╦ п╡я√п╢п©п╬п╡я√п╢п╫я√я│я┌я▄ я─я▐п╢п╨п╟ %d. "
+#~ "п≈п╠п╣я─п╣п╤я√я┌я▄ я─п╣п╥я┐п╩я▄я┌п╟я┌п╦ п╡п╟я┬п╬я≈ я─п╬п╠п╬я┌п╦."
+
+#~ msgid "Window size is too small for nano...\n"
+#~ msgstr "п═п╬п╥п╪я√я─ п╡я√п╨п╫п╟ п╥п╟п╪п╟п╩п╦п╧ п╢п╩я▐ nano...\n"
+
+#~ msgid "Can't go outside of %s in confined mode"
+#~ msgstr "п²п╣ п╪п╬п╤п╫п╟ п©п╣я─п╣я┘п╬п╢п╦я┌п╦ п╥п╟ п╪п╣п╤я√ %s п╡ п╬п╠п╪п╣п╤п╣п╫п╬п╪я┐ я─п╣п╤п╦п╪я√"
+>>>>>>> origin/tomato-shibby-RT-AC
 
 #~ msgid ""
 #~ "Usage: nano [+LINE] [GNU long option] [option] [file]\n"
@@ -2501,6 +4729,7 @@ msgstr "Дяку╓мо Вам за те, що обрали nano!\n"
 #~ msgstr "Скидання буферу до stderr...\n"
 
 #~ msgid ""
+<<<<<<< HEAD
 #~ "\n"
 #~ "The -p flag now invokes the Pico \"preserve\" flag.\n"
 #~ "The Pico compatibility flag has been removed as nano\n"
@@ -2508,6 +4737,40 @@ msgstr "Дяку╓мо Вам за те, що обрали nano!\n"
 #~ "for more info on this change...\n"
 #~ "\n"
 #~ "Press return to continue\n"
+=======
+#~ "Read %lu line (Converted from DOS format - Warning: No write permission)"
+#~ msgid_plural ""
+#~ "Read %lu lines (Converted from DOS format - Warning: No write permission)"
+#~ msgstr[0] ""
+#~ "п÷я─п╬я┤п╦я┌п╟п╫п╬ %lu я─я▐п╢п╬п╨ (п©п╣я─п╣я┌п╡п╬я─п╣п╫п╬ п╥ я└п╬я─п╪п╟я┌я┐ DOS; п©п╬п©п╣я─п╣п╢п╤п╣п╫п╫я▐: п╫п╣п╪п╟я■ "
+#~ "п╢п╬я│я┌я┐п©я┐ п╫п╟ п╥п╟п©п╦я│)"
+#~ msgstr[1] ""
+#~ "п÷я─п╬я┤п╦я┌п╟п╫п╬ %lu я─я▐п╢п╨п╟ (п©п╣я─п╣я┌п╡п╬я─п╣п╫п╬ п╥ я└п╬я─п╪п╟я┌я┐ DOS; п©п╬п©п╣я─п╣п╢п╤п╣п╫п╫я▐: п╫п╣п╪п╟я■ "
+#~ "п╢п╬я│я┌я┐п©я┐ п╫п╟ п╥п╟п©п╦я│)"
+#~ msgstr[2] ""
+#~ "п÷я─п╬я┤п╦я┌п╟п╫п╬ %lu я─я▐п╢п╨я√п╡ (п©п╣я─п╣я┌п╡п╬я─п╣п╫п╬ п╥ я└п╬я─п╪п╟я┌я┐ DOS; п©п╬п©п╣я─п╣п╢п╤п╣п╫п╫я▐: п╫п╣п╪п╟я■ "
+#~ "п╢п╬я│я┌я┐п©я┐ п╫п╟ п╥п╟п©п╦я│)"
+
+#~ msgid "Read %lu line (Warning: No write permission)"
+#~ msgid_plural "Read %lu lines (Warning: No write permission)"
+#~ msgstr[0] "п÷я─п╬я┤п╦я┌п╟п╫п╬ %lu я─я▐п╢п╬п╨ (п©п╬п©п╣я─п╣п╢п╤п╣п╫п╫я▐: п╫п╣п╪п╟я■ п╢п╬я│я┌я┐п©я┐ п╫п╟ п╥п╟п©п╦я│)"
+#~ msgstr[1] "п÷я─п╬я┤п╦я┌п╟п╫я√ %lu я─я▐п╢п╨п╦ (п©п╬п©п╣я─п╣п╢п╤п╣п╫п╫я▐: п╫п╣п╪п╟я■ п╢п╬я│я┌я┐п©я┐ п╫п╟ п╥п╟п©п╦я│)"
+#~ msgstr[2] "п÷я─п╬я┤п╦я┌п╟п╫п╬ %lu я─я▐п╢п╨я√п╡ (п©п╬п©п╣я─п╣п╢п╤п╣п╫п╫я▐: п╫п╣п╪п╟я■ п╢п╬я│я┌я┐п©я┐ п╫п╟ п╥п╟п©п╦я│)"
+
+#~ msgid "Save modified buffer (ANSWERING \"No\" WILL DESTROY CHANGES) ? "
+#~ msgstr "п≈п╠п╣я─п╣пЁя┌п╦ п╥п╪я√п╫п╣п╫п╦п╧ п╠я┐я└п╣я─ (п▓я√п╢п©п╬п╡я√п╢я▄ б╚п²я√б╩ п║п п░п║пёп└ п▓п║п├ п≈п°п├п²п≤)? "
+
+#~ msgid "Unknown Command"
+#~ msgstr "п²п╣п╡я√п╢п╬п╪п╟ п╨п╬п╪п╟п╫п╢п╟"
+
+#~ msgid "Cannot add a color command without a syntax command"
+#~ msgstr "п²п╣ п╡п╢п╟я■я┌я▄я│я▐ п╢п╬п╢п╟я┌п╦ п╨п╬п╪п╟п╫п╢я┐ п╨п╬п╩я▄п╬я─я┐ п╠п╣п╥ п╨п╬п╪п╟п╫п╢п╦ я│п╦п╫я┌п╟п╨я│п╦я│я┐"
+
+#~ msgid "Cannot add a header regex without a syntax command"
+#~ msgstr "п²п╣ п╡п╢п╟я■я┌я▄я│я▐ п╢п╬п╢п╟я┌п╦ я─п╣пЁ. п╡п╦я─п╟п╥ п╥п╟пЁп╬п╩п╬п╡п╨я┐ п╠п╣п╥ п╨п╬п╪п╟п╫п╢п╦ я│п╦п╫я┌п╟п╨я│п╦я│я┐"
+
+#~ msgid "Cannot add a magic string regex without a syntax command"
+>>>>>>> origin/tomato-shibby-RT-AC
 #~ msgstr ""
 #~ "\n"
 #~ "Опц╕я -p зараз визнача╓ опц╕ю \"preserve\" редактора Pico.\n"
@@ -2654,6 +4917,7 @@ msgstr "Дяку╓мо Вам за те, що обрали nano!\n"
 #~ msgid " -o [dir] \t--operatingdir=[dir]\tSet operating directory\n"
 #~ msgstr " -o [dir] \t--operatingdir=[dir]\tВстановити робочий каталог\n"
 
+<<<<<<< HEAD
 #~ msgid " -p \t\t--pico\t\t\tEmulate Pico as closely as possible\n"
 #~ msgstr " -p\t \t--pico\t\t\tЕмулювати Pico наск╕льки це можливо\n"
 
@@ -2714,6 +4978,10 @@ msgstr "Дяку╓мо Вам за те, що обрали nano!\n"
 
 #~ msgid "Regexp Search%s%s"
 #~ msgstr "Пошук Формального Виразу%s%s"
+=======
+#~ msgid "line wrap"
+#~ msgstr "п©п╣я─п╣п╫п╣я│п╣п╫п╫я▐ я─я▐п╢п╨п╟"
+>>>>>>> origin/tomato-shibby-RT-AC
 
 #~ msgid "Only %d lines available, skipping to last line"
 #~ msgstr "Т╕льки %d рядк╕в у наявност╕, скипа╓мо до останнього рядка"

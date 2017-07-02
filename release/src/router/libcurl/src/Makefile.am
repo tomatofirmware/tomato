@@ -5,7 +5,11 @@
 #                            | (__| |_| |  _ <| |___
 #                             \___|\___/|_| \_\_____|
 #
+<<<<<<< HEAD
 # Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
+=======
+# Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+>>>>>>> origin/tomato-shibby-RT-AC
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
@@ -81,19 +85,29 @@ CLEANFILES = tool_hugehelp.c
 # embedded text.
 NROFF=env LC_ALL=C @NROFF@ @MANOPT@ # figured out by the configure script
 
+<<<<<<< HEAD
 EXTRA_DIST = mkhelp.pl makefile.dj Makefile.vc6 Makefile.b32 Makefile.m32 \
 	macos/curl.mcp.xml.sit.hqx                                        \
 	macos/MACINSTALL.TXT macos/src/curl_GUSIConfig.cpp \
 	macos/src/macos_main.cpp makefile.amiga curl.rc                   \
 	Makefile.netware Makefile.inc Makefile.Watcom CMakeLists.txt
+=======
+EXTRA_DIST = mkhelp.pl makefile.dj Makefile.b32		\
+ Makefile.m32 macos/curl.mcp.xml.sit.hqx macos/MACINSTALL.TXT		\
+ macos/src/curl_GUSIConfig.cpp macos/src/macos_main.cpp makefile.amiga	\
+ curl.rc Makefile.netware Makefile.inc Makefile.Watcom CMakeLists.txt
+>>>>>>> origin/tomato-shibby-RT-AC
 
-MANPAGE=$(top_srcdir)/docs/curl.1
+MANPAGE=$(top_builddir)/docs/curl.1
 README=$(top_srcdir)/docs/MANUAL
 MKHELP=$(top_srcdir)/src/mkhelp.pl
 HUGE=tool_hugehelp.c
 
 if USE_MANUAL
 # Here are the stuff to create a built-in manual
+
+$(MANPAGE):
+	cd $(top_builddir)/docs && make curl.1
 
 if HAVE_LIBZ
 # This generates the tool_hugehelp.c file in both uncompressed and

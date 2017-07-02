@@ -216,6 +216,7 @@ endif
 obj-$(TCONFIG_NGINX) += mysql
 obj-$(TCONFIG_NGINX) += spawn-fcgi
 obj-$(TCONFIG_NGINX) += pcre
+obj-$(TCONFIG_NGINX) += libatomic_ops
 obj-$(TCONFIG_NGINX) += libiconv
 obj-$(TCONFIG_NGINX) += libxml2
 obj-$(TCONFIG_NGINX) += libpng
@@ -418,6 +419,10 @@ endif
 
 	@cd $(TARGETDIR) && $(TOP)/others/rootprep.sh
 
+ifeq ($(TCONFIG_TOR),y)
+		@cd $(TARGETDIR) && $(TOP)/others/rootprep.sh ln_Tor
+endif
+
 	@echo ---
 
 ifeq ($(TCONFIG_OPTIMIZE_SHARED_LIBS),y)
@@ -475,12 +480,12 @@ endif
 	$(if $(NEED_EX_USB),@cp -f,@mv) $(TARGETDIR)/lib/modules/*/kernel/drivers/net/usb/huawei_ether.*o $(PLATFORMDIR)/extras/ || true
 	$(if $(NEED_EX_USB),@cp -f,@mv) $(TARGETDIR)/lib/modules/*/kernel/drivers/usb/ftdi_sio.*o $(PLATFORMDIR)/extras/ || true
 	$(if $(NEED_EX_USB),@cp -f,@mv) $(TARGETDIR)/lib/modules/*/kernel/drivers/usb/pl2303.*o $(PLATFORMDIR)/extras/ || true
-	$(if $(NEED_EX_USB),@cp -f,@mv) $(TARGETDIR)/lib/modules/*/kernel/drivers/usb/ch341.*o $(PLATFORMDIR)/extras/ || true
 	$(if $(NEED_EX_USB),@cp -f,@mv) $(TARGETDIR)/lib/modules/*/kernel/drivers/usb/class/cdc-wdm.*o $(PLATFORMDIR)/extras/ || true
 	$(if $(NEED_EX_USB),@cp -f,@mv) $(TARGETDIR)/lib/modules/*/kernel/drivers/net/usb/qmi_wwan.*o $(PLATFORMDIR)/extras/ || true
 	$(if $(NEED_SD_MODULES),@cp -f,@mv) $(TARGETDIR)/lib/modules/*/kernel/drivers/mmc/*.*o $(PLATFORMDIR)/extras/ || true
 	$(if $(NEED_SD_MODULES),@ls,@rm -rf) $(TARGETDIR)/lib/modules/*/kernel/drivers/mmc || true
 
+	@mv $(TARGETDIR)/lib/modules/*/kernel/drivers/usb/ch341.*o $(PLATFORMDIR)/extras/ || true
 	@mv $(TARGETDIR)/lib/modules/*/kernel/drivers/usb/usbip*.*o $(PLATFORMDIR)/extras/ || true
 	@mv $(TARGETDIR)/lib/modules/*/kernel/drivers/usb/usbkbd.*o $(PLATFORMDIR)/extras/ || true
 	@mv $(TARGETDIR)/lib/modules/*/kernel/drivers/usb/usbmouse.*o $(PLATFORMDIR)/extras/ || true
@@ -767,7 +772,7 @@ openssl/stamp-h1:
 	cd openssl && \
 	./Configure linux-mipsel --openssldir=/etc --cross-compile-prefix=' ' \
 	-ffunction-sections -fdata-sections -Wl,--gc-sections \
-	shared $(OPENSSL_CIPHERS) no-ssl2 no-ssl3 \
+	shared $(OPENSSL_CIPHERS) \
 	no-sha0 no-smime no-camellia no-krb5 no-rmd160 no-ripemd \
 	no-seed no-capieng no-gms no-gmp no-rfc3779 \
 	no-err no-hw no-jpake \
@@ -778,6 +783,8 @@ openssl/stamp-h1:
 	@touch openssl/stamp-h1
 
 openssl: openssl/stamp-h1
+	@$(SEP)
+	@$(MAKE) -C openssl $(PARALLEL_BUILD)
 
 openssl-clean:
 	-@$(MAKE) -C openssl clean
@@ -797,11 +804,11 @@ openssl-install: openssl
 #	perl -e 'while (<>) { s/.SECS/time()-(24*60*60)/e; print; }' < httpd/gencert.sh > $(INSTALLDIR)/openssl/usr/sbin/gencert.sh
 #	chmod 0500 $(INSTALLDIR)/openssl/usr/sbin/gencert.sh
 
-ifeq ($(FULL_OPENSSL),y)
+#ifeq ($(FULL_OPENSSL),y)
 	install -D openssl/libssl.so.1.0.0 $(INSTALLDIR)/openssl/usr/lib/libssl.so.1.0.0
 	$(STRIP) $(INSTALLDIR)/openssl/usr/lib/libssl.so.1.0.0
 	cd $(INSTALLDIR)/openssl/usr/lib && ln -sf libssl.so.1.0.0 libssl.so
-endif
+#endif
 
 mssl:	$(if $(FULL_OPENSSL),openssl,cyassl)
 
@@ -842,9 +849,9 @@ dnsmasq-install:
 nettle/stamp-h1: gmp
 	@cd nettle && CC=$(CC) AR=$(AR) RANLIB=$(RANLIB) LD=$(LD) \
 	CPPFLAGS="-I$(TOP)/gmp" \
-	CFLAGS="-Os -Wall $(EXTRACFLAGS) -fPIC -ffunction-sections -fdata-sections" \
+	CFLAGS="-O2 -Wall $(EXTRACFLAGS) -fPIC -ffunction-sections -fdata-sections" \
 	LDFLAGS="-L$(TOP)/gmp/.libs -ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC" \
-	$(CONFIGURE) prefix=$(TOP)/nettle
+	$(CONFIGURE) prefix=$(TOP)/nettle --disable-documentation
 	@touch nettle/stamp-h1
 
 nettle: nettle/stamp-h1
@@ -1027,6 +1034,8 @@ libusb10: libusb10/Makefile
 libusb10-install: libusb10
 	install -D libusb10/libusb/.libs/libusb-1.0.so $(INSTALLDIR)/libusb10/usr/lib/libusb-1.0.so
 	$(STRIP) $(INSTALLDIR)/libusb10/usr/lib/*.so
+	cd $(INSTALLDIR)/libusb10/usr/lib && \
+		ln -sf libusb-1.0.so libusb-1.0.so.0
 
 libusb10-clean:
 	-@$(MAKE) -C $@ clean
@@ -1245,7 +1254,7 @@ rp-l2tp-install:
 	$(STRIP) $(INSTALLDIR)/rp-l2tp/usr/sbin/l2tpd
 
 xl2tpd: pppd
-	CFLAGS="-g $(EXTRACFLAGS)" $(MAKE) -C $@ PREFIX=/usr xl2tpd
+	CFLAGS="-g $(EXTRACFLAGS)" $(MAKE) -C $@ PREFIX=/usr xl2tpd $(PARALLEL_BUILD)
 
 xl2tpd-install: xl2tpd
 	install -D xl2tpd/xl2tpd $(INSTALLDIR)/xl2tpd/usr/sbin/xl2tpd
@@ -1583,7 +1592,7 @@ minidlna-clean:
 	-@$(MAKE) -C minidlna clean
 	@rm -f minidlna/stamp-h1
 
-minidlna-install: minidlan
+minidlna-install: minidlna
 	@$(SEP)
 	install -D minidlna/minidlna $(INSTALLDIR)/minidlna/usr/sbin/minidlna
 	$(STRIP) $(INSTALLDIR)/minidlna/usr/sbin/minidlna
@@ -1671,7 +1680,7 @@ ebtables-clean:
 
 #Roadkill
 spawn-fcgi/stamp-h1:
-	cd spawn-fcgi && CC=$(CC) \
+	cd spawn-fcgi && autoreconf && CC=$(CC) \
 	CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
 	LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections -fPIC" \
 	ac_cv_func_malloc_0_nonnull=yes \
@@ -1751,13 +1760,15 @@ pcre: pcre/stamp-h1
 
 pcre-install: pcre
 	@$(SEP)
-	install -D pcre/.libs/libpcre.so.1 $(INSTALLDIR)/pcre/usr/lib/libpcre.so.1.2.3
-	$(STRIP) -s $(INSTALLDIR)/pcre/usr/lib/libpcre.so.1.2.3
-	install -D pcre/.libs/libpcreposix.so.0.0.2 $(INSTALLDIR)/pcre/usr/lib/libpcreposix.so.0.0.2
-	$(STRIP) -s $(INSTALLDIR)/pcre/usr/lib/libpcreposix.so.0.0.2
+	install -D pcre/.libs/libpcre.so.1 $(INSTALLDIR)/pcre/usr/lib/libpcre.so.1.2.7
+	$(STRIP) -s $(INSTALLDIR)/pcre/usr/lib/libpcre.so.1.2.7
 	cd $(INSTALLDIR)/pcre/usr/lib/ && \
-		ln -sf libpcre.so.1.2.3 libpcre.so.1 && \
-		ln -sf libpcreposix.so.0.0.2 libpcreposix.so.0
+		ln -sf libpcre.so.1.2.7 libpcre.so.1
+#unused at the moment - shibby
+#	install -D pcre/.libs/libpcreposix.so.0.0.4 $(INSTALLDIR)/pcre/usr/lib/libpcreposix.so.0.0.4
+#	$(STRIP) -s $(INSTALLDIR)/pcre/usr/lib/libpcreposix.so.0.0.4
+#	cd $(INSTALLDIR)/pcre/usr/lib/ && \
+#		ln -sf libpcreposix.so.0.0.4 libpcreposix.so.0
 
 pcre-clean:
 	( if [ -f pcre/Makefile ]; then \
@@ -1811,10 +1822,24 @@ libpng-install: libpng
 		ln -sf libpng12.so.0.51.0 libpng12.so && \
 		ln -sf libpng12.so.0.51.0 libpng12.so.0
 
-libpng-clean:
-	-@$(MAKE) -C libpng clean
-	@rm -f libpng/stamp-h1
-	@rm -rf libpng/staged
+libatomic_ops/stamp-h1:
+	cd libatomic_ops && \
+	./autogen.sh && \
+	CC=$(CC) AR=$(AR) RANLIB=$(RANLIB) LD=$(LD) CFLAGS="-Os -Wall $(EXTRACFLAGS)" \
+	$(CONFIGURE) --prefix=/usr --enable-static --enable-shared
+	touch $@
+
+libatomic_ops: libatomic_ops/stamp-h1
+	@$(MAKE) -C libatomic_ops $(PARALLEL_BUILD)
+
+libatomic_ops-install: libatomic_ops
+	@$(SEP)
+	install -D libatomic_ops/src/.libs/libatomic_ops.so.1.0.3 $(INSTALLDIR)/libatomic_ops/usr/lib/libatomic_ops.so.1.0.3
+	$(STRIP) $(INSTALLDIR)/libatomic_ops/usr/lib/libatomic_ops.so.1.0.3
+
+libatomic_ops-clean:
+	-@$(MAKE) -C libatomic_ops clean
+	@rm -f libatomic_ops/stamp-h1
 
 php/stamp-h1: pcre zlib libiconv sqlite libxml2 libpng jpeg libcurl
 	@$(SEP)
@@ -1907,7 +1932,7 @@ php-install: php
 	cd $(INSTALLDIR)/php/usr/sbin && ln -sf php-cgi php-fcgi
 	$(STRIP) $(INSTALLDIR)/php/usr/sbin/php-cgi
 
-nginx/stamp-h1: openssl zlib pcre
+nginx/stamp-h1: openssl zlib pcre libatomic_ops
 	@$(SEP)
 	cd $(TOP)/nginx && ./configure --crossbuild=Linux::$(ARCH) \
 		--prefix=/usr \
@@ -1925,9 +1950,10 @@ nginx/stamp-h1: openssl zlib pcre
 		--http-uwsgi-temp-path=/tmp/var/lib/nginx/uwsgi \
 		--http-scgi-temp-path=/tmp/var/lib/nginx/scgi \
 		--http-proxy-temp-path=/tmp/var/lib/nginx/proxy \
+		--with-libatomic="$(TOP)/libatomic_ops" \
 		--with-cc="$(CC)" \
-		--with-ld-opt="$(LDFLAGS) -L $(TOP)/pcre/.libs -L $(TOP)/zlib -L $(TOP)/openssl" \
-		--with-cc-opt="$(EXTRACFLAGS) $(CPPFLAGS) $(CFLAGS) -I $(TOP)/openssl/include -I $(TOP)/openssl/include/openssl -I $(TOP)/pcre -I $(TOP)/zlib" \
+		--with-ld-opt="$(LDFLAGS) -L $(TOP)/pcre/.libs -L $(TOP)/zlib -L $(TOP)/openssl -L $(TOP)/libatomic_ops/src" \
+		--with-cc-opt="$(EXTRACFLAGS) $(CPPFLAGS) $(CFLAGS) -I $(TOP)/openssl/include -I $(TOP)/openssl/include/openssl -I $(TOP)/pcre -I $(TOP)/zlib -I $(TOP)/libatomic_ops/src/.libs" \
 		$(ADDITIONAL_MODULES)
 
 nginx: nginx/stamp-h1
@@ -1972,19 +1998,19 @@ libncurses-install: libncurses
 	install -D -m 0644 libncurses/staged/usr/share/terminfo/v/vt220 $(INSTALLDIR)/libncurses/usr/share/terminfo/v
 	install -D -m 0644 libncurses/staged/usr/share/terminfo/x/xterm $(INSTALLDIR)/libncurses/usr/share/terminfo/x
 	cd $(INSTALLDIR)/libncurses/usr/lib && ln -sf ../share/terminfo terminfo
-	install libncurses/lib/libncurses.so.5.9 $(INSTALLDIR)/libncurses/usr/lib/libncurses.so.5
-	$(STRIP) $(INSTALLDIR)/libncurses/usr/lib/libncurses.so.5
-	install libncurses/lib/libpanel.so.5.9 $(INSTALLDIR)/libncurses/usr/lib/libpanel.so.5
-	$(STRIP) $(INSTALLDIR)/libncurses/usr/lib/libpanel.so.5
-	install libncurses/lib/libform.so.5.9 $(INSTALLDIR)/libncurses/usr/lib/libform.so.5
-	$(STRIP) $(INSTALLDIR)/libncurses/usr/lib/libform.so.5
-	install libncurses/lib/libmenu.so.5.9 $(INSTALLDIR)/libncurses/usr/lib/libmenu.so.5
-	$(STRIP) $(INSTALLDIR)/libncurses/usr/lib/libmenu.so.5
+	install libncurses/lib/libncurses.so.6.0 $(INSTALLDIR)/libncurses/usr/lib/libncurses.so.6
+	$(STRIP) $(INSTALLDIR)/libncurses/usr/lib/libncurses.so.6
+	install libncurses/lib/libpanel.so.6.0 $(INSTALLDIR)/libncurses/usr/lib/libpanel.so.6
+	$(STRIP) $(INSTALLDIR)/libncurses/usr/lib/libpanel.so.6
+	install libncurses/lib/libform.so.6.0 $(INSTALLDIR)/libncurses/usr/lib/libform.so.6
+	$(STRIP) $(INSTALLDIR)/libncurses/usr/lib/libform.so.6
+	install libncurses/lib/libmenu.so.6.0 $(INSTALLDIR)/libncurses/usr/lib/libmenu.so.6
+	$(STRIP) $(INSTALLDIR)/libncurses/usr/lib/libmenu.so.6
 	cd $(INSTALLDIR)/libncurses/usr/lib/ && \
-		ln -sf libncurses.so.5 libncurses.so && \
-		ln -sf libpanel.so.5 libpanel.so && \
-		ln -sf libform.so.5 libform.so && \
-		ln -sf libmenu.so.5 libmenu.so
+		ln -sf libncurses.so.6 libncurses.so && \
+		ln -sf libpanel.so.6 libpanel.so && \
+		ln -sf libform.so.6 libform.so && \
+		ln -sf libmenu.so.6 libmenu.so
 
 mysql/stamp-h1: openssl zlib libncurses
 	@$(SEP)
@@ -2097,7 +2123,7 @@ openvpn/.conf: openssl lzo
 	$(CONFIGURE) --prefix= \
 	--with-crypto-library=openssl \
 	--disable-debug --disable-plugin-auth-pam --disable-plugin-down-root --with-plugindir=/lib --enable-management --disable-small \
-	--disable-selinux --disable-socks --enable-password-save \
+	--disable-selinux --disable-socks \
 	OPENSSL_SSL_CFLAGS="-I$(TOP)/openssl/include" \
 	OPENSSL_SSL_LIBS="-L$(TOP)/openssl -lssl" \
 	ac_cv_lib_resolv_gethostbyname=no
@@ -2120,11 +2146,11 @@ openvpn_plugin_auth_nvram:nvram
 #shibby
 nano/stamp-h1: libncurses
 	cd nano && CC=$(CC) STRIP='mipsel-uclibc-strip' \
-		CFLAGS="-O3 -Wall $(EXTRACFLAGS) -I$(TOP)/libncurses/staged/usr/include -ffunction-sections -fdata-sections" \
+		CFLAGS="-Os -Wall $(EXTRACFLAGS) -I$(TOP)/libncurses/staged/usr/include -ffunction-sections -fdata-sections" \
 		CPPFLAGS="-Os -Wall $(EXTRACFLAGS) -I$(TOP)/libncurses/staged/usr/include -ffunction-sections -fdata-sections" \
 		LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections -L$(TOP)/libncurses/staged/usr/lib -fPIC" \
 		ac_cv_lib_ncursesw_get_wch=no \
-		$(CONFIGURE) --prefix=/usr --disable-nls --enable-all --without-libiconv-prefix --disable-utf8
+		$(CONFIGURE) --prefix=/usr --disable-nls --enable-tiny --without-libiconv-prefix --disable-utf8
 	touch nano/stamp-h1
 
 nano: nano/stamp-h1
@@ -2139,6 +2165,12 @@ nano-install: nano
 	install -D nano/src/nano $(INSTALLDIR)/nano/usr/sbin/nano
 	$(STRIP) -s $(INSTALLDIR)/nano/usr/sbin/nano
 
+ifeq ($(TCONFIG_AIO),y)
+CACERT:=--with-ca-bundle=/rom/cacert.pem
+else
+CACERT:=
+endif
+
 libcurl/stamp-h1: zlib openssl
 	cd libcurl && CC=$(CC) STRIP='mipsel-uclibc-strip' \
 		CPPFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections -I$(TOP)/zlib" \
@@ -2148,9 +2180,9 @@ libcurl/stamp-h1: zlib openssl
 		--enable-file --enable-ftp --enable-http --enable-ipv6 --enable-tftp \
 		--disable-nls --disable-ares --disable-dict --disable-debug --disable-gopher \
 		--disable-ldap --disable-manual --disable-telnet --disable-verbose \
-		--with-random="/dev/urandom" --with-ssl="$(TOP)/openssl" \
+		--with-random="/dev/urandom" --with-ssl="$(TOP)/openssl/ssl" \
 		--without-gnutls --without-krb4 --without-libidn \
-		--with-linux-headers=$(LINUXDIR)/include \
+		--with-linux-headers=$(LINUXDIR)/include $(CACERT) \
 		OPENSSL_CFLAGS="-I$(TOP)/openssl/include" \
 		OPENSSL_LIBS="-L$(TOP)/openssl -lcrypto -lssl"
 		touch libcurl/stamp-h1
@@ -2169,11 +2201,11 @@ libcurl-install: libcurl
 	install -D libcurl/src/.libs/curl $(INSTALLDIR)/libcurl/usr/sbin/curl
 	$(STRIP) -s $(INSTALLDIR)/libcurl/usr/sbin/curl
 	install -d $(INSTALLDIR)/libcurl/usr/lib
-	install -D libcurl/lib/.libs/libcurl.so.4.3.0 $(INSTALLDIR)/libcurl/usr/lib/libcurl.so.4.3.0
-	$(STRIP) -s $(INSTALLDIR)/libcurl/usr/lib/libcurl.so.4.3.0
+	install -D libcurl/lib/.libs/libcurl.so.4.4.0 $(INSTALLDIR)/libcurl/usr/lib/libcurl.so.4.4.0
+	$(STRIP) -s $(INSTALLDIR)/libcurl/usr/lib/libcurl.so.4.4.0
 	cd $(INSTALLDIR)/libcurl/usr/lib/ && \
-		ln -sf libcurl.so.4.3.0 libcurl.so.4 && \
-		ln -sf libcurl.so.4.3.0 libcurl.so
+		ln -sf libcurl.so.4.4.0 libcurl.so.4 && \
+		ln -sf libcurl.so.4.4.0 libcurl.so
 
 libevent/stamp-h1:
 	cd libevent && CC=$(CC) \
@@ -2216,11 +2248,11 @@ libiconv-clean:
 
 libiconv-install: libiconv
 	install -d $(INSTALLDIR)/libiconv/usr/lib
-	install libiconv/lib/.libs/libiconv.so.2.5.1 $(INSTALLDIR)/libiconv/usr/lib/libiconv.so.2.5.1
-	$(STRIP)-s $(INSTALLDIR)/libiconv/usr/lib/libiconv.so.2.5.1
+	install libiconv/lib/.libs/libiconv.so.2.6.0 $(INSTALLDIR)/libiconv/usr/lib/libiconv.so.2.6.0
+	$(STRIP)-s $(INSTALLDIR)/libiconv/usr/lib/libiconv.so.2.6.0
 	cd $(INSTALLDIR)/libiconv/usr/lib/ && \
-		ln -sf libiconv.so.2.5.1 libiconv.so.2 && \
-		ln -sf libiconv.so.2.5.1 libiconv.so
+		ln -sf libiconv.so.2.6.0 libiconv.so.2 && \
+		ln -sf libiconv.so.2.6.0 libiconv.so
 
 transmission/stamp-h1: openssl libcurl libevent zlib
 	cd transmission && CC=$(CC) STRIP='mipsel-uclibc-strip' \
@@ -2390,7 +2422,7 @@ tinc/stamp-h1: openssl zlib lzo
 
 tinc: tinc/stamp-h1
 	@$(SEP)
-	@$(MAKE) -C tinc LIBS="-lcrypto $(TOP)/zlib/libz.a -llzo2" $(PARALLEL_BUILD)
+	@$(MAKE) -C tinc LIBS="-lcrypto $(TOP)/zlib/libz.a -llzo2 -lm" $(PARALLEL_BUILD)
 
 tinc-clean:
 	-@$(MAKE) -C tinc clean
@@ -2478,11 +2510,11 @@ libsodium: libsodium/stamp-h1
 
 libsodium-install: libsodium
 	install -d $(INSTALLDIR)/libsodium/usr/lib
-	install -D libsodium/src/libsodium/.libs/libsodium.so.18.0.1 $(INSTALLDIR)/libsodium/usr/lib/libsodium.so.18.0.1
-	$(STRIP) -s $(INSTALLDIR)/libsodium/usr/lib/libsodium.so.18.0.1
+	install -D libsodium/src/libsodium/.libs/libsodium.so.18.2.0 $(INSTALLDIR)/libsodium/usr/lib/libsodium.so.18.2.0
+	$(STRIP) -s $(INSTALLDIR)/libsodium/usr/lib/libsodium.so.18.2.0
 	cd $(INSTALLDIR)/libsodium/usr/lib/ && \
-		ln -sf libsodium.so.18.0.1 libsodium.so.18 && \
-		ln -sf libsodium.so.18.0.1 libsodium.so
+		ln -sf libsodium.so.18.2.0 libsodium.so.18 && \
+		ln -sf libsodium.so.18.2.0 libsodium.so
 
 libsodium-clean:
 	-$(MAKE) -C libsodium clean
@@ -2517,13 +2549,14 @@ tor/stamp-h1: openssl zlib libevent
 	LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections" \
 	$(CONFIGURE) --prefix=/usr --with-libevent-dir=$(TOP)/libevent/staged/usr/local \
 		--with-openssl-dir=$(TOP)/openssl --with-zlib-dir=$(TOP)/zlib \
-		--disable-asciidoc --disable-tool-name-check
+		--disable-asciidoc --disable-tool-name-check --disable-unittests
 	touch tor/stamp-h1
 
 tor: tor/stamp-h1
 	$(MAKE) -C tor $(PARALLEL_BUILD)
 
 tor-install: tor
+	install -d $(INSTALLDIR)/tor/usr/share
 	install -D tor/src/or/tor $(INSTALLDIR)/tor/usr/sbin/tor
 	$(STRIP) -s $(INSTALLDIR)/tor/usr/sbin/tor
 
@@ -2532,16 +2565,19 @@ tor-clean:
 	@rm -rf tor/stamp-h1 tor/Makefile
 
 udpxy/stamp-h1:
-	cd udpxy \
 	$(MAKE) -C udpxy CFLAGS="-Os -Wall --host=mipsel-linux --target=mipsel-linux $(EXTRACFLAGS)" \
 		LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections"
 	touch udpxy/stamp-h1
+
+udpxy: udpxy/stamp-h1
+	@$(SEP)
 
 udpxy-clean:
 	-@$(MAKE) -C udpxy clean
 	@rm -f udpxy/stamp-h1
 
-udpxy-install: udpxy/stamp-h1
+udpxy-install: udpxy
+	@$(SEP)
 	install -d $(INSTALLDIR)/udpxy/usr/bin
 	install -D udpxy/udpxy $(INSTALLDIR)/udpxy/bin/udpxy
 	$(STRIP) -s $(INSTALLDIR)/udpxy/bin/udpxy

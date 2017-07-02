@@ -1,27 +1,36 @@
 /* $Id: nano.c 4520 2010-11-12 06:23:14Z astyanax $ */ 
 /**************************************************************************
- *   nano.c                                                               *
+ *   nano.c  --  This file is part of GNU nano.                           *
  *                                                                        *
  *   Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,  *
+<<<<<<< HEAD
  *   2008, 2009 Free Software Foundation, Inc.                            *
  *   This program is free software; you can redistribute it and/or modify *
  *   it under the terms of the GNU General Public License as published by *
  *   the Free Software Foundation; either version 3, or (at your option)  *
  *   any later version.                                                   *
+=======
+ *   2008, 2009, 2010, 2011, 2013, 2014 Free Software Foundation, Inc.    *
+ *   Copyright (C) 2014, 2015, 2016 Benno Schulenberg                     *
+>>>>>>> origin/tomato-shibby-RT-AC
  *                                                                        *
- *   This program is distributed in the hope that it will be useful, but  *
- *   WITHOUT ANY WARRANTY; without even the implied warranty of           *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU    *
- *   General Public License for more details.                             *
+ *   GNU nano is free software: you can redistribute it and/or modify     *
+ *   it under the terms of the GNU General Public License as published    *
+ *   by the Free Software Foundation, either version 3 of the License,    *
+ *   or (at your option) any later version.                               *
+ *                                                                        *
+ *   GNU nano is distributed in the hope that it will be useful,          *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty          *
+ *   of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.              *
+ *   See the GNU General Public License for more details.                 *
  *                                                                        *
  *   You should have received a copy of the GNU General Public License    *
- *   along with this program; if not, write to the Free Software          *
- *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA            *
- *   02110-1301, USA.                                                     *
+ *   along with this program.  If not, see http://www.gnu.org/licenses/.  *
  *                                                                        *
  **************************************************************************/
 
 #include "proto.h"
+#include "revision.h"
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -36,10 +45,10 @@
 #ifdef ENABLE_UTF8
 #include <langinfo.h>
 #endif
+#ifdef HAVE_TERMIOS_H
 #include <termios.h>
-#ifdef HAVE_GETOPT_H
-#include <getopt.h>
 #endif
+#include <getopt.h>
 #ifndef NANO_TINY
 #include <sys/ioctl.h>
 #endif
@@ -52,7 +61,12 @@ static int oldinterval = -1;
 static bool no_rcfiles = FALSE;
 	/* Should we ignore all rcfiles? */
 #endif
+#ifdef HAVE_TERMIOS_H
 static struct termios oldterm;
+#else
+# define tcsetattr(...)
+# define tcgetattr(...)
+#endif
 	/* The user's original terminal settings. */
 static struct sigaction act;
 	/* Used to set up all our fun signal handlers. */
@@ -80,8 +94,6 @@ filestruct *copy_node(const filestruct *src)
 {
     filestruct *dst;
 
-    assert(src != NULL);
-
     dst = (filestruct *)nmalloc(sizeof(filestruct));
 
     dst->data = mallocstrcpy(NULL, src->data);
@@ -99,6 +111,7 @@ filestruct *copy_node(const filestruct *src)
 void splice_node(filestruct *begin, filestruct *newnode, filestruct
 	*end)
 {
+<<<<<<< HEAD
     assert(newnode != NULL && begin != NULL);
 
     newnode->next = end;
@@ -106,13 +119,22 @@ void splice_node(filestruct *begin, filestruct *newnode, filestruct
     begin->next = newnode;
     if (end != NULL)
 	end->prev = newnode;
+=======
+    newnode->next = afterthis->next;
+    newnode->prev = afterthis;
+    if (afterthis->next != NULL)
+	afterthis->next->prev = newnode;
+    afterthis->next = newnode;
+
+    /* Update filebot when inserting a node at the end of file. */
+    if (openfile && openfile->filebot == afterthis)
+	openfile->filebot = newnode;
+>>>>>>> origin/tomato-shibby-RT-AC
 }
 
 /* Unlink a node from the rest of the filestruct. */
 void unlink_node(const filestruct *fileptr)
 {
-    assert(fileptr != NULL);
-
     if (fileptr->prev != NULL)
 	fileptr->prev->next = fileptr->next;
     if (fileptr->next != NULL)
@@ -122,6 +144,7 @@ void unlink_node(const filestruct *fileptr)
 /* Delete a node from the filestruct. */
 void delete_node(filestruct *fileptr)
 {
+<<<<<<< HEAD
     assert(fileptr != NULL && fileptr->data != NULL);
 
     if (fileptr->data != NULL)
@@ -130,6 +153,11 @@ void delete_node(filestruct *fileptr)
 #ifdef ENABLE_COLOR
     if (fileptr->multidata)
 	free(fileptr->multidata);
+=======
+    free(fileptr->data);
+#ifndef DISABLE_COLOR
+    free(fileptr->multidata);
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif
 
     free(fileptr);
@@ -139,8 +167,6 @@ void delete_node(filestruct *fileptr)
 filestruct *copy_filestruct(const filestruct *src)
 {
     filestruct *head, *copy;
-
-    assert(src != NULL);
 
     copy = copy_node(src);
     copy->prev = NULL;
@@ -230,12 +256,16 @@ partition *partition_filestruct(filestruct *top, size_t top_x,
     p->bot_data = mallocstrcpy(NULL, bot->data + bot_x);
 
     /* Remove all text after bot_x at the bottom of the partition. */
-    null_at(&bot->data, bot_x);
+    bot->data[bot_x] = '\0';
 
     /* Remove all text before top_x at the top of the partition. */
+<<<<<<< HEAD
     charmove(top->data, top->data + top_x, strlen(top->data) -
 	top_x + 1);
     align(&top->data);
+=======
+    charmove(top->data, top->data + top_x, strlen(top->data) - top_x + 1);
+>>>>>>> origin/tomato-shibby-RT-AC
 
     /* Return the partition. */
     return p;
@@ -290,7 +320,7 @@ void unpartition_filestruct(partition **p)
  * current filestruct to a filestruct beginning with file_top and ending
  * with file_bot.  If no text is between (top, top_x) and (bot, bot_x),
  * don't do anything. */
-void move_to_filestruct(filestruct **file_top, filestruct **file_bot,
+void extract_buffer(filestruct **file_top, filestruct **file_bot,
 	filestruct *top, size_t top_x, filestruct *bot, size_t bot_x)
 {
     filestruct *top_save;
@@ -363,6 +393,7 @@ void move_to_filestruct(filestruct **file_top, filestruct **file_bot,
 	    renumber(file_bot_save->next);
     }
 
+<<<<<<< HEAD
     /* Since the text has now been saved, remove it from the
      * filestruct. */
     openfile->fileage = (filestruct *)nmalloc(sizeof(filestruct));
@@ -373,6 +404,13 @@ void move_to_filestruct(filestruct **file_top, filestruct **file_bot,
     openfile->fileage->multidata = NULL;
 #endif
 
+=======
+    /* Since the text has now been saved, remove it from the filestruct. */
+    openfile->fileage = make_new_node(NULL);
+    openfile->fileage->data = mallocstrcpy(NULL, "");
+    openfile->filebot = openfile->fileage;
+
+>>>>>>> origin/tomato-shibby-RT-AC
     /* Restore the current line and cursor position.  If the mark begins
      * inside the partition, set the beginning of the mark to where the
      * saved text used to start. */
@@ -393,8 +431,15 @@ void move_to_filestruct(filestruct **file_top, filestruct **file_bot,
 
     /* If the top of the edit window was inside the old partition, put
      * it in range of current. */
+<<<<<<< HEAD
     if (edittop_inside)
 	edit_update(NONE);
+=======
+    if (edittop_inside) {
+	adjust_viewport(STATIONARY);
+	refresh_needed = TRUE;
+    }
+>>>>>>> origin/tomato-shibby-RT-AC
 
     /* Renumber starting with the beginning line of the old
      * partition. */
@@ -406,10 +451,16 @@ void move_to_filestruct(filestruct **file_top, filestruct **file_bot,
 	new_magicline();
 }
 
+<<<<<<< HEAD
 /* Copy all the text from the filestruct beginning with file_top and
  * ending with file_bot to the current filestruct at the current cursor
  * position. */
 void copy_from_filestruct(filestruct *file_top, filestruct *file_bot)
+=======
+/* Meld the given buffer into the current file buffer
+ * at the current cursor position. */
+void ingraft_buffer(filestruct *somebuffer)
+>>>>>>> origin/tomato-shibby-RT-AC
 {
     filestruct *top_save;
     size_t current_x_save = openfile->current_x;
@@ -441,9 +492,15 @@ void copy_from_filestruct(filestruct *file_top, filestruct *file_bot)
 	openfile->current_x, openfile->current, openfile->current_x);
     edittop_inside = (openfile->edittop == openfile->fileage);
 
+<<<<<<< HEAD
     /* Put the top and bottom of the filestruct at copies of file_top
      * and file_bot. */
     openfile->fileage = copy_filestruct(file_top);
+=======
+    /* Put the top and bottom of the current filestruct at the top and
+     * bottom of the passed buffer. */
+    openfile->fileage = somebuffer;
+>>>>>>> origin/tomato-shibby-RT-AC
     openfile->filebot = openfile->fileage;
     while (openfile->filebot->next != NULL)
 	openfile->filebot = openfile->filebot->next;
@@ -480,6 +537,7 @@ void copy_from_filestruct(filestruct *file_top, filestruct *file_bot)
     openfile->totsize += get_totsize(openfile->fileage,
 	openfile->filebot);
 
+<<<<<<< HEAD
     /* Update the current y-coordinate to account for the number of
      * lines the copied text has, less one since the first line will be
      * tacked onto the current line. */
@@ -489,6 +547,10 @@ void copy_from_filestruct(filestruct *file_top, filestruct *file_bot)
 
     /* If the top of the edit window is inside the partition, set it to
      * where the copied text now starts. */
+=======
+    /* If we pasted onto the first line of the edit window, the corresponding
+     * struct has been freed, so... point at the start of the copied text. */
+>>>>>>> origin/tomato-shibby-RT-AC
     if (edittop_inside)
 	openfile->edittop = openfile->fileage;
 
@@ -504,6 +566,14 @@ void copy_from_filestruct(filestruct *file_top, filestruct *file_bot)
      * a magicline, add a new magicline. */
     if (!ISSET(NO_NEWLINES) && openfile->filebot->data[0] != '\0')
 	new_magicline();
+}
+
+/* Meld a copy of the given buffer into the current file buffer. */
+void copy_from_buffer(filestruct *somebuffer)
+{
+    filestruct *the_copy = copy_filestruct(somebuffer);
+
+    ingraft_buffer(the_copy);
 }
 
 /* Create a new openfilestruct node. */
@@ -542,7 +612,11 @@ void splice_opennode(openfilestruct *begin, openfilestruct *newnode,
 /* Unlink a node from the rest of the openfilestruct, and delete it. */
 void unlink_opennode(openfilestruct *fileptr)
 {
+<<<<<<< HEAD
     assert(fileptr != NULL && fileptr->prev != NULL && fileptr->next != NULL && fileptr != fileptr->prev && fileptr != fileptr->next);
+=======
+    assert(fileptr != fileptr->prev && fileptr != fileptr->next);
+>>>>>>> origin/tomato-shibby-RT-AC
 
     fileptr->prev->next = fileptr->next;
     fileptr->next->prev = fileptr->prev;
@@ -553,8 +627,6 @@ void unlink_opennode(openfilestruct *fileptr)
 /* Delete a node from the openfilestruct. */
 void delete_opennode(openfilestruct *fileptr)
 {
-    assert(fileptr != NULL && fileptr->filename != NULL && fileptr->fileage != NULL);
-
     free(fileptr->filename);
     free_filestruct(fileptr->fileage);
 #ifndef NANO_TINY
@@ -629,49 +701,46 @@ void die(const char *msg, ...)
     vfprintf(stderr, msg, ap);
     va_end(ap);
 
-    /* Save the current file buffer if it's been modified. */
+#ifndef NANO_TINY
+    /* If the current buffer has a lockfile, remove it. */
+    if (openfile && ISSET(LOCKING) && openfile->lock_filename)
+	delete_lockfile(openfile->lock_filename);
+#endif
+
+    /* If the current file buffer was modified, save it. */
     if (openfile && openfile->modified) {
-	/* If we've partitioned the filestruct, unpartition it now. */
+	/* If the filestruct is partitioned, unpartition it first. */
 	if (filepart != NULL)
 	    unpartition_filestruct(&filepart);
 
-	die_save_file(openfile->filename
-#ifndef NANO_TINY
-		, openfile->current_stat
-#endif
-		);
+	die_save_file(openfile->filename, openfile->current_stat);
     }
 
 #ifdef ENABLE_MULTIBUFFER
     /* Save all of the other modified file buffers, if any. */
     if (openfile != NULL) {
-	openfilestruct *tmp = openfile;
+	openfilestruct *firstone = openfile;
 
-	while (tmp != openfile->next) {
+	while (openfile->next != firstone) {
 	    openfile = openfile->next;
 
-	    /* Save the current file buffer if it's been modified. */
-	    if (openfile->modified)
-		die_save_file(openfile->filename
 #ifndef NANO_TINY
-			, openfile->current_stat
+	    if (ISSET(LOCKING) && openfile->lock_filename)
+		delete_lockfile(openfile->lock_filename);
 #endif
-			);
+	    if (openfile->modified)
+		die_save_file(openfile->filename, openfile->current_stat);
 	}
     }
 #endif
 
-    /* Get out. */
+    /* Abandon the building. */
     exit(1);
 }
 
 /* Save the current file under the name spacified in die_filename, which
  * is modified to be unique if necessary. */
-void die_save_file(const char *die_filename
-#ifndef NANO_TINY
-	, struct stat *die_stat
-#endif
-	)
+void die_save_file(const char *die_filename, struct stat *die_stat)
 {
     char *retval;
     bool failed = TRUE;
@@ -717,32 +786,49 @@ void die_save_file(const char *die_filename
 /* Initialize the three window portions nano uses. */
 void window_init(void)
 {
+<<<<<<< HEAD
     /* If the screen height is too small, get out. */
     editwinrows = LINES - 5 + no_more_space() + no_help();
     if (COLS < MIN_EDITOR_COLS || editwinrows < MIN_EDITOR_ROWS)
 	die(_("Window size is too small for nano...\n"));
+=======
+    /* First delete existing windows, in case of resizing. */
+    delwin(topwin);
+    topwin = NULL;
+    delwin(edit);
+    delwin(bottomwin);
 
-#ifndef DISABLE_WRAPJUSTIFY
-    /* Set up fill, based on the screen width. */
-    fill = wrap_at;
-    if (fill <= 0)
-	fill += COLS;
-    if (fill < 0)
-	fill = 0;
-#endif
+    /* If the terminal is very flat, don't set up a titlebar. */
+    if (LINES < 3) {
+	editwinrows = 1;
+	/* Set up two subwindows.  If the terminal is just one line,
+	 * edit window and statusbar window will cover each other. */
+	edit = newwin(1, COLS, 0, 0);
+	bottomwin = newwin(1, COLS, LINES - 1, 0);
+    } else {
+	int toprows = (ISSET(MORE_SPACE) ? 1 : (LINES < 6) ? 1 : 2);
+	int bottomrows = (ISSET(NO_HELP) ? 1 : (LINES < 5) ? 1 : 3);
+>>>>>>> origin/tomato-shibby-RT-AC
 
-    if (topwin != NULL)
-	delwin(topwin);
-    if (edit != NULL)
-	delwin(edit);
-    if (bottomwin != NULL)
-	delwin(bottomwin);
+	editwinrows = LINES - toprows - bottomrows;
 
+	/* Set up the normal three subwindows. */
+	topwin = newwin(toprows, COLS, 0, 0);
+	edit = newwin(editwinrows, COLS, toprows, 0);
+	bottomwin = newwin(bottomrows, COLS, toprows + editwinrows, 0);
+    }
+
+<<<<<<< HEAD
     /* Set up the windows. */
     topwin = newwin(2 - no_more_space(), COLS, 0, 0);
     edit = newwin(editwinrows, COLS, 2 - no_more_space(), 0);
     bottomwin = newwin(3 - no_help(), COLS, editwinrows + (2 -
 	no_more_space()), 0);
+=======
+    /* In case the terminal shrunk, make sure the status line is clear. */
+    blank_statusbar();
+    wnoutrefresh(bottomwin);
+>>>>>>> origin/tomato-shibby-RT-AC
 
     /* Turn the keypad on for the windows, if necessary. */
     if (!ISSET(REBIND_KEYPAD)) {
@@ -750,6 +836,15 @@ void window_init(void)
 	keypad(edit, TRUE);
 	keypad(bottomwin, TRUE);
     }
+
+#ifndef DISABLE_WRAPJUSTIFY
+    /* Set up the wrapping point, accounting for screen width when negative. */
+    fill = wrap_at;
+    if (fill <= 0)
+	fill += COLS;
+    if (fill < 0)
+	fill = 0;
+#endif
 }
 
 #ifndef DISABLE_MOUSE
@@ -778,32 +873,20 @@ void mouse_init(void)
 }
 #endif /* !DISABLE_MOUSE */
 
-#ifdef HAVE_GETOPT_LONG
-#define print_opt(shortflag, longflag, desc) print_opt_full(shortflag, longflag, desc)
-#else
-#define print_opt(shortflag, longflag, desc) print_opt_full(shortflag, desc)
-#endif
-
 /* Print one usage string to the screen.  This cuts down on duplicate
  * strings to translate, and leaves out the parts that shouldn't be
  * translatable (i.e. the flag names). */
-void print_opt_full(const char *shortflag
-#ifdef HAVE_GETOPT_LONG
-	, const char *longflag
-#endif
-	, const char *desc)
+void print_opt(const char *shortflag, const char *longflag, const char *desc)
 {
     printf(" %s\t", shortflag);
     if (strlenpt(shortflag) < 8)
 	printf("\t");
 
-#ifdef HAVE_GETOPT_LONG
     printf("%s\t", longflag);
     if (strlenpt(longflag) < 8)
 	printf("\t\t");
     else if (strlenpt(longflag) < 16)
 	printf("\t");
-#endif
 
     if (desc != NULL)
 	printf("%s", _(desc));
@@ -813,6 +896,7 @@ void print_opt_full(const char *shortflag
 /* Explain how to properly use nano and its command line options. */
 void usage(void)
 {
+<<<<<<< HEAD
     printf(_("Usage: nano [OPTIONS] [[+LINE,COLUMN] FILE]...\n\n"));
     printf(
 #ifdef HAVE_GETOPT_LONG
@@ -829,6 +913,25 @@ void usage(void)
     print_opt("-B", "--backup", N_("Save backups of existing files"));
     print_opt(_("-C <dir>"), _("--backupdir=<dir>"),
 	N_("Directory for saving unique backup files"));
+=======
+    printf(_("Usage: nano [OPTIONS] [[+LINE[,COLUMN]] FILE]...\n\n"));
+    /* TRANSLATORS: The next two strings are part of the --help output.
+     * It's best to keep its lines within 80 characters. */
+    printf(_("To place the cursor on a specific line of a file, put the line number with\n"
+		"a '+' before the filename.  The column number can be added after a comma.\n"));
+    printf(_("When the first filename is '-', nano reads data from standard input.\n\n"));
+    printf(_("Option\t\tGNU long option\t\tMeaning\n"));
+#ifndef NANO_TINY
+    print_opt("-A", "--smarthome",
+	/* TRANSLATORS: The next forty or so strings are option descriptions
+	 * for the --help output.  Try to keep them at most 40 characters. */
+		N_("Enable smart home key"));
+    if (!ISSET(RESTRICTED)) {
+	print_opt("-B", "--backup", N_("Save backups of existing files"));
+	print_opt(_("-C <dir>"), _("--backupdir=<dir>"),
+		N_("Directory for saving unique backup files"));
+    }
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif
     print_opt("-D", "--boldtext",
 	N_("Use bold instead of reverse video text"));
@@ -875,21 +978,44 @@ void usage(void)
 #ifndef NANO_TINY
     print_opt("-W", "--wordbounds",
 	N_("Detect word boundaries more accurately"));
+    print_opt(_("-X <str>"), _("--wordchars=<str>"),
+	N_("Which other characters are word parts"));
 #endif
+<<<<<<< HEAD
 #ifdef ENABLE_COLOR
     print_opt(_("-Y <str>"), _("--syntax=<str>"),
 	N_("Syntax definition to use for coloring"));
+=======
+#ifndef DISABLE_COLOR
+    if (!ISSET(RESTRICTED))
+	print_opt(_("-Y <name>"), _("--syntax=<name>"),
+		N_("Syntax definition to use for coloring"));
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif
     print_opt("-c", "--const", N_("Constantly show cursor position"));
     print_opt("-d", "--rebinddelete",
 	N_("Fix Backspace/Delete confusion problem"));
+<<<<<<< HEAD
+=======
+#ifndef DISABLE_BROWSER
+    if (!ISSET(RESTRICTED))
+	print_opt("-g", "--showcursor", N_("Show cursor in file browser"));
+#endif
+    print_opt("-h", "--help", N_("Show this help text and exit"));
+>>>>>>> origin/tomato-shibby-RT-AC
 #ifndef NANO_TINY
     print_opt("-i", "--autoindent",
 	N_("Automatically indent new lines"));
     print_opt("-k", "--cut", N_("Cut from cursor to end of line"));
 #endif
+<<<<<<< HEAD
     print_opt("-l", "--nofollow",
 	N_("Don't follow symbolic links, overwrite"));
+=======
+#ifdef ENABLE_LINENUMBERS
+    print_opt("-l", "--linenumbers", N_("Show line numbers in front of the text"));
+#endif
+>>>>>>> origin/tomato-shibby-RT-AC
 #ifndef DISABLE_MOUSE
     print_opt("-m", "--mouse", N_("Enable the use of the mouse"));
 #endif
@@ -935,14 +1061,75 @@ void usage(void)
  * it was compiled with. */
 void version(void)
 {
+<<<<<<< HEAD
     printf(_(" GNU nano version %s (compiled %s, %s)\n"), VERSION,
 	__TIME__, __DATE__);
     printf(" (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,\n");
     printf(" 2008, 2009 Free Software Foundation, Inc.\n");
+=======
+#ifdef REVISION
+    printf(" GNU nano from git, %s\n", REVISION);
+#else
+    printf(_(" GNU nano, version %s\n"), VERSION);
+#endif
+    printf(" (C) 1999..2016 Free Software Foundation, Inc.\n");
+    printf(_(" (C) 2014..%s the contributors to nano\n"), "2017");
+>>>>>>> origin/tomato-shibby-RT-AC
     printf(
 	_(" Email: nano@nano-editor.org	Web: http://www.nano-editor.org/"));
     printf(_("\n Compiled options:"));
 
+<<<<<<< HEAD
+=======
+#ifdef NANO_TINY
+    printf(" --enable-tiny");
+#ifndef DISABLE_BROWSER
+    printf(" --enable-browser");
+#endif
+#ifndef DISABLE_COLOR
+    printf(" --enable-color");
+#endif
+#ifndef DISABLE_EXTRA
+    printf(" --enable-extra");
+#endif
+#ifndef DISABLE_HELP
+    printf(" --enable-help");
+#endif
+#ifndef DISABLE_HISTORIES
+    printf(" --enable-histories");
+#endif
+#ifndef DISABLE_JUSTIFY
+    printf(" --enable-justify");
+#endif
+#ifdef HAVE_LIBMAGIC
+    printf(" --enable-libmagic");
+#endif
+#ifdef ENABLE_LINENUMBERS
+    printf(" --enable-linenumbers");
+#endif
+#ifndef DISABLE_MOUSE
+    printf(" --enable-mouse");
+#endif
+#ifndef DISABLE_NANORC
+    printf(" --enable-nanorc");
+#endif
+#ifndef DISABLE_MULTIBUFFER
+    printf(" --enable-multibuffer");
+#endif
+#ifndef DISABLE_OPERATINGDIR
+    printf(" --enable-operatingdir");
+#endif
+#ifndef DISABLE_SPELLER
+    printf(" --enable-speller");
+#endif
+#ifndef DISABLE_TABCOMP
+    printf(" --enable-tabcomp");
+#endif
+#ifndef DISABLE_WRAPPING
+    printf(" --enable-wrapping");
+#endif
+#else /* !NANO_TINY */
+>>>>>>> origin/tomato-shibby-RT-AC
 #ifdef DISABLE_BROWSER
     printf(" --disable-browser");
 #endif
@@ -952,6 +1139,15 @@ void version(void)
 #ifdef DISABLE_JUSTIFY
     printf(" --disable-justify");
 #endif
+<<<<<<< HEAD
+=======
+#ifndef HAVE_LIBMAGIC
+    printf(" --disable-libmagic");
+#endif
+#ifndef ENABLE_LINENUMBERS
+    printf(" --disable-linenumbers");
+#endif
+>>>>>>> origin/tomato-shibby-RT-AC
 #ifdef DISABLE_MOUSE
     printf(" --disable-mouse");
 #endif
@@ -966,6 +1162,9 @@ void version(void)
 #endif
 #ifdef DISABLE_TABCOMP
     printf(" --disable-tabcomp");
+#endif
+#ifndef ENABLE_WORDCOMPLETION
+    printf(" --disable-wordcomp");
 #endif
 #ifdef DISABLE_WRAPPING
     printf(" --disable-wrapping");
@@ -1000,6 +1199,7 @@ void version(void)
     printf("\n");
 }
 
+<<<<<<< HEAD
 /* Return 1 if the MORE_SPACE flag is set, and 0 otherwise.  This is
  * used to calculate the relative screen position while taking this flag
  * into account, since it adds one line to the edit window. */
@@ -1022,6 +1222,8 @@ void nano_disabled_msg(void)
     statusbar(_("Sorry, support for this function has been disabled"));
 }
 
+=======
+>>>>>>> origin/tomato-shibby-RT-AC
 /* If the current file buffer has been modified, and the TEMP_FILE flag
  * isn't set, ask whether or not to save the file buffer.  If the
  * TEMP_FILE flag is set, save it unconditionally.  Then, if more than
@@ -1039,9 +1241,21 @@ void do_exit(void)
     else if (ISSET(TEMP_FILE))
 	i = 1;
     /* Otherwise, ask the user whether or not to save. */
+<<<<<<< HEAD
     else
 	i = do_yesno_prompt(FALSE,
 		_("Save modified buffer (ANSWERING \"No\" WILL DESTROY CHANGES) ? "));
+=======
+    else {
+	/* If the TEMP_FILE flag is set, and the current file doesn't
+	 * have a name, warn the user before prompting for a name. */
+	if (ISSET(TEMP_FILE))
+	    warn_and_shortly_pause(_("No file name"));
+
+	i = do_yesno_prompt(FALSE, _("Save modified buffer?  "
+			"(Answering \"No\" will DISCARD changes.) "));
+    }
+>>>>>>> origin/tomato-shibby-RT-AC
 
 #ifdef DEBUG
     dump_filestruct(openfile->fileage);
@@ -1113,10 +1327,16 @@ void stdin_pager(void)
 	tcsetattr(0, TCSANOW, &oldterm);
     fprintf(stderr, _("Reading from stdin, ^C to abort\n"));
 
+<<<<<<< HEAD
     /* Set things up so that Ctrl-C will cancel the new process. */
     /* Enable interpretation of the special control keys so that we get
      * SIGINT when Ctrl-C is pressed. */
 #ifndef NANO_TINY
+=======
+#ifndef NANO_TINY
+    /* Enable interpretation of the special control keys so that
+     * we get SIGINT when Ctrl-C is pressed. */
+>>>>>>> origin/tomato-shibby-RT-AC
     enable_signals();
 #endif
 
@@ -1145,11 +1365,15 @@ void signal_init(void)
     memset(&act, 0, sizeof(struct sigaction));
     act.sa_handler = SIG_IGN;
     sigaction(SIGINT, &act, NULL);
+#ifdef SIGQUIT
     sigaction(SIGQUIT, &act, NULL);
+#endif
 
     /* Trap SIGHUP and SIGTERM because we want to write the file out. */
     act.sa_handler = handle_hupterm;
+#ifdef SIGHUP
     sigaction(SIGHUP, &act, NULL);
+#endif
     sigaction(SIGTERM, &act, NULL);
 
 #ifndef NANO_TINY
@@ -1162,17 +1386,23 @@ void signal_init(void)
     /* Trap normal suspend (^Z) so we can handle it ourselves. */
     if (!ISSET(SUSPEND)) {
 	act.sa_handler = SIG_IGN;
+#ifdef SIGTSTP
 	sigaction(SIGTSTP, &act, NULL);
+#endif
     } else {
 	/* Block all other signals in the suspend and continue handlers.
 	 * If we don't do this, other stuff interrupts them! */
 	sigfillset(&act.sa_mask);
 
 	act.sa_handler = do_suspend;
+#ifdef SIGTSTP
 	sigaction(SIGTSTP, &act, NULL);
+#endif
 
 	act.sa_handler = do_continue;
+#ifdef SIGCONT
 	sigaction(SIGCONT, &act, NULL);
+#endif
     }
 }
 
@@ -1210,11 +1440,15 @@ RETSIGTYPE do_suspend(int signal)
     /* Trap SIGHUP and SIGTERM so we can properly deal with them while
      * suspended. */
     act.sa_handler = handle_hupterm;
+#ifdef SIGHUP
     sigaction(SIGHUP, &act, NULL);
+#endif
     sigaction(SIGTERM, &act, NULL);
 
     /* Do what mutt does: send ourselves a SIGSTOP. */
+#ifdef SIGSTOP
     kill(0, SIGSTOP);
+#endif
 }
 
 /* the subnfunc version */
@@ -1234,13 +1468,13 @@ RETSIGTYPE do_continue(int signal)
 #endif
 
 #ifndef NANO_TINY
-    /* Perhaps the user resized the window while we slept.  Handle it,
-     * and restore the terminal to its previous state and update the
-     * screen in the process. */
-    handle_sigwinch(0);
+    /* Perhaps the user resized the window while we slept.  So act as if,
+     * and restore the terminal to its previous state in the process. */
+    regenerate_screen();
 #else
-    /* Restore the terminal to its previous state. */
+    /* Restore the state of the terminal and redraw the whole screen. */
     terminal_init();
+<<<<<<< HEAD
 
     /* Turn the cursor back on for sure. */
     curs_set(1);
@@ -1248,6 +1482,8 @@ RETSIGTYPE do_continue(int signal)
     /* Redraw the contents of the windows that need it. */
     blank_statusbar();
     wnoutrefresh(bottomwin);
+=======
+>>>>>>> origin/tomato-shibby-RT-AC
     total_refresh();
 #endif
 }
@@ -1256,9 +1492,22 @@ RETSIGTYPE do_continue(int signal)
 /* Handler for SIGWINCH (window size change). */
 RETSIGTYPE handle_sigwinch(int signal)
 {
+<<<<<<< HEAD
+=======
+    /* Let the input routine know that a SIGWINCH has occurred. */
+    the_window_resized = TRUE;
+}
+
+/* Reinitialize and redraw the screen completely. */
+void regenerate_screen(void)
+{
+>>>>>>> origin/tomato-shibby-RT-AC
     const char *tty = ttyname(0);
     int fd, result = 0;
     struct winsize win;
+
+    /* Reset the trigger. */
+    the_window_resized = FALSE;
 
     if (tty == NULL)
 	return;
@@ -1278,6 +1527,10 @@ RETSIGTYPE handle_sigwinch(int signal)
     COLS = win.ws_col;
     LINES = win.ws_row;
 #endif
+    editwincols = COLS - margin;
+
+    /* Ensure that firstcolumn is the starting column of its chunk. */
+    ensure_firstcolumn_is_aligned();
 
     /* If we've partitioned the filestruct, unpartition it now. */
     if (filepart != NULL)
@@ -1354,6 +1607,7 @@ void do_toggle(int flag)
 	case SUSPEND:
 	    signal_init();
 	    break;
+<<<<<<< HEAD
 #ifdef ENABLE_NANORC
 	case WHITESPACE_DISPLAY:
 	    titlebar(NULL);
@@ -1361,17 +1615,32 @@ void do_toggle(int flag)
 	    break;
 #endif
 #ifdef ENABLE_COLOR
+=======
+	case SOFTWRAP:
+	    if (!ISSET(SOFTWRAP))
+		openfile->firstcolumn = 0;
+	    refresh_needed = TRUE;
+	    break;
+	case WHITESPACE_DISPLAY:
+	    titlebar(NULL);	/* Fall through. */
+#ifndef DISABLE_COLOR
+>>>>>>> origin/tomato-shibby-RT-AC
 	case NO_COLOR_SYNTAX:
 	    edit_refresh();
 	    break;
 #endif
+<<<<<<< HEAD
 	case SOFTWRAP:
 	    total_refresh();
+=======
+	    refresh_needed = TRUE;
+>>>>>>> origin/tomato-shibby-RT-AC
 	    break;
     }
 
     enabled = ISSET(flag);
 
+<<<<<<< HEAD
     if (flag ==  NO_HELP
 #ifndef DISABLE_WRAPPING
 	|| flag == NO_WRAP
@@ -1380,35 +1649,51 @@ void do_toggle(int flag)
 	|| flag == NO_COLOR_SYNTAX
 #endif
 	)
+=======
+    if (flag == NO_HELP || flag == NO_WRAP || flag == NO_COLOR_SYNTAX)
+>>>>>>> origin/tomato-shibby-RT-AC
 	enabled = !enabled;
 
     desc = _(flagtostr(flag));
     statusbar("%s %s", desc, enabled ? _("enabled") :
 	_("disabled"));
 }
+
+<<<<<<< HEAD
+=======
+/* Bleh. */
+void do_toggle_void(void)
+{
+    ;
+}
 #endif /* !NANO_TINY */
 
+>>>>>>> origin/tomato-shibby-RT-AC
 /* Disable extended input and output processing in our terminal
  * settings. */
 void disable_extended_io(void)
 {
+#ifdef HAVE_TERMIOS_H
     struct termios term;
 
     tcgetattr(0, &term);
     term.c_lflag &= ~IEXTEN;
     term.c_oflag &= ~OPOST;
     tcsetattr(0, TCSANOW, &term);
+#endif
 }
 
 /* Disable interpretation of the special control keys in our terminal
  * settings. */
 void disable_signals(void)
 {
+#ifdef HAVE_TERMIOS_H
     struct termios term;
 
     tcgetattr(0, &term);
     term.c_lflag &= ~ISIG;
     tcsetattr(0, TCSANOW, &term);
+#endif
 }
 
 #ifndef NANO_TINY
@@ -1416,11 +1701,13 @@ void disable_signals(void)
  * settings. */
 void enable_signals(void)
 {
+#ifdef HAVE_TERMIOS_H
     struct termios term;
 
     tcgetattr(0, &term);
     term.c_lflag |= ISIG;
     tcsetattr(0, TCSANOW, &term);
+#endif
 }
 #endif
 
@@ -1428,22 +1715,26 @@ void enable_signals(void)
  * settings. */
 void disable_flow_control(void)
 {
+#ifdef HAVE_TERMIOS_H
     struct termios term;
 
     tcgetattr(0, &term);
     term.c_iflag &= ~IXON;
     tcsetattr(0, TCSANOW, &term);
+#endif
 }
 
 /* Enable interpretation of the flow control characters in our terminal
  * settings. */
 void enable_flow_control(void)
 {
+#ifdef HAVE_TERMIOS_H
     struct termios term;
 
     tcgetattr(0, &term);
     term.c_iflag |= IXON;
     tcsetattr(0, TCSANOW, &term);
+#endif
 }
 
 /* Set up the terminal state.  Put the terminal in raw mode (read one
@@ -1488,6 +1779,7 @@ void terminal_init(void)
 #endif
 }
 
+<<<<<<< HEAD
 /* Read in a character, interpret it as a shortcut or toggle if
  * necessary, and return it.  Set meta_key to TRUE if the character is a
  * meta sequence, set func_key to TRUE if the character is a function
@@ -1505,6 +1797,47 @@ int do_input(bool *meta_key, bool *func_key, bool *s_or_t, bool
     static int *kbinput = NULL;
 	/* The input buffer. */
     static size_t kbinput_len = 0;
+=======
+/* Ask ncurses for a keycode, or assign a default one. */
+int get_keycode(const char *keyname, const int standard)
+{
+#ifdef HAVE_KEY_DEFINED
+    const char *keyvalue = tigetstr(keyname);
+
+    if (keyvalue != 0 && keyvalue != (char *)-1)
+	return key_defined(keyvalue);
+    else
+#endif
+	return standard;
+}
+
+/* Say that an unbound key was struck, and if possible which one. */
+void unbound_key(int code)
+{
+    if (!is_byte(code))
+	statusline(ALERT, _("Unbound key"));
+    else if (meta_key) {
+	if (code == '[')
+	    statusline(ALERT, _("Unbindable key: M-["));
+	else
+	    statusline(ALERT, _("Unbound key: M-%c"), toupper(code));
+    } else if (code < 0x20)
+	statusline(ALERT, _("Unbound key: ^%c"), code + 0x40);
+    else
+	statusline(ALERT, _("Unbound key: %c"), code);
+}
+
+/* Read in a keystroke.  Act on the keystroke if it is a shortcut or a toggle;
+ * otherwise, insert it into the edit buffer.  If allow_funcs is FALSE, don't
+ * do anything with the keystroke -- just return it. */
+int do_input(bool allow_funcs)
+{
+    int input;
+	/* The keystroke we read in: a character or a shortcut. */
+    static char *puddle = NULL;
+	/* The input buffer for actual characters. */
+    static size_t depth = 0;
+>>>>>>> origin/tomato-shibby-RT-AC
 	/* The length of the input buffer. */
     bool cut_copy = FALSE;
 	/* Are we cutting or copying text? */
@@ -1519,6 +1852,7 @@ int do_input(bool *meta_key, bool *func_key, bool *s_or_t, bool
     input = get_kbinput(edit, meta_key, func_key);
 
 #ifndef DISABLE_MOUSE
+<<<<<<< HEAD
     if (allow_funcs) {
 	/* If we got a mouse click and it was on a shortcut, read in the
 	 * shortcut character. */
@@ -1531,6 +1865,17 @@ int do_input(bool *meta_key, bool *func_key, bool *s_or_t, bool
 		input = ERR;
 	    }
 	}
+=======
+    if (input == KEY_MOUSE) {
+	/* We received a mouse click. */
+	if (do_mouse() == 1)
+	    /* The click was on a shortcut -- read in the character
+	     * that it was converted into. */
+	    input = get_kbinput(edit);
+	else
+	    /* The click was invalid or has been handled -- get out. */
+	    return ERR;
+>>>>>>> origin/tomato-shibby-RT-AC
     }
 #endif
 
@@ -1544,15 +1889,21 @@ int do_input(bool *meta_key, bool *func_key, bool *s_or_t, bool
     /* If we got a non-high-bit control key, a meta key sequence, or a
      * function key, and it's not a shortcut or toggle, throw it out. */
     if (!have_shortcut) {
+<<<<<<< HEAD
 	if (is_ascii_cntrl_char(input) || *meta_key || *func_key) {
 	    statusbar(_("Unknown Command"));
 	    beep();
 	    *meta_key = FALSE;
 	    *func_key = FALSE;
+=======
+	if (is_ascii_cntrl_char(input) || meta_key || !is_byte(input)) {
+	    unbound_key(input);
+>>>>>>> origin/tomato-shibby-RT-AC
 	    input = ERR;
 	}
     }
 
+<<<<<<< HEAD
     if (allow_funcs) {
 	/* If we got a character, and it isn't a shortcut or toggle,
 	 * it's a normal text character.  Display the warning if we're
@@ -1583,8 +1934,31 @@ int do_input(bool *meta_key, bool *func_key, bool *s_or_t, bool
 	    if (have_shortcut && (!have_shortcut || s == NULL || s->scfunc !=
 		DO_VERBATIM_INPUT))
 		wrap_reset();
-#endif
+=======
+    if (!allow_funcs)
+	return input;
 
+    /* If the keystroke isn't a shortcut nor a toggle, it's a normal text
+     * character: add the character to the input buffer -- or display a
+     * warning when we're in view mode. */
+     if (input != ERR && !have_shortcut) {
+	if (ISSET(VIEW_MODE))
+	    print_view_warning();
+	else {
+	    /* Store the byte, and leave room for a terminating zero. */
+	    puddle = charealloc(puddle, depth + 2);
+	    puddle[depth++] = (char)input;
+	}
+#ifndef NANO_TINY
+	if (openfile->mark_set && openfile->kind_of_mark == SOFTMARK) {
+	    openfile->mark_set = FALSE;
+	    refresh_needed = TRUE;
+	}
+>>>>>>> origin/tomato-shibby-RT-AC
+#endif
+    }
+
+<<<<<<< HEAD
 	    if (kbinput != NULL) {
 		/* Display all the characters in the input buffer at
 		 * once, filtering out control characters. */
@@ -1596,9 +1970,39 @@ int do_input(bool *meta_key, bool *func_key, bool *s_or_t, bool
 		output[i] = '\0';
 
 		do_output(output, kbinput_len, FALSE);
+=======
+    /* If we got a shortcut or toggle, or if there aren't any other
+     * characters waiting after the one we read in, we need to output
+     * all available characters in the input puddle.  Note that this
+     * puddle will be empty if we're in view mode. */
+    if (have_shortcut || get_key_buffer_len() == 0) {
+#ifndef DISABLE_WRAPPING
+	/* If we got a shortcut or toggle, and it's not the shortcut
+	 * for verbatim input, turn off prepending of wrapped text. */
+	if (have_shortcut && s->scfunc != do_verbatim_input)
+	    wrap_reset();
+#endif
 
-		free(output);
+	if (puddle != NULL) {
+	    /* Insert all bytes in the input buffer into the edit buffer
+	     * at once, filtering out any low control codes. */
+	    puddle[depth] = '\0';
+	    do_output(puddle, depth, FALSE);
 
+	    /* Empty the input buffer. */
+	    free(puddle);
+	    puddle = NULL;
+	    depth = 0;
+	}
+    }
+>>>>>>> origin/tomato-shibby-RT-AC
+
+    if (!have_shortcut)
+	pletion_line = NULL;
+    else {
+	const subnfunc *f = sctofunc(s);
+
+<<<<<<< HEAD
 		/* Empty the input buffer. */
 		kbinput_len = 0;
 		free(kbinput);
@@ -1657,7 +2061,60 @@ int do_input(bool *meta_key, bool *func_key, bool *s_or_t, bool
 		    }
 		    *finished = TRUE;
 		    break;
+=======
+	if (ISSET(VIEW_MODE) && f && !f->viewok) {
+	    print_view_warning();
+	    return ERR;
+	}
+
+	/* If the function associated with this shortcut is
+	 * cutting or copying text, remember this. */
+	if (s->scfunc == do_cut_text_void
+#ifndef NANO_TINY
+		|| s->scfunc == do_copy_text || s->scfunc == do_cut_till_eof
+#endif
+		)
+	    preserve = TRUE;
+
+#ifdef ENABLE_WORDCOMPLETION
+	if (s->scfunc != complete_a_word)
+	    pletion_line = NULL;
+#endif
+#ifndef NANO_TINY
+	if (s->scfunc == do_toggle_void) {
+	    do_toggle(s->toggle);
+	    if (s->toggle != CUT_TO_END)
+		preserve = TRUE;
+	} else
+#endif
+	{
+#ifndef NANO_TINY
+	    /* If Shifted movement occurs, set the mark. */
+	    if (shift_held && !openfile->mark_set) {
+		openfile->mark_set = TRUE;
+		openfile->mark_begin = openfile->current;
+		openfile->mark_begin_x = openfile->current_x;
+		openfile->kind_of_mark = SOFTMARK;
 	    }
+#endif
+	    /* Execute the function of the shortcut. */
+	    s->scfunc();
+#ifndef NANO_TINY
+	    /* If Shiftless movement occurred, discard a soft mark. */
+	    if (openfile->mark_set && !shift_held &&
+				openfile->kind_of_mark == SOFTMARK) {
+		openfile->mark_set = FALSE;
+		openfile->mark_begin = NULL;
+		refresh_needed = TRUE;
+>>>>>>> origin/tomato-shibby-RT-AC
+	    }
+#endif
+#ifndef DISABLE_COLOR
+	    if (f && !f->viewok)
+		check_the_multis(openfile->current);
+#endif
+	    if (!refresh_needed && (s->scfunc == do_delete || s->scfunc == do_backspace))
+		update_line(openfile->current, openfile->current_x);
 	}
     }
 
@@ -1684,9 +2141,10 @@ void xoff_complaint(void)
 /* Handle a mouse click on the edit window or the shortcut list. */
 int do_mouse(void)
 {
-    int mouse_x, mouse_y;
-    int retval = get_mouseinput(&mouse_x, &mouse_y, TRUE);
+    int mouse_col, mouse_row;
+    int retval = get_mouseinput(&mouse_col, &mouse_row, TRUE);
 
+<<<<<<< HEAD
     /* We can click on the edit window to move the cursor. */
     if (retval == 0 && wmouse_trafo(edit, &mouse_y, &mouse_x, FALSE)) {
 	bool sameline;
@@ -1700,8 +2158,29 @@ int do_mouse(void)
 
 #ifdef DEBUG
 	    fprintf(stderr, "mouse_y = %d, current_y = %d\n", mouse_y, openfile->current_y);
-#endif
+=======
+    /* If the click is wrong or already handled, we're done. */
+    if (retval != 0)
+	return retval;
 
+    /* If the click was in the edit window, put the cursor in that spot. */
+    if (wmouse_trafo(edit, &mouse_row, &mouse_col, FALSE)) {
+	bool sameline = (mouse_row == openfile->current_y);
+	    /* Whether the click was on the row where the cursor is. */
+	filestruct *current_save = openfile->current;
+	ssize_t row_count = mouse_row - openfile->current_y;
+	size_t leftedge;
+#ifndef NANO_TINY
+	size_t current_x_save = openfile->current_x;
+
+	if (ISSET(SOFTWRAP))
+	    leftedge = (xplustabs() / editwincols) * editwincols;
+	else
+>>>>>>> origin/tomato-shibby-RT-AC
+#endif
+	    leftedge = get_page_start(xplustabs());
+
+<<<<<<< HEAD
  	if (ISSET(SOFTWRAP)) {
 	    int i = 0;
 	    for (openfile->current = openfile->edittop;
@@ -1745,11 +2224,24 @@ int do_mouse(void)
 
 	    openfile->placewewant = xplustabs();
 	}
+=======
+#ifdef DEBUG
+	fprintf(stderr, "mouse_row = %d, current_y = %ld\n", mouse_row, (long)openfile->current_y);
+#endif
+
+	/* Move current up or down to the row corresponding to mouse_row. */
+	if (row_count < 0)
+	    go_back_chunks(-row_count, &openfile->current, &leftedge);
+	else
+	    go_forward_chunks(row_count, &openfile->current, &leftedge);
+
+	openfile->current_x = actual_x(openfile->current->data,
+					leftedge + mouse_col);
+>>>>>>> origin/tomato-shibby-RT-AC
 
 #ifndef NANO_TINY
-	/* Clicking where the cursor is toggles the mark, as does
-	 * clicking beyond the line length with the cursor at the end of
-	 * the line. */
+	/* Clicking where the cursor is toggles the mark, as does clicking
+	 * beyond the line length with the cursor at the end of the line. */
 	if (sameline && openfile->current_x == current_x_save)
 	    do_mark();
 #endif
@@ -1907,6 +2399,7 @@ precalc_cleanup:
  * TRUE. */
 void do_output(char *output, size_t output_len, bool allow_cntrls)
 {
+<<<<<<< HEAD
     size_t current_len, orig_lenpt, i = 0;
     char *char_buf = charalloc(mb_cur_max());
     int char_buf_len;
@@ -1934,9 +2427,33 @@ void do_output(char *output, size_t output_len, bool allow_cntrls)
 
 	/* Interpret the next multibyte character. */
 	char_buf_len = parse_mbchar(output + i, char_buf, NULL);
+=======
+    char *char_buf = charalloc(mb_cur_max());
+    int char_len;
+    size_t current_len = strlen(openfile->current->data);
+    size_t i = 0;
+#ifndef NANO_TINY
+    size_t orig_rows = 0, original_row = 0;
 
-	i += char_buf_len;
+    if (ISSET(SOFTWRAP)) {
+	if (openfile->current_y == editwinrows - 1)
+	    original_row = xplustabs() / editwincols;
+	orig_rows = strlenpt(openfile->current->data) / editwincols;
+    }
+#endif
 
+    while (i < output_len) {
+	/* Encode an embedded NUL byte as 0x0A. */
+	if (output[i] == '\0')
+	    output[i] = '\n';
+
+	/* Get the next multibyte character. */
+	char_len = parse_mbchar(output + i, char_buf, NULL);
+>>>>>>> origin/tomato-shibby-RT-AC
+
+	i += char_len;
+
+<<<<<<< HEAD
 	/* If allow_cntrls is FALSE, filter out an ASCII control
 	 * character. */
 	if (!allow_cntrls && is_ascii_cntrl_char(*(output + i -
@@ -1962,6 +2479,28 @@ void do_output(char *output, size_t output_len, bool allow_cntrls)
 	strncpy(openfile->current->data + openfile->current_x, char_buf,
 		char_buf_len);
 	current_len += char_buf_len;
+=======
+	/* If controls are not allowed, ignore an ASCII control character. */
+	if (!allow_cntrls && is_ascii_cntrl_char(*(output + i -	char_len)))
+	    continue;
+
+	/* If we're adding to the magicline, create a new magicline. */
+	if (!ISSET(NO_NEWLINES) && openfile->filebot == openfile->current) {
+	    new_magicline();
+	    if (margin > 0)
+		refresh_needed = TRUE;
+	}
+
+	/* Make room for the new character and copy it into the line. */
+	openfile->current->data = charealloc(openfile->current->data,
+					current_len + char_len + 1);
+	charmove(openfile->current->data + openfile->current_x + char_len,
+			openfile->current->data + openfile->current_x,
+			current_len - openfile->current_x + 1);
+	strncpy(openfile->current->data + openfile->current_x, char_buf,
+			char_len);
+	current_len += char_len;
+>>>>>>> origin/tomato-shibby-RT-AC
 	openfile->totsize++;
 	set_modified();
 
@@ -1969,26 +2508,51 @@ void do_output(char *output, size_t output_len, bool allow_cntrls)
 	update_undo(ADD);
 
 	/* Note that current_x has not yet been incremented. */
+<<<<<<< HEAD
 	if (openfile->mark_set && openfile->current ==
 		openfile->mark_begin && openfile->current_x <
 		openfile->mark_begin_x)
 	    openfile->mark_begin_x += char_buf_len;
+=======
+	if (openfile->mark_set && openfile->current == openfile->mark_begin &&
+		openfile->current_x < openfile->mark_begin_x)
+	    openfile->mark_begin_x += char_len;
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif
 
-	openfile->current_x += char_buf_len;
+	openfile->current_x += char_len;
 
 #ifndef DISABLE_WRAPPING
+<<<<<<< HEAD
 	/* If we're wrapping text, we need to call edit_refresh(). */
 	if (!ISSET(NO_WRAP))
 	    if (do_wrap(openfile->current, FALSE))
 		edit_refresh_needed = TRUE;
+=======
+	/* If text gets wrapped, the edit window needs a refresh. */
+	if (!ISSET(NO_WRAP) && do_wrap(openfile->current))
+	    refresh_needed = TRUE;
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif
 
+<<<<<<< HEAD
 #ifdef ENABLE_COLOR
 	/* If color syntaxes are available and turned on, we need to
 	 * call edit_refresh(). */
 	if (openfile->colorstrings != NULL && !ISSET(NO_COLOR_SYNTAX))
 	    edit_refresh_needed = TRUE;
+=======
+#ifndef NANO_TINY
+    /* If the number of screen rows that a softwrapped line occupies has
+     * changed, we need a full refresh.  And if we were on the last line
+     * of the edit window, and we moved one screen row, we're now below
+     * the last line of the edit window, so we need a full refresh too. */
+    if (ISSET(SOFTWRAP) && refresh_needed == FALSE &&
+		(strlenpt(openfile->current->data) / editwincols != orig_rows ||
+		(openfile->current_y == editwinrows - 1 &&
+		xplustabs() / editwincols != original_row)))
+	refresh_needed = TRUE;
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif
     }
 
@@ -2002,6 +2566,7 @@ void do_output(char *output, size_t output_len, bool allow_cntrls)
 
     openfile->placewewant = xplustabs();
 
+<<<<<<< HEAD
 
 #ifdef ENABLE_COLOR
     reset_multis(openfile->current, FALSE);
@@ -2010,6 +2575,13 @@ void do_output(char *output, size_t output_len, bool allow_cntrls)
 	edit_refresh();
 	edit_refresh_needed = FALSE;
     } else
+=======
+#ifndef DISABLE_COLOR
+    check_the_multis(openfile->current);
+#endif
+
+    if (!refresh_needed)
+>>>>>>> origin/tomato-shibby-RT-AC
 	update_line(openfile->current, openfile->current_x);
 }
 
@@ -2029,7 +2601,6 @@ int main(int argc, char **argv)
 	/* The old value of the multibuffer option, restored after we
 	 * load all files on the command line. */
 #endif
-#ifdef HAVE_GETOPT_LONG
     const struct option long_options[] = {
 	{"help", 0, NULL, 'h'},
 	{"boldtext", 0, NULL, 'D'},
@@ -2053,7 +2624,17 @@ int main(int argc, char **argv)
 #endif
 	{"const", 0, NULL, 'c'},
 	{"rebinddelete", 0, NULL, 'd'},
+<<<<<<< HEAD
 	{"nofollow", 0, NULL, 'l'},
+=======
+#ifndef DISABLE_BROWSER
+	{"showcursor", 0, NULL, 'g'},
+#endif
+	{"help", 0, NULL, 'h'},
+#ifdef ENABLE_LINENUMBERS
+	{"linenumbers", 0, NULL, 'l'},
+#endif
+>>>>>>> origin/tomato-shibby-RT-AC
 #ifndef DISABLE_MOUSE
 	{"mouse", 0, NULL, 'm'},
 #endif
@@ -2086,13 +2667,13 @@ int main(int argc, char **argv)
 	{"quickblank", 0, NULL, 'U'},
 	{"undo", 0, NULL, 'u'},
 	{"wordbounds", 0, NULL, 'W'},
+	{"wordchars", 1, NULL, 'X'},
 	{"autoindent", 0, NULL, 'i'},
 	{"cut", 0, NULL, 'k'},
 	{"softwrap", 0, NULL, '$'},
 #endif
 	{NULL, 0, NULL, 0}
     };
-#endif
 
 #ifdef ENABLE_UTF8
     {
@@ -2124,9 +2705,13 @@ int main(int argc, char **argv)
 	SET(NO_WRAP);
 #endif
 
+    /* If the executable's name starts with 'r', activate restricted mode. */
+    if (*(tail(argv[0])) == 'r')
+	SET(RESTRICTED);
+
     while ((optchr =
-#ifdef HAVE_GETOPT_LONG
 	getopt_long(argc, argv,
+<<<<<<< HEAD
 		"h?ABC:DEFHIKLNOQ:RST:UVWY:abcdefgijklmo:pqr:s:tuvwxz$",
 		long_options, NULL)
 #else
@@ -2134,12 +2719,15 @@ int main(int argc, char **argv)
 		"h?ABC:DEFHIKLNOQ:RST:UVWY:abcdefgijklmo:pqr:s:tuvwxz$")
 #endif
 		) != -1) {
+=======
+		"ABC:DEFGHIKLNOPQ:RST:UVWX:Y:abcdefghijklmno:pqr:s:tuvwxz$",
+		long_options, NULL)) != -1) {
+>>>>>>> origin/tomato-shibby-RT-AC
 	switch (optchr) {
 	    case 'a':
 	    case 'b':
 	    case 'e':
 	    case 'f':
-	    case 'g':
 	    case 'j':
 		/* Pico compatibility flags. */
 		break;
@@ -2223,6 +2811,9 @@ int main(int argc, char **argv)
 	    case 'W':
 		SET(WORD_BOUNDS);
 		break;
+	    case 'X':
+		word_chars = mallocstrcpy(word_chars, optarg);
+		break;
 #endif
 #ifdef ENABLE_COLOR
 	    case 'Y':
@@ -2234,6 +2825,9 @@ int main(int argc, char **argv)
 		break;
 	    case 'd':
 		SET(REBIND_DELETE);
+		break;
+	    case 'g':
+		SET(SHOW_CURSOR);
 		break;
 #ifndef NANO_TINY
 	    case 'i':
@@ -2309,11 +2903,23 @@ int main(int argc, char **argv)
 		SET(SOFTWRAP);
 		break;
 #endif
+<<<<<<< HEAD
+=======
+#ifdef ENABLE_LINENUMBERS
+	    case 'l':
+		SET(LINE_NUMBERS);
+		break;
+#endif
+	    case 'h':
+		usage();
+		exit(0);
+>>>>>>> origin/tomato-shibby-RT-AC
 	    default:
 		usage();
 	}
     }
 
+<<<<<<< HEAD
     /* If the executable filename starts with 'r', enable restricted
      * mode. */
     if (*(tail(argv[0])) == 'r')
@@ -2322,6 +2928,11 @@ int main(int argc, char **argv)
     /* If we're using restricted mode, disable suspending, backups, and
      * reading rcfiles, since they all would allow reading from or
      * writing to files not specified on the command line. */
+=======
+    /* If we're using restricted mode, disable suspending, backups,
+     * rcfiles, and history files, since they all would allow reading
+     * from or writing to files not specified on the command line. */
+>>>>>>> origin/tomato-shibby-RT-AC
     if (ISSET(RESTRICTED)) {
 	UNSET(SUSPEND);
 	UNSET(BACKUP_FILE);
@@ -2348,6 +2959,7 @@ int main(int argc, char **argv)
 #endif
 #ifndef NANO_TINY
 	char *backup_dir_cpy = backup_dir;
+	char *word_chars_cpy = word_chars;
 #endif
 #ifndef DISABLE_JUSTIFY
 	char *quotestr_cpy = quotestr;
@@ -2366,6 +2978,7 @@ int main(int argc, char **argv)
 #endif
 #ifndef NANO_TINY
 	backup_dir = NULL;
+	word_chars = NULL;
 #endif
 #ifndef DISABLE_JUSTIFY
 	quotestr = NULL;
@@ -2374,7 +2987,7 @@ int main(int argc, char **argv)
 	alt_speller = NULL;
 #endif
 
-	do_rcfile();
+	do_rcfiles();
 
 #ifdef DEBUG
         fprintf(stderr, "After rebinding keys...\n");
@@ -2395,6 +3008,10 @@ int main(int argc, char **argv)
 	if (backup_dir_cpy != NULL) {
 	    free(backup_dir);
 	    backup_dir = backup_dir_cpy;
+	}
+	if (word_chars_cpy != NULL) {
+	    free(word_chars);
+	    word_chars = word_chars_cpy;
 	}
 #endif
 #ifndef DISABLE_JUSTIFY
@@ -2471,6 +3088,7 @@ int main(int argc, char **argv)
 
     /* If quotestr wasn't specified, set its default value. */
     if (quotestr == NULL)
+<<<<<<< HEAD
 	quotestr = mallocstrcpy(NULL,
 #ifdef HAVE_REGEX_H
 		"^([ \t]*[#:>|}])+"
@@ -2480,6 +3098,10 @@ int main(int argc, char **argv)
 		);
 #ifdef HAVE_REGEX_H
     quoterc = regcomp(&quotereg, quotestr, REG_EXTENDED);
+=======
+	quotestr = mallocstrcpy(NULL, "^([ \t]*[#:>|}])+");
+    quoterc = regcomp(&quotereg, quotestr, NANO_REG_EXTENDED);
+>>>>>>> origin/tomato-shibby-RT-AC
 
     if (quoterc == 0) {
 	/* We no longer need quotestr, just quotereg. */
@@ -2491,9 +3113,6 @@ int main(int argc, char **argv)
 	quoteerr = charalloc(size);
 	regerror(quoterc, &quotereg, quoteerr, size);
     }
-#else
-    quotelen = strlen(quotestr);
-#endif /* !HAVE_REGEX_H */
 #endif /* !DISABLE_JUSTIFY */
 
 #ifndef DISABLE_SPELLER
@@ -2538,8 +3157,15 @@ int main(int argc, char **argv)
     /* Set up the terminal state. */
     terminal_init();
 
+<<<<<<< HEAD
     /* Turn the cursor on for sure. */
     curs_set(1);
+=======
+#ifdef __linux__
+    /* Check whether we're running on a Linux console. */
+    console = (getenv("DISPLAY") == NULL);
+#endif
+>>>>>>> origin/tomato-shibby-RT-AC
 
 #ifdef DEBUG
     fprintf(stderr, "Main: set up windows\n");
@@ -2549,6 +3175,8 @@ int main(int argc, char **argv)
      * dimensions. */
     window_init();
 
+    editwincols = COLS;
+
     /* Set up the signal handlers. */
     signal_init();
 
@@ -2557,6 +3185,42 @@ int main(int argc, char **argv)
     mouse_init();
 #endif
 
+<<<<<<< HEAD
+=======
+#ifndef DISABLE_COLOR
+    set_colorpairs();
+#else
+    interface_color_pair[TITLE_BAR] = hilite_attribute;
+    interface_color_pair[LINE_NUMBER] = hilite_attribute;
+    interface_color_pair[STATUS_BAR] = hilite_attribute;
+    interface_color_pair[KEY_COMBO] = hilite_attribute;
+    interface_color_pair[FUNCTION_TAG] = A_NORMAL;
+#endif
+
+    /* Ask ncurses for the key codes for Control+Left/Right/Up/Down. */
+    controlleft = get_keycode("kLFT5", CONTROL_LEFT);
+    controlright = get_keycode("kRIT5", CONTROL_RIGHT);
+    controlup = get_keycode("kUP5", CONTROL_UP);
+    controldown = get_keycode("kDN5", CONTROL_DOWN);
+#ifndef NANO_TINY
+    /* Ask for the codes for Shift+Control+Left/Right/Up/Down. */
+    shiftcontrolleft = get_keycode("kLFT6", SHIFT_CONTROL_LEFT);
+    shiftcontrolright = get_keycode("kRIT6", SHIFT_CONTROL_RIGHT);
+    shiftcontrolup = get_keycode("kUP6", SHIFT_CONTROL_UP);
+    shiftcontroldown = get_keycode("kDN6", SHIFT_CONTROL_DOWN);
+    /* Ask for the codes for Shift+Alt+Left/Right/Up/Down. */
+    shiftaltleft = get_keycode("kLFT4", SHIFT_ALT_LEFT);
+    shiftaltright = get_keycode("kRIT4", SHIFT_ALT_RIGHT);
+    shiftaltup = get_keycode("kUP4", SHIFT_ALT_UP);
+    shiftaltdown = get_keycode("kDN4", SHIFT_ALT_DOWN);
+#endif
+
+#ifdef HAVE_SET_ESCDELAY
+    /* Tell ncurses to pass the Esc key quickly. */
+    set_escdelay(50);
+#endif
+
+>>>>>>> origin/tomato-shibby-RT-AC
 #ifdef DEBUG
     fprintf(stderr, "Main: open file\n");
 #endif
@@ -2565,10 +3229,12 @@ int main(int argc, char **argv)
      * non-option argument, and it is followed by at least one other
      * argument, the filename it applies to. */
     if (0 < optind && optind < argc - 1 && argv[optind][0] == '+') {
-	parse_line_column(&argv[optind][1], &startline, &startcol);
+	if (!parse_line_column(&argv[optind][1], &startline, &startcol))
+	    statusline(ALERT, _("Invalid line or column number"));
 	optind++;
     }
 
+    /* If one of the arguments is a dash, read text from standard input. */
     if (optind < argc && !strcmp(argv[optind], "-")) {
 	stdin_pager();
 	set_modified();
@@ -2586,6 +3252,7 @@ int main(int argc, char **argv)
 	ssize_t iline = 1, icol = 1;
 
 	for (; i < argc; i++) {
+<<<<<<< HEAD
 	    /* If there's a +LINE or +LINE,COLUMN flag here, it is
 	     * followed by at least one other argument, the filename it
 	     * applies to. */
@@ -2594,6 +3261,17 @@ int main(int argc, char **argv)
 		parse_line_column(&argv[i][1], &iline, &icol);
 	    else {
 		open_buffer(argv[i], FALSE);
+=======
+	    /* If there's a +LINE or +LINE,COLUMN flag here, it is followed
+	     * by at least one other argument: the filename it applies to. */
+	    if (i < argc - 1 && argv[i][0] == '+') {
+		if (!parse_line_column(&argv[i][1], &iline, &icol))
+		    statusline(ALERT, _("Invalid line or column number"));
+	    } else {
+		/* If opening fails, don't try to position the cursor. */
+		if (!open_buffer(argv[i], FALSE))
+		    continue;
+>>>>>>> origin/tomato-shibby-RT-AC
 
 		if (iline > 1 || icol > 1) {
 		    do_gotolinecolumn(iline, icol, FALSE, FALSE, FALSE,
@@ -2601,6 +3279,18 @@ int main(int argc, char **argv)
 		    iline = 1;
 		    icol = 1;
 		}
+<<<<<<< HEAD
+=======
+#ifndef DISABLE_HISTORIES
+		else if (ISSET(POS_HISTORY)) {
+		    ssize_t savedposline, savedposcol;
+		    /* If edited before, restore the last cursor position. */
+		    if (has_old_position(argv[i], &savedposline, &savedposcol))
+			do_gotolinecolumn(savedposline, savedposcol,
+						FALSE, FALSE);
+		}
+#endif
+>>>>>>> origin/tomato-shibby-RT-AC
 	    }
 	}
     }
@@ -2626,6 +3316,7 @@ int main(int argc, char **argv)
 	UNSET(MULTIBUFFER);
 #endif
 
+<<<<<<< HEAD
 #ifdef DEBUG
     fprintf(stderr, "Main: top and bottom win\n");
 #endif
@@ -2633,6 +3324,22 @@ int main(int argc, char **argv)
 #ifdef ENABLE_COLOR
     if (openfile->syntax && openfile->syntax->nmultis > 0)
 	precalc_multicolorinfo();
+=======
+    /* If a starting position was given on the command line, go there. */
+    if (startline > 0 || startcol > 0)
+	do_gotolinecolumn(startline, startcol, FALSE, FALSE);
+#ifndef DISABLE_HISTORIES
+    else if (ISSET(POS_HISTORY)) {
+	ssize_t savedposline, savedposcol;
+	/* If the file was edited before, restore the last cursor position. */
+	if (has_old_position(argv[optind], &savedposline, &savedposcol))
+	    do_gotolinecolumn(savedposline, savedposcol, FALSE, FALSE);
+    }
+#endif
+
+#ifdef DEBUG
+    fprintf(stderr, "Main: show buffer contents, and enter main loop\n");
+>>>>>>> origin/tomato-shibby-RT-AC
 #endif
 
     if (startline > 1 || startcol > 1)
@@ -2644,6 +3351,7 @@ int main(int argc, char **argv)
     display_buffer();
 
     while (TRUE) {
+<<<<<<< HEAD
 	bool meta_key, func_key, s_or_t, ran_func, finished;
 
 	/* Make sure the cursor is in the edit window. */
@@ -2664,18 +3372,63 @@ int main(int argc, char **argv)
 	/* Just in case we were at the statusbar prompt, make sure the
 	 * statusbar cursor position is reset. */
 	do_prompt_abort();
+=======
+#ifdef ENABLE_LINENUMBERS
+	int needed_margin = digits(openfile->filebot->lineno) + 1;
 
-	/* If constant cursor position display is on, and there are no
-	 * keys waiting in the input buffer, display the current cursor
-	 * position on the statusbar. */
+	/* Only enable line numbers when there is enough room for them. */
+	if (!ISSET(LINE_NUMBERS) || needed_margin > COLS - 4)
+	    needed_margin = 0;
+
+	if (needed_margin != margin) {
+	    margin = needed_margin;
+	    editwincols = COLS - margin;
+
+	    /* Ensure that firstcolumn is the starting column of its chunk. */
+	    ensure_firstcolumn_is_aligned();
+
+	    /* The margin has changed -- schedule a full refresh. */
+	    refresh_needed = TRUE;
+	}
+#endif
+
+	if (currmenu != MMAIN)
+	    display_main_list();
+
+	lastmessage = HUSH;
+	as_an_at = TRUE;
+>>>>>>> origin/tomato-shibby-RT-AC
+
+	/* Update the displayed current cursor position only when there
+	 * are no keys waiting in the input buffer. */
 	if (ISSET(CONST_UPDATE) && get_key_buffer_len() == 0)
-	    do_cursorpos(TRUE);
+	    do_cursorpos(FALSE);
 
+<<<<<<< HEAD
         currmenu = MMAIN;
 
 	/* Read in and interpret characters. */
 	do_input(&meta_key, &func_key, &s_or_t, &ran_func, &finished,
 		TRUE);
+=======
+	/* Refresh just the cursor position or the entire edit window. */
+	if (!refresh_needed) {
+	    reset_cursor();
+	    wnoutrefresh(edit);
+	} else
+	    edit_refresh();
+
+	/* Make sure the cursor is visible. */
+	curs_set(1);
+
+	focusing = TRUE;
+
+	/* Forget any earlier statusbar x position. */
+	reinit_statusbar_x();
+
+	/* Read in and interpret keystrokes. */
+	do_input(TRUE);
+>>>>>>> origin/tomato-shibby-RT-AC
     }
 
     /* We should never get here. */

@@ -794,7 +794,8 @@ static void add_hosts_cname(struct crec *target)
   struct cname *a;
   
   for (a = daemon->cnames; a; a = a->next)
-    if (hostname_isequal(cache_get_name(target), a->target) &&
+    if (a->alias[1] != '*' &&
+	hostname_isequal(cache_get_name(target), a->target) &&
 	(crec = whine_malloc(sizeof(struct crec))))
       {
 	crec->flags = F_FORWARD | F_IMMORTAL | F_NAMEP | F_CONFIG | F_CNAME;
@@ -1073,7 +1074,8 @@ void cache_reload(void)
   /* Add CNAMEs to interface_names to the cache */
   for (a = daemon->cnames; a; a = a->next)
     for (intr = daemon->int_names; intr; intr = intr->next)
-      if (hostname_isequal(a->target, intr->name) &&
+      if (a->alias[1] != '*' &&
+	  hostname_isequal(a->target, intr->name) &&
 	  ((cache = whine_malloc(sizeof(struct crec)))))
 	{
 	  cache->flags = F_FORWARD | F_NAMEP | F_CNAME | F_IMMORTAL | F_CONFIG;
@@ -1190,7 +1192,8 @@ static void add_dhcp_cname(struct crec *target, time_t ttd)
   struct cname *a;
   
   for (a = daemon->cnames; a; a = a->next)
-    if (hostname_isequal(cache_get_name(target), a->target))
+    if (a->alias[1] != '*' &&
+      hostname_isequal(cache_get_name(target), a->target))
       {
 	if ((aliasc = dhcp_spare))
 	  dhcp_spare = dhcp_spare->next;

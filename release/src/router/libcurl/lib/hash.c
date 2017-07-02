@@ -155,7 +155,7 @@ Curl_hash_add(struct curl_hash *h, void *key, size_t key_len, void *p)
 {
   struct curl_hash_element  *he;
   struct curl_llist_element *le;
-  struct curl_llist *l = FETCH_LIST (h, key, key_len);
+  struct curl_llist *l = FETCH_LIST(h, key, key_len);
 
   for(le = l->head; le; le = le->next) {
     he = (struct curl_hash_element *) le->ptr;
@@ -285,6 +285,7 @@ Curl_hash_clean_with_criterium(struct curl_hash *h, void *user,
   }
 }
 
+<<<<<<< HEAD
 void
 Curl_hash_destroy(struct curl_hash *h)
 {
@@ -297,8 +298,11 @@ Curl_hash_destroy(struct curl_hash *h)
 }
 
 size_t Curl_hash_str(void* key, size_t key_length, size_t slots_num)
+=======
+size_t Curl_hash_str(void *key, size_t key_length, size_t slots_num)
+>>>>>>> origin/tomato-shibby-RT-AC
 {
-  const char* key_str = (const char *) key;
+  const char *key_str = (const char *) key;
   const char *end = key_str + key_length;
   unsigned long h = 5381;
 

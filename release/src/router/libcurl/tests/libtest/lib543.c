@@ -36,14 +36,19 @@ int test(char *URL)
   char *s;
   (void)URL;
 
+<<<<<<< HEAD
   if ((easy = curl_easy_init()) == NULL) {
+=======
+  easy = curl_easy_init();
+  if(!easy) {
+>>>>>>> origin/tomato-shibby-RT-AC
     fprintf(stderr, "curl_easy_init() failed\n");
     return TEST_ERR_MAJOR_BAD;
   }
 
   asize = (int)sizeof(a);
 
-  s = curl_easy_escape(easy, (char*)a, asize);
+  s = curl_easy_escape(easy, (char *)a, asize);
 
   if(s)
     printf("%s\n", s);

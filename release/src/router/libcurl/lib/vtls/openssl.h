@@ -7,7 +7,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
+<<<<<<< HEAD
  * Copyright (C) 1998 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
+=======
+ * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+>>>>>>> origin/tomato-shibby-RT-AC
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -41,20 +45,24 @@ void Curl_ossl_close(struct connectdata *conn, int sockindex);
 
 /* tell OpenSSL to close down all open information regarding connections (and
    thus session ID caching etc) */
+<<<<<<< HEAD
 int Curl_ossl_close_all(struct SessionHandle *data);
+=======
+void Curl_ossl_close_all(struct Curl_easy *data);
+>>>>>>> origin/tomato-shibby-RT-AC
 
 /* Sets an OpenSSL engine */
-CURLcode Curl_ossl_set_engine(struct SessionHandle *data, const char *engine);
+CURLcode Curl_ossl_set_engine(struct Curl_easy *data, const char *engine);
 
 /* function provided for the generic SSL-layer, called when a session id
    should be freed */
 void Curl_ossl_session_free(void *ptr);
 
 /* Sets engine as default for all SSL operations */
-CURLcode Curl_ossl_set_engine_default(struct SessionHandle *data);
+CURLcode Curl_ossl_set_engine_default(struct Curl_easy *data);
 
 /* Build list of OpenSSL engines */
-struct curl_slist *Curl_ossl_engines_list(struct SessionHandle *data);
+struct curl_slist *Curl_ossl_engines_list(struct Curl_easy *data);
 
 int Curl_ossl_init(void);
 void Curl_ossl_cleanup(void);
@@ -66,12 +74,43 @@ int Curl_ossl_seed(struct SessionHandle *data);
 int Curl_ossl_shutdown(struct connectdata *conn, int sockindex);
 bool Curl_ossl_data_pending(const struct connectdata *conn,
                             int connindex);
+<<<<<<< HEAD
 void Curl_ossl_random(struct SessionHandle *data, unsigned char *entropy,
                       size_t length);
+=======
+
+/* return 0 if a find random is filled in */
+CURLcode Curl_ossl_random(struct Curl_easy *data, unsigned char *entropy,
+                          size_t length);
+>>>>>>> origin/tomato-shibby-RT-AC
 void Curl_ossl_md5sum(unsigned char *tmp, /* input */
                       size_t tmplen,
                       unsigned char *md5sum /* output */,
                       size_t unused);
+<<<<<<< HEAD
+=======
+void Curl_ossl_sha256sum(const unsigned char *tmp, /* input */
+                      size_t tmplen,
+                      unsigned char *sha256sum /* output */,
+                      size_t unused);
+
+bool Curl_ossl_cert_status_request(void);
+
+/* Support HTTPS-proxy */
+#define HTTPS_PROXY_SUPPORT 1
+
+/* Set the API backend definition to OpenSSL */
+#define CURL_SSL_BACKEND CURLSSLBACKEND_OPENSSL
+
+/* this backend supports the CAPATH option */
+#define have_curlssl_ca_path 1
+
+/* this backend supports CURLOPT_CERTINFO */
+#define have_curlssl_certinfo 1
+
+/* this backend supports CURLOPT_SSL_CTX_* */
+#define have_curlssl_ssl_ctx 1
+>>>>>>> origin/tomato-shibby-RT-AC
 
 /* this backend provides these functions: */
 #define have_curlssl_random 1

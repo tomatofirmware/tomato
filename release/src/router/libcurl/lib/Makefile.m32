@@ -206,6 +206,10 @@ ifdef SSL
       CFLAGS += -DHAVE_SSLEAY_SRP -DUSE_TLS_SRP
     endif
   endif
+else
+ifdef WINSSL
+  DLL_LIBS += -lcrypt32
+endif
 endif
 ifdef ZLIB
   INCLUDES += -I"$(ZLIB_PATH)"

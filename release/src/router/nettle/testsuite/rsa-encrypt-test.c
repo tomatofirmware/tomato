@@ -11,11 +11,11 @@ test_main(void)
   struct knuth_lfib_ctx lfib;
 
   /* FIXME: How is this spelled? */
-  const uint8_t *msg = "Squemish ossifrage";
-  unsigned msg_length;
+  const unsigned char msg[] = "Squemish ossifrage";
+  size_t msg_length = LLENGTH(msg);
 
   uint8_t *decrypted;
-  unsigned decrypted_length;
+  size_t decrypted_length;
   uint8_t after;
 
   mpz_t gibberish;
@@ -27,10 +27,9 @@ test_main(void)
   knuth_lfib_init(&lfib, 17);
   
   test_rsa_set_key_1(&pub, &key);
-  msg_length = strlen(msg);
 
   if (verbose)
-    fprintf(stderr, "msg: `%s', length = %d\n", msg, msg_length);
+    fprintf(stderr, "msg: `%s', length = %d\n", msg, (int) msg_length);
   
   ASSERT(rsa_encrypt(&pub,
 		     &lfib, (nettle_random_func *) knuth_lfib_random,
@@ -39,7 +38,6 @@ test_main(void)
 
   if (verbose)
     {
-      /* In which GMP version was gmp_fprintf introduced? */
       fprintf(stderr, "encrypted: ");
       mpz_out_str(stderr, 10, gibberish);
     }
@@ -77,6 +75,13 @@ test_main(void)
   ASSERT(decrypted_length == msg_length);
   ASSERT(MEMEQ(msg_length, msg, decrypted));
   ASSERT(decrypted[msg_length] == after);
+
+  /* Test invalid key. */
+  mpz_add_ui (key.q, key.q, 2);
+  decrypted_length = key.size;
+  ASSERT(!rsa_decrypt_tr(&pub, &key,
+			 &lfib, (nettle_random_func *) knuth_lfib_random,
+			 &decrypted_length, decrypted, gibberish));
 
   rsa_private_key_clear(&key);
   rsa_public_key_clear(&pub);

@@ -43,7 +43,12 @@ int test(char *URL)
     return TEST_ERR_MAJOR_BAD;
   }
 
+<<<<<<< HEAD
   if ((curl = curl_easy_init()) == NULL) {
+=======
+  curl = curl_easy_init();
+  if(!curl) {
+>>>>>>> origin/tomato-shibby-RT-AC
     fprintf(stderr, "curl_easy_init() failed\n");
     curl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;
@@ -57,7 +62,8 @@ int test(char *URL)
 
   test_setopt(curl, CURLOPT_RTSP_REQUEST, CURL_RTSPREQ_OPTIONS);
 
-  if((stream_uri = suburl(URL, request++)) == NULL) {
+  stream_uri = suburl(URL, request++);
+  if(!stream_uri) {
     res = TEST_ERR_MAJOR_BAD;
     goto test_cleanup;
   }
@@ -77,7 +83,8 @@ int test(char *URL)
                     "RAW/RAW/UDP;unicast;client_port=3056-3057");
   test_setopt(curl, CURLOPT_RTSP_REQUEST, CURL_RTSPREQ_SETUP);
 
-  if((stream_uri = suburl(URL, request++)) == NULL) {
+  stream_uri = suburl(URL, request++);
+  if(!stream_uri) {
     res = TEST_ERR_MAJOR_BAD;
     goto test_cleanup;
   }
@@ -91,7 +98,8 @@ int test(char *URL)
 
   test_setopt(curl, CURLOPT_RTSP_REQUEST, CURL_RTSPREQ_PLAY);
 
-  if((stream_uri = suburl(URL, request++)) == NULL) {
+  stream_uri = suburl(URL, request++);
+  if(!stream_uri) {
     res = TEST_ERR_MAJOR_BAD;
     goto test_cleanup;
   }

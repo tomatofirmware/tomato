@@ -5,7 +5,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
+<<<<<<< HEAD
  * Copyright (C) 1998 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
+=======
+ * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
+>>>>>>> origin/tomato-shibby-RT-AC
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -39,6 +43,11 @@ void config_init(struct OperationConfig* config)
   config->proto_redir =
     CURLPROTO_ALL & ~(CURLPROTO_FILE|CURLPROTO_SCP); /* not FILE or SCP */
   config->proto_redir_present = FALSE;
+<<<<<<< HEAD
+=======
+  config->proto_default = NULL;
+  config->tcp_nodelay = TRUE; /* enabled by default */
+>>>>>>> origin/tomato-shibby-RT-AC
 }
 
 static void free_config_fields(struct OperationConfig *config)
@@ -65,6 +74,9 @@ static void free_config_fields(struct OperationConfig *config)
   Curl_safefree(config->tls_username);
   Curl_safefree(config->tls_password);
   Curl_safefree(config->tls_authtype);
+  Curl_safefree(config->proxy_tls_username);
+  Curl_safefree(config->proxy_tls_password);
+  Curl_safefree(config->proxy_tls_authtype);
   Curl_safefree(config->proxyuserpwd);
   Curl_safefree(config->proxy);
 
@@ -96,14 +108,27 @@ static void free_config_fields(struct OperationConfig *config)
   config->url_out = NULL;
 
   Curl_safefree(config->cipher_list);
+  Curl_safefree(config->proxy_cipher_list);
   Curl_safefree(config->cert);
+  Curl_safefree(config->proxy_cert);
   Curl_safefree(config->cert_type);
+  Curl_safefree(config->proxy_cert_type);
   Curl_safefree(config->cacert);
+  Curl_safefree(config->proxy_cacert);
   Curl_safefree(config->capath);
+  Curl_safefree(config->proxy_capath);
   Curl_safefree(config->crlfile);
+<<<<<<< HEAD
+=======
+  Curl_safefree(config->pinnedpubkey);
+  Curl_safefree(config->proxy_crlfile);
+>>>>>>> origin/tomato-shibby-RT-AC
   Curl_safefree(config->key);
+  Curl_safefree(config->proxy_key);
   Curl_safefree(config->key_type);
+  Curl_safefree(config->proxy_key_type);
   Curl_safefree(config->key_passwd);
+  Curl_safefree(config->proxy_key_passwd);
   Curl_safefree(config->pubkey);
   Curl_safefree(config->hostpubmd5);
   Curl_safefree(config->engine);
@@ -131,8 +156,14 @@ static void free_config_fields(struct OperationConfig *config)
   curl_slist_free_all(config->telnet_options);
   curl_slist_free_all(config->resolve);
 
+<<<<<<< HEAD
   Curl_safefree(config->socksproxy);
   Curl_safefree(config->socks5_gssapi_service);
+=======
+  Curl_safefree(config->preproxy);
+  Curl_safefree(config->proxy_service_name);
+  Curl_safefree(config->service_name);
+>>>>>>> origin/tomato-shibby-RT-AC
 
   Curl_safefree(config->ftp_account);
   Curl_safefree(config->ftp_alternative_to_user);

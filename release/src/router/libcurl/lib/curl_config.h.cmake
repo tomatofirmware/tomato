@@ -480,6 +480,15 @@
 /* Define to 1 if you have the send function. */
 #cmakedefine HAVE_SEND ${HAVE_SEND}
 
+/* Define to 1 if you have the 'fsetxattr' function. */
+#cmakedefine HAVE_FSETXATTR 1
+
+/* fsetxattr() takes 5 args */
+#cmakedefine HAVE_FSETXATTR_5 1
+
+/* fsetxattr() takes 6 args */
+#cmakedefine HAVE_FSETXATTR_6 1
+
 /* Define to 1 if you have the <setjmp.h> header file. */
 #cmakedefine HAVE_SETJMP_H ${HAVE_SETJMP_H}
 
@@ -868,6 +877,9 @@
 /* Define if you want to enable c-ares support */
 #cmakedefine USE_ARES ${USE_ARES}
 
+/* Define if you want to enable WIN32 threaded DNS lookup */
+#cmakedefine USE_THREADS_WIN32 1
+
 /* Define to disable non-blocking sockets. */
 #cmakedefine USE_BLOCKING_SOCKETS ${USE_BLOCKING_SOCKETS}
 
@@ -876,6 +888,9 @@
 
 /* if PolarSSL is enabled */
 #cmakedefine USE_POLARSSL ${USE_POLARSSL}
+
+/* if mbedTLS is enabled */
+#cmakedefine USE_MBEDTLS 1
 
 /* if libSSH2 is in use */
 #cmakedefine USE_LIBSSH2 ${USE_LIBSSH2}
@@ -889,12 +904,23 @@
 /* if OpenSSL is in use */
 #cmakedefine USE_OPENSSL ${USE_OPENSSL}
 
+<<<<<<< HEAD
 /* if SSL is enabled */
 #cmakedefine USE_SSLEAY ${USE_SSLEAY}
 
 /* Define to 1 if you are building a Windows target without large file
    support. */
 #cmakedefine USE_WIN32_LARGE_FILES ${USE_WIN32_LARGE_FILES}
+=======
+/* to enable NGHTTP2  */
+#cmakedefine USE_NGHTTP2 1
+
+/* if Unix domain sockets are enabled  */
+#cmakedefine USE_UNIX_SOCKETS
+
+/* Define to 1 if you are building a Windows target with large file support. */
+#cmakedefine USE_WIN32_LARGE_FILES 1
+>>>>>>> origin/tomato-shibby-RT-AC
 
 /* to enable SSPI support */
 #cmakedefine USE_WINDOWS_SSPI ${USE_WINDOWS_SSPI}

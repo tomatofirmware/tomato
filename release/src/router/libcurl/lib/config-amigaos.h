@@ -7,7 +7,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
+<<<<<<< HEAD
  * Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
+=======
+ * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
+>>>>>>> origin/tomato-shibby-RT-AC
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -99,7 +103,7 @@
 #define OS "AmigaOS"
 
 #define PACKAGE "curl"
-#define PACKAGE_BUGREPORT "curl-bug@haxx.se"
+#define PACKAGE_BUGREPORT "a suitable mailing list: https://curl.haxx.se/mail/"
 #define PACKAGE_NAME "curl"
 #define PACKAGE_STRING "curl -"
 #define PACKAGE_TARNAME "curl"
