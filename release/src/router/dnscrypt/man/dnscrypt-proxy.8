@@ -1,11 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-<<<<<<< HEAD
-.TH "DNSCRYPT\-PROXY" "8" "July 2015" "" ""
-=======
 .TH "DNSCRYPT\-PROXY" "8" "January 2017" "" ""
->>>>>>> origin/tomato-shibby-RT-AC
 .
 .SH "NAME"
 \fBdnscrypt\-proxy\fR \- A DNSCrypt forwarder
@@ -70,9 +66,6 @@ The proxy verifies the replies, decrypts them, and transparently forwards them t
 \fB\-r\fR, \fB\-\-resolver\-address=<ip>[:port]\fR: a DNSCrypt\-capable resolver IP address with an optional port (for private resolvers)\. The default port is 443\.
 .
 .IP "\(bu" 4
-<<<<<<< HEAD
-\fB\-t\fR, \fB\-\-test=<margin>\fR: don\'t actually start the proxy, but check that a valid certificate can be retrieved from the server and that it will remain valid for the next \fImargin\fR minutes\. The exit code is 0 if a valid certificate can be used, 2 if no valid certificates can be used, 3 if a timeout occurred, and 4 if a currently valid certificate is going to expire before \fImargin\fR\. The margin is always specificied in minutes\.
-=======
 \fB\-S\fR, \fB\-\-syslog\fR: if a log file hasn\'t been set, log diagnostic messages to syslog instead of printing them\. \fB\-\-daemonize\fR implies \fB\-\-syslog\fR\.
 .
 .IP "\(bu" 4
@@ -80,7 +73,6 @@ The proxy verifies the replies, decrypts them, and transparently forwards them t
 .
 .IP "\(bu" 4
 \fB\-n\fR, \fB\-\-max\-active\-requests=<count>\fR: set the maximum number of simultaneous active requests\. The default value is 250\.
->>>>>>> origin/tomato-shibby-RT-AC
 .
 .IP "\(bu" 4
 \fB\-u\fR, \fB\-\-user=<user name>\fR: chroot(2) to this user\'s home directory and drop privileges\.
@@ -128,7 +120,7 @@ $ dnscrypt\-proxy \-\-daemonize \-\-resolver\-name=\.\.\.
 The resolver name is the first column (Name) in the CSV file\.
 .
 .SH "BUGS AND SUPPORT"
-Please report issues with DNSCrypt itself to http://dnscrypt\.org/issues
+Please report issues with DNSCrypt itself to https://dnscrypt\.org/issues
 .
 .SH "SEE ALSO"
 hostip(8)

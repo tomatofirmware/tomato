@@ -5,11 +5,11 @@
 '*                            | (__| |_| |  _ <| |___
 '*                             \___|\___/|_| \_\_____|
 '*
-'* Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
+'* Copyright (C) 1998 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
 '*
 '* This software is licensed as described in the file COPYING, which
 '* you should have received as part of this distribution. The terms
-'* are also available at http://curl.haxx.se/docs/copyright.html.
+'* are also available at https://curl.haxx.se/docs/copyright.html.
 '*
 '* You may opt to use, copy, modify, merge, publish, distribute and/or sell
 '* copies of the Software, and permit persons to whom the Software is
@@ -26,17 +26,9 @@
 '* Hacked by Guenter Knauf
 '***************************************************************************
 Option Explicit
-<<<<<<< HEAD
-Const myVersion = "0.3.8"
-
-Const myUrl = "http://mxr.mozilla.org/mozilla/source/security/nss/lib/ckfw/builtins/certdata.txt?raw=1"
-
-Const myOpenssl = "openssl.exe"
-=======
 Const myVersion = "0.4.0"
 
 Const myUrl = "https://hg.mozilla.org/releases/mozilla-release/raw-file/default/security/nss/lib/ckfw/builtins/certdata.txt"
->>>>>>> origin/tomato-shibby-RT-AC
 
 Const myOpenSSL = "openssl.exe"
 Dim myUseOpenSSL
@@ -71,12 +63,8 @@ Set objHttp = WScript.CreateObject("WinHttp.WinHttpRequest.5.1")
 If objHttp Is Nothing Then Set objHttp = WScript.CreateObject("WinHttp.WinHttpRequest")
 myBase = Left(WScript.ScriptFullName, InstrRev(WScript.ScriptFullName, "\"))
 mySelf = Left(WScript.ScriptName, InstrRev(WScript.ScriptName, ".") - 1) & " " & myVersion
-<<<<<<< HEAD
-myCdFile = Mid(myUrl, InstrRev(myUrl, "/") + 1, InstrRev(myUrl, "?") - InstrRev(myUrl, "/") - 1)
-=======
 
 myCdFile = Mid(myUrl, InstrRev(myUrl, "/") + 1)
->>>>>>> origin/tomato-shibby-RT-AC
 myCaFile = "ca-bundle.crt"
 myTmpName = InputBox("It will take a minute to download and parse the " & _
                      "certificate data." & _
@@ -133,8 +121,8 @@ objHttp.SetTimeouts 0, 5000, 10000, 10000
 objHttp.Open "GET", myUrl, FALSE
 objHttp.setRequestHeader "User-Agent", WScript.ScriptName & "/" & myVersion
 objHttp.Send ""
-If Not (objHttp.statusText = "OK") Then
-  MsgBox("Failed to download '" & myCdFile & "': " & objHttp.statusText), vbCritical, mySelf
+If Not (objHttp.Status = 200) Then
+  MsgBox("Failed to download '" & myCdFile & "': " & objHttp.Status & " - " & objHttp.StatusText), vbCritical, mySelf
   WScript.Quit 1
 End If
 ' Write received data to file if enabled

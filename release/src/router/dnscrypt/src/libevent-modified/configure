@@ -768,7 +768,6 @@ infodir
 docdir
 oldincludedir
 includedir
-runstatedir
 localstatedir
 sharedstatedir
 sysconfdir
@@ -858,7 +857,6 @@ datadir='${datarootdir}'
 sysconfdir='${prefix}/etc'
 sharedstatedir='${prefix}/com'
 localstatedir='${prefix}/var'
-runstatedir='${localstatedir}/run'
 includedir='${prefix}/include'
 oldincludedir='/usr/include'
 docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
@@ -1111,15 +1109,6 @@ do
   | -silent | --silent | --silen | --sile | --sil)
     silent=yes ;;
 
-  -runstatedir | --runstatedir | --runstatedi | --runstated \
-  | --runstate | --runstat | --runsta | --runst | --runs \
-  | --run | --ru | --r)
-    ac_prev=runstatedir ;;
-  -runstatedir=* | --runstatedir=* | --runstatedi=* | --runstated=* \
-  | --runstate=* | --runstat=* | --runsta=* | --runst=* | --runs=* \
-  | --run=* | --ru=* | --r=*)
-    runstatedir=$ac_optarg ;;
-
   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
     ac_prev=sbindir ;;
   -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
@@ -1257,7 +1246,7 @@ fi
 for ac_var in	exec_prefix prefix bindir sbindir libexecdir datarootdir \
 		datadir sysconfdir sharedstatedir localstatedir includedir \
 		oldincludedir docdir infodir htmldir dvidir pdfdir psdir \
-		libdir localedir mandir runstatedir
+		libdir localedir mandir
 do
   eval ac_val=\$$ac_var
   # Remove trailing slashes.
@@ -1410,7 +1399,6 @@ Fine tuning of the installation directories:
   --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
   --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
   --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
-  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
   --libdir=DIR            object code libraries [EPREFIX/lib]
   --includedir=DIR        C header files [PREFIX/include]
   --oldincludedir=DIR     C header files for non-gcc [/usr/include]
@@ -5567,7 +5555,8 @@ else
     ;;
   *)
     lt_cv_sys_max_cmd_len=`(getconf ARG_MAX) 2> /dev/null`
-    if test -n "$lt_cv_sys_max_cmd_len"; then
+    if test -n "$lt_cv_sys_max_cmd_len" && \
+       test undefined != "$lt_cv_sys_max_cmd_len"; then
       lt_cv_sys_max_cmd_len=`expr $lt_cv_sys_max_cmd_len \/ 4`
       lt_cv_sys_max_cmd_len=`expr $lt_cv_sys_max_cmd_len \* 3`
     else
@@ -7190,7 +7179,43 @@ ia64-*-hpux*)
   rm -rf conftest*
   ;;
 
-x86_64-*kfreebsd*-gnu|x86_64-*linux*|ppc*-*linux*|powerpc*-*linux*| \
+mips64*-*linux*)
+  # Find out what ABI is being produced by ac_compile, and set linker
+  # options accordingly.
+  echo '#line '$LINENO' "configure"' > conftest.$ac_ext
+  if { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_compile\""; } >&5
+  (eval $ac_compile) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+    emul=elf
+    case `/usr/bin/file conftest.$ac_objext` in
+      *32-bit*)
+	emul="${emul}32"
+	;;
+      *64-bit*)
+	emul="${emul}64"
+	;;
+    esac
+    case `/usr/bin/file conftest.$ac_objext` in
+      *MSB*)
+	emul="${emul}btsmip"
+	;;
+      *LSB*)
+	emul="${emul}ltsmip"
+	;;
+    esac
+    case `/usr/bin/file conftest.$ac_objext` in
+      *N32*)
+	emul="${emul}n32"
+	;;
+    esac
+    LD="${LD-ld} -m $emul"
+  fi
+  rm -rf conftest*
+  ;;
+
+x86_64-*kfreebsd*-gnu|x86_64-*linux*|powerpc*-*linux*| \
 s390*-*linux*|s390*-*tpf*|sparc*-*linux*)
   # Find out what ABI is being produced by ac_compile, and set linker
   # options accordingly.  Note that the listed cases only cover the
@@ -7220,7 +7245,10 @@ s390*-*linux*|s390*-*tpf*|sparc*-*linux*)
 		;;
 	    esac
 	    ;;
-	  ppc64-*linux*|powerpc64-*linux*)
+	  powerpc64le-*linux*)
+	    LD="${LD-ld} -m elf32lppclinux"
+	    ;;
+	  powerpc64-*linux*)
 	    LD="${LD-ld} -m elf32ppclinux"
 	    ;;
 	  s390x-*linux*)
@@ -7239,7 +7267,10 @@ s390*-*linux*|s390*-*tpf*|sparc*-*linux*)
 	  x86_64-*linux*)
 	    LD="${LD-ld} -m elf_x86_64"
 	    ;;
-	  ppc*-*linux*|powerpc*-*linux*)
+	  powerpcle-*linux*)
+	    LD="${LD-ld} -m elf64lppc"
+	    ;;
+	  powerpc-*linux*)
 	    LD="${LD-ld} -m elf64ppc"
 	    ;;
 	  s390*-*linux*|s390*-*tpf*)

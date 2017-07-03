@@ -32,7 +32,6 @@ export PATH="${PATH}:${TOOLCHAIN_DIR}/bin"
 
 export SODIUM_ANDROID_PREFIX=${SODIUM_ANDROID_PREFIX:-/tmp/libsodium-android-${TARGET_ARCH}}
 export CPPFLAGS="$CPPFLAGS -I${SODIUM_ANDROID_PREFIX}/include"
-export CPPFLAGS="$CPPFLAGS -DUSE_ONLY_PORTABLE_IMPLEMENTATIONS=1"
 export LDFLAGS="$LDFLAGS -L${SODIUM_ANDROID_PREFIX}/lib"
 
 export UPDATE_BINARY="dist-build/android-files/META-INF/com/google/android/update-binary"
@@ -42,19 +41,6 @@ export UPDATE_BINARY_PUBKEY="RWQf6LRCGA9i53mlYecO4IzT51TGPpvWucNSCh1CBM0QTaLn73Y
 
 rm -rf "${TOOLCHAIN_DIR}" "${PREFIX}"
 
-<<<<<<< HEAD
-bash $MAKE_TOOLCHAIN --platform="${NDK_PLATFORM:-android-18}" \
-                --arch="$ARCH" \
-                --install-dir="$TOOLCHAIN_DIR" && \
-./configure --host="${HOST_COMPILER}" \
-            --with-sysroot="${TOOLCHAIN_DIR}/sysroot" \
-            --prefix="${PREFIX}" \
-            --disable-soname-versions \
-            --disable-shared && \
-make clean && \
-make -j3 install && \
-echo "dnscrypt-proxy has been installed into $PREFIX"
-=======
 if [ ! -f "$UPDATE_BINARY" ]; then
   curl -v -L -o "${UPDATE_BINARY}.tmp" "$UPDATE_BINARY_URL" || exit 1
   if $(which minisign > /dev/null 2>&1); then
@@ -91,4 +77,3 @@ echo "dnscrypt-proxy has been installed here:" && \
 echo "${PREFIX}" && \
 echo "The dnscrypt-proxy ZIP file has been placed here:" && \
 echo "${PREFIX}.zip"
->>>>>>> origin/tomato-shibby-RT-AC

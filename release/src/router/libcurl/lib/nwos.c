@@ -5,11 +5,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2011, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -26,11 +26,7 @@
 
 #ifdef __NOVELL_LIBC__
 /* For native LibC-based NLM we need to do nothing. */
-<<<<<<< HEAD
-int netware_init ( void )
-=======
 int netware_init(void)
->>>>>>> origin/tomato-shibby-RT-AC
 {
   return 0;
 }
@@ -49,11 +45,7 @@ NETDB_DEFINE_CONTEXT
 #include <arpa/inet.h>
 NETINET_DEFINE_CONTEXT
 
-<<<<<<< HEAD
-int netware_init ( void )
-=======
 int netware_init(void)
->>>>>>> origin/tomato-shibby-RT-AC
 {
   int rc = 0;
   unsigned int myHandle = GetNLMHandle();
@@ -80,21 +72,13 @@ int netware_init(void)
 }
 
 /* dummy function to satisfy newer prelude */
-<<<<<<< HEAD
-int __init_environment ( void )
-=======
 int __init_environment(void)
->>>>>>> origin/tomato-shibby-RT-AC
 {
   return 0;
 }
 
 /* dummy function to satisfy newer prelude */
-<<<<<<< HEAD
-int __deinit_environment ( void )
-=======
 int __deinit_environment(void)
->>>>>>> origin/tomato-shibby-RT-AC
 {
   return 0;
 }

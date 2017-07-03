@@ -1,19 +1,9 @@
-/* $Id: chars.c 4453 2009-12-02 03:36:22Z astyanax $ */
 /**************************************************************************
  *   chars.c  --  This file is part of GNU nano.                          *
  *                                                                        *
-<<<<<<< HEAD
- *   Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009   *
- *   Free Software Foundation, Inc.                                       *
- *   This program is free software; you can redistribute it and/or modify *
- *   it under the terms of the GNU General Public License as published by *
- *   the Free Software Foundation; either version 3, or (at your option)  *
- *   any later version.                                                   *
-=======
  *   Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,  *
  *   2010, 2011, 2013, 2014 Free Software Foundation, Inc.                *
  *   Copyright (C) 2016 Benno Schulenberg                                 *
->>>>>>> origin/tomato-shibby-RT-AC
  *                                                                        *
  *   GNU nano is free software: you can redistribute it and/or modify     *
  *   it under the terms of the GNU General Public License as published    *
@@ -53,46 +43,33 @@ bool using_utf8(void)
 {
     return use_utf8;
 }
-#endif
+#endif /* ENABLE_UTF8 */
 
-<<<<<<< HEAD
-#ifndef HAVE_ISBLANK
-/* This function is equivalent to isblank(). */
-bool nisblank(int c)
+/* Concatenate two allocated strings, and free the second. */
+char *addstrings(char* str1, size_t len1, char* str2, size_t len2)
 {
-    return isspace(c) && (c == '\t' || !is_cntrl_char(c));
-}
-#endif
+    str1 = charealloc(str1, len1 + len2 + 1);
+    str1[len1] = '\0';
 
-#if !defined(HAVE_ISWBLANK) && defined(ENABLE_UTF8)
-/* This function is equivalent to iswblank(). */
-bool niswblank(wchar_t wc)
-{
-    return iswspace(wc) && (wc == '\t' || !is_cntrl_wchar(wc));
-}
-#endif
+    strncat(&str1[len1], str2, len2);
+    free(str2);
 
-/* Return TRUE if the value of c is in byte range, and FALSE
- * otherwise. */
-=======
+    return str1;
+}
+
 /* Return TRUE if the value of c is in byte range, and FALSE otherwise. */
->>>>>>> origin/tomato-shibby-RT-AC
 bool is_byte(int c)
 {
     return ((unsigned int)c == (unsigned char)c);
 }
 
-static void mbtowc_reset(void)
+void mbtowc_reset(void)
 {
     IGNORE_CALL_RESULT(mbtowc(NULL, NULL, 0));
 }
 
-<<<<<<< HEAD
-static void wctomb_reset(void)
-=======
 /* This function is equivalent to isalpha() for multibyte characters. */
 bool is_alpha_mbchar(const char *c)
->>>>>>> origin/tomato-shibby-RT-AC
 {
     assert(c != NULL);
 
@@ -187,9 +164,8 @@ bool is_punct_mbchar(const char *c)
 #ifdef ENABLE_UTF8
     if (use_utf8) {
 	wchar_t wc;
-	int c_mb_len = mbtowc(&wc, c, MB_CUR_MAX);
 
-	if (c_mb_len < 0) {
+	if (mbtowc(&wc, c, MB_CUR_MAX) < 0) {
 	    mbtowc_reset();
 	    return 0;
 	}
@@ -235,16 +211,8 @@ char control_rep(const signed char c)
 	return c + 64;
 }
 
-<<<<<<< HEAD
-/* c is a multibyte control character.  It displays as ^@, ^?, or ^[ch],
- * where ch is (c + 64).  We return that multibyte character.  If crep
- * is an invalid multibyte sequence, it will be replaced with Unicode
- * 0xFFFD (Replacement Character). */
-char *control_mbrep(const char *c, char *crep, int *crep_len)
-=======
 /* Return the visible representation of multibyte control character c. */
 char control_mbrep(const char *c, bool isdata)
->>>>>>> origin/tomato-shibby-RT-AC
 {
     /* An embedded newline is an encoded NUL if it is data. */
     if (*c == '\n' && (isdata || as_an_at))
@@ -252,31 +220,6 @@ char control_mbrep(const char *c, bool isdata)
 
 #ifdef ENABLE_UTF8
     if (use_utf8) {
-<<<<<<< HEAD
-	wchar_t wc;
-
-	if (mbtowc(&wc, c, MB_CUR_MAX) < 0) {
-	    mbtowc_reset();
-	    *crep_len = bad_mbchar_len;
-	    strncpy(crep, bad_mbchar, *crep_len);
-	} else {
-	    *crep_len = wctomb(crep, control_wrep(wc));
-
-	    if (*crep_len < 0) {
-		wctomb_reset();
-		*crep_len = 0;
-	    }
-	}
-    } else {
-#endif
-	*crep_len = 1;
-	*crep = control_rep(*c);
-#ifdef ENABLE_UTF8
-    }
-#endif
-
-    return crep;
-=======
 	if ((unsigned char)c[0] < 128)
 	    return control_rep(c[0]);
 	else
@@ -284,7 +227,6 @@ char control_mbrep(const char *c, bool isdata)
     } else
 #endif
 	return control_rep(*c);
->>>>>>> origin/tomato-shibby-RT-AC
 }
 
 /* Assess how many bytes the given (multibyte) character occupies.  Return -1
@@ -316,19 +258,9 @@ int length_of_char(const char *c, int *width)
 		*width = 1;
 	    return charlen;
 	}
-    } else {
+    } else
 #endif
-<<<<<<< HEAD
-	*crep_len = 1;
-	*crep = *c;
-#ifdef ENABLE_UTF8
-    }
-#endif
-
-    return crep;
-=======
 	return 1;
->>>>>>> origin/tomato-shibby-RT-AC
 }
 
 /* This function is equivalent to wcwidth() for multibyte characters. */
@@ -386,13 +318,12 @@ char *make_mbchar(long chr, int *chr_mb_len)
 	    IGNORE_CALL_RESULT(wctomb(NULL, 0));
 	    *chr_mb_len = 0;
 	}
-    } else {
+    } else
 #endif
+    {
 	*chr_mb_len = 1;
 	chr_mb = mallocstrncpy(NULL, (char *)&chr, 1);
-#ifdef ENABLE_UTF8
     }
-#endif
 
     return chr_mb;
 }
@@ -411,19 +342,13 @@ int parse_mbchar(const char *buf, char *chr, size_t *col)
 	/* Get the number of bytes in the multibyte character. */
 	length = mblen(buf, MB_CUR_MAX);
 
-<<<<<<< HEAD
-	/* If buf contains an invalid multibyte character, only
-	 * interpret buf's first byte. */
-	if (buf_mb_len < 0) {
-=======
 	/* When the multibyte sequence is invalid, only take the first byte. */
 	if (length <= 0) {
->>>>>>> origin/tomato-shibby-RT-AC
 	    IGNORE_CALL_RESULT(mblen(NULL, 0));
 	    length = 1;
 	}
 
-	/* Save the multibyte character in chr. */
+	/* When requested, store the multibyte character in chr. */
 	if (chr != NULL) {
 	    int i;
 
@@ -431,79 +356,45 @@ int parse_mbchar(const char *buf, char *chr, size_t *col)
 		chr[i] = buf[i];
 	}
 
-<<<<<<< HEAD
-	/* Save the column width of the wide character in col. */
-=======
 	/* When requested, add the width of the character to col. */
->>>>>>> origin/tomato-shibby-RT-AC
 	if (col != NULL) {
 	    /* If we have a tab, compute its width in columns based on the
 	     * current value of col. */
 	    if (*buf == '\t')
 		*col += tabsize - *col % tabsize;
-	    /* If we have a control character, get its width using one
-	     * column for the "^" that will be displayed in front of it,
-	     * and the width in columns of its visible equivalent as
-	     * returned by control_mbrep(). */
+	    /* If we have a control character, it's two columns wide: one
+	     * column for the "^", and one for the visible character. */
 	    else if (is_cntrl_mbchar(buf)) {
-<<<<<<< HEAD
-		char *ctrl_buf_mb = charalloc(MB_CUR_MAX);
-		int ctrl_buf_mb_len;
-
-		(*col)++;
-
-		ctrl_buf_mb = control_mbrep(buf, ctrl_buf_mb,
-			&ctrl_buf_mb_len);
-
-		*col += mbwidth(ctrl_buf_mb);
-
-		free(ctrl_buf_mb);
-	    /* If we have a normal character, get its width in columns
-	     * normally. */
-=======
 		*col += 2;
 	    /* If we have a normal character, get its width normally. */
->>>>>>> origin/tomato-shibby-RT-AC
 	    } else
 		*col += mbwidth(buf);
 	}
-    } else {
+    } else
 #endif
-<<<<<<< HEAD
-	/* Get the number of bytes in the byte character. */
-	buf_mb_len = 1;
-=======
     {
 	/* A byte character is one byte long. */
 	length = 1;
->>>>>>> origin/tomato-shibby-RT-AC
 
-	/* Save the byte character in chr. */
+	/* When requested, store the byte character in chr. */
 	if (chr != NULL)
 	    *chr = *buf;
 
-<<<<<<< HEAD
-=======
 	/* When requested, add the width of the character to col. */
->>>>>>> origin/tomato-shibby-RT-AC
 	if (col != NULL) {
 	    /* If we have a tab, compute its width in columns using the
 	     * current value of col. */
 	    if (*buf == '\t')
 		*col += tabsize - *col % tabsize;
-	    /* If we have a control character, it's two columns wide:
-	     * one column for the "^" that will be displayed in front of
-	     * it, and one column for its visible equivalent as returned
-	     * by control_mbrep(). */
+	    /* If we have a control character, it's two columns wide: one
+	     * column for the "^", and one for the visible character. */
 	    else if (is_cntrl_char((unsigned char)*buf))
 		*col += 2;
 	    /* If we have a normal character, it's one column wide. */
 	    else
 		(*col)++;
 	}
-#ifdef ENABLE_UTF8
     }
-#endif
 
     return length;
 }
@@ -512,22 +403,24 @@ int parse_mbchar(const char *buf, char *chr, size_t *col)
  * before the one at pos. */
 size_t move_mbleft(const char *buf, size_t pos)
 {
-    size_t pos_prev = pos;
+    size_t before, char_len = 0;
 
     assert(buf != NULL && pos <= strlen(buf));
 
     /* There is no library function to move backward one multibyte
-     * character.  Here is the naive, O(pos) way to do it. */
-    while (TRUE) {
-	int buf_mb_len = parse_mbchar(buf + pos - pos_prev, NULL, NULL);
+     * character.  So we just start groping for one at the farthest
+     * possible point. */
+    if (mb_cur_max() > pos)
+	before = 0;
+    else
+	before = pos - mb_cur_max();
 
-	if (pos_prev <= buf_mb_len)
-	    break;
-
-	pos_prev -= buf_mb_len;
+    while (before < pos) {
+	char_len = parse_mbchar(buf + before, NULL, NULL);
+	before += char_len;
     }
 
-    return pos - pos_prev;
+    return before - char_len;
 }
 
 /* Return the index in buf of the beginning of the multibyte character
@@ -537,103 +430,29 @@ size_t move_mbright(const char *buf, size_t pos)
     return pos + parse_mbchar(buf + pos, NULL, NULL);
 }
 
-<<<<<<< HEAD
-#ifndef HAVE_STRCASECMP
-/* This function is equivalent to strcasecmp(). */
-int nstrcasecmp(const char *s1, const char *s2)
-{
-    return strncasecmp(s1, s2, (size_t)-1);
-}
-#endif
-
-=======
->>>>>>> origin/tomato-shibby-RT-AC
 /* This function is equivalent to strcasecmp() for multibyte strings. */
 int mbstrcasecmp(const char *s1, const char *s2)
 {
-    return mbstrncasecmp(s1, s2, (size_t)-1);
+    return mbstrncasecmp(s1, s2, HIGHEST_POSITIVE);
 }
 
-<<<<<<< HEAD
-#ifndef HAVE_STRNCASECMP
-/* This function is equivalent to strncasecmp(). */
-int nstrncasecmp(const char *s1, const char *s2, size_t n)
-{
-    if (s1 == s2)
-	return 0;
-
-    assert(s1 != NULL && s2 != NULL);
-
-    for (; *s1 != '\0' && *s2 != '\0' && n > 0; s1++, s2++, n--) {
-	if (tolower(*s1) != tolower(*s2))
-	    break;
-    }
-
-    return (n > 0) ? tolower(*s1) - tolower(*s2) : 0;
-}
-#endif
-
-/* This function is equivalent to strncasecmp() for multibyte
- * strings. */
-=======
 /* This function is equivalent to strncasecmp() for multibyte strings. */
->>>>>>> origin/tomato-shibby-RT-AC
 int mbstrncasecmp(const char *s1, const char *s2, size_t n)
 {
 #ifdef ENABLE_UTF8
     if (use_utf8) {
-	char *s1_mb, *s2_mb;
-	wchar_t ws1, ws2;
+	wchar_t wc1, wc2;
 
-<<<<<<< HEAD
-	if (s1 == s2)
-	    return 0;
-
-	assert(s1 != NULL && s2 != NULL);
-
-	s1_mb = charalloc(MB_CUR_MAX);
-	s2_mb = charalloc(MB_CUR_MAX);
-
-	for (; *s1 != '\0' && *s2 != '\0' && n > 0; s1 +=
-		move_mbright(s1, 0), s2 += move_mbright(s2, 0), n--) {
-	    bool bad_s1_mb = FALSE, bad_s2_mb = FALSE;
-	    int s1_mb_len, s2_mb_len;
-=======
 	while (*s1 != '\0' && *s2 != '\0' && n > 0) {
 	    bool bad1 = FALSE, bad2 = FALSE;
->>>>>>> origin/tomato-shibby-RT-AC
 
-	    s1_mb_len = parse_mbchar(s1, s1_mb, NULL);
-
-	    if (mbtowc(&ws1, s1_mb, s1_mb_len) < 0) {
+	    if (mbtowc(&wc1, s1, MB_CUR_MAX) < 0) {
 		mbtowc_reset();
-<<<<<<< HEAD
-		ws1 = (unsigned char)*s1_mb;
-		bad_s1_mb = TRUE;
-=======
 		bad1 = TRUE;
->>>>>>> origin/tomato-shibby-RT-AC
 	    }
 
-	    s2_mb_len = parse_mbchar(s2, s2_mb, NULL);
-
-	    if (mbtowc(&ws2, s2_mb, s2_mb_len) < 0) {
+	    if (mbtowc(&wc2, s2, MB_CUR_MAX) < 0) {
 		mbtowc_reset();
-<<<<<<< HEAD
-		ws2 = (unsigned char)*s2_mb;
-		bad_s2_mb = TRUE;
-	    }
-
-	    if (bad_s1_mb != bad_s2_mb || towlower(ws1) !=
-		towlower(ws2))
-		break;
-	}
-
-	free(s1_mb);
-	free(s2_mb);
-
-	return (n > 0) ? towlower(ws1) - towlower(ws2) : 0;
-=======
 		bad2 = TRUE;
 	    }
 
@@ -656,7 +475,6 @@ int mbstrncasecmp(const char *s1, const char *s2, size_t n)
 	}
 
 	return (n > 0) ? ((unsigned char)*s1 - (unsigned char)*s2) : 0;
->>>>>>> origin/tomato-shibby-RT-AC
     } else
 #endif
 	return strncasecmp(s1, s2, n);
@@ -674,12 +492,7 @@ char *mbstrcasestr(const char *haystack, const char *needle)
 
 	needle_len = mbstrlen(needle);
 
-<<<<<<< HEAD
-	for (; *haystack != '\0' && haystack_len >= needle_len;
-		haystack += move_mbright(haystack, 0), haystack_len--) {
-=======
 	while (*haystack != '\0') {
->>>>>>> origin/tomato-shibby-RT-AC
 	    if (mbstrncasecmp(haystack, needle, needle_len) == 0)
 		return (char *)haystack;
 
@@ -689,7 +502,7 @@ char *mbstrcasestr(const char *haystack, const char *needle)
 	return NULL;
     } else
 #endif
-	return strcasestr(haystack, needle);
+	return (char *) strcasestr(haystack, needle);
 }
 
 /* This function is equivalent to strstr(), except in that it scans the
@@ -745,8 +558,7 @@ char *revstrcasestr(const char *haystack, const char *needle, const char
 }
 
 /* This function is equivalent to strcasestr() for multibyte strings,
- * except in that it scans the string in reverse, starting at
- * rev_start. */
+ * except in that it scans the string in reverse, starting at rev_start. */
 char *mbrevstrcasestr(const char *haystack, const char *needle, const
 	char *rev_start)
 {
@@ -764,15 +576,9 @@ char *mbrevstrcasestr(const char *haystack, const char *needle, const
 
 	rev_start_len = mbstrlen(rev_start);
 
-<<<<<<< HEAD
-	while (!begin_line) {
-	    if (rev_start_len >= needle_len && mbstrncasecmp(rev_start,
-		needle, needle_len) == 0)
-=======
 	while (TRUE) {
 	    if (rev_start_len >= needle_len &&
 			mbstrncasecmp(rev_start, needle, needle_len) == 0)
->>>>>>> origin/tomato-shibby-RT-AC
 		return (char *)rev_start;
 
 	    /* If we've reached the head of the haystack, we found nothing. */
@@ -822,9 +628,8 @@ char *mbstrchr(const char *s, const char *c)
 	char symbol[MB_CUR_MAX];
 	const char *q = s;
 	wchar_t ws, wc;
-	int c_mb_len = mbtowc(&wc, c, MB_CUR_MAX);
 
-	if (c_mb_len < 0) {
+	if (mbtowc(&wc, c, MB_CUR_MAX) < 0) {
 	    mbtowc_reset();
 	    wc = (unsigned char)*c;
 	    bad_c_mb = TRUE;
@@ -852,7 +657,7 @@ char *mbstrchr(const char *s, const char *c)
 	return (char *)q;
     } else
 #endif
-	return strchr(s, *c);
+	return (char *) strchr(s, *c);
 }
 #endif /* !NANO_TINY || !DISABLE_JUSTIFY */
 
@@ -870,7 +675,7 @@ char *mbstrpbrk(const char *s, const char *accept)
 	return NULL;
     } else
 #endif
-	return strpbrk(s, accept);
+	return (char *) strpbrk(s, accept);
 }
 
 /* This function is equivalent to strpbrk(), except in that it scans the
@@ -895,8 +700,7 @@ char *revstrpbrk(const char *s, const char *accept, const char
 }
 
 /* This function is equivalent to strpbrk() for multibyte strings,
- * except in that it scans the string in reverse, starting at
- * rev_start. */
+ * except in that it scans the string in reverse, starting at rev_start. */
 char *mbrevstrpbrk(const char *s, const char *accept, const char
 	*rev_start)
 {
@@ -926,7 +730,7 @@ char *mbrevstrpbrk(const char *s, const char *accept, const char
 }
 #endif /* !NANO_TINY */
 
-#if defined(ENABLE_NANORC) && (!defined(NANO_TINY) || !defined(DISABLE_JUSTIFY))
+#if !defined(DISABLE_NANORC) && (!defined(NANO_TINY) || !defined(DISABLE_JUSTIFY))
 /* Return TRUE if the string s contains one or more blank characters,
  * and FALSE otherwise. */
 bool has_blank_chars(const char *s)
@@ -959,19 +763,20 @@ bool has_blank_mbchars(const char *s)
 #endif
 	return has_blank_chars(s);
 }
-#endif /* ENABLE_NANORC && (!NANO_TINY || !DISABLE_JUSTIFY) */
+#endif /* !DISABLE_NANORC && (!NANO_TINY || !DISABLE_JUSTIFY) */
 
 #ifdef ENABLE_UTF8
 /* Return TRUE if wc is valid Unicode, and FALSE otherwise. */
 bool is_valid_unicode(wchar_t wc)
 {
-    return ((0 <= wc && wc <= 0x10FFFF) && (wc <= 0xD7FF || 0xE000 <=
-	wc) && (wc <= 0xFDCF || 0xFDF0 <= wc) && ((wc & 0xFFFF) <=
-	0xFFFD));
+    return ((0 <= wc && wc <= 0xD7FF) ||
+		(0xE000 <= wc && wc <= 0xFDCF) ||
+		(0xFDF0 <= wc && wc <= 0xFFFD) ||
+		(0xFFFF < wc && wc <= 0x10FFFF && (wc & 0xFFFF) <= 0xFFFD));
 }
 #endif
 
-#ifdef ENABLE_NANORC
+#ifndef DISABLE_NANORC
 /* Check if the string s is a valid multibyte string.  Return TRUE if it
  * is, and FALSE otherwise. */
 bool is_valid_mbstring(const char *s)
@@ -983,4 +788,4 @@ bool is_valid_mbstring(const char *s)
 #endif
 	return TRUE;
 }
-#endif /* ENABLE_NANORC */
+#endif /* !DISABLE_NANORC */

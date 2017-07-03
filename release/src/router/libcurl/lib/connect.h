@@ -7,15 +7,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
-<<<<<<< HEAD
- * Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
-=======
  * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
->>>>>>> origin/tomato-shibby-RT-AC
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -45,7 +41,7 @@ time_t Curl_timeleft(struct Curl_easy *data,
 
 #define DEFAULT_CONNECT_TIMEOUT 300000 /* milliseconds == five minutes */
 #define HAPPY_EYEBALLS_TIMEOUT     200 /* milliseconds to wait between
-                                          ipv4/ipv6 connection attempts */
+                                          IPv4/IPv6 connection attempts */
 
 /*
  * Used to extract socket and connectdata struct for the most recent
@@ -65,7 +61,7 @@ bool Curl_connalive(struct connectdata *conn);
 /* When you run a program that uses the Windows Sockets API, you may
    experience slow performance when you copy data to a TCP server.
 
-   http://support.microsoft.com/kb/823764
+   https://support.microsoft.com/kb/823764
 
    Work-around: Make the Socket Send Buffer Size Larger Than the Program Send
    Buffer Size
@@ -111,8 +107,6 @@ CURLcode Curl_socket(struct connectdata *conn,
                      struct Curl_sockaddr_ex *addr,
                      curl_socket_t *sockfd);
 
-<<<<<<< HEAD
-=======
 void Curl_tcpnodelay(struct connectdata *conn, curl_socket_t sockfd);
 
 /*
@@ -150,5 +144,4 @@ void Curl_conncontrol(struct connectdata *conn,
 
 bool Curl_conn_data_pending(struct connectdata *conn, int sockindex);
 
->>>>>>> origin/tomato-shibby-RT-AC
 #endif /* HEADER_CURL_CONNECT_H */

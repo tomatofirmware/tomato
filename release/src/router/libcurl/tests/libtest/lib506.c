@@ -5,15 +5,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
-<<<<<<< HEAD
- * Copyright (C) 1998 - 2011, Daniel Stenberg, <daniel@haxx.se>, et al.
-=======
  * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
->>>>>>> origin/tomato-shibby-RT-AC
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -24,9 +20,6 @@
  *
  ***************************************************************************/
 #include "test.h"
-
-#include <curl/mprintf.h>
-
 #include "memdebug.h"
 
 static const char *HOSTHEADER = "Host: www.host.foo.com";
@@ -44,41 +37,36 @@ struct userdata {
   int counter;
 };
 
-<<<<<<< HEAD
-=======
 static int locks[3];
 
->>>>>>> origin/tomato-shibby-RT-AC
 /* lock callback */
-static void my_lock(CURL *handle, curl_lock_data data, curl_lock_access laccess,
-          void *useptr )
+static void my_lock(CURL *handle, curl_lock_data data,
+                    curl_lock_access laccess, void *useptr)
 {
   const char *what;
   struct userdata *user = (struct userdata *)useptr;
+  int locknum;
 
   (void)handle;
   (void)laccess;
 
-<<<<<<< HEAD
-  switch ( data ) {
-=======
   switch(data) {
->>>>>>> origin/tomato-shibby-RT-AC
     case CURL_LOCK_DATA_SHARE:
       what = "share";
+      locknum = 0;
       break;
     case CURL_LOCK_DATA_DNS:
       what = "dns";
+      locknum = 1;
       break;
     case CURL_LOCK_DATA_COOKIE:
       what = "cookie";
+      locknum = 2;
       break;
     default:
       fprintf(stderr, "lock: no such data: %d\n", (int)data);
       return;
   }
-<<<<<<< HEAD
-=======
 
   /* detect locking of locked locks */
   if(locks[locknum]) {
@@ -87,37 +75,34 @@ static void my_lock(CURL *handle, curl_lock_data data, curl_lock_access laccess,
   }
   locks[locknum]++;
 
->>>>>>> origin/tomato-shibby-RT-AC
   printf("lock:   %-6s [%s]: %d\n", what, user->text, user->counter);
   user->counter++;
 }
 
 /* unlock callback */
-static void my_unlock(CURL *handle, curl_lock_data data, void *useptr )
+static void my_unlock(CURL *handle, curl_lock_data data, void *useptr)
 {
   const char *what;
   struct userdata *user = (struct userdata *)useptr;
+  int locknum;
   (void)handle;
-<<<<<<< HEAD
-  switch ( data ) {
-=======
   switch(data) {
->>>>>>> origin/tomato-shibby-RT-AC
     case CURL_LOCK_DATA_SHARE:
       what = "share";
+      locknum = 0;
       break;
     case CURL_LOCK_DATA_DNS:
       what = "dns";
+      locknum = 1;
       break;
     case CURL_LOCK_DATA_COOKIE:
       what = "cookie";
+      locknum = 2;
       break;
     default:
       fprintf(stderr, "unlock: no such data: %d\n", (int)data);
       return;
   }
-<<<<<<< HEAD
-=======
 
   /* detect unlocking of unlocked locks */
   if(!locks[locknum]) {
@@ -126,7 +111,6 @@ static void my_unlock(CURL *handle, curl_lock_data data, void *useptr )
   }
   locks[locknum]--;
 
->>>>>>> origin/tomato-shibby-RT-AC
   printf("unlock: %-6s [%s]: %d\n", what, user->text, user->counter);
   user->counter++;
 }
@@ -136,7 +120,7 @@ static void my_unlock(CURL *handle, curl_lock_data data, void *useptr )
 static struct curl_slist *sethost(struct curl_slist *headers)
 {
   (void)headers;
-  return curl_slist_append(NULL, HOSTHEADER );
+  return curl_slist_append(NULL, HOSTHEADER);
 }
 
 
@@ -149,7 +133,8 @@ static void *fire(void *ptr)
   CURL *curl;
   int i=0;
 
-  if ((curl = curl_easy_init()) == NULL) {
+  curl = curl_easy_init();
+  if(!curl) {
     fprintf(stderr, "curl_easy_init() failed\n");
     return NULL;
   }
@@ -158,17 +143,17 @@ static void *fire(void *ptr)
   curl_easy_setopt(curl, CURLOPT_VERBOSE,    1L);
   curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
   curl_easy_setopt(curl, CURLOPT_URL,        tdata->url);
-  printf( "CURLOPT_SHARE\n" );
+  printf("CURLOPT_SHARE\n");
   curl_easy_setopt(curl, CURLOPT_SHARE, tdata->share);
 
-  printf( "PERFORM\n" );
+  printf("PERFORM\n");
   code = curl_easy_perform(curl);
-  if( code != CURLE_OK ) {
+  if(code) {
     fprintf(stderr, "perform url '%s' repeat %d failed, curlcode %d\n",
             tdata->url, i, (int)code);
   }
 
-  printf( "CLEANUP\n" );
+  printf("CLEANUP\n");
   curl_easy_cleanup(curl);
   curl_slist_free_all(headers);
 
@@ -188,59 +173,57 @@ int test(char *URL)
 {
   int res;
   CURLSHcode scode = CURLSHE_OK;
+  CURLcode code = CURLE_OK;
   char *url = NULL;
   struct Tdata tdata;
   CURL *curl;
   CURLSH *share;
   struct curl_slist *headers = NULL;
+  struct curl_slist *cookies = NULL;
+  struct curl_slist *next_cookie = NULL;
   int i;
   struct userdata user;
 
   user.text = (char *)"Pigs in space";
   user.counter = 0;
 
-  printf( "GLOBAL_INIT\n" );
-  if (curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK) {
+  printf("GLOBAL_INIT\n");
+  if(curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK) {
     fprintf(stderr, "curl_global_init() failed\n");
     return TEST_ERR_MAJOR_BAD;
   }
 
   /* prepare share */
-<<<<<<< HEAD
-  printf( "SHARE_INIT\n" );
-  if ((share = curl_share_init()) == NULL) {
-=======
   printf("SHARE_INIT\n");
   share = curl_share_init();
   if(!share) {
->>>>>>> origin/tomato-shibby-RT-AC
     fprintf(stderr, "curl_share_init() failed\n");
     curl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;
   }
 
-  if ( CURLSHE_OK == scode ) {
-    printf( "CURLSHOPT_LOCKFUNC\n" );
-    scode = curl_share_setopt( share, CURLSHOPT_LOCKFUNC, my_lock);
+  if(CURLSHE_OK == scode) {
+    printf("CURLSHOPT_LOCKFUNC\n");
+    scode = curl_share_setopt(share, CURLSHOPT_LOCKFUNC, my_lock);
   }
-  if ( CURLSHE_OK == scode ) {
-    printf( "CURLSHOPT_UNLOCKFUNC\n" );
-    scode = curl_share_setopt( share, CURLSHOPT_UNLOCKFUNC, my_unlock);
+  if(CURLSHE_OK == scode) {
+    printf("CURLSHOPT_UNLOCKFUNC\n");
+    scode = curl_share_setopt(share, CURLSHOPT_UNLOCKFUNC, my_unlock);
   }
-  if ( CURLSHE_OK == scode ) {
-    printf( "CURLSHOPT_USERDATA\n" );
-    scode = curl_share_setopt( share, CURLSHOPT_USERDATA, &user);
+  if(CURLSHE_OK == scode) {
+    printf("CURLSHOPT_USERDATA\n");
+    scode = curl_share_setopt(share, CURLSHOPT_USERDATA, &user);
   }
-  if ( CURLSHE_OK == scode ) {
-    printf( "CURL_LOCK_DATA_COOKIE\n" );
-    scode = curl_share_setopt( share, CURLSHOPT_SHARE, CURL_LOCK_DATA_COOKIE);
+  if(CURLSHE_OK == scode) {
+    printf("CURL_LOCK_DATA_COOKIE\n");
+    scode = curl_share_setopt(share, CURLSHOPT_SHARE, CURL_LOCK_DATA_COOKIE);
   }
-  if ( CURLSHE_OK == scode ) {
-    printf( "CURL_LOCK_DATA_DNS\n" );
-    scode = curl_share_setopt( share, CURLSHOPT_SHARE, CURL_LOCK_DATA_DNS);
+  if(CURLSHE_OK == scode) {
+    printf("CURL_LOCK_DATA_DNS\n");
+    scode = curl_share_setopt(share, CURLSHOPT_SHARE, CURL_LOCK_DATA_DNS);
   }
 
-  if ( CURLSHE_OK != scode ) {
+  if(CURLSHE_OK != scode) {
     fprintf(stderr, "curl_share_setopt() failed\n");
     curl_share_cleanup(share);
     curl_global_cleanup();
@@ -248,85 +231,79 @@ int test(char *URL)
   }
 
   /* initial cookie manipulation */
-<<<<<<< HEAD
-  if ((curl = curl_easy_init()) == NULL) {
-=======
   curl = curl_easy_init();
   if(!curl) {
->>>>>>> origin/tomato-shibby-RT-AC
     fprintf(stderr, "curl_easy_init() failed\n");
     curl_share_cleanup(share);
     curl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;
   }
-  printf( "CURLOPT_SHARE\n" );
-  test_setopt( curl, CURLOPT_SHARE,      share );
-  printf( "CURLOPT_COOKIELIST injected_and_clobbered\n" );
-  test_setopt( curl, CURLOPT_COOKIELIST,
+  printf("CURLOPT_SHARE\n");
+  test_setopt(curl, CURLOPT_SHARE,      share);
+  printf("CURLOPT_COOKIELIST injected_and_clobbered\n");
+  test_setopt(curl, CURLOPT_COOKIELIST,
                "Set-Cookie: injected_and_clobbered=yes; "
-               "domain=host.foo.com; expires=Sat Feb 2 11:56:27 GMT 2030" );
-  printf( "CURLOPT_COOKIELIST ALL\n" );
-  test_setopt( curl, CURLOPT_COOKIELIST, "ALL" );
-  printf( "CURLOPT_COOKIELIST session\n" );
-  test_setopt( curl, CURLOPT_COOKIELIST, "Set-Cookie: session=elephants" );
-  printf( "CURLOPT_COOKIELIST injected\n" );
-  test_setopt( curl, CURLOPT_COOKIELIST,
+               "domain=host.foo.com; expires=Sat Feb 2 11:56:27 GMT 2030");
+  printf("CURLOPT_COOKIELIST ALL\n");
+  test_setopt(curl, CURLOPT_COOKIELIST, "ALL");
+  printf("CURLOPT_COOKIELIST session\n");
+  test_setopt(curl, CURLOPT_COOKIELIST, "Set-Cookie: session=elephants");
+  printf("CURLOPT_COOKIELIST injected\n");
+  test_setopt(curl, CURLOPT_COOKIELIST,
                "Set-Cookie: injected=yes; domain=host.foo.com; "
-               "expires=Sat Feb 2 11:56:27 GMT 2030" );
-  printf( "CURLOPT_COOKIELIST SESS\n" );
-  test_setopt( curl, CURLOPT_COOKIELIST, "SESS" );
-  printf( "CLEANUP\n" );
-  curl_easy_cleanup( curl );
+               "expires=Sat Feb 2 11:56:27 GMT 2030");
+  printf("CURLOPT_COOKIELIST SESS\n");
+  test_setopt(curl, CURLOPT_COOKIELIST, "SESS");
+  printf("CLEANUP\n");
+  curl_easy_cleanup(curl);
 
 
   res = 0;
 
   /* start treads */
-  for (i=1; i<=THREADS; i++ ) {
+  for(i=1; i<=THREADS; i++) {
 
     /* set thread data */
-    tdata.url   = suburl( URL, i ); /* must be curl_free()d */
+    tdata.url   = suburl(URL, i); /* must be curl_free()d */
     tdata.share = share;
 
     /* simulate thread, direct call of "thread" function */
-    printf( "*** run %d\n",i );
-    fire( &tdata );
+    printf("*** run %d\n",i);
+    fire(&tdata);
 
-    curl_free( tdata.url );
-
+    curl_free(tdata.url);
   }
 
 
   /* fetch a another one and save cookies */
-<<<<<<< HEAD
-  printf( "*** run %d\n", i );
-  if ((curl = curl_easy_init()) == NULL) {
-=======
   printf("*** run %d\n", i);
   curl = curl_easy_init();
   if(!curl) {
->>>>>>> origin/tomato-shibby-RT-AC
     fprintf(stderr, "curl_easy_init() failed\n");
     curl_share_cleanup(share);
     curl_global_cleanup();
     return TEST_ERR_MAJOR_BAD;
   }
 
-  url = suburl( URL, i );
-  headers = sethost( NULL );
-  test_setopt( curl, CURLOPT_HTTPHEADER, headers );
-  test_setopt( curl, CURLOPT_URL,        url );
-  printf( "CURLOPT_SHARE\n" );
-  test_setopt( curl, CURLOPT_SHARE,      share );
-  printf( "CURLOPT_COOKIEJAR\n" );
-  test_setopt( curl, CURLOPT_COOKIEJAR,  JAR );
-  printf( "CURLOPT_COOKIELIST FLUSH\n" );
-  test_setopt( curl, CURLOPT_COOKIELIST, "FLUSH" );
+  url = suburl(URL, i);
+  headers = sethost(NULL);
+  test_setopt(curl, CURLOPT_HTTPHEADER, headers);
+  test_setopt(curl, CURLOPT_URL,        url);
+  printf("CURLOPT_SHARE\n");
+  test_setopt(curl, CURLOPT_SHARE,      share);
+  printf("CURLOPT_COOKIEJAR\n");
+  test_setopt(curl, CURLOPT_COOKIEJAR,  JAR);
+  printf("CURLOPT_COOKIELIST FLUSH\n");
+  test_setopt(curl, CURLOPT_COOKIELIST, "FLUSH");
 
-<<<<<<< HEAD
-  printf( "PERFORM\n" );
-  curl_easy_perform( curl );
-=======
+  printf("PERFORM\n");
+  curl_easy_perform(curl);
+
+  printf("CLEANUP\n");
+  curl_easy_cleanup(curl);
+  curl_free(url);
+  curl_slist_free_all(headers);
+
   /* load cookies */
   curl = curl_easy_init();
   if(!curl) {
@@ -368,39 +345,34 @@ int test(char *URL)
   }
   printf("-----------------\n");
   curl_slist_free_all(cookies);
->>>>>>> origin/tomato-shibby-RT-AC
 
   /* try to free share, expect to fail because share is in use*/
-  printf( "try SHARE_CLEANUP...\n" );
-  scode = curl_share_cleanup( share );
-  if ( scode==CURLSHE_OK )
-  {
+  printf("try SHARE_CLEANUP...\n");
+  scode = curl_share_cleanup(share);
+  if(scode==CURLSHE_OK) {
     fprintf(stderr, "curl_share_cleanup succeed but error expected\n");
     share = NULL;
-  } else {
-    printf( "SHARE_CLEANUP failed, correct\n" );
+  }
+  else {
+    printf("SHARE_CLEANUP failed, correct\n");
   }
 
 test_cleanup:
 
   /* clean up last handle */
-  printf( "CLEANUP\n" );
-  curl_easy_cleanup( curl );
-
-  if ( headers )
-    curl_slist_free_all( headers );
-
-  if ( url )
-    curl_free(url);
+  printf("CLEANUP\n");
+  curl_easy_cleanup(curl);
+  curl_slist_free_all(headers);
+  curl_free(url);
 
   /* free share */
-  printf( "SHARE_CLEANUP\n" );
-  scode = curl_share_cleanup( share );
-  if ( scode!=CURLSHE_OK )
+  printf("SHARE_CLEANUP\n");
+  scode = curl_share_cleanup(share);
+  if(scode!=CURLSHE_OK)
     fprintf(stderr, "curl_share_cleanup failed, code errno %d\n",
             (int)scode);
 
-  printf( "GLOBAL_CLEANUP\n" );
+  printf("GLOBAL_CLEANUP\n");
   curl_global_cleanup();
 
   return res;

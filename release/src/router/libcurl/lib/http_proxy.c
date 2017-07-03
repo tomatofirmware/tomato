@@ -5,15 +5,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
-<<<<<<< HEAD
- * Copyright (C) 1998 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
-=======
  * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
->>>>>>> origin/tomato-shibby-RT-AC
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -38,15 +34,12 @@
 #include "progress.h"
 #include "non-ascii.h"
 #include "connect.h"
-
-#define _MPRINTF_REPLACE /* use our functions only */
-#include <curl/mprintf.h>
-
 #include "curlx.h"
 #include "vtls/vtls.h"
 
+/* The last 3 #include files should be in this order */
+#include "curl_printf.h"
 #include "curl_memory.h"
-/* The last #include file should be: */
 #include "memdebug.h"
 
 /*
@@ -91,6 +84,8 @@ CURLcode Curl_proxy_connect(struct connectdata *conn, int sockindex)
     /* for [protocol] tunneled through HTTP proxy */
     struct HTTP http_proxy;
     void *prot_save;
+    const char *hostname;
+    int remote_port;
     CURLcode result;
 
     /* BLOCKING */
@@ -108,11 +103,6 @@ CURLcode Curl_proxy_connect(struct connectdata *conn, int sockindex)
     prot_save = conn->data->req.protop;
     memset(&http_proxy, 0, sizeof(http_proxy));
     conn->data->req.protop = &http_proxy;
-<<<<<<< HEAD
-    conn->bits.close = FALSE;
-    result = Curl_proxyCONNECT(conn, FIRSTSOCKET,
-                               conn->host.name, conn->remote_port);
-=======
     connkeep(conn, "HTTP proxy CONNECT");
 
     /* for the secondary socket (FTP), use the "connect to host"
@@ -134,10 +124,10 @@ CURLcode Curl_proxy_connect(struct connectdata *conn, int sockindex)
       remote_port = conn->remote_port;
     result = Curl_proxyCONNECT(conn, sockindex, hostname,
                                remote_port, FALSE);
->>>>>>> origin/tomato-shibby-RT-AC
     conn->data->req.protop = prot_save;
     if(CURLE_OK != result)
       return result;
+    Curl_safefree(conn->allocptr.proxyuserpwd);
 #else
     return CURLE_NOT_BUILT_IN;
 #endif
@@ -150,19 +140,21 @@ CURLcode Curl_proxy_connect(struct connectdata *conn, int sockindex)
  * Curl_proxyCONNECT() requires that we're connected to a HTTP proxy. This
  * function will issue the necessary commands to get a seamless tunnel through
  * this proxy. After that, the socket can be used just as a normal socket.
+ *
+ * 'blocking' set to TRUE means that this function will do the entire CONNECT
+ * + response in a blocking fashion. Should be avoided!
  */
 
 CURLcode Curl_proxyCONNECT(struct connectdata *conn,
                            int sockindex,
                            const char *hostname,
-                           int remote_port)
+                           int remote_port,
+                           bool blocking)
 {
   int subversion=0;
   struct Curl_easy *data=conn->data;
   struct SingleRequest *k = &data->req;
   CURLcode result;
-  long timeout =
-    data->set.timeout?data->set.timeout:PROXY_TIMEOUT; /* in milliseconds */
   curl_socket_t tunnelsocket = conn->sock[sockindex];
   curl_off_t cl=0;
   bool closeConnection = FALSE;
@@ -188,13 +180,11 @@ CURLcode Curl_proxyCONNECT(struct connectdata *conn,
       infof(data, "Establish HTTP proxy tunnel to %s:%hu\n",
             hostname, remote_port);
 
-      if(data->req.newurl) {
         /* This only happens if we've looped here due to authentication
            reasons, and we don't really use the newly cloned URL here
            then. Just free() it. */
-        free(data->req.newurl);
-        data->req.newurl = NULL;
-      }
+      free(data->req.newurl);
+      data->req.newurl = NULL;
 
       /* initialize a dynamic send-buffer */
       req_buffer = Curl_add_buffer_init();
@@ -204,7 +194,7 @@ CURLcode Curl_proxyCONNECT(struct connectdata *conn,
 
       host_port = aprintf("%s:%hu", hostname, remote_port);
       if(!host_port) {
-        free(req_buffer);
+        Curl_add_buffer_free(req_buffer);
         return CURLE_OUT_OF_MEMORY;
       }
 
@@ -213,23 +203,23 @@ CURLcode Curl_proxyCONNECT(struct connectdata *conn,
 
       free(host_port);
 
-<<<<<<< HEAD
-      if(CURLE_OK == result) {
-        char *host=(char *)"";
-=======
       if(!result) {
         char *host = NULL;
->>>>>>> origin/tomato-shibby-RT-AC
         const char *proxyconn="";
         const char *useragent="";
         const char *http = (conn->http_proxy.proxytype == CURLPROXY_HTTP_1_0) ?
           "1.0" : "1.1";
-        char *hostheader= /* host:port with IPv6 support */
-          aprintf("%s%s%s:%hu", conn->bits.ipv6_ip?"[":"",
-                  hostname, conn->bits.ipv6_ip?"]":"",
+        bool ipv6_ip = conn->bits.ipv6_ip;
+        char *hostheader;
+
+        /* the hostname may be different */
+        if(hostname != conn->host.name)
+          ipv6_ip = (strchr(hostname, ':') != NULL);
+        hostheader= /* host:port with IPv6 support */
+          aprintf("%s%s%s:%hu", ipv6_ip?"[":"", hostname, ipv6_ip?"]":"",
                   remote_port);
         if(!hostheader) {
-          free(req_buffer);
+          Curl_add_buffer_free(req_buffer);
           return CURLE_OUT_OF_MEMORY;
         }
 
@@ -237,7 +227,7 @@ CURLcode Curl_proxyCONNECT(struct connectdata *conn,
           host = aprintf("Host: %s\r\n", hostheader);
           if(!host) {
             free(hostheader);
-            free(req_buffer);
+            Curl_add_buffer_free(req_buffer);
             return CURLE_OUT_OF_MEMORY;
           }
         }
@@ -267,14 +257,14 @@ CURLcode Curl_proxyCONNECT(struct connectdata *conn,
           free(host);
         free(hostheader);
 
-        if(CURLE_OK == result)
+        if(!result)
           result = Curl_add_custom_headers(conn, TRUE, req_buffer);
 
-        if(CURLE_OK == result)
+        if(!result)
           /* CRLF terminate the request */
           result = Curl_add_bufferf(req_buffer, "\r\n");
 
-        if(CURLE_OK == result) {
+        if(!result) {
           /* Send the connect request to the proxy */
           /* BLOCKING */
           result =
@@ -286,17 +276,19 @@ CURLcode Curl_proxyCONNECT(struct connectdata *conn,
           failf(data, "Failed sending CONNECT to proxy");
       }
 
-      Curl_safefree(req_buffer);
+      Curl_add_buffer_free(req_buffer);
       if(result)
         return result;
 
       conn->tunnel_state[sockindex] = TUNNEL_CONNECT;
+    } /* END CONNECT PHASE */
 
-<<<<<<< HEAD
-      /* now we've issued the CONNECT and we're waiting to hear back, return
-         and get called again polling-style */
-      return CURLE_OK;
-=======
+    check = Curl_timeleft(data, NULL, TRUE);
+    if(check <= 0) {
+      failf(data, "Proxy CONNECT aborted due to timeout");
+      return CURLE_RECV_ERROR;
+    }
+
     if(!blocking) {
       if(!Curl_conn_data_pending(conn, sockindex))
         /* return so we'll be called again polling-style */
@@ -306,11 +298,10 @@ CURLcode Curl_proxyCONNECT(struct connectdata *conn,
                "Read response immediately from proxy CONNECT\n"));
       }
     }
->>>>>>> origin/tomato-shibby-RT-AC
 
-    } /* END CONNECT PHASE */
+    /* at this point, the tunnel_connecting phase is over. */
 
-    { /* BEGIN NEGOTIATION PHASE */
+    { /* READING RESPONSE PHASE */
       size_t nread;   /* total size read */
       int perline; /* count bytes per line */
       int keepon=TRUE;
@@ -321,11 +312,6 @@ CURLcode Curl_proxyCONNECT(struct connectdata *conn,
       ptr = data->state.buffer;
       line_start = ptr;
 
-<<<<<<< HEAD
-      nread=0;
-      perline=0;
-      keepon=TRUE;
-=======
       nread = 0;
       perline = 0;
 
@@ -334,16 +320,13 @@ CURLcode Curl_proxyCONNECT(struct connectdata *conn,
 
         if(Curl_pgrsUpdate(conn))
           return CURLE_ABORTED_BY_CALLBACK;
->>>>>>> origin/tomato-shibby-RT-AC
 
         if(ptr >= &data->state.buffer[BUFSIZE]) {
           failf(data, "CONNECT response too large!");
           return CURLE_RECV_ERROR;
         }
 
-        /* if timeout is requested, find out how much remaining time we have */
-        check = timeout - /* timeout time */
-          Curl_tvdiff(Curl_tvnow(), conn->now); /* spent time */
+        check = Curl_timeleft(data, NULL, TRUE);
         if(check <= 0) {
           failf(data, "Proxy CONNECT aborted due to timeout");
           error = SELECT_TIMEOUT; /* already too little time */
@@ -378,26 +361,6 @@ CURLcode Curl_proxyCONNECT(struct connectdata *conn,
           }
           keepon = FALSE;
           break;
-<<<<<<< HEAD
-        default:
-          DEBUGASSERT(ptr+BUFSIZE-nread <= data->state.buffer+BUFSIZE+1);
-          result = Curl_read(conn, tunnelsocket, ptr, BUFSIZE-nread,
-                             &gotbytes);
-          if(result==CURLE_AGAIN)
-            continue; /* go loop yourself */
-          else if(result)
-            keepon = FALSE;
-          else if(gotbytes <= 0) {
-            keepon = FALSE;
-            if(data->set.proxyauth && data->state.authproxy.avail) {
-              /* proxy auth was requested and there was proxy auth available,
-                 then deem this as "mere" proxy disconnect */
-              conn->bits.proxy_connect_closed = TRUE;
-            }
-            else {
-              error = SELECT_ERROR;
-              failf(data, "Proxy CONNECT aborted");
-=======
         }
 
         /* We got a byte of data */
@@ -415,7 +378,6 @@ CURLcode Curl_proxyCONNECT(struct connectdata *conn,
             if(cl <= 0) {
               keepon = FALSE;
               break;
->>>>>>> origin/tomato-shibby-RT-AC
             }
           }
           else {
@@ -519,181 +481,12 @@ CURLcode Curl_proxyCONNECT(struct connectdata *conn,
                 conn->tunnel_state[sockindex] = TUNNEL_COMPLETE;
               }
             }
-<<<<<<< HEAD
-            else
-              for(i = 0; i < gotbytes; ptr++, i++) {
-                perline++; /* amount of bytes in this line so far */
-                if(*ptr == 0x0a) {
-                  char letter;
-                  int writetype;
-
-                  /* convert from the network encoding */
-                  result = Curl_convert_from_network(data, line_start,
-                                                     perline);
-                  /* Curl_convert_from_network calls failf if unsuccessful */
-                  if(result)
-                    return result;
-
-                  /* output debug if that is requested */
-                  if(data->set.verbose)
-                    Curl_debug(data, CURLINFO_HEADER_IN,
-                               line_start, (size_t)perline, conn);
-
-                  /* send the header to the callback */
-                  writetype = CLIENTWRITE_HEADER;
-                  if(data->set.include_header)
-                    writetype |= CLIENTWRITE_BODY;
-
-                  result = Curl_client_write(conn, writetype, line_start,
-                                             perline);
-
-                  data->info.header_size += (long)perline;
-                  data->req.headerbytecount += (long)perline;
-
-                  if(result)
-                    return result;
-
-                  /* Newlines are CRLF, so the CR is ignored as the line isn't
-                     really terminated until the LF comes. Treat a following CR
-                     as end-of-headers as well.*/
-
-                  if(('\r' == line_start[0]) ||
-                     ('\n' == line_start[0])) {
-                    /* end of response-headers from the proxy */
-                    nread = 0; /* make next read start over in the read
-                                  buffer */
-                    ptr=data->state.buffer;
-                    if((407 == k->httpcode) && !data->state.authproblem) {
-                      /* If we get a 407 response code with content length
-                         when we have no auth problem, we must ignore the
-                         whole response-body */
-                      keepon = 2;
-
-                      if(cl) {
-                        infof(data, "Ignore %" CURL_FORMAT_CURL_OFF_T
-                              " bytes of response-body\n", cl);
-
-                        /* remove the remaining chunk of what we already
-                           read */
-                        cl -= (gotbytes - i);
-
-                        if(cl<=0)
-                          /* if the whole thing was already read, we are done!
-                           */
-                          keepon=FALSE;
-                      }
-                      else if(chunked_encoding) {
-                        CHUNKcode r;
-                        /* We set ignorebody true here since the chunked
-                           decoder function will acknowledge that. Pay
-                           attention so that this is cleared again when this
-                           function returns! */
-                        k->ignorebody = TRUE;
-                        infof(data, "%zd bytes of chunk left\n", gotbytes-i);
-
-                        if(line_start[1] == '\n') {
-                          /* this can only be a LF if the letter at index 0
-                             was a CR */
-                          line_start++;
-                          i++;
-                        }
-
-                        /* now parse the chunked piece of data so that we can
-                           properly tell when the stream ends */
-                        r = Curl_httpchunk_read(conn, line_start+1,
-                                                  gotbytes -i, &gotbytes);
-                        if(r == CHUNKE_STOP) {
-                          /* we're done reading chunks! */
-                          infof(data, "chunk reading DONE\n");
-                          keepon = FALSE;
-                          /* we did the full CONNECT treatment, go to
-                             COMPLETE */
-                          conn->tunnel_state[sockindex] = TUNNEL_COMPLETE;
-                        }
-                        else
-                          infof(data, "Read %zd bytes of chunk, continue\n",
-                                gotbytes);
-                      }
-                      else {
-                        /* without content-length or chunked encoding, we
-                           can't keep the connection alive since the close is
-                           the end signal so we bail out at once instead */
-                        keepon=FALSE;
-                      }
-                    }
-                    else {
-                      keepon = FALSE;
-                      if(200 == data->info.httpproxycode) {
-                        if(gotbytes - (i+1))
-                          failf(data, "Proxy CONNECT followed by %zd bytes "
-                                "of opaque data. Data ignored (known bug #39)",
-                                gotbytes - (i+1));
-                      }
-                    }
-                    /* we did the full CONNECT treatment, go to COMPLETE */
-                    conn->tunnel_state[sockindex] = TUNNEL_COMPLETE;
-                    break; /* breaks out of for-loop, not switch() */
-                  }
-
-                  /* keep a backup of the position we are about to blank */
-                  letter = line_start[perline];
-                  line_start[perline]=0; /* zero terminate the buffer */
-                  if((checkprefix("WWW-Authenticate:", line_start) &&
-                      (401 == k->httpcode)) ||
-                     (checkprefix("Proxy-authenticate:", line_start) &&
-                      (407 == k->httpcode))) {
-
-                    bool proxy = (k->httpcode == 407) ? TRUE : FALSE;
-                    char *auth = Curl_copy_header_value(line_start);
-                    if(!auth)
-                      return CURLE_OUT_OF_MEMORY;
-
-                    result = Curl_http_input_auth(conn, proxy, auth);
-
-                    Curl_safefree(auth);
-
-                    if(result)
-                      return result;
-                  }
-                  else if(checkprefix("Content-Length:", line_start)) {
-                    cl = curlx_strtoofft(line_start +
-                                         strlen("Content-Length:"), NULL, 10);
-                  }
-                  else if(Curl_compareheader(line_start,
-                                             "Connection:", "close"))
-                    closeConnection = TRUE;
-                  else if(Curl_compareheader(line_start,
-                                             "Transfer-Encoding:",
-                                             "chunked")) {
-                    infof(data, "CONNECT responded chunked\n");
-                    chunked_encoding = TRUE;
-                    /* init our chunky engine */
-                    Curl_httpchunk_init(conn);
-                  }
-                  else if(Curl_compareheader(line_start,
-                                             "Proxy-Connection:", "close"))
-                    closeConnection = TRUE;
-                  else if(2 == sscanf(line_start, "HTTP/1.%d %d",
-                                      &subversion,
-                                      &k->httpcode)) {
-                    /* store the HTTP code from the proxy */
-                    data->info.httpproxycode = k->httpcode;
-                  }
-                  /* put back the letter we blanked out before */
-                  line_start[perline]= letter;
-
-                  perline=0; /* line starts over here */
-                  line_start = ptr+1; /* this skips the zero byte we wrote */
-                }
-              }
-=======
             else {
               /* without content-length or chunked encoding, we
                  can't keep the connection alive since the close is
                  the end signal so we bail out at once instead */
               keepon = FALSE;
             }
->>>>>>> origin/tomato-shibby-RT-AC
           }
           else
             keepon = FALSE;
@@ -790,7 +583,7 @@ CURLcode Curl_proxyCONNECT(struct connectdata *conn,
         conn->sock[sockindex] = CURL_SOCKET_BAD;
         break;
       }
-    } /* END NEGOTIATION PHASE */
+    } /* END READING RESPONSE PHASE */
 
     /* If we are supposed to continue and request a new URL, which basically
      * means the HTTP authentication is still going on so if the tunnel
@@ -805,29 +598,30 @@ CURLcode Curl_proxyCONNECT(struct connectdata *conn,
   } while(data->req.newurl);
 
   if(200 != data->req.httpcode) {
-    failf(data, "Received HTTP code %d from proxy after CONNECT",
-          data->req.httpcode);
-
-    if(closeConnection && data->req.newurl)
+    if(closeConnection && data->req.newurl) {
       conn->bits.proxy_connect_closed = TRUE;
-
-    if(data->req.newurl) {
-      /* this won't be used anymore for the CONNECT so free it now */
+      infof(data, "Connect me again please\n");
+    }
+    else {
       free(data->req.newurl);
       data->req.newurl = NULL;
-<<<<<<< HEAD
-=======
       /* failure, close this connection to avoid re-use */
       streamclose(conn, "proxy CONNECT failure");
       Curl_closesocket(conn, conn->sock[sockindex]);
       conn->sock[sockindex] = CURL_SOCKET_BAD;
->>>>>>> origin/tomato-shibby-RT-AC
     }
 
     /* to back to init state */
     conn->tunnel_state[sockindex] = TUNNEL_INIT;
 
-    return CURLE_RECV_ERROR;
+    if(conn->bits.proxy_connect_closed)
+      /* this is not an error, just part of the connection negotiation */
+      return CURLE_OK;
+    else {
+      failf(data, "Received HTTP code %d from proxy after CONNECT",
+            data->req.httpcode);
+      return CURLE_RECV_ERROR;
+    }
   }
 
   conn->tunnel_state[sockindex] = TUNNEL_COMPLETE;

@@ -17,12 +17,8 @@ static unsigned char c[16] = { 101, 120, 112, 97,  110, 100, 32, 51,
 
 static unsigned char out[64];
 
-<<<<<<< HEAD
-void print(unsigned char *x, unsigned char *y)
-=======
 static void
 print(unsigned char *x, unsigned char *y)
->>>>>>> origin/tomato-shibby-RT-AC
 {
     int          i;
     unsigned int borrow = 0;

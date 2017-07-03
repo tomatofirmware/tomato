@@ -15,23 +15,6 @@ libsodium_la_SOURCES = \
 	crypto_core/curve25519/ref10/base.h \
 	crypto_core/curve25519/ref10/base2.h \
 	crypto_core/curve25519/ref10/curve25519_ref10.c \
-<<<<<<< HEAD
-	crypto_core/curve25519/ref10/curve25519_ref10.h \
-	crypto_core/hsalsa20/ref2/core_hsalsa20.c \
-	crypto_core/hsalsa20/core_hsalsa20_api.c \
-	crypto_core/salsa20/ref/core_salsa20.c \
-	crypto_core/salsa20/core_salsa20_api.c \
-	crypto_generichash/crypto_generichash.c \
-	crypto_generichash/blake2/generichash_blake2_api.c \
-	crypto_generichash/blake2/ref/blake2-impl.h \
-	crypto_generichash/blake2/ref/blake2.h \
-	crypto_generichash/blake2/ref/blake2b-compress-ref.c \
-	crypto_generichash/blake2/ref/blake2b-load-sse2.h \
-	crypto_generichash/blake2/ref/blake2b-load-sse41.h \
-	crypto_generichash/blake2/ref/blake2b-ref.c \
-	crypto_generichash/blake2/ref/blake2b-round.h \
-	crypto_generichash/blake2/ref/generichash_blake2b.c \
-=======
 	crypto_core/hchacha20/core_hchacha20.c \
 	crypto_core/hsalsa20/ref2/core_hsalsa20_ref2.c \
 	crypto_core/hsalsa20/core_hsalsa20.c \
@@ -45,7 +28,6 @@ libsodium_la_SOURCES = \
 	crypto_generichash/blake2b/ref/blake2b-load-avx2.h \
 	crypto_generichash/blake2b/ref/blake2b-ref.c \
 	crypto_generichash/blake2b/ref/generichash_blake2b.c \
->>>>>>> origin/tomato-shibby-RT-AC
 	crypto_hash/crypto_hash.c \
 	crypto_hash/sha256/hash_sha256.c \
 	crypto_hash/sha256/cp/hash_sha256_cp.c \
@@ -61,8 +43,6 @@ libsodium_la_SOURCES = \
 	crypto_onetimeauth/poly1305/donna/poly1305_donna32.h \
 	crypto_onetimeauth/poly1305/donna/poly1305_donna64.h \
 	crypto_onetimeauth/poly1305/donna/poly1305_donna.c \
-<<<<<<< HEAD
-=======
 	crypto_pwhash/argon2/argon2-core.c \
 	crypto_pwhash/argon2/argon2-core.h \
 	crypto_pwhash/argon2/argon2-encoding.c \
@@ -75,14 +55,12 @@ libsodium_la_SOURCES = \
 	crypto_pwhash/argon2/blamka-round-ref.h \
 	crypto_pwhash/argon2/pwhash_argon2i.c \
 	crypto_pwhash/crypto_pwhash.c \
->>>>>>> origin/tomato-shibby-RT-AC
 	crypto_pwhash/scryptsalsa208sha256/crypto_scrypt-common.c \
 	crypto_pwhash/scryptsalsa208sha256/crypto_scrypt.h \
 	crypto_pwhash/scryptsalsa208sha256/scrypt_platform.c \
 	crypto_pwhash/scryptsalsa208sha256/pbkdf2-sha256.c \
 	crypto_pwhash/scryptsalsa208sha256/pbkdf2-sha256.h \
 	crypto_pwhash/scryptsalsa208sha256/pwhash_scryptsalsa208sha256.c \
-	crypto_pwhash/scryptsalsa208sha256/sysendian.h \
 	crypto_pwhash/scryptsalsa208sha256/nosse/pwhash_scryptsalsa208sha256_nosse.c \
 	crypto_scalarmult/crypto_scalarmult.c \
 	crypto_scalarmult/curve25519/scalarmult_curve25519.c \
@@ -100,23 +78,8 @@ libsodium_la_SOURCES = \
 	crypto_sign/ed25519/ref10/keypair.c \
 	crypto_sign/ed25519/ref10/open.c \
 	crypto_sign/ed25519/ref10/sign.c \
-	crypto_stream/crypto_stream.c \
 	crypto_stream/chacha20/stream_chacha20.c \
 	crypto_stream/chacha20/stream_chacha20.h \
-<<<<<<< HEAD
-	crypto_stream/chacha20/ref/stream_chacha20_ref.h \
-	crypto_stream/chacha20/ref/stream_chacha20_ref.c \
-	crypto_stream/salsa20/stream_salsa20_api.c \
-	crypto_stream/xsalsa20/stream_xsalsa20_api.c \
-	crypto_stream/xsalsa20/ref/stream_xsalsa20.c \
-	crypto_stream/xsalsa20/ref/xor_xsalsa20.c \
-	crypto_verify/16/verify_16_api.c \
-	crypto_verify/16/ref/verify_16.c \
-	crypto_verify/32/verify_32_api.c \
-	crypto_verify/32/ref/verify_32.c \
-	crypto_verify/64/verify_64_api.c \
-	crypto_verify/64/ref/verify_64.c \
-=======
 	crypto_stream/chacha20/ref/chacha20_ref.h \
 	crypto_stream/chacha20/ref/chacha20_ref.c \
 	crypto_stream/crypto_stream.c \
@@ -128,7 +91,6 @@ libsodium_la_SOURCES = \
 	include/sodium/private/curve25519_ref10.h \
 	include/sodium/private/mutex.h \
 	include/sodium/private/sse2_64_32.h \
->>>>>>> origin/tomato-shibby-RT-AC
 	randombytes/randombytes.c \
 	sodium/core.c \
 	sodium/runtime.c \
@@ -197,31 +159,6 @@ endif
 
 if !MINIMAL
 libsodium_la_SOURCES += \
-<<<<<<< HEAD
-	crypto_core/salsa2012/ref/core_salsa2012.c \
-	crypto_core/salsa2012/core_salsa2012_api.c \
-	crypto_core/salsa208/ref/core_salsa208.c \
-	crypto_core/salsa208/core_salsa208_api.c \
-	crypto_sign/ed25519/ref10/obsolete.c \
-	crypto_stream/aes128ctr/portable/afternm_aes128ctr.c \
-	crypto_stream/aes128ctr/stream_aes128ctr_api.c \
-	crypto_stream/aes128ctr/portable/beforenm_aes128ctr.c \
-	crypto_stream/aes128ctr/portable/common.h \
-	crypto_stream/aes128ctr/portable/common_aes128ctr.c \
-	crypto_stream/aes128ctr/portable/consts.h \
-	crypto_stream/aes128ctr/portable/consts_aes128ctr.c \
-	crypto_stream/aes128ctr/portable/int128.h \
-	crypto_stream/aes128ctr/portable/int128_aes128ctr.c \
-	crypto_stream/aes128ctr/portable/stream_aes128ctr.c \
-	crypto_stream/aes128ctr/portable/types.h \
-	crypto_stream/aes128ctr/portable/xor_afternm_aes128ctr.c \
-	crypto_stream/salsa2012/stream_salsa2012_api.c \
-	crypto_stream/salsa2012/ref/stream_salsa2012.c \
-	crypto_stream/salsa2012/ref/xor_salsa2012.c \
-	crypto_stream/salsa208/stream_salsa208_api.c \
-	crypto_stream/salsa208/ref/stream_salsa208.c \
-	crypto_stream/salsa208/ref/xor_salsa208.c
-=======
 	crypto_box/curve25519xchacha20poly1305/box_curve25519xchacha20poly1305.c \
 	crypto_secretbox/xchacha20poly1305/secretbox_xchacha20poly1305.c \
 	crypto_shorthash/siphash24/shorthash_siphashx24.c \
@@ -242,7 +179,6 @@ libsodium_la_SOURCES += \
 	crypto_stream/salsa208/ref/stream_salsa208_ref.c \
 	crypto_stream/salsa208/stream_salsa208.c \
 	crypto_stream/xchacha20/stream_xchacha20.c
->>>>>>> origin/tomato-shibby-RT-AC
 endif
 
 libsodium_la_LDFLAGS = \
@@ -267,8 +203,8 @@ endif
 SUBDIRS = \
 	include
 
-libsodium_la_LIBADD = libaesni.la libsse2.la libssse3.la libsse41.la
-noinst_LTLIBRARIES =  libaesni.la libsse2.la libssse3.la libsse41.la
+libsodium_la_LIBADD = libaesni.la libsse2.la libssse3.la libsse41.la libavx2.la
+noinst_LTLIBRARIES =  libaesni.la libsse2.la libssse3.la libsse41.la libavx2.la
 
 libaesni_la_LDFLAGS = $(libsodium_la_LDFLAGS)
 libaesni_la_CPPFLAGS = $(libsodium_la_CPPFLAGS) \
@@ -297,11 +233,6 @@ libssse3_la_LDFLAGS = $(libsodium_la_LDFLAGS)
 libssse3_la_CPPFLAGS = $(libsodium_la_CPPFLAGS) \
 	@CFLAGS_SSE2@ @CFLAGS_SSSE3@
 libssse3_la_SOURCES = \
-<<<<<<< HEAD
-	crypto_generichash/blake2/ref/blake2b-compress-ssse3.c \
-	crypto_stream/chacha20/vec/stream_chacha20_vec.h \
-	crypto_stream/chacha20/vec/stream_chacha20_vec.c
-=======
 	crypto_generichash/blake2b/ref/blake2b-compress-ssse3.c \
 	crypto_generichash/blake2b/ref/blake2b-compress-ssse3.h \
 	crypto_pwhash/argon2/argon2-fill-block-ssse3.c \
@@ -311,15 +242,11 @@ libssse3_la_SOURCES = \
 	crypto_stream/chacha20/dolbeau/u0.h \
 	crypto_stream/chacha20/dolbeau/u1.h \
 	crypto_stream/chacha20/dolbeau/u4.h
->>>>>>> origin/tomato-shibby-RT-AC
 
 libsse41_la_LDFLAGS = $(libsodium_la_LDFLAGS)
 libsse41_la_CPPFLAGS = $(libsodium_la_CPPFLAGS) \
 	@CFLAGS_SSE2@ @CFLAGS_SSSE3@ @CFLAGS_SSE41@
 libsse41_la_SOURCES = \
-<<<<<<< HEAD
-	crypto_generichash/blake2/ref/blake2b-compress-sse41.c
-=======
 	crypto_generichash/blake2b/ref/blake2b-compress-sse41.c \
 	crypto_generichash/blake2b/ref/blake2b-compress-sse41.h
 
@@ -338,4 +265,3 @@ libavx2_la_SOURCES = \
 	crypto_stream/salsa20/xmm6int/u1.h \
 	crypto_stream/salsa20/xmm6int/u4.h \
 	crypto_stream/salsa20/xmm6int/u8.h
->>>>>>> origin/tomato-shibby-RT-AC

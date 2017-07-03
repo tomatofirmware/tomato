@@ -7,11 +7,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -27,12 +27,8 @@
  * Prototypes for library-wide functions provided by url.c
  */
 
-<<<<<<< HEAD
-CURLcode Curl_open(struct SessionHandle **curl);
-=======
 CURLcode Curl_init_do(struct Curl_easy *data, struct connectdata *conn);
 CURLcode Curl_open(struct Curl_easy **curl);
->>>>>>> origin/tomato-shibby-RT-AC
 CURLcode Curl_init_userdefined(struct UserDefined *set);
 CURLcode Curl_setopt(struct Curl_easy *data, CURLoption option,
                      va_list arg);
@@ -41,9 +37,6 @@ void Curl_freeset(struct Curl_easy * data);
 CURLcode Curl_close(struct Curl_easy *data); /* opposite of curl_open() */
 CURLcode Curl_connect(struct Curl_easy *, struct connectdata **,
                       bool *async, bool *protocol_connect);
-CURLcode Curl_do(struct connectdata **, bool *done);
-CURLcode Curl_do_more(struct connectdata *, int *completed);
-CURLcode Curl_done(struct connectdata **, CURLcode, bool premature);
 CURLcode Curl_disconnect(struct connectdata *, bool dead_connection);
 CURLcode Curl_protocol_connect(struct connectdata *conn, bool *done);
 CURLcode Curl_protocol_connecting(struct connectdata *conn, bool *done);
@@ -64,11 +57,8 @@ CURLcode Curl_addHandleToPipeline(struct Curl_easy *handle,
                                   struct curl_llist *pipeline);
 int Curl_removeHandleFromPipeline(struct Curl_easy *handle,
                                   struct curl_llist *pipeline);
-<<<<<<< HEAD
-=======
 struct connectdata *
 Curl_oldest_idle_connection(struct Curl_easy *data);
->>>>>>> origin/tomato-shibby-RT-AC
 /* remove the specified connection from all (possible) pipelines and related
    queues */
 void Curl_getoff_all_pipelines(struct Curl_easy *data,
@@ -77,13 +67,8 @@ void Curl_getoff_all_pipelines(struct Curl_easy *data,
 void Curl_close_connections(struct Curl_easy *data);
 
 #define CURL_DEFAULT_PROXY_PORT 1080 /* default proxy port unless specified */
-<<<<<<< HEAD
-#define CURL_DEFAULT_SOCKS5_GSSAPI_SERVICE "rcmd" /* default socks5 gssapi
-                                                     service */
-=======
 #define CURL_DEFAULT_HTTPS_PROXY_PORT 443 /* default https proxy port unless
                                              specified */
->>>>>>> origin/tomato-shibby-RT-AC
 
 CURLcode Curl_connected_proxy(struct connectdata *conn, int sockindex);
 

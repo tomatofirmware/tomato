@@ -10,7 +10,7 @@
 # *
 # * This software is licensed as described in the file COPYING, which
 # * you should have received as part of this distribution. The terms
-# * are also available at http://curl.haxx.se/docs/copyright.html.
+# * are also available at https://curl.haxx.se/docs/copyright.html.
 # *
 # * You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # * copies of the Software, and permit persons to whom the Software is
@@ -37,22 +37,6 @@ use strict;
 use vars qw($opt_b $opt_d $opt_f $opt_h $opt_i $opt_k $opt_l $opt_m $opt_n $opt_p $opt_q $opt_s $opt_t $opt_u $opt_v $opt_w);
 use List::Util;
 use Text::Wrap;
-<<<<<<< HEAD
-
-my %urls = (
-  'nss' =>
-    'http://mxr.mozilla.org/nss/source/lib/ckfw/builtins/certdata.txt?raw=1',
-  'central' =>
-    'http://mxr.mozilla.org/mozilla-central/source/security/nss/lib/ckfw/builtins/certdata.txt?raw=1',
-  'aurora' =>
-    'http://mxr.mozilla.org/mozilla-aurora/source/security/nss/lib/ckfw/builtins/certdata.txt?raw=1',
-  'beta' =>
-    'http://mxr.mozilla.org/mozilla-beta/source/security/nss/lib/ckfw/builtins/certdata.txt?raw=1',
-  'release' =>
-    'http://mxr.mozilla.org/mozilla-release/source/security/nss/lib/ckfw/builtins/certdata.txt?raw=1',
-  'mozilla' =>
-    'http://mxr.mozilla.org/mozilla/source/security/nss/lib/ckfw/builtins/certdata.txt?raw=1'
-=======
 my $MOD_SHA = "Digest::SHA";
 eval "require $MOD_SHA";
 if ($@) {
@@ -72,7 +56,6 @@ my %urls = (
     'https://hg.mozilla.org/releases/mozilla-beta/raw-file/default/security/nss/lib/ckfw/builtins/certdata.txt',
   'release' =>
     'https://hg.mozilla.org/releases/mozilla-release/raw-file/default/security/nss/lib/ckfw/builtins/certdata.txt',
->>>>>>> origin/tomato-shibby-RT-AC
 );
 
 $opt_d = 'release';
@@ -80,11 +63,7 @@ $opt_d = 'release';
 # If the OpenSSL commandline is not in search path you can configure it here!
 my $openssl = 'openssl';
 
-<<<<<<< HEAD
-my $version = '1.21';
-=======
 my $version = '1.27';
->>>>>>> origin/tomato-shibby-RT-AC
 
 $opt_w = 76; # default base64 encoded lines length
 
@@ -125,7 +104,8 @@ my @valid_signature_algorithms = (
   "MD5",
   "SHA1",
   "SHA256",
-  "SHA512"  
+  "SHA384",
+  "SHA512"
 );
 
 $0 =~ s@.*(/|\\)@@;
@@ -149,17 +129,10 @@ else {
   $url = $opt_d;
 }
 
+my $curl = `curl -V`;
+
 if ($opt_i) {
   print ("=" x 78 . "\n");
-<<<<<<< HEAD
-  print "Script Version            : $version\n";
-  print "Perl Version              : $]\n";
-  print "Operating System Name     : $^O\n";
-  print "Getopt::Std.pm Version    : ${Getopt::Std::VERSION}\n";
-  print "MIME::Base64.pm Version   : ${MIME::Base64::VERSION}\n";
-  print "LWP::UserAgent.pm Version : ${LWP::UserAgent::VERSION}\n";
-  print "LWP.pm Version            : ${LWP::VERSION}\n";
-=======
   print "Script Version                   : $version\n";
   print "Perl Version                     : $]\n";
   print "Operating System Name            : $^O\n";
@@ -169,23 +142,12 @@ if ($opt_i) {
   print "LWP.pm Version                   : ${LWP::VERSION}\n" if($LWP::VERSION);
   print "Digest::SHA.pm Version           : ${Digest::SHA::VERSION}\n" if ($Digest::SHA::VERSION);
   print "Digest::SHA::PurePerl.pm Version : ${Digest::SHA::PurePerl::VERSION}\n" if ($Digest::SHA::PurePerl::VERSION);
->>>>>>> origin/tomato-shibby-RT-AC
   print ("=" x 78 . "\n");
 }
 
-sub WARNING_MESSAGE() {
+sub warning_message() {
   if ( $opt_d =~ m/^risk$/i ) { # Long Form Warning and Exit
     print "Warning: Use of this script may pose some risk:\n";
-<<<<<<< HEAD
-	print "\n";
-	print "  1) Using http is subject to man in the middle attack of certdata content\n";
-	print "  2) Default to 'release', but more recent updates may be found in other trees\n";
-	print "  3) certdata.txt file format may change, lag time to update this script\n";
-	print "  4) Generally unwise to blindly trust CAs without manual review & verification\n";
-	print "  5) Mozilla apps use additional security checks aren't represented in certdata\n";
-	print "  6) Use of this script will make a security engineer grind his teeth and\n";
-	print "     swear at you.  ;)\n";
-=======
     print "\n";
     print "  1) If you use HTTP URLs they are subject to a man in the middle attack\n";
     print "  2) Default to 'release', but more recent updates may be found in other trees\n";
@@ -194,7 +156,6 @@ sub WARNING_MESSAGE() {
     print "  5) Mozilla apps use additional security checks aren't represented in certdata\n";
     print "  6) Use of this script will make a security engineer grind his teeth and\n";
     print "     swear at you.  ;)\n";
->>>>>>> origin/tomato-shibby-RT-AC
     exit;
   } else { # Short Form Warning
     print "Warning: Use of this script may pose some risk, -d risk for more details.\n";
@@ -233,10 +194,16 @@ sub VERSION_MESSAGE() {
   print "${0} version ${version} running Perl ${]} on ${^O}\n";
 }
 
-WARNING_MESSAGE() unless ($opt_q || $url =~ m/^(ht|f)tps:/i );
+warning_message() unless ($opt_q || $url =~ m/^(ht|f)tps:/i );
 HELP_MESSAGE() if ($opt_h);
 
-sub IS_IN_LIST($@) {
+sub report($@) {
+  my $output = shift;
+
+  print STDERR $output . "\n" unless $opt_q;
+}
+
+sub is_in_list($@) {
   my $target = shift;
 
   return defined(List::Util::first { $target eq $_ } @_);
@@ -244,7 +211,7 @@ sub IS_IN_LIST($@) {
 
 # Parses $param_string as a case insensitive comma separated list with optional whitespace
 # validates that only allowed parameters are supplied
-sub PARSE_CSV_PARAM($$@) {
+sub parse_csv_param($$@) {
   my $description = shift;
   my $param_string = shift;
   my @valid_values = @_;
@@ -256,21 +223,19 @@ sub PARSE_CSV_PARAM($$@) {
   } split( ',', $param_string );
 
   # Find all values which are not in the list of valid values or "ALL"
-  my @invalid = grep { !IS_IN_LIST($_,"ALL",@valid_values) } @values;
+  my @invalid = grep { !is_in_list($_,"ALL",@valid_values) } @values;
 
   if ( scalar(@invalid) > 0 ) {
     # Tell the user which parameters were invalid and print the standard help message which will exit
     print "Error: Invalid ", $description, scalar(@invalid) == 1 ? ": " : "s: ", join( ", ", map { "\"$_\"" } @invalid ), "\n";
     HELP_MESSAGE();
   }
-  
-  @values = @valid_values if ( IS_IN_LIST("ALL",@values) );
-  
+
+  @values = @valid_values if ( is_in_list("ALL",@values) );
+
   return @values;
 }
 
-<<<<<<< HEAD
-=======
 sub sha256 {
   my $result;
   if ($Digest::SHA::VERSION || $Digest::SHA::PurePerl::VERSION) {
@@ -301,26 +266,25 @@ sub oldhash {
   return $hash;
 }
 
->>>>>>> origin/tomato-shibby-RT-AC
 if ( $opt_p !~ m/:/ ) {
   print "Error: Mozilla trust identifier list must include both purposes and levels\n";
   HELP_MESSAGE();
 }
 
 (my $included_mozilla_trust_purposes_string, my $included_mozilla_trust_levels_string) = split( ':', $opt_p );
-my @included_mozilla_trust_purposes = PARSE_CSV_PARAM( "trust purpose", $included_mozilla_trust_purposes_string, @valid_mozilla_trust_purposes );
-my @included_mozilla_trust_levels = PARSE_CSV_PARAM( "trust level", $included_mozilla_trust_levels_string, @valid_mozilla_trust_levels );
+my @included_mozilla_trust_purposes = parse_csv_param( "trust purpose", $included_mozilla_trust_purposes_string, @valid_mozilla_trust_purposes );
+my @included_mozilla_trust_levels = parse_csv_param( "trust level", $included_mozilla_trust_levels_string, @valid_mozilla_trust_levels );
 
-my @included_signature_algorithms = PARSE_CSV_PARAM( "signature algorithm", $opt_s, @valid_signature_algorithms );
+my @included_signature_algorithms = parse_csv_param( "signature algorithm", $opt_s, @valid_signature_algorithms );
 
-sub SHOULD_OUTPUT_CERT(%) {
+sub should_output_cert(%) {
   my %trust_purposes_by_level = @_;
-  
+
   foreach my $level (@included_mozilla_trust_levels) {
     # for each level we want to output, see if any of our desired purposes are included
-    return 1 if ( defined( List::Util::first { IS_IN_LIST( $_, @included_mozilla_trust_purposes ) } @{$trust_purposes_by_level{$level}} ) );
+    return 1 if ( defined( List::Util::first { is_in_list( $_, @included_mozilla_trust_purposes ) } @{$trust_purposes_by_level{$level}} ) );
   }
-  
+
   return 0;
 }
 
@@ -331,23 +295,6 @@ my $stdout = $crt eq '-';
 my $resp;
 my $fetched;
 
-<<<<<<< HEAD
-unless ($opt_n and -e $txt) {
-  print STDERR "Downloading '$txt' ...\n" if (!$opt_q);
-  my $ua  = new LWP::UserAgent(agent => "$0/$version");
-  $ua->env_proxy();
-  $resp = $ua->mirror($url, $txt);
-  if ($resp && $resp->code eq '304') {
-    print STDERR "Not modified\n" unless $opt_q;
-    exit 0 if -e $crt && !$opt_f;
-  } else {
-      $fetched = 1;
-  }
-  if( !$resp || $resp->code !~ /^(?:200|304)$/ ) {
-      print STDERR "Unable to download latest data: "
-        . ($resp? $resp->code . ' - ' . $resp->message : "LWP failed") . "\n"
-        unless $opt_q;
-=======
 my $oldhash = oldhash($crt);
 
 report "SHA256 of old file: $oldhash";
@@ -412,15 +359,11 @@ if(!$opt_n) {
     if(!$resp || $resp->code !~ /^(?:200|304)$/) {
       report "Unable to download latest data: "
         . ($resp? $resp->code . ' - ' . $resp->message : "LWP failed");
->>>>>>> origin/tomato-shibby-RT-AC
       exit 1 if -e $crt || ! -r $txt;
     }
   }
 }
 
-<<<<<<< HEAD
-my $currentdate = scalar gmtime($fetched ? $resp->last_modified : (stat($txt))[9]);
-=======
 my $filedate = $resp ? $resp->last_modified : (stat($txt))[9];
 my $datesrc = "as of";
 if(!$filedate) {
@@ -440,7 +383,6 @@ if(!$opt_f && $oldhash eq $newhash) {
 report "SHA256 of new file: $newhash";
 
 my $currentdate = scalar gmtime($filedate);
->>>>>>> origin/tomato-shibby-RT-AC
 
 my $format = $opt_t ? "plain text and " : "";
 if( $stdout ) {
@@ -450,13 +392,9 @@ if( $stdout ) {
 }
 print CRT <<EOT;
 ##
-## $crt -- Bundle of CA Root Certificates
+## Bundle of CA Root Certificates
 ##
-<<<<<<< HEAD
-## Certificate data from Mozilla as of: ${currentdate}
-=======
 ## Certificate data from Mozilla ${datesrc}: ${currentdate} GMT
->>>>>>> origin/tomato-shibby-RT-AC
 ##
 ## This is a bundle of X.509 certificates of public Certificate Authorities
 ## (CA). These were automatically extracted from Mozilla's root certificates
@@ -468,16 +406,13 @@ print CRT <<EOT;
 ## an Apache+mod_ssl webserver for SSL client authentication.
 ## Just configure this file as the SSLCACertificateFile.
 ##
-<<<<<<< HEAD
-=======
 ## Conversion done with mk-ca-bundle.pl version $version.
 ## SHA256: $newhash
 ##
->>>>>>> origin/tomato-shibby-RT-AC
 
 EOT
 
-print STDERR "Processing  '$txt' ...\n" if (!$opt_q);
+report "Processing  '$txt' ...";
 my $caname;
 my $certnum = 0;
 my $skipnum = 0;
@@ -533,17 +468,17 @@ while (<TXT>) {
     while (<TXT>) {
       last if (/^#/);
       if (/^CKA_TRUST_([A-Z_]+)\s+CK_TRUST\s+CKT_NSS_([A-Z_]+)\s*$/) {
-        if ( !IS_IN_LIST($1,@valid_mozilla_trust_purposes) ) {
-          print STDERR "Warning: Unrecognized trust purpose for cert: $caname. Trust purpose: $1. Trust Level: $2\n" if (!$opt_q);
-        } elsif ( !IS_IN_LIST($2,@valid_mozilla_trust_levels) ) {
-          print STDERR "Warning: Unrecognized trust level for cert: $caname. Trust purpose: $1. Trust Level: $2\n" if (!$opt_q);
+        if ( !is_in_list($1,@valid_mozilla_trust_purposes) ) {
+          report "Warning: Unrecognized trust purpose for cert: $caname. Trust purpose: $1. Trust Level: $2";
+        } elsif ( !is_in_list($2,@valid_mozilla_trust_levels) ) {
+          report "Warning: Unrecognized trust level for cert: $caname. Trust purpose: $1. Trust Level: $2";
         } else {
           push @{$trust_purposes_by_level{$2}}, $1;
         }
       }
     }
 
-    if ( !SHOULD_OUTPUT_CERT(%trust_purposes_by_level) ) {
+    if ( !should_output_cert(%trust_purposes_by_level) ) {
       $skipnum ++;
     } else {
       my $encoded = MIME::Base64::encode_base64($data, '');
@@ -591,7 +526,7 @@ while (<TXT>) {
           open(CRT, ">>$crt.~") or die "Couldn't open $crt.~: $!";
         }
       }
-      print STDERR "Parsing: $caname\n" if ($opt_v);
+      report "Parsing: $caname" if ($opt_v);
       $certnum ++;
       $start_of_cert = 0;
     }
@@ -613,16 +548,7 @@ unless( $stdout ) {
     }
     rename "$crt.~", $crt or die "Failed to rename $crt.~ to $crt: $!\n";
 }
-<<<<<<< HEAD
-unlink $txt if ($opt_u);
-print STDERR "Done ($certnum CA certs processed, $skipnum skipped).\n" if (!$opt_q);
-
-exit;
-
-
-=======
 if($opt_u && -e $txt && !unlink($txt)) {
   report "Failed to remove $txt: $!\n";
 }
 report "Done ($certnum CA certs processed, $skipnum skipped).";
->>>>>>> origin/tomato-shibby-RT-AC

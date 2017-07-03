@@ -7,15 +7,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
-<<<<<<< HEAD
- * Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
-=======
  * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
->>>>>>> origin/tomato-shibby-RT-AC
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -41,7 +37,6 @@ typedef unsigned long   u_int32_t;
 
 #include <sys/socket.h>
 #include <netdb.h>
-#include <qsossl.h>
 #include <gskssl.h>
 #include <qsoasync.h>
 #include <gssapi.h>
@@ -59,21 +54,6 @@ extern int Curl_getnameinfo_a(const struct sockaddr *sa,
                               char *servname, curl_socklen_t servnamelen,
                               int flags);
 #define getnameinfo             Curl_getnameinfo_a
-
-
-/* SSL wrappers. */
-
-extern int      Curl_SSL_Init_Application_a(SSLInitApp * init_app);
-#define SSL_Init_Application    Curl_SSL_Init_Application_a
-
-
-extern int      Curl_SSL_Init_a(SSLInit * init);
-#define SSL_Init                Curl_SSL_Init_a
-
-
-extern char *   Curl_SSL_Strerror_a(int sslreturnvalue,
-                                    SSLErrorMsg * serrmsgp);
-#define SSL_Strerror            Curl_SSL_Strerror_a
 
 
 /* GSKit wrappers. */

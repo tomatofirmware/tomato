@@ -5,15 +5,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
-<<<<<<< HEAD
- * Copyright (C) 1998 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
-=======
  * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
->>>>>>> origin/tomato-shibby-RT-AC
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -26,15 +22,10 @@
 
 #include "curl_setup.h"
 
-<<<<<<< HEAD
-#if defined(USE_SSLEAY) || defined(USE_AXTLS) || defined(USE_QSOSSL) || \
-    defined(USE_GSKIT)
-=======
 #if defined(USE_OPENSSL)                                \
   || defined(USE_AXTLS)                                 \
   || defined(USE_GSKIT)                                 \
   || (defined(USE_SCHANNEL) && defined(_WIN32_WCE))
->>>>>>> origin/tomato-shibby-RT-AC
 /* these backends use functions from this file */
 
 #ifdef HAVE_NETINET_IN_H
@@ -55,7 +46,7 @@
  *  "foo.host.com" matches "*.host.com".
  *
  * We use the matching rule described in RFC6125, section 6.4.3.
- * http://tools.ietf.org/html/rfc6125#section-6.4.3
+ * https://tools.ietf.org/html/rfc6125#section-6.4.3
  *
  * In addition: ignore trailing dots in the host names and wildcards, so that
  * the names are used normalized. This is what the browsers do.
@@ -156,8 +147,4 @@ int Curl_cert_hostcheck(const char *match_pattern, const char *hostname)
   return res;
 }
 
-<<<<<<< HEAD
-#endif /* SSLEAY or AXTLS or QSOSSL or GSKIT */
-=======
 #endif /* OPENSSL, AXTLS, GSKIT or schannel+wince */
->>>>>>> origin/tomato-shibby-RT-AC

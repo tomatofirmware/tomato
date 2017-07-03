@@ -73,8 +73,6 @@ forwards them to the local stub resolver.
     address with an optional port (for private resolvers).
     The default port is 443.
 
-<<<<<<< HEAD
-=======
   * `-S`, `--syslog`: if a log file hasn't been set, log diagnostic messages to
     syslog instead of printing them. `--daemonize` implies `--syslog`.
 
@@ -87,7 +85,6 @@ forwards them to the local stub resolver.
   * `-u`, `--user=<user name>`: chroot(2) to this user's home directory
     and drop privileges.
 
->>>>>>> origin/tomato-shibby-RT-AC
   * `-t`, `--test=<margin>`: don't actually start the proxy, but check that
     a valid certificate can be retrieved from the server and that it
     will remain valid for the next <margin> minutes. The exit code is 0
@@ -130,7 +127,7 @@ The resolver name is the first column (Name) in the CSV file.
 
 ## BUGS AND SUPPORT
 
-Please report issues with DNSCrypt itself to http://dnscrypt.org/issues
+Please report issues with DNSCrypt itself to https://dnscrypt.org/issues
 
 ## SEE ALSO
 

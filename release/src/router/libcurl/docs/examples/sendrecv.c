@@ -5,11 +5,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -19,7 +19,10 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-/* An example of curl_easy_send() and curl_easy_recv() usage. */
+/* <DESC>
+ * An example of curl_easy_send() and curl_easy_recv() usage.
+ * </DESC>
+ */
 
 #include <stdio.h>
 #include <string.h>
@@ -41,12 +44,10 @@ static int wait_on_socket(curl_socket_t sockfd, int for_recv, long timeout_ms)
 
   FD_SET(sockfd, &errfd); /* always check for error */
 
-  if(for_recv)
-  {
+  if(for_recv) {
     FD_SET(sockfd, &infd);
   }
-  else
-  {
+  else {
     FD_SET(sockfd, &outfd);
   }
 
@@ -65,6 +66,14 @@ int main(void)
   curl_socket_t sockfd;
   size_t nsent_total = 0;
 
+  /* A general note of caution here: if you're using curl_easy_recv() or
+     curl_easy_send() to implement HTTP or _any_ other protocol libcurl
+     supports "natively", you're doing it wrong and you should stop.
+
+     This example uses HTTP only to show how to use this API, it does not
+     suggest that writing an application doing this is sensible.
+  */
+
   curl = curl_easy_init();
   if(curl) {
     curl_easy_setopt(curl, CURLOPT_URL, "http://example.com");
@@ -72,40 +81,19 @@ int main(void)
     curl_easy_setopt(curl, CURLOPT_CONNECT_ONLY, 1L);
     res = curl_easy_perform(curl);
 
-<<<<<<< HEAD
-    if(CURLE_OK != res)
-    {
-      printf("Error: %s\n", strerror(res));
-=======
     if(res != CURLE_OK) {
       printf("Error: %s\n", curl_easy_strerror(res));
->>>>>>> origin/tomato-shibby-RT-AC
       return 1;
     }
 
     /* Extract the socket from the curl handle - we'll need it for waiting. */
     res = curl_easy_getinfo(curl, CURLINFO_ACTIVESOCKET, &sockfd);
 
-<<<<<<< HEAD
-    if(CURLE_OK != res)
-    {
-=======
     if(res != CURLE_OK) {
->>>>>>> origin/tomato-shibby-RT-AC
       printf("Error: %s\n", curl_easy_strerror(res));
       return 1;
     }
 
-<<<<<<< HEAD
-    sockfd = sockextr;
-
-    /* wait for the socket to become ready for sending */
-    if(!wait_on_socket(sockfd, 0, 60000L))
-    {
-      printf("Error: timeout.\n");
-      return 1;
-    }
-=======
     printf("Sending request.\n");
 
     do {
@@ -118,7 +106,6 @@ int main(void)
         res = curl_easy_send(curl, request + nsent_total,
             request_len - nsent_total, &nsent);
         nsent_total += nsent;
->>>>>>> origin/tomato-shibby-RT-AC
 
         if(res == CURLE_AGAIN && !wait_on_socket(sockfd, 0, 60000L)) {
           printf("Error: timeout.\n");
@@ -126,19 +113,6 @@ int main(void)
         }
       } while(res == CURLE_AGAIN);
 
-<<<<<<< HEAD
-    if(CURLE_OK != res)
-    {
-      printf("Error: %s\n", curl_easy_strerror(res));
-      return 1;
-    }
-    puts("Reading response.");
-
-    /* read the response */
-    for(;;)
-    {
-      char buf[1024];
-=======
       if(res != CURLE_OK) {
         printf("Error: %s\n", curl_easy_strerror(res));
         return 1;
@@ -148,7 +122,6 @@ int main(void)
         (curl_off_t)nsent);
 
     } while(nsent_total < request_len);
->>>>>>> origin/tomato-shibby-RT-AC
 
     printf("Reading response.\n");
 

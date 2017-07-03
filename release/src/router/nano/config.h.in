@@ -1243,13 +1243,6 @@
 /* Define to 1 if strndup is declared even after undefining macros. */
 #undef HAVE_RAW_DECL_STRNDUP
 
-<<<<<<< HEAD
-/* Define this to disable the help text display. */
-#undef DISABLE_HELP
-
-/* Define this to disable the justify routines. */
-#undef DISABLE_JUSTIFY
-=======
 /* Define to 1 if strnlen is declared even after undefining macros. */
 #undef HAVE_RAW_DECL_STRNLEN
 
@@ -1264,16 +1257,10 @@
 
 /* Define to 1 if strtod is declared even after undefining macros. */
 #undef HAVE_RAW_DECL_STRTOD
->>>>>>> origin/tomato-shibby-RT-AC
 
 /* Define to 1 if strtok_r is declared even after undefining macros. */
 #undef HAVE_RAW_DECL_STRTOK_R
 
-<<<<<<< HEAD
-/* Define this to disable the setting of the operating directory (chroot of
-   sorts). */
-#undef DISABLE_OPERATINGDIR
-=======
 /* Define to 1 if strtoll is declared even after undefining macros. */
 #undef HAVE_RAW_DECL_STRTOLL
 
@@ -1282,7 +1269,6 @@
 
 /* Define to 1 if strverscmp is declared even after undefining macros. */
 #undef HAVE_RAW_DECL_STRVERSCMP
->>>>>>> origin/tomato-shibby-RT-AC
 
 /* Define to 1 if symlink is declared even after undefining macros. */
 #undef HAVE_RAW_DECL_SYMLINK
@@ -1290,32 +1276,14 @@
 /* Define to 1 if symlinkat is declared even after undefining macros. */
 #undef HAVE_RAW_DECL_SYMLINKAT
 
-<<<<<<< HEAD
-/* Define to disable the tab completion functions for files and search
-   strings. */
-#undef DISABLE_TABCOMP
-=======
 /* Define to 1 if tanf is declared even after undefining macros. */
 #undef HAVE_RAW_DECL_TANF
->>>>>>> origin/tomato-shibby-RT-AC
 
 /* Define to 1 if tanhf is declared even after undefining macros. */
 #undef HAVE_RAW_DECL_TANHF
 
-<<<<<<< HEAD
-/* Define this to have syntax highlighting, requires regex.h and ENABLE_NANORC
-   too! */
-#undef ENABLE_COLOR
-
-/* Define this to enable multiple file buffers. */
-#undef ENABLE_MULTIBUFFER
-
-/* Define this to use .nanorc files. */
-#undef ENABLE_NANORC
-=======
 /* Define to 1 if tanl is declared even after undefining macros. */
 #undef HAVE_RAW_DECL_TANL
->>>>>>> origin/tomato-shibby-RT-AC
 
 /* Define to 1 if tmpfile is declared even after undefining macros. */
 #undef HAVE_RAW_DECL_TMPFILE
@@ -1323,13 +1291,8 @@
 /* Define to 1 if towctrans is declared even after undefining macros. */
 #undef HAVE_RAW_DECL_TOWCTRANS
 
-<<<<<<< HEAD
-/* Define if the system supports GNU-style word boundaries in regexes. */
-#undef GNU_WORDBOUNDS
-=======
 /* Define to 1 if trunc is declared even after undefining macros. */
 #undef HAVE_RAW_DECL_TRUNC
->>>>>>> origin/tomato-shibby-RT-AC
 
 /* Define to 1 if truncf is declared even after undefining macros. */
 #undef HAVE_RAW_DECL_TRUNCF
@@ -1376,16 +1339,6 @@
 /* Define to 1 if wcrtomb is declared even after undefining macros. */
 #undef HAVE_RAW_DECL_WCRTOMB
 
-<<<<<<< HEAD
-/* Define to 1 if you have the <libintl.h> header file. */
-#undef HAVE_LIBINTL_H
-
-/* Define to 1 if you have the <limits.h> header file. */
-#undef HAVE_LIMITS_H
-
-/* Define to 1 if you have the `mblen' function. */
-#undef HAVE_MBLEN
-=======
 /* Define to 1 if wcscasecmp is declared even after undefining macros. */
 #undef HAVE_RAW_DECL_WCSCASECMP
 
@@ -1406,7 +1359,6 @@
 
 /* Define to 1 if wcscspn is declared even after undefining macros. */
 #undef HAVE_RAW_DECL_WCSCSPN
->>>>>>> origin/tomato-shibby-RT-AC
 
 /* Define to 1 if wcsdup is declared even after undefining macros. */
 #undef HAVE_RAW_DECL_WCSDUP
@@ -1519,10 +1471,6 @@
 /* Define to 1 if the system has the type `sigset_t'. */
 #undef HAVE_SIGSET_T
 
-<<<<<<< HEAD
-/* Define to 1 if you have the <stdarg.h> header file. */
-#undef HAVE_STDARG_H
-=======
 /* Define to 1 if you have the `snprintf' function. */
 #undef HAVE_SNPRINTF
 
@@ -1530,7 +1478,6 @@
    bytes (excluding the terminating NUL) that would have been produced if the
    buffer had been large enough. */
 #undef HAVE_SNPRINTF_RETVAL_C99
->>>>>>> origin/tomato-shibby-RT-AC
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
@@ -1651,10 +1598,6 @@
 /* Define to 1 if you have the `wcwidth' function. */
 #undef HAVE_WCWIDTH
 
-<<<<<<< HEAD
-/* Define this to enable extra stuff. */
-#undef NANO_EXTRA
-=======
 /* Define to 1 if you have the <winsock2.h> header file. */
 #undef HAVE_WINSOCK2_H
 
@@ -1749,7 +1692,6 @@
 
 /* Flag(s) to use to get the full range of extended regular expressions */
 #undef NANO_REG_EXTENDED
->>>>>>> origin/tomato-shibby-RT-AC
 
 /* Define this to make the nano executable as small as possible. */
 #undef NANO_TINY
@@ -1833,9 +1775,6 @@
 /* Where data are placed to. */
 #undef PKGDATADIR
 
-<<<<<<< HEAD
-/* Specify alternate rcfile name (default: .nanorc) */
-=======
 /* Define if the pthread_in_use() detection is hard. */
 #undef PTHREAD_IN_USE_DETECTION_HARD
 
@@ -1844,12 +1783,11 @@
 #undef PTRDIFF_T_SUFFIX
 
 /* Specify an alternate rcfile name (default: .nanorc). */
->>>>>>> origin/tomato-shibby-RT-AC
 #undef RCFILE_NAME
 
 /* Define this if you know your curses library allows LINES and COLS to be
    redefined to deal with a resizing bug */
-#undef REDEFINIG_MACROS_OK
+#undef REDEFINING_MACROS_OK
 
 /* Define to 1 if gnulib's dirfd() replacement is used. */
 #undef REPLACE_DIRFD
@@ -1871,12 +1809,6 @@
 /* Define as the return type of signal handlers (`int' or `void'). */
 #undef RETSIGTYPE
 
-<<<<<<< HEAD
-/* Define to 1 if you have the ANSI C header files. */
-#undef STDC_HEADERS
-
-/* Define to use the slang wrappers for curses instead of native curses. */
-=======
 /* Define to l, ll, u, ul, ull, etc., as suitable for constants of type
    'sig_atomic_t'. */
 #undef SIG_ATOMIC_T_SUFFIX
@@ -1921,7 +1853,6 @@
 
 /* Define this to use the slang wrappers for curses instead of native curses.
    */
->>>>>>> origin/tomato-shibby-RT-AC
 #undef USE_SLANG
 
 /* Define if the old Solaris multithreading library can be used. */
@@ -1997,8 +1928,6 @@
 /* Version number of package */
 #undef VERSION
 
-<<<<<<< HEAD
-=======
 /* Define to l, ll, u, ul, ull, etc., as suitable for constants of type
    'wchar_t'. */
 #undef WCHAR_T_SUFFIX
@@ -2022,7 +1951,6 @@
 /* Enable large inode numbers on Mac OS X 10.5. */
 #undef _DARWIN_USE_64_BIT_INODE
 
->>>>>>> origin/tomato-shibby-RT-AC
 /* Number of bits in a file offset, on hosts where this is settable. */
 #undef _FILE_OFFSET_BITS
 

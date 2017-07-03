@@ -7,15 +7,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
-<<<<<<< HEAD
- * Copyright (C) 1998 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
-=======
  * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
->>>>>>> origin/tomato-shibby-RT-AC
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -44,6 +40,8 @@
 #define PORT_IMAPS 993
 #define PORT_POP3 110
 #define PORT_POP3S 995
+#define PORT_SMB 445
+#define PORT_SMBS 445
 #define PORT_SMTP 25
 #define PORT_SMTPS 465 /* sometimes called SSMTP */
 #define PORT_RTSP 554
@@ -68,6 +66,7 @@
 #define PROTO_FAMILY_HTTP (CURLPROTO_HTTP|CURLPROTO_HTTPS)
 #define PROTO_FAMILY_FTP  (CURLPROTO_FTP|CURLPROTO_FTPS)
 #define PROTO_FAMILY_POP3 (CURLPROTO_POP3|CURLPROTO_POP3S)
+#define PROTO_FAMILY_SMB  (CURLPROTO_SMB|CURLPROTO_SMBS)
 #define PROTO_FAMILY_SMTP (CURLPROTO_SMTP|CURLPROTO_SMTPS)
 
 #define DEFAULT_CONNCACHE_SIZE 5
@@ -83,44 +82,26 @@
 #include "cookie.h"
 #include "formdata.h"
 
-#ifdef USE_SSLEAY
 #ifdef USE_OPENSSL
-#include <openssl/rsa.h>
-#include <openssl/crypto.h>
-#include <openssl/x509.h>
-#include <openssl/pem.h>
 #include <openssl/ssl.h>
-#include <openssl/err.h>
 #ifdef HAVE_OPENSSL_ENGINE_H
 #include <openssl/engine.h>
 #endif
-#ifdef HAVE_OPENSSL_PKCS12_H
-#include <openssl/pkcs12.h>
-#endif
-#else /* SSLeay-style includes */
-#include <rsa.h>
-#include <crypto.h>
-#include <x509.h>
-#include <pem.h>
-#include <ssl.h>
-#include <err.h>
-#ifdef HAVE_OPENSSL_ENGINE_H
-#include <engine.h>
-#endif
-#ifdef HAVE_OPENSSL_PKCS12_H
-#include <pkcs12.h>
-#endif
 #endif /* USE_OPENSSL */
-#ifdef USE_GNUTLS
-#error Configuration error; cannot use GnuTLS *and* OpenSSL.
-#endif
-#endif /* USE_SSLEAY */
 
 #ifdef USE_GNUTLS
 #include <gnutls/gnutls.h>
 #endif
 
-#ifdef USE_POLARSSL
+#ifdef USE_MBEDTLS
+
+#include <mbedtls/ssl.h>
+#include <mbedtls/version.h>
+#include <mbedtls/entropy.h>
+#include <mbedtls/ctr_drbg.h>
+
+#elif defined USE_POLARSSL
+
 #include <polarssl/ssl.h>
 #include <polarssl/version.h>
 #if POLARSSL_VERSION_NUMBER<0x01010000
@@ -129,6 +110,7 @@
 #include <polarssl/entropy.h>
 #include <polarssl/ctr_drbg.h>
 #endif /* POLARSSL_VERSION_NUMBER<0x01010000 */
+
 #endif /* USE_POLARSSL */
 
 #ifdef USE_CYASSL
@@ -142,15 +124,12 @@
 #include <pk11pub.h>
 #endif
 
-#ifdef USE_QSOSSL
-#include <qsossl.h>
-#endif
-
 #ifdef USE_GSKIT
 #include <gskssl.h>
 #endif
 
 #ifdef USE_AXTLS
+#include <axTLS/config.h>
 #include <axTLS/ssl.h>
 #undef malloc
 #undef calloc
@@ -201,6 +180,7 @@
 #include "ssh.h"
 #include "http.h"
 #include "rtsp.h"
+#include "smb.h"
 #include "wildcard.h"
 #include "multihandle.h"
 
@@ -232,11 +212,8 @@
 #define HEADERSIZE 256
 
 #define CURLEASY_MAGIC_NUMBER 0xc0dedbadU
-<<<<<<< HEAD
-=======
 #define GOOD_EASY_HANDLE(x) \
   ((x) && ((x)->magic == CURLEASY_MAGIC_NUMBER))
->>>>>>> origin/tomato-shibby-RT-AC
 
 /* Some convenience macros to get the larger/smaller value out of two given.
    We prefix with CURL to prevent name collisions. */
@@ -300,96 +277,82 @@ struct ssl_connect_data {
      current state of the connection. */
   bool use;
   ssl_connection_state state;
-#ifdef USE_SSLEAY
+  ssl_connect_state connecting_state;
+#if defined(USE_OPENSSL)
   /* these ones requires specific SSL-types */
   SSL_CTX* ctx;
   SSL*     handle;
   X509*    server_cert;
-  ssl_connect_state connecting_state;
-#endif /* USE_SSLEAY */
-#ifdef USE_GNUTLS
-  gnutls_session session;
-  gnutls_certificate_credentials cred;
+#elif defined(USE_GNUTLS)
+  gnutls_session_t session;
+  gnutls_certificate_credentials_t cred;
 #ifdef USE_TLS_SRP
-  gnutls_srp_client_credentials srp_client_cred;
+  gnutls_srp_client_credentials_t srp_client_cred;
 #endif
-  ssl_connect_state connecting_state;
-#endif /* USE_GNUTLS */
-#ifdef USE_POLARSSL
+#elif defined(USE_MBEDTLS)
+  mbedtls_ctr_drbg_context ctr_drbg;
+  mbedtls_entropy_context entropy;
+  mbedtls_ssl_context ssl;
+  int server_fd;
+  mbedtls_x509_crt cacert;
+  mbedtls_x509_crt clicert;
+  mbedtls_x509_crl crl;
+  mbedtls_pk_context pk;
+  mbedtls_ssl_config config;
+  const char *protocols[3];
+#elif defined(USE_POLARSSL)
   ctr_drbg_context ctr_drbg;
   entropy_context entropy;
   ssl_context ssl;
-  ssl_session ssn;
   int server_fd;
   x509_crt cacert;
   x509_crt clicert;
   x509_crl crl;
   rsa_context rsa;
-  ssl_connect_state connecting_state;
-#endif /* USE_POLARSSL */
-#ifdef USE_CYASSL
+#elif defined(USE_CYASSL)
   SSL_CTX* ctx;
   SSL*     handle;
-  ssl_connect_state connecting_state;
-#endif /* USE_CYASSL */
-#ifdef USE_NSS
+#elif defined(USE_NSS)
   PRFileDesc *handle;
   char *client_nickname;
   struct Curl_easy *data;
   struct curl_llist *obj_list;
   PK11GenericObject *obj_clicert;
-  ssl_connect_state connecting_state;
-#endif /* USE_NSS */
-#ifdef USE_QSOSSL
-  SSLHandle *handle;
-#endif /* USE_QSOSSL */
-#ifdef USE_GSKIT
+#elif defined(USE_GSKIT)
   gsk_handle handle;
   int iocport;
-<<<<<<< HEAD
-  ssl_connect_state connecting_state;
-#endif
-#ifdef USE_AXTLS
-=======
   int localfd;
   int remotefd;
 #elif defined(USE_AXTLS)
->>>>>>> origin/tomato-shibby-RT-AC
   SSL_CTX* ssl_ctx;
   SSL*     ssl;
-  ssl_connect_state connecting_state;
-#endif /* USE_AXTLS */
-#ifdef USE_SCHANNEL
+#elif defined(USE_SCHANNEL)
   struct curl_schannel_cred *cred;
   struct curl_schannel_ctxt *ctxt;
   SecPkgContext_StreamSizes stream_sizes;
-  ssl_connect_state connecting_state;
   size_t encdata_length, decdata_length;
   size_t encdata_offset, decdata_offset;
   unsigned char *encdata_buffer, *decdata_buffer;
   unsigned long req_flags, ret_flags;
-<<<<<<< HEAD
-#endif /* USE_SCHANNEL */
-#ifdef USE_DARWINSSL
-=======
   CURLcode recv_unrecoverable_err; /* schannel_recv had an unrecoverable err */
   bool recv_sspi_close_notify; /* true if connection closed by close_notify */
   bool recv_connection_closed; /* true if connection closed, regardless how */
   bool use_alpn; /* true if ALPN is used for this connection */
 #elif defined(USE_DARWINSSL)
->>>>>>> origin/tomato-shibby-RT-AC
   SSLContextRef ssl_ctx;
   curl_socket_t ssl_sockfd;
-  ssl_connect_state connecting_state;
   bool ssl_direction; /* true if writing, false if reading */
   size_t ssl_write_buffered_length;
-#endif /* USE_DARWINSSL */
+#elif defined(USE_SSL)
+#error "SSL backend specific information missing from ssl_connect_data"
+#endif
 };
 
 struct ssl_primary_config {
   long version;          /* what version the client wants to use */
   bool verifypeer;       /* set TRUE if this is desired */
   bool verifyhost;       /* set TRUE if CN/SAN must match hostname */
+  bool verifystatus;     /* set TRUE if certificate status must be checked */
   char *CApath;          /* certificate dir (doesn't work on windows) */
   char *CAfile;          /* certificate to verify peer against */
   char *clientcert;
@@ -409,6 +372,7 @@ struct ssl_config_data {
   curl_ssl_ctx_callback fsslctx; /* function to initialize ssl ctx */
   void *fsslctxp;        /* parameter for call back */
   bool certinfo;         /* gather lots of certificate info */
+  bool falsestart;
 
   char *cert; /* client certificate file name */
   char *cert_type; /* format for certificate (default: PEM)*/
@@ -431,13 +395,6 @@ struct ssl_general_config {
 /* information stored about one single SSL session */
 struct curl_ssl_session {
   char *name;       /* host name for which this ID was used */
-<<<<<<< HEAD
-  void *sessionid;  /* as returned from the SSL layer */
-  size_t idsize;    /* if known, otherwise 0 */
-  long age;         /* just a number, the higher the more recent */
-  int remote_port;  /* remote port to connect to */
-  struct ssl_config_data ssl_config; /* setup for this session */
-=======
   char *conn_to_host; /* host name for the connection (may be NULL) */
   const char *scheme; /* protocol scheme used */
   void *sessionid;  /* as returned from the SSL layer */
@@ -446,19 +403,15 @@ struct curl_ssl_session {
   int remote_port;  /* remote port */
   int conn_to_port; /* remote port for the connection (may be -1) */
   struct ssl_primary_config ssl_config; /* setup for this session */
->>>>>>> origin/tomato-shibby-RT-AC
 };
 
 /* Struct used for Digest challenge-response authentication */
 struct digestdata {
-<<<<<<< HEAD
-=======
 #if defined(USE_WINDOWS_SSPI)
   BYTE *input_token;
   size_t input_token_len;
   CtxtHandle *http_context;
 #else
->>>>>>> origin/tomato-shibby-RT-AC
   char *nonce;
   char *cnonce;
   char *realm;
@@ -468,6 +421,7 @@ struct digestdata {
   char *qop;
   char *algorithm;
   int nc; /* nounce count */
+#endif
 };
 
 typedef enum {
@@ -486,17 +440,37 @@ typedef enum {
 #include <iconv.h>
 #endif
 
+/* Struct used for GSSAPI (Kerberos V5) authentication */
+#if defined(USE_KERBEROS5)
+struct kerberos5data {
+#if defined(USE_WINDOWS_SSPI)
+  CredHandle *credentials;
+  CtxtHandle *context;
+  TCHAR *spn;
+  SEC_WINNT_AUTH_IDENTITY identity;
+  SEC_WINNT_AUTH_IDENTITY *p_identity;
+  size_t token_max;
+  BYTE *output_token;
+#else
+  gss_ctx_id_t context;
+  gss_name_t spn;
+#endif
+};
+#endif
+
 /* Struct used for NTLM challenge-response authentication */
+#if defined(USE_NTLM)
 struct ntlmdata {
   curlntlm state;
 #ifdef USE_WINDOWS_SSPI
-  CredHandle handle;
-  CtxtHandle c_handle;
+  CredHandle *credentials;
+  CtxtHandle *context;
   SEC_WINNT_AUTH_IDENTITY identity;
   SEC_WINNT_AUTH_IDENTITY *p_identity;
-  int has_handles;
-  void *type_2;
-  unsigned long n_type_2;
+  size_t token_max;
+  BYTE *output_token;
+  BYTE *input_token;
+  size_t input_token_len;
 #else
   unsigned int flags;
   unsigned char nonce[8];
@@ -504,26 +478,27 @@ struct ntlmdata {
   unsigned int target_info_len;
 #endif
 };
+#endif
 
-#ifdef USE_HTTP_NEGOTIATE
+#ifdef USE_SPNEGO
 struct negotiatedata {
-  /* when doing Negotiate we first need to receive an auth token and then we
-     need to send our header */
+  /* When doing Negotiate (SPNEGO) auth, we first need to send a token
+     and then validate the received one. */
   enum { GSS_AUTHNONE, GSS_AUTHRECV, GSS_AUTHSENT } state;
-  bool gss; /* Whether we're processing GSS-Negotiate or Negotiate */
-  const char* protocol; /* "GSS-Negotiate" or "Negotiate" */
 #ifdef HAVE_GSSAPI
   OM_uint32 status;
   gss_ctx_id_t context;
-  gss_name_t server_name;
+  gss_name_t spn;
   gss_buffer_desc output_token;
 #else
 #ifdef USE_WINDOWS_SSPI
   DWORD status;
-  CtxtHandle *context;
   CredHandle *credentials;
-  char server_name[1024];
-  size_t max_token_length;
+  CtxtHandle *context;
+  SEC_WINNT_AUTH_IDENTITY identity;
+  SEC_WINNT_AUTH_IDENTITY *p_identity;
+  TCHAR *spn;
+  size_t token_max;
   BYTE *output_token;
   size_t output_token_length;
 #endif
@@ -536,8 +511,13 @@ struct negotiatedata {
  * Boolean values that concerns this connection.
  */
 struct ConnectBits {
+  /* always modify bits.close with the connclose() and connkeep() macros! */
   bool close; /* if set, we close the connection after this request */
   bool reuse; /* if set, this is a re-used connection */
+  bool conn_to_host; /* if set, this connection has a "connect to host"
+                        that overrides the host in the URL */
+  bool conn_to_port; /* if set, this connection has a "connect to port"
+                        that overrides the port in the URL (remote port) */
   bool proxy; /* if set, this transfer is done through a proxy - any type */
   bool httpproxy;    /* if set, this transfer is done through a http proxy */
   bool socksproxy;   /* if set, this transfer is done through a socks proxy */
@@ -578,11 +558,6 @@ struct ConnectBits {
   bool ftp_use_data_ssl; /* Enabled SSL for the data connection */
   bool netrc;         /* name+password provided by netrc */
   bool userpwd_in_url; /* name+password found in url */
-
-  bool done;          /* set to FALSE when Curl_do() is called and set to TRUE
-                         when Curl_done() is called, to prevent Curl_done() to
-                         get invoked twice when the multi interface is
-                         used. */
   bool stream_was_rewound; /* Indicates that the stream was rewound after a
                               request read past the end of its response byte
                               boundary */
@@ -592,8 +567,6 @@ struct ConnectBits {
   bool bound; /* set true if bind() has already been done on this socket/
                  connection */
   bool type_set;  /* type= was used in the URL */
-<<<<<<< HEAD
-=======
   bool multiplex; /* connection is multiplexed */
 
   bool tcp_fastopen; /* use TCP Fast Open */
@@ -602,7 +575,6 @@ struct ConnectBits {
   bool proxy_ssl_connected[2]; /* TRUE when SSL initialization for HTTPS proxy
                                   is complete */
   bool socksproxy_connecting; /* connecting through a socks proxy */
->>>>>>> origin/tomato-shibby-RT-AC
 };
 
 struct hostname {
@@ -675,12 +647,6 @@ enum upgrade101 {
   UPGR101_WORKING             /* talking upgraded protocol */
 };
 
-enum negotiatenpn {
-  NPN_INIT,                   /* default state */
-  NPN_HTTP1_1,                /* HTTP/1.1 negotiated */
-  NPN_HTTP2                   /* HTTP2 (draft-xx) negotiated */
-};
-
 /*
  * Request specific data in the easy handle (Curl_easy).  Previously,
  * these members were on the connectdata struct but since a conn struct may
@@ -738,7 +704,6 @@ struct SingleRequest {
 #define IDENTITY 0              /* No encoding */
 #define DEFLATE 1               /* zlib deflate [RFC 1950 & 1951] */
 #define GZIP 2                  /* gzip algorithm [RFC 1952] */
-#define COMPRESS 3              /* Not handled, added for completeness */
 
 #ifdef HAVE_LIBZ
   zlibInitState zlib_init;      /* possible zlib init state;
@@ -881,14 +846,10 @@ struct Curl_handler {
                                         url query strings (?foo=bar) ! */
 #define PROTOPT_CREDSPERREQUEST (1<<7) /* requires login credentials per
                                           request instead of per connection */
-<<<<<<< HEAD
-
-=======
 #define PROTOPT_ALPN_NPN (1<<8) /* set ALPN and/or NPN for this */
 #define PROTOPT_STREAM (1<<9) /* a protocol with individual logical streams */
 #define PROTOPT_URLOPTIONS (1<<10) /* allow options part in the userinfo field
                                       of the URL */
->>>>>>> origin/tomato-shibby-RT-AC
 
 /* return the count of bytes sent, or -1 on error */
 typedef ssize_t (Curl_send)(struct connectdata *conn, /* connection data */
@@ -904,8 +865,6 @@ typedef ssize_t (Curl_recv)(struct connectdata *conn, /* connection data */
                             size_t len,               /* max amount to read */
                             CURLcode *err);           /* error to return */
 
-<<<<<<< HEAD
-=======
 #ifdef USE_RECV_BEFORE_SEND_WORKAROUND
 struct postponed_data {
   char *buffer;          /* Temporal store for received data during
@@ -928,7 +887,6 @@ struct proxy_info {
   char *passwd;  /* proxy password string, allocated */
 };
 
->>>>>>> origin/tomato-shibby-RT-AC
 /*
  * The connectdata struct contains all fields and variables that should be
  * unique for an entire connection.
@@ -973,17 +931,11 @@ struct connectdata {
      the ip_addr itself. */
   char ip_addr_str[MAX_IPADR_LEN];
 
-  unsigned int scope;    /* address scope for IPv6 */
+  unsigned int scope_id;  /* Scope id for IPv6 */
 
   int socktype;  /* SOCK_STREAM or SOCK_DGRAM */
 
   struct hostname host;
-<<<<<<< HEAD
-  struct hostname proxy;
-
-  long port;       /* which port to use locally */
-  int remote_port; /* what remote port to connect to, not the proxy port! */
-=======
   char *secondaryhostname; /* secondary socket host name (ftp) */
   struct hostname conn_to_host; /* the host to connect to. valid only if
                                    bits.conn_to_host is set */
@@ -997,7 +949,6 @@ struct connectdata {
                        bits.conn_to_port is set */
   unsigned short secondary_port; /* secondary socket remote port to connect to
                                     (ftp) */
->>>>>>> origin/tomato-shibby-RT-AC
 
   /* 'primary_ip' and 'primary_port' get filled with peer's numerical
      ip address and port number whenever an outgoing connection is
@@ -1020,7 +971,7 @@ struct connectdata {
   char *passwd;  /* password string, allocated */
   char *options; /* options string, allocated */
 
-  char *xoauth2_bearer; /* bearer token for xoauth2, allocated */
+  char *oauth_bearer; /* bearer token for OAuth 2.0, allocated */
 
   int httpversion;        /* the HTTP version*10 reported by the server */
   int rtspversion;        /* the RTSP version*10 reported by the server */
@@ -1035,15 +986,14 @@ struct connectdata {
   Curl_recv *recv[2];
   Curl_send *send[2];
 
+#ifdef USE_RECV_BEFORE_SEND_WORKAROUND
+  struct postponed_data postponed[2]; /* two buffers for two sockets */
+#endif /* USE_RECV_BEFORE_SEND_WORKAROUND */
   struct ssl_connect_data ssl[2]; /* this is for ssl-stuff */
-<<<<<<< HEAD
-  struct ssl_config_data ssl_config;
-=======
   struct ssl_connect_data proxy_ssl[2]; /* this is for proxy ssl-stuff */
   struct ssl_primary_config ssl_config;
   struct ssl_primary_config proxy_ssl_config;
   bool tls_upgraded;
->>>>>>> origin/tomato-shibby-RT-AC
 
   struct ConnectBits bits;    /* various state-flags for this connection */
 
@@ -1083,8 +1033,8 @@ struct connectdata {
     char *te; /* TE: request header */
   } allocptr;
 
-  int sec_complete; /* if kerberos is enabled for this connection */
 #ifdef HAVE_GSSAPI
+  int sec_complete; /* if Kerberos is enabled for this connection */
   enum protection_level command_prot;
   enum protection_level data_prot;
   enum protection_level request_data_prot;
@@ -1094,6 +1044,10 @@ struct connectdata {
   const struct Curl_sec_client_mech *mech;
   struct sockaddr_in local_addr;
 #endif
+
+#if defined(USE_KERBEROS5)    /* Consider moving some of the above GSS-API */
+  struct kerberos5data krb5;  /* variables into the structure definition, */
+#endif                        /* however, some of them are ftp specific. */
 
   /* the two following *_inuse fields are only flags, not counters in any way.
      If TRUE it means the channel is in use, and if FALSE it means the channel
@@ -1118,21 +1072,19 @@ struct connectdata {
 
   /*************** Request - specific items ************/
 
-  /* previously this was in the urldata struct */
-  curl_read_callback fread_func; /* function that reads the input */
-  void *fread_in;           /* pointer to pass to the fread() above */
-
+#if defined(USE_NTLM)
   struct ntlmdata ntlm;     /* NTLM differs from other authentication schemes
                                because it authenticates connections, not
                                single requests! */
   struct ntlmdata proxyntlm; /* NTLM data for proxy */
 
-#if defined(USE_NTLM) && defined(NTLM_WB_ENABLED)
+#if defined(NTLM_WB_ENABLED)
   /* used for communication with Samba's winbind daemon helper ntlm_auth */
   curl_socket_t ntlm_auth_hlpr_socket;
   pid_t ntlm_auth_hlpr_pid;
   char *challenge_header;
   char *response_header;
+#endif
 #endif
 
   char syserr_buf [256]; /* buffer for Curl_strerror() */
@@ -1156,6 +1108,7 @@ struct connectdata {
     struct pop3_conn pop3c;
     struct smtp_conn smtpc;
     struct rtsp_conn rtspc;
+    struct smb_conn smbc;
     void *generic; /* RTMP and LDAP use this */
   } proto;
 
@@ -1183,16 +1136,12 @@ struct connectdata {
   } tunnel_state[2]; /* two separate ones to allow FTP */
   struct connectbundle *bundle; /* The bundle we are member of */
 
-<<<<<<< HEAD
-  enum negotiatenpn negnpn;
-=======
   int negnpn; /* APLN or NPN TLS negotiated protocol, CURL_HTTP_VERSION* */
 
 #ifdef USE_UNIX_SOCKETS
   char *unix_domain_socket;
   bool abstract_unix_socket;
 #endif
->>>>>>> origin/tomato-shibby-RT-AC
 };
 
 /* The end of connectdata. */
@@ -1368,11 +1317,13 @@ struct UrlState {
                                 bytes / second */
   bool this_is_a_follow; /* this is a followed Location: request */
 
-  char *first_host; /* if set, this should be the host name that we will
+  char *first_host; /* host name of the first (not followed) request.
+                       if set, this should be the host name that we will
                        sent authorization to, no else. Used to make Location:
                        following not keep sending user+password... This is
                        strdup() data.
                     */
+  int first_remote_port; /* remote port of the first (not followed) request */
   struct curl_ssl_session *session; /* array of 'max_ssl_sessions' size */
   long sessionage;                  /* number of the most recent session */
   char *tempwrite;      /* allocated buffer to keep data in when a write
@@ -1394,7 +1345,7 @@ struct UrlState {
   struct digestdata digest;      /* state data for host Digest auth */
   struct digestdata proxydigest; /* state data for proxy Digest auth */
 
-#ifdef USE_HTTP_NEGOTIATE
+#ifdef USE_SPNEGO
   struct negotiatedata negotiate; /* state data for host Negotiate auth */
   struct negotiatedata proxyneg; /* state data for proxy Negotiate auth */
 #endif
@@ -1407,9 +1358,9 @@ struct UrlState {
   void *resolver; /* resolver state, if it is used in the URL state -
                      ares_channel f.e. */
 
-#if defined(USE_SSLEAY) && defined(HAVE_OPENSSL_ENGINE_H)
+#if defined(USE_OPENSSL) && defined(HAVE_OPENSSL_ENGINE_H)
   ENGINE *engine;
-#endif /* USE_SSLEAY */
+#endif /* USE_OPENSSL */
   struct timeval expiretime; /* set this with Curl_expire() only */
   struct Curl_tree timenode; /* for the splay stuff */
   struct curl_llist *timeoutlist; /* list of pending timeouts */
@@ -1453,12 +1404,8 @@ struct UrlState {
   long rtsp_next_server_CSeq; /* the session's next server CSeq */
   long rtsp_CSeq_recv; /* most recent CSeq received */
 
-  /* if true, force SSL connection retry (workaround for certain servers) */
-  bool ssl_connect_retry;
   curl_off_t infilesize; /* size of file to upload, -1 means unknown.
                             Copied from set.filesize at start of operation */
-<<<<<<< HEAD
-=======
 
   size_t drain; /* Increased when this stream has data to read, even if its
                    socket is not necessarily is readable. Decreased when
@@ -1473,7 +1420,6 @@ struct UrlState {
   struct Curl_easy *stream_depends_on;
   bool stream_depends_e; /* set or don't set the Exclusive bit */
   int stream_weight;
->>>>>>> origin/tomato-shibby-RT-AC
 };
 
 
@@ -1514,6 +1460,7 @@ enum dupstring {
   STRING_COOKIE,          /* HTTP cookie string to send */
   STRING_COOKIEJAR,       /* dump all cookies to this file */
   STRING_CUSTOMREQUEST,   /* HTTP/FTP/RTSP request/method to use */
+  STRING_DEFAULT_PROTOCOL, /* Protocol to use when the URL doesn't specify */
   STRING_DEVICE,          /* local network interface/address to use */
   STRING_ENCODING,        /* Accept-Encoding string */
   STRING_FTP_ACCOUNT,     /* ftp account data */
@@ -1528,17 +1475,11 @@ enum dupstring {
   STRING_KRB_LEVEL,       /* krb security level */
   STRING_NETRC_FILE,      /* if not NULL, use this instead of trying to find
                              $HOME/.netrc */
-  STRING_COPYPOSTFIELDS,  /* if POST, set the fields' values here */
   STRING_PROXY,           /* proxy to use */
   STRING_PRE_PROXY,       /* pre socks proxy to use */
   STRING_SET_RANGE,       /* range, if used */
   STRING_SET_REFERER,     /* custom string for the HTTP referer field */
   STRING_SET_URL,         /* what original URL to work on */
-<<<<<<< HEAD
-  STRING_SSL_CAPATH,      /* CA directory name (doesn't work on windows) */
-  STRING_SSL_CAFILE,      /* certificate file to verify peer against */
-  STRING_SSL_CIPHER_LIST, /* list of ciphers to use */
-=======
   STRING_SSL_CAPATH_ORIG, /* CA directory name (doesn't work on windows) */
   STRING_SSL_CAPATH_PROXY, /* CA directory name (doesn't work on windows) */
   STRING_SSL_CAFILE_ORIG, /* certificate file to verify peer against */
@@ -1547,7 +1488,6 @@ enum dupstring {
   STRING_SSL_PINNEDPUBLICKEY_PROXY, /* public key file to verify proxy */
   STRING_SSL_CIPHER_LIST_ORIG, /* list of ciphers to use */
   STRING_SSL_CIPHER_LIST_PROXY, /* list of ciphers to use */
->>>>>>> origin/tomato-shibby-RT-AC
   STRING_SSL_EGDSOCKET,   /* path to file containing the EGD daemon socket */
   STRING_SSL_RANDOM_FILE, /* path to file containing "random" data */
   STRING_USERAGENT,       /* User-Agent string */
@@ -1572,16 +1512,16 @@ enum dupstring {
   STRING_SSH_KNOWNHOSTS,  /* file name of knownhosts file */
 #endif
 #if defined(HAVE_GSSAPI) || defined(USE_WINDOWS_SSPI)
-  STRING_SOCKS5_GSSAPI_SERVICE,  /* GSSAPI service name */
+  STRING_PROXY_SERVICE_NAME, /* Proxy service name */
+#endif
+#if !defined(CURL_DISABLE_CRYPTO_AUTH) || defined(USE_KERBEROS5) || \
+    defined(USE_SPNEGO)
+  STRING_SERVICE_NAME,    /* Service name */
 #endif
   STRING_MAIL_FROM,
   STRING_MAIL_AUTH,
 
 #ifdef USE_TLS_SRP
-<<<<<<< HEAD
-  STRING_TLSAUTH_USERNAME,     /* TLS auth <username> */
-  STRING_TLSAUTH_PASSWORD,     /* TLS auth <password> */
-=======
   STRING_TLSAUTH_USERNAME_ORIG,  /* TLS auth <username> */
   STRING_TLSAUTH_USERNAME_PROXY, /* TLS auth <username> */
   STRING_TLSAUTH_PASSWORD_ORIG,  /* TLS auth <password> */
@@ -1590,12 +1530,17 @@ enum dupstring {
   STRING_BEARER,                /* <bearer>, if used */
 #ifdef USE_UNIX_SOCKETS
   STRING_UNIX_SOCKET_PATH,      /* path to Unix socket, if used */
->>>>>>> origin/tomato-shibby-RT-AC
 #endif
 
-  STRING_BEARER,          /* <bearer>, if used */
+  /* -- end of zero-terminated strings -- */
 
-  /* -- end of strings -- */
+  STRING_LASTZEROTERMINATED,
+
+  /* -- below this are pointers to binary data that cannot be strdup'ed.
+     Each such pointer must be added manually to Curl_dupset() --- */
+
+  STRING_COPYPOSTFIELDS,  /* if POST, set the fields' values here */
+
   STRING_LAST /* not used, just an end-of-list marker */
 };
 
@@ -1606,8 +1551,8 @@ struct UserDefined {
   long proxyport; /* If non-zero, use this port number by default. If the
                      proxy string features a ":[port]" that one will override
                      this. */
-  void *out;         /* the fetched file goes here */
-  void *in;          /* the uploaded file is read from here */
+  void *out;         /* CURLOPT_WRITEDATA */
+  void *in_set;      /* CURLOPT_READDATA */
   void *writeheader; /* write the header to this if non-NULL */
   void *rtp_out;     /* write RTP to this if non-NULL */
   long use_port;     /* which port to use (when not using default) */
@@ -1632,7 +1577,7 @@ struct UserDefined {
   curl_write_callback fwrite_func;   /* function that stores the output */
   curl_write_callback fwrite_header; /* function that stores headers */
   curl_write_callback fwrite_rtp;    /* function that stores interleaved RTP */
-  curl_read_callback fread_func;     /* function that reads the input */
+  curl_read_callback fread_func_set; /* function that reads the input */
   int is_fread_set; /* boolean, has read callback been set to non-NULL? */
   int is_fwrite_set; /* boolean, has write callback been set to non-NULL? */
   curl_progress_callback fprogress; /* OLD and deprecated progress callback  */
@@ -1664,7 +1609,8 @@ struct UserDefined {
   long connecttimeout;  /* in milliseconds, 0 means no timeout */
   long accepttimeout;   /* in milliseconds, 0 means no timeout */
   long server_response_timeout; /* in milliseconds, 0 means no timeout */
-  long tftp_blksize ; /* in bytes, 0 means use default */
+  long tftp_blksize;    /* in bytes, 0 means use default */
+  bool tftp_no_options; /* do not send TFTP options requests */
   curl_off_t filesize;  /* size of file to upload, -1 means unknown */
   long low_speed_limit; /* bytes/second */
   long low_speed_time;  /* number of seconds */
@@ -1689,6 +1635,8 @@ struct UserDefined {
   struct curl_slist *telnet_options; /* linked list of telnet options */
   struct curl_slist *resolve;     /* list of names to add/remove from
                                      DNS cache */
+  struct curl_slist *connect_to; /* list of host:port mappings to override
+                                    the hostname and port to connect to */
   curl_TimeCond timecondition; /* kind of time/date comparison */
   time_t timevalue;       /* what time to compare with */
   Curl_HttpReq httpreq;   /* what kind of HTTP request (if any) is this */
@@ -1730,12 +1678,8 @@ struct UserDefined {
   bool ftp_list_only;    /* switch FTP command for listing directories */
   bool ftp_use_port;     /* use the FTP PORT command */
   bool hide_progress;    /* don't use the progress meter */
-<<<<<<< HEAD
-  bool http_fail_on_error;  /* fail on HTTP error codes >= 300 */
-=======
   bool http_fail_on_error;  /* fail on HTTP error codes >= 400 */
   bool http_keep_sending_on_error; /* for HTTP status codes >= 300 */
->>>>>>> origin/tomato-shibby-RT-AC
   bool http_follow_location; /* follow HTTP redirects */
   bool http_transfer_encoding; /* request compressed HTTP transfer-encoding */
   bool http_disable_hostname_check_before_authentication;
@@ -1743,12 +1687,11 @@ struct UserDefined {
   bool http_set_referer; /* is a custom referer used */
   bool http_auto_referer; /* set "correct" referer when following location: */
   bool opt_no_body;      /* as set with CURLOPT_NOBODY */
-  bool set_port;         /* custom port number used */
   bool upload;           /* upload request */
   enum CURL_NETRC_OPTION
        use_netrc;        /* defined in include/curl.h */
   bool verbose;          /* output verbosity */
-  bool krb;              /* kerberos connection requested */
+  bool krb;              /* Kerberos connection requested */
   bool reuse_forbid;     /* forbidden to be reused, close after use */
   bool reuse_fresh;      /* do not re-use an existing connection  */
   bool ftp_use_epsv;     /* if EPSV is to be attempted or not */
@@ -1766,11 +1709,6 @@ struct UserDefined {
   bool ftp_skip_ip;      /* skip the IP address the FTP server passes on to
                             us */
   bool connect_only;     /* make connection, let application use the socket */
-<<<<<<< HEAD
-  bool ssl_enable_beast; /* especially allow this flaw for interoperability's
-                            sake*/
-=======
->>>>>>> origin/tomato-shibby-RT-AC
   long ssh_auth_types;   /* allowed SSH auth types */
   bool http_te_skip;     /* pass the raw body data to the user, even when
                             transfer-encoded (chunked, compressed) */
@@ -1781,11 +1719,11 @@ struct UserDefined {
   bool proxy_transfer_mode; /* set transfer mode (;type=<a|i>) when doing FTP
                                via an HTTP proxy */
   char *str[STRING_LAST]; /* array of strings, pointing to allocated memory */
-  unsigned int scope;    /* address scope for IPv6 */
+  unsigned int scope_id;  /* Scope id for IPv6 */
   long allowed_protocols;
   long redir_protocols;
 #if defined(HAVE_GSSAPI) || defined(USE_WINDOWS_SSPI)
-  long socks5_gssapi_nec; /* flag to support nec socks5 server */
+  bool socks5_gssapi_nec; /* Flag to support NEC SOCKS5 server */
 #endif
   struct curl_slist *mail_rcpt; /* linked list of mail recipients */
   bool sasl_ir;         /* Enable/disable SASL initial response */
@@ -1801,21 +1739,23 @@ struct UserDefined {
                                     to pattern (e.g. if WILDCARDMATCH is on) */
   void *fnmatch_data;
 
-  long gssapi_delegation; /* GSSAPI credential delegation, see the
+  long gssapi_delegation; /* GSS-API credential delegation, see the
                              documentation of CURLOPT_GSSAPI_DELEGATION */
 
   bool tcp_keepalive;    /* use TCP keepalives */
   long tcp_keepidle;     /* seconds in idle before sending keepalive probe */
   long tcp_keepintvl;    /* seconds between TCP keepalive probes */
+  bool tcp_fastopen;     /* use TCP Fast Open */
 
   size_t maxconnects;  /* Max idle connections in the connection cache */
 
-  bool ssl_enable_npn;  /* TLS NPN extension? */
-  bool ssl_enable_alpn; /* TLS ALPN extension? */
-
-<<<<<<< HEAD
+  bool ssl_enable_npn;      /* TLS NPN extension? */
+  bool ssl_enable_alpn;     /* TLS ALPN extension? */
+  bool path_as_is;      /* allow dotdots? */
+  bool pipewait;        /* wait for pipe/multiplex status before starting a
+                           new connection */
   long expect_100_timeout; /* in milliseconds */
-=======
+
   struct Curl_easy *stream_depends_on;
   bool stream_depends_e; /* set or don't set the Exclusive bit */
   int stream_weight;
@@ -1823,7 +1763,6 @@ struct UserDefined {
   struct Curl_http2_dep *stream_dependents;
 
   bool abstract_unix_socket;
->>>>>>> origin/tomato-shibby-RT-AC
 };
 
 struct Names {

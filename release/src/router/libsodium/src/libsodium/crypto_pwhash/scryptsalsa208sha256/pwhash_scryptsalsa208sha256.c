@@ -11,15 +11,9 @@
 #include "randombytes.h"
 #include "utils.h"
 
-<<<<<<< HEAD
-#define SETTING_SIZE(saltbytes) \
-    (sizeof "$7$" - 1U) + \
-    (1U /* N_log2 */) + (5U /* r */) + (5U /* p */) + BYTES2CHARS(saltbytes)
-=======
 #define SETTING_SIZE(saltbytes)                                              \
     ((sizeof "$7$" - 1U) + (1U /* N_log2 */) + (5U /* r */) + (5U /* p */) + \
      BYTES2CHARS(saltbytes))
->>>>>>> origin/tomato-shibby-RT-AC
 
 static int
 pickparams(unsigned long long opslimit, const size_t memlimit,
@@ -247,6 +241,7 @@ crypto_pwhash_scryptsalsa208sha256_str_verify(
     if (escrypt_init_local(&escrypt_local) != 0) {
         return -1; /* LCOV_EXCL_LINE */
     }
+    memset(wanted, 0, sizeof wanted);
     if (escrypt_r(&escrypt_local, (const uint8_t *) passwd, (size_t) passwdlen,
                   (const uint8_t *) str, (uint8_t *) wanted,
                   sizeof wanted) == NULL) {

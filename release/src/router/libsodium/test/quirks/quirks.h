@@ -1,8 +1,6 @@
 
 #include <stdlib.h>
 
-<<<<<<< HEAD
-=======
 /* C++Builder defines a "random" macro */
 #undef random
 
@@ -23,7 +21,6 @@ xmemset(void *dst, int c, size_t n)
 }
 #endif
 
->>>>>>> origin/tomato-shibby-RT-AC
 #ifdef __EMSCRIPTEN__
 # define strcmp(s1, s2) xstrcmp(s1, s2)
 

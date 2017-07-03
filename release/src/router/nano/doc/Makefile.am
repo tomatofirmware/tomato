@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-if USE_COLOR
-SUBDIRS = man syntax texinfo
-else
-SUBDIRS = man texinfo
-endif
-
-EXTRA_DIST = faq.html
-=======
 SUBDIRS =
 BUILT_SOURCES =
 
@@ -40,4 +31,3 @@ dist_html_DATA += nano.html
 AM_MAKEINFOHTMLFLAGS = --no-split
 
 EXTRA_DIST = $(BUILT_SOURCES) $(info_TEXINFOS)
->>>>>>> origin/tomato-shibby-RT-AC

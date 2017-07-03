@@ -6,10 +6,6 @@
 #include "crypto_hash_sha512.h"
 #include "crypto_sign_ed25519.h"
 #include "crypto_verify_32.h"
-<<<<<<< HEAD
-#include "utils.h"
-#include "../../../crypto_core/curve25519/ref10/curve25519_ref10.h"
-=======
 #include "ed25519_ref10.h"
 #include "private/curve25519_ref10.h"
 #include "utils.h"
@@ -110,7 +106,6 @@ small_order(const unsigned char R[32])
     return 0;
 }
 #endif
->>>>>>> origin/tomato-shibby-RT-AC
 
 int
 _crypto_sign_ed25519_verify_detached(const unsigned char *sig,
@@ -127,17 +122,15 @@ _crypto_sign_ed25519_verify_detached(const unsigned char *sig,
     ge_p3                    A;
     ge_p2                    R;
 
-<<<<<<< HEAD
-=======
 #ifndef ED25519_COMPAT
     if (crypto_sign_check_S_lt_L(sig + 32) != 0 || small_order(sig) != 0) {
         return -1;
     }
 #else
->>>>>>> origin/tomato-shibby-RT-AC
     if (sig[63] & 224) {
         return -1;
     }
+#endif
     if (ge_frombytes_negate_vartime(&A, pk) != 0) {
         return -1;
     }

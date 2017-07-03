@@ -9,25 +9,25 @@ static unsigned char a[64];
 int
 main(void)
 {
-    int clen;
+    size_t clen;
 
     for (clen = 0; clen < sizeof c; ++clen) {
         crypto_auth_keygen(key);
         randombytes_buf(c, clen);
         crypto_auth_hmacsha512(a, c, clen, key);
         if (crypto_auth_hmacsha512_verify(a, c, clen, key) != 0) {
-            printf("fail %d\n", clen);
+            printf("fail %u\n", (unsigned int) clen);
             return 100;
         }
         if (clen > 0) {
-            c[rand() % clen] += 1 + (rand() % 255);
+            c[(size_t) rand() % clen] += 1 + (rand() % 255);
             if (crypto_auth_hmacsha512_verify(a, c, clen, key) == 0) {
-                printf("forgery %d\n", clen);
+                printf("forgery %u\n", (unsigned int) clen);
                 return 100;
             }
             a[rand() % sizeof a] += 1 + (rand() % 255);
             if (crypto_auth_hmacsha512_verify(a, c, clen, key) == 0) {
-                printf("forgery %d\n", clen);
+                printf("forgery %u\n", (unsigned int) clen);
                 return 100;
             }
         }

@@ -19,8 +19,6 @@
 #include <dnscrypt/plugin.h>
 #include <ldns/ldns.h>
 
-<<<<<<< HEAD
-=======
 #ifdef _MSC_VER
 # define strncasecmp _strnicmp
 # define strcasecmp _stricmp
@@ -28,7 +26,6 @@
 
 #include "fpst.h"
 
->>>>>>> origin/tomato-shibby-RT-AC
 DCPLUGIN_MAIN(__FILE__);
 
 #ifndef putc_unlocked
@@ -71,17 +68,6 @@ skip_spaces(char *str)
     return str;
 }
 
-<<<<<<< HEAD
-static StrList *
-parse_str_list(const char * const file)
-{
-    char     line[300U];
-    FILE    *fp;
-    char    *ptr;
-    StrList *str_list = NULL;
-    StrList *str_list_item;
-    StrList *str_list_last = NULL;
-=======
 static char *
 skip_chars(char *str)
 {
@@ -159,7 +145,6 @@ free_list(const char *key, uint32_t val)
     (void) val;
     free((void *) key);
 }
->>>>>>> origin/tomato-shibby-RT-AC
 
 static int
 parse_domain_list(FPST ** const domain_list_p,
@@ -194,13 +179,6 @@ parse_domain_list(FPST ** const domain_list_p,
         if ((line = trim_comments(untab(buf))) == NULL || *line == 0) {
             continue;
         }
-<<<<<<< HEAD
-        if (*line == 0 || *line == '#') {
-            continue;
-        }
-        if ((str_list_item = calloc(1U, sizeof *str_list_item)) == NULL ||
-            (str_list_item->str = strdup(line)) == NULL) {
-=======
         line_len = strlen(line);
         if (line[0] == '*' && line[line_len - 1] == '*') {
             line[line_len - 1] = 0;
@@ -224,7 +202,6 @@ parse_domain_list(FPST ** const domain_list_p,
         }
         str_tolower(line);
         if ((line = strdup(line)) == NULL) {
->>>>>>> origin/tomato-shibby-RT-AC
             break;
         }
         if (block_type == BLOCKTYPE_SUFFIX) {
@@ -750,16 +727,16 @@ DCPluginSyncFilterResult
 dcplugin_sync_pre_filter(DCPlugin *dcplugin, DCPluginDNSPacket *dcp_packet)
 {
     Blocking                 *blocking = dcplugin_get_user_data(dcplugin);
-    ldns_pkt                 *packet;
+    ldns_pkt                 *packet = NULL;
     DCPluginSyncFilterResult  result = DCP_SYNC_FILTER_RESULT_OK;
 
     if (blocking->domains == NULL && blocking->domains_rev == NULL &&
         blocking->domains_substr == NULL) {
         return DCP_SYNC_FILTER_RESULT_OK;
     }
-    ldns_wire2pkt(&packet, dcplugin_get_wire_data(dcp_packet),
-                  dcplugin_get_wire_data_len(dcp_packet));
-    if (packet == NULL) {
+    if (ldns_wire2pkt(&packet, dcplugin_get_wire_data(dcp_packet),
+                      dcplugin_get_wire_data_len(dcp_packet))
+        != LDNS_STATUS_OK) {
         return DCP_SYNC_FILTER_RESULT_ERROR;
     }
     if ((result = apply_block_domains(dcp_packet, blocking, packet))

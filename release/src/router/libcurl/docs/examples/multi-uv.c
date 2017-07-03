@@ -5,11 +5,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,23 +20,12 @@
  *
  ***************************************************************************/
 
-<<<<<<< HEAD
-/* Example application code using the multi socket interface to download
-   multiple files at once, but instead of using curl_multi_perform and
-   curl_multi_wait, which uses select(), we use libuv.
-   It supports epoll, kqueue, etc. on unixes and fast IO completion ports on
-   Windows, which means, it should be very fast on all platforms..
-
-   Written by Clemens Gruber, based on an outdated example from uvbook and
-   some tests from libuv.
-=======
 /* <DESC>
  * multi_socket API using libuv
  * </DESC>
  */
 /* Example application using the multi socket interface to download multiple
    files in parallel, powered by libuv.
->>>>>>> origin/tomato-shibby-RT-AC
 
    Requires libuv and (of course) libcurl.
 
@@ -73,13 +62,13 @@ static curl_context_t* create_curl_context(curl_socket_t sockfd)
 
 static void curl_close_cb(uv_handle_t *handle)
 {
-  curl_context_t* context = (curl_context_t*) handle->data;
+  curl_context_t *context = (curl_context_t *) handle->data;
   free(context);
 }
 
 static void destroy_curl_context(curl_context_t *context)
 {
-  uv_close((uv_handle_t*) &context->poll_handle, curl_close_cb);
+  uv_close((uv_handle_t *) &context->poll_handle, curl_close_cb);
 }
 
 static void add_download(const char *url, int num)
@@ -88,24 +77,22 @@ static void add_download(const char *url, int num)
   FILE *file;
   CURL *handle;
 
-  sprintf(filename, "%d.download", num);
+  snprintf(filename, 50, "%d.download", num);
 
-  file = fopen(filename, "w");
-  if (file == NULL) {
+  file = fopen(filename, "wb");
+  if(!file) {
     fprintf(stderr, "Error opening %s\n", filename);
     return;
   }
 
   handle = curl_easy_init();
   curl_easy_setopt(handle, CURLOPT_WRITEDATA, file);
+  curl_easy_setopt(handle, CURLOPT_PRIVATE, file);
   curl_easy_setopt(handle, CURLOPT_URL, url);
   curl_multi_add_handle(curl_handle, handle);
   fprintf(stderr, "Added download %s -> %s\n", url, filename);
 }
 
-<<<<<<< HEAD
-void curl_perform(uv_poll_t *req, int status, int events)
-=======
 static void check_multi_info(void)
 {
   char *done_url;
@@ -143,42 +130,22 @@ static void check_multi_info(void)
 }
 
 static void curl_perform(uv_poll_t *req, int status, int events)
->>>>>>> origin/tomato-shibby-RT-AC
 {
   int running_handles;
   int flags = 0;
   curl_context_t *context;
 
-  if (events & UV_READABLE)
+  if(events & UV_READABLE)
     flags |= CURL_CSELECT_IN;
-  if (events & UV_WRITABLE)
+  if(events & UV_WRITABLE)
     flags |= CURL_CSELECT_OUT;
 
-<<<<<<< HEAD
-  context = (curl_context_t*)req;
-=======
   context = (curl_context_t *) req->data;
->>>>>>> origin/tomato-shibby-RT-AC
 
   curl_multi_socket_action(curl_handle, context->sockfd, flags,
                            &running_handles);
 
-  while ((message = curl_multi_info_read(curl_handle, &pending))) {
-    switch (message->msg) {
-    case CURLMSG_DONE:
-      curl_easy_getinfo(message->easy_handle, CURLINFO_EFFECTIVE_URL,
-                        &done_url);
-      printf("%s DONE\n", done_url);
-
-      curl_multi_remove_handle(curl_handle, message->easy_handle);
-      curl_easy_cleanup(message->easy_handle);
-
-      break;
-    default:
-      fprintf(stderr, "CURLMSG default\n");
-      abort();
-    }
-  }
+  check_multi_info();
 }
 
 static void on_timeout(uv_timer_t *req, int status)
@@ -186,16 +153,11 @@ static void on_timeout(uv_timer_t *req, int status)
   int running_handles;
   curl_multi_socket_action(curl_handle, CURL_SOCKET_TIMEOUT, 0,
                            &running_handles);
+  check_multi_info();
 }
 
 static int start_timeout(CURLM *multi, long timeout_ms, void *userp)
 {
-<<<<<<< HEAD
-  if (timeout_ms <= 0)
-    timeout_ms = 1; /* 0 means directly call socket_action, but we'll do it in
-                       a bit */
-  uv_timer_start(&timeout, on_timeout, timeout_ms, 0);
-=======
   if(timeout_ms < 0) {
     uv_timer_stop(&timeout);
   }
@@ -206,28 +168,15 @@ static int start_timeout(CURLM *multi, long timeout_ms, void *userp)
     uv_timer_start(&timeout, on_timeout, timeout_ms, 0);
   }
   return 0;
->>>>>>> origin/tomato-shibby-RT-AC
 }
 
 static int handle_socket(CURL *easy, curl_socket_t s, int action, void *userp,
                   void *socketp)
 {
   curl_context_t *curl_context;
-<<<<<<< HEAD
-  if (action == CURL_POLL_IN || action == CURL_POLL_OUT) {
-    if (socketp) {
-      curl_context = (curl_context_t*) socketp;
-    }
-    else {
-      curl_context = create_curl_context(s);
-    }
-    curl_multi_assign(curl_handle, s, (void *) curl_context);
-  }
-=======
   int events = 0;
->>>>>>> origin/tomato-shibby-RT-AC
 
-  switch (action) {
+  switch(action) {
   case CURL_POLL_IN:
   case CURL_POLL_OUT:
   case CURL_POLL_INOUT:
@@ -244,7 +193,7 @@ static int handle_socket(CURL *easy, curl_socket_t s, int action, void *userp,
     uv_poll_start(&curl_context->poll_handle, events, curl_perform);
     break;
   case CURL_POLL_REMOVE:
-    if (socketp) {
+    if(socketp) {
       uv_poll_stop(&((curl_context_t*)socketp)->poll_handle);
       destroy_curl_context((curl_context_t*) socketp);
       curl_multi_assign(curl_handle, s, NULL);
@@ -261,16 +210,11 @@ int main(int argc, char **argv)
 {
   loop = uv_default_loop();
 
-  if (argc <= 1)
+  if(argc <= 1)
     return 0;
 
-<<<<<<< HEAD
-  if (curl_global_init(CURL_GLOBAL_ALL)) {
-    fprintf(stderr, "Could not init cURL\n");
-=======
   if(curl_global_init(CURL_GLOBAL_ALL)) {
     fprintf(stderr, "Could not init curl\n");
->>>>>>> origin/tomato-shibby-RT-AC
     return 1;
   }
 
@@ -280,11 +224,12 @@ int main(int argc, char **argv)
   curl_multi_setopt(curl_handle, CURLMOPT_SOCKETFUNCTION, handle_socket);
   curl_multi_setopt(curl_handle, CURLMOPT_TIMERFUNCTION, start_timeout);
 
-  while (argc-- > 1) {
+  while(argc-- > 1) {
     add_download(argv[argc], argc);
   }
 
   uv_run(loop, UV_RUN_DEFAULT);
   curl_multi_cleanup(curl_handle);
+
   return 0;
 }

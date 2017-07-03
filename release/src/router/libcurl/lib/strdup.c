@@ -5,11 +5,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -19,12 +19,16 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-/*
- * This file is 'mem-include-scan' clean. See test 1132.
- */
+
 #include "curl_setup.h"
 
+#include <curl/curl.h>
+
 #include "strdup.h"
+#include "curl_memory.h"
+
+/* The last #include file should be: */
+#include "memdebug.h"
 
 #ifndef HAVE_STRDUP
 char *curlx_strdup(const char *str)
@@ -44,14 +48,12 @@ char *curlx_strdup(const char *str)
   if(!newstr)
     return (char *)NULL;
 
-  memcpy(newstr,str,(len+1)*sizeof(char));
+  memcpy(newstr, str, (len+1)*sizeof(char));
 
   return newstr;
 
 }
 #endif
-<<<<<<< HEAD
-=======
 
 /***************************************************************************
  *
@@ -96,4 +98,3 @@ void *Curl_saferealloc(void *ptr, size_t size)
     free(ptr);
   return datap;
 }
->>>>>>> origin/tomato-shibby-RT-AC

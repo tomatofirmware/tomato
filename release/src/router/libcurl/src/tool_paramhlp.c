@@ -5,15 +5,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
-<<<<<<< HEAD
- * Copyright (C) 1998 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
-=======
  * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
->>>>>>> origin/tomato-shibby-RT-AC
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -281,6 +277,8 @@ long proto2num(struct OperationConfig *config, long *val, const char *str)
     { "smtps", CURLPROTO_SMTPS },
     { "rtsp", CURLPROTO_RTSP },
     { "gopher", CURLPROTO_GOPHER },
+    { "smb", CURLPROTO_SMB },
+    { "smbs", CURLPROTO_SMBS },
     { NULL, 0 }
   };
 
@@ -340,7 +338,7 @@ long proto2num(struct OperationConfig *config, long *val, const char *str)
          if no protocols are allowed */
       if(action == set)
         *val = 0;
-      warnf(config, "unrecognized protocol '%s'\n", token);
+      warnf(config->global, "unrecognized protocol '%s'\n", token);
     }
   }
   Curl_safefree(buffer);
@@ -348,8 +346,6 @@ long proto2num(struct OperationConfig *config, long *val, const char *str)
 }
 
 /**
-<<<<<<< HEAD
-=======
  * Check if the given string is a protocol supported by libcurl
  *
  * @param str  the protocol name
@@ -371,7 +367,6 @@ int check_protocol(const char *str)
 }
 
 /**
->>>>>>> origin/tomato-shibby-RT-AC
  * Parses the given string looking for an offset (which may be a
  * larger-than-integer value). The offset CANNOT be negative!
  *
@@ -438,7 +433,7 @@ static CURLcode checkpasswd(const char *kind, /* for what purpose */
       curlx_msnprintf(prompt, sizeof(prompt),
                       "Enter %s password for user '%s' on URL #%"
                       CURL_FORMAT_CURL_OFF_TU ":",
-                      kind, *userpwd, i + 1);
+                      kind, *userpwd, (curl_off_t) (i + 1));
 
     /* get password */
     getpass_r(prompt, passwd, sizeof(passwd));
@@ -482,7 +477,10 @@ int ftpfilemethod(struct OperationConfig *config, const char *str)
     return CURLFTPMETHOD_NOCWD;
   if(curl_strequal("multicwd", str))
     return CURLFTPMETHOD_MULTICWD;
-  warnf(config, "unrecognized ftp file method '%s', using default\n", str);
+
+  warnf(config->global, "unrecognized ftp file method '%s', using default\n",
+        str);
+
   return CURLFTPMETHOD_MULTICWD;
 }
 
@@ -492,7 +490,10 @@ int ftpcccmethod(struct OperationConfig *config, const char *str)
     return CURLFTPSSL_CCC_PASSIVE;
   if(curl_strequal("active", str))
     return CURLFTPSSL_CCC_ACTIVE;
-  warnf(config, "unrecognized ftp CCC method '%s', using default\n", str);
+
+  warnf(config->global, "unrecognized ftp CCC method '%s', using default\n",
+        str);
+
   return CURLFTPSSL_CCC_PASSIVE;
 }
 
@@ -504,7 +505,10 @@ long delegation(struct OperationConfig *config, char *str)
     return CURLGSSAPI_DELEGATION_POLICY_FLAG;
   if(curl_strequal("always", str))
     return CURLGSSAPI_DELEGATION_FLAG;
-  warnf(config, "unrecognized delegation method '%s', using none\n", str);
+
+  warnf(config->global, "unrecognized delegation method '%s', using none\n",
+        str);
+
   return CURLGSSAPI_DELEGATION_NONE;
 }
 
@@ -522,7 +526,7 @@ CURLcode get_args(struct OperationConfig *config, const size_t i)
   bool last = (config->next ? FALSE : TRUE);
 
   /* Check we have a password for the given host user */
-  if(config->userpwd && !config->xoauth2_bearer) {
+  if(config->userpwd && !config->oauth_bearer) {
     result = checkpasswd("host", i, last, &config->userpwd);
     if(result)
       return result;

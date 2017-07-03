@@ -5,11 +5,11 @@
 .\" *                            | (__| |_| |  _ <| |___
 .\" *                             \___|\___/|_| \_\_____|
 .\" *
-.\" * Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
+.\" * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
 .\" *
 .\" * This software is licensed as described in the file COPYING, which
 .\" * you should have received as part of this distribution. The terms
-.\" * are also available at http://curl.haxx.se/docs/copyright.html.
+.\" * are also available at https://curl.haxx.se/docs/copyright.html.
 .\" *
 .\" * You may opt to use, copy, modify, merge, publish, distribute and/or sell
 .\" * copies of the Software, and permit persons to whom the Software is
@@ -39,18 +39,6 @@ connection set-up.
 \fBbuffer\fP is a pointer to the data of length \fBbuflen\fP that you want sent.
 The variable \fBn\fP points to will receive the number of sent bytes.
 
-<<<<<<< HEAD
-To establish the connection, set \fBCURLOPT_CONNECT_ONLY\fP option before
-calling \fIcurl_easy_perform(3)\fP. Note that \fIcurl_easy_send(3)\fP will not
-work on connections that were created without this option.
-
-You must ensure that the socket is writable before calling
-\fIcurl_easy_send(3)\fP, otherwise the call will return \fBCURLE_AGAIN\fP -
-the socket is used in non-blocking mode internally. Use
-\fIcurl_easy_getinfo(3)\fP with \fBCURLINFO_LASTSOCKET\fP to obtain the
-socket; use your operating system facilities like \fIselect(2)\fP to check if
-it can be written to.
-=======
 To establish the connection, set \fICURLOPT_CONNECT_ONLY(3)\fP option before
 calling \fIcurl_easy_perform(3)\fP or \fIcurl_multi_perform(3)\fP. Note that
 \fIcurl_easy_send(3)\fP will not work on connections that were created without
@@ -66,7 +54,6 @@ Furthermore if you wait on the socket and it tells you it's writable,
 \fIcurl_easy_send(3)\fP may return \fBCURLE_AGAIN\fP if the only data that was
 sent was for internal SSL processing, and no other data could be sent.
 
->>>>>>> origin/tomato-shibby-RT-AC
 .SH AVAILABILITY
 Added in 7.18.2.
 .SH RETURN VALUE

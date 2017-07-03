@@ -12,13 +12,11 @@
 #warning The sodium_utils3 test is expected to fail with address sanitizer
 #endif
 
-<<<<<<< HEAD
-static void segv_handler(int sig)
-=======
 __attribute__((noreturn)) static void
 segv_handler(int sig)
->>>>>>> origin/tomato-shibby-RT-AC
 {
+    (void) sig;
+
     printf("Intentional segfault / bus error caught\n");
     printf("OK\n");
 #ifdef SIGSEGV
@@ -48,13 +46,8 @@ main(void)
 #ifdef SIGABRT
     signal(SIGABRT, segv_handler);
 #endif
-<<<<<<< HEAD
-    size = randombytes_uniform(100000U);
-    buf = sodium_malloc(size);
-=======
     size = 1U + randombytes_uniform(100000U);
     buf  = sodium_malloc(size);
->>>>>>> origin/tomato-shibby-RT-AC
     assert(buf != NULL);
     sodium_mprotect_noaccess(buf);
     sodium_mprotect_readwrite(buf);

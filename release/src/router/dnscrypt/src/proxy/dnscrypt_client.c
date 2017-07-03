@@ -232,10 +232,6 @@ dnscrypt_client_init_resolver_publickey(DNSCryptClient * const client,
 # error crypto_box_BEFORENMBYTES != crypto_box_PUBLICKEYBYTES
 #endif
     if (client->ephemeral_keys == 0) {
-<<<<<<< HEAD
-        crypto_box_beforenm(client->nmkey, resolver_publickey,
-                            client->secretkey);
-=======
         if (client->cipher == CIPHER_XSALSA20POLY1305) {
             res = crypto_box_beforenm
                 (client->nmkey, resolver_publickey, client->secretkey);
@@ -245,7 +241,6 @@ dnscrypt_client_init_resolver_publickey(DNSCryptClient * const client,
                 (client->nmkey, resolver_publickey, client->secretkey);
 #endif
         }
->>>>>>> origin/tomato-shibby-RT-AC
     } else {
         memcpy(client->publickey, resolver_publickey, sizeof client->publickey);
         res = 0;

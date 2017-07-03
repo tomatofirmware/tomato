@@ -7,11 +7,12 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
+ * Copyright (C) 2015, Daniel Stenberg, <daniel@haxx.se>, et al.
  * Copyright (C) 2013 - 2014, Linus Nielsen Feltzing, <linus@haxx.se>
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -41,8 +42,6 @@ bool Curl_pipeline_server_blacklisted(struct Curl_easy *handle,
 CURLMcode Curl_pipeline_set_server_blacklist(char **servers,
                                              struct curl_llist **list_ptr);
 
-<<<<<<< HEAD
-=======
 bool Curl_pipeline_checkget_write(struct Curl_easy *data,
                                   struct connectdata *conn);
 bool Curl_pipeline_checkget_read(struct Curl_easy *data,
@@ -54,5 +53,4 @@ bool Curl_recvpipe_head(struct Curl_easy *data,
 bool Curl_sendpipe_head(struct Curl_easy *data,
                         struct connectdata *conn);
 
->>>>>>> origin/tomato-shibby-RT-AC
 #endif /* HEADER_CURL_PIPELINE_H */

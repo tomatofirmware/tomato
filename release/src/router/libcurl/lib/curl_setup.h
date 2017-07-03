@@ -7,11 +7,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -112,6 +112,13 @@
 #  endif
 #endif
 
+/* Solaris needs this to get a POSIX-conformant getpwuid_r */
+#if defined(sun) || defined(__sun)
+#  ifndef _POSIX_PTHREAD_SEMANTICS
+#    define _POSIX_PTHREAD_SEMANTICS 1
+#  endif
+#endif
+
 /* ================================================================ */
 /*  If you need to include a system header file for your platform,  */
 /*  please, do it beyond the point further indicated in this file.  */
@@ -174,14 +181,14 @@
 #  ifndef CURL_DISABLE_SMTP
 #    define CURL_DISABLE_SMTP
 #  endif
-#  ifndef CURL_DISABLE_RTSP
-#    define CURL_DISABLE_RTSP
-#  endif
 #  ifndef CURL_DISABLE_RTMP
 #    define CURL_DISABLE_RTMP
 #  endif
 #  ifndef CURL_DISABLE_GOPHER
 #    define CURL_DISABLE_GOPHER
+#  endif
+#  ifndef CURL_DISABLE_SMB
+#    define CURL_DISABLE_SMB
 #  endif
 #endif
 
@@ -248,7 +255,7 @@
 #  ifdef HAVE_WINSOCK2_H
 #    include <winsock2.h>
 #    ifdef HAVE_WS2TCPIP_H
-#       include <ws2tcpip.h>
+#      include <ws2tcpip.h>
 #    endif
 #  else
 #    ifdef HAVE_WINSOCK_H
@@ -475,7 +482,7 @@
 #  endif
 
 #  ifndef fileno /* sunos 4 have this as a macro! */
-     int fileno( FILE *stream);
+     int fileno(FILE *stream);
 #  endif
 
 #endif /* WIN32 */
@@ -483,9 +490,10 @@
 /*
  * msvc 6.0 requires PSDK in order to have INET6_ADDRSTRLEN
  * defined in ws2tcpip.h as well as to provide IPv6 support.
+ * Does not apply if lwIP is used.
  */
 
-#if defined(_MSC_VER) && !defined(__POCC__)
+#if defined(_MSC_VER) && !defined(__POCC__) && !defined(USE_LWIPSOCK)
 #  if !defined(HAVE_WS2TCPIP_H) || \
      ((_MSC_VER < 1300) && !defined(INET6_ADDRSTRLEN))
 #    undef HAVE_GETADDRINFO_THREADSAFE
@@ -529,6 +537,7 @@
 #  define CURLRES_ARES
 /* now undef the stock libc functions just to avoid them being used */
 #  undef HAVE_GETADDRINFO
+#  undef HAVE_FREEADDRINFO
 #  undef HAVE_GETHOSTBYNAME
 #elif defined(USE_THREADS_POSIX) || defined(USE_THREADS_WIN32)
 #  define CURLRES_ASYNCH
@@ -602,23 +611,31 @@ int netware_init(void);
 
 #define LIBIDN_REQUIRED_VERSION "0.4.1"
 
-#if defined(USE_GNUTLS) || defined(USE_SSLEAY) || defined(USE_NSS) || \
-    defined(USE_QSOSSL) || defined(USE_POLARSSL) || defined(USE_AXTLS) || \
+#if defined(USE_GNUTLS) || defined(USE_OPENSSL) || defined(USE_NSS) || \
+    defined(USE_POLARSSL) || defined(USE_AXTLS) || defined(USE_MBEDTLS) || \
     defined(USE_CYASSL) || defined(USE_SCHANNEL) || \
     defined(USE_DARWINSSL) || defined(USE_GSKIT)
 #define USE_SSL    /* SSL support has been enabled */
 #endif
 
+/* Single point where USE_SPNEGO definition might be defined */
 #if !defined(CURL_DISABLE_CRYPTO_AUTH) && \
     (defined(HAVE_GSSAPI) || defined(USE_WINDOWS_SSPI))
-#define USE_HTTP_NEGOTIATE
+#define USE_SPNEGO
 #endif
 
-/* Single point where USE_NTLM definition might be done */
-#if !defined(CURL_DISABLE_HTTP) && !defined(CURL_DISABLE_NTLM) && \
-    !defined(CURL_DISABLE_CRYPTO_AUTH)
-#if defined(USE_SSLEAY) || defined(USE_WINDOWS_SSPI) || \
-    defined(USE_GNUTLS) || defined(USE_NSS) || defined(USE_DARWINSSL)
+/* Single point where USE_KERBEROS5 definition might be defined */
+#if !defined(CURL_DISABLE_CRYPTO_AUTH) && \
+    (defined(HAVE_GSSAPI) || defined(USE_WINDOWS_SSPI))
+#define USE_KERBEROS5
+#endif
+
+/* Single point where USE_NTLM definition might be defined */
+#if !defined(CURL_DISABLE_NTLM) && !defined(CURL_DISABLE_CRYPTO_AUTH)
+#if defined(USE_OPENSSL) || defined(USE_WINDOWS_SSPI) || \
+    defined(USE_GNUTLS) || defined(USE_NSS) || defined(USE_DARWINSSL) || \
+    defined(USE_OS400CRYPTO) || defined(USE_WIN32_CRYPTO)
+
 #define USE_NTLM
 
 #elif defined(USE_MBEDTLS)
@@ -644,8 +661,10 @@ int netware_init(void);
 #if defined(__GNUC__) && ((__GNUC__ >= 3) || \
   ((__GNUC__ == 2) && defined(__GNUC_MINOR__) && (__GNUC_MINOR__ >= 7)))
 #  define UNUSED_PARAM __attribute__((__unused__))
+#  define WARN_UNUSED_RESULT __attribute__((warn_unused_result))
 #else
 #  define UNUSED_PARAM /*NOTHING*/
+#  define WARN_UNUSED_RESULT
 #endif
 
 /*
@@ -668,7 +687,7 @@ int netware_init(void);
  * Ensure that Winsock and lwIP TCP/IP stacks are not mixed.
  */
 
-#if defined(__LWIP_OPT_H__)
+#if defined(__LWIP_OPT_H__) || defined(LWIP_HDR_OPT_H)
 #  if defined(SOCKET) || \
      defined(USE_WINSOCK) || \
      defined(HAVE_WINSOCK_H) || \
@@ -698,8 +717,6 @@ int netware_init(void);
 #define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
 #endif
 
-<<<<<<< HEAD
-=======
 /* In Windows the default file mode is text but an application can override it.
 Therefore we specify it explicitly. https://github.com/curl/curl/pull/258
 */
@@ -745,5 +762,4 @@ endings either CRLF or LF so 't' is appropriate.
 #  endif
 # endif
 
->>>>>>> origin/tomato-shibby-RT-AC
 #endif /* HEADER_CURL_SETUP_H */

@@ -21,9 +21,6 @@
 # include <unistd.h>
 #endif
 
-<<<<<<< HEAD
-#if defined(_WIN32) && (!defined(WINAPI_FAMILY) || WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
-=======
 #include "randombytes.h"
 #include "utils.h"
 
@@ -33,7 +30,6 @@
 
 #if defined(_WIN32) && \
     (!defined(WINAPI_FAMILY) || WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
->>>>>>> origin/tomato-shibby-RT-AC
 # define WINAPI_DESKTOP
 #endif
 
@@ -94,14 +90,9 @@ sodium_memzero(void *const pnt, const size_t len)
 #elif HAVE_WEAK_SYMBOLS
     _sodium_memzero_as_a_weak_symbol_to_prevent_lto(pnt, len);
 #else
-<<<<<<< HEAD
-    volatile unsigned char *pnt_ = (volatile unsigned char *) pnt;
-    size_t                     i = (size_t) 0U;
-=======
     volatile unsigned char *volatile pnt_ =
         (volatile unsigned char *volatile) pnt;
     size_t i = (size_t) 0U;
->>>>>>> origin/tomato-shibby-RT-AC
 
     while (i < len) {
         pnt_[i++] = 0U;
@@ -128,15 +119,10 @@ sodium_memcmp(const void *const b1_, const void *const b2_, size_t len)
     const unsigned char *b1 = (const unsigned char *) b1_;
     const unsigned char *b2 = (const unsigned char *) b2_;
 #else
-<<<<<<< HEAD
-    const volatile unsigned char *b1 = (const volatile unsigned char *) b1_;
-    const volatile unsigned char *b2 = (const volatile unsigned char *) b2_;
-=======
     const volatile unsigned char *volatile b1 =
         (const volatile unsigned char *volatile) b1_;
     const volatile unsigned char *volatile b2 =
         (const volatile unsigned char *volatile) b2_;
->>>>>>> origin/tomato-shibby-RT-AC
 #endif
     size_t        i;
     unsigned char d = (unsigned char) 0U;
@@ -169,15 +155,10 @@ sodium_compare(const unsigned char *b1_, const unsigned char *b2_, size_t len)
     const unsigned char *b1 = b1_;
     const unsigned char *b2 = b2_;
 #else
-<<<<<<< HEAD
-    const volatile unsigned char *b1 = (const volatile unsigned char *) b1_;
-    const volatile unsigned char *b2 = (const volatile unsigned char *) b2_;
-=======
     const volatile unsigned char *volatile b1 =
         (const volatile unsigned char *volatile) b1_;
     const volatile unsigned char *volatile b2 =
         (const volatile unsigned char *volatile) b2_;
->>>>>>> origin/tomato-shibby-RT-AC
 #endif
     unsigned char gt = 0U;
     unsigned char eq = 1U;
@@ -486,11 +467,7 @@ _mprotect_readwrite(void *ptr, size_t size)
 
 #ifdef HAVE_ALIGNED_MALLOC
 
-<<<<<<< HEAD
-static void
-=======
 __attribute__((noreturn)) static void
->>>>>>> origin/tomato-shibby-RT-AC
 _out_of_bounds(void)
 {
 # ifdef SIGSEGV
@@ -568,7 +545,7 @@ _unprotected_ptr_from_user_ptr(void *const ptr)
 static __attribute__((malloc)) void *
 _sodium_malloc(const size_t size)
 {
-    return malloc(size);
+    return malloc(size > (size_t) 0U ? size : (size_t) 1U);
 }
 #else
 static __attribute__((malloc)) void *
@@ -620,7 +597,7 @@ sodium_malloc(const size_t size)
     void *ptr;
 
     if ((ptr = _sodium_malloc(size)) == NULL) {
-        return NULL; /* LCOV_EXCL_LINE */
+        return NULL;
     }
     memset(ptr, (int) GARBAGE_VALUE, size);
 

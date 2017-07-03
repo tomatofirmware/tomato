@@ -5,15 +5,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
-<<<<<<< HEAD
- * Copyright (C) 1998 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
-=======
  * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
->>>>>>> origin/tomato-shibby-RT-AC
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -59,15 +55,7 @@
 #include "escape.h"
 #include "progress.h"
 #include "dict.h"
-<<<<<<< HEAD
-#include "rawstr.h"
-
-#define _MPRINTF_REPLACE /* use our functions only */
-#include <curl/mprintf.h>
-
-=======
 #include "strcase.h"
->>>>>>> origin/tomato-shibby-RT-AC
 #include "curl_memory.h"
 /* The last #include file should be: */
 #include "memdebug.h"
@@ -107,13 +95,8 @@ static char *unescape_word(struct Curl_easy *data, const char *inputbuff)
   char *newp;
   char *dictp;
   char *ptr;
-<<<<<<< HEAD
-  int len;
-  char byte;
-=======
   size_t len;
   char ch;
->>>>>>> origin/tomato-shibby-RT-AC
   int olen=0;
 
   CURLcode result = Curl_urldecode(data, inputbuff, 0, &newp, &len, FALSE);
@@ -125,13 +108,13 @@ static char *unescape_word(struct Curl_easy *data, const char *inputbuff)
     /* According to RFC2229 section 2.2, these letters need to be escaped with
        \[letter] */
     for(ptr = newp;
-        (byte = *ptr) != 0;
+        (ch = *ptr) != 0;
         ptr++) {
-      if((byte <= 32) || (byte == 127) ||
-          (byte == '\'') || (byte == '\"') || (byte == '\\')) {
+      if((ch <= 32) || (ch == 127) ||
+          (ch == '\'') || (ch == '\"') || (ch == '\\')) {
         dictp[olen++] = '\\';
       }
-      dictp[olen++] = byte;
+      dictp[olen++] = ch;
     }
     dictp[olen]=0;
   }

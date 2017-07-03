@@ -3,10 +3,6 @@
 
 #include "crypto_hash_sha512.h"
 #include "crypto_sign_ed25519.h"
-<<<<<<< HEAD
-#include "utils.h"
-#include "../../../crypto_core/curve25519/ref10/curve25519_ref10.h"
-=======
 #include "ed25519_ref10.h"
 #include "private/curve25519_ref10.h"
 #include "utils.h"
@@ -26,7 +22,6 @@ _crypto_sign_ed25519_ref10_hinit(crypto_hash_sha512_state *hs, int prehashed)
         crypto_hash_sha512_update(hs, DOM2PREFIX, sizeof DOM2PREFIX);
     }
 }
->>>>>>> origin/tomato-shibby-RT-AC
 
 int
 _crypto_sign_ed25519_detached(unsigned char *sig, unsigned long long *siglen_p,

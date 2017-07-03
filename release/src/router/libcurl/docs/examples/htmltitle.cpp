@@ -5,15 +5,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
-<<<<<<< HEAD
- * Copyright (C) 1998 - 2011, Daniel Stenberg, <daniel@haxx.se>, et al.
-=======
  * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
->>>>>>> origin/tomato-shibby-RT-AC
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -23,20 +19,9 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-<<<<<<< HEAD
-// Get a web page, parse it with libxml.
-//
-// Written by Lars Nilsson
-//
-// GNU C++ compile command line suggestion (edit paths accordingly):
-//
-// g++ -Wall -I/opt/curl/include -I/opt/libxml/include/libxml2 htmltitle.cpp \
-// -o htmltitle -L/opt/curl/lib -L/opt/libxml/lib -lcurl -lxml2
-=======
 /* <DESC>
  * Get a web page, extract the title with libxml.
  * </DESC>
->>>>>>> origin/tomato-shibby-RT-AC
 
  Written by Lars Nilsson
 
@@ -57,7 +42,7 @@
 //
 
 #ifdef _MSC_VER
-#define COMPARE(a, b) (!stricmp((a), (b)))
+#define COMPARE(a, b) (!_stricmp((a), (b)))
 #else
 #define COMPARE(a, b) (!strcasecmp((a), (b)))
 #endif

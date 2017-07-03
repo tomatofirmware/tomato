@@ -27,7 +27,7 @@
 int
 logger_open_syslog(struct ProxyContext_ * const context)
 {
-    assert(context->daemonize != 0);
+    assert(context->syslog != 0);
 #ifndef _WIN32
     openlog(PACKAGE_TARNAME, LOG_NDELAY | LOG_PID, LOG_DAEMON);
 #endif
@@ -107,17 +107,12 @@ logger(struct ProxyContext_ * const context,
     }
     line[len++] = 0;
 #ifndef _WIN32
-<<<<<<< HEAD
-    if (context != NULL && context->log_fp == NULL && context->daemonize) {
-        syslog(crit, "%s", line);
-=======
     if (context != NULL && context->log_fp == NULL && context->syslog != 0) {
         if (context->syslog_prefix != NULL) {
             syslog(crit, "%s %s", context->syslog_prefix, line);
         } else {
             syslog(crit, "%s", line);
         }
->>>>>>> origin/tomato-shibby-RT-AC
         return 0;
     }
 #endif
@@ -180,7 +175,7 @@ int
 logger_close(struct ProxyContext_ * const context)
 {
 #ifndef _WIN32
-    if (context->daemonize) {
+    if (context->syslog != 0) {
         closelog();
     }
 #endif

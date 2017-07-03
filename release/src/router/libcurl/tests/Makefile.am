@@ -5,11 +5,11 @@
 #                            | (__| |_| |  _ <| |___
 #                             \___|\___/|_| \_\_____|
 #
-# Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
+# Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at http://curl.haxx.se/docs/copyright.html.
+# are also available at https://curl.haxx.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -25,14 +25,11 @@ PDFPAGES = testcurl.pdf runtests.pdf
 
 EXTRA_DIST = ftpserver.pl httpserver.pl secureserver.pl runtests.pl getpart.pm \
  FILEFORMAT README stunnel.pem memanalyze.pl testcurl.pl valgrind.pm ftp.pm   \
- sshserver.pl sshhelp.pm testcurl.1 runtests.1 $(HTMLPAGES) $(PDFPAGES) \
+ sshserver.pl sshhelp.pm pathhelp.pm testcurl.1 runtests.1 \
+ $(HTMLPAGES) $(PDFPAGES) \
  serverhelp.pm tftpserver.pl rtspserver.pl directories.pm symbol-scan.pl \
-<<<<<<< HEAD
- CMakeLists.txt mem-include-scan.pl valgrind.supp http_pipe.py
-=======
  CMakeLists.txt mem-include-scan.pl valgrind.supp http_pipe.py extern-scan.pl \
  manpage-scan.pl nroff-scan.pl http2-server.pl
->>>>>>> origin/tomato-shibby-RT-AC
 
 DISTCLEANFILES = configurehelp.pm
 
@@ -54,7 +51,7 @@ PERLFLAGS = -I$(srcdir)
 
 CLEANFILES = .http.pid .https.pid .ftp.pid .ftps.pid
 
-MAN2HTML= roffit < $< >$@
+MAN2HTML= roffit $< >$@
 
 curl:
 	@cd $(top_builddir) && $(MAKE)
@@ -97,8 +94,6 @@ torture-test: perlcheck all
 	ps2pdf $$foo.ps $@; \
 	rm $$foo.ps; \
 	echo "converted $< to $@")
-<<<<<<< HEAD
-=======
 
 checksrc:
 	cd libtest && $(MAKE) checksrc
@@ -109,4 +104,3 @@ if CURLDEBUG
 # for debug builds, we scan the sources on all regular make invokes
 all-local: checksrc
 endif
->>>>>>> origin/tomato-shibby-RT-AC

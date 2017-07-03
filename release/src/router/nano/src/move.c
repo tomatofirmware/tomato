@@ -1,18 +1,9 @@
-/* $Id: move.c 4486 2010-03-21 04:56:37Z astyanax $ */
 /**************************************************************************
  *   move.c  --  This file is part of GNU nano.                           *
  *                                                                        *
  *   Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,  *
-<<<<<<< HEAD
- *   2008, 2009 Free Software Foundation, Inc.                            *
- *   This program is free software; you can redistribute it and/or modify *
- *   it under the terms of the GNU General Public License as published by *
- *   the Free Software Foundation; either version 3, or (at your option)  *
- *   any later version.                                                   *
-=======
  *   2008, 2009, 2010, 2011, 2013, 2014 Free Software Foundation, Inc.    *
  *   Copyright (C) 2014, 2015, 2016 Benno Schulenberg                     *
->>>>>>> origin/tomato-shibby-RT-AC
  *                                                                        *
  *   GNU nano is free software: you can redistribute it and/or modify     *
  *   it under the terms of the GNU General Public License as published    *
@@ -41,7 +32,7 @@ void do_first_line(void)
     openfile->current_x = 0;
     openfile->placewewant = 0;
 
-    edit_refresh_needed = 1;
+    refresh_needed = TRUE;
 }
 
 /* Move to the last line of the file. */
@@ -54,23 +45,13 @@ void do_last_line(void)
     /* Set the last line of the screen as the target for the cursor. */
     openfile->current_y = editwinrows - 1;
 
-    edit_refresh_needed = 1;
+    refresh_needed = TRUE;
+    focusing = FALSE;
 }
 
 /* Determine the actual current chunk and the target column. */
 void get_edge_and_target(size_t *leftedge, size_t *target_column)
 {
-<<<<<<< HEAD
-    int i, skipped = 0;
-
-    /* If there's less than a page of text left on the screen, put the
-     * cursor at the beginning of the first line of the file, and then
-     * update the edit window. */
-    if (openfile->current->lineno == 1 || (!ISSET(SOFTWRAP) &&
-	openfile->current->lineno <= editwinrows - 2)) {
-	do_first_line();
-	return;
-=======
 #ifndef NANO_TINY
     if (ISSET(SOFTWRAP)) {
 	size_t realspan = strlenpt(openfile->current->data);
@@ -85,7 +66,6 @@ void get_edge_and_target(size_t *leftedge, size_t *target_column)
     {
 	*leftedge = 0;
 	*target_column = openfile->placewewant;
->>>>>>> origin/tomato-shibby-RT-AC
     }
 }
 
@@ -97,29 +77,12 @@ void do_page_up(void)
 
     /* If we're not in smooth scrolling mode, put the cursor at the
      * beginning of the top line of the edit window, as Pico does. */
-<<<<<<< HEAD
-
-#ifndef NANO_TINY
-=======
->>>>>>> origin/tomato-shibby-RT-AC
     if (!ISSET(SMOOTH_SCROLL)) {
 	openfile->current = openfile->edittop;
 	openfile->placewewant = openfile->firstcolumn;
 	openfile->current_y = 0;
     }
 
-<<<<<<< HEAD
-    for (i = editwinrows - 2; i - skipped > 0 && openfile->current !=
-	openfile->fileage; i--) {
-	openfile->current = openfile->current->prev;
-	if (ISSET(SOFTWRAP) && openfile->current) {
-	    skipped += strlenpt(openfile->current->data) / COLS;
-#ifdef DEBUG
-    fprintf(stderr, "do_page_up: i = %d, skipped = %d based on line %ld len %d\n", i, (unsigned long) skipped, 
-openfile->current->lineno, strlenpt(openfile->current->data));
-#endif
-	}
-=======
     get_edge_and_target(&leftedge, &target_column);
 
     /* Move up the required number of lines or chunks.  If we can't, we're
@@ -127,45 +90,22 @@ openfile->current->lineno, strlenpt(openfile->current->data));
     if (go_back_chunks(mustmove, &openfile->current, &leftedge) > 0) {
 	do_first_line();
 	return;
->>>>>>> origin/tomato-shibby-RT-AC
     }
 
     openfile->placewewant = leftedge + target_column;
     openfile->current_x = actual_x(openfile->current->data,
-	openfile->placewewant);
+					openfile->placewewant);
 
-<<<<<<< HEAD
-#ifdef DEBUG
-    fprintf(stderr, "do_page_up: openfile->current->lineno = %lu, skipped = %d\n", (unsigned long) openfile->current->lineno, skipped);
-#endif
-
-    /* Scroll the edit window up a page. */
-    edit_update(NONE);
-=======
     /* Scroll the edit window up a page. */
     adjust_viewport(STATIONARY);
     refresh_needed = TRUE;
->>>>>>> origin/tomato-shibby-RT-AC
 }
 
 /* Move down nearly one screenful. */
 void do_page_down(void)
 {
-<<<<<<< HEAD
-    int i;
-
-    /* If there's less than a page of text left on the screen, put the
-     * cursor at the beginning of the last line of the file, and then
-     * update the edit window. */
-    if (openfile->current->lineno + maxrows - 2 >=
-	openfile->filebot->lineno) {
-	do_last_line();
-	return;
-    }
-=======
     int mustmove = (editwinrows < 3) ? 1 : editwinrows - 2;
     size_t leftedge, target_column;
->>>>>>> origin/tomato-shibby-RT-AC
 
     /* If we're not in smooth scrolling mode, put the cursor at the
      * beginning of the top line of the edit window, as Pico does. */
@@ -175,16 +115,7 @@ void do_page_down(void)
 	openfile->current_y = 0;
     }
 
-<<<<<<< HEAD
-    for (i = maxrows - 2; i > 0 && openfile->current !=
-	openfile->filebot; i--) {
-	openfile->current = openfile->current->next;
-#ifdef DEBUG
-    fprintf(stderr, "do_page_down: moving to line %lu\n", (unsigned long) openfile->current->lineno);
-#endif
-=======
     get_edge_and_target(&leftedge, &target_column);
->>>>>>> origin/tomato-shibby-RT-AC
 
     /* Move down the required number of lines or chunks.  If we can't, we're
      * at the bottom of the file, so put the cursor there and get out. */
@@ -195,15 +126,11 @@ void do_page_down(void)
 
     openfile->placewewant = leftedge + target_column;
     openfile->current_x = actual_x(openfile->current->data,
-	openfile->placewewant);
+					openfile->placewewant);
 
     /* Scroll the edit window down a page. */
-<<<<<<< HEAD
-    edit_update(NONE);
-=======
     adjust_viewport(STATIONARY);
     refresh_needed = TRUE;
->>>>>>> origin/tomato-shibby-RT-AC
 }
 
 #ifndef DISABLE_JUSTIFY
@@ -212,12 +139,7 @@ void do_page_down(void)
  * afterwards. */
 void do_para_begin(bool allow_update)
 {
-<<<<<<< HEAD
-    filestruct *current_save = openfile->current;
-    const size_t pww_save = openfile->placewewant;
-=======
     filestruct *was_current = openfile->current;
->>>>>>> origin/tomato-shibby-RT-AC
 
     if (openfile->current != openfile->fileage) {
 	do
@@ -226,14 +148,9 @@ void do_para_begin(bool allow_update)
     }
 
     openfile->current_x = 0;
-    openfile->placewewant = 0;
 
     if (allow_update)
-<<<<<<< HEAD
-	edit_redraw(current_save, pww_save);
-=======
 	edit_redraw(was_current);
->>>>>>> origin/tomato-shibby-RT-AC
 }
 
 /* Move up to the beginning of the last beginning-of-paragraph line
@@ -251,38 +168,26 @@ void do_para_begin_void(void)
  * paragraph or isn't in a paragraph. */
 void do_para_end(bool allow_update)
 {
-<<<<<<< HEAD
-    filestruct *const current_save = openfile->current;
-    const size_t pww_save = openfile->placewewant;
-=======
     filestruct *was_current = openfile->current;
->>>>>>> origin/tomato-shibby-RT-AC
 
     while (openfile->current != openfile->filebot &&
-	!inpar(openfile->current))
+		!inpar(openfile->current))
 	openfile->current = openfile->current->next;
 
     while (openfile->current != openfile->filebot &&
-	inpar(openfile->current->next) &&
-	!begpar(openfile->current->next)) {
+		inpar(openfile->current->next) &&
+		!begpar(openfile->current->next)) {
 	openfile->current = openfile->current->next;
     }
 
     if (openfile->current != openfile->filebot) {
 	openfile->current = openfile->current->next;
 	openfile->current_x = 0;
-	openfile->placewewant = 0;
-    } else {
+    } else
 	openfile->current_x = strlen(openfile->current->data);
-	openfile->placewewant = xplustabs();
-    }
 
     if (allow_update)
-<<<<<<< HEAD
-	edit_redraw(current_save, pww_save);
-=======
 	edit_redraw(was_current);
->>>>>>> origin/tomato-shibby-RT-AC
 }
 
 /* Move down to the beginning of the last line of the current paragraph.
@@ -294,10 +199,6 @@ void do_para_end_void(void)
 }
 #endif /* !DISABLE_JUSTIFY */
 
-<<<<<<< HEAD
-#ifndef NANO_TINY
-/* Move to the next word in the file.  If allow_punct is TRUE, treat
-=======
 /* Move to the preceding block of text in the file. */
 void do_prev_block(void)
 {
@@ -339,23 +240,10 @@ void do_next_block(void)
 }
 
 /* Move to the previous word in the file.  If allow_punct is TRUE, treat
->>>>>>> origin/tomato-shibby-RT-AC
  * punctuation as part of a word.  If allow_update is TRUE, update the
- * screen afterwards.  Return TRUE if we started on a word, and FALSE
- * otherwise. */
-bool do_next_word(bool allow_punct, bool allow_update)
+ * screen afterwards. */
+void do_prev_word(bool allow_punct, bool allow_update)
 {
-<<<<<<< HEAD
-    size_t pww_save = openfile->placewewant;
-    filestruct *current_save = openfile->current;
-    char *char_mb;
-    int char_mb_len;
-    bool end_line = FALSE, started_on_word = FALSE;
-
-    assert(openfile->current != NULL && openfile->current->data != NULL);
-
-    char_mb = charalloc(mb_cur_max());
-=======
     filestruct *was_current = openfile->current;
     bool seen_a_word = FALSE, step_forward = FALSE;
 
@@ -368,151 +256,49 @@ bool do_next_word(bool allow_punct, bool allow_update)
 	    openfile->current = openfile->current->prev;
 	    openfile->current_x = strlen(openfile->current->data);
 	}
->>>>>>> origin/tomato-shibby-RT-AC
 
-    /* Move forward until we find the character after the last letter of
-     * the current word. */
-    while (!end_line) {
-	char_mb_len = parse_mbchar(openfile->current->data +
-		openfile->current_x, char_mb, NULL);
+	/* Step back one character. */
+	openfile->current_x = move_mbleft(openfile->current->data,
+						openfile->current_x);
 
-	/* If we've found it, stop moving forward through the current
-	 * line. */
-	if (!is_word_mbchar(char_mb, allow_punct))
-	    break;
-
-	/* If we haven't found it, then we've started on a word, so set
-	 * started_on_word to TRUE. */
-	started_on_word = TRUE;
-
-	if (openfile->current->data[openfile->current_x] == '\0')
-	    end_line = TRUE;
-	else
-	    openfile->current_x += char_mb_len;
-    }
-
-    /* Move forward until we find the first letter of the next word. */
-    if (openfile->current->data[openfile->current_x] == '\0')
-	end_line = TRUE;
-    else
-	openfile->current_x += char_mb_len;
-
-    for (; openfile->current != NULL;
-	openfile->current = openfile->current->next) {
-	while (!end_line) {
-	    char_mb_len = parse_mbchar(openfile->current->data +
-		openfile->current_x, char_mb, NULL);
-
-	    /* If we've found it, stop moving forward through the
-	     * current line. */
-	    if (is_word_mbchar(char_mb, allow_punct))
+	if (is_word_mbchar(openfile->current->data + openfile->current_x,
+				allow_punct)) {
+	    seen_a_word = TRUE;
+	    /* If at the head of a line now, this surely is a word start. */
+	    if (openfile->current_x == 0)
 		break;
-
-	    if (openfile->current->data[openfile->current_x] == '\0')
-		end_line = TRUE;
-	    else
-		openfile->current_x += char_mb_len;
-	}
-
-	/* If we've found it, stop moving forward to the beginnings of
-	 * subsequent lines. */
-	if (!end_line)
+	} else if (seen_a_word) {
+	    /* This is space now: we've overshot the start of the word. */
+	    step_forward = TRUE;
 	    break;
-
-	if (openfile->current != openfile->filebot) {
-	    end_line = FALSE;
-	    openfile->current_x = 0;
 	}
     }
 
-    free(char_mb);
-
-    /* If we haven't found it, move to the end of the file. */
-    if (openfile->current == NULL)
-	openfile->current = openfile->filebot;
-
-    openfile->placewewant = xplustabs();
+    if (step_forward)
+	/* Move one character forward again to sit on the start of the word. */
+	openfile->current_x = move_mbright(openfile->current->data,
+						openfile->current_x);
 
     /* If allow_update is TRUE, update the screen. */
-<<<<<<< HEAD
-    if (allow_update)
-	edit_redraw(current_save, pww_save);
-
-    /* Return whether we started on a word. */
-    return started_on_word;
-=======
     if (allow_update) {
 	focusing = FALSE;
 	edit_redraw(was_current);
     }
->>>>>>> origin/tomato-shibby-RT-AC
 }
 
-/* Move to the next word in the file, treating punctuation as part of a
- * word if the WORD_BOUNDS flag is set, and update the screen
- * afterwards. */
-void do_next_word_void(void)
+/* Move to the previous word in the file, treating punctuation as part of a
+ * word if the WORD_BOUNDS flag is set, and update the screen afterwards. */
+void do_prev_word_void(void)
 {
-    do_next_word(ISSET(WORD_BOUNDS), TRUE);
+    do_prev_word(ISSET(WORD_BOUNDS), TRUE);
 }
 
-/* Move to the previous word in the file.  If allow_punct is TRUE, treat
+/* Move to the next word in the file.  If allow_punct is TRUE, treat
  * punctuation as part of a word.  If allow_update is TRUE, update the
  * screen afterwards.  Return TRUE if we started on a word, and FALSE
  * otherwise. */
-bool do_prev_word(bool allow_punct, bool allow_update)
+bool do_next_word(bool allow_punct, bool allow_update)
 {
-<<<<<<< HEAD
-    size_t pww_save = openfile->placewewant;
-    filestruct *current_save = openfile->current;
-    char *char_mb;
-    int char_mb_len;
-    bool begin_line = FALSE, started_on_word = FALSE;
-
-    assert(openfile->current != NULL && openfile->current->data != NULL);
-
-    char_mb = charalloc(mb_cur_max());
-
-    /* Move backward until we find the character before the first letter
-     * of the current word. */
-    while (!begin_line) {
-	char_mb_len = parse_mbchar(openfile->current->data +
-		openfile->current_x, char_mb, NULL);
-
-	/* If we've found it, stop moving backward through the current
-	 * line. */
-	if (!is_word_mbchar(char_mb, allow_punct))
-	    break;
-
-	/* If we haven't found it, then we've started on a word, so set
-	 * started_on_word to TRUE. */
-	started_on_word = TRUE;
-
-	if (openfile->current_x == 0)
-	    begin_line = TRUE;
-	else
-	    openfile->current_x = move_mbleft(openfile->current->data,
-		openfile->current_x);
-    }
-
-    /* Move backward until we find the last letter of the previous
-     * word. */
-    if (openfile->current_x == 0)
-	begin_line = TRUE;
-    else
-	openfile->current_x = move_mbleft(openfile->current->data,
-		openfile->current_x);
-
-    for (; openfile->current != NULL;
-	openfile->current = openfile->current->prev) {
-	while (!begin_line) {
-	    char_mb_len = parse_mbchar(openfile->current->data +
-		openfile->current_x, char_mb, NULL);
-
-	    /* If we've found it, stop moving backward through the
-	     * current line. */
-	    if (is_word_mbchar(char_mb, allow_punct))
-=======
     filestruct *was_current = openfile->current;
     bool started_on_word = is_word_mbchar(openfile->current->data +
 				openfile->current_x, allow_punct);
@@ -524,88 +310,40 @@ bool do_prev_word(bool allow_punct, bool allow_update)
 	if (openfile->current->data[openfile->current_x] == '\0') {
 	    /* If at the end of the file, stop. */
 	    if (openfile->current->next == NULL)
->>>>>>> origin/tomato-shibby-RT-AC
 		break;
-
-	    if (openfile->current_x == 0)
-		begin_line = TRUE;
-	    else
-		openfile->current_x =
-			move_mbleft(openfile->current->data,
-			openfile->current_x);
+	    openfile->current = openfile->current->next;
+	    openfile->current_x = 0;
+	    seen_space = TRUE;
+	} else {
+	    /* Step forward one character. */
+	    openfile->current_x = move_mbright(openfile->current->data,
+						openfile->current_x);
 	}
 
-	/* If we've found it, stop moving backward to the ends of
-	 * previous lines. */
-	if (!begin_line)
+	/* If this is not a word character, then it's a separator; else
+	 * if we've already seen a separator, then it's a word start. */
+	if (!is_word_mbchar(openfile->current->data + openfile->current_x,
+				allow_punct))
+	    seen_space = TRUE;
+	else if (seen_space)
 	    break;
-
-	if (openfile->current != openfile->fileage) {
-	    begin_line = FALSE;
-	    openfile->current_x = strlen(openfile->current->prev->data);
-	}
     }
 
-<<<<<<< HEAD
-    /* If we haven't found it, move to the beginning of the file. */
-    if (openfile->current == NULL)
-	openfile->current = openfile->fileage;
-    /* If we've found it, move backward until we find the character
-     * before the first letter of the previous word. */
-    else if (!begin_line) {
-	if (openfile->current_x == 0)
-	    begin_line = TRUE;
-	else
-	    openfile->current_x = move_mbleft(openfile->current->data,
-		openfile->current_x);
-
-	while (!begin_line) {
-	    char_mb_len = parse_mbchar(openfile->current->data +
-		openfile->current_x, char_mb, NULL);
-
-	    /* If we've found it, stop moving backward through the
-	     * current line. */
-	    if (!is_word_mbchar(char_mb, allow_punct))
-		break;
-
-	    if (openfile->current_x == 0)
-		begin_line = TRUE;
-	    else
-		openfile->current_x =
-			move_mbleft(openfile->current->data,
-			openfile->current_x);
-	}
-
-	/* If we've found it, move forward to the first letter of the
-	 * previous word. */
-	if (!begin_line)
-	    openfile->current_x += char_mb_len;
-=======
     /* If allow_update is TRUE, update the screen. */
     if (allow_update) {
 	focusing = FALSE;
 	edit_redraw(was_current);
->>>>>>> origin/tomato-shibby-RT-AC
     }
-
-    free(char_mb);
-
-    openfile->placewewant = xplustabs();
-
-    /* If allow_update is TRUE, update the screen. */
-    if (allow_update)
-	edit_redraw(current_save, pww_save);
 
     /* Return whether we started on a word. */
     return started_on_word;
 }
 
-/* Move to the previous word in the file, treating punctuation as part
- * of a word if the WORD_BOUNDS flag is set, and update the screen
- * afterwards. */
-void do_prev_word_void(void)
+/* Move to the next word in the file, treating punctuation as part of a word
+ * if the WORD_BOUNDS flag is set, and update the screen afterwards. */
+void do_next_word_void(void)
 {
-    do_prev_word(ISSET(WORD_BOUNDS), TRUE);
+    do_next_word(ISSET(WORD_BOUNDS), TRUE);
 }
 
 /* Move to the beginning of the current line (or softwrapped chunk).
@@ -647,27 +385,14 @@ void do_home(bool be_clever)
 	 * Otherwise, move to the left edge. */
 	if (openfile->current_x == leftedge_x && be_clever)
 	    openfile->current_x = 0;
-<<<<<<< HEAD
-
-	openfile->placewewant = xplustabs();
-    } else {
-=======
 	else {
 	    openfile->current_x = leftedge_x;
 	    moved_off_chunk = FALSE;
 	}
     } else if (!moved)
->>>>>>> origin/tomato-shibby-RT-AC
 #endif
 	openfile->current_x = 0;
-	openfile->placewewant = 0;
-#ifndef NANO_TINY
-    }
-#endif
 
-<<<<<<< HEAD
-    if (need_horizontal_update(pww_save))
-=======
     openfile->placewewant = xplustabs();
 
     /* If we changed chunk, we might be offscreen.  Otherwise,
@@ -676,7 +401,6 @@ void do_home(bool be_clever)
 	focusing = FALSE;
 	edit_redraw(was_current);
     } else if (line_needs_update(was_column, openfile->placewewant))
->>>>>>> origin/tomato-shibby-RT-AC
 	update_line(openfile->current, openfile->current_x);
 }
 
@@ -716,16 +440,12 @@ void do_end(bool be_clever)
 
     openfile->placewewant = xplustabs();
 
-<<<<<<< HEAD
-    if (need_horizontal_update(pww_save))
-=======
     /* If we changed chunk, we might be offscreen.  Otherwise,
      * update current if the mark is on or we changed "page". */
     if (ISSET(SOFTWRAP) && moved_off_chunk) {
 	focusing = FALSE;
 	edit_redraw(was_current);
     } else if (line_needs_update(was_column, openfile->placewewant))
->>>>>>> origin/tomato-shibby-RT-AC
 	update_line(openfile->current, openfile->current_x);
 }
 
@@ -756,34 +476,8 @@ void do_up(bool scroll_only)
 
     openfile->placewewant = leftedge + target_column;
     openfile->current_x = actual_x(openfile->current->data,
-	openfile->placewewant);
+					openfile->placewewant);
 
-<<<<<<< HEAD
-    /* If scroll_only is FALSE and if we're on the first line of the
-     * edit window, scroll the edit window up one line if we're in
-     * smooth scrolling mode, or up half a page if we're not.  If
-     * scroll_only is TRUE, scroll the edit window up one line
-     * unconditionally. */
-    if (openfile->current_y == 0 || (ISSET(SOFTWRAP) && openfile->edittop->lineno == openfile->current->next->lineno)
-#ifndef NANO_TINY
-	|| scroll_only
-#endif
-	)
-	edit_scroll(UP_DIR,
-#ifndef NANO_TINY
-		(ISSET(SMOOTH_SCROLL) || scroll_only) ? 1 :
-#endif
-		editwinrows / 2 + 1);
-
-    /* If we're below the first line of the edit window, update the
-     * line we were on before and the line we're on now.  The former
-     * needs to be redrawn if we're not on the first page, and the
-     * latter needs to be drawn unconditionally. */
-    if (openfile->current_y > 0) {
-	if (need_vertical_update(0))
-	    update_line(openfile->current->next, 0);
-	update_line(openfile->current, openfile->current_x);
-=======
     /* When the cursor was on the first line of the edit window (or when just
      * scrolling without moving the cursor), scroll the edit window up -- one
      * line if we're in smooth scrolling mode, and half a page otherwise. */
@@ -801,7 +495,6 @@ void do_up(bool scroll_only)
 	/* Redraw the current line if it needs to be horizontally scrolled. */
 	if (line_needs_update(0, xplustabs()))
 	    update_line(openfile->current, openfile->current_x);
->>>>>>> origin/tomato-shibby-RT-AC
     }
 }
 
@@ -819,71 +512,16 @@ void do_down(bool scroll_only)
     size_t was_column = xplustabs();
     size_t leftedge, target_column;
 
-<<<<<<< HEAD
-/* If scroll_only is FALSE, move down one line.  If scroll_only is TRUE,
- * scroll down one line without scrolling the cursor. */
-void do_down(
-#ifndef NANO_TINY
-	bool scroll_only
-#else
-	void
-#endif
-	)
-{
-    bool onlastline = FALSE;
-=======
     get_edge_and_target(&leftedge, &target_column);
->>>>>>> origin/tomato-shibby-RT-AC
 
     /* If we can't move down one line or chunk, we're at bottom of file. */
     if (go_forward_chunks(1, &openfile->current, &leftedge) > 0)
 	return;
 
-<<<<<<< HEAD
-
-    assert(ISSET(SOFTWRAP) || openfile->current_y == openfile->current->lineno - openfile->edittop->lineno);
-
-    /* Move the current line of the edit window down. */
-    openfile->current = openfile->current->next;
-=======
     openfile->placewewant = leftedge + target_column;
->>>>>>> origin/tomato-shibby-RT-AC
     openfile->current_x = actual_x(openfile->current->data,
-	openfile->placewewant);
+					openfile->placewewant);
 
-    if (ISSET(SOFTWRAP)) {
-	if (openfile->current->lineno - openfile->edittop->lineno >= maxrows)
-	    onlastline = TRUE;
-    }
-
-<<<<<<< HEAD
-    /* If scroll_only is FALSE and if we're on the first line of the
-     * edit window, scroll the edit window down one line if we're in
-     * smooth scrolling mode, or down half a page if we're not.  If
-     * scroll_only is TRUE, scroll the edit window down one line
-     * unconditionally. */
-    if (onlastline || openfile->current_y == editwinrows - 1
-#ifndef NANO_TINY
-	|| scroll_only
-#endif
-	) {
-	edit_scroll(DOWN_DIR,
-#ifndef NANO_TINY
-		(ISSET(SMOOTH_SCROLL) || scroll_only) ? 1 :
-#endif
-		editwinrows / 2 + 1);
-
-	edit_refresh_needed = TRUE;
-    }
-    /* If we're above the last line of the edit window, update the line
-     * we were on before and the line we're on now.  The former needs to
-     * be redrawn if we're not on the first page, and the latter needs
-     * to be drawn unconditionally. */
-    if (ISSET(SOFTWRAP) || openfile->current_y < editwinrows - 1) {
-	if (need_vertical_update(0))
-	    update_line(openfile->current->prev, 0);
-	update_line(openfile->current, openfile->current_x);
-=======
     /* When the cursor was on the last line of the edit window (or when just
      * scrolling without moving the cursor), scroll the edit window down -- one
      * line if we're in smooth scrolling mode, and half a page otherwise. */
@@ -901,7 +539,6 @@ void do_down(
 	/* Redraw the current line if it needs to be horizontally scrolled. */
 	if (line_needs_update(0, xplustabs()))
 	    update_line(openfile->current, openfile->current_x);
->>>>>>> origin/tomato-shibby-RT-AC
     }
 }
 
@@ -936,7 +573,7 @@ void do_left(void)
 
     if (openfile->current_x > 0)
 	openfile->current_x = move_mbleft(openfile->current->data,
-		openfile->current_x);
+						openfile->current_x);
     else if (openfile->current != openfile->fileage) {
 	do_up_void();
 	do_end(FALSE);
@@ -945,9 +582,6 @@ void do_left(void)
 
     openfile->placewewant = xplustabs();
 
-<<<<<<< HEAD
-    if (need_horizontal_update(pww_save))
-=======
 #ifndef NANO_TINY
     /* If we were on the first line of the edit window, and we changed chunk,
      * we're now above the first line of the edit window, so scroll up. */
@@ -961,7 +595,6 @@ void do_left(void)
 
     /* Update current if the mark is on or it has changed "page". */
     if (line_needs_update(was_column, openfile->placewewant))
->>>>>>> origin/tomato-shibby-RT-AC
 	update_line(openfile->current, openfile->current_x);
 }
 
@@ -976,7 +609,7 @@ void do_right(void)
 
     if (openfile->current->data[openfile->current_x] != '\0')
 	openfile->current_x = move_mbright(openfile->current->data,
-		openfile->current_x);
+						openfile->current_x);
     else if (openfile->current != openfile->filebot) {
 	do_home(FALSE);
 	do_down_void();
@@ -985,9 +618,6 @@ void do_right(void)
 
     openfile->placewewant = xplustabs();
 
-<<<<<<< HEAD
-    if (need_horizontal_update(pww_save))
-=======
 #ifndef NANO_TINY
     /* If we were on the last line of the edit window, and we changed chunk,
      * we're now below the first line of the edit window, so scroll down. */
@@ -1001,6 +631,5 @@ void do_right(void)
 
     /* Update current if the mark is on or it has changed "page". */
     if (line_needs_update(was_column, openfile->placewewant))
->>>>>>> origin/tomato-shibby-RT-AC
 	update_line(openfile->current, openfile->current_x);
 }

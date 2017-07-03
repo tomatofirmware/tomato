@@ -23,18 +23,6 @@
 #endif
 #include "private/common.h"
 
-<<<<<<< HEAD
-#ifndef __EMSCRIPTEN__
-#ifdef __native_client__
-static const randombytes_implementation *implementation =
-    &randombytes_nativeclient_implementation;
-#else
-static const randombytes_implementation *implementation =
-    &randombytes_sysrandom_implementation;
-#endif
-#else
-static const randombytes_implementation *implementation = NULL;
-=======
 /* C++Builder defines a "random" macro */
 #undef random
 
@@ -50,7 +38,6 @@ static const randombytes_implementation *implementation;
 #   define RANDOMBYTES_DEFAULT_IMPLEMENTATION &randombytes_sysrandom_implementation;
 #  endif
 # endif
->>>>>>> origin/tomato-shibby-RT-AC
 #endif
 
 static void

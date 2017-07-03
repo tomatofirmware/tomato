@@ -1,6 +1,4 @@
 
-<<<<<<< HEAD
-=======
 * Version 1.0.12
  - Ed25519ph was implemented, adding a multi-part signature API
 (`crypto_sign_init()`, `crypto_sign_update()`, `crypto_sign_final_*()`).
@@ -94,7 +92,6 @@ construction.
  - The library can now be compiled on Minix.
  - HEASLR is now enabled on MinGW builds.
 
->>>>>>> origin/tomato-shibby-RT-AC
 * Version 1.0.8
  - Handle the case where the CPU supports AVX, but we are running
 on an hypervisor with AVX disabled/not supported.

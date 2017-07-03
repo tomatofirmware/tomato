@@ -1,19 +1,9 @@
-/* $Id: color.c 4453 2009-12-02 03:36:22Z astyanax $ */
 /**************************************************************************
  *   color.c  --  This file is part of GNU nano.                          *
  *                                                                        *
-<<<<<<< HEAD
- *   Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009   *
- *   Free Software Foundation, Inc.                                       *
- *   This program is free software; you can redistribute it and/or modify *
- *   it under the terms of the GNU General Public License as published by *
- *   the Free Software Foundation; either version 3, or (at your option)  *
- *   any later version.                                                   *
-=======
  *   Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,  *
  *   2010, 2011, 2013, 2014, 2015 Free Software Foundation, Inc.          *
  *   Copyright (C) 2014, 2015, 2016, 2017 Benno Schulenberg               *
->>>>>>> origin/tomato-shibby-RT-AC
  *                                                                        *
  *   GNU nano is free software: you can redistribute it and/or modify     *
  *   it under the terms of the GNU General Public License as published    *
@@ -34,20 +24,20 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
+#include <time.h>
+#include <unistd.h>
 
-#ifdef ENABLE_COLOR
+#ifdef HAVE_MAGIC_H
+#include <magic.h>
+#endif
 
-/* For each syntax list entry, go through the list of colors and assign
- * the color pairs. */
+#ifndef DISABLE_COLOR
+
+/* Initialize the colors for nano's interface, and assign pair numbers
+ * for the colors in each syntax. */
 void set_colorpairs(void)
 {
-<<<<<<< HEAD
-    const syntaxtype *this_syntax = syntaxes;
-
-    for (; this_syntax != NULL; this_syntax = this_syntax->next) {
-	colortype *this_color = this_syntax->color;
-	int color_pair = 1;
-=======
     const syntaxtype *sint;
     bool using_defaults = FALSE;
     short foreground, background;
@@ -91,26 +81,10 @@ void set_colorpairs(void)
     for (sint = syntaxes; sint != NULL; sint = sint->next) {
 	colortype *ink;
 	int new_number = NUMBER_OF_ELEMENTS + 1;
->>>>>>> origin/tomato-shibby-RT-AC
 
 	for (ink = sint->color; ink != NULL; ink = ink->next) {
 	    const colortype *beforenow = sint->color;
 
-<<<<<<< HEAD
-	    for (; beforenow != this_color &&
-		(beforenow->fg != this_color->fg ||
-		beforenow->bg != this_color->bg ||
-		beforenow->bright != this_color->bright);
-		beforenow = beforenow->next)
-		;
-
-	    if (beforenow != this_color)
-		this_color->pairnum = beforenow->pairnum;
-	    else {
-		this_color->pairnum = color_pair;
-		color_pair++;
-	    }
-=======
 	    while (beforenow != ink && (beforenow->fg != ink->fg ||
 					beforenow->bg != ink->bg ||
 					beforenow->bright != ink->bright))
@@ -123,7 +97,6 @@ void set_colorpairs(void)
 
 	    ink->attributes = COLOR_PAIR(ink->pairnum) |
 				(ink->bright ? A_BOLD : A_NORMAL);
->>>>>>> origin/tomato-shibby-RT-AC
 	}
     }
 }
@@ -131,12 +104,6 @@ void set_colorpairs(void)
 /* Initialize the color information. */
 void color_init(void)
 {
-<<<<<<< HEAD
-    assert(openfile != NULL);
-
-    if (has_colors()) {
-	const colortype *tmpcolor;
-=======
     const colortype *ink;
     bool using_defaults = FALSE;
     short foreground, background;
@@ -145,317 +112,196 @@ void color_init(void)
     if (!has_colors())
 	return;
 
->>>>>>> origin/tomato-shibby-RT-AC
 #ifdef HAVE_USE_DEFAULT_COLORS
-	bool defok;
+    /* Allow using the default colors, if available. */
+    using_defaults = (use_default_colors() != ERR);
 #endif
 
-<<<<<<< HEAD
-	start_color();
-=======
     /* For each coloring expression, initialize the color pair. */
     for (ink = openfile->colorstrings; ink != NULL; ink = ink->next) {
 	foreground = ink->fg;
 	background = ink->bg;
->>>>>>> origin/tomato-shibby-RT-AC
 
-#ifdef HAVE_USE_DEFAULT_COLORS
-	/* Use the default colors, if available. */
-	defok = (use_default_colors() != ERR);
-#endif
+	if (foreground == -1 && !using_defaults)
+	    foreground = COLOR_WHITE;
 
-<<<<<<< HEAD
-	for (tmpcolor = openfile->colorstrings; tmpcolor != NULL;
-		tmpcolor = tmpcolor->next) {
-	    short foreground = tmpcolor->fg, background = tmpcolor->bg;
-	    if (foreground == -1) {
-#ifdef HAVE_USE_DEFAULT_COLORS
-		if (!defok)
-=======
+	if (background == -1 && !using_defaults)
+	    background = COLOR_BLACK;
+
 	init_pair(ink->pairnum, foreground, background);
 #ifdef DEBUG
 	fprintf(stderr, "init_pair(): fg = %hd, bg = %hd\n", foreground, background);
->>>>>>> origin/tomato-shibby-RT-AC
 #endif
-		    foreground = COLOR_WHITE;
-	    }
-
-	    if (background == -1) {
-#ifdef HAVE_USE_DEFAULT_COLORS
-		if (!defok)
-#endif
-		    background = COLOR_BLACK;
-	    }
-
-	    init_pair(tmpcolor->pairnum, foreground, background);
-
-#ifdef DEBUG
-	    fprintf(stderr, "init_pair(): fg = %hd, bg = %hd\n", tmpcolor->fg, tmpcolor->bg);
-#endif
-	}
     }
 }
 
-/* Update the color information based on the current filename. */
+/* Try to match the given shibboleth string with one of the regexes in
+ * the list starting at head.  Return TRUE upon success. */
+bool found_in_list(regexlisttype *head, const char *shibboleth)
+{
+    regexlisttype *item;
+    regex_t rgx;
+
+    for (item = head; item != NULL; item = item->next) {
+	regcomp(&rgx, fixbounds(item->full_regex), NANO_REG_EXTENDED);
+
+	if (regexec(&rgx, shibboleth, 0, NULL, 0) == 0) {
+	    regfree(&rgx);
+	    return TRUE;
+	}
+
+	regfree(&rgx);
+    }
+
+    return FALSE;
+}
+
+/* Update the color information based on the current filename and content. */
 void color_update(void)
 {
-    syntaxtype *tmpsyntax;
-    syntaxtype *defsyntax = NULL;
-    colortype *tmpcolor, *defcolor = NULL;
+    syntaxtype *sint = NULL;
+    colortype *ink;
 
-<<<<<<< HEAD
-    assert(openfile != NULL);
-
-    openfile->syntax = NULL;
-    openfile->colorstrings = NULL;
-=======
     /* If the rcfiles were not read, or contained no syntaxes, get out. */
     if (syntaxes == NULL)
 	return;
->>>>>>> origin/tomato-shibby-RT-AC
 
-    /* If we specified a syntax override string, use it. */
+    /* If we specified a syntax-override string, use it. */
     if (syntaxstr != NULL) {
-	/* If the syntax override is "none", it's the same as not having
-	 * a syntax at all, so get out. */
+	/* An override of "none" is like having no syntax at all. */
 	if (strcmp(syntaxstr, "none") == 0)
 	    return;
 
-	for (tmpsyntax = syntaxes; tmpsyntax != NULL;
-		tmpsyntax = tmpsyntax->next) {
-	    if (strcmp(tmpsyntax->desc, syntaxstr) == 0) {
-		openfile->syntax = tmpsyntax;
-		openfile->colorstrings = tmpsyntax->color;
-	    }
+	for (sint = syntaxes; sint != NULL; sint = sint->next) {
+	    if (strcmp(sint->name, syntaxstr) == 0)
+		break;
+	}
 
-	    if (openfile->colorstrings != NULL)
+	if (sint == NULL)
+	    statusline(ALERT, _("Unknown syntax name: %s"), syntaxstr);
+    }
+
+    /* If no syntax-override string was specified, or it didn't match,
+     * try finding a syntax based on the filename (extension). */
+    if (sint == NULL) {
+	char *reserved = charalloc(PATH_MAX + 1);
+	char *currentdir = getcwd(reserved, PATH_MAX + 1);
+	char *joinednames = charalloc(PATH_MAX + 1);
+	char *fullname = NULL;
+
+	if (currentdir == NULL)
+	    free(reserved);
+	else {
+	    /* Concatenate the current working directory with the
+	     * specified filename, and canonicalize the result. */
+	    sprintf(joinednames, "%s/%s", currentdir, openfile->filename);
+	    fullname = get_full_path(joinednames);
+	    free(currentdir);
+	}
+
+	if (fullname == NULL)
+	    fullname = mallocstrcpy(fullname, openfile->filename);
+
+	for (sint = syntaxes; sint != NULL; sint = sint->next) {
+	    if (found_in_list(sint->extensions, fullname))
+		break;
+	}
+
+	free(joinednames);
+	free(fullname);
+    }
+
+    /* If the filename didn't match anything, try the first line. */
+    if (sint == NULL) {
+#ifdef DEBUG
+	fprintf(stderr, "No result from file extension, trying headerline...\n");
+#endif
+	for (sint = syntaxes; sint != NULL; sint = sint->next) {
+	    if (found_in_list(sint->headers, openfile->fileage->data))
 		break;
 	}
     }
 
-    /* If we didn't specify a syntax override string, or if we did and
-     * there was no syntax by that name, get the syntax based on the
-     * file extension, and then look in the header. */
-    if (openfile->colorstrings == NULL) {
-	for (tmpsyntax = syntaxes; tmpsyntax != NULL;
-		tmpsyntax = tmpsyntax->next) {
-	    exttype *e;
-
-	    /* If this is the default syntax, it has no associated
-	     * extensions, which we've checked for elsewhere.  Skip over
-	     * it here, but keep track of its color regexes. */
-	    if (strcmp(tmpsyntax->desc, "default") == 0) {
-		defsyntax = tmpsyntax;
-		defcolor = tmpsyntax->color;
-		continue;
+#ifdef HAVE_LIBMAGIC
+    /* If we still don't have an answer, try using magic. */
+    if (sint == NULL) {
+	struct stat fileinfo;
+	magic_t cookie = NULL;
+	const char *magicstring = NULL;
+#ifdef DEBUG
+	fprintf(stderr, "No result from headerline either, trying libmagic...\n");
+#endif
+	if (stat(openfile->filename, &fileinfo) == 0) {
+	    /* Open the magic database and get a diagnosis of the file. */
+	    cookie = magic_open(MAGIC_SYMLINK |
+#ifdef DEBUG
+				    MAGIC_DEBUG | MAGIC_CHECK |
+#endif
+				    MAGIC_ERROR);
+	    if (cookie == NULL || magic_load(cookie, NULL) < 0)
+		statusline(ALERT, _("magic_load() failed: %s"), strerror(errno));
+	    else {
+		magicstring = magic_file(cookie, openfile->filename);
+		if (magicstring == NULL)
+		    statusline(ALERT, _("magic_file(%s) failed: %s"),
+				openfile->filename, magic_error(cookie));
+#ifdef DEBUG
+		fprintf(stderr, "Returned magic string is: %s\n", magicstring);
+#endif
 	    }
+	}
 
-	    for (e = tmpsyntax->extensions; e != NULL; e = e->next) {
-		bool not_compiled = (e->ext == NULL);
-
-		/* e->ext_regex has already been checked for validity
-		 * elsewhere.  Compile its specified regex if we haven't
-		 * already. */
-		if (not_compiled) {
-		    e->ext = (regex_t *)nmalloc(sizeof(regex_t));
-		    regcomp(e->ext, fixbounds(e->ext_regex), REG_EXTENDED);
-		}
-
-		/* Set colorstrings if we matched the extension
-		 * regex. */
-		if (regexec(e->ext, openfile->filename, 0, NULL,
-			0) == 0) {
-		    openfile->syntax = tmpsyntax;
-		    openfile->colorstrings = tmpsyntax->color;
-		}
-
-		if (openfile->colorstrings != NULL)
+	/* Now try and find a syntax that matches the magic string. */
+	if (magicstring != NULL) {
+	    for (sint = syntaxes; sint != NULL; sint = sint->next) {
+		if (found_in_list(sint->magics, magicstring))
 		    break;
-
-		/* Decompile e->ext_regex's specified regex if we aren't
-		 * going to use it. */
-		if (not_compiled) {
-		    regfree(e->ext);
-		    free(e->ext);
-		    e->ext = NULL;
-		}
 	    }
 	}
 
-	/* If we haven't matched anything yet, try the headers */
-	if (openfile->colorstrings == NULL) {
-#ifdef DEBUG
-	    fprintf(stderr, "No match for file extensions, looking at headers...\n");
-#endif
-	    for (tmpsyntax = syntaxes; tmpsyntax != NULL;
-		tmpsyntax = tmpsyntax->next) {
-		exttype *e;
+	if (stat(openfile->filename, &fileinfo) == 0)
+	    magic_close(cookie);
+    }
+#endif /* HAVE_LIBMAGIC */
 
-		for (e = tmpsyntax->headers; e != NULL; e = e->next) {
-		    bool not_compiled = (e->ext == NULL);
-
-		    /* e->ext_regex has already been checked for validity
-		     * elsewhere.  Compile its specified regex if we haven't
-		     * already. */
-		    if (not_compiled) {
-			e->ext = (regex_t *)nmalloc(sizeof(regex_t));
-			regcomp(e->ext, fixbounds(e->ext_regex), REG_EXTENDED);
-		    }
-
-		    /* Set colorstrings if we matched the extension
-		     * regex. */
-#ifdef DEBUG
-		fprintf(stderr, "Comparing header regex \"%s\" to fileage \"%s\"...\n", e->ext_regex, openfile->fileage->data);
-#endif
-		    if (regexec(e->ext, openfile->fileage->data, 0, NULL, 0) == 0) {
-			openfile->syntax = tmpsyntax;
-			openfile->colorstrings = tmpsyntax->color;
-		    }
-
-		    if (openfile->colorstrings != NULL)
-			break;
-
-		    /* Decompile e->ext_regex's specified regex if we aren't
-		     * going to use it. */
-		    if (not_compiled) {
-			regfree(e->ext);
-			free(e->ext);
-			e->ext = NULL;
-		    }
-		}
-	    }
+    /* If nothing at all matched, see if there is a default syntax. */
+    if (sint == NULL) {
+	for (sint = syntaxes; sint != NULL; sint = sint->next) {
+	    if (strcmp(sint->name, "default") == 0)
+		break;
 	}
     }
 
+    openfile->syntax = sint;
+    openfile->colorstrings = (sint == NULL ? NULL : sint->color);
 
-    /* If we didn't get a syntax based on the file extension, and we
-     * have a default syntax, use it. */
-    if (openfile->colorstrings == NULL && defcolor != NULL) {
-	openfile->syntax = defsyntax;
-	openfile->colorstrings = defcolor;
-    }
-
-    for (tmpcolor = openfile->colorstrings; tmpcolor != NULL;
-	tmpcolor = tmpcolor->next) {
-	/* tmpcolor->start_regex and tmpcolor->end_regex have already
-	 * been checked for validity elsewhere.  Compile their specified
-	 * regexes if we haven't already. */
-	if (tmpcolor->start == NULL) {
-	    tmpcolor->start = (regex_t *)nmalloc(sizeof(regex_t));
-	    regcomp(tmpcolor->start, fixbounds(tmpcolor->start_regex),
-		REG_EXTENDED | (tmpcolor->icase ? REG_ICASE : 0));
+    /* If a syntax was found, compile its specified regexes (which have
+     * already been checked for validity when they were read in). */
+    for (ink = openfile->colorstrings; ink != NULL; ink = ink->next) {
+	if (ink->start == NULL) {
+	    ink->start = (regex_t *)nmalloc(sizeof(regex_t));
+	    regcomp(ink->start, fixbounds(ink->start_regex), ink->rex_flags);
 	}
 
-	if (tmpcolor->end_regex != NULL && tmpcolor->end == NULL) {
-	    tmpcolor->end = (regex_t *)nmalloc(sizeof(regex_t));
-	    regcomp(tmpcolor->end, fixbounds(tmpcolor->end_regex),
-		REG_EXTENDED | (tmpcolor->icase ? REG_ICASE : 0));
+	if (ink->end_regex != NULL && ink->end == NULL) {
+	    ink->end = (regex_t *)nmalloc(sizeof(regex_t));
+	    regcomp(ink->end, fixbounds(ink->end_regex), ink->rex_flags);
 	}
     }
 }
 
-<<<<<<< HEAD
-/* Reset the multicolor info cache for records for any lines which need
-   to be recalculated */
-void reset_multis_after(filestruct *fileptr, int mindex)
-{
-    filestruct *oof;
-    for (oof = fileptr->next; oof != NULL; oof = oof->next) {
-	alloc_multidata_if_needed(oof);
-	if (oof->multidata == NULL)
-	    continue;
-	if (oof->multidata[mindex] != CNONE)
-	    oof->multidata[mindex] = -1;
-	else
-	    break;
-    }
-    for (; oof != NULL; oof = oof->next) {
-	alloc_multidata_if_needed(oof);
-	if (oof->multidata == NULL)
-	    continue;
-	if (oof->multidata[mindex] == CNONE)
-	    oof->multidata[mindex] = -1;
-	else
-	    break;
-    }
-    edit_refresh_needed = TRUE;
-}
-
-void reset_multis_before(filestruct *fileptr, int mindex)
-{
-    filestruct *oof;
-    for (oof = fileptr->prev; oof != NULL; oof = oof->prev) {
-	alloc_multidata_if_needed(oof);
-	if (oof->multidata == NULL)
-	    continue;
-	if (oof->multidata[mindex] != CNONE)
-	    oof->multidata[mindex] = -1;
-	else
-	    break;
-    }
-    for (; oof != NULL; oof = oof->prev) {
-	alloc_multidata_if_needed(oof);
-	if (oof->multidata == NULL)
-	    continue;
-	if (oof->multidata[mindex] == CNONE)
-	    oof->multidata[mindex] = -1;
-	else
-	    break;
-    }
-
-    edit_refresh_needed = TRUE;
-}
-
-/* Reset one multiline regex info */
-void reset_multis_for_id(filestruct *fileptr, int num)
-{
-    reset_multis_before(fileptr, num);
-    reset_multis_after(fileptr, num);
-    fileptr->multidata[num] = -1;
-}
-
-/* Reset multi line strings around a filestruct ptr, trying to be smart about stopping
-   force = reset everything regardless, useful when we don't know how much screen state
-           has changed  */
-void reset_multis(filestruct *fileptr, bool force)
-{
-    int nobegin, noend;
-=======
 /* Determine whether the matches of multiline regexes are still the same,
  * and if not, schedule a screen refresh, so things will be repainted. */
 void check_the_multis(filestruct *line)
 {
     const colortype *ink;
     bool astart, anend;
->>>>>>> origin/tomato-shibby-RT-AC
     regmatch_t startmatch, endmatch;
 
-    if (!openfile->syntax)
+    /* If there is no syntax or no multiline regex, there is nothing to do. */
+    if (openfile->syntax == NULL || openfile->syntax->nmultis == 0)
 	return;
 
-<<<<<<< HEAD
-    for (; tmpcolor != NULL; tmpcolor = tmpcolor->next) {
-
-	/* If it's not a multi-line regex, amscray */
-	if (tmpcolor->end == NULL)
-	    continue;
-
-	alloc_multidata_if_needed(fileptr);
-	if (force == TRUE) {
-	    reset_multis_for_id(fileptr, tmpcolor->id);
-	    continue;
-	}
-
-	/* Figure out where the first begin and end are to determine if
-	   things changed drastically for the precalculated multi values */
-        nobegin = regexec(tmpcolor->start, fileptr->data, 1, &startmatch, 0);
-        noend = regexec(tmpcolor->end, fileptr->data, 1, &endmatch, 0);
-	if (fileptr->multidata[tmpcolor->id] ==  CWHOLELINE) {
-	    if (nobegin && noend)
-		continue;
-	} else if (fileptr->multidata[tmpcolor->id] == CNONE) {
-	    if (nobegin && noend)
-=======
     for (ink = openfile->colorstrings; ink != NULL; ink = ink->next) {
 	/* If it's not a multiline regex, skip. */
 	if (ink->end == NULL)
@@ -479,21 +325,9 @@ void check_the_multis(filestruct *line)
 		continue;
 	} else if (line->multidata[ink->id] == CENDAFTER) {
 	    if (astart && !anend)
->>>>>>> origin/tomato-shibby-RT-AC
 		continue;
-	}  else if (fileptr->multidata[tmpcolor->id] & CBEGINBEFORE && !noend
-	  && (nobegin || endmatch.rm_eo > startmatch.rm_eo)) {
-	    reset_multis_after(fileptr, tmpcolor->id);
-	    continue;
 	}
 
-<<<<<<< HEAD
-	/* If we got here assume the worst */
-	reset_multis_for_id(fileptr, tmpcolor->id);
-    }
-}
-#endif /* ENABLE_COLOR */
-=======
 	/* There is a mismatch, so something changed: repaint. */
 	refresh_needed = TRUE;
 	return;
@@ -604,4 +438,3 @@ void precalc_multicolorinfo(void)
 }
 
 #endif /* !DISABLE_COLOR */
->>>>>>> origin/tomato-shibby-RT-AC

@@ -11,7 +11,7 @@
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -79,16 +79,12 @@ Curl_ip2addr(int af, const void *inaddr, const char *hostname, int port);
 
 Curl_addrinfo *Curl_str2addr(char *dotted, int port);
 
-<<<<<<< HEAD
-#if defined(CURLDEBUG) && defined(HAVE_FREEADDRINFO)
-=======
 #ifdef USE_UNIX_SOCKETS
 Curl_addrinfo *Curl_unix2addr(const char *path, bool *longpath, bool abstract);
 #endif
 
 #if defined(CURLDEBUG) && defined(HAVE_GETADDRINFO) && \
     defined(HAVE_FREEADDRINFO)
->>>>>>> origin/tomato-shibby-RT-AC
 void
 curl_dofreeaddrinfo(struct addrinfo *freethis,
                     int line, const char *source);

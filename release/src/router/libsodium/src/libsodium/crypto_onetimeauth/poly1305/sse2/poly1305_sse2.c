@@ -109,20 +109,11 @@ static POLY1305_NOINLINE void
 poly1305_init_ext(poly1305_state_internal_t *st, const unsigned char key[32],
                   unsigned long long bytes)
 {
-<<<<<<< HEAD
-    uint32_t *R;
-    uint128_t d[3],m0;
-    uint64_t r0,r1,r2;
-    uint32_t rp0,rp1,rp2,rp3,rp4;
-    uint64_t rt0,rt1,rt2,st2,c;
-    uint64_t t0,t1;
-=======
     uint32_t *         R;
     uint128_t          d[3];
     uint64_t           r0, r1, r2;
     uint64_t           rt0, rt1, rt2, st2, c;
     uint64_t           t0, t1;
->>>>>>> origin/tomato-shibby-RT-AC
     unsigned long long i;
 
     if (!bytes) {
@@ -211,22 +202,6 @@ static POLY1305_NOINLINE void
 poly1305_blocks(poly1305_state_internal_t *st, const unsigned char *m,
                 unsigned long long bytes)
 {
-<<<<<<< HEAD
-    CRYPTO_ALIGN(64) xmmi HIBIT = _mm_shuffle_epi32(_mm_cvtsi32_si128(1 << 24), _MM_SHUFFLE(1,0,1,0));
-    const xmmi MMASK = _mm_shuffle_epi32(_mm_cvtsi32_si128((1 << 26) - 1), _MM_SHUFFLE(1,0,1,0));
-    const xmmi FIVE = _mm_shuffle_epi32(_mm_cvtsi32_si128(5), _MM_SHUFFLE(1,0,1,0));
-    xmmi H0,H1,H2,H3,H4;
-    xmmi T0,T1,T2,T3,T4,T5,T6,T7,T8;
-    xmmi M0,M1,M2,M3,M4;
-    xmmi M5,M6,M7,M8,M9;
-    xmmi C1,C2;
-    xmmi R20,R21,R22,R23,R24,S21,S22,S23,S24;
-    xmmi R40,R41,R42,R43,R44,S41,S42,S43,S44;
-
-    if (st->flags & poly1305_final_shift8) HIBIT = _mm_srli_si128(HIBIT, 8);
-    if (st->flags & poly1305_final_shift16) HIBIT = _mm_setzero_si128();
-
-=======
     CRYPTO_ALIGN(64)
     xmmi HIBIT =
         _mm_shuffle_epi32(_mm_cvtsi32_si128(1 << 24), _MM_SHUFFLE(1, 0, 1, 0));
@@ -248,7 +223,6 @@ poly1305_blocks(poly1305_state_internal_t *st, const unsigned char *m,
     if (st->flags & poly1305_final_shift16) {
         HIBIT = _mm_setzero_si128();
     }
->>>>>>> origin/tomato-shibby-RT-AC
     if (!(st->flags & poly1305_started)) {
         /* H = [Mx,My] */
         T5 = _mm_unpacklo_epi64(
@@ -835,12 +809,7 @@ static POLY1305_NOINLINE void
 poly1305_finish_ext(poly1305_state_internal_t *st, const unsigned char *m,
                     unsigned long long leftover, unsigned char mac[16])
 {
-<<<<<<< HEAD
-    uint64_t h0,h1,h2;
-    uint64_t t0,t1,c;
-=======
     uint64_t h0, h1, h2;
->>>>>>> origin/tomato-shibby-RT-AC
 
     if (leftover) {
         CRYPTO_ALIGN(16) unsigned char final[32] = { 0 };

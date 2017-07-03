@@ -1,17 +1,8 @@
-# Czech translation for nano
+# Czech translation for nano.
 # Copyright (C) 2010 Free Software Foundation, Inc.
 # This file is distributed under the same license as the nano package.
 #
-# Pavel Fric <pavelfric@seznam.cz>, 2010.
 # Václav Haisman <V.Haisman@sh.cvut.cz>, 2000, 2001.
-<<<<<<< HEAD
-msgid ""
-msgstr ""
-"Project-Id-Version: nano 2.2.4pre2\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-11-22 06:34-0500\n"
-"PO-Revision-Date: 2010-10-19 22:11+0100\n"
-=======
 # Pavel Fric <pavelfric@seznam.cz>, 2010, 2012, 2013, 2014, 2015, 2016.
 msgid ""
 msgstr ""
@@ -19,93 +10,16 @@ msgstr ""
 "Report-Msgid-Bugs-To: nano-devel@gnu.org\n"
 "POT-Creation-Date: 2017-03-31 11:02+0200\n"
 "PO-Revision-Date: 2016-12-25 21:38+0100\n"
->>>>>>> origin/tomato-shibby-RT-AC
 "Last-Translator: Pavel Fric <pavelfric@seznam.cz>\n"
 "Language-Team: Czech <translation-team-cs@lists.sourceforge.net>\n"
+"Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Bugs: Report translation errors to the Language-Team address.\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Lokalize 1.0\n"
+"X-Generator: Lokalize 1.5\n"
 
-<<<<<<< HEAD
-#: src/browser.c:220
-msgid "Go To Directory"
-msgstr "Jít do adresáře"
-
-#: src/browser.c:233 src/browser.c:830 src/files.c:860 src/files.c:2048
-#: src/nano.c:1060 src/search.c:220 src/search.c:314 src/search.c:975
-#: src/search.c:1040
-msgid "Cancelled"
-msgstr "Zrušeno"
-
-#: src/browser.c:266 src/browser.c:314
-#, c-format
-msgid "Can't go outside of %s in restricted mode"
-msgstr "V omezeném režimu nelze jít mimo %s"
-
-#: src/browser.c:277 src/browser.c:324 src/browser.c:347 src/files.c:722
-#: src/files.c:731 src/files.c:1540 src/files.c:1659 src/files.c:1711
-#: src/files.c:1732 src/files.c:1855 src/files.c:2691 src/rcfile.c:568
-#: src/rcfile.c:1204
-#, c-format
-msgid "Error reading %s: %s"
-msgstr "Chyba při čtení: %s: %s"
-
-#: src/browser.c:303
-msgid "Can't move up a directory"
-msgstr "Nepodařilo se přejít do nadřazeného adresáře"
-
-#. TRANSLATORS: Try to keep this at most 7
-#. * characters.
-#: src/browser.c:665 src/browser.c:674
-msgid "(dir)"
-msgstr "(adresář)"
-
-#. TRANSLATORS: Try to keep this at most 12
-#. * characters.
-#: src/browser.c:671
-msgid "(parent dir)"
-msgstr "(rodičovský adresář)"
-
-#: src/browser.c:801 src/search.c:185
-msgid "Search"
-msgstr "Hledat"
-
-#. TRANSLATORS: This string is just a modifier for the search
-#. * prompt; no grammar is implied.
-#: src/browser.c:805 src/search.c:189
-msgid " [Case Sensitive]"
-msgstr " [Rozlišovat velikost písmen]"
-
-#. TRANSLATORS: This string is just a modifier for the search
-#. * prompt; no grammar is implied.
-#: src/browser.c:811 src/search.c:195
-msgid " [Regexp]"
-msgstr " [regulární výraz]"
-
-#. TRANSLATORS: This string is just a modifier for the search
-#. * prompt; no grammar is implied.
-#: src/browser.c:817 src/search.c:201
-msgid " [Backwards]"
-msgstr " [Zpět]"
-
-#: src/browser.c:909 src/browser.c:917 src/search.c:395
-msgid "Search Wrapped"
-msgstr "Hledání dokončeno"
-
-#: src/browser.c:1006 src/browser.c:1039 src/search.c:514 src/search.c:517
-#: src/search.c:574 src/search.c:577
-msgid "This is the only occurrence"
-msgstr "Toto je jediný výskyt"
-
-#: src/browser.c:1042 src/search.c:583
-msgid "No current search pattern"
-msgstr "Žádný současný vzor hledání"
-
-#: src/files.c:125
-=======
 #: src/browser.c:72
 #, c-format
 msgid "Cannot open directory: %s"
@@ -254,18 +168,10 @@ msgid "File %s is being edited (by %s with %s, PID %s); continue?"
 msgstr "Soubor %s je upravován (%s s %s, ID procesu %s); pokračovat?"
 
 #: src/files.c:446
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Can't insert file from outside of %s"
 msgstr "Nelze vložit soubor z vně %s"
 
-<<<<<<< HEAD
-#: src/files.c:234
-msgid "No more open file buffers"
-msgstr "Žádné další otevřené souborové vyrovnávací paměti"
-
-#: src/files.c:250
-=======
 #: src/files.c:461 src/files.c:987 src/rcfile.c:540
 #, c-format
 msgid "\"%s\" is a directory"
@@ -281,18 +187,10 @@ msgid "No more open file buffers"
 msgstr "Žádné další otevřené souborové vyrovnávací paměti"
 
 #: src/files.c:643
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Switched to %s"
 msgstr "Přepnuto na %s"
 
-<<<<<<< HEAD
-#: src/files.c:251 src/global.c:469 src/winio.c:2168
-msgid "New Buffer"
-msgstr "Nová vyrovnávací paměť"
-
-#: src/files.c:633
-=======
 #: src/files.c:645 src/global.c:985 src/winio.c:1982
 msgid "New Buffer"
 msgstr "Nová vyrovnávací paměť"
@@ -304,7 +202,6 @@ msgstr "Soubor '%s' je nezapisovatelný"
 
 #. TRANSLATORS: Keep the next four messages at most 78 characters.
 #: src/files.c:917
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Read %lu line (Converted from DOS and Mac format)"
 msgid_plural "Read %lu lines (Converted from DOS and Mac format)"
@@ -312,29 +209,7 @@ msgstr[0] "Přečten jeden řádek (převeden z formátu DOS a Mac)"
 msgstr[1] "Přečteny %lu řádky (převedeny z formátu DOS a Mac)"
 msgstr[2] "Přečteno %lu řádků (převedeny z formátu DOS a Mac)"
 
-<<<<<<< HEAD
-#: src/files.c:638
-#, c-format
-msgid ""
-"Read %lu line (Converted from DOS and Mac format - Warning: No write "
-"permission)"
-msgid_plural ""
-"Read %lu lines (Converted from DOS and Mac format - Warning: No write "
-"permission)"
-msgstr[0] ""
-"Přečten jeden řádek (převeden z formátu DOS a Mac - Varování: Žádné "
-"oprávnění pro zápis)"
-msgstr[1] ""
-"Přečteny %lu řádky (převedeny z formátu DOS a Mac - Varování: Žádné "
-"oprávnění pro zápis)"
-msgstr[2] ""
-"Přečteno %lu řádků (převedeny z formátu DOS a Mac - Varování: Žádné "
-"oprávnění pro zápis)"
-
-#: src/files.c:644
-=======
 #: src/files.c:922
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Read %lu line (Converted from Mac format)"
 msgid_plural "Read %lu lines (Converted from Mac format)"
@@ -342,27 +217,7 @@ msgstr[0] "Přečten jeden řádek (převeden z formátu Mac)"
 msgstr[1] "Přečteny %lu řádky (převedeny z formátu Mac)"
 msgstr[2] "Přečteno %lu řádků (převedeny z formátu Mac)"
 
-<<<<<<< HEAD
-#: src/files.c:648
-#, c-format
-msgid ""
-"Read %lu line (Converted from Mac format - Warning: No write permission)"
-msgid_plural ""
-"Read %lu lines (Converted from Mac format - Warning: No write permission)"
-msgstr[0] ""
-"Přečten jeden řádek (převeden z formátu Mac - Varování: Žádné oprávnění pro "
-"zápis)"
-msgstr[1] ""
-"Přečteny %lu řádky (převedeny z formátu Mac - Varování: Žádné oprávnění pro "
-"zápis)"
-msgstr[2] ""
-"Přečteno %lu řádků (převedeny z formátu Mac - Varování: Žádné oprávnění pro "
-"zápis)"
-
-#: src/files.c:654
-=======
 #: src/files.c:927
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Read %lu line (Converted from DOS format)"
 msgid_plural "Read %lu lines (Converted from DOS format)"
@@ -370,27 +225,7 @@ msgstr[0] "Přečten jeden řádek (převeden z formátu DOS)"
 msgstr[1] "Přečteny %lu řádky (převedeny z formátu DOS)"
 msgstr[2] "Přečteno %lu řádků (převedeny z formátu DOS)"
 
-<<<<<<< HEAD
-#: src/files.c:658
-#, c-format
-msgid ""
-"Read %lu line (Converted from DOS format - Warning: No write permission)"
-msgid_plural ""
-"Read %lu lines (Converted from DOS format - Warning: No write permission)"
-msgstr[0] ""
-"Přečten jeden řádek (převeden z formátu DOS - Varování: Žádné oprávnění pro "
-"zápis)"
-msgstr[1] ""
-"Přečteny %lu řádky (převedeny z formátu DOS - Varování: Žádné oprávnění pro "
-"zápis)"
-msgstr[2] ""
-"Přečteno %lu řádků (převedeny z formátu DOSc - Varování: Žádné oprávnění pro "
-"zápis)"
-
-#: src/files.c:664
-=======
 #: src/files.c:933
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Read %lu line"
 msgid_plural "Read %lu lines"
@@ -398,35 +233,6 @@ msgstr[0] "Přečten jeden řádek"
 msgstr[1] "Přečteny %lu řádky"
 msgstr[2] "Přečteno %lu řádků"
 
-<<<<<<< HEAD
-#: src/files.c:667
-#, c-format
-msgid "Read %lu line ( Warning: No write permission)"
-msgid_plural "Read %lu lines (Warning: No write permission)"
-msgstr[0] "Přečten jeden řádek (Varování: Žádné oprávnění pro zápis)"
-msgstr[1] "Přečteny %lu řádky (Varování: Žádné oprávnění pro zápis)"
-msgstr[2] "Přečteno %lu řádků (Varování: Žádné oprávnění pro zápis)"
-
-#: src/files.c:700 src/files.c:736
-msgid "Reading File"
-msgstr "Čte se soubor"
-
-#: src/files.c:706
-msgid "New File"
-msgstr "Nový soubor"
-
-#: src/files.c:709
-#, c-format
-msgid "\"%s\" not found"
-msgstr "\"%s\" nenalezen"
-
-#: src/files.c:717 src/rcfile.c:559 src/rcfile.c:1154 src/rcfile.c:1195
-#, c-format
-msgid "\"%s\" is a directory"
-msgstr "„%s“ je adresář"
-
-#: src/files.c:718 src/rcfile.c:560 src/rcfile.c:1155 src/rcfile.c:1196
-=======
 #: src/files.c:973
 msgid "New File"
 msgstr "Nový soubor"
@@ -437,38 +243,10 @@ msgid "File \"%s\" not found"
 msgstr "Soubor \"%s\" nenalezen"
 
 #: src/files.c:988 src/rcfile.c:541
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "\"%s\" is a device file"
 msgstr "\"%s\" je soubor zařízení"
 
-<<<<<<< HEAD
-#: src/files.c:817
-#, c-format
-msgid "Command to execute in new buffer [from %s] "
-msgstr "Příkaz k provedení v nové vyrovnávací paměti [z %s] "
-
-#: src/files.c:819
-#, c-format
-msgid "Command to execute [from %s] "
-msgstr "Příkaz k provedení [z %s] "
-
-#: src/files.c:825
-#, c-format
-msgid "File to insert into new buffer [from %s] "
-msgstr "Soubor k vložení do nové vyrovnávací paměti [z %s] "
-
-#: src/files.c:827
-#, c-format
-msgid "File to insert [from %s] "
-msgstr "Soubor k vložení [z %s] "
-
-#: src/files.c:1077
-msgid "Key invalid in non-multibuffer mode"
-msgstr "Klávesa nepřípustná, když není v režimu více vyrovnávacích pamětí"
-
-#: src/files.c:1486
-=======
 #: src/files.c:1006
 msgid "Reading File"
 msgstr "Čte se soubor"
@@ -510,37 +288,16 @@ msgstr ""
 "si jisti) "
 
 #: src/files.c:1627
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Can't write outside of %s"
 msgstr "Nelze zapsat vně %s"
 
-<<<<<<< HEAD
-#: src/files.c:1501
-msgid "Cannot prepend or append to a symlink with --nofollow set"
-msgstr ""
-"Nelze připojit dopředu nebo dozadu k symbolickému odkazu, když je nastaveno "
-"--nofollow"
-
-#: src/files.c:1581 src/files.c:1603 src/files.c:1621 src/files.c:1632
-#: src/files.c:1640 src/files.c:1667
-=======
 #: src/files.c:1710 src/files.c:1735 src/files.c:1753 src/files.c:1766
 #: src/files.c:1777 src/files.c:1805
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Error writing backup file %s: %s"
 msgstr "Chyba při zápisu zálohovacího souboru %s: %s"
 
-<<<<<<< HEAD
-#: src/files.c:1582 src/nano.c:701
-msgid "Too many backup files?"
-msgstr "Příliš mnoho zálohovacích souborů?"
-
-#: src/files.c:1687 src/files.c:1744 src/files.c:1763 src/files.c:1775
-#: src/files.c:1799 src/files.c:1817 src/files.c:1827 src/files.c:1863
-#: src/files.c:1868 src/files.c:2764 src/files.c:2773
-=======
 #: src/files.c:1711 src/nano.c:663
 msgid "Too many backup files?"
 msgstr "Příliš mnoho zálohovacích souborů?"
@@ -553,21 +310,11 @@ msgstr "Chyba při zápisu dočasného souboru s: %s"
 
 #: src/files.c:1890 src/files.c:1900 src/files.c:1920 src/files.c:1937
 #: src/files.c:1947 src/files.c:1979 src/files.c:1986
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Error writing %s: %s"
 msgstr "Chyba při zápisu %s: %s"
 
-<<<<<<< HEAD
-#: src/files.c:1721 src/text.c:2929 src/text.c:2941
-#, c-format
-msgid "Error writing temp file: %s"
-msgstr "Chyba při zápisu dočasného souboru s: %s"
-
-#: src/files.c:1900
-=======
 #: src/files.c:2025
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Wrote %lu line"
 msgid_plural "Wrote %lu lines"
@@ -575,21 +322,6 @@ msgstr[0] "Zapsán jeden řádek"
 msgstr[1] "Zapsány %lu řádky"
 msgstr[2] "Zapsáno %lu řádků"
 
-<<<<<<< HEAD
-#: src/files.c:2004
-msgid " [DOS Format]"
-msgstr " [Formát DOS]"
-
-#: src/files.c:2005
-msgid " [Mac Format]"
-msgstr " [Formát Mac]"
-
-#: src/files.c:2007
-msgid " [Backup]"
-msgstr " [Záloha]"
-
-#: src/files.c:2015
-=======
 #: src/files.c:2121
 msgid " [DOS Format]"
 msgstr " [Formát DOS]"
@@ -604,65 +336,25 @@ msgstr " [Záloha]"
 
 #. TRANSLATORS: The next six strings are prompts.
 #: src/files.c:2132
->>>>>>> origin/tomato-shibby-RT-AC
 msgid "Prepend Selection to File"
-msgstr "Připojit výběr k souboru dopředu"
+msgstr "Připojit výběr na začátek souboru"
 
-<<<<<<< HEAD
-#: src/files.c:2016
-=======
 #: src/files.c:2133
->>>>>>> origin/tomato-shibby-RT-AC
 msgid "Append Selection to File"
-msgstr "Připojit výběr k souboru"
+msgstr "Připojit výběr na konec souboru"
 
-<<<<<<< HEAD
-#: src/files.c:2017
-msgid "Write Selection to File"
-msgstr "Zapsat výběr do souboru"
-
-#: src/files.c:2020
-=======
 #: src/files.c:2134
 msgid "Write Selection to File"
 msgstr "Zapsat výběr do souboru"
 
 #: src/files.c:2137
->>>>>>> origin/tomato-shibby-RT-AC
 msgid "File Name to Prepend to"
-msgstr "Název souboru k připojení dopředu"
+msgstr "Název souboru, na jehož začátek provést připojení"
 
-<<<<<<< HEAD
-#: src/files.c:2021
-=======
 #: src/files.c:2138
->>>>>>> origin/tomato-shibby-RT-AC
 msgid "File Name to Append to"
-msgstr "Název souboru k připojení"
+msgstr "Název souboru, na jehož konec provést připojení"
 
-<<<<<<< HEAD
-#: src/files.c:2022
-msgid "File Name to Write"
-msgstr "Název souboru k zapsání"
-
-#: src/files.c:2153
-msgid "File exists, OVERWRITE ? "
-msgstr "Soubor existuje. PŘEPSAT?"
-
-#: src/files.c:2162
-msgid "Save file under DIFFERENT NAME ? "
-msgstr "Uložit soubor pod JINÝM NÁZVEM? "
-
-#: src/files.c:2173
-msgid "File was modified since you opened it, continue saving ? "
-msgstr "Soubor byl poté, co jste jej otevřel, upraven. Pokračovat v ukládání?"
-
-#: src/files.c:2611
-msgid "(more)"
-msgstr "(více)"
-
-#: src/files.c:2694 src/rcfile.c:1220
-=======
 #: src/files.c:2139
 msgid "File Name to Write"
 msgstr "Název souboru k zapsání"
@@ -694,209 +386,14 @@ msgid "(more)"
 msgstr "(více)"
 
 #: src/files.c:2810
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid ""
 "\n"
-"Press Enter to continue starting nano.\n"
+"Press Enter to continue\n"
 msgstr ""
 "\n"
-"Stiskněte klávesu Enter pro pokračování ve spouštění programu nano.\n"
+"Stiskněte klávesu Enter pro pokračování \n"
 
-<<<<<<< HEAD
-#. TRANSLATORS: Try to keep the next five strings at most 10 characters.
-#: src/global.c:415 src/prompt.c:1288
-msgid "Cancel"
-msgstr "Zrušit"
-
-#: src/global.c:416
-msgid "Replace"
-msgstr "Nahradit"
-
-#: src/global.c:417
-msgid "No Replace"
-msgstr "Žádné nahrazení"
-
-#: src/global.c:420
-msgid "Case Sens"
-msgstr "VELKÁ PÍSMENA/malá písmena"
-
-#: src/global.c:421
-msgid "Backwards"
-msgstr "Zpět"
-
-#: src/global.c:425
-msgid "Regexp"
-msgstr "Regulární výraz"
-
-#. TRANSLATORS: Try to keep the next five strings at most 10 characters.
-#: src/global.c:451
-msgid "PrevHstory"
-msgstr "Předchozí historie"
-
-#: src/global.c:452
-msgid "NextHstory"
-msgstr "Další historie"
-
-#: src/global.c:453
-msgid "Go To Text"
-msgstr "Jít na text"
-
-#. TRANSLATORS: Try to keep the next three strings at most 12 characters.
-#: src/global.c:455
-msgid "WhereIs Next"
-msgstr "Kde je další"
-
-#: src/global.c:457
-msgid "First File"
-msgstr "První soubor"
-
-#: src/global.c:458
-msgid "Last File"
-msgstr "Poslední soubor"
-
-#. TRANSLATORS: Try to keep the next nine strings at most 16 characters.
-#: src/global.c:460
-msgid "To Files"
-msgstr "Jít na soubory"
-
-#: src/global.c:462
-msgid "DOS Format"
-msgstr "Formát DOS"
-
-#: src/global.c:463
-msgid "Mac Format"
-msgstr "Formát Mac"
-
-#: src/global.c:464
-msgid "Append"
-msgstr "Připojit"
-
-#: src/global.c:465
-msgid "Prepend"
-msgstr "Připojit dopředu"
-
-#: src/global.c:466
-msgid "Backup File"
-msgstr "Soubor se zálohou"
-
-#: src/global.c:467
-msgid "Execute Command"
-msgstr "Provést příkaz"
-
-#: src/global.c:471
-msgid "Go To Dir"
-msgstr "Jít do adresáře"
-
-#. TRANSLATORS: Try to keep the following strings at most 10 characters.
-#: src/global.c:480
-msgid "Get Help"
-msgstr "Získat nápovědu"
-
-#: src/global.c:481
-msgid "Exit"
-msgstr "Ukončit"
-
-#: src/global.c:482
-msgid "Where Is"
-msgstr "Kde je"
-
-#: src/global.c:483
-msgid "Prev Page"
-msgstr "Předchozí strana"
-
-#: src/global.c:484
-msgid "Next Page"
-msgstr "Další strana"
-
-#: src/global.c:485
-msgid "First Line"
-msgstr "První řádek"
-
-#: src/global.c:486
-msgid "Last Line"
-msgstr "Poslední řádek"
-
-#: src/global.c:487
-msgid "Suspend"
-msgstr "Odložit (na pozadí)"
-
-#: src/global.c:489
-msgid "Beg of Par"
-msgstr "Začátek odstavce"
-
-#: src/global.c:490
-msgid "End of Par"
-msgstr "Konec odstavce"
-
-#: src/global.c:491
-msgid "FullJstify"
-msgstr "Plné zarovnání"
-
-#: src/global.c:493
-msgid "Refresh"
-msgstr "Obnovit"
-
-#: src/global.c:495
-msgid "Insert File"
-msgstr "Vložit soubor"
-
-#: src/global.c:497
-msgid "Go To Line"
-msgstr "Přejít na řádek"
-
-#: src/global.c:500
-msgid "Justify the current paragraph"
-msgstr "Zarovnat nynější odstavec"
-
-#. TRANSLATORS: The next long series of strings are shortcut descriptions;
-#. * they are best kept shorter than 56 characters, but may be longer.
-#: src/global.c:505
-msgid "Cancel the current function"
-msgstr "Zrušit současnou funkci"
-
-#: src/global.c:506
-msgid "Display this help text"
-msgstr "Zobrazit tento text s nápovědou"
-
-#: src/global.c:509
-msgid "Close the current file buffer / Exit from nano"
-msgstr "Zavřít nynější souborovou vyrovnávací paměť/Ukončit nano"
-
-#: src/global.c:511
-msgid "Exit from nano"
-msgstr "Ukončit nano"
-
-#: src/global.c:515
-msgid "Write the current file to disk"
-msgstr "Zapsat nynější soubor na disk"
-
-#: src/global.c:517
-msgid "Insert another file into the current one"
-msgstr "Vložit další soubor do nynějšího"
-
-#: src/global.c:519
-msgid "Search for a string or a regular expression"
-msgstr "Hledat řetězec nebo regulární výraz"
-
-#: src/global.c:520
-msgid "Go to previous screen"
-msgstr "Jít na předchozí obrazovku"
-
-#: src/global.c:521
-msgid "Go to next screen"
-msgstr "Jít na další obrazovku"
-
-#: src/global.c:523
-msgid "Cut the current line and store it in the cutbuffer"
-msgstr "Vyjmout nynější řádek a uložit jej ve schránce"
-
-#: src/global.c:525
-msgid "Uncut from the cutbuffer into the current line"
-msgstr "Vložit ze schránky do nynějšího řádku"
-
-#: src/global.c:527
-=======
 #: src/files.c:2826
 #, c-format
 msgid ""
@@ -1074,93 +571,13 @@ msgid "Uncut from the cutbuffer into the current line"
 msgstr "Vložit ze schránky do nynějšího řádku"
 
 #: src/global.c:513
->>>>>>> origin/tomato-shibby-RT-AC
 msgid "Display the position of the cursor"
-msgstr "Zobrazit polohu ukazovátka"
+msgstr "Zobrazit polohu ukazatele"
 
-<<<<<<< HEAD
-#: src/global.c:529
-=======
 #: src/global.c:515
->>>>>>> origin/tomato-shibby-RT-AC
 msgid "Invoke the spell checker, if available"
-msgstr "Vyvolat ověření pravopisu (je-li dostupné)"
+msgstr "Vyvolat ověřování pravopisu (je-li dostupné)"
 
-<<<<<<< HEAD
-#: src/global.c:531
-msgid "Replace a string or a regular expression"
-msgstr "Nahradit řetězec nebo regulární výraz"
-
-#: src/global.c:532
-msgid "Go to line and column number"
-msgstr "Jít na určitý řádek a sloupec"
-
-#: src/global.c:534
-msgid "Mark text at the cursor position"
-msgstr "Označit text v poloze ukazovátka"
-
-#: src/global.c:535
-msgid "Repeat last search"
-msgstr "Opakovat poslední hledání"
-
-#: src/global.c:537
-msgid "Copy the current line and store it in the cutbuffer"
-msgstr "Zkopírovat nynější řádek a uložit jej ve schránce"
-
-#: src/global.c:538
-msgid "Indent the current line"
-msgstr "Odsadit nynější řádek"
-
-#: src/global.c:539
-msgid "Unindent the current line"
-msgstr "Zrušit odsazení nynějšího řádku"
-
-#: src/global.c:540
-msgid "Undo the last operation"
-msgstr "Zrušit poslední operaci"
-
-#: src/global.c:541
-msgid "Redo the last undone operation"
-msgstr "Zopakovat poslední zrušenou operaci"
-
-#: src/global.c:543
-msgid "Go forward one character"
-msgstr "Jít o jeden znak vpřed"
-
-#: src/global.c:544
-msgid "Go back one character"
-msgstr "Jít o jeden znak zpět"
-
-#: src/global.c:546
-msgid "Go forward one word"
-msgstr "Jít o jedno slovo vpřed"
-
-#: src/global.c:547
-msgid "Go back one word"
-msgstr "Jít o jedno slovo zpět"
-
-#: src/global.c:549
-msgid "Go to previous line"
-msgstr "Jít na předchozí řádek"
-
-#: src/global.c:550
-msgid "Go to next line"
-msgstr "Jít na další řádek"
-
-#: src/global.c:551
-msgid "Go to beginning of current line"
-msgstr "Jít na začátek nynějšího řádku"
-
-#: src/global.c:552
-msgid "Go to end of current line"
-msgstr "Jít na konec nynějšího řádku"
-
-#: src/global.c:555
-msgid "Go to beginning of paragraph; then of previous paragraph"
-msgstr "Jít na začátek odstavce; potom předchozího odstavce"
-
-#: src/global.c:557
-=======
 #: src/global.c:517
 msgid "Replace a string or a regular expression"
 msgstr "Nahradit řetězec nebo regulární výraz"
@@ -1242,25 +659,9 @@ msgid "Go to beginning of paragraph; then of previous paragraph"
 msgstr "Jít na začátek odstavce; potom předchozího odstavce"
 
 #: src/global.c:543
->>>>>>> origin/tomato-shibby-RT-AC
 msgid "Go just beyond end of paragraph; then of next paragraph"
-msgstr "Jít za koneck odstavce; potom dalšího odstavce"
+msgstr "Jít za konec odstavce; potom dalšího odstavce"
 
-<<<<<<< HEAD
-#: src/global.c:560
-msgid "Go to the first line of the file"
-msgstr "Jít na první řádek souboru"
-
-#: src/global.c:562
-msgid "Go to the last line of the file"
-msgstr "Jít na poslední řádek souboru"
-
-#: src/global.c:564
-msgid "Go to the matching bracket"
-msgstr "Jít na odpovídající závorky"
-
-#: src/global.c:566
-=======
 #: src/global.c:545
 msgid "Go to the first line of the file"
 msgstr "Jít na první řádek souboru"
@@ -1274,29 +675,13 @@ msgid "Go to the matching bracket"
 msgstr "Jít na odpovídající závorky"
 
 #: src/global.c:550
->>>>>>> origin/tomato-shibby-RT-AC
 msgid "Scroll up one line without scrolling the cursor"
-msgstr "Posunout obraz o jeden řádek nahoru, aniž by se pohnulo ukazovátko"
+msgstr "Posunout obraz o jeden řádek nahoru, aniž by se pohnul ukazatel"
 
-<<<<<<< HEAD
-#: src/global.c:568
-=======
 #: src/global.c:552
->>>>>>> origin/tomato-shibby-RT-AC
 msgid "Scroll down one line without scrolling the cursor"
-msgstr "Posunout obraz o jeden řádek dolů, aniž by se pohnulo ukazovátko"
+msgstr "Posunout obraz o jeden řádek dolů, aniž by se pohnul ukazatel"
 
-<<<<<<< HEAD
-#: src/global.c:572
-msgid "Switch to the previous file buffer"
-msgstr "Přepnout na předchozí souborovou vyrovnávací paměť"
-
-#: src/global.c:574
-msgid "Switch to the next file buffer"
-msgstr "Přepnout na další souborovou vyrovnávací paměť"
-
-#: src/global.c:577
-=======
 #: src/global.c:555
 msgid "Switch to the previous file buffer"
 msgstr "Přepnout na předchozí souborovou vyrovnávací paměť"
@@ -1306,41 +691,21 @@ msgid "Switch to the next file buffer"
 msgstr "Přepnout na další souborovou vyrovnávací paměť"
 
 #: src/global.c:558
->>>>>>> origin/tomato-shibby-RT-AC
 msgid "Insert the next keystroke verbatim"
-msgstr "Vložit další znak přímo (doslovně, nevykládaný)"
+msgstr "Vložit další znak přímo (takový jaký je)"
 
-<<<<<<< HEAD
-#: src/global.c:579
-=======
 #: src/global.c:559
->>>>>>> origin/tomato-shibby-RT-AC
 msgid "Insert a tab at the cursor position"
-msgstr "Vložit zarážku v poloze ukazovátka"
+msgstr "Vložit zarážku v poloze ukazatele"
 
-<<<<<<< HEAD
-#: src/global.c:581
-=======
 #: src/global.c:560
->>>>>>> origin/tomato-shibby-RT-AC
 msgid "Insert a newline at the cursor position"
-msgstr "Vložit zalomení řádku v poloze ukazovátka"
+msgstr "Vložit zalomení řádku v poloze ukazatele"
 
-<<<<<<< HEAD
-#: src/global.c:583
-=======
 #: src/global.c:561
->>>>>>> origin/tomato-shibby-RT-AC
 msgid "Delete the character under the cursor"
-msgstr "Smazat znak v poloze ukazovátka"
+msgstr "Smazat znak v poloze ukazatele"
 
-<<<<<<< HEAD
-#: src/global.c:585
-msgid "Delete the character to the left of the cursor"
-msgstr "Smazat znak nalevo od polohy ukazovátka"
-
-#: src/global.c:588
-=======
 #: src/global.c:563
 msgid "Delete the character to the left of the cursor"
 msgstr "Smazat znak nalevo od polohy ukazatele"
@@ -1354,41 +719,9 @@ msgid "Cut forward from cursor to next word start"
 msgstr "Vyjmout od ukazatele po začátek dalšího slova"
 
 #: src/global.c:570
->>>>>>> origin/tomato-shibby-RT-AC
 msgid "Cut from the cursor position to the end of the file"
-msgstr "Vyjmout od polohy ukazovátka po konec souboru"
+msgstr "Vyjmout od polohy ukazatele po konec souboru"
 
-<<<<<<< HEAD
-#: src/global.c:591
-msgid "Justify the entire file"
-msgstr "Zarovnat celý soubor"
-
-#: src/global.c:595
-msgid "Count the number of words, lines, and characters"
-msgstr "Spočítat počet slov, řádků a znaků"
-
-#: src/global.c:598
-msgid "Refresh (redraw) the current screen"
-msgstr "Obnovit (překreslit) současnou obrazovku"
-
-#: src/global.c:600
-msgid "Suspend the editor (if suspend is enabled)"
-msgstr "Odložit editor na pozadí (je-li povolen \"suspend\")"
-
-#: src/global.c:603
-msgid "Toggle the case sensitivity of the search"
-msgstr "Přepnout při hledání rozlišování mezi psaním velkých a malých písmen"
-
-#: src/global.c:605
-msgid "Reverse the direction of the search"
-msgstr "Obrátit směr hledání"
-
-#: src/global.c:609
-msgid "Toggle the use of regular expressions"
-msgstr "Přepnout používání regulárních výrazů"
-
-#: src/global.c:613
-=======
 #: src/global.c:573
 msgid "Justify the entire file"
 msgstr "Zarovnat celý soubor"
@@ -1440,33 +773,13 @@ msgid "Toggle the use of regular expressions"
 msgstr "Přepnout používání regulárních výrazů"
 
 #: src/global.c:603
->>>>>>> origin/tomato-shibby-RT-AC
 msgid "Recall the previous search/replace string"
-msgstr "Vybavit předchozí řetězec hledání/nahrazení"
+msgstr "Vyvolat předchozí řetězec hledání/nahrazení"
 
-<<<<<<< HEAD
-#: src/global.c:615
-=======
 #: src/global.c:605
->>>>>>> origin/tomato-shibby-RT-AC
 msgid "Recall the next search/replace string"
-msgstr "Vybavit další řetězec hledání/nahrazení"
+msgstr "Vyvolat další řetězec hledání/nahrazení"
 
-<<<<<<< HEAD
-#: src/global.c:618
-msgid "Go to file browser"
-msgstr "Jít do prohlížeče souborů"
-
-#: src/global.c:621
-msgid "Toggle the use of DOS format"
-msgstr "Přepnout zápis ve formátu DOS"
-
-#: src/global.c:622
-msgid "Toggle the use of Mac format"
-msgstr "Přepnout zápis ve formátu Mac"
-
-#: src/global.c:624
-=======
 #: src/global.c:608
 msgid "Go to file browser"
 msgstr "Jít do prohlížeče souborů"
@@ -1480,150 +793,13 @@ msgid "Toggle the use of Mac format"
 msgstr "Přepnout zápis ve formátu Mac"
 
 #: src/global.c:613
->>>>>>> origin/tomato-shibby-RT-AC
 msgid "Toggle appending"
-msgstr "Přepnout připojování"
+msgstr "Přepnout připojování na konec souboru"
 
-<<<<<<< HEAD
-#: src/global.c:625
-=======
 #: src/global.c:614
->>>>>>> origin/tomato-shibby-RT-AC
 msgid "Toggle prepending"
-msgstr "Přepnout připojování dopředu"
+msgstr "Přepnout připojování na začátek souboru"
 
-<<<<<<< HEAD
-#: src/global.c:628
-msgid "Toggle backing up of the original file"
-msgstr "Přepnout zálohování původního souboru při ukládání"
-
-#: src/global.c:629
-msgid "Execute external command"
-msgstr "Provést vnější příkaz"
-
-#: src/global.c:633
-msgid "Toggle the use of a new buffer"
-msgstr "Přepnout používání nové vyrovnávací paměti"
-
-#: src/global.c:636
-msgid "Exit from the file browser"
-msgstr "Ukončit prohlížeč souborů"
-
-#: src/global.c:638
-msgid "Go to the first file in the list"
-msgstr "Jít na první řádek v seznamu"
-
-#: src/global.c:640
-msgid "Go to the last file in the list"
-msgstr "Jít na poslední řádek v seznamu"
-
-#: src/global.c:641
-msgid "Go to the next file in the list"
-msgstr "Jít na další řádek v seznamu"
-
-#: src/global.c:642
-msgid "Go to the previous file in the list"
-msgstr "Jít na předchozí řádek v seznamu"
-
-#: src/global.c:643
-msgid "Go to directory"
-msgstr "Jít do adresáře"
-
-#. TRANSLATORS: Try to keep this at most 10 characters.
-#: src/global.c:670
-msgid "Close"
-msgstr "Zavřít"
-
-#. TRANSLATORS: Try to keep this at most 10 characters.
-#: src/global.c:679
-msgid "WriteOut"
-msgstr "Uložit"
-
-#. TRANSLATORS: Try to keep this at most 10 characters.
-#: src/global.c:684
-msgid "Justify"
-msgstr "Zarovnat"
-
-#. TRANSLATORS: Try to keep this at most 10 characters.
-#: src/global.c:696
-msgid "Read File"
-msgstr "Otevřít soubor"
-
-#. TRANSLATORS: Try to keep this at most 10 characters.
-#: src/global.c:713
-msgid "Cut Text"
-msgstr "Vyjmout text"
-
-#. TRANSLATORS: Try to keep this at most 10 characters.
-#: src/global.c:718
-msgid "UnJustify"
-msgstr "Zrušit zarovnání"
-
-#. TRANSLATORS: Try to keep this at most 10 characters.
-#: src/global.c:723
-msgid "UnCut Text"
-msgstr "Zrušit vyjmutí textu"
-
-#. TRANSLATORS: Try to keep this at most 10 characters.
-#: src/global.c:728 src/global.c:755
-msgid "Cur Pos"
-msgstr "Poloha ukazovátka"
-
-#. TRANSLATORS: Try to keep this at most 10 characters.
-#: src/global.c:737
-msgid "To Spell"
-msgstr "Pravopis"
-
-#: src/global.c:771
-msgid "Mark Text"
-msgstr "Označit text"
-
-#: src/global.c:777
-msgid "Copy Text"
-msgstr "Kopírovat text"
-
-#: src/global.c:780
-msgid "Indent Text"
-msgstr "Odsadit text"
-
-#: src/global.c:783
-msgid "Unindent Text"
-msgstr "Zrušit odsazení textu"
-
-#: src/global.c:787
-msgid "Undo"
-msgstr "Zpět"
-
-#: src/global.c:790
-msgid "Redo"
-msgstr "Znovu"
-
-#: src/global.c:796 src/global.c:800
-msgid "Forward"
-msgstr "Vpřed"
-
-#: src/global.c:806 src/global.c:810
-msgid "Back"
-msgstr "Zpět"
-
-#: src/global.c:817
-msgid "Next Word"
-msgstr "Další slovo"
-
-#: src/global.c:820
-msgid "Prev Word"
-msgstr "Předchozí slovo"
-
-#: src/global.c:824
-msgid "Prev Line"
-msgstr "Předchozí řádek"
-
-#: src/global.c:827
-msgid "Next Line"
-msgstr "Další řádek"
-
-#: src/global.c:830
-=======
 #: src/global.c:615
 msgid "Toggle backing up of the original file"
 msgstr "Přepnout zálohování původního souboru při ukládání"
@@ -1778,71 +954,9 @@ msgid "Next Word"
 msgstr "Další slovo"
 
 #: src/global.c:818
->>>>>>> origin/tomato-shibby-RT-AC
 msgid "Home"
-msgstr "Poloha 1"
+msgstr "Začátek"
 
-<<<<<<< HEAD
-#: src/global.c:833
-msgid "End"
-msgstr "Konec"
-
-#: src/global.c:845
-msgid "Find Other Bracket"
-msgstr "Najít jiné závorky"
-
-#: src/global.c:848
-msgid "Scroll Up"
-msgstr "Posunout obraz nahoru"
-
-#: src/global.c:851
-msgid "Scroll Down"
-msgstr "Posunout obraz dolů"
-
-#: src/global.c:856
-msgid "Previous File"
-msgstr "Předchozí soubor"
-
-#: src/global.c:858
-msgid "Next File"
-msgstr "Další soubor"
-
-#. TRANSLATORS: This is displayed when the next keystroke will be
-#. * inserted verbatim.
-#: src/global.c:862 src/text.c:3045
-msgid "Verbatim Input"
-msgstr "Přímé zadání"
-
-#: src/global.c:867
-msgid "Tab"
-msgstr "Zarážka"
-
-#: src/global.c:870
-msgid "Enter"
-msgstr "Enter"
-
-#: src/global.c:873
-msgid "Delete"
-msgstr "Delete (smazat následující znak)"
-
-#: src/global.c:876
-msgid "Backspace"
-msgstr "Backspace (smazat předcházející znak)"
-
-#: src/global.c:893
-msgid "CutTillEnd"
-msgstr "Vyjmout až po konec"
-
-#: src/global.c:906
-msgid "Word Count"
-msgstr "Počet slov"
-
-#: src/global.c:1367
-msgid "Help mode"
-msgstr "Režim s nápovědou"
-
-#: src/global.c:1369
-=======
 #: src/global.c:820
 msgid "End"
 msgstr "Konec"
@@ -2024,21 +1138,9 @@ msgid "Help mode"
 msgstr "Režim s nápovědou"
 
 #: src/global.c:1320
->>>>>>> origin/tomato-shibby-RT-AC
 msgid "Constant cursor position display"
-msgstr "Ukazovat stálou polohu ukazovátka"
+msgstr "Ukazovat stálou polohu ukazatele"
 
-<<<<<<< HEAD
-#: src/global.c:1371
-msgid "Use of one more line for editing"
-msgstr "Používání ještě jednoho řádku k úpravám"
-
-#: src/global.c:1373
-msgid "Smooth scrolling"
-msgstr "Plynulé posunování obrazu"
-
-#: src/global.c:1375
-=======
 #: src/global.c:1322
 msgid "Use of one more line for editing"
 msgstr "Používání ještě jednoho řádku k úpravám"
@@ -2052,61 +1154,17 @@ msgid "Soft wrapping of overlong lines"
 msgstr "Plynulé zalamování dlouhých řádků"
 
 #: src/global.c:1328
->>>>>>> origin/tomato-shibby-RT-AC
 msgid "Whitespace display"
-msgstr "Zobrazování prázdného místa"
+msgstr "Zobrazování bílých znaků"
 
-<<<<<<< HEAD
-#: src/global.c:1377
-msgid "Color syntax highlighting"
-msgstr "Barevné zvýrazňování skladby"
-
-#: src/global.c:1379
-=======
 #: src/global.c:1330
 msgid "Color syntax highlighting"
 msgstr "Barevné zvýrazňování skladby"
 
 #: src/global.c:1332
->>>>>>> origin/tomato-shibby-RT-AC
 msgid "Smart home key"
-msgstr "Chytrá klávesa pro Polohu 1"
+msgstr "Chytrá klávesa pro začátek dokumentu (Poloha 1)"
 
-<<<<<<< HEAD
-#: src/global.c:1381
-msgid "Auto indent"
-msgstr "Automaticky odsadit"
-
-#: src/global.c:1383
-msgid "Cut to end"
-msgstr "Vyjmout po konec"
-
-#: src/global.c:1385
-msgid "Long line wrapping"
-msgstr "Zalamování dlouhých řádků"
-
-#: src/global.c:1387
-msgid "Conversion of typed tabs to spaces"
-msgstr "Převod zadaných zarážek na mezery"
-
-#: src/global.c:1389
-msgid "Backup files"
-msgstr "Zálohovací soubory"
-
-#: src/global.c:1391
-msgid "Multiple file buffers"
-msgstr "Více souborových vyrovnávacích pamětí"
-
-#: src/global.c:1393
-msgid "Mouse support"
-msgstr "Podpora pro myš"
-
-#: src/global.c:1395
-msgid "No conversion from DOS/Mac format"
-msgstr "Žádný převod z formátů DOS/Mac"
-
-#: src/global.c:1397
-=======
 #: src/global.c:1334
 msgid "Auto indent"
 msgstr "Automaticky odsadit"
@@ -2140,23 +1198,14 @@ msgid "No conversion from DOS/Mac format"
 msgstr "Žádný převod z formátů DOS/Mac"
 
 #: src/global.c:1350
->>>>>>> origin/tomato-shibby-RT-AC
 msgid "Suspension"
-msgstr "Odklad na pozadí"
+msgstr "Odložit na pozadí"
 
-#: src/global.c:1399
-msgid "Soft line wrapping"
-msgstr "Plynulé zalamování dlouhých řádků"
-
-<<<<<<< HEAD
-#: src/help.c:236
-=======
 #: src/global.c:1352
 msgid "Line numbering"
 msgstr "Číslování řádků"
 
 #: src/help.c:211
->>>>>>> origin/tomato-shibby-RT-AC
 msgid ""
 "Search Command Help Text\n"
 "\n"
@@ -2168,7 +1217,7 @@ msgid ""
 "prompt.  Hitting Enter without entering any text will perform the previous "
 "search.  "
 msgstr ""
-"Text s nápovědou pro příkaz ke hledání\n"
+"Nápověda pro příkaz Hledat\n"
 "\n"
 " Zadejte slova nebo znaky, podle kterých chcete hledat, a stiskněte klávesu "
 "Enter.  Pokud je pro vámi zadaný text nalezena shoda, obrazovka se posune k "
@@ -2178,7 +1227,7 @@ msgstr ""
 "závorkách. Stisknutí klávesy Enter bez zadání nějakého textu povede k "
 "provedení předchozího požadavku na hledání.  "
 
-#: src/help.c:245
+#: src/help.c:220
 msgid ""
 "If you have selected text with the mark and then search to replace, only "
 "matches in the selected text will be replaced.\n"
@@ -2192,7 +1241,7 @@ msgstr ""
 " Následující funkční klávesy jsou dostupné v režimu Hledání:\n"
 "\n"
 
-#: src/help.c:251
+#: src/help.c:226
 msgid ""
 "Go To Line Help Text\n"
 "\n"
@@ -2203,7 +1252,7 @@ msgid ""
 " The following function keys are available in Go To Line mode:\n"
 "\n"
 msgstr ""
-"Text s nápovědou pro „Přejít na řádek“\n"
+"Nápověda pro Přejít na řádek\n"
 "\n"
 " zadejte číslo řádku, na který si přejete přejít, a stiskněte klávesu Enter. "
 "Pokud je v textu menší počet řádků, než jaký jste udal, nano provede skok na "
@@ -2212,7 +1261,7 @@ msgstr ""
 " Následující funkční klávesy jsou dostupné v režimu Přejít na řádek:\n"
 "\n"
 
-#: src/help.c:260
+#: src/help.c:235
 msgid ""
 "Insert File Help Text\n"
 "\n"
@@ -2224,10 +1273,10 @@ msgid ""
 "Meta-F toggle, or a nanorc file, inserting a file will cause it to be loaded "
 "into a separate buffer (use Meta-< and > to switch between file buffers).  "
 msgstr ""
-"Text s nápovědou pro Vložit soubor\n"
+"Nápověda pro Vložit soubor\n"
 "\n"
 " Zadejte název souboru, který se má vložit do nynější souborové vyrovnávací "
-"paměti v současné poloze ukazovátka.\n"
+"paměti v současné poloze ukazatele.\n"
 "\n"
 " Pokud jste nano sestavil s podporou pro více souborových vyrovnávacích "
 "pamětí, a povolil tuto funkci více souborových vyrovnávacích pamětí volbou "
@@ -2236,7 +1285,7 @@ msgstr ""
 "oddělené vyrovnávací paměti (použijte Meta-< a > pro přepínání mezi "
 "souborovými vyrovnávacími paměťmi)."
 
-#: src/help.c:269
+#: src/help.c:244
 msgid ""
 "If you need another blank buffer, do not enter any filename, or type in a "
 "nonexistent filename at the prompt and press Enter.\n"
@@ -2251,7 +1300,7 @@ msgstr ""
 " Následující funkční klávesy jsou dostupné v režimu Vložit soubor:\n"
 "\n"
 
-#: src/help.c:275
+#: src/help.c:250
 msgid ""
 "Write File Help Text\n"
 "\n"
@@ -2266,12 +1315,12 @@ msgid ""
 " The following function keys are available in Write File mode:\n"
 "\n"
 msgstr ""
-"Text s nápovědou pro „Zapsat soubor“\n"
+"Nápověda pro Zapsat soubor\n"
 "\n"
 " Zadejte název, pod kterým si přejete uložit současný soubor, a stiskněte "
 "klávesu Enter.\n"
 "\n"
-" Pokud jste označil text, bude vám položena otázka, zda chete zapsat pouze "
+" Pokud jste označil text, bude vám položena otázka, zda chcete zapsat pouze "
 "vybranou část textu do odděleného souboru. Abyste zmenšil nebezpečí, že by "
 "došlo k přepsání nynějšího souboru jeho částí, není v tomto režimu nynější "
 "souborový název veden jako výchozí.\n"
@@ -2279,7 +1328,7 @@ msgstr ""
 " Následující funkční klávesy jsou dostupné v režimu Zapsat soubor:\n"
 "\n"
 
-#: src/help.c:289
+#: src/help.c:264
 msgid ""
 "File Browser Help Text\n"
 "\n"
@@ -2292,7 +1341,7 @@ msgid ""
 " The following function keys are available in the file browser:\n"
 "\n"
 msgstr ""
-"Text s nápovědou pro „Prohlížeč souborů\"\n"
+"Nápověda pro Prohlížeč souborů\n"
 "\n"
 " Prohlížeč souborů se používá pro názorné procházení uspořádání adresářů, "
 "aby se vybral soubor pro čtení nebo zápis. Můžete použít klávesy šipek nebo "
@@ -2304,7 +1353,7 @@ msgstr ""
 " Následující funkční klávesy jsou dostupné v prohlížeči souborů:\n"
 "\n"
 
-#: src/help.c:302
+#: src/help.c:277
 msgid ""
 "Browser Search Command Help Text\n"
 "\n"
@@ -2317,7 +1366,7 @@ msgid ""
 "search.\n"
 "\n"
 msgstr ""
-"Text s nápovědou pro příkaz k \"Hledání v prohlížeči souborů\"\n"
+"Nápověda pro příkaz Hledat v prohlížeči souborů\"\n"
 "\n"
 " Zadejte slova nebo znaky, které byste chtěl vyhledat, a potom stiskněte "
 "klávesu Enter. Pokud dojde k nalezení textu shodného s textem, který jste "
@@ -2328,16 +1377,16 @@ msgstr ""
 "provedení předchozího požadavku na hledání.\n"
 "\n"
 
-#: src/help.c:311
+#: src/help.c:286
 msgid ""
 " The following function keys are available in Browser Search mode:\n"
 "\n"
 msgstr ""
-" Následující funkční klávesy jsou dostupné v režimu \"Hledání v prohlížeči "
-"souborů\":\n"
+" Následující funkční klávesy jsou dostupné v režimu hledání v prohlížeči "
+"souborů:\n"
 "\n"
 
-#: src/help.c:315
+#: src/help.c:290
 msgid ""
 "Browser Go To Directory Help Text\n"
 "\n"
@@ -2349,7 +1398,7 @@ msgid ""
 " The following function keys are available in Browser Go To Directory mode:\n"
 "\n"
 msgstr ""
-"Text s nápovědou pro \"Jít do adresáře\" v prohlížeči souborů\n"
+"Nápověda pro Jít do adresáře v prohlížeči souborů\n"
 "\n"
 " Zadejte název adresáře, který byste chtěl procházet.\n"
 "\n"
@@ -2361,7 +1410,7 @@ msgstr ""
 "prohlížeči souborů:\n"
 "\n"
 
-#: src/help.c:328
+#: src/help.c:303
 msgid ""
 "Spell Check Help Text\n"
 "\n"
@@ -2374,7 +1423,7 @@ msgid ""
 " The following function keys are available in Spell Check mode:\n"
 "\n"
 msgstr ""
-"Text s nápovědou pro \"Ověřování pravopisu\"\n"
+"Nápověda pro ověřování pravopisu\n"
 "\n"
 " Ověřování pravopisu ověřuje pravopis celého textu v současném souboru. "
 "Narazí-li se na neznámé slovo, je zvýrazněno a náhradu lze upravovat. Budete "
@@ -2385,7 +1434,7 @@ msgstr ""
 "\":\n"
 "\n"
 
-#: src/help.c:343
+#: src/help.c:318
 msgid ""
 "Execute Command Help Text\n"
 "\n"
@@ -2396,17 +1445,17 @@ msgid ""
 " The following function keys are available in Execute Command mode:\n"
 "\n"
 msgstr ""
-"Text s nápovědou pro \"Provést příkaz\"\n"
+"Nápověda pro Provést příkaz\n"
 "\n"
 " Tento režim vám umožňuje vložit výstup vnějšího příkazu, který byl proveden "
 "v shellu, do současné vyrovnávací paměti (nebo do nové vyrovnávací paměti v "
 "režimu více souborových vyrovnávacích pamětí). Pokud potřebujete další "
-"prázdnou vyrovnávací paměť, nezadavejte žádný příkaz.\n"
+"prázdnou vyrovnávací paměť, nezadávejte žádný příkaz.\n"
 "\n"
 " Následující funkční klávesy jsou dostupné v režimu \"Provést příkaz\":\n"
 "\n"
 
-#: src/help.c:356
+#: src/help.c:331
 msgid ""
 "Main nano help text\n"
 "\n"
@@ -2425,19 +1474,14 @@ msgstr ""
 "soubor změněn, nebo nebyl. Hlavní okno obsahuje soubor, který je upravován. "
 "Stavový řádek (třetí řádek zdola) ukazuje důležité zprávy.  "
 
-<<<<<<< HEAD
-#: src/help.c:366
-=======
 #: src/help.c:341
->>>>>>> origin/tomato-shibby-RT-AC
 msgid ""
 "The bottom two lines show the most commonly used shortcuts in the editor.\n"
 "\n"
-" The notation for shortcuts is as follows: Control-key sequences are notated "
-"with a caret (^) symbol and can be entered either by using the Control "
-"(Ctrl) key or pressing the Escape (Esc) key twice.  Escape-key sequences are "
-"notated with the Meta (M-) symbol and can be entered using either the Esc, "
-"Alt, or Meta key depending on your keyboard setup.  "
+" Shortcuts are written as follows: Control-key sequences are notated with a "
+"'^' and can be entered either by using the Ctrl key or pressing the Esc key "
+"twice.  Meta-key sequences are notated with 'M-' and can be entered using "
+"either the Alt, Cmd, or Esc key, depending on your keyboard setup.  "
 msgstr ""
 "Nejspodnější dva řádky ukazují v editoru nejčastěji používané zkratky.\n"
 "\n"
@@ -2448,7 +1492,7 @@ msgstr ""
 "buď pomocí klávesy Alt, Cmd nebo Esc v závislosti na nastavení vaší "
 "klávesnice.  "
 
-#: src/help.c:375
+#: src/help.c:348
 msgid ""
 "Also, pressing Esc twice and then typing a three-digit decimal number from "
 "000 to 255 will enter the character with the corresponding value.  The "
@@ -2462,17 +1506,6 @@ msgstr ""
 "uváděny v závorkách:\n"
 "\n"
 
-<<<<<<< HEAD
-#: src/help.c:407 src/help.c:483
-msgid "enable/disable"
-msgstr "Zapnout/Vypnout"
-
-#: src/nano.c:587
-msgid "Key invalid in view mode"
-msgstr "Klávesa nepřípustná v režimu pouze pro čtení"
-
-#: src/nano.c:695
-=======
 #: src/help.c:380 src/help.c:461
 msgid "enable/disable"
 msgstr "Zapnout/Vypnout"
@@ -2490,7 +1523,6 @@ msgid "Help is not available"
 msgstr "Nápověda není dostupná"
 
 #: src/nano.c:657
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid ""
 "\n"
@@ -2499,11 +1531,7 @@ msgstr ""
 "\n"
 "Vyrovnávací paměť zapsána do %s\n"
 
-<<<<<<< HEAD
-#: src/nano.c:697
-=======
 #: src/nano.c:659
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid ""
 "\n"
@@ -2512,11 +1540,7 @@ msgstr ""
 "\n"
 "Vyrovnávací paměť nezapsána do %s: %s\n"
 
-<<<<<<< HEAD
-#: src/nano.c:700
-=======
 #: src/nano.c:662
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid ""
 "\n"
@@ -2525,17 +1549,8 @@ msgstr ""
 "\n"
 "Vyrovnávací paměť nezapsána: %s\n"
 
-<<<<<<< HEAD
-#: src/nano.c:723
-msgid "Window size is too small for nano...\n"
-msgstr "Velikost okna je pro nano příliš malá...\n"
-
-#: src/nano.c:816
-#, c-format
-=======
 #: src/nano.c:777
 #, fuzzy, c-format
->>>>>>> origin/tomato-shibby-RT-AC
 msgid ""
 "Usage: nano [OPTIONS] [[+LINE[,COLUMN]] FILE]...\n"
 "\n"
@@ -2543,45 +1558,22 @@ msgstr ""
 "Použití: nano [VOLBY] [[+ŘÁDEK,SLOUPEC] SOUBOR]...\n"
 "\n"
 
-<<<<<<< HEAD
-#: src/nano.c:819
-=======
 #. TRANSLATORS: The next two strings are part of the --help output.
 #. * It's best to keep its lines within 80 characters.
 #: src/nano.c:780
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid ""
 "To place the cursor on a specific line of a file, put the line number with\n"
 "a '+' before the filename.  The column number can be added after a comma.\n"
 msgstr ""
 
-<<<<<<< HEAD
-#: src/nano.c:821
-=======
 #: src/nano.c:782
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid ""
 "When the first filename is '-', nano reads data from standard input.\n"
 "\n"
 msgstr ""
 
-<<<<<<< HEAD
-#: src/nano.c:824
-msgid "Show this message"
-msgstr "Ukázat tuto zprávu"
-
-#: src/nano.c:825
-msgid "+LINE,COLUMN"
-msgstr "+ŘÁDEK,SLOUPEC"
-
-#: src/nano.c:826
-msgid "Start at line LINE, column COLUMN"
-msgstr "Začít na řádku ŘÁDEK,sloupec SLOUPEC"
-
-#: src/nano.c:828
-=======
 #: src/nano.c:783
 #, c-format
 msgid "Option\t\tGNU long option\t\tMeaning\n"
@@ -2590,101 +1582,9 @@ msgstr "Volba\t\tdlouhá volba GNU\t\tVýznam\n"
 #. TRANSLATORS: The next forty or so strings are option descriptions
 #. * for the --help output.  Try to keep them at most 40 characters.
 #: src/nano.c:788
->>>>>>> origin/tomato-shibby-RT-AC
 msgid "Enable smart home key"
-msgstr "Povolit chytrou klávesu Poloha 1"
+msgstr "Povolit chytrou klávesu pro začátek dokumentu (Poloha 1)"
 
-<<<<<<< HEAD
-#: src/nano.c:829
-msgid "Save backups of existing files"
-msgstr "Uložit zálohy stávajících souborů"
-
-#: src/nano.c:830
-msgid "-C <dir>"
-msgstr "-C <adresář>"
-
-#: src/nano.c:830
-msgid "--backupdir=<dir>"
-msgstr "--backupdir=<adresář>"
-
-#: src/nano.c:831
-msgid "Directory for saving unique backup files"
-msgstr "Adresář pro ukládání jedinečných zálohovacích souborů"
-
-#: src/nano.c:834
-msgid "Use bold instead of reverse video text"
-msgstr "Použít tučný tisk místo opačného textu"
-
-#: src/nano.c:837
-msgid "Convert typed tabs to spaces"
-msgstr "Převést zadané zarážky na mezery"
-
-#: src/nano.c:840
-msgid "Enable multiple file buffers"
-msgstr "Povolit více souborových vyrovnávacích pamětí"
-
-#: src/nano.c:845
-msgid "Log & read search/replace string history"
-msgstr "Zapisovat a číst historii hledání/nahrazování řetězců"
-
-#: src/nano.c:848
-msgid "Don't look at nanorc files"
-msgstr "Nezkoumat soubory nanorc"
-
-#: src/nano.c:851
-msgid "Fix numeric keypad key confusion problem"
-msgstr "Opravit zmatek okolo kláves na číselné klávesnici"
-
-#: src/nano.c:853
-msgid "Don't add newlines to the ends of files"
-msgstr "Nepřidávat zalomení řádku na koncích souborů"
-
-#: src/nano.c:856
-msgid "Don't convert files from DOS/Mac format"
-msgstr "Nepřevádět soubory z formátů DOS/Mac"
-
-#: src/nano.c:858
-msgid "Use one more line for editing"
-msgstr "Používat ještě jeden řádek k úpravám"
-
-#: src/nano.c:860
-msgid "-Q <str>"
-msgstr "-Q <řetězec znaků>"
-
-#: src/nano.c:860
-msgid "--quotestr=<str>"
-msgstr "--quotestr=<řetězec znaků>"
-
-#: src/nano.c:861
-msgid "Quoting string"
-msgstr "Dání řetězce do uvozovek"
-
-#: src/nano.c:863
-msgid "Restricted mode"
-msgstr "Omezený režim"
-
-#: src/nano.c:866
-msgid "Scroll by line instead of half-screen"
-msgstr "Posunovat obraz po řádcích místo po půlobrazovkách"
-
-#: src/nano.c:868
-msgid "-T <#cols>"
-msgstr "-T <#sloupce>"
-
-#: src/nano.c:868
-msgid "--tabsize=<#cols>"
-msgstr "--tabsize=<#sloupce>"
-
-#: src/nano.c:869
-msgid "Set width of a tab to #cols columns"
-msgstr "Nastavit velikost zarážky na #sloupce"
-
-#: src/nano.c:871
-msgid "Do quick statusbar blanking"
-msgstr "Provést rychlé vymazání stavového řádku"
-
-#: src/nano.c:874
-=======
 #: src/nano.c:790
 msgid "Save backups of existing files"
 msgstr "Uložit zálohy stávajících souborů"
@@ -2782,29 +1682,9 @@ msgid "Do quick statusbar blanking"
 msgstr "Provést rychlé vymazání stavového řádku"
 
 #: src/nano.c:843
->>>>>>> origin/tomato-shibby-RT-AC
 msgid "Print version information and exit"
-msgstr "Vytisknout informaci o verzi a ukončit"
+msgstr "Zobrazit informaci o verzi a ukončit"
 
-<<<<<<< HEAD
-#: src/nano.c:877
-msgid "Detect word boundaries more accurately"
-msgstr "Rozpoznávat hranice slov přesněji"
-
-#: src/nano.c:880
-msgid "-Y <str>"
-msgstr "-Y <řetězec znaků>"
-
-#: src/nano.c:880
-msgid "--syntax=<str>"
-msgstr "--syntax=<řetězec znaků>"
-
-#: src/nano.c:881
-msgid "Syntax definition to use for coloring"
-msgstr "Vymezení skladby k užití pro obarvování"
-
-#: src/nano.c:883
-=======
 #: src/nano.c:846
 msgid "Detect word boundaries more accurately"
 msgstr "Rozpoznávat hranice slov přesněji"
@@ -2835,21 +1715,9 @@ msgid "Syntax definition to use for coloring"
 msgstr "Vymezení skladby k užití pro obarvování"
 
 #: src/nano.c:855
->>>>>>> origin/tomato-shibby-RT-AC
 msgid "Constantly show cursor position"
-msgstr "Stále ukazovat polohu ukazovátka"
+msgstr "Stále ukazovat polohu ukazatele"
 
-<<<<<<< HEAD
-#: src/nano.c:885
-msgid "Fix Backspace/Delete confusion problem"
-msgstr "Odstranit záměnu kláves Backspace/Delete"
-
-#: src/nano.c:888
-msgid "Automatically indent new lines"
-msgstr "Automaticky odsadit nové řádky"
-
-#: src/nano.c:889
-=======
 #: src/nano.c:857
 msgid "Fix Backspace/Delete confusion problem"
 msgstr "Odstranit záměnu kláves Backspace/Delete"
@@ -2868,104 +1736,9 @@ msgid "Automatically indent new lines"
 msgstr "Automaticky odsadit nové řádky"
 
 #: src/nano.c:865
->>>>>>> origin/tomato-shibby-RT-AC
 msgid "Cut from cursor to end of line"
-msgstr "Vyjmout od polohy ukazovátka po konec řádku"
+msgstr "Vyjmout od polohy ukazatele po konec řádku"
 
-<<<<<<< HEAD
-#: src/nano.c:892
-msgid "Don't follow symbolic links, overwrite"
-msgstr "Nenásledovat symbolické odkazy, nýbrž přepsat"
-
-#: src/nano.c:894
-msgid "Enable the use of the mouse"
-msgstr "Povolit použití myši"
-
-#: src/nano.c:897
-msgid "-o <dir>"
-msgstr "-o <adresář>"
-
-#: src/nano.c:897
-msgid "--operatingdir=<dir>"
-msgstr "--operatingdir=<adresář>"
-
-#: src/nano.c:898
-msgid "Set operating directory"
-msgstr "Nastavit pracovní adresář"
-
-#: src/nano.c:901
-msgid "Preserve XON (^Q) and XOFF (^S) keys"
-msgstr "Zachovat klávesy XON (^Q) a XOFF (^S)"
-
-#: src/nano.c:903
-msgid "Silently ignore startup issues like rc file errors"
-msgstr "Přecházet tiše potíže při spuštění, jako jsou chyby v souborech rc"
-
-#: src/nano.c:905
-msgid "-r <#cols>"
-msgstr "-r <#sloupce>"
-
-#: src/nano.c:905
-msgid "--fill=<#cols>"
-msgstr "--fill=<#sloupce>"
-
-#: src/nano.c:906
-msgid "Set wrapping point at column #cols"
-msgstr "Nastavit bod zalomení při sloupci #sloupce"
-
-#: src/nano.c:909
-msgid "-s <prog>"
-msgstr "-s <program>"
-
-#: src/nano.c:909
-msgid "--speller=<prog>"
-msgstr "--speller=<program>"
-
-#: src/nano.c:910
-msgid "Enable alternate speller"
-msgstr "Povolit náhradní program na ověřování pravopisu"
-
-#: src/nano.c:913
-msgid "Auto save on exit, don't prompt"
-msgstr "Při ukončení automaticky bez zpětného dotazu uložit"
-
-#: src/nano.c:915
-msgid "Allow generic undo [EXPERIMENTAL]"
-msgstr "Povolit obecnou funkci pro zpět [pokusné]"
-
-#: src/nano.c:918
-msgid "View mode (read-only)"
-msgstr "Režim pouze pro čtení (žádné změny nejsou možné)"
-
-#: src/nano.c:920
-msgid "Don't wrap long lines"
-msgstr "Nezalamovat dlouhé řádky do nových řádků"
-
-#: src/nano.c:922
-msgid "Don't show the two help lines"
-msgstr "Neukazovat dva pomocné řádky"
-
-#: src/nano.c:923
-msgid "Enable suspension"
-msgstr "Povolit odložení na pozadí (zastavit a zpět k shellu)"
-
-#: src/nano.c:924
-msgid "Enable soft line wrapping"
-msgstr "Povolit plynulé zalamování dlouhých řádků"
-
-#: src/nano.c:928
-msgid "(ignored, for Pico compatibility)"
-msgstr "(přechází se, pro slučitelnost s Pico)"
-
-#: src/nano.c:938
-#, c-format
-msgid " GNU nano version %s (compiled %s, %s)\n"
-msgstr " GNU verze nano %s (sestaveno %s, %s)\n"
-
-#: src/nano.c:943
-#, c-format
-msgid " Email: nano@nano-editor.org\tWeb: http://www.nano-editor.org/"
-=======
 #: src/nano.c:868
 msgid "Show line numbers in front of the text"
 msgstr "Ukázat čísla řádků před textem"
@@ -3063,16 +1836,11 @@ msgstr " (C) 2014..%s přispěvatelé do nano\n"
 #: src/nano.c:922
 #, c-format
 msgid " Email: nano@nano-editor.org\tWeb: https://nano-editor.org/"
->>>>>>> origin/tomato-shibby-RT-AC
 msgstr ""
 "Adresa elektronické pošty: nano@nano-editor.org\tStránky: https://nano-"
 "editor.org/"
 
-<<<<<<< HEAD
-#: src/nano.c:944
-=======
 #: src/nano.c:923
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid ""
 "\n"
@@ -3081,17 +1849,6 @@ msgstr ""
 "\n"
 " Volby při sestavování:"
 
-<<<<<<< HEAD
-#: src/nano.c:1022
-msgid "Sorry, support for this function has been disabled"
-msgstr "Promiňte, ale tato funkce není podporována"
-
-#: src/nano.c:1044
-msgid "Save modified buffer (ANSWERING \"No\" WILL DESTROY CHANGES) ? "
-msgstr "Uložit změněnou vyrovnávací paměť (odpověď \"Ne\" zahodí změny)?"
-
-#: src/nano.c:1088
-=======
 #: src/nano.c:1069
 msgid "No file name"
 msgstr "Žádný název souboru"
@@ -3101,60 +1858,24 @@ msgid "Save modified buffer?  (Answering \"No\" will DISCARD changes.) "
 msgstr "Uložit změněnou vyrovnávací paměť? (odpověď \"Ne\" zahodí změny) "
 
 #: src/nano.c:1132
->>>>>>> origin/tomato-shibby-RT-AC
 msgid "Couldn't reopen stdin from keyboard, sorry\n"
 msgstr ""
 "Obvyklý vstup (stdin) se z klávesnice znovu otevřít nepodařilo. Promiňte\n"
 
-<<<<<<< HEAD
-#: src/nano.c:1114
-=======
 #: src/nano.c:1156
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Reading from stdin, ^C to abort\n"
 msgstr "Čte se z obvyklého vstupu (stdin), ^C k pro přerušení\n"
 
-<<<<<<< HEAD
-#: src/nano.c:1182
-msgid "Received SIGHUP or SIGTERM\n"
-msgstr "Přijat SIGHUP nebo SIGTERM\n"
-
-#: src/nano.c:1204
-=======
 #: src/nano.c:1230
 msgid "Received SIGHUP or SIGTERM\n"
 msgstr "Přijat SIGHUP nebo SIGTERM\n"
 
 #: src/nano.c:1246
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Use \"fg\" to return to nano.\n"
 msgstr "Použijte \"fg\" pro návrat do nano.\n"
 
-<<<<<<< HEAD
-#: src/nano.c:1386
-msgid "enabled"
-msgstr "povoleno"
-
-#: src/nano.c:1387
-msgid "disabled"
-msgstr "zakázáno"
-
-#: src/nano.c:1548 src/winio.c:1256
-msgid "Unknown Command"
-msgstr "Neznámý příkaz"
-
-#: src/nano.c:1674
-msgid "XON ignored, mumble mumble"
-msgstr "XON nebrán na vědomí, huhňání"
-
-#: src/nano.c:1679
-msgid "XOFF ignored, mumble mumble"
-msgstr "XOFF nebrán na vědomí, huhňání"
-
-#: src/nano.c:2209 src/rcfile.c:1100
-=======
 #: src/nano.c:1272
 msgid "Suspension is not enabled"
 msgstr "Uspání není povoleno"
@@ -3199,50 +1920,15 @@ msgid "XOFF ignored, mumble mumble"
 msgstr "XOFF nebrán na vědomí, huhňání"
 
 #: src/nano.c:2121 src/rcfile.c:1218
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Requested tab size \"%s\" is invalid"
 msgstr "Požadovaná velikost zarážky \"%s\" je neplatná"
 
-<<<<<<< HEAD
-#: src/nano.c:2268 src/rcfile.c:1025
-=======
 #: src/nano.c:2188 src/rcfile.c:1155
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Requested fill size \"%s\" is invalid"
 msgstr "Požadovaná velikost výplně \"%s\" je neplatná"
 
-<<<<<<< HEAD
-#. TRANSLATORS: For the next three strings, if possible, specify
-#. * the single-byte shortcuts for both your language and English.
-#. * For example, in French: "OoYy" for "Oui".
-#: src/prompt.c:1259
-msgid "Yy"
-msgstr "Yy"
-
-#: src/prompt.c:1260
-msgid "Nn"
-msgstr "Nn"
-
-#: src/prompt.c:1261
-msgid "Aa"
-msgstr "Aa"
-
-#: src/prompt.c:1275
-msgid "Yes"
-msgstr "Ano"
-
-#: src/prompt.c:1280
-msgid "All"
-msgstr "Vše"
-
-#: src/prompt.c:1285
-msgid "No"
-msgstr "Ne"
-
-#: src/rcfile.c:130
-=======
 #: src/nano.c:2242
 #, c-format
 msgid "Type '%s -h' for a list of available options.\n"
@@ -3280,74 +1966,24 @@ msgid "No"
 msgstr "Ne"
 
 #: src/rcfile.c:154
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Error in %s on line %lu: "
 msgstr "Chyba v %s na řádku %lu: "
 
-<<<<<<< HEAD
-#: src/rcfile.c:185
-=======
 #: src/rcfile.c:213
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Argument '%s' has an unterminated \""
 msgstr "Argument „%s“ má neukončené \""
 
-<<<<<<< HEAD
-#: src/rcfile.c:212 src/rcfile.c:264 src/rcfile.c:711 src/rcfile.c:768
-#: src/rcfile.c:821
-msgid "Regex strings must begin and end with a \" character"
-msgstr "Řetězce znaků pro regulární výrazy musí začínat a končit znakem \""
-
-#: src/rcfile.c:238 src/search.c:62
-=======
 #: src/rcfile.c:241 src/rcfile.c:693 src/rcfile.c:748 src/rcfile.c:852
 msgid "Regex strings must begin and end with a \" character"
 msgstr "Řetězce znaků pro regulární výrazy musí začínat a končit znakem \""
 
 #: src/rcfile.c:267 src/search.c:54
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Bad regex \"%s\": %s"
 msgstr "Špatný regulární výraz \"%s\": %s"
 
-<<<<<<< HEAD
-#: src/rcfile.c:258
-msgid "Missing syntax name"
-msgstr "Chybí název skladby"
-
-#: src/rcfile.c:316
-msgid "The \"none\" syntax is reserved"
-msgstr "Skladba \"none\" je zamluvena"
-
-#: src/rcfile.c:323
-msgid "The \"default\" syntax must take no extensions"
-msgstr "Skladba \"defaul\" nesmí mít žádné přípony"
-
-#: src/rcfile.c:386 src/rcfile.c:483
-msgid "Missing key name"
-msgstr "Chybí název klíče"
-
-#: src/rcfile.c:398 src/rcfile.c:499
-msgid "keybindings must begin with \"^\", \"M\", or \"F\""
-msgstr "Klávesové zkratky musí začínat \"^\", \"M\", nebo \"F\""
-
-#: src/rcfile.c:407
-msgid "Must specify function to bind key to"
-msgstr "Funkce spojená s klávesou musí být zadána"
-
-#: src/rcfile.c:418 src/rcfile.c:510
-msgid "Must specify menu to bind key to (or \"all\")"
-msgstr "Nabídka spojená s klávesou (nebo \"vše\") musí být zadána"
-
-#: src/rcfile.c:426
-#, c-format
-msgid "Could not map name \"%s\" to a function"
-msgstr "Nepodařilo se spojit název \"%s\" s funkcí"
-
-#: src/rcfile.c:432 src/rcfile.c:517
-=======
 #: src/rcfile.c:289
 msgid "Missing syntax name"
 msgstr "Chybí název skladby"
@@ -3408,25 +2044,16 @@ msgid "Function '%s' does not exist in menu '%s'"
 msgstr "Funkce \"%s\" neexistuje v nabídce \"%s\""
 
 #: src/rcfile.c:492
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
-msgid "Could not map name \"%s\" to a menu"
-msgstr "Nepodařilo se spojit název \"%s\" s nabídkou"
+msgid "Sorry, keystroke \"%s\" may not be rebound"
+msgstr "Promiňte, ale klávesu \"%s\" nelze znovu přiřadit"
 
-<<<<<<< HEAD
-#: src/rcfile.c:454
-=======
 #: src/rcfile.c:596
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
-msgid "Sorry, keystr \"%s\" is an illegal binding"
-msgstr "Promiňte, ale keystr \"%s\" není dovoleným přiřazením"
+msgid "Error expanding %s: %s"
+msgstr "Chyba při rozšíření %s: %s"
 
-<<<<<<< HEAD
-#: src/rcfile.c:625
-=======
 #: src/rcfile.c:635
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid ""
 "Color \"%s\" not understood.\n"
@@ -3442,17 +2069,6 @@ msgstr ""
 "a „black“ (černá), s volitelnou předponou „bright“ (světlá)\n"
 "pro barvy popředí."
 
-<<<<<<< HEAD
-#: src/rcfile.c:647
-msgid "Cannot add a color command without a syntax command"
-msgstr "Nelze přidat pokyn pro barvu bez příkazu pro skladbu"
-
-#: src/rcfile.c:652
-msgid "Missing color name"
-msgstr "Chybí název barvy"
-
-#: src/rcfile.c:672
-=======
 #: src/rcfile.c:656 src/rcfile.c:823 src/rcfile.c:886
 #, c-format
 msgid "A '%s' command requires a preceding 'syntax' command"
@@ -3477,26 +2093,10 @@ msgid "\"start=\" requires a corresponding \"end=\""
 msgstr "„start=“ vyžaduje odpovídající „end=“"
 
 #: src/rcfile.c:796
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Background color \"%s\" cannot be bright"
 msgstr "Barva pozadí \"%s\" nemůže být světlá (\"bright\")"
 
-<<<<<<< HEAD
-#: src/rcfile.c:690 src/rcfile.c:809
-msgid "Missing regex string"
-msgstr "Chybí řetězec regulárního výrazu"
-
-#: src/rcfile.c:762
-msgid "\"start=\" requires a corresponding \"end=\""
-msgstr "„start=“ vyžaduje odpovídající „end=“"
-
-#: src/rcfile.c:804
-msgid "Cannot add a header regex without a syntax command"
-msgstr "Nelze přidat regulární výraz pro záhlaví bez příkazu pro skladbu"
-
-#: src/rcfile.c:874
-=======
 #: src/rcfile.c:830
 #, c-format
 msgid "The \"default\" syntax does not accept '%s' regexes"
@@ -3513,63 +2113,38 @@ msgid "Argument of '%s' lacks closing \""
 msgstr "Argument „%s“ má neukončené \""
 
 #: src/rcfile.c:938
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
-msgid "Fatal error: no keys mapped for function \"%s\""
-msgstr "Vážná chyba: s funkcí \"%s\" nejsou spojeny žádné klávesy"
+msgid "Fatal error: no keys mapped for function \"%s\".  Exiting.\n"
+msgstr "Závažná chyba: S funkcí \"%s\" není spojena žádná klávesová zkratka.\n"
 
-<<<<<<< HEAD
-#: src/rcfile.c:876
-=======
 #: src/rcfile.c:940
 #, c-format
->>>>>>> origin/tomato-shibby-RT-AC
 msgid ""
-"Exiting.  Please use nano with the -I option if needed to adjust your nanorc "
-"settings\n"
+"If needed, use nano with the -I option to adjust your nanorc settings.\n"
 msgstr ""
-"Ukončuje se. Spusťte, prosím, v případě potřeby nano s volbou \"-l\", chcete-"
-"li změnit svá nastavení nanorc\n"
+"Spusťte, prosím, v případě potřeby nano s volbou \"-l\", chcete-li změnit "
+"svá nastavení nanorc.\n"
 
-<<<<<<< HEAD
-#: src/rcfile.c:926 src/rcfile.c:935 src/rcfile.c:945
-=======
 #: src/rcfile.c:995
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
-msgid "Command \"%s\" not allowed in included file"
-msgstr "Příkaz \"%s\" nedovolen v zahrnutém souboru"
+msgid "Could not find syntax \"%s\" to extend"
+msgstr "Nepodařilo se najít skladbu \"%s\" k rozšíření"
 
-<<<<<<< HEAD
-#: src/rcfile.c:951 src/rcfile.c:1128
-=======
 #: src/rcfile.c:1017 src/rcfile.c:1229
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Syntax \"%s\" has no color commands"
 msgstr "Skladba \"%s\" nemá pokyny pro barvy"
 
-<<<<<<< HEAD
-#: src/rcfile.c:966
-=======
 #: src/rcfile.c:1048
 #, c-format
 msgid "Command \"%s\" not allowed in included file"
 msgstr "Příkaz \"%s\" nedovolen v zahrnutém souboru"
 
 #: src/rcfile.c:1063
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Command \"%s\" not understood"
 msgstr "Příkazu \"%s\" neporozuměno"
 
-<<<<<<< HEAD
-#: src/rcfile.c:972
-msgid "Missing flag"
-msgstr "Chybí příznak"
-
-#: src/rcfile.c:994
-=======
 #: src/rcfile.c:1075
 msgid "Missing option"
 msgstr "Chybějící volba"
@@ -3585,31 +2160,10 @@ msgid "Cannot unset option \"%s\""
 msgstr "Nelze vypnout volbu \"%s\""
 
 #: src/rcfile.c:1114
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Option \"%s\" requires an argument"
 msgstr "Volba \"%s\" vyžaduje argument"
 
-<<<<<<< HEAD
-#: src/rcfile.c:1012
-msgid "Option is not a valid multibyte string"
-msgstr "Volba není žádným platným řetězcem znaků multibyte"
-
-#: src/rcfile.c:1038 src/rcfile.c:1066 src/rcfile.c:1075
-msgid "Non-blank characters required"
-msgstr "Požadovány ne-prázdné znaky"
-
-#: src/rcfile.c:1048
-msgid "Two single-column characters required"
-msgstr "Požadovány dva znaky v rozsahu jednoho sloupce"
-
-#: src/rcfile.c:1114
-#, c-format
-msgid "Cannot unset flag \"%s\""
-msgstr "Nelze vypnout příznak \"%s\""
-
-#: src/rcfile.c:1123
-=======
 #: src/rcfile.c:1130
 msgid "Argument is not a valid multibyte string"
 msgstr "Argument není platným řetězcem znaků multibyte"
@@ -3627,43 +2181,19 @@ msgid "I can't find my home directory!  Wah!"
 msgstr "Nemohu najít svůj domovský adresář! Jau!"
 
 #: src/rcfile.c:1298
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
-msgid "Unknown flag \"%s\""
-msgstr "Neznámý příznak \"%s\""
+msgid ""
+"\n"
+"Press Enter to continue starting nano.\n"
+msgstr ""
+"\n"
+"Stiskněte klávesu Enter pro pokračování ve spouštění programu nano.\n"
 
-<<<<<<< HEAD
-#: src/rcfile.c:1182
-msgid "I can't find my home directory!  Wah!"
-msgstr "Nemohu najít svůj domovský adresář! Jau!"
-
-#: src/search.c:96
-=======
 #: src/search.c:87
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "\"%.*s%s\" not found"
 msgstr "\"%.*s%s\" nenalezen"
 
-<<<<<<< HEAD
-#: src/search.c:205
-msgid " (to replace) in selection"
-msgstr " (k nahrazení) ve výběru"
-
-#: src/search.c:207
-msgid " (to replace)"
-msgstr " (k nahrazení)"
-
-#: src/search.c:784
-msgid "Replace this instance?"
-msgstr "Nahradit tento případ?"
-
-#: src/search.c:962
-msgid "Replace with"
-msgstr "Nahradit"
-
-#: src/search.c:1004
-=======
 #. TRANSLATORS: The next three modify the search prompt.
 #: src/search.c:154
 msgid " [Case Sensitive]"
@@ -3703,7 +2233,6 @@ msgid "Replace with"
 msgstr "Nahradit"
 
 #: src/search.c:797
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Replaced %lu occurrence"
 msgid_plural "Replaced %lu occurrences"
@@ -3711,62 +2240,6 @@ msgstr[0] "Nahrazen jeden výskyt"
 msgstr[1] "Nahrazeny %lu výskyty"
 msgstr[2] "Nahrazeno %lu výskytů"
 
-<<<<<<< HEAD
-#: src/search.c:1034
-msgid "Enter line number, column number"
-msgstr "Zadat číslo řádku, číslo sloupce"
-
-#: src/search.c:1061
-msgid "Invalid line or column number"
-msgstr "Neplatné číslo řádku nebo, číslo sloupce"
-
-#: src/search.c:1214
-msgid "Not a bracket"
-msgstr "Žádná závorka"
-
-#: src/search.c:1281
-msgid "No matching bracket"
-msgstr "Žádná odpovídající závorka"
-
-#: src/text.c:54
-msgid "Mark Set"
-msgstr "Značka nastavena"
-
-#: src/text.c:58
-msgid "Mark Unset"
-msgstr "Značka odstraněna"
-
-#: src/text.c:443
-msgid "Nothing in undo buffer!"
-msgstr "Nic ve vyrovnávací paměti pro \"Zpět\"!"
-
-#: src/text.c:455 src/text.c:593
-#, c-format
-msgid "Internal error: can't match line %d.  Please save your work"
-msgstr "Vnitřní chyba: nelze nalézt řádek %d. Uložte, prosím, svou práci."
-
-#: src/text.c:466 src/text.c:603
-msgid "text add"
-msgstr "Přidat text"
-
-#: src/text.c:475 src/text.c:613
-msgid "text delete"
-msgstr "Smazat text"
-
-#: src/text.c:489 src/text.c:628
-msgid "line wrap"
-msgstr "Zalomení řádku"
-
-#: src/text.c:503 src/text.c:636
-msgid "line join"
-msgstr "Spojit řádek"
-
-#: src/text.c:514 src/text.c:651
-msgid "text cut"
-msgstr "Vyjmout text"
-
-#: src/text.c:518 src/text.c:655
-=======
 #. TRANSLATORS: This is a prompt.
 #: src/search.c:833
 msgid "Enter line number, column number"
@@ -3825,29 +2298,9 @@ msgid "text cut"
 msgstr "Vyjmout text"
 
 #: src/text.c:760 src/text.c:934
->>>>>>> origin/tomato-shibby-RT-AC
 msgid "text uncut"
-msgstr "Vzít zpět vyjmutí textu"
+msgstr "Zrušit vyjmutí textu"
 
-<<<<<<< HEAD
-#: src/text.c:522 src/text.c:622
-msgid "line break"
-msgstr "Zalamovat řádky"
-
-#: src/text.c:532 src/text.c:665
-msgid "text insert"
-msgstr "Vložit text"
-
-#: src/text.c:550 src/text.c:659
-msgid "text replace"
-msgstr "Nahradit text"
-
-#: src/text.c:557 src/text.c:671
-msgid "Internal error: unknown type.  Please save your work"
-msgstr "Vnitřní chyba: neznámý typ. Uložte, prosím, svou práci."
-
-#: src/text.c:563
-=======
 #: src/text.c:766 src/text.c:910
 msgid "Internal error: line is missing.  Please save your work."
 msgstr "Vnitřní chyba: Chybí řádek. Uložte, prosím, svoji práci."
@@ -3877,59 +2330,24 @@ msgid "Internal error: unknown type.  Please save your work."
 msgstr "Vnitřní chyba: neznámý typ. Uložte, prosím, svou práci."
 
 #: src/text.c:818
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Undid action (%s)"
 msgstr "Operace vrácena zpět (%s)"
 
-<<<<<<< HEAD
-#: src/text.c:578
-msgid "Nothing to re-do!"
-msgstr "Nic k zopakování!"
-
-#: src/text.c:582
-msgid "Internal error: Redo setup failed.  Please save your work"
-=======
 #: src/text.c:839
 msgid "Nothing to re-do!"
 msgstr "Nic k zopakování!"
 
 #: src/text.c:848
 msgid "Internal error: cannot set up redo.  Please save your work."
->>>>>>> origin/tomato-shibby-RT-AC
 msgstr ""
-"Vnitřní chyba: Příprava na zopakování operace se nezdařila. Uložte, prosím, "
-"svou práci."
+"Vnitřní chyba: Nelze připravit \"provést znovu\". Uložte, prosím, svou práci."
 
-<<<<<<< HEAD
-#: src/text.c:676
-=======
 #: src/text.c:968
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Redid action (%s)"
 msgstr "Operace zopakována (%s)"
 
-<<<<<<< HEAD
-#: src/text.c:766
-msgid "Could not pipe"
-msgstr "Přenos dat se nepodařilo provést"
-
-#: src/text.c:793 src/text.c:2636 src/text.c:2788
-msgid "Could not fork"
-msgstr "Vidlici se nepodařilo provést"
-
-#: src/text.c:941
-msgid "Internal error: can't setup uncut.  Please save your work."
-msgstr ""
-"Vnitřní chyba: vzetí vyjmutí zpět nelze nastavit. Uložte, prosím, svou práci."
-
-#: src/text.c:950
-msgid "Internal error: unknown type.  Please save your work."
-msgstr "Vnitřní chyba: neznámý typ. Uložte, prosím, svou práci."
-
-#: src/text.c:1870
-=======
 #: src/text.c:1062 src/text.c:2680 src/text.c:3066
 msgid "Could not create pipe"
 msgstr "Nepodařilo se vytvořit přenos dat"
@@ -3940,55 +2358,10 @@ msgid "Could not fork"
 msgstr "Vidlici se nepodařilo provést"
 
 #: src/text.c:2078
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Bad quote string %s: %s"
 msgstr "Neplatný řetězec znaku uvozovek %s: %s"
 
-<<<<<<< HEAD
-#: src/text.c:2267
-msgid "Can now UnJustify!"
-msgstr "Nyní lze zrušit zarovnání odstavce!"
-
-#: src/text.c:2462
-msgid "Edit a replacement"
-msgstr "Upravit nahrazení"
-
-#: src/text.c:2548
-msgid "Could not create pipe"
-msgstr "Nepodařilo se vytvořit přenos dat"
-
-#: src/text.c:2550
-msgid "Creating misspelled word list, please wait..."
-msgstr "Vytváří se seznam nesprávně napsaných slov. Čekejte, prosím,..."
-
-#: src/text.c:2642
-msgid "Could not get size of pipe buffer"
-msgstr "Nepodařilo se získat velikost vyrovnávací paměti přenosu dat"
-
-#: src/text.c:2693
-msgid "Error invoking \"spell\""
-msgstr "Chyba při vyvolání „spell“"
-
-#: src/text.c:2696
-msgid "Error invoking \"sort -f\""
-msgstr "Chyba při vyvolání „sort -f“"
-
-#: src/text.c:2699
-msgid "Error invoking \"uniq\""
-msgstr "Chyba při vyvolání „uniq“"
-
-#: src/text.c:2756 src/text.c:2965
-msgid "Finished checking spelling"
-msgstr "Ověřování pravopisu dokončeno"
-
-#: src/text.c:2815
-#, c-format
-msgid "Error invoking \"%s\""
-msgstr "Chyba při vyvolání „%s“"
-
-#: src/text.c:2960
-=======
 #: src/text.c:2443
 msgid "Can now UnJustify!"
 msgstr "Nyní lze zrušit zarovnání odstavce!"
@@ -4032,23 +2405,15 @@ msgid "Invoking spell checker, please wait"
 msgstr "Vyvolat ověření správného psaní. Počkejte, prosím"
 
 #: src/text.c:3019
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Spell checking failed: %s"
 msgstr "Ověření pravopisu se nezdařilo: %s"
 
-<<<<<<< HEAD
-#: src/text.c:2962
-=======
 #: src/text.c:3021
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "Spell checking failed: %s: %s"
 msgstr "Ověření pravopisu se nezdařilo: %s: %s"
 
-<<<<<<< HEAD
-#: src/text.c:3030
-=======
 #: src/text.c:3024
 msgid "Finished checking spelling"
 msgstr "Ověřování pravopisu dokončeno"
@@ -4102,18 +2467,10 @@ msgid "Finished formatting"
 msgstr "Formátování dokončeno"
 
 #: src/text.c:3519
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "%sWords: %lu  Lines: %ld  Chars: %lu"
 msgstr "%sSlov: %lu  Řádků: %ld  Znaků: %lu"
 
-<<<<<<< HEAD
-#: src/text.c:3031
-msgid "In Selection:  "
-msgstr "Ve výběru:  "
-
-#: src/utils.c:405 src/utils.c:417
-=======
 #: src/text.c:3520
 msgid "In Selection:  "
 msgstr "Ve výběru:  "
@@ -4134,35 +2491,9 @@ msgid "No matches"
 msgstr "Žádné shody"
 
 #: src/utils.c:323 src/utils.c:335
->>>>>>> origin/tomato-shibby-RT-AC
 msgid "nano is out of memory!"
 msgstr "Nano už nemá paměť!"
 
-<<<<<<< HEAD
-#. TRANSLATORS: This is displayed during the input of a
-#. * six-digit hexadecimal Unicode character code.
-#: src/winio.c:1557
-msgid "Unicode Input"
-msgstr "Vstup Unicode"
-
-#: src/winio.c:2149 src/winio.c:2153
-msgid "Modified"
-msgstr "Změněno"
-
-#: src/winio.c:2150
-msgid "View"
-msgstr "Pohled"
-
-#: src/winio.c:2164
-msgid "DIR:"
-msgstr "Adresář:"
-
-#: src/winio.c:2171
-msgid "File:"
-msgstr "Soubor:"
-
-#: src/winio.c:3360
-=======
 #: src/utils.c:512
 #, c-format
 msgid "Internal error: can't match line %ld.  Please save your work."
@@ -4203,38 +2534,10 @@ msgid "Further warnings were suppressed"
 msgstr ""
 
 #: src/winio.c:3184
->>>>>>> origin/tomato-shibby-RT-AC
 #, c-format
 msgid "line %ld/%ld (%d%%), col %lu/%lu (%d%%), char %lu/%lu (%d%%)"
 msgstr "Řádek %ld/%ld (%d%%), Sloupec %lu/%lu (%d%%), Znak %lu/%lu (%d%%)"
 
-<<<<<<< HEAD
-#: src/winio.c:3492
-msgid "The nano text editor"
-msgstr "Textový editor nano"
-
-#: src/winio.c:3493
-msgid "version"
-msgstr "Verze"
-
-#: src/winio.c:3494
-msgid "Brought to you by:"
-msgstr "Vyvíjeno:"
-
-#: src/winio.c:3495
-msgid "Special thanks to:"
-msgstr "Zvláštní poděkování:"
-
-#: src/winio.c:3496
-msgid "The Free Software Foundation"
-msgstr "The Free Software Foundation"
-
-#: src/winio.c:3497
-msgid "For ncurses:"
-msgstr "Pro ncurses:"
-
-#: src/winio.c:3498
-=======
 #: src/winio.c:3317
 msgid "The nano text editor"
 msgstr "Textový editor nano"
@@ -4264,16 +2567,9 @@ msgid "For ncurses:"
 msgstr "Pro ncurses:"
 
 #: src/winio.c:3324
->>>>>>> origin/tomato-shibby-RT-AC
 msgid "and anyone else we forgot..."
-msgstr "a všichni nejmenovaní..."
+msgstr "a všem nejmenovaným osobám, na které se zapomnělo..."
 
-<<<<<<< HEAD
-#: src/winio.c:3499
-msgid "Thank you for using nano!"
-msgstr "Děkujeme vám za to, že používáte nano!"
-
-=======
 #: src/winio.c:3325
 msgid "Thank you for using nano!"
 msgstr "Děkujeme vám za to, že používáte nano!"
@@ -4442,6 +2738,5 @@ msgstr "Děkujeme vám za to, že používáte nano!"
 #~ msgid "Could not pipe"
 #~ msgstr "Přenos dat se nepodařilo provést"
 
->>>>>>> origin/tomato-shibby-RT-AC
 #~ msgid "Error writing backup file %s: File owner mismatch"
 #~ msgstr "Chyba při zápisu zálohovacího souboru %s: Nesouhlasí vlastník"

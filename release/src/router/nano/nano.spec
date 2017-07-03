@@ -1,49 +1,51 @@
 %define name	nano
-<<<<<<< HEAD
-%define version	2.2.6
-=======
 %define version	2.8.0
->>>>>>> origin/tomato-shibby-RT-AC
 %define release	1
 
-Summary	: Pico editor clone with enhancements
 Name		: %{name}
 Version		: %{version}
 Release		: %{release}
-License		: GPL
+Summary		: a user-friendly editor, a Pico clone with enhancements
+
+License		: GPLv3+
 Group		: Applications/Editors
-URL		: http://www.nano-editor.org/
-Source		: http://www.nano-editor.org/dist/v2.0/%{name}-%{version}.tar.gz
+URL		: https://nano-editor.org/
+Source		: https://nano-editor.org/dist/v2.6/%{name}-%{version}.tar.gz
+
 BuildRoot	: %{_tmppath}/%{name}-%{version}-root
-BuildRequires	: autoconf, automake, gettext-devel, ncurses-devel
+BuildRequires	: autoconf, automake, gettext-devel, ncurses-devel, texinfo
+Requires(post)	: info
+Requires(preun)	: info
 
 %description
 GNU nano is a small and friendly text editor.  It aims to emulate the
-<<<<<<< HEAD
-Pico text editor while also offering a few enhancements.
-=======
 Pico text editor while also offering several enhancements.
->>>>>>> origin/tomato-shibby-RT-AC
 
 %prep
 %setup -q
 
 %build
-%configure --enable-all
+%configure
 make
 
 %install
-rm -rf %{buildroot}
 make DESTDIR="%{buildroot}" install
+#ln -s nano %{buildroot}/%{_bindir}/pico
+rm -f %{buildroot}/%{_infodir}/dir
+
+%post
+/sbin/install-info %{_infodir}/%{name}.info %{_infodir}/dir || :
+
+%preun
+if [ $1 = 0 ] ; then
+/sbin/install-info --delete %{_infodir}/%{name}.info %{_infodir}/dir || :
+fi
 
 %files
 %defattr(-,root,root)
-<<<<<<< HEAD
-%doc AUTHORS BUGS COPYING ChangeLog INSTALL NEWS README THANKS TODO doc/faq.html doc/nanorc.sample
-=======
 %doc AUTHORS COPYING ChangeLog INSTALL NEWS README THANKS TODO doc/faq.html doc/sample.nanorc
->>>>>>> origin/tomato-shibby-RT-AC
 %{_bindir}/*
+%{_docdir}/nano/*
 %{_mandir}/man*/*
 %{_mandir}/fr/man*/*
 %{_infodir}/nano.info*

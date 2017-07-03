@@ -1,18 +1,9 @@
-/* $Id: winio.c 4484 2010-03-07 19:35:46Z astyanax $ */
 /**************************************************************************
  *   winio.c  --  This file is part of GNU nano.                          *
  *                                                                        *
  *   Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,  *
-<<<<<<< HEAD
- *   2008, 2009 Free Software Foundation, Inc.                            *
- *   This program is free software; you can redistribute it and/or modify *
- *   it under the terms of the GNU General Public License as published by *
- *   the Free Software Foundation; either version 3, or (at your option)  *
- *   any later version.                                                   *
-=======
  *   2008, 2009, 2010, 2011, 2013, 2014 Free Software Foundation, Inc.    *
  *   Copyright (C) 2014, 2015, 2016, 2017 Benno Schulenberg               *
->>>>>>> origin/tomato-shibby-RT-AC
  *                                                                        *
  *   GNU nano is free software: you can redistribute it and/or modify     *
  *   it under the terms of the GNU General Public License as published    *
@@ -56,13 +47,6 @@ static size_t key_buffer_len = 0;
 static bool solitary = FALSE;
 	/* Whether an Esc arrived by itself -- not as leader of a sequence. */
 static int statusblank = 0;
-<<<<<<< HEAD
-	/* The number of keystrokes left after we call statusbar(),
-	 * before we actually blank the statusbar. */
-static bool disable_cursorpos = FALSE;
-	/* Should we temporarily disable constant cursor position
-	 * display? */
-=======
 	/* The number of keystrokes left before we blank the statusbar. */
 static bool suppress_cursorpos = FALSE;
 	/* Should we skip constant position display for one keystroke? */
@@ -70,7 +54,6 @@ static bool suppress_cursorpos = FALSE;
 static bool seen_wide = FALSE;
 	/* Whether we've seen a multicolumn character in the current line. */
 #endif
->>>>>>> origin/tomato-shibby-RT-AC
 
 /* Control character compatibility:
  *
@@ -132,57 +115,47 @@ static bool seen_wide = FALSE;
 void get_key_buffer(WINDOW *win)
 {
     int input;
-    size_t errcount;
+    size_t errcount = 0;
 
     /* If the keystroke buffer isn't empty, get out. */
     if (key_buffer != NULL)
 	return;
 
-    /* Read in the first character using blocking input. */
+    /* Just before reading in the first character, display any pending
+     * screen updates. */
+    doupdate();
+
+    /* Read in the first character using whatever mode we're in. */
+    input = wgetch(win);
+
 #ifndef NANO_TINY
-<<<<<<< HEAD
-    allow_pending_sigwinch(TRUE);
-=======
     if (the_window_resized) {
 	ungetch(input);
 	regenerate_screen();
 	input = KEY_WINCH;
     }
->>>>>>> origin/tomato-shibby-RT-AC
 #endif
 
-    /* Just before reading in the first character, display any pending
-     * screen updates. */
-    doupdate();
+    if (input == ERR && nodelay_mode)
+	return;
 
-    errcount = 0;
-    if (nodelay_mode) {
-	if ((input =  wgetch(win)) == ERR)
-           return;
-    } else
-	while ((input = wgetch(win)) == ERR) {
-	    errcount++;
-
-	    /* If we've failed to get a character MAX_BUF_SIZE times in a
-	     * row, assume that the input source we were using is gone and
-	     * die gracefully.  We could check if errno is set to EIO
-	     * ("Input/output error") and die gracefully in that case, but
-	     * it's not always set properly.  Argh. */
-	    if (errcount == MAX_BUF_SIZE)
-		handle_hupterm(0);
-	}
+    while (input == ERR) {
+	/* If we've failed to get a character MAX_BUF_SIZE times in a row,
+	 * assume our input source is gone and die gracefully.  We could
+	 * check if errno is set to EIO ("Input/output error") and die in
+	 * that case, but it's not always set properly.  Argh. */
+	if (++errcount == MAX_BUF_SIZE)
+	    handle_hupterm(0);
 
 #ifndef NANO_TINY
-<<<<<<< HEAD
-    allow_pending_sigwinch(FALSE);
-=======
 	if (the_window_resized) {
 	    regenerate_screen();
 	    input = KEY_WINCH;
 	    break;
 	}
->>>>>>> origin/tomato-shibby-RT-AC
 #endif
+	input = wgetch(win);
+    }
 
     /* Increment the length of the keystroke buffer, and save the value
      * of the keystroke at the end of it. */
@@ -190,14 +163,17 @@ void get_key_buffer(WINDOW *win)
     key_buffer = (int *)nmalloc(sizeof(int));
     key_buffer[0] = input;
 
+#ifndef NANO_TINY
+    /* If we got SIGWINCH, get out immediately since the win argument is
+     * no longer valid. */
+    if (input == KEY_WINCH)
+	return;
+#endif
+
     /* Read in the remaining characters using non-blocking input. */
     nodelay(win, TRUE);
 
     while (TRUE) {
-#ifndef NANO_TINY
-	allow_pending_sigwinch(TRUE);
-#endif
-
 	input = wgetch(win);
 
 	/* If there aren't any more characters, stop reading. */
@@ -210,17 +186,20 @@ void get_key_buffer(WINDOW *win)
 	key_buffer = (int *)nrealloc(key_buffer, key_buffer_len *
 		sizeof(int));
 	key_buffer[key_buffer_len - 1] = input;
-
-#ifndef NANO_TINY
-	allow_pending_sigwinch(FALSE);
-#endif
     }
 
-    /* Switch back to non-blocking input. */
-    nodelay(win, FALSE);
+    /* Restore waiting mode if it was on. */
+    if (!nodelay_mode)
+	nodelay(win, FALSE);
 
 #ifdef DEBUG
-    fprintf(stderr, "get_key_buffer(): key_buffer_len = %lu\n", (unsigned long)key_buffer_len);
+    {
+	size_t i;
+	fprintf(stderr, "\nget_key_buffer(): the sequence of hex codes:");
+	for (i = 0; i < key_buffer_len; i++)
+	    fprintf(stderr, " %3x", key_buffer[i]);
+	fprintf(stderr, "\n");
+    }
 #endif
 }
 
@@ -233,11 +212,6 @@ size_t get_key_buffer_len(void)
 /* Add the keystrokes in input to the keystroke buffer. */
 void unget_input(int *input, size_t input_len)
 {
-#ifndef NANO_TINY
-    allow_pending_sigwinch(TRUE);
-    allow_pending_sigwinch(FALSE);
-#endif
-
     /* If input is empty, get out. */
     if (input_len == 0)
 	return;
@@ -265,21 +239,6 @@ void unget_input(int *input, size_t input_len)
     memcpy(key_buffer, input, input_len * sizeof(int));
 }
 
-<<<<<<< HEAD
-/* Put back the character stored in kbinput, putting it in byte range
- * beforehand.  If meta_key is TRUE, put back the Escape character after
- * putting back kbinput.  If func_key is TRUE, put back the function key
- * (a value outside byte range) without putting it in byte range. */
-void unget_kbinput(int kbinput, bool meta_key, bool func_key)
-{
-    if (!func_key)
-	kbinput = (char)kbinput;
-
-    unget_input(&kbinput, 1);
-
-    if (meta_key) {
-	kbinput = NANO_CONTROL_3;
-=======
 /* Put the character given in kbinput back into the input stream.  If it
  * is a Meta key, also insert an Escape character in front of it. */
 void unget_kbinput(int kbinput, bool metakey)
@@ -288,39 +247,23 @@ void unget_kbinput(int kbinput, bool metakey)
 
     if (metakey) {
 	kbinput = ESC_CODE;
->>>>>>> origin/tomato-shibby-RT-AC
 	unget_input(&kbinput, 1);
     }
 }
 
 /* Try to read input_len codes from the keystroke buffer.  If the
  * keystroke buffer is empty and win isn't NULL, try to read in more
-<<<<<<< HEAD
- * characters from win and add them to the keystroke buffer before doing
- * anything else.  If the keystroke buffer is empty and win is NULL,
- * return NULL. */
-=======
  * codes from win and add them to the keystroke buffer before doing
  * anything else.  If the keystroke buffer is (still) empty, return NULL. */
->>>>>>> origin/tomato-shibby-RT-AC
 int *get_input(WINDOW *win, size_t input_len)
 {
     int *input;
 
-#ifndef NANO_TINY
-    allow_pending_sigwinch(TRUE);
-    allow_pending_sigwinch(FALSE);
-#endif
+    if (key_buffer_len == 0 && win != NULL)
+	get_key_buffer(win);
 
-    if (key_buffer_len == 0) {
-	if (win != NULL) {
-	    get_key_buffer(win);
-
-	    if (key_buffer_len == 0)
-		return NULL;
-	} else
-	    return NULL;
-    }
+    if (key_buffer_len == 0)
+	return NULL;
 
     /* Limit the request to the number of available codes in the buffer. */
     if (input_len > key_buffer_len)
@@ -346,24 +289,11 @@ int *get_input(WINDOW *win, size_t input_len)
     return input;
 }
 
-/* Read in a single character.  If it's ignored, swallow it and go on.
- * Otherwise, try to translate it from ASCII, meta key sequences, escape
- * sequences, and/or extended keypad values.  Set meta_key to TRUE when
- * we get a meta key sequence, and set func_key to TRUE when we get an
- * extended keypad value.  Supported extended keypad values consist of
- * [arrow key], Ctrl-[arrow key], Shift-[arrow key], Enter, Backspace,
- * the editing keypad (Insert, Delete, Home, End, PageUp, and PageDown),
- * the function keypad (F1-F16), and the numeric keypad with NumLock
- * off.  Assume nodelay(win) is FALSE. */
-int get_kbinput(WINDOW *win, bool *meta_key, bool *func_key)
+/* Read in a single keystroke, ignoring any that are invalid. */
+int get_kbinput(WINDOW *win)
 {
     int kbinput = ERR;
 
-<<<<<<< HEAD
-    /* Read in a character and interpret it.  Continue doing this until
-     * we get a recognized value or sequence. */
-    while ((kbinput = parse_kbinput(win, meta_key, func_key)) == ERR);
-=======
     /* Extract one keystroke from the input stream. */
     while (kbinput == ERR)
 	kbinput = parse_kbinput(win);
@@ -372,29 +302,14 @@ int get_kbinput(WINDOW *win, bool *meta_key, bool *func_key)
     fprintf(stderr, "after parsing:  kbinput = %d, meta_key = %s\n",
 	kbinput, meta_key ? "TRUE" : "FALSE");
 #endif
->>>>>>> origin/tomato-shibby-RT-AC
 
-    /* If we read from the edit window, blank the statusbar if we need
-     * to. */
+    /* If we read from the edit window, blank the statusbar if needed. */
     if (win == edit)
 	check_statusblank();
 
     return kbinput;
 }
 
-<<<<<<< HEAD
-/* Translate ASCII characters, extended keypad values, and escape
- * sequences into their corresponding key values.  Set meta_key to TRUE
- * when we get a meta key sequence, and set func_key to TRUE when we get
- * a function key.  Assume nodelay(win) is FALSE. */
-int parse_kbinput(WINDOW *win, bool *meta_key, bool *func_key)
-{
-    static int escapes = 0, byte_digits = 0;
-    int *kbinput, retval = ERR;
-
-    *meta_key = FALSE;
-    *func_key = FALSE;
-=======
 /* Extract a single keystroke from the input stream.  Translate escape
  * sequences and extended keypad codes into their corresponding values.
  * Set meta_key to TRUE when appropriate.  Supported extended keypad values
@@ -409,15 +324,15 @@ int parse_kbinput(WINDOW *win)
 
     meta_key = FALSE;
     shift_held = FALSE;
->>>>>>> origin/tomato-shibby-RT-AC
 
     /* Read in a character. */
-    if (nodelay_mode) {
+    kbinput = get_input(win, 1);
+
+    if (kbinput == NULL && nodelay_mode)
+	return 0;
+
+    while (kbinput == NULL)
 	kbinput = get_input(win, 1);
-	if (kbinput == 0)
-	    return 0;
-    } else
-	while ((kbinput = get_input(win, 1)) == NULL);
 
     keycode = *kbinput;
     free(kbinput);
@@ -445,134 +360,6 @@ int parse_kbinput(WINDOW *win)
 	    /* One non-escape: normal input mode. */
 	    retval = keycode;
 	    break;
-<<<<<<< HEAD
-	case NANO_CONTROL_3:
-	    /* Increment the escape counter. */
-	    escapes++;
-	    switch (escapes) {
-		case 1:
-		    /* One escape: wait for more input. */
-		case 2:
-		    /* Two escapes: wait for more input. */
-		case 3:
-		    /* Three escapes: wait for more input. */
-		    break;
-		default:
-		    /* More than three escapes: limit the escape counter
-		     * to no more than two, and wait for more input. */
-		    escapes %= 3;
-	    }
-	    break;
-	default:
-	    switch (escapes) {
-		case 0:
-		    /* One non-escape: normal input mode.  Save the
-		     * non-escape character as the result. */
-		    retval = *kbinput;
-		    break;
-		case 1:
-		    /* Reset the escape counter. */
-		    escapes = 0;
-		    if (get_key_buffer_len() == 0) {
-			/* One escape followed by a non-escape, and
-			 * there aren't any other keystrokes waiting:
-			 * meta key sequence mode.  Set meta_key to
-			 * TRUE, and save the lowercase version of the
-			 * non-escape character as the result. */
-			*meta_key = TRUE;
-			retval = tolower(*kbinput);
-		    } else
-			/* One escape followed by a non-escape, and
-			 * there are other keystrokes waiting: escape
-			 * sequence mode.  Interpret the escape
-			 * sequence. */
-			retval = parse_escape_seq_kbinput(win,
-				*kbinput);
-		    break;
-		case 2:
-		    if (get_key_buffer_len() == 0) {
-			if (('0' <= *kbinput && *kbinput <= '2' &&
-				byte_digits == 0) || ('0' <= *kbinput &&
-				*kbinput <= '9' && byte_digits > 0)) {
-			    /* Two escapes followed by one or more
-			     * decimal digits, and there aren't any
-			     * other keystrokes waiting: byte sequence
-			     * mode.  If the byte sequence's range is
-			     * limited to 2XX (the first digit is in the
-			     * '0' to '2' range and it's the first
-			     * digit, or it's in the '0' to '9' range
-			     * and it's not the first digit), increment
-			     * the byte sequence counter and interpret
-			     * the digit.  If the byte sequence's range
-			     * is not limited to 2XX, fall through. */
-			    int byte;
-
-			    byte_digits++;
-			    byte = get_byte_kbinput(*kbinput);
-
-			    if (byte != ERR) {
-				char *byte_mb;
-				int byte_mb_len, *seq, i;
-
-				/* If we've read in a complete byte
-				 * sequence, reset the escape counter
-				 * and the byte sequence counter, and
-				 * put back the corresponding byte
-				 * value. */
-				escapes = 0;
-				byte_digits = 0;
-
-				/* Put back the multibyte equivalent of
-				 * the byte value. */
-				byte_mb = make_mbchar((long)byte,
-					&byte_mb_len);
-
-				seq = (int *)nmalloc(byte_mb_len *
-					sizeof(int));
-
-				for (i = 0; i < byte_mb_len; i++)
-				    seq[i] = (unsigned char)byte_mb[i];
-
-				unget_input(seq, byte_mb_len);
-
-				free(byte_mb);
-				free(seq);
-			    }
-			} else {
-			    /* Reset the escape counter. */
-			    escapes = 0;
-			    if (byte_digits == 0)
-				/* Two escapes followed by a non-decimal
-				 * digit or a decimal digit that would
-				 * create a byte sequence greater than
-				 * 2XX, we're not in the middle of a
-				 * byte sequence, and there aren't any
-				 * other keystrokes waiting: control
-				 * character sequence mode.  Interpret
-				 * the control sequence and save the
-				 * corresponding control character as
-				 * the result. */
-				retval = get_control_kbinput(*kbinput);
-			    else {
-				/* If we're in the middle of a byte
-				 * sequence, reset the byte sequence
-				 * counter and save the character we got
-				 * as the result. */
-				byte_digits = 0;
-				retval = *kbinput;
-			    }
-			}
-		    } else {
-			/* Two escapes followed by a non-escape, and
-			 * there are other keystrokes waiting: combined
-			 * meta and escape sequence mode.  Reset the
-			 * escape counter, set meta_key to TRUE, and
-			 * interpret the escape sequence. */
-			escapes = 0;
-			*meta_key = TRUE;
-			retval = parse_escape_seq_kbinput(win,
-				*kbinput);
-=======
 	case 1:
 	    if (keycode >= 0x80)
 		retval = keycode;
@@ -660,7 +447,6 @@ int parse_kbinput(WINDOW *win)
 
 			byte_digits = 0;
 			escapes = 0;
->>>>>>> origin/tomato-shibby-RT-AC
 		    }
 		} else {
 		    if (byte_digits == 0)
@@ -678,24 +464,6 @@ int parse_kbinput(WINDOW *win)
 			retval = keycode;
 		    }
 		    escapes = 0;
-<<<<<<< HEAD
-		    if (get_key_buffer_len() == 0)
-			/* Three escapes followed by a non-escape, and
-			 * there aren't any other keystrokes waiting:
-			 * normal input mode.  Save the non-escape
-			 * character as the result. */
-			retval = *kbinput;
-		    else
-			/* Three escapes followed by a non-escape, and
-			 * there are other keystrokes waiting: combined
-			 * control character and escape sequence mode.
-			 * Interpret the escape sequence, and interpret
-			 * the result as a control sequence. */
-			retval = get_control_kbinput(
-				parse_escape_seq_kbinput(win,
-				*kbinput));
-		    break;
-=======
 		}
 	    } else if (keycode == '[' && key_buffer_len > 0 &&
 			(('A' <= *key_buffer && *key_buffer <= 'D') ||
@@ -708,7 +476,6 @@ int parse_kbinput(WINDOW *win)
 		retval = parse_escape_sequence(win, keycode);
 		meta_key = TRUE;
 		escapes = 0;
->>>>>>> origin/tomato-shibby-RT-AC
 	    }
 	    break;
 	case 3:
@@ -727,29 +494,6 @@ int parse_kbinput(WINDOW *win)
 	    break;
     }
 
-<<<<<<< HEAD
-    if (retval != ERR) {
-	switch (retval) {
-	    case NANO_CONTROL_8:
-		retval = ISSET(REBIND_DELETE) ? sc_seq_or(DO_DELETE, 0) :
-			sc_seq_or(DO_BACKSPACE, 0);
-		break;
-	    case KEY_DOWN:
-#ifdef KEY_SDOWN
-	    /* ncurses and Slang don't support KEY_SDOWN. */
-	    case KEY_SDOWN:
-#endif
-		retval = sc_seq_or(DO_DOWN_VOID, *kbinput);
-		break;
-	    case KEY_UP:
-#ifdef KEY_SUP
-	    /* ncurses and Slang don't support KEY_SUP. */
-	    case KEY_SUP:
-#endif
-		retval = sc_seq_or(DO_UP_VOID, *kbinput);
-		break;
-	    case KEY_LEFT:
-=======
     if (retval == ERR)
 	return ERR;
 
@@ -828,19 +572,12 @@ int parse_kbinput(WINDOW *win)
 #endif /* __linux__ */
 
     switch (retval) {
->>>>>>> origin/tomato-shibby-RT-AC
 #ifdef KEY_SLEFT
 	/* Slang doesn't support KEY_SLEFT. */
 	case KEY_SLEFT:
 	    shift_held = TRUE;
 	    return KEY_LEFT;
 #endif
-<<<<<<< HEAD
-		retval = sc_seq_or(DO_LEFT, *kbinput);
-		break;
-	    case KEY_RIGHT:
-=======
->>>>>>> origin/tomato-shibby-RT-AC
 #ifdef KEY_SRIGHT
 	/* Slang doesn't support KEY_SRIGHT. */
 	case KEY_SRIGHT:
@@ -865,32 +602,10 @@ int parse_kbinput(WINDOW *win)
 	    shift_held = TRUE;
 	    return KEY_DOWN;
 #endif
-<<<<<<< HEAD
-		retval = sc_seq_or(DO_RIGHT, *kbinput);
-		break;
-=======
->>>>>>> origin/tomato-shibby-RT-AC
 #ifdef KEY_SHOME
 	/* HP-UX 10-11 and Slang don't support KEY_SHOME. */
 	case KEY_SHOME:
 #endif
-<<<<<<< HEAD
-	    case KEY_A1:	/* Home (7) on numeric keypad with
-				 * NumLock off. */
-		retval = sc_seq_or(DO_HOME, *kbinput);
-		break;
-	    case KEY_BACKSPACE:
-		retval = sc_seq_or(DO_BACKSPACE, *kbinput);
-		break;
-#ifdef KEY_SDC
-	    /* Slang doesn't support KEY_SDC. */
-	    case KEY_SDC:
-		if (ISSET(REBIND_DELETE))
-		   retval = sc_seq_or(DO_DELETE, *kbinput);
-		else
-		   retval = sc_seq_or(DO_BACKSPACE, *kbinput);
-		break;
-=======
 	case SHIFT_HOME:
 	    shift_held = TRUE;
 	case KEY_A1:	/* Home (7) on keypad with NumLock off. */
@@ -924,7 +639,6 @@ int parse_kbinput(WINDOW *win)
 #ifdef KEY_SDC
 	/* Slang doesn't support KEY_SDC. */
 	case KEY_SDC:
->>>>>>> origin/tomato-shibby-RT-AC
 #endif
 	case DEL_CODE:
 	    if (ISSET(REBIND_DELETE))
@@ -932,36 +646,6 @@ int parse_kbinput(WINDOW *win)
 	    else
 		return KEY_BACKSPACE;
 #ifdef KEY_SIC
-<<<<<<< HEAD
-	    /* Slang doesn't support KEY_SIC. */
-	    case KEY_SIC:
-		retval = sc_seq_or(DO_INSERTFILE_VOID, *kbinput);
-		break;
-#endif
-	    case KEY_C3:	/* PageDown (4) on numeric keypad with
-				 * NumLock off. */
-		retval = sc_seq_or(DO_PAGE_DOWN, *kbinput);
-		break;
-	    case KEY_A3:	/* PageUp (9) on numeric keypad with
-				 * NumLock off. */
-		retval = sc_seq_or(DO_PAGE_UP, *kbinput);
-		break;
-	    case KEY_ENTER:
-		retval = sc_seq_or(DO_ENTER, *kbinput);
-		break;
-	    case KEY_B2:	/* Center (5) on numeric keypad with
-				 * NumLock off. */
-		retval = ERR;
-		break;
-	    case KEY_C1:	/* End (1) on numeric keypad with
-				 * NumLock off. */
-#ifdef KEY_SEND
-	    /* HP-UX 10-11 and Slang don't support KEY_SEND. */
-	    case KEY_SEND:
-#endif
-		retval = sc_seq_or(DO_END, *kbinput);
-		break;
-=======
 	/* Slang doesn't support KEY_SIC. */
 	case KEY_SIC:
 	    return the_code_for(do_insertfile_void, KEY_IC);
@@ -970,7 +654,6 @@ int parse_kbinput(WINDOW *win)
 	/* Slang doesn't support KEY_SBEG. */
 	case KEY_SBEG:
 #endif
->>>>>>> origin/tomato-shibby-RT-AC
 #ifdef KEY_BEG
 	/* Slang doesn't support KEY_BEG. */
 	case KEY_BEG:
@@ -979,16 +662,8 @@ int parse_kbinput(WINDOW *win)
 	    return ERR;
 #ifdef KEY_CANCEL
 #ifdef KEY_SCANCEL
-<<<<<<< HEAD
-	    /* Slang doesn't support KEY_SCANCEL. */
-	    case KEY_SCANCEL:
-#endif
-		retval = first_sc_for(currmenu, CANCEL_MSG)->seq;
-		break;
-=======
 	/* Slang doesn't support KEY_SCANCEL. */
 	case KEY_SCANCEL:
->>>>>>> origin/tomato-shibby-RT-AC
 #endif
 	/* Slang doesn't support KEY_CANCEL. */
 	case KEY_CANCEL:
@@ -996,25 +671,12 @@ int parse_kbinput(WINDOW *win)
 #endif
 #ifdef KEY_SUSPEND
 #ifdef KEY_SSUSPEND
-<<<<<<< HEAD
-	    /* Slang doesn't support KEY_SSUSPEND. */
-	    case KEY_SSUSPEND:
-		retval = sc_seq_or(DO_SUSPEND_VOID, 0);
-		break;
-#endif
-#ifdef KEY_SUSPEND
-	    /* Slang doesn't support KEY_SUSPEND. */
-	    case KEY_SUSPEND:
-		retval =  sc_seq_or(DO_SUSPEND_VOID, 0);
-		break;
-=======
 	/* Slang doesn't support KEY_SSUSPEND. */
 	case KEY_SSUSPEND:
 #endif
 	/* Slang doesn't support KEY_SUSPEND. */
 	case KEY_SUSPEND:
 	    return the_code_for(do_suspend_void, KEY_SUSPEND);
->>>>>>> origin/tomato-shibby-RT-AC
 #endif
 #ifdef PDCURSES
 	case KEY_SHIFT_L:
@@ -1025,23 +687,6 @@ int parse_kbinput(WINDOW *win)
 	case KEY_ALT_R:
 	    return ERR;
 #endif
-<<<<<<< HEAD
-	}
-
-	/* If our result is an extended keypad value (i.e. a value
-	 * outside of byte range), set func_key to TRUE. */
-	if (retval != ERR)
-	    *func_key = !is_byte(retval);
-    }
-
-#ifdef DEBUG
-    fprintf(stderr, "parse_kbinput(): kbinput = %d, meta_key = %s, func_key = %s, escapes = %d, byte_digits = %d, retval = %d\n", *kbinput, *meta_key ? "TRUE" : "FALSE", *func_key ? "TRUE" : "FALSE", escapes, byte_digits, retval);
-#endif
-
-    free(kbinput);
-
-    /* Return the result. */
-=======
 #ifdef KEY_RESIZE
 	/* Slang and SunOS 5.7-5.9 don't support KEY_RESIZE. */
 	case KEY_RESIZE:
@@ -1049,7 +694,6 @@ int parse_kbinput(WINDOW *win)
 #endif
     }
 
->>>>>>> origin/tomato-shibby-RT-AC
     return retval;
 }
 
@@ -1057,10 +701,8 @@ int parse_kbinput(WINDOW *win)
  * keypad values, into their corresponding key values.  These sequences
  * are generated when the keypad doesn't support the needed keys.
  * Assume that Escape has already been read in. */
-int get_escape_seq_kbinput(const int *seq, size_t seq_len)
+int convert_sequence(const int *seq, size_t seq_len)
 {
-    int retval = ERR;
-
     if (seq_len > 1) {
 	switch (seq[0]) {
 	    case 'O':
@@ -1070,53 +712,6 @@ int get_escape_seq_kbinput(const int *seq, size_t seq_len)
 
 	switch (seq[3]) {
 	    case '2':
-<<<<<<< HEAD
-		if (seq_len >= 5) {
-		    switch (seq[4]) {
-			case 'A': /* Esc O 1 ; 2 A == Shift-Up on
-				   * Terminal. */
-			case 'B': /* Esc O 1 ; 2 B == Shift-Down on
-				   * Terminal. */
-			case 'C': /* Esc O 1 ; 2 C == Shift-Right on
-				   * Terminal. */
-			case 'D': /* Esc O 1 ; 2 D == Shift-Left on
-				   * Terminal. */
-			    retval = get_escape_seq_abcd(seq[4]);
-			    break;
-			case 'P': /* Esc O 1 ; 2 P == F13 on
-				   * Terminal. */
-			    retval = KEY_F(13);
-			    break;
-			case 'Q': /* Esc O 1 ; 2 Q == F14 on
-				   * Terminal. */
-			    retval = KEY_F(14);
-			    break;
-			case 'R': /* Esc O 1 ; 2 R == F15 on
-				   * Terminal. */
-			    retval = KEY_F(15);
-			    break;
-			case 'S': /* Esc O 1 ; 2 S == F16 on
-				   * Terminal. */
-			    retval = KEY_F(16);
-			    break;
-		    }
-		}
-		break;
-	    case '5':
-		if (seq_len >= 5) {
-		    switch (seq[4]) {
-			case 'A': /* Esc O 1 ; 5 A == Ctrl-Up on
-				   * Terminal. */
-			case 'B': /* Esc O 1 ; 5 B == Ctrl-Down on
-				   * Terminal. */
-			case 'C': /* Esc O 1 ; 5 C == Ctrl-Right on
-				   * Terminal. */
-			case 'D': /* Esc O 1 ; 5 D == Ctrl-Left on
-				   * Terminal. */
-			    retval = get_escape_seq_abcd(seq[4]);
-			    break;
-		    }
-=======
 		switch (seq[4]) {
 		    case 'A': /* Esc O 1 ; 2 A == Shift-Up on Terminal. */
 		    case 'B': /* Esc O 1 ; 2 B == Shift-Down on Terminal. */
@@ -1144,7 +739,6 @@ int get_escape_seq_kbinput(const int *seq, size_t seq_len)
 			return CONTROL_RIGHT;
 		    case 'D': /* Esc O 1 ; 5 D == Ctrl-Left on Terminal. */
 			return CONTROL_LEFT;
->>>>>>> origin/tomato-shibby-RT-AC
 		}
 		break;
 	}
@@ -1154,51 +748,26 @@ int get_escape_seq_kbinput(const int *seq, size_t seq_len)
 		    case '2':
 			if (seq_len >= 3) {
 			    switch (seq[2]) {
-				case 'P': /* Esc O 2 P == F13 on
-					   * xterm. */
-				    retval = KEY_F(13);
-				    break;
-				case 'Q': /* Esc O 2 Q == F14 on
-					   * xterm. */
-				    retval = KEY_F(14);
-				    break;
-				case 'R': /* Esc O 2 R == F15 on
-					   * xterm. */
-				    retval = KEY_F(15);
-				    break;
-				case 'S': /* Esc O 2 S == F16 on
-					   * xterm. */
-				    retval = KEY_F(16);
-				    break;
+				case 'P': /* Esc O 2 P == F13 on xterm. */
+				    return KEY_F(13);
+				case 'Q': /* Esc O 2 Q == F14 on xterm. */
+				    return KEY_F(14);
+				case 'R': /* Esc O 2 R == F15 on xterm. */
+				    return KEY_F(15);
+				case 'S': /* Esc O 2 S == F16 on xterm. */
+				    return KEY_F(16);
 			    }
 			}
 			break;
 		    case 'A': /* Esc O A == Up on VT100/VT320/xterm. */
-		    case 'B': /* Esc O B == Down on
-			       * VT100/VT320/xterm. */
-		    case 'C': /* Esc O C == Right on
-			       * VT100/VT320/xterm. */
-		    case 'D': /* Esc O D == Left on
-			       * VT100/VT320/xterm. */
-			retval = get_escape_seq_abcd(seq[1]);
-			break;
+		    case 'B': /* Esc O B == Down on VT100/VT320/xterm. */
+		    case 'C': /* Esc O C == Right on VT100/VT320/xterm. */
+		    case 'D': /* Esc O D == Left on VT100/VT320/xterm. */
+			return arrow_from_abcd(seq[1]);
 		    case 'E': /* Esc O E == Center (5) on numeric keypad
 			       * with NumLock off on xterm. */
-			retval = KEY_B2;
-			break;
+			return KEY_B2;
 		    case 'F': /* Esc O F == End on xterm/Terminal. */
-<<<<<<< HEAD
-			retval = sc_seq_or(DO_END, 0);
-			break;
-		    case 'H': /* Esc O H == Home on xterm/Terminal. */
-			retval = sc_seq_or(DO_HOME, 0);;
-			break;
-		    case 'M': /* Esc O M == Enter on numeric keypad with
-			       * NumLock off on VT100/VT220/VT320/xterm/
-			       * rxvt/Eterm. */
-			retval = sc_seq_or(DO_HOME, 0);;
-			break;
-=======
 			return KEY_END;
 		    case 'H': /* Esc O H == Home on xterm/Terminal. */
 			return KEY_HOME;
@@ -1206,113 +775,65 @@ int get_escape_seq_kbinput(const int *seq, size_t seq_len)
 			       * NumLock off on VT100/VT220/VT320/xterm/
 			       * rxvt/Eterm. */
 			return KEY_ENTER;
->>>>>>> origin/tomato-shibby-RT-AC
 		    case 'P': /* Esc O P == F1 on VT100/VT220/VT320/Mach
 			       * console. */
-			retval = KEY_F(1);
-			break;
+			return KEY_F(1);
 		    case 'Q': /* Esc O Q == F2 on VT100/VT220/VT320/Mach
 			       * console. */
-			retval = KEY_F(2);
-			break;
+			return KEY_F(2);
 		    case 'R': /* Esc O R == F3 on VT100/VT220/VT320/Mach
 			       * console. */
-			retval = KEY_F(3);
-			break;
+			return KEY_F(3);
 		    case 'S': /* Esc O S == F4 on VT100/VT220/VT320/Mach
 			       * console. */
-			retval = KEY_F(4);
-			break;
+			return KEY_F(4);
 		    case 'T': /* Esc O T == F5 on Mach console. */
-			retval = KEY_F(5);
-			break;
+			return KEY_F(5);
 		    case 'U': /* Esc O U == F6 on Mach console. */
-			retval = KEY_F(6);
-			break;
+			return KEY_F(6);
 		    case 'V': /* Esc O V == F7 on Mach console. */
-			retval = KEY_F(7);
-			break;
+			return KEY_F(7);
 		    case 'W': /* Esc O W == F8 on Mach console. */
-			retval = KEY_F(8);
-			break;
+			return KEY_F(8);
 		    case 'X': /* Esc O X == F9 on Mach console. */
-			retval = KEY_F(9);
-			break;
+			return KEY_F(9);
 		    case 'Y': /* Esc O Y == F10 on Mach console. */
-			retval = KEY_F(10);
-			break;
+			return KEY_F(10);
 		    case 'a': /* Esc O a == Ctrl-Up on rxvt. */
 			return CONTROL_UP;
 		    case 'b': /* Esc O b == Ctrl-Down on rxvt. */
-<<<<<<< HEAD
-=======
 			return CONTROL_DOWN;
->>>>>>> origin/tomato-shibby-RT-AC
 		    case 'c': /* Esc O c == Ctrl-Right on rxvt. */
+			return CONTROL_RIGHT;
 		    case 'd': /* Esc O d == Ctrl-Left on rxvt. */
-			retval = get_escape_seq_abcd(seq[1]);
-			break;
+			return CONTROL_LEFT;
 		    case 'j': /* Esc O j == '*' on numeric keypad with
 			       * NumLock off on VT100/VT220/VT320/xterm/
 			       * rxvt/Eterm/Terminal. */
-			retval = '*';
-			break;
+			return '*';
 		    case 'k': /* Esc O k == '+' on numeric keypad with
 			       * NumLock off on VT100/VT220/VT320/xterm/
 			       * rxvt/Eterm/Terminal. */
-			retval = '+';
-			break;
+			return '+';
 		    case 'l': /* Esc O l == ',' on numeric keypad with
 			       * NumLock off on VT100/VT220/VT320/xterm/
 			       * rxvt/Eterm/Terminal. */
-			retval = ',';
-			break;
+			return ',';
 		    case 'm': /* Esc O m == '-' on numeric keypad with
 			       * NumLock off on VT100/VT220/VT320/xterm/
 			       * rxvt/Eterm/Terminal. */
-			retval = '-';
-			break;
+			return '-';
 		    case 'n': /* Esc O n == Delete (.) on numeric keypad
 			       * with NumLock off on VT100/VT220/VT320/
 			       * xterm/rxvt/Eterm/Terminal. */
-<<<<<<< HEAD
-			retval = sc_seq_or(DO_DELETE, 0);;
-			break;
-=======
 			return KEY_DC;
->>>>>>> origin/tomato-shibby-RT-AC
 		    case 'o': /* Esc O o == '/' on numeric keypad with
 			       * NumLock off on VT100/VT220/VT320/xterm/
 			       * rxvt/Eterm/Terminal. */
-			retval = '/';
-			break;
+			return '/';
 		    case 'p': /* Esc O p == Insert (0) on numeric keypad
 			       * with NumLock off on VT100/VT220/VT320/
 			       * rxvt/Eterm/Terminal. */
-<<<<<<< HEAD
-			retval = sc_seq_or(DO_INSERTFILE_VOID, 0);;
-			break;
-		    case 'q': /* Esc O q == End (1) on numeric keypad
-			       * with NumLock off on VT100/VT220/VT320/
-			       * rxvt/Eterm/Terminal. */
-			retval = sc_seq_or(DO_END, 0);;
-			break;
-		    case 'r': /* Esc O r == Down (2) on numeric keypad
-			       * with NumLock off on VT100/VT220/VT320/
-			       * rxvt/Eterm/Terminal. */
-			retval = sc_seq_or(DO_DOWN_VOID, 0);;
-			break;
-		    case 's': /* Esc O s == PageDown (3) on numeric
-			       * keypad with NumLock off on VT100/VT220/
-			       * VT320/rxvt/Eterm/Terminal. */
-			retval = sc_seq_or(DO_PAGE_DOWN, 0);;
-			break;
-		    case 't': /* Esc O t == Left (4) on numeric keypad
-			       * with NumLock off on VT100/VT220/VT320/
-			       * rxvt/Eterm/Terminal. */
-			retval = sc_seq_or(DO_LEFT, 0);;
-			break;
-=======
 			return KEY_IC;
 		    case 'q': /* Esc O q == End (1) on numeric keypad
 			       * with NumLock off on VT100/VT220/VT320/
@@ -1330,34 +851,13 @@ int get_escape_seq_kbinput(const int *seq, size_t seq_len)
 			       * with NumLock off on VT100/VT220/VT320/
 			       * rxvt/Eterm/Terminal. */
 			return KEY_LEFT;
->>>>>>> origin/tomato-shibby-RT-AC
 		    case 'u': /* Esc O u == Center (5) on numeric keypad
 			       * with NumLock off on VT100/VT220/VT320/
 			       * rxvt/Eterm. */
-			retval = KEY_B2;
-			break;
+			return KEY_B2;
 		    case 'v': /* Esc O v == Right (6) on numeric keypad
 			       * with NumLock off on VT100/VT220/VT320/
 			       * rxvt/Eterm/Terminal. */
-<<<<<<< HEAD
-			retval = sc_seq_or(DO_RIGHT, 0);
-			break;
-		    case 'w': /* Esc O w == Home (7) on numeric keypad
-			       * with NumLock off on VT100/VT220/VT320/
-			       * rxvt/Eterm/Terminal. */
-			retval = sc_seq_or(DO_HOME, 0);
-			break;
-		    case 'x': /* Esc O x == Up (8) on numeric keypad
-			       * with NumLock off on VT100/VT220/VT320/
-			       * rxvt/Eterm/Terminal. */
-			retval = sc_seq_or(DO_UP_VOID, 0);
-			break;
-		    case 'y': /* Esc O y == PageUp (9) on numeric keypad
-			       * with NumLock off on VT100/VT220/VT320/
-			       * rxvt/Eterm/Terminal. */
-			retval = sc_seq_or(DO_PAGE_UP, 0);
-			break;
-=======
 			return KEY_RIGHT;
 		    case 'w': /* Esc O w == Home (7) on numeric keypad
 			       * with NumLock off on VT100/VT220/VT320/
@@ -1371,7 +871,6 @@ int get_escape_seq_kbinput(const int *seq, size_t seq_len)
 			       * with NumLock off on VT100/VT220/VT320/
 			       * rxvt/Eterm/Terminal. */
 			return KEY_PPAGE;
->>>>>>> origin/tomato-shibby-RT-AC
 		}
 		break;
 	    case 'o':
@@ -1379,14 +878,11 @@ int get_escape_seq_kbinput(const int *seq, size_t seq_len)
 		    case 'a': /* Esc o a == Ctrl-Up on Eterm. */
 			return CONTROL_UP;
 		    case 'b': /* Esc o b == Ctrl-Down on Eterm. */
-<<<<<<< HEAD
-=======
 			return CONTROL_DOWN;
->>>>>>> origin/tomato-shibby-RT-AC
 		    case 'c': /* Esc o c == Ctrl-Right on Eterm. */
+			return CONTROL_RIGHT;
 		    case 'd': /* Esc o d == Ctrl-Left on Eterm. */
-			retval = get_escape_seq_abcd(seq[1]);
-			break;
+			return CONTROL_LEFT;
 		}
 		break;
 	    case '[':
@@ -1394,60 +890,28 @@ int get_escape_seq_kbinput(const int *seq, size_t seq_len)
 		    case '1':
 			if (seq_len > 3 && seq[3] == '~') {
 			    switch (seq[2]) {
-				case '1': /* Esc [ 1 1 ~ == F1 on rxvt/
-					   * Eterm. */
-				    retval = KEY_F(1);
-				    break;
-				case '2': /* Esc [ 1 2 ~ == F2 on rxvt/
-					   * Eterm. */
-				    retval = KEY_F(2);
-				    break;
-				case '3': /* Esc [ 1 3 ~ == F3 on rxvt/
-					   * Eterm. */
-				    retval = KEY_F(3);
-				    break;
-				case '4': /* Esc [ 1 4 ~ == F4 on rxvt/
-					   * Eterm. */
-				    retval = KEY_F(4);
-				    break;
+				case '1': /* Esc [ 1 1 ~ == F1 on rxvt/Eterm. */
+				    return KEY_F(1);
+				case '2': /* Esc [ 1 2 ~ == F2 on rxvt/Eterm. */
+				    return KEY_F(2);
+				case '3': /* Esc [ 1 3 ~ == F3 on rxvt/Eterm. */
+				    return KEY_F(3);
+				case '4': /* Esc [ 1 4 ~ == F4 on rxvt/Eterm. */
+				    return KEY_F(4);
 				case '5': /* Esc [ 1 5 ~ == F5 on xterm/
 					   * rxvt/Eterm. */
-				    retval = KEY_F(5);
-				    break;
+				    return KEY_F(5);
 				case '7': /* Esc [ 1 7 ~ == F6 on
 					   * VT220/VT320/Linux console/
 					   * xterm/rxvt/Eterm. */
-				    retval = KEY_F(6);
-				    break;
+				    return KEY_F(6);
 				case '8': /* Esc [ 1 8 ~ == F7 on
 					   * VT220/VT320/Linux console/
 					   * xterm/rxvt/Eterm. */
-				    retval = KEY_F(7);
-				    break;
+				    return KEY_F(7);
 				case '9': /* Esc [ 1 9 ~ == F8 on
 					   * VT220/VT320/Linux console/
 					   * xterm/rxvt/Eterm. */
-<<<<<<< HEAD
-				    retval = KEY_F(8);
-				    break;
-				case ';':
-    if (seq_len >= 4) {
-	switch (seq[3]) {
-	    case '2':
-		if (seq_len >= 5) {
-		    switch (seq[4]) {
-			case 'A': /* Esc [ 1 ; 2 A == Shift-Up on
-				   * xterm. */
-			case 'B': /* Esc [ 1 ; 2 B == Shift-Down on
-				   * xterm. */
-			case 'C': /* Esc [ 1 ; 2 C == Shift-Right on
-				   * xterm. */
-			case 'D': /* Esc [ 1 ; 2 D == Shift-Left on
-				   * xterm. */
-			    retval = get_escape_seq_abcd(seq[4]);
-			    break;
-		    }
-=======
 				    return KEY_F(8);
 			    }
 			} else if (seq_len > 4 && seq[2] == ';') {
@@ -1476,26 +940,10 @@ int get_escape_seq_kbinput(const int *seq, size_t seq_len)
 			return SHIFT_END;
 		    case 'D': /* Esc [ 1 ; 4 D == Shift-Alt-Left on xterm. */
 			return SHIFT_HOME;
->>>>>>> origin/tomato-shibby-RT-AC
 		}
 		break;
 #endif
 	    case '5':
-<<<<<<< HEAD
-		if (seq_len >= 5) {
-		    switch (seq[4]) {
-			case 'A': /* Esc [ 1 ; 5 A == Ctrl-Up on
-				   * xterm. */
-			case 'B': /* Esc [ 1 ; 5 B == Ctrl-Down on
-				   * xterm. */
-			case 'C': /* Esc [ 1 ; 5 C == Ctrl-Right on
-				   * xterm. */
-			case 'D': /* Esc [ 1 ; 5 D == Ctrl-Left on
-				   * xterm. */
-			    retval = get_escape_seq_abcd(seq[4]);
-			    break;
-		    }
-=======
 		switch (seq[4]) {
 		    case 'A': /* Esc [ 1 ; 5 A == Ctrl-Up on xterm. */
 			return CONTROL_UP;
@@ -1518,77 +966,18 @@ int get_escape_seq_kbinput(const int *seq, size_t seq_len)
 			return shiftcontrolright;
 		    case 'D': /* Esc [ 1 ; 6 D == Shift-Ctrl-Left on xterm. */
 			return shiftcontrolleft;
->>>>>>> origin/tomato-shibby-RT-AC
 		}
 		break;
 #endif
 	}
-<<<<<<< HEAD
-    }
-				    break;
-				default: /* Esc [ 1 ~ == Home on
-					  * VT320/Linux console. */
-				    retval = sc_seq_or(DO_HOME, 0);;
-				    break;
-			    }
-			}
-=======
 
 			} else if (seq_len > 2 && seq[2] == '~')
 			    /* Esc [ 1 ~ == Home on VT320/Linux console. */
 			    return KEY_HOME;
->>>>>>> origin/tomato-shibby-RT-AC
 			break;
 		    case '2':
 			if (seq_len > 3 && seq[3] == '~') {
 			    switch (seq[2]) {
-<<<<<<< HEAD
-				case '0': /* Esc [ 2 0 ~ == F9 on
-					   * VT220/VT320/Linux console/
-					   * xterm/rxvt/Eterm. */
-				    retval = KEY_F(9);
-				    break;
-				case '1': /* Esc [ 2 1 ~ == F10 on
-					   * VT220/VT320/Linux console/
-					   * xterm/rxvt/Eterm. */
-				    retval = KEY_F(10);
-				    break;
-				case '3': /* Esc [ 2 3 ~ == F11 on
-					   * VT220/VT320/Linux console/
-					   * xterm/rxvt/Eterm. */
-				    retval = KEY_F(11);
-				    break;
-				case '4': /* Esc [ 2 4 ~ == F12 on
-					   * VT220/VT320/Linux console/
-					   * xterm/rxvt/Eterm. */
-				    retval = KEY_F(12);
-				    break;
-				case '5': /* Esc [ 2 5 ~ == F13 on
-					   * VT220/VT320/Linux console/
-					   * rxvt/Eterm. */
-				    retval = KEY_F(13);
-				    break;
-				case '6': /* Esc [ 2 6 ~ == F14 on
-					   * VT220/VT320/Linux console/
-					   * rxvt/Eterm. */
-				    retval = KEY_F(14);
-				    break;
-				case '8': /* Esc [ 2 8 ~ == F15 on
-					   * VT220/VT320/Linux console/
-					   * rxvt/Eterm. */
-				    retval = KEY_F(15);
-				    break;
-				case '9': /* Esc [ 2 9 ~ == F16 on
-					   * VT220/VT320/Linux console/
-					   * rxvt/Eterm. */
-				    retval = KEY_F(16);
-				    break;
-				default: /* Esc [ 2 ~ == Insert on
-					  * VT220/VT320/Linux console/
-					  * xterm/Terminal. */
-				    retval = sc_seq_or(DO_INSERTFILE_VOID, 0);;
-				    break;
-=======
 				case '0': /* Esc [ 2 0 ~ == F9 on VT220/VT320/
 					   * Linux console/xterm/rxvt/Eterm. */
 				    return KEY_F(9);
@@ -1613,7 +1002,6 @@ int get_escape_seq_kbinput(const int *seq, size_t seq_len)
 				case '9': /* Esc [ 2 9 ~ == F16 on VT220/VT320/
 					   * Linux console/rxvt/Eterm. */
 				    return KEY_F(16);
->>>>>>> origin/tomato-shibby-RT-AC
 			    }
 			} else if (seq_len > 2 && seq[2] == '~')
 			    /* Esc [ 2 ~ == Insert on VT220/VT320/
@@ -1622,13 +1010,6 @@ int get_escape_seq_kbinput(const int *seq, size_t seq_len)
 			break;
 		    case '3': /* Esc [ 3 ~ == Delete on VT220/VT320/
 			       * Linux console/xterm/Terminal. */
-<<<<<<< HEAD
-			retval = sc_seq_or(DO_DELETE, 0);;
-			break;
-		    case '4': /* Esc [ 4 ~ == End on VT220/VT320/Linux
-			       * console/xterm. */
-			retval = sc_seq_or(DO_END, 0);;
-=======
 			if (seq_len > 2 && seq[2] == '~')
 			    return KEY_DC;
 			break;
@@ -1636,32 +1017,10 @@ int get_escape_seq_kbinput(const int *seq, size_t seq_len)
 			       * console/xterm. */
 			if (seq_len > 2 && seq[2] == '~')
 			    return KEY_END;
->>>>>>> origin/tomato-shibby-RT-AC
 			break;
 		    case '5': /* Esc [ 5 ~ == PageUp on VT220/VT320/
 			       * Linux console/xterm/Terminal;
 			       * Esc [ 5 ^ == PageUp on Eterm. */
-<<<<<<< HEAD
-			retval = sc_seq_or(DO_PAGE_UP, 0);;
-			break;
-		    case '6': /* Esc [ 6 ~ == PageDown on VT220/VT320/
-			       * Linux console/xterm/Terminal;
-			        * Esc [ 6 ^ == PageDown on Eterm. */
-			retval = sc_seq_or(DO_PAGE_DOWN, 0);;
-			break;
-		    case '7': /* Esc [ 7 ~ == Home on rxvt. */
-			retval = sc_seq_or(DO_HOME, 0);
-			break;
-		    case '8': /* Esc [ 8 ~ == End on rxvt. */
-			retval = sc_seq_or(DO_END, 0);
-			break;
-		    case '9': /* Esc [ 9 == Delete on Mach console. */
-			retval = sc_seq_or(DO_DELETE, 0);;
-			break;
-		    case '@': /* Esc [ @ == Insert on Mach console. */
-			retval = sc_seq_or(DO_INSERTFILE_VOID, 0);;
-			break;
-=======
 			if (seq_len > 2 && (seq[2] == '~' || seq[2] == '^'))
 			    return KEY_PPAGE;
 			break;
@@ -1689,7 +1048,6 @@ int get_escape_seq_kbinput(const int *seq, size_t seq_len)
 			return KEY_DC;
 		    case '@': /* Esc [ @ == Insert on Mach console. */
 			return KEY_IC;
->>>>>>> origin/tomato-shibby-RT-AC
 		    case 'A': /* Esc [ A == Up on ANSI/VT220/Linux
 			       * console/FreeBSD console/Mach console/
 			       * rxvt/Eterm/Terminal. */
@@ -1702,35 +1060,10 @@ int get_escape_seq_kbinput(const int *seq, size_t seq_len)
 		    case 'D': /* Esc [ D == Left on ANSI/VT220/Linux
 			       * console/FreeBSD console/Mach console/
 			       * rxvt/Eterm/Terminal. */
-			retval = get_escape_seq_abcd(seq[1]);
-			break;
+			return arrow_from_abcd(seq[1]);
 		    case 'E': /* Esc [ E == Center (5) on numeric keypad
 			       * with NumLock off on FreeBSD console/
 			       * Terminal. */
-<<<<<<< HEAD
-			retval = KEY_B2;
-			break;
-		    case 'F': /* Esc [ F == End on FreeBSD
-			       * console/Eterm. */
-			retval = sc_seq_or(DO_END, 0);
-			break;
-		    case 'G': /* Esc [ G == PageDown on FreeBSD
-			       * console. */
-			retval = sc_seq_or(DO_PAGE_DOWN, 0);
-			break;
-		    case 'H': /* Esc [ H == Home on ANSI/VT220/FreeBSD
-			       * console/Mach console/Eterm. */
-			retval = sc_seq_or(DO_HOME, 0);
-			break;
-		    case 'I': /* Esc [ I == PageUp on FreeBSD
-			       * console. */
-			retval = sc_seq_or(DO_PAGE_UP, 0);
-			break;
-		    case 'L': /* Esc [ L == Insert on ANSI/FreeBSD
-			       * console. */
-			retval = sc_seq_or(DO_INSERTFILE_VOID, 0);
-			break;
-=======
 			return KEY_B2;
 		    case 'F': /* Esc [ F == End on FreeBSD console/Eterm. */
 			return KEY_END;
@@ -1743,115 +1076,72 @@ int get_escape_seq_kbinput(const int *seq, size_t seq_len)
 			return KEY_PPAGE;
 		    case 'L': /* Esc [ L == Insert on ANSI/FreeBSD console. */
 			return KEY_IC;
->>>>>>> origin/tomato-shibby-RT-AC
 		    case 'M': /* Esc [ M == F1 on FreeBSD console. */
-			retval = KEY_F(1);
-			break;
+			return KEY_F(1);
 		    case 'N': /* Esc [ N == F2 on FreeBSD console. */
-			retval = KEY_F(2);
-			break;
+			return KEY_F(2);
 		    case 'O':
 			if (seq_len > 2) {
 			    switch (seq[2]) {
-				case 'P': /* Esc [ O P == F1 on
-					   * xterm. */
-				    retval = KEY_F(1);
-				    break;
-				case 'Q': /* Esc [ O Q == F2 on
-					   * xterm. */
-				    retval = KEY_F(2);
-				    break;
-				case 'R': /* Esc [ O R == F3 on
-					   * xterm. */
-				    retval = KEY_F(3);
-				    break;
-				case 'S': /* Esc [ O S == F4 on
-					   * xterm. */
-				    retval = KEY_F(4);
-				    break;
+				case 'P': /* Esc [ O P == F1 on xterm. */
+				    return KEY_F(1);
+				case 'Q': /* Esc [ O Q == F2 on xterm. */
+				    return KEY_F(2);
+				case 'R': /* Esc [ O R == F3 on xterm. */
+				    return KEY_F(3);
+				case 'S': /* Esc [ O S == F4 on xterm. */
+				    return KEY_F(4);
 			    }
 			} else
 			    /* Esc [ O == F3 on FreeBSD console. */
-			    retval = KEY_F(3);
+			    return KEY_F(3);
 			break;
 		    case 'P': /* Esc [ P == F4 on FreeBSD console. */
-			retval = KEY_F(4);
-			break;
+			return KEY_F(4);
 		    case 'Q': /* Esc [ Q == F5 on FreeBSD console. */
-			retval = KEY_F(5);
-			break;
+			return KEY_F(5);
 		    case 'R': /* Esc [ R == F6 on FreeBSD console. */
-			retval = KEY_F(6);
-			break;
+			return KEY_F(6);
 		    case 'S': /* Esc [ S == F7 on FreeBSD console. */
-			retval = KEY_F(7);
-			break;
+			return KEY_F(7);
 		    case 'T': /* Esc [ T == F8 on FreeBSD console. */
-			retval = KEY_F(8);
-			break;
+			return KEY_F(8);
 		    case 'U': /* Esc [ U == PageDown on Mach console. */
-<<<<<<< HEAD
-			retval = sc_seq_or(DO_PAGE_DOWN, 0);
-			break;
-		    case 'V': /* Esc [ V == PageUp on Mach console. */
-			retval = sc_seq_or(DO_PAGE_UP, 0);
-			break;
-=======
 			return KEY_NPAGE;
 		    case 'V': /* Esc [ V == PageUp on Mach console. */
 			return KEY_PPAGE;
->>>>>>> origin/tomato-shibby-RT-AC
 		    case 'W': /* Esc [ W == F11 on FreeBSD console. */
-			retval = KEY_F(11);
-			break;
+			return KEY_F(11);
 		    case 'X': /* Esc [ X == F12 on FreeBSD console. */
-			retval = KEY_F(12);
-			break;
+			return KEY_F(12);
 		    case 'Y': /* Esc [ Y == End on Mach console. */
-<<<<<<< HEAD
-			retval = sc_seq_or(DO_END, 0);
-			break;
-=======
 			return KEY_END;
->>>>>>> origin/tomato-shibby-RT-AC
 		    case 'Z': /* Esc [ Z == F14 on FreeBSD console. */
-			retval = KEY_F(14);
-			break;
+			return KEY_F(14);
 		    case 'a': /* Esc [ a == Shift-Up on rxvt/Eterm. */
 		    case 'b': /* Esc [ b == Shift-Down on rxvt/Eterm. */
-		    case 'c': /* Esc [ c == Shift-Right on rxvt/
-			       * Eterm. */
+		    case 'c': /* Esc [ c == Shift-Right on rxvt/Eterm. */
 		    case 'd': /* Esc [ d == Shift-Left on rxvt/Eterm. */
-<<<<<<< HEAD
-			retval = get_escape_seq_abcd(seq[1]);
-			break;
-=======
 			shift_held = TRUE;
 			return arrow_from_abcd(seq[1]);
->>>>>>> origin/tomato-shibby-RT-AC
 		    case '[':
 			if (seq_len > 2 ) {
 			    switch (seq[2]) {
 				case 'A': /* Esc [ [ A == F1 on Linux
 					   * console. */
-				    retval = KEY_F(1);
-				    break;
+				    return KEY_F(1);
 				case 'B': /* Esc [ [ B == F2 on Linux
 					   * console. */
-				    retval = KEY_F(2);
-				    break;
+				    return KEY_F(2);
 				case 'C': /* Esc [ [ C == F3 on Linux
 					   * console. */
-				    retval = KEY_F(3);
-				    break;
+				    return KEY_F(3);
 				case 'D': /* Esc [ [ D == F4 on Linux
 					   * console. */
-				    retval = KEY_F(4);
-				    break;
+				    return KEY_F(4);
 				case 'E': /* Esc [ [ E == F5 on Linux
 					   * console. */
-				    retval = KEY_F(5);
-				    break;
+				    return KEY_F(5);
 			    }
 			}
 			break;
@@ -1860,29 +1150,9 @@ int get_escape_seq_kbinput(const int *seq, size_t seq_len)
 	}
     }
 
-#ifdef DEBUG
-    fprintf(stderr, "get_escape_seq_kbinput(): retval = %d\n", retval);
-#endif
-
-    return retval;
+    return ERR;
 }
 
-<<<<<<< HEAD
-/* Return the equivalent arrow key value for the case-insensitive
- * letters A (up), B (down), C (right), and D (left).  These are common
- * to many escape sequences. */
-int get_escape_seq_abcd(int kbinput)
-{
-    switch (tolower(kbinput)) {
-	case 'a':
-	    return sc_seq_or(DO_UP_VOID, 0);;
-	case 'b':
-	    return sc_seq_or(DO_DOWN_VOID, 0);;
-	case 'c':
-	    return sc_seq_or(DO_RIGHT, 0);;
-	case 'd':
-	    return sc_seq_or(DO_LEFT, 0);;
-=======
 /* Return the equivalent arrow-key value for the first four letters
  * in the alphabet, common to many escape sequences. */
 int arrow_from_abcd(int kbinput)
@@ -1896,7 +1166,6 @@ int arrow_from_abcd(int kbinput)
 	    return KEY_RIGHT;
 	case 'd':
 	    return KEY_LEFT;
->>>>>>> origin/tomato-shibby-RT-AC
 	default:
 	    return ERR;
     }
@@ -1905,7 +1174,7 @@ int arrow_from_abcd(int kbinput)
 /* Interpret the escape sequence in the keystroke buffer, the first
  * character of which is kbinput.  Assume that the keystroke buffer
  * isn't empty, and that the initial escape has already been read in. */
-int parse_escape_seq_kbinput(WINDOW *win, int kbinput)
+int parse_escape_sequence(WINDOW *win, int kbinput)
 {
     int retval, *seq;
     size_t seq_len;
@@ -1916,20 +1185,28 @@ int parse_escape_seq_kbinput(WINDOW *win, int kbinput)
     unget_input(&kbinput, 1);
     seq_len = key_buffer_len;
     seq = get_input(NULL, seq_len);
-    retval = get_escape_seq_kbinput(seq, seq_len);
+    retval = convert_sequence(seq, seq_len);
 
     free(seq);
 
-    /* If we got an unrecognized escape sequence, throw it out. */
+    /* If we got an unrecognized escape sequence, notify the user. */
     if (retval == ERR) {
 	if (win == edit) {
-	    statusbar(_("Unknown Command"));
-	    beep();
+	    /* TRANSLATORS: This refers to a sequence of escape codes
+	     * (from the keyboard) that nano does not know about. */
+	    statusline(ALERT, _("Unknown sequence"));
+	    suppress_cursorpos = FALSE;
+	    lastmessage = HUSH;
+	    if (currmenu == MMAIN) {
+		reset_cursor();
+		curs_set(1);
+	    }
 	}
     }
 
 #ifdef DEBUG
-    fprintf(stderr, "parse_escape_seq_kbinput(): kbinput = %d, seq_len = %lu, retval = %d\n", kbinput, (unsigned long)seq_len, retval);
+    fprintf(stderr, "parse_escape_sequence(): kbinput = %d, seq_len = %lu, retval = %d\n",
+		kbinput, (unsigned long)seq_len, retval);
 #endif
 
     return retval;
@@ -1971,15 +1248,13 @@ int get_byte_kbinput(int kbinput)
 	    break;
 	case 3:
 	    /* Third digit: This must be from zero to five if the first
-	     * was two and the second was between zero and five, and may
-	     * be any decimal value if the first was zero or one and the
-	     * second was between six and nine.  Put it in the 1's
-	     * position of the byte sequence holder. */
+	     * was two and the second was five, and may be any decimal
+	     * value otherwise.  Put it in the 1's position of the byte
+	     * sequence holder. */
 	    if (('0' <= kbinput && kbinput <= '5') || (byte < 250 &&
 		'6' <= kbinput && kbinput <= '9')) {
 		byte += kbinput - '0';
-		/* If this character is a valid decimal value, then the
-		 * byte sequence is complete. */
+		/* The byte sequence is complete. */
 		retval = byte;
 	    } else
 		/* This isn't the third digit of a byte sequence.
@@ -2010,21 +1285,18 @@ int get_byte_kbinput(int kbinput)
 
 #ifdef ENABLE_UTF8
 /* If the character in kbinput is a valid hexadecimal digit, multiply it
- * by factor and add the result to uni. */
+ * by factor and add the result to uni, and return ERR to signify okay. */
 long add_unicode_digit(int kbinput, long factor, long *uni)
 {
-    long retval = ERR;
-
     if ('0' <= kbinput && kbinput <= '9')
 	*uni += (kbinput - '0') * factor;
     else if ('a' <= tolower(kbinput) && tolower(kbinput) <= 'f')
 	*uni += (tolower(kbinput) - 'a' + 10) * factor;
     else
-	/* If this character isn't a valid hexadecimal value, save it as
-	 * the result. */
-	retval = kbinput;
+	/* The character isn't hexadecimal; give it as the result. */
+	return (long)kbinput;
 
-    return retval;
+    return ERR;
 }
 
 /* Translate a Unicode sequence: turn a six-digit hexadecimal number
@@ -2074,12 +1346,6 @@ long get_unicode_kbinput(WINDOW *win, int kbinput)
 	    if (retval == ERR)
 		retval = uni;
 	    break;
-	default:
-	    /* If there are more than six digits, return this character
-	     * as the result.  (Maybe we should produce an error
-	     * instead?) */
-	    retval = kbinput;
-	    break;
     }
 
     /* Show feedback only when editing, not when at a prompt. */
@@ -2114,7 +1380,7 @@ int get_control_kbinput(int kbinput)
 {
     int retval;
 
-     /* Ctrl-Space (Ctrl-2, Ctrl-@, Ctrl-`) */
+    /* Ctrl-Space (Ctrl-2, Ctrl-@, Ctrl-`) */
     if (kbinput == ' ' || kbinput == '2')
 	retval = 0;
     /* Ctrl-/ (Ctrl-7, Ctrl-_) */
@@ -2207,14 +1473,9 @@ int *parse_verbatim_kbinput(WINDOW *win, size_t *count)
 {
     int *kbinput;
 
-<<<<<<< HEAD
-    /* Read in the first keystroke. */
-    while ((kbinput = get_input(win, 1)) == NULL);
-=======
     /* Read in the first code. */
     while ((kbinput = get_input(win, 1)) == NULL)
 	;
->>>>>>> origin/tomato-shibby-RT-AC
 
 #ifndef NANO_TINY
     /* When the window was resized, abort and return nothing. */
@@ -2241,18 +1502,11 @@ int *parse_verbatim_kbinput(WINDOW *win, size_t *count)
 	    char *multibyte;
 	    int onebyte, i;
 
-<<<<<<< HEAD
-	    while (uni == ERR) {
-		while ((kbinput = get_input(win, 1)) == NULL);
-
-		uni = get_unicode_kbinput(*kbinput);
-=======
 	    while (unicode == ERR) {
 		free(kbinput);
 		while ((kbinput = get_input(win, 1)) == NULL)
 		    ;
 		unicode = get_unicode_kbinput(win, *kbinput);
->>>>>>> origin/tomato-shibby-RT-AC
 	    }
 
 	    /* Convert the Unicode value to a multibyte sequence. */
@@ -2327,17 +1581,9 @@ int get_mouseinput(int *mouse_x, int *mouse_y, bool allow_shortcuts)
 		/* The width of all the shortcuts, except for the last
 		 * two, in the shortcut list in bottomwin. */
 	    int j;
-<<<<<<< HEAD
-		/* The y-coordinate relative to the beginning of the
-		 * shortcut list in bottomwin. */
-	    size_t currslen;
-		/* The number of shortcuts in the current shortcut
-		 * list. */
-=======
 		/* The calculated index number of the clicked item. */
 	    size_t number;
 		/* The number of available shortcuts in the current menu. */
->>>>>>> origin/tomato-shibby-RT-AC
 
 	    /* Translate the mouse event coordinates so that they're
 	     * relative to bottomwin. */
@@ -2354,20 +1600,8 @@ int get_mouseinput(int *mouse_x, int *mouse_y, bool allow_shortcuts)
 		return 0;
 	    }
 
-<<<<<<< HEAD
-	    /* Calculate the y-coordinate relative to the beginning of
-	     * the shortcut list in bottomwin. */
-	    j = *mouse_y - 1;
-
-	    /* Get the shortcut lists' length. */
-	    if (currmenu == MMAIN)
-		currslen = MAIN_VISIBLE;
-	    else {
-		currslen = length_of_list(currmenu);
-=======
 	    /* Determine how many shortcuts are being shown. */
 	    number = length_of_list(currmenu);
->>>>>>> origin/tomato-shibby-RT-AC
 
 	    if (number > MAIN_VISIBLE)
 		number = MAIN_VISIBLE;
@@ -2380,58 +1614,42 @@ int get_mouseinput(int *mouse_x, int *mouse_y, bool allow_shortcuts)
 	    else
 		i = COLS / ((number / 2) + (number % 2));
 
-	    /* Calculate the x-coordinate relative to the beginning of
-	     * the shortcut list in bottomwin, and add it to j.  j
-	     * should now be the index in the shortcut list of the
-	     * shortcut we released/clicked on. */
-	    j = (*mouse_x / i) * 2 + j;
+	    /* Calculate the one-based index in the shortcut list. */
+	    j = (*mouse_x / i) * 2 + *mouse_y;
 
-<<<<<<< HEAD
-	    /* Adjust j if we released on the last two shortcuts. */
-	    if ((j >= currslen) && (*mouse_x % i < COLS % i))
-=======
 	    /* Adjust the index if we hit the last two wider ones. */
 	    if ((j > number) && (*mouse_x % i < COLS % i))
->>>>>>> origin/tomato-shibby-RT-AC
 		j -= 2;
-
+#ifdef DEBUG
+	    fprintf(stderr, "Calculated %i as index in shortcut list, currmenu = %x.\n", j, currmenu);
+#endif
 	    /* Ignore releases/clicks of the first mouse button beyond
 	     * the last shortcut. */
-<<<<<<< HEAD
-	    if (j >= currslen)
-=======
 	    if (j > number)
->>>>>>> origin/tomato-shibby-RT-AC
 		return 2;
 
-	    /* Go through the shortcut list to determine which shortcut
-	     * we released/clicked on. */
-	    f = allfuncs;
-
-	    for (; j > 0; j--) {
-		if (f->next != NULL)
-		    f = f->next;
-
-                while (f->next != NULL && ((f->menus & currmenu) == 0
-#ifndef DISABLE_HELP
-                       || strlen(f->help) == 0
-#endif
-		))
-		     f = f->next;
+	    /* Go through the list of functions to determine which
+	     * shortcut in the current menu we released/clicked on. */
+	    for (f = allfuncs; f != NULL; f = f->next) {
+		if ((f->menus & currmenu) == 0)
+		    continue;
+		if (first_sc_for(currmenu, f->scfunc) == NULL)
+		    continue;
+		/* Tick off an actually shown shortcut. */
+		j -= 1;
+		if (j == 0)
+		    break;
 	    }
+#ifdef DEBUG
+	    fprintf(stderr, "Stopped on func %ld present in menus %x\n", (long)f->scfunc, f->menus);
+#endif
 
-
-	    /* And put back the equivalent key. */
+	    /* And put the corresponding key into the keyboard buffer. */
 	    if (f != NULL) {
-<<<<<<< HEAD
-                const sc *s = first_sc_for(currmenu, f->scfunc);
-		if (s != NULL)
-		    unget_kbinput(s->seq, s->type == META, FALSE);
-=======
 		const sc *s = first_sc_for(currmenu, f->scfunc);
 		unget_kbinput(s->keycode, s->meta);
->>>>>>> origin/tomato-shibby-RT-AC
 	    }
+	    return 1;
 	} else
 	    /* Handle releases/clicks of the first mouse button that
 	     * aren't on the current shortcut list elsewhere. */
@@ -2457,12 +1675,7 @@ int get_mouseinput(int *mouse_x, int *mouse_y, bool allow_shortcuts)
 	     * wheel is equivalent to moving down three lines. */
 	    for (i = 0; i < 3; i++)
 		unget_kbinput((mevent.bstate & BUTTON4_PRESSED) ?
-<<<<<<< HEAD
-			 sc_seq_or(DO_UP_VOID, 0) : sc_seq_or(DO_DOWN_VOID, 0), FALSE,
-			FALSE);
-=======
 				KEY_PPAGE : KEY_NPAGE, FALSE);
->>>>>>> origin/tomato-shibby-RT-AC
 
 	    return 1;
 	} else
@@ -2478,83 +1691,35 @@ int get_mouseinput(int *mouse_x, int *mouse_y, bool allow_shortcuts)
 }
 #endif /* !DISABLE_MOUSE */
 
-/* Return the shortcut corresponding to the values of kbinput (the key
- * itself), meta_key (whether the key is a meta sequence), and func_key
- * (whether the key is a function key), if any.  The shortcut will be
- * the first one in the list (control key, meta key sequence, function
- * key, other meta key sequence) for the corresponding function.  For
- * example, passing in a meta key sequence that corresponds to a
- * function with a control key, a function key, and a meta key sequence
- * will return the control key corresponding to that function. */
-const sc *get_shortcut(int menu, int *kbinput, bool
-	*meta_key, bool *func_key)
+/* Return the shortcut that corresponds to the values of kbinput (the
+ * key itself) and meta_key (whether the key is a meta sequence).  The
+ * returned shortcut will be the first in the list that corresponds to
+ * the given sequence. */
+const sc *get_shortcut(int *kbinput)
 {
     sc *s;
 
 #ifdef DEBUG
-<<<<<<< HEAD
-    fprintf(stderr, "get_shortcut(): kbinput = %d, meta_key = %s, func_key = %s\n", *kbinput, *meta_key ? "TRUE" : "FALSE", *func_key ? "TRUE" : "FALSE");
-=======
     fprintf(stderr, "get_shortcut(): kbinput = %d, meta_key = %s -- ",
 				*kbinput, meta_key ? "TRUE" : "FALSE");
->>>>>>> origin/tomato-shibby-RT-AC
 #endif
 
-    /* Check for shortcuts. */
     for (s = sclist; s != NULL; s = s->next) {
-<<<<<<< HEAD
-        if ((menu & s->menu)
-		&& ((s->type == META && *meta_key == TRUE && *kbinput == s->seq)
-		|| (s->type != META && *kbinput == s->seq))) {
-#ifdef DEBUG
-	    fprintf (stderr, "matched seq \"%s\" and btw meta was %d (menus %d = %d)\n", s->keystr, *meta_key, menu, s->menu);
-=======
 	if ((s->menus & currmenu) && *kbinput == s->keycode &&
 					meta_key == s->meta) {
 #ifdef DEBUG
 	    fprintf (stderr, "matched seq '%s'  (menu is %x from %x)\n",
 				s->keystr, currmenu, s->menus);
->>>>>>> origin/tomato-shibby-RT-AC
 #endif
 	    return s;
 	}
     }
 #ifdef DEBUG
-<<<<<<< HEAD
-    fprintf (stderr, "matched nothing btw meta was %d\n", *meta_key);
-=======
     fprintf (stderr, "matched nothing\n");
->>>>>>> origin/tomato-shibby-RT-AC
 #endif
 
     return NULL;
 }
-
-
-/* Try to get a function back from a window.  Just a wrapper so
-   functions to need to create function_key meta_key blah blah 
-    mmenu - what menu name to look through for valid funcs */
-const subnfunc *getfuncfromkey(WINDOW *win)
-{
-    int kbinput;
-    bool func_key = FALSE, meta_key = FALSE;
-    const sc *s;
-    const subnfunc *f;
-
-    kbinput = parse_kbinput(win, &meta_key, &func_key);
-    if (kbinput == 0)
-	return NULL;
-
-    s = get_shortcut(currmenu, &kbinput, &meta_key, &func_key);
-    if (!s)
-	return NULL;
-
-    f = sctofunc((sc *) s);
-    return f;
-
-}
-
-
 
 /* Move to (x, y) in win, and display a line of n spaces with the
  * current attributes. */
@@ -2600,18 +1765,23 @@ void blank_bottombars(void)
 
 /* Check if the number of keystrokes needed to blank the statusbar has
  * been pressed.  If so, blank the statusbar, unless constant cursor
- * position display is on. */
+ * position display is on and we are in the editing screen. */
 void check_statusblank(void)
 {
-    if (statusblank > 0) {
-	statusblank--;
+    if (statusblank == 0)
+	return;
 
-	if (statusblank == 0 && !ISSET(CONST_UPDATE)) {
-	    blank_statusbar();
-	    wnoutrefresh(bottomwin);
-	    reset_cursor();
-	    wnoutrefresh(edit);
-	}
+    statusblank--;
+
+    /* When editing and 'constantshow' is active, skip the blanking. */
+    if (currmenu == MMAIN && ISSET(CONST_UPDATE))
+	return;
+
+    if (statusblank == 0) {
+	blank_statusbar();
+	wnoutrefresh(bottomwin);
+	reset_cursor();
+	wnoutrefresh(edit);
     }
 
     /* If the subwindows overlap, make sure to show the edit window now. */
@@ -2646,13 +1816,10 @@ char *display_string(const char *buf, size_t start_col, size_t span,
     assert(column <= start_col);
 
     index = 0;
-<<<<<<< HEAD
-=======
 #ifdef USING_OLD_NCURSES
     seen_wide = FALSE;
 #endif
     buf += start_index;
->>>>>>> origin/tomato-shibby-RT-AC
 
     /* Allocate enough space for converting the relevant part of the line. */
     converted = charalloc(strlen(buf) * (mb_cur_max() + tabsize) + 1);
@@ -2663,26 +1830,9 @@ char *display_string(const char *buf, size_t start_col, size_t span,
 				(column > 0 && isdata && !ISSET(SOFTWRAP)))) {
 	if (is_cntrl_mbchar(buf)) {
 	    if (column < start_col) {
-<<<<<<< HEAD
-		char *ctrl_buf_mb = charalloc(mb_cur_max());
-		int ctrl_buf_mb_len, i;
-
-		ctrl_buf_mb = control_mbrep(buf_mb, ctrl_buf_mb,
-			&ctrl_buf_mb_len);
-
-		for (i = 0; i < ctrl_buf_mb_len; i++)
-		    converted[index++] = ctrl_buf_mb[i];
-
-		start_col += mbwidth(ctrl_buf_mb);
-
-		free(ctrl_buf_mb);
-
-		start_index += buf_mb_len;
-=======
 		converted[index++] = control_mbrep(buf, isdata);
 		start_col++;
 		buf += parse_mbchar(buf, NULL, NULL);
->>>>>>> origin/tomato-shibby-RT-AC
 	    }
 	}
 #ifdef ENABLE_UTF8
@@ -2700,22 +1850,6 @@ char *display_string(const char *buf, size_t start_col, size_t span,
 #endif
     }
 
-<<<<<<< HEAD
-    while (buf[start_index] != '\0') {
-	buf_mb_len = parse_mbchar(buf + start_index, buf_mb, NULL);
-
-	/* Make sure there's enough room for the next character, whether
-	 * it's a multibyte control character, a non-control multibyte
-	 * character, a tab character, or a null terminator. */
-	if (index + mb_cur_max() + tabsize + 1 >= alloc_len - 1) {
-	    alloc_len += (mb_cur_max() + tabsize + 1) * MAX_BUF_SIZE;
-	    converted = charealloc(converted, alloc_len);
-	}
-
-	/* If buf contains a tab character, interpret it. */
-	if (*buf_mb == '\t') {
-#if !defined(NANO_TINY) && defined(ENABLE_NANORC)
-=======
     while (*buf != '\0' && start_col < beyond) {
 	int charlength, charwidth = 1;
 
@@ -2736,71 +1870,20 @@ char *display_string(const char *buf, size_t start_col, size_t span,
 	} else if (*buf == '\t') {
 	    /* Show a tab as a visible character, or as as a space. */
 #ifndef NANO_TINY
->>>>>>> origin/tomato-shibby-RT-AC
 	    if (ISSET(WHITESPACE_DISPLAY)) {
-		int i;
+		int i = 0;
 
-		for (i = 0; i < whitespace_len[0]; i++)
-		    converted[index++] = whitespace[i];
+		while (i < whitespace_len[0])
+		    converted[index++] = whitespace[i++];
 	    } else
 #endif
 		converted[index++] = ' ';
 	    start_col++;
+	    /* Fill the tab up with the required number of spaces. */
 	    while (start_col % tabsize != 0) {
 		converted[index++] = ' ';
 		start_col++;
 	    }
-<<<<<<< HEAD
-	/* If buf contains a control character, interpret it.  If buf
-	 * contains an invalid multibyte control character, display it
-	 * as such.*/
-	} else if (is_cntrl_mbchar(buf_mb)) {
-	    char *ctrl_buf_mb = charalloc(mb_cur_max());
-	    int ctrl_buf_mb_len, i;
-
-	    converted[index++] = '^';
-	    start_col++;
-
-	    ctrl_buf_mb = control_mbrep(buf_mb, ctrl_buf_mb,
-		&ctrl_buf_mb_len);
-
-	    for (i = 0; i < ctrl_buf_mb_len; i++)
-		converted[index++] = ctrl_buf_mb[i];
-
-	    start_col += mbwidth(ctrl_buf_mb);
-
-	    free(ctrl_buf_mb);
-	/* If buf contains a space character, interpret it. */
-	} else if (*buf_mb == ' ') {
-#if !defined(NANO_TINY) && defined(ENABLE_NANORC)
-	    if (ISSET(WHITESPACE_DISPLAY)) {
-		int i;
-
-		for (i = whitespace_len[0]; i < whitespace_len[0] +
-			whitespace_len[1]; i++)
-		    converted[index++] = whitespace[i];
-	    } else
-#endif
-		converted[index++] = ' ';
-	    start_col++;
-	/* If buf contains a non-control character, interpret it.  If
-	 * buf contains an invalid multibyte non-control character,
-	 * display it as such. */
-	} else {
-	    char *nctrl_buf_mb = charalloc(mb_cur_max());
-	    int nctrl_buf_mb_len, i;
-
-	    nctrl_buf_mb = mbrep(buf_mb, nctrl_buf_mb,
-		&nctrl_buf_mb_len);
-
-	    for (i = 0; i < nctrl_buf_mb_len; i++)
-		converted[index++] = nctrl_buf_mb[i];
-
-	    start_col += mbwidth(nctrl_buf_mb);
-
-	    free(nctrl_buf_mb);
-	}
-=======
 	    buf++;
 	    continue;
 	}
@@ -2836,7 +1919,6 @@ char *display_string(const char *buf, size_t start_col, size_t span,
 
 	start_col += 1;
 	buf++;
->>>>>>> origin/tomato-shibby-RT-AC
 
 	/* For invalid codepoints, skip extra bytes. */
 	if (charlength < -1)
@@ -2861,34 +1943,6 @@ char *display_string(const char *buf, size_t start_col, size_t span,
  * of path on the titlebar. */
 void titlebar(const char *path)
 {
-<<<<<<< HEAD
-    int space = COLS;
-	/* The space we have available for display. */
-    size_t verlen = strlenpt(PACKAGE_STRING) + 1;
-	/* The length of the version message in columns, plus one for
-	 * padding. */
-    const char *prefix;
-	/* "DIR:", "File:", or "New Buffer".  Goes before filename. */
-    size_t prefixlen;
-	/* The length of the prefix in columns, plus one for padding. */
-    const char *state;
-	/* "Modified", "View", or "".  Shows the state of this
-	 * buffer. */
-    size_t statelen = 0;
-	/* The length of the state in columns, or the length of
-	 * "Modified" if the state is blank and we're not in the file
-	 * browser. */
-    char *exppath = NULL;
-	/* The filename, expanded for display. */
-    bool newfie = FALSE;
-	/* Do we say "New Buffer"? */
-    bool dots = FALSE;
-	/* Do we put an ellipsis before the path? */
-
-    assert(path != NULL || openfile->filename != NULL);
-
-    wattron(topwin, reverse_attr);
-=======
     size_t verlen, prefixlen, pathlen, statelen;
 	/* The width of the different titlebar elements, in columns. */
     size_t pluglen = 0;
@@ -2909,134 +1963,68 @@ void titlebar(const char *path)
     assert(path != NULL || openfile->filename != NULL);
 
     wattron(topwin, interface_color_pair[TITLE_BAR]);
->>>>>>> origin/tomato-shibby-RT-AC
 
     blank_titlebar();
     as_an_at = FALSE;
 
-    /* space has to be at least 4: two spaces before the version message,
-     * at least one character of the version message, and one space
-     * after the version message. */
-    if (space < 4)
-	space = 0;
-    else {
-	/* Limit verlen to 1/3 the length of the screen in columns,
-	 * minus three columns for spaces. */
-	if (verlen > (COLS / 3) - 3)
-	    verlen = (COLS / 3) - 3;
-    }
+    /* Do as Pico: if there is not enough width available for all items,
+     * first sacrifice the version string, then eat up the side spaces,
+     * then sacrifice the prefix, and only then start dottifying. */
 
-    if (space >= 4) {
-	/* Add a space after the version message, and account for both
-	 * it and the two spaces before it. */
-	mvwaddnstr(topwin, 0, 2, PACKAGE_STRING,
-		actual_x(PACKAGE_STRING, verlen));
-	verlen += 3;
-
-	/* Account for the full length of the version message. */
-	space -= verlen;
-    }
-
+    /* Figure out the path, prefix and state strings. */
 #ifndef DISABLE_BROWSER
-    /* Don't display the state if we're in the file browser. */
-    if (path != NULL)
-	state = "";
-    else
-#endif
-	state = openfile->modified ? _("Modified") : ISSET(VIEW_MODE) ?
-		_("View") : "";
-
-    statelen = strlenpt((*state == '\0' && path == NULL) ?
-	_("Modified") : state);
-
-    /* If possible, add a space before state. */
-    if (space > 0 && statelen < space)
-	statelen++;
-    else
-	goto the_end;
-
-#ifndef DISABLE_BROWSER
-    /* path should be a directory if we're in the file browser. */
     if (path != NULL)
 	prefix = _("DIR:");
     else
 #endif
-    if (openfile->filename[0] == '\0') {
-	prefix = _("New Buffer");
-	newfie = TRUE;
-    } else
-	prefix = _("File:");
+    {
+	if (openfile->filename[0] == '\0')
+	    path = _("New Buffer");
+	else {
+	    path = openfile->filename;
+	    prefix = _("File:");
+	}
 
-    prefixlen = strnlenpt(prefix, space - statelen) + 1;
+	if (openfile->modified)
+	    state = _("Modified");
+	else if (ISSET(VIEW_MODE))
+	    state = _("View");
 
-    /* If newfie is FALSE, add a space after prefix. */
-    if (!newfie && prefixlen + statelen < space)
-	prefixlen++;
-
-    /* If we're not in the file browser, set path to the current
-     * filename. */
-    if (path == NULL)
-	path = openfile->filename;
-
-    /* Account for the full lengths of the prefix and the state. */
-    if (space >= prefixlen + statelen)
-	space -= prefixlen + statelen;
-    else
-	space = 0;
-	/* space is now the room we have for the filename. */
-
-    if (!newfie) {
-	size_t lenpt = strlenpt(path), start_col;
-
-	/* Don't set dots to TRUE if we have fewer than eight columns
-	 * (i.e. one column for padding, plus seven columns for a
-	 * filename). */
-	dots = (space >= 8 && lenpt >= space);
-
-	if (dots) {
-	    start_col = lenpt - space + 3;
-	    space -= 3;
-	} else
-	    start_col = 0;
-
-	exppath = display_string(path, start_col, space, FALSE);
+	pluglen = strlenpt(_("Modified")) + 1;
     }
 
-    /* If dots is TRUE, we will display something like "File:
-     * ...ename". */
-    if (dots) {
-	mvwaddnstr(topwin, 0, verlen - 1, prefix, actual_x(prefix,
-		prefixlen));
-	if (space <= -3 || newfie)
-	    goto the_end;
-	waddch(topwin, ' ');
-	waddnstr(topwin, "...", space + 3);
-	if (space <= 0)
-	    goto the_end;
-	waddstr(topwin, exppath);
-    } else {
-	size_t exppathlen = newfie ? 0 : strlenpt(exppath);
-	    /* The length of the expanded filename. */
+    /* Determine the widths of the four elements, including their padding. */
+    verlen = strlenpt(BRANDING) + 3;
+    prefixlen = strlenpt(prefix);
+    if (prefixlen > 0)
+	prefixlen++;
+    pathlen= strlenpt(path);
+    statelen = strlenpt(state) + 2;
+    if (statelen > 2) {
+	pathlen++;
+	pluglen = 0;
+    }
 
-	/* There is room for the whole filename, so we center it. */
-	mvwaddnstr(topwin, 0, verlen + ((space - exppathlen) / 3),
-		prefix, actual_x(prefix, prefixlen));
-	if (!newfie) {
-	    waddch(topwin, ' ');
-	    waddstr(topwin, exppath);
+    /* Only print the version message when there is room for it. */
+    if (verlen + prefixlen + pathlen + pluglen + statelen <= COLS)
+	mvwaddstr(topwin, 0, 2, BRANDING);
+    else {
+	verlen = 2;
+	/* If things don't fit yet, give up the placeholder. */
+	if (verlen + prefixlen + pathlen + pluglen + statelen > COLS)
+	    pluglen = 0;
+	/* If things still don't fit, give up the side spaces. */
+	if (verlen + prefixlen + pathlen + pluglen + statelen > COLS) {
+	    verlen = 0;
+	    statelen -= 2;
 	}
     }
 
-  the_end:
-    free(exppath);
+    /* If we have side spaces left, center the path name. */
+    if (verlen > 0)
+	offset = verlen + (COLS - (verlen + pluglen + statelen) -
+					(prefixlen + pathlen)) / 2;
 
-<<<<<<< HEAD
-    if (state[0] != '\0') {
-	if (statelen >= COLS - 1)
-	    mvwaddnstr(topwin, 0, 0, state, actual_x(state, COLS));
-	else {
-	    assert(COLS - statelen - 1 >= 0);
-=======
     /* Only print the prefix when there is room for it. */
     if (verlen + prefixlen + pathlen + pluglen + statelen <= COLS) {
 	mvwaddstr(topwin, 0, offset, prefix);
@@ -3057,37 +2045,26 @@ void titlebar(const char *path)
 	waddstr(topwin, caption);
 	free(caption);
     }
->>>>>>> origin/tomato-shibby-RT-AC
 
-	    mvwaddnstr(topwin, 0, COLS - statelen - 1, state,
-		actual_x(state, statelen));
-	}
-    }
+    /* Right-align the state if there's room; otherwise, trim it. */
+    if (statelen > 0 && statelen <= COLS)
+	mvwaddstr(topwin, 0, COLS - statelen, state);
+    else if (statelen > 0)
+	mvwaddnstr(topwin, 0, 0, state, actual_x(state, COLS));
 
-<<<<<<< HEAD
-    wattroff(topwin, reverse_attr);
-=======
     wattroff(topwin, interface_color_pair[TITLE_BAR]);
->>>>>>> origin/tomato-shibby-RT-AC
 
     wnoutrefresh(topwin);
     reset_cursor();
     wnoutrefresh(edit);
 }
 
-/* Mark the current file as modified if it isn't already, and then
- * update the titlebar to display the file's new status. */
-void set_modified(void)
+/* Display a normal message on the statusbar, quietly. */
+void statusbar(const char *msg)
 {
-    if (!openfile->modified) {
-	openfile->modified = TRUE;
-	titlebar(NULL);
-    }
+    statusline(HUSH, msg);
 }
 
-<<<<<<< HEAD
-/* Display a message on the statusbar, and set disable_cursorpos to
-=======
 /* Warn the user on the statusbar and pause for a moment, so that the
  * message can be noticed and read. */
 void warn_and_shortly_pause(const char *msg)
@@ -3098,18 +2075,11 @@ void warn_and_shortly_pause(const char *msg)
 }
 
 /* Display a message on the statusbar, and set suppress_cursorpos to
->>>>>>> origin/tomato-shibby-RT-AC
  * TRUE, so that the message won't be immediately overwritten if
  * constant cursor position display is on. */
-void statusbar(const char *msg, ...)
+void statusline(message_type importance, const char *msg, ...)
 {
     va_list ap;
-<<<<<<< HEAD
-    char *bar, *foo;
-    size_t start_x, foo_len;
-#if !defined(NANO_TINY) && defined(ENABLE_NANORC)
-    bool old_whitespace;
-=======
     static int alerts = 0;
     char *compound, *message;
     size_t start_col;
@@ -3118,7 +2088,6 @@ void statusbar(const char *msg, ...)
     bool old_whitespace = ISSET(WHITESPACE_DISPLAY);
 
     UNSET(WHITESPACE_DISPLAY);
->>>>>>> origin/tomato-shibby-RT-AC
 #endif
 
     va_start(ap, msg);
@@ -3131,33 +2100,6 @@ void statusbar(const char *msg, ...)
 	return;
     }
 
-<<<<<<< HEAD
-    blank_statusbar();
-
-#if !defined(NANO_TINY) && defined(ENABLE_NANORC)
-    old_whitespace = ISSET(WHITESPACE_DISPLAY);
-    UNSET(WHITESPACE_DISPLAY);
-#endif
-    bar = charalloc(mb_cur_max() * (COLS - 3));
-    vsnprintf(bar, mb_cur_max() * (COLS - 3), msg, ap);
-    va_end(ap);
-    foo = display_string(bar, 0, COLS - 4, FALSE);
-#if !defined(NANO_TINY) && defined(ENABLE_NANORC)
-    if (old_whitespace)
-	SET(WHITESPACE_DISPLAY);
-#endif
-    free(bar);
-    foo_len = strlenpt(foo);
-    start_x = (COLS - foo_len - 4) / 2;
-
-    wmove(bottomwin, 0, start_x);
-    wattron(bottomwin, reverse_attr);
-    waddstr(bottomwin, "[ ");
-    waddstr(bottomwin, foo);
-    free(foo);
-    waddstr(bottomwin, " ]");
-    wattroff(bottomwin, reverse_attr);
-=======
     /* If there already was an alert message, ignore lesser ones. */
     if ((lastmessage == ALERT && importance != ALERT) ||
 		(lastmessage == MILD && importance == HUSH))
@@ -3206,24 +2148,11 @@ void statusbar(const char *msg, ...)
     wattroff(bottomwin, interface_color_pair[STATUS_BAR]);
 
     /* Push the message to the screen straightaway. */
->>>>>>> origin/tomato-shibby-RT-AC
     wnoutrefresh(bottomwin);
-    reset_cursor();
-    wnoutrefresh(edit);
-	/* Leave the cursor at its position in the edit window, not in
-	 * the statusbar. */
+    doupdate();
 
-    disable_cursorpos = TRUE;
+    suppress_cursorpos = TRUE;
 
-<<<<<<< HEAD
-    /* If we're doing quick statusbar blanking, and constant cursor
-     * position display is off, blank the statusbar after only one
-     * keystroke.  Otherwise, blank it after twenty-six keystrokes, as
-     * Pico does. */
-    statusblank =
-#ifndef NANO_TINY
-	ISSET(QUICK_BLANK) && !ISSET(CONST_UPDATE) ? 1 :
-=======
 #ifndef NANO_TINY
     if (old_whitespace)
 	SET(WHITESPACE_DISPLAY);
@@ -3233,27 +2162,22 @@ void statusbar(const char *msg, ...)
     if (ISSET(QUICK_BLANK))
 	statusblank = 1;
     else
->>>>>>> origin/tomato-shibby-RT-AC
 #endif
-	26;
+	statusblank = 26;
 }
 
-/* Display the shortcut list in s on the last two rows of the bottom
- * portion of the window. */
+/* Display the shortcut list corresponding to menu on the last two rows
+ * of the bottom portion of the window. */
 void bottombars(int menu)
 {
     size_t number, itemwidth, i;
     subnfunc *f;
     const sc *s;
 
-<<<<<<< HEAD
-    if (ISSET(NO_HELP))
-=======
     /* Set the global variable to the given menu. */
     currmenu = menu;
 
     if (ISSET(NO_HELP) || LINES < 5)
->>>>>>> origin/tomato-shibby-RT-AC
 	return;
 
     /* Determine how many shortcuts there are to show. */
@@ -3277,42 +2201,28 @@ void bottombars(int menu)
 
     for (f = allfuncs, i = 0; i < number && f != NULL; f = f->next) {
 #ifdef DEBUG
-        fprintf(stderr, "Checking menu items....");
+	fprintf(stderr, "Checking menu items....");
 #endif
-        if ((f->menus & menu) == 0)
-	    continue;
-
-        if (!f->desc || strlen(f->desc) == 0)
+	if ((f->menus & menu) == 0)
 	    continue;
 
 #ifdef DEBUG
-        fprintf(stderr, "found one! f->menus = %d, desc = \"%s\"\n", f->menus, f->desc);
+	fprintf(stderr, "found one! f->menus = %x, desc = \"%s\"\n", f->menus, f->desc);
 #endif
-        s = first_sc_for(menu, f->scfunc);
-        if (s == NULL) {
+	s = first_sc_for(menu, f->scfunc);
+	if (s == NULL) {
 #ifdef DEBUG
 	    fprintf(stderr, "Whoops, guess not, no shortcut key found for func!\n");
 #endif
-<<<<<<< HEAD
-            continue;
-        }
-	wmove(bottomwin, 1 + i % 2, (i / 2) * colwidth);
-=======
 	    continue;
 	}
 
 	wmove(bottomwin, 1 + i % 2, (i / 2) * itemwidth);
->>>>>>> origin/tomato-shibby-RT-AC
 #ifdef DEBUG
-        fprintf(stderr, "Calling onekey with keystr \"%s\" and desc \"%s\"\n", s->keystr, f->desc);
+	fprintf(stderr, "Calling onekey with keystr \"%s\" and desc \"%s\"\n", s->keystr, f->desc);
 #endif
-<<<<<<< HEAD
-	onekey(s->keystr, _(f->desc), colwidth + (COLS % colwidth));
-        i++;
-=======
 	onekey(s->keystr, _(f->desc), itemwidth + (COLS % itemwidth));
 	i++;
->>>>>>> origin/tomato-shibby-RT-AC
     }
 
     /* Defeat a VTE bug by moving the cursor and forcing a screen update. */
@@ -3326,51 +2236,21 @@ void bottombars(int menu)
 
 /* Write a shortcut key to the help area at the bottom of the window.
  * keystroke is e.g. "^G" and desc is e.g. "Get Help".  We are careful
- * to write at most len characters, even if len is very small and
+ * to write at most length characters, even if length is very small and
  * keystroke and desc are long.  Note that waddnstr(,,(size_t)-1) adds
  * the whole string!  We do not bother padding the entry with blanks. */
-void onekey(const char *keystroke, const char *desc, size_t len)
+void onekey(const char *keystroke, const char *desc, int length)
 {
-    size_t keystroke_len = strlenpt(keystroke) + 1;
-
     assert(keystroke != NULL && desc != NULL);
 
-<<<<<<< HEAD
-    wattron(bottomwin, reverse_attr);
-    waddnstr(bottomwin, keystroke, actual_x(keystroke, len));
-    wattroff(bottomwin, reverse_attr);
-=======
     wattron(bottomwin, interface_color_pair[KEY_COMBO]);
     waddnstr(bottomwin, keystroke, actual_x(keystroke, length));
     wattroff(bottomwin, interface_color_pair[KEY_COMBO]);
->>>>>>> origin/tomato-shibby-RT-AC
 
-    if (len > keystroke_len)
-	len -= keystroke_len;
-    else
-	len = 0;
+    length -= strlenpt(keystroke) + 1;
 
-    if (len > 0) {
+    if (length > 0) {
 	waddch(bottomwin, ' ');
-<<<<<<< HEAD
-	waddnstr(bottomwin, desc, actual_x(desc, len));
-    }
-}
-
-/* Reset current_y, based on the position of current, and put the cursor
- * in the edit window at (current_y, current_x). */
-void reset_cursor(void)
-{
-    size_t xpt;
-    /* If we haven't opened any files yet, put the cursor in the top
-     * left corner of the edit window and get out. */
-    if (openfile == NULL) {
-	wmove(edit, 0, 0);
-	return;
-    }
-
-    xpt = xplustabs();
-=======
 	wattron(bottomwin, interface_color_pair[FUNCTION_TAG]);
 	waddnstr(bottomwin, desc, actual_x(desc, length));
 	wattroff(bottomwin, interface_color_pair[FUNCTION_TAG]);
@@ -3383,26 +2263,9 @@ void reset_cursor(void)
 {
     ssize_t row = 0;
     size_t col, xpt = xplustabs();
->>>>>>> origin/tomato-shibby-RT-AC
 
+#ifndef NANO_TINY
     if (ISSET(SOFTWRAP)) {
-<<<<<<< HEAD
-	filestruct *tmp;
-	openfile->current_y = 0;
-
-	for (tmp = openfile->edittop; tmp && tmp != openfile->current; tmp = tmp->next)
-	    openfile->current_y += 1 + strlenpt(tmp->data) / COLS;
-
-	openfile->current_y += xplustabs() / COLS;
-	if (openfile->current_y < editwinrows)
-	    wmove(edit, openfile->current_y, xpt % COLS);
-    } else {
-	openfile->current_y = openfile->current->lineno -
-	    openfile->edittop->lineno;
-
-	if (openfile->current_y < editwinrows)
-	    wmove(edit, openfile->current_y, xpt - get_page_start(xpt));
-=======
 	filestruct *line = openfile->edittop;
 
 	row -= (openfile->firstcolumn / editwincols);
@@ -3421,7 +2284,6 @@ void reset_cursor(void)
     {
 	row = openfile->current->lineno - openfile->edittop->lineno;
 	col = xpt - get_page_start(xpt);
->>>>>>> origin/tomato-shibby-RT-AC
     }
 
     if (row < editwinrows)
@@ -3441,13 +2303,8 @@ void reset_cursor(void)
 void edit_draw(filestruct *fileptr, const char *converted,
 	int row, size_t from_col)
 {
-<<<<<<< HEAD
-#if !defined(NANO_TINY) || defined(ENABLE_COLOR)
-    size_t startpos = actual_x(fileptr->data, start);
-=======
 #if !defined(NANO_TINY) || !defined(DISABLE_COLOR)
     size_t from_x = actual_x(fileptr->data, from_col);
->>>>>>> origin/tomato-shibby-RT-AC
 	/* The position in fileptr->data of the leftmost character
 	 * that displays at least partially on the window. */
     size_t till_x = actual_x(fileptr->data, from_col + editwincols - 1) + 1;
@@ -3474,42 +2331,6 @@ void edit_draw(filestruct *fileptr, const char *converted,
     }
 #endif
 
-<<<<<<< HEAD
-    /* Just paint the string in any case (we'll add color or reverse on
-     * just the text that needs it). */
-    mvwaddstr(edit, line, 0, converted);
-
-#ifdef ENABLE_COLOR
-    /* If color syntaxes are available and turned on, we need to display
-     * them. */
-    if (openfile->colorstrings != NULL && !ISSET(NO_COLOR_SYNTAX)) {
-	const colortype *tmpcolor = openfile->colorstrings;
-
-	/* Set up multi-line color data for this line if it's not yet calculated  */
-        if (fileptr->multidata == NULL && openfile->syntax
-		&& openfile->syntax->nmultis > 0) {
- 	    int i;
-	    fileptr->multidata = (short *) nmalloc(openfile->syntax->nmultis * sizeof(short));
-            for (i = 0; i < openfile->syntax->nmultis; i++)
-		fileptr->multidata[i] = -1;	/* Assue this applies until we know otherwise */
-	}
-	for (; tmpcolor != NULL; tmpcolor = tmpcolor->next) {
-	    int x_start;
-		/* Starting column for mvwaddnstr.  Zero-based. */
-	    int paintlen;
-		/* Number of chars to paint on this line.  There are
-		 * COLS characters on a whole line. */
-	    size_t index;
-		/* Index in converted where we paint. */
-	    regmatch_t startmatch;
-		/* Match position for start_regex. */
-	    regmatch_t endmatch;
-		/* Match position for end_regex. */
-
-	    if (tmpcolor->bright)
-		wattron(edit, A_BOLD);
-	    wattron(edit, COLOR_PAIR(tmpcolor->pairnum));
-=======
     /* First simply write the converted line -- afterward we'll add colors
      * and the marking highlight on just the pieces that need it. */
     mvwaddstr(edit, row, margin, converted);
@@ -3544,24 +2365,15 @@ void edit_draw(filestruct *fileptr, const char *converted,
 	    regmatch_t match;
 		/* The match positions of a single-line regex. */
 
->>>>>>> origin/tomato-shibby-RT-AC
 	    /* Two notes about regexec().  A return value of zero means
 	     * that there is a match.  Also, rm_eo is the first
 	     * non-matching character after the match. */
 
-<<<<<<< HEAD
-	    /* First case, tmpcolor is a single-line expression. */
-	    if (tmpcolor->end == NULL) {
-		size_t k = 0;
-
-		/* We increment k by rm_eo, to move past the end of the
-=======
 	    wattron(edit, varnish->attributes);
 
 	    /* First case: varnish is a single-line expression. */
 	    if (varnish->end == NULL) {
 		/* We increment index by rm_eo, to move past the end of the
->>>>>>> origin/tomato-shibby-RT-AC
 		 * last match.  Even though two matches may overlap, we
 		 * want to ignore them, so that we can highlight e.g. C
 		 * strings correctly. */
@@ -3571,14 +2383,8 @@ void edit_draw(filestruct *fileptr, const char *converted,
 		     * unless index is zero.  If regexec() returns
 		     * REG_NOMATCH, there are no more matches in the
 		     * line. */
-<<<<<<< HEAD
-		    if (regexec(tmpcolor->start, &fileptr->data[k], 1,
-			&startmatch, (k == 0) ? 0 : REG_NOTBOL) ==
-			REG_NOMATCH)
-=======
 		    if (regexec(varnish->start, &fileptr->data[index], 1,
 				&match, (index == 0) ? 0 : REG_NOTBOL) != 0)
->>>>>>> origin/tomato-shibby-RT-AC
 			break;
 
 		    /* If the match is of length zero, skip it. */
@@ -3601,56 +2407,6 @@ void edit_draw(filestruct *fileptr, const char *converted,
 					0 : strnlenpt(fileptr->data,
 					match.rm_so) - from_col;
 
-<<<<<<< HEAD
-			mvwaddnstr(edit, line, x_start, converted +
-				index, paintlen);
-		    }
-		    k = startmatch.rm_eo;
-		}
-	    } else if (fileptr->multidata != NULL && fileptr->multidata[tmpcolor->id] != CNONE) {
-		/* This is a multi-line regex.  There are two steps.
-		 * First, we have to see if the beginning of the line is
-		 * colored by a start on an earlier line, and an end on
-		 * this line or later.
-		 *
-		 * We find the first line before fileptr matching the
-		 * start.  If every match on that line is followed by an
-		 * end, then go to step two.  Otherwise, find the next
-		 * line after start_line matching the end.  If that line
-		 * is not before fileptr, then paint the beginning of
-		 * this line. */
-		const filestruct *start_line = fileptr->prev;
-		    /* The first line before fileptr matching start. */
-		regoff_t start_col;
-		    /* Where it starts in that line. */
-		const filestruct *end_line;
-		short md = fileptr->multidata[tmpcolor->id];
-
-		if (md == -1)
-		    fileptr->multidata[tmpcolor->id] = CNONE; /* until we find out otherwise */
-		else if (md == CNONE)
-		    continue;
-		else if (md == CWHOLELINE) {
-		    mvwaddnstr(edit, line, 0, converted, -1);
-		    continue;
-		} else if (md == CBEGINBEFORE) {
-		    regexec(tmpcolor->end, fileptr->data, 1, &endmatch, 0);
-		    paintlen = actual_x(converted, strnlenpt(fileptr->data,
-			endmatch.rm_eo) - start);
-		    mvwaddnstr(edit, line, 0, converted, paintlen);
-		    continue;
-		}
-
-		while (start_line != NULL && regexec(tmpcolor->start,
-			start_line->data, 1, &startmatch, 0) ==
-			REG_NOMATCH) {
-		    /* If there is an end on this line, there is no need
-		     * to look for starts on earlier lines. */
-		    if (regexec(tmpcolor->end, start_line->data, 0,
-			NULL, 0) == 0)
-			goto step_two;
-		    start_line = start_line->prev;
-=======
 		    thetext = converted + actual_x(converted, start_col);
 
 		    paintlen = actual_x(thetext, strnlenpt(fileptr->data,
@@ -3658,147 +2414,10 @@ void edit_draw(filestruct *fileptr, const char *converted,
 
 		    mvwaddnstr(edit, row, margin + start_col,
 						thetext, paintlen);
->>>>>>> origin/tomato-shibby-RT-AC
 		}
 		goto tail_of_loop;
 	    }
 
-<<<<<<< HEAD
-		/* Skip over a zero-length regex match. */
-		if (startmatch.rm_so == startmatch.rm_eo)
-		    startmatch.rm_eo++;
-		else {
-		    /* No start found, so skip to the next step. */
-		    if (start_line == NULL)
-			goto step_two;
-		    /* Now start_line is the first line before fileptr
-		     * containing a start match.  Is there a start on
-		     * this line not followed by an end on this line? */
-		    start_col = 0;
-		    while (TRUE) {
-			start_col += startmatch.rm_so;
-			startmatch.rm_eo -= startmatch.rm_so;
-			if (regexec(tmpcolor->end, start_line->data +
-				start_col + startmatch.rm_eo, 0, NULL,
-				(start_col + startmatch.rm_eo == 0) ?
-				0 : REG_NOTBOL) == REG_NOMATCH)
-			    /* No end found after this start. */
-			    break;
-			start_col++;
-			if (regexec(tmpcolor->start, start_line->data +
-				start_col, 1, &startmatch,
-				REG_NOTBOL) == REG_NOMATCH)
-			    /* No later start on this line. */
-			    goto step_two;
-		    }
-		    /* Indeed, there is a start not followed on this
-		     * line by an end. */
-
-		    /* We have already checked that there is no end
-		     * before fileptr and after the start.  Is there an
-		     * end after the start at all?  We don't paint
-		     * unterminated starts. */
-		    end_line = fileptr;
-		    while (end_line != NULL && regexec(tmpcolor->end,
-			end_line->data, 1, &endmatch, 0) == REG_NOMATCH)
-			end_line = end_line->next;
-
-		    /* No end found, or it is too early. */
-		    if (end_line == NULL || (end_line == fileptr &&
-			endmatch.rm_eo <= startpos))
-			goto step_two;
-
-		    /* Now paint the start of fileptr.  If the start of
-		     * fileptr is on a different line from the end,
-		     * paintlen is -1, meaning that everything on the
-		     * line gets painted.  Otherwise, paintlen is the
-		     * expanded location of the end of the match minus
-		     * the expanded location of the beginning of the
-		     * page. */
-		    if (end_line != fileptr) {
-			paintlen = -1;
-			fileptr->multidata[tmpcolor->id] = CWHOLELINE;
-		    } else {
-			paintlen = actual_x(converted,
-				strnlenpt(fileptr->data,
-				endmatch.rm_eo) - start);
-			fileptr->multidata[tmpcolor->id] = CBEGINBEFORE;
-		    }
-		    mvwaddnstr(edit, line, 0, converted, paintlen);
-  step_two:
-		    /* Second step, we look for starts on this line. */
-		    start_col = 0;
-
-		    while (start_col < endpos) {
-			if (regexec(tmpcolor->start, fileptr->data +
-				start_col, 1, &startmatch, (start_col ==
-				0) ? 0 : REG_NOTBOL) == REG_NOMATCH ||
-				start_col + startmatch.rm_so >= endpos)
-			    /* No more starts on this line. */
-			    break;
-			/* Translate the match to be relative to the
-			 * beginning of the line. */
-			startmatch.rm_so += start_col;
-			startmatch.rm_eo += start_col;
-
-			x_start = (startmatch.rm_so <= startpos) ? 0 :
-				strnlenpt(fileptr->data,
-				startmatch.rm_so) - start;
-
-			index = actual_x(converted, x_start);
-
-			if (regexec(tmpcolor->end, fileptr->data +
-				startmatch.rm_eo, 1, &endmatch,
-				(startmatch.rm_eo == 0) ? 0 :
-				REG_NOTBOL) == 0) {
-			    /* Translate the end match to be relative to
-			     * the beginning of the line. */
-			    endmatch.rm_so += startmatch.rm_eo;
-			    endmatch.rm_eo += startmatch.rm_eo;
-			    /* There is an end on this line.  But does
-			     * it appear on this page, and is the match
-			     * more than zero characters long? */
-			    if (endmatch.rm_eo > startpos &&
-				endmatch.rm_eo > startmatch.rm_so) {
-				paintlen = actual_x(converted + index,
-					strnlenpt(fileptr->data,
-					endmatch.rm_eo) - start -
-					x_start);
-
-				assert(0 <= x_start && x_start < COLS);
-
-				mvwaddnstr(edit, line, x_start,
-					converted + index, paintlen);
-				if (paintlen > 0)
-				    fileptr->multidata[tmpcolor->id] = CSTARTENDHERE;
-
-			    }
-			} else {
-			    /* There is no end on this line.  But we
-			     * haven't yet looked for one on later
-			     * lines. */
-			    end_line = fileptr->next;
-
-			    while (end_line != NULL &&
-				regexec(tmpcolor->end, end_line->data,
-				0, NULL, 0) == REG_NOMATCH)
-				end_line = end_line->next;
-
-			    if (end_line != NULL) {
-				assert(0 <= x_start && x_start < COLS);
-
-				mvwaddnstr(edit, line, x_start,
-					converted + index, -1);
-				/* We painted to the end of the line, so
-				 * don't bother checking any more
-				 * starts. */
-				fileptr->multidata[tmpcolor->id] = CENDAFTER;
-				break;
-			    }
-			}
-			start_col = startmatch.rm_so + 1;
-		    }
-=======
 	    /* Second case: varnish is a multiline expression. */
 	    const filestruct *start_line = fileptr->prev;
 		/* The first line before fileptr that matches 'start'. */
@@ -3961,7 +2580,6 @@ void edit_draw(filestruct *fileptr, const char *converted,
 		if (end_line == NULL) {
 		    fileptr->multidata[varnish->id] = CWOULDBE;
 		    break;
->>>>>>> origin/tomato-shibby-RT-AC
 		}
 
 		/* Paint the rest of the line, and we're done. */
@@ -3969,75 +2587,13 @@ void edit_draw(filestruct *fileptr, const char *converted,
 		fileptr->multidata[varnish->id] = CENDAFTER;
 		break;
 	    }
-<<<<<<< HEAD
-
-	    wattroff(edit, A_BOLD);
-	    wattroff(edit, COLOR_PAIR(tmpcolor->pairnum));
-=======
   tail_of_loop:
 	    wattroff(edit, varnish->attributes);
->>>>>>> origin/tomato-shibby-RT-AC
 	}
     }
-#endif /* ENABLE_COLOR */
+#endif /* !DISABLE_COLOR */
 
 #ifndef NANO_TINY
-<<<<<<< HEAD
-    /* If the mark is on, we need to display it. */
-    if (openfile->mark_set && (fileptr->lineno <=
-	openfile->mark_begin->lineno || fileptr->lineno <=
-	openfile->current->lineno) && (fileptr->lineno >=
-	openfile->mark_begin->lineno || fileptr->lineno >=
-	openfile->current->lineno)) {
-	/* fileptr is at least partially selected. */
-	const filestruct *top;
-	    /* Either current or mark_begin, whichever is first. */
-	size_t top_x;
-	    /* current_x or mark_begin_x, corresponding to top. */
-	const filestruct *bot;
-	size_t bot_x;
-	int x_start;
-	    /* Starting column for mvwaddnstr().  Zero-based. */
-	int paintlen;
-	    /* Number of characters to paint on this line.  There are
-	     * COLS characters on a whole line. */
-	size_t index;
-	    /* Index in converted where we paint. */
-
-	mark_order(&top, &top_x, &bot, &bot_x, NULL);
-
-	if (top->lineno < fileptr->lineno || top_x < startpos)
-	    top_x = startpos;
-	if (bot->lineno > fileptr->lineno || bot_x > endpos)
-	    bot_x = endpos;
-
-	/* The selected bit of fileptr is on this page. */
-	if (top_x < endpos && bot_x > startpos) {
-	    assert(startpos <= top_x);
-
-	    /* x_start is the expanded location of the beginning of the
-	     * mark minus the beginning of the page. */
-	    x_start = strnlenpt(fileptr->data, top_x) - start;
-
-	    /* If the end of the mark is off the page, paintlen is -1,
-	     * meaning that everything on the line gets painted.
-	     * Otherwise, paintlen is the expanded location of the end
-	     * of the mark minus the expanded location of the beginning
-	     * of the mark. */
-	    if (bot_x >= endpos)
-		paintlen = -1;
-	    else
-		paintlen = strnlenpt(fileptr->data, bot_x) - (x_start +
-			start);
-
-	    /* If x_start is before the beginning of the page, shift
-	     * paintlen x_start characters to compensate, and put
-	     * x_start at the beginning of the page. */
-	    if (x_start < 0) {
-		paintlen += x_start;
-		x_start = 0;
-	    }
-=======
     /* If the mark is on, and fileptr is at least partially selected, we
      * need to paint it. */
     if (openfile->mark_set &&
@@ -4062,7 +2618,6 @@ void edit_draw(filestruct *fileptr, const char *converted,
 	    top_x = from_x;
 	if (bot->lineno > fileptr->lineno || bot_x > till_x)
 	    bot_x = till_x;
->>>>>>> origin/tomato-shibby-RT-AC
 
 	/* Only paint if the marked part of the line is on this page. */
 	if (top_x < till_x && bot_x > from_x) {
@@ -4081,47 +2636,14 @@ void edit_draw(filestruct *fileptr, const char *converted,
 		paintlen = actual_x(thetext, end_col - start_col);
 	    }
 
-<<<<<<< HEAD
-	    wattron(edit, reverse_attr);
-	    mvwaddnstr(edit, line, x_start, converted + index,
-		paintlen);
-	    wattroff(edit, reverse_attr);
-=======
 	    wattron(edit, hilite_attribute);
 	    mvwaddnstr(edit, row, margin + start_col, thetext, paintlen);
 	    wattroff(edit, hilite_attribute);
->>>>>>> origin/tomato-shibby-RT-AC
 	}
     }
 #endif /* !NANO_TINY */
 }
 
-<<<<<<< HEAD
-/* Just update one line in the edit buffer.  This is basically a wrapper
- * for edit_draw().  The line will be displayed starting with
- * fileptr->data[index].  Likely arguments are current_x or zero.
- * Returns: Number of additiona lines consumed (needed for SOFTWRAP)
- */
-int update_line(filestruct *fileptr, size_t index)
-{
-    int line = 0;
-    int extralinesused = 0;
-	/* The line in the edit window that we want to update. */
-    char *converted;
-	/* fileptr->data converted to have tabs and control characters
-	 * expanded. */
-    size_t page_start;
-    filestruct *tmp;
-
-    assert(fileptr != NULL);
-
-    if (ISSET(SOFTWRAP)) {
-	for (tmp = openfile->edittop; tmp && tmp != fileptr; tmp = tmp->next) {
-	    line += 1 + (strlenpt(tmp->data) / COLS);
-	}
-    } else
-	line = fileptr->lineno - openfile->edittop->lineno;
-=======
 /* Redraw the line at fileptr.  The line will be displayed so that the
  * character with the given index is visible -- if necessary, the line
  * will be horizontally scrolled.  In softwrap mode, however, the entire
@@ -4141,7 +2663,6 @@ int update_line(filestruct *fileptr, size_t index)
     if (ISSET(SOFTWRAP))
 	return update_softwrapped_line(fileptr);
 #endif
->>>>>>> origin/tomato-shibby-RT-AC
 
     row = fileptr->lineno - openfile->edittop->lineno;
 
@@ -4152,25 +2673,6 @@ int update_line(filestruct *fileptr, size_t index)
 	return 0;
     }
 
-<<<<<<< HEAD
-    /* Next, convert variables that index the line to their equivalent
-     * positions in the expanded line. */
-    if (ISSET(SOFTWRAP))
-	index = 0;
-    else
-	index = strnlenpt(fileptr->data, index);
-    page_start = get_page_start(index);
-
-    /* Expand the line, replacing tabs with spaces, and control
-     * characters with their displayed forms. */
-    converted = display_string(fileptr->data, page_start, COLS, !ISSET(SOFTWRAP));
-
-#ifdef DEBUG
-    if (ISSET(SOFTWRAP) && strlen(converted) >= COLS - 2)
-	    fprintf(stderr, "update_line(): converted(1) line = %s\n", converted);
-#endif
-
-=======
     /* First, blank out the row. */
     blank_row(edit, row, 0, COLS);
 
@@ -4180,43 +2682,11 @@ int update_line(filestruct *fileptr, size_t index)
     /* Expand the line, replacing tabs with spaces, and control
      * characters with their displayed forms. */
     converted = display_string(fileptr->data, from_col, editwincols, TRUE);
->>>>>>> origin/tomato-shibby-RT-AC
 
     /* Draw the line. */
     edit_draw(fileptr, converted, row, from_col);
     free(converted);
 
-<<<<<<< HEAD
-    if (!ISSET(SOFTWRAP)) {
-	if (page_start > 0)
-	    mvwaddch(edit, line, 0, '$');
-	if (strlenpt(fileptr->data) > page_start + COLS)
-	    mvwaddch(edit, line, COLS - 1, '$');
-    } else {
-        int full_length = strlenpt(fileptr->data);
-	for (index += COLS; index <= full_length && line < editwinrows; index += COLS) {
-	    line++;
-#ifdef DEBUG
-	    fprintf(stderr, "update_line(): Softwrap code, moving to %d index %lu\n", line, (unsigned long) index);
-#endif
- 	    blank_line(edit, line, 0, COLS);
-
-	    /* Expand the line, replacing tabs with spaces, and control
- 	     * characters with their displayed forms. */
-	    converted = display_string(fileptr->data, index, COLS, !ISSET(SOFTWRAP));
-#ifdef DEBUG
-	    if (ISSET(SOFTWRAP) && strlen(converted) >= COLS - 2)
-		fprintf(stderr, "update_line(): converted(2) line = %s\n", converted);
-#endif
-
-	    /* Paint the line. */
-	    edit_draw(fileptr, converted, line, index);
- 	    free(converted);
-	    extralinesused++;
-	}
-    }
-    return extralinesused;
-=======
     if (from_col > 0)
 	mvwaddch(edit, row, margin, '$');
     if (strlenpt(fileptr->data) > from_col + editwincols)
@@ -4277,50 +2747,19 @@ int update_softwrapped_line(filestruct *fileptr)
     }
 
     return (row - starting_row);
->>>>>>> origin/tomato-shibby-RT-AC
 }
 #endif
 
-<<<<<<< HEAD
-/* Return TRUE if we need an update after moving horizontally, and FALSE
- * otherwise.  We need one if the mark is on or if pww_save and
- * placewewant are on different pages. */
-bool need_horizontal_update(size_t pww_save)
-{
-    return
-#ifndef NANO_TINY
-	openfile->mark_set ||
-#endif
-	get_page_start(pww_save) !=
-	get_page_start(openfile->placewewant);
-}
-
-/* Return TRUE if we need an update after moving vertically, and FALSE
- * otherwise.  We need one if the mark is on or if pww_save and
- * placewewant are on different pages. */
-bool need_vertical_update(size_t pww_save)
-=======
 /* Check whether the mark is on, or whether old_column and new_column are on
  * different "pages" (in softwrap mode, only the former applies), which means
  * that the relevant line needs to be redrawn. */
 bool line_needs_update(const size_t old_column, const size_t new_column)
->>>>>>> origin/tomato-shibby-RT-AC
 {
 #ifndef NANO_TINY
     if (openfile->mark_set)
 	return TRUE;
     else
 #endif
-<<<<<<< HEAD
-	get_page_start(pww_save) !=
-	get_page_start(openfile->placewewant);
-}
-
-/* When edittop changes, try and figure out how many lines
- * we really have to work with (i.e. set maxrows)
- */
-void compute_maxrows(void)
-=======
 	return (get_page_start(old_column) != get_page_start(new_column));
 }
 
@@ -4329,7 +2768,6 @@ void compute_maxrows(void)
  * starting column of the current chunk.  Return the number of chunks we
  * couldn't move up, which will be zero if we completely succeeded. */
 int go_back_chunks(int nrows, filestruct **line, size_t *leftedge)
->>>>>>> origin/tomato-shibby-RT-AC
 {
     int i;
 
@@ -4337,18 +2775,9 @@ int go_back_chunks(int nrows, filestruct **line, size_t *leftedge)
     if (nrows > editwinrows - 1)
 	nrows = (editwinrows < 2) ? 1 : editwinrows - 1;
 
-<<<<<<< HEAD
-    maxrows = 0;
-    for (n = 0; n < editwinrows && foo; n++) {
-	maxrows ++;
-	n += strlenpt(foo->data) / COLS;
-	foo = foo->next;
-    }
-=======
 #ifndef NANO_TINY
     if (ISSET(SOFTWRAP)) {
 	size_t current_chunk = (*leftedge) / editwincols;
->>>>>>> origin/tomato-shibby-RT-AC
 
 	/* Recede through the requested number of chunks. */
 	for (i = nrows; i > 0; i--) {
@@ -4357,10 +2786,6 @@ int go_back_chunks(int nrows, filestruct **line, size_t *leftedge)
 		continue;
 	    }
 
-<<<<<<< HEAD
-#ifdef DEBUG
-    fprintf(stderr, "compute_maxrows(): maxrows = %ld\n", maxrows);
-=======
 	    if (*line == openfile->fileage)
 		break;
 
@@ -4372,7 +2797,6 @@ int go_back_chunks(int nrows, filestruct **line, size_t *leftedge)
 	if (i < nrows)
 	    *leftedge = current_chunk * editwincols;
     } else
->>>>>>> origin/tomato-shibby-RT-AC
 #endif
 	for (i = nrows; i > 0 && (*line)->prev != NULL; i--)
 	    *line = (*line)->prev;
@@ -4380,56 +2804,6 @@ int go_back_chunks(int nrows, filestruct **line, size_t *leftedge)
     return i;
 }
 
-<<<<<<< HEAD
-/* Scroll the edit window in the given direction and the given number
- * of lines, and draw new lines on the blank lines left after the
- * scrolling.  direction is the direction to scroll, either UP_DIR or
- * DOWN_DIR, and nlines is the number of lines to scroll.  We change
- * edittop, and assume that current and current_x are up to date.  We
- * also assume that scrollok(edit) is FALSE. */
-void edit_scroll(scroll_dir direction, ssize_t nlines)
-{
-    filestruct *foo;
-    ssize_t i, extracuzsoft = 0;
-    bool do_redraw = FALSE;
-
-    /* Don't bother scrolling less than one line. */
-    if (nlines < 1)
-	return;
-
-    if (need_vertical_update(0))
-	do_redraw = TRUE;
-
-
-    /* If using soft wrapping, we want to scroll down enough to display the entire next
-        line, if possible... */
-    if (ISSET(SOFTWRAP) && direction == DOWN_DIR) {
-#ifdef DEBUG
-	   fprintf(stderr, "Softwrap: Entering check for extracuzsoft\n");
-#endif
-	for (i = maxrows, foo = openfile->edittop; foo && i > 0; i--, foo = foo->next)
-	    ;
-
-	if (foo) {
-	   extracuzsoft += strlenpt(foo->data) / COLS;
-#ifdef DEBUG
-	   fprintf(stderr, "Setting extracuzsoft to %lu due to strlen %lu of line %lu\n", (unsigned long) extracuzsoft,
-		(unsigned long) strlenpt(foo->data), (unsigned long) foo->lineno);
-#endif
-
-	    /* Now account for whether the edittop line itself is >COLS, if scrolling down */
-	   for (foo = openfile->edittop; foo && extracuzsoft > 0; nlines++) {
-		extracuzsoft -= 1 + strlenpt(foo->data) / COLS;
-#ifdef DEBUG
- 		fprintf(stderr, "Edittop adjustment, setting nlines to %lu\n", (unsigned long) nlines);
-#endif
-		if (foo == openfile->filebot)
-		    break;
-		foo = foo->next;
-	    }
-	}
-    }
-=======
 /* Try to move down nrows softwrapped chunks from the given line and the
  * given column (leftedge).  After moving, leftedge will be set to the
  * starting column of the current chunk.  Return the number of chunks we
@@ -4441,7 +2815,6 @@ int go_forward_chunks(int nrows, filestruct **line, size_t *leftedge)
     /* Don't move more chunks than the window can hold. */
     if (nrows > editwinrows - 1)
 	nrows = (editwinrows < 2) ? 1 : editwinrows - 1;
->>>>>>> origin/tomato-shibby-RT-AC
 
 #ifndef NANO_TINY
     if (ISSET(SOFTWRAP)) {
@@ -4455,36 +2828,13 @@ int go_forward_chunks(int nrows, filestruct **line, size_t *leftedge)
 		continue;
 	    }
 
-<<<<<<< HEAD
-    /* Move the top line of the edit window up or down (depending on the
-     * value of direction) nlines lines, or as many lines as we can if
-     * there are fewer than nlines lines available. */
-    for (i = nlines; i > 0; i--) {
-	if (direction == UP_DIR) {
-	    if (openfile->edittop == openfile->fileage)
-		break;
-	    openfile->edittop = openfile->edittop->prev;
-	} else {
-	    if (openfile->edittop == openfile->filebot)
-=======
 	    if (*line == openfile->filebot)
->>>>>>> origin/tomato-shibby-RT-AC
 		break;
 
 	    *line = (*line)->next;
 	    current_chunk = 0;
 	    last_chunk = strlenpt((*line)->data) / editwincols;
 	}
-<<<<<<< HEAD
-	/* Don't over-scroll on long lines */
-	if (ISSET(SOFTWRAP)) {
-	    ssize_t len = strlenpt(openfile->edittop->data) / COLS;
-	    i -=  len;
-	    if (len > 0)
-		do_redraw = TRUE;
-	}
-    }
-=======
 
 	/* Only change leftedge when we actually could move. */
 	if (i < nrows)
@@ -4524,7 +2874,6 @@ void edit_scroll(scroll_dir direction, int nrows)
 
     /* Part 1: nrows is the number of rows we're going to scroll the text of
      * the edit window. */
->>>>>>> origin/tomato-shibby-RT-AC
 
     /* Move the top line of the edit window the requested number of rows up or
      * down, and reduce the number of rows with the amount we couldn't move. */
@@ -4533,78 +2882,16 @@ void edit_scroll(scroll_dir direction, int nrows)
     else
 	nrows -= go_forward_chunks(nrows, &openfile->edittop, &openfile->firstcolumn);
 
-<<<<<<< HEAD
-    /* Don't bother scrolling zero lines or more than the number of
-     * lines in the edit window minus one; in both cases, get out, and
-     * call edit_refresh() beforehand if we need to. */
-    if (nlines == 0 || do_redraw || nlines >= editwinrows) {
-	if (do_redraw || nlines >= editwinrows)
-	    edit_refresh_needed = TRUE;
-=======
     /* Don't bother scrolling zero rows, nor more than the window can hold. */
     if (nrows == 0)
 	return;
     if (nrows >= editwinrows) {
 	refresh_needed = TRUE;
->>>>>>> origin/tomato-shibby-RT-AC
 	return;
     }
 
     /* Scroll the text of the edit window a number of rows up or down. */
     scrollok(edit, TRUE);
-<<<<<<< HEAD
-    wscrl(edit, (direction == UP_DIR) ? -nlines : nlines);
-    scrollok(edit, FALSE);
-
-    /* Part 2: nlines is the number of lines in the scrolled region of
-     * the edit window that we need to draw. */
-
-    /* If the top or bottom line of the file is now visible in the edit
-     * window, we need to draw the entire edit window. */
-    if ((direction == UP_DIR && openfile->edittop ==
-	openfile->fileage) || (direction == DOWN_DIR &&
-	openfile->edittop->lineno + editwinrows - 1 >=
-	openfile->filebot->lineno))
-	nlines = editwinrows;
-
-    /* If the scrolled region contains only one line, and the line
-     * before it is visible in the edit window, we need to draw it too.
-     * If the scrolled region contains more than one line, and the lines
-     * before and after the scrolled region are visible in the edit
-     * window, we need to draw them too. */
-    nlines += (nlines == 1) ? 1 : 2;
-
-    if (nlines > editwinrows)
-	nlines = editwinrows;
-
-    /* If we scrolled up, we're on the line before the scrolled
-     * region. */
-    foo = openfile->edittop;
-
-    /* If we scrolled down, move down to the line before the scrolled
-     * region. */
-    if (direction == DOWN_DIR) {
-	for (i = editwinrows - nlines; i > 0 && foo != NULL; i--)
-	    foo = foo->next;
-    }
-
-    /* Draw new lines on any blank lines before or inside the scrolled
-     * region.  If we scrolled down and we're on the top line, or if we
-     * scrolled up and we're on the bottom line, the line won't be
-     * blank, so we don't need to draw it unless the mark is on or we're
-     * not on the first page. */
-    for (i = nlines; i > 0 && foo != NULL; i--) {
-	if ((i == nlines && direction == DOWN_DIR) || (i == 1 &&
-		direction == UP_DIR)) {
-	    if (do_redraw)
-		update_line(foo, (foo == openfile->current) ?
-			openfile->current_x : 0);
-	} else
-	    update_line(foo, (foo == openfile->current) ?
-		openfile->current_x : 0);
-	foo = foo->next;
-    }
-=======
     wscrl(edit, (direction == UPWARD) ? -nrows : nrows);
     scrollok(edit, FALSE);
 
@@ -4693,81 +2980,14 @@ bool current_is_below_screen(void)
 bool current_is_offscreen(void)
 {
     return (current_is_above_screen() || current_is_below_screen());
->>>>>>> origin/tomato-shibby-RT-AC
 }
 
 /* Update any lines between old_current and current that need to be
  * updated.  Use this if we've moved without changing any text. */
-void edit_redraw(filestruct *old_current, size_t pww_save)
+void edit_redraw(filestruct *old_current)
 {
-    bool do_redraw = need_vertical_update(0) ||
-	need_vertical_update(pww_save);
-    filestruct *foo = NULL;
+    size_t was_pww = openfile->placewewant;
 
-    /* If either old_current or current is offscreen, scroll the edit
-     * window until it's onscreen and get out. */
-    if (old_current->lineno < openfile->edittop->lineno ||
-	old_current->lineno >= openfile->edittop->lineno +
-	maxrows || openfile->current->lineno <
-	openfile->edittop->lineno || openfile->current->lineno >=
-	openfile->edittop->lineno + maxrows) {
-
-<<<<<<< HEAD
-#ifdef DEBUG
-    fprintf(stderr, "edit_redraw(): line %lu was offscreen, oldcurrent = %lu edittop = %lu", openfile->current->lineno,
-                    old_current->lineno, openfile->edittop->lineno);
-#endif
-	filestruct *old_edittop = openfile->edittop;
-	ssize_t nlines;
-
-#ifndef NANO_TINY
-	/* If the mark is on, update all the lines between old_current
-	 * and either the old first line or old last line (depending on
-	 * whether we've scrolled up or down) of the edit window. */
-	if (openfile->mark_set) {
-	    ssize_t old_lineno;
-
-	    if (old_edittop->lineno < openfile->edittop->lineno)
-		old_lineno = old_edittop->lineno;
-	    else
-		old_lineno = (old_edittop->lineno + maxrows <=
-			openfile->filebot->lineno) ?
-			old_edittop->lineno + editwinrows :
-			openfile->filebot->lineno;
-
-	    foo = old_current;
-
-	    while (foo->lineno != old_lineno) {
-		update_line(foo, 0);
-
-		foo = (foo->lineno > old_lineno) ? foo->prev :
-			foo->next;
-	    }
-	}
-#endif /* !NANO_TINY */
-
-	/* Put edittop in range of current, get the difference in lines
-	 * between the original edittop and the current edittop, and
-	 * then restore the original edittop. */
-	edit_update(CENTER);
-
-	/* Update old_current if we're not on the same page as
-	 * before. */
-	if (do_redraw)
-	    update_line(old_current, 0);
-
-#ifndef NANO_TINY
-	/* If the mark is on, update all the lines between the old first
-	 * line or old last line of the edit window (depending on
-	 * whether we've scrolled up or down) and current. */
-	if (openfile->mark_set) {
-	    while (foo->lineno != openfile->current->lineno) {
-		update_line(foo, 0);
-
-		foo = (foo->lineno > openfile->current->lineno) ?
-			foo->prev : foo->next;
-	    }
-=======
     openfile->placewewant = xplustabs();
 
     /* If the current line is offscreen, scroll until it's onscreen. */
@@ -4787,42 +3007,19 @@ void edit_redraw(filestruct *old_current, size_t pww_save)
 
 	    line = (line->lineno > openfile->current->lineno) ?
 			line->prev : line->next;
->>>>>>> origin/tomato-shibby-RT-AC
 	}
-#endif /* !NANO_TINY */
-
-	return;
-    }
-
-    /* Update old_current and current if we're not on the same page as
-     * before.  If the mark is on, update all the lines between
-     * old_current and current too. */
-    foo = old_current;
-
-    while (foo != openfile->current) {
-	if (do_redraw)
-	    update_line(foo, 0);
-
-#ifndef NANO_TINY
-	if (!openfile->mark_set)
+    } else
 #endif
-	    break;
+	/* Otherwise, update old_current only if it differs from current
+	 * and was horizontally scrolled. */
+	if (old_current != openfile->current && get_page_start(was_pww) > 0)
+	    update_line(old_current, 0);
 
-<<<<<<< HEAD
-#ifndef NANO_TINY
-	foo = (foo->lineno > openfile->current->lineno) ? foo->prev :
-		foo->next;
-#endif
-    }
-
-    if (do_redraw)
-=======
     /* Update current if the mark is on or it has changed "page", or if it
      * differs from old_current and needs to be horizontally scrolled. */
     if (line_needs_update(was_pww, openfile->placewewant) ||
 			(old_current != openfile->current &&
 			get_page_start(openfile->placewewant) > 0))
->>>>>>> origin/tomato-shibby-RT-AC
 	update_line(openfile->current, openfile->current_x);
 }
 
@@ -4830,25 +3027,6 @@ void edit_redraw(filestruct *old_current, size_t pww_save)
  * if we've moved and changed text. */
 void edit_refresh(void)
 {
-<<<<<<< HEAD
-    filestruct *foo;
-    int nlines;
-
-    /* Figure out what maxrows should really be */
-    compute_maxrows();
-
-    if (openfile->current->lineno < openfile->edittop->lineno ||
-	openfile->current->lineno >= openfile->edittop->lineno +
-	maxrows) {
-
-#ifdef DEBUG
-    fprintf(stderr, "edit_refresh(): line = %d, edittop %d + maxrows %d\n", openfile->current->lineno, openfile->edittop->lineno, maxrows);
-#endif
-
-	/* Put the top line of the edit window in range of the current
-	 * line. */
-	edit_update(CENTER);
-=======
     filestruct *line;
     int row = 0;
 
@@ -4859,7 +3037,6 @@ void edit_refresh(void)
 		(long)openfile->current->lineno, (long)openfile->edittop->lineno, editwinrows);
 #endif
 	adjust_viewport((focusing || !ISSET(SMOOTH_SCROLL)) ? CENTERING : STATIONARY);
->>>>>>> origin/tomato-shibby-RT-AC
     }
 
 #ifdef DEBUG
@@ -4885,28 +3062,6 @@ void edit_refresh(void)
     refresh_needed = FALSE;
 }
 
-<<<<<<< HEAD
-/* Move edittop to put it in range of current, keeping current in the
- * same place.  location determines how we move it: if it's CENTER, we
- * center current, and if it's NONE, we put current current_y lines
- * below edittop. */
-void edit_update(update_type location)
-{
-    filestruct *foo = openfile->current;
-    int goal;
-
-    /* If location is CENTER, we move edittop up (editwinrows / 2)
-     * lines.  This puts current at the center of the screen.  If
-     * location is NONE, we move edittop up current_y lines if current_y
-     * is in range of the screen, 0 lines if current_y is less than 0,
-     * or (editwinrows - 1) lines if current_y is greater than
-     * (editwinrows - 1).  This puts current at the same place on the
-     * screen as before, or at the top or bottom of the screen if
-     * edittop is beyond either. */
-    if (location == CENTER)
-	goal = editwinrows / 2;
-    else {
-=======
 /* Move edittop so that current is on the screen.  manner says how it
  * should be moved: CENTERING means that current should end up in the
  * middle of the screen, STATIONARY means that it should stay at the
@@ -4930,7 +3085,6 @@ void adjust_viewport(update_type manner)
 	if (!current_is_above_screen())
 	    goal = editwinrows - 1;
     } else {
->>>>>>> origin/tomato-shibby-RT-AC
 	goal = openfile->current_y;
 
 	/* Limit goal to (editwinrows - 1) rows maximum. */
@@ -4938,19 +3092,6 @@ void adjust_viewport(update_type manner)
 	    goal = editwinrows - 1;
     }
 
-<<<<<<< HEAD
-    for (; goal > 0 && foo->prev != NULL; goal--) {
-	foo = foo->prev;
-	if (ISSET(SOFTWRAP) && foo)
-	    goal -= strlenpt(foo->data) / COLS;
-    }
-    openfile->edittop = foo;
-#ifdef DEBUG
-    fprintf(stderr, "edit_udpate(), setting edittop to lineno %d\n", openfile->edittop->lineno);
-#endif
-    compute_maxrows();
-    edit_refresh_needed = TRUE;
-=======
     openfile->edittop = openfile->current;
 
 #ifndef NANO_TINY
@@ -4964,7 +3105,6 @@ void adjust_viewport(update_type manner)
 #ifdef DEBUG
     fprintf(stderr, "adjust_viewport(): setting edittop to lineno %ld\n", (long)openfile->edittop->lineno);
 #endif
->>>>>>> origin/tomato-shibby-RT-AC
 }
 
 /* Unconditionally redraw the entire screen. */
@@ -4994,23 +3134,21 @@ void total_refresh(void)
  * portion of the window. */
 void display_main_list(void)
 {
+#ifndef DISABLE_COLOR
+    if (openfile->syntax &&
+		(openfile->syntax->formatter || openfile->syntax->linter))
+	set_lint_or_format_shortcuts();
+    else
+	set_spell_shortcuts();
+#endif
+
     bottombars(MMAIN);
 }
 
-<<<<<<< HEAD
-/* If constant is TRUE, we display the current cursor position only if
- * disable_cursorpos is FALSE.  Otherwise, we display it
- * unconditionally and set disable_cursorpos to FALSE.  If constant is
- * TRUE and disable_cursorpos is TRUE, we also set disable_cursorpos to
- * FALSE, so that we leave the current statusbar alone this time, and
- * display the current cursor position next time. */
-void do_cursorpos(bool constant)
-=======
 /* Show info about the current cursor position on the statusbar.
  * Do this unconditionally when force is TRUE; otherwise, only if
  * suppress_cursorpos is FALSE.  In any case, reset the latter. */
 void do_cursorpos(bool force)
->>>>>>> origin/tomato-shibby-RT-AC
 {
     char saved_byte;
     size_t sum, cur_xpt = xplustabs() + 1;
@@ -5019,15 +3157,8 @@ void do_cursorpos(bool force)
 
     assert(openfile->fileage != NULL && openfile->current != NULL);
 
-<<<<<<< HEAD
-    f = openfile->current->next;
-    c = openfile->current->data[openfile->current_x];
-
-    openfile->current->next = NULL;
-=======
     /* Determine the size of the file up to the cursor. */
     saved_byte = openfile->current->data[openfile->current_x];
->>>>>>> origin/tomato-shibby-RT-AC
     openfile->current->data[openfile->current_x] = '\0';
 
     sum = get_totsize(openfile->fileage, openfile->current);
@@ -5038,37 +3169,26 @@ void do_cursorpos(bool force)
     if (openfile->current != openfile->filebot)
 	sum--;
 
-<<<<<<< HEAD
-    if (constant && disable_cursorpos) {
-	disable_cursorpos = FALSE;
-=======
     /* If the showing needs to be suppressed, don't suppress it next time. */
     if (suppress_cursorpos && !force) {
 	suppress_cursorpos = FALSE;
->>>>>>> origin/tomato-shibby-RT-AC
 	return;
     }
 
-    /* Display the current cursor position on the statusbar, and set
-     * disable_cursorpos to FALSE. */
-    linepct = 100 * openfile->current->lineno /
-	openfile->filebot->lineno;
+    /* Display the current cursor position on the statusbar. */
+    linepct = 100 * openfile->current->lineno / openfile->filebot->lineno;
     colpct = 100 * cur_xpt / cur_lenpt;
-<<<<<<< HEAD
-    charpct = (openfile->totsize == 0) ? 0 : 100 * i /
-	openfile->totsize;
-=======
     charpct = (openfile->totsize == 0) ? 0 : 100 * sum / openfile->totsize;
->>>>>>> origin/tomato-shibby-RT-AC
 
-    statusbar(
+    statusline(HUSH,
 	_("line %ld/%ld (%d%%), col %lu/%lu (%d%%), char %lu/%lu (%d%%)"),
 	(long)openfile->current->lineno,
 	(long)openfile->filebot->lineno, linepct,
 	(unsigned long)cur_xpt, (unsigned long)cur_lenpt, colpct,
 	(unsigned long)sum, (unsigned long)openfile->totsize, charpct);
 
-    disable_cursorpos = FALSE;
+    /* Displaying the cursor position should not suppress it next time. */
+    suppress_cursorpos = FALSE;
 }
 
 /* Unconditionally display the current cursor position. */
@@ -5079,33 +3199,20 @@ void do_cursorpos_void(void)
 
 void enable_nodelay(void)
 {
-   nodelay_mode = TRUE;
-   nodelay(edit, TRUE);
+    nodelay_mode = TRUE;
+    nodelay(edit, TRUE);
 }
 
 void disable_nodelay(void)
 {
-   nodelay_mode = FALSE;
-   nodelay(edit, FALSE);
+    nodelay_mode = FALSE;
+    nodelay(edit, FALSE);
 }
-
 
 /* Highlight the current word being replaced or spell checked.  We
  * expect word to have tabs and control characters expanded. */
-void do_replace_highlight(bool highlight, const char *word)
+void spotlight(bool active, const char *word)
 {
-<<<<<<< HEAD
-    size_t y = xplustabs(), word_len = strlenpt(word);
-
-    y = get_page_start(y) + COLS - y;
-	/* Now y is the number of columns that we can display on this
-	 * line. */
-
-    assert(y > 0);
-
-    if (word_len > y)
-	y--;
-=======
     size_t word_span = strlenpt(word);
     size_t room = word_span;
 
@@ -5117,26 +3224,18 @@ void do_replace_highlight(bool highlight, const char *word)
 	if (word_span > room)
 	    room--;
     }
->>>>>>> origin/tomato-shibby-RT-AC
 
     reset_cursor();
 
-    if (highlight)
-	wattron(edit, reverse_attr);
+    if (active)
+	wattron(edit, hilite_attribute);
 
     /* This is so we can show zero-length matches. */
     if (word_span == 0)
 	waddch(edit, ' ');
     else
-	waddnstr(edit, word, actual_x(word, y));
+	waddnstr(edit, word, actual_x(word, room));
 
-<<<<<<< HEAD
-    if (word_len > y)
-	waddch(edit, '$');
-
-    if (highlight)
-	wattroff(edit, reverse_attr);
-=======
     if (word_span > room)
 	waddch(edit, '$');
 
@@ -5144,12 +3243,11 @@ void do_replace_highlight(bool highlight, const char *word)
 	wattroff(edit, hilite_attribute);
 
     wnoutrefresh(edit);
->>>>>>> origin/tomato-shibby-RT-AC
 }
 
-#ifdef NANO_EXTRA
-#define CREDIT_LEN 55
-#define XLCREDIT_LEN 8
+#ifndef DISABLE_EXTRA
+#define CREDIT_LEN 54
+#define XLCREDIT_LEN 9
 
 /* Easter egg: Display credits.  Assume nodelay(edit) and scrollok(edit)
  * are FALSE. */
@@ -5171,14 +3269,11 @@ void do_credits(void)
 	"Rocco Corsi",
 	"David Lawrence Ramsey",
 	"David Benbennick",
+	"Mark Majeres",
 	"Mike Frysinger",
+	"Benno Schulenberg",
 	"Ken Tyler",
 	"Sven Guckes",
-	NULL,				/* credits[15], handled below. */
-	"Pauli Virtanen",
-	"Daniele Medri",
-	"Clement Laforet",
-	"Tedi Heriyanto",
 	"Bill Soudan",
 	"Christian Weisgerber",
 	"Erik Andersen",
@@ -5188,6 +3283,7 @@ void do_credits(void)
 	"Albert Chin",
 	"",
 	NULL,				/* "Special thanks to:" */
+	"Monique, Brielle & Joseph",
 	"Plattsburgh State University",
 	"Benet Laboratories",
 	"Amy Allegretta",
@@ -5196,6 +3292,7 @@ void do_credits(void)
 	"Richard Kolb II",
 	NULL,				/* "The Free Software Foundation" */
 	"Linus Torvalds",
+	NULL,				/* "the many translators and the TP" */
 	NULL,				/* "For ncurses:" */
 	"Thomas Dickey",
 	"Pavel Curtis",
@@ -5207,13 +3304,13 @@ void do_credits(void)
 	"",
 	"",
 	"",
-	"(C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007",
+	"(C) 1999 - 2016",
 	"Free Software Foundation, Inc.",
 	"",
 	"",
 	"",
 	"",
-	"http://www.nano-editor.org/"
+	"https://nano-editor.org/"
     };
 
     const char *xlcredits[XLCREDIT_LEN] = {
@@ -5222,19 +3319,11 @@ void do_credits(void)
 	N_("Brought to you by:"),
 	N_("Special thanks to:"),
 	N_("The Free Software Foundation"),
+	N_("the many translators and the TP"),
 	N_("For ncurses:"),
 	N_("and anyone else we forgot..."),
 	N_("Thank you for using nano!")
     };
-
-    /* credits[15]: Make sure this name is displayed properly, since we
-     * can't dynamically assign it above, using Unicode 00F6 (Latin
-     * Small Letter O with Diaresis) if applicable. */
-    credits[15] =
-#ifdef ENABLE_UTF8
-	 using_utf8() ? "Florian K\xC3\xB6nig" :
-#endif
-	"Florian K\xF6nig";
 
     if (!old_more_space || !old_no_help) {
 	SET(MORE_SPACE);
@@ -5299,15 +3388,14 @@ void do_credits(void)
     if (kbinput != ERR)
 	ungetch(kbinput);
 
-    if (!old_more_space || !old_no_help) {
+    if (!old_more_space)
 	UNSET(MORE_SPACE);
+    if (!old_no_help)
 	UNSET(NO_HELP);
-	window_init();
-    }
+    window_init();
 
-    curs_set(1);
     nodelay(edit, FALSE);
 
     total_refresh();
 }
-#endif /* NANO_EXTRA */
+#endif /* !DISABLE_EXTRA */

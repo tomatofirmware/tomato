@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-localedir = $(datadir)/locale
-INCLUDES = -DLOCALEDIR=\"$(localedir)\" -DSYSCONFDIR=\"$(sysconfdir)\"
-
-ACLOCAL_AMFLAGS = -I m4
-=======
 AM_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\" -DSYSCONFDIR=\"$(sysconfdir)\" \
 	-I$(top_builddir)/lib -I$(top_srcdir)/lib
 
@@ -24,7 +18,6 @@ revision.h: update_revision
 	echo "#define $(SOMETHING)" > $@
 
 .PHONY: update_revision
->>>>>>> origin/tomato-shibby-RT-AC
 
 bin_PROGRAMS = 	nano
 nano_SOURCES =	browser.c \

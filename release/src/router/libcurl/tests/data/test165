@@ -53,14 +53,11 @@ GET http://www.xn--4cab6c.se/page/165 HTTP/1.1
 Host: www.xn--4cab6c.se
 Accept: */*
 Proxy-Connection: Keep-Alive
-<<<<<<< HEAD
-=======
 
 GET http://www.xn--groe-xna.de/page/165 HTTP/1.1
 Host: www.xn--groe-xna.de
 Accept: */*
 Proxy-Connection: Keep-Alive
->>>>>>> origin/tomato-shibby-RT-AC
 
 </protocol>
 </verify>

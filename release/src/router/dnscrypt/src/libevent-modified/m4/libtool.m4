@@ -1337,7 +1337,39 @@ ia64-*-hpux*)
   rm -rf conftest*
   ;;
 
-x86_64-*kfreebsd*-gnu|x86_64-*linux*|ppc*-*linux*|powerpc*-*linux*| \
+mips64*-*linux*)
+  # Find out what ABI is being produced by ac_compile, and set linker
+  # options accordingly.
+  echo '[#]line '$LINENO' "configure"' > conftest.$ac_ext
+  if AC_TRY_EVAL(ac_compile); then
+    emul=elf
+    case `/usr/bin/file conftest.$ac_objext` in
+      *32-bit*)
+	emul="${emul}32"
+	;;
+      *64-bit*)
+	emul="${emul}64"
+	;;
+    esac
+    case `/usr/bin/file conftest.$ac_objext` in
+      *MSB*)
+	emul="${emul}btsmip"
+	;;
+      *LSB*)
+	emul="${emul}ltsmip"
+	;;
+    esac
+    case `/usr/bin/file conftest.$ac_objext` in
+      *N32*)
+	emul="${emul}n32"
+	;;
+    esac
+    LD="${LD-ld} -m $emul"
+  fi
+  rm -rf conftest*
+  ;;
+
+x86_64-*kfreebsd*-gnu|x86_64-*linux*|powerpc*-*linux*| \
 s390*-*linux*|s390*-*tpf*|sparc*-*linux*)
   # Find out what ABI is being produced by ac_compile, and set linker
   # options accordingly.  Note that the listed cases only cover the
@@ -1363,7 +1395,10 @@ s390*-*linux*|s390*-*tpf*|sparc*-*linux*)
 		;;
 	    esac
 	    ;;
-	  ppc64-*linux*|powerpc64-*linux*)
+	  powerpc64le-*linux*)
+	    LD="${LD-ld} -m elf32lppclinux"
+	    ;;
+	  powerpc64-*linux*)
 	    LD="${LD-ld} -m elf32ppclinux"
 	    ;;
 	  s390x-*linux*)
@@ -1382,7 +1417,10 @@ s390*-*linux*|s390*-*tpf*|sparc*-*linux*)
 	  x86_64-*linux*)
 	    LD="${LD-ld} -m elf_x86_64"
 	    ;;
-	  ppc*-*linux*|powerpc*-*linux*)
+	  powerpcle-*linux*)
+	    LD="${LD-ld} -m elf64lppc"
+	    ;;
+	  powerpc-*linux*)
 	    LD="${LD-ld} -m elf64ppc"
 	    ;;
 	  s390*-*linux*|s390*-*tpf*)
@@ -1726,7 +1764,8 @@ AC_CACHE_VAL([lt_cv_sys_max_cmd_len], [dnl
     ;;
   *)
     lt_cv_sys_max_cmd_len=`(getconf ARG_MAX) 2> /dev/null`
-    if test -n "$lt_cv_sys_max_cmd_len"; then
+    if test -n "$lt_cv_sys_max_cmd_len" && \
+       test undefined != "$lt_cv_sys_max_cmd_len"; then
       lt_cv_sys_max_cmd_len=`expr $lt_cv_sys_max_cmd_len \/ 4`
       lt_cv_sys_max_cmd_len=`expr $lt_cv_sys_max_cmd_len \* 3`
     else

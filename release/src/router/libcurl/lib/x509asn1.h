@@ -8,15 +8,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
-<<<<<<< HEAD
- * Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
-=======
  * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
->>>>>>> origin/tomato-shibby-RT-AC
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -29,12 +25,8 @@
 
 #include "curl_setup.h"
 
-<<<<<<< HEAD
-#if defined(USE_QSOSSL) || defined(USE_GSKIT) || defined(USE_NSS)
-=======
 #if defined(USE_GSKIT) || defined(USE_NSS) || defined(USE_GNUTLS) || \
     defined(USE_CYASSL) || defined(USE_SCHANNEL)
->>>>>>> origin/tomato-shibby-RT-AC
 
 #include "urldata.h"
 
@@ -88,8 +80,9 @@
 
 /* ASN.1 parsed element. */
 typedef struct {
+  const char *  header;         /* Pointer to header byte. */
   const char *  beg;            /* Pointer to element data. */
-  const char *  end;            /* Pointer to 1st byte after element data. */
+  const char *  end;            /* Pointer to 1st byte after element. */
   unsigned char class;          /* ASN.1 element class. */
   unsigned char tag;            /* ASN.1 element tag. */
   bool          constructed;    /* Element is constructed. */
@@ -114,6 +107,7 @@ typedef struct {
   curl_asn1Element      notBefore;
   curl_asn1Element      notAfter;
   curl_asn1Element      subject;
+  curl_asn1Element      subjectPublicKeyInfo;
   curl_asn1Element      subjectPublicKeyAlgorithm;
   curl_asn1Element      subjectPublicKey;
   curl_asn1Element      issuerUniqueID;
@@ -126,20 +120,6 @@ typedef struct {
  * Prototypes.
  */
 
-<<<<<<< HEAD
-const char * Curl_getASN1Element(curl_asn1Element * elem,
-                                 const char * beg, const char * end);
-const char * Curl_ASN1tostr(curl_asn1Element * elem, int type);
-const char * Curl_DNtostr(curl_asn1Element * dn);
-void Curl_parseX509(curl_X509certificate * cert,
-                    const char * beg, const char * end);
-CURLcode Curl_extract_certinfo(struct connectdata * conn, int certnum,
-                               const char * beg, const char * end);
-CURLcode Curl_verifyhost(struct connectdata * conn,
-                         const char * beg, const char * end);
-
-#endif /* USE_QSOSSL or USE_GSKIT or USE_NSS */
-=======
 const char *Curl_getASN1Element(curl_asn1Element *elem,
                                  const char *beg, const char *end);
 const char *Curl_ASN1tostr(curl_asn1Element *elem, int type);
@@ -151,5 +131,4 @@ CURLcode Curl_extract_certinfo(struct connectdata *conn, int certnum,
 CURLcode Curl_verifyhost(struct connectdata *conn,
                          const char *beg, const char *end);
 #endif /* USE_GSKIT or USE_NSS or USE_GNUTLS or USE_CYASSL or USE_SCHANNEL */
->>>>>>> origin/tomato-shibby-RT-AC
 #endif /* HEADER_CURL_X509ASN1_H */

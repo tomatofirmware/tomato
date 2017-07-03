@@ -7,11 +7,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 2011, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 2011 - 2015, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -39,26 +39,19 @@
 #  include <gssapi.h>
 #endif
 
+extern gss_OID_desc Curl_spnego_mech_oid;
+extern gss_OID_desc Curl_krb5_mech_oid;
 
-/* Common method for using gss api */
-
+/* Common method for using GSS-API */
 OM_uint32 Curl_gss_init_sec_context(
-<<<<<<< HEAD
-    struct SessionHandle *data,
-    OM_uint32 * minor_status,
-    gss_ctx_id_t * context,
-=======
     struct Curl_easy *data,
     OM_uint32 *minor_status,
     gss_ctx_id_t *context,
->>>>>>> origin/tomato-shibby-RT-AC
     gss_name_t target_name,
+    gss_OID mech_type,
     gss_channel_bindings_t input_chan_bindings,
     gss_buffer_t input_token,
     gss_buffer_t output_token,
-<<<<<<< HEAD
-    OM_uint32 * ret_flags);
-=======
     const bool mutual_auth,
     OM_uint32 *ret_flags);
 
@@ -76,7 +69,6 @@ void Curl_gss_log_error(struct Curl_easy *data, const char *prefix,
 #define GSSAUTH_P_NONE      1
 #define GSSAUTH_P_INTEGRITY 2
 #define GSSAUTH_P_PRIVACY   4
->>>>>>> origin/tomato-shibby-RT-AC
 
 #endif /* HAVE_GSSAPI */
 

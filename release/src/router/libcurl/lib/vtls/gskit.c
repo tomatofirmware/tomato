@@ -5,15 +5,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
-<<<<<<< HEAD
- * Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
-=======
  * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
->>>>>>> origin/tomato-shibby-RT-AC
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -78,9 +74,7 @@
 #include "select.h"
 #include "strcase.h"
 #include "x509asn1.h"
-
-#define _MPRINTF_REPLACE /* use our functions only */
-#include <curl/mprintf.h>
+#include "curl_printf.h"
 
 #include "curl_memory.h"
 /* The last #include file should be: */
@@ -142,8 +136,12 @@ static const gskit_cipher  ciphertable[] = {
       CURL_GSKPROTO_TLSV10_MASK | CURL_GSKPROTO_TLSV11_MASK |
       CURL_GSKPROTO_TLSV12_MASK },
   { "null-sha256",      "3B",   CURL_GSKPROTO_TLSV12_MASK },
-  { "aes128-sha256",    "3D",   CURL_GSKPROTO_TLSV12_MASK },
+  { "aes128-sha256",    "3C",   CURL_GSKPROTO_TLSV12_MASK },
   { "aes256-sha256",    "3D",   CURL_GSKPROTO_TLSV12_MASK },
+  { "aes128-gcm-sha256",
+                        "9C",   CURL_GSKPROTO_TLSV12_MASK },
+  { "aes256-gcm-sha384",
+                        "9D",   CURL_GSKPROTO_TLSV12_MASK },
   { "rc4-md5",          "1",    CURL_GSKPROTO_SSLV2_MASK },
   { "exp-rc4-md5",      "2",    CURL_GSKPROTO_SSLV2_MASK },
   { "rc2-md5",          "3",    CURL_GSKPROTO_SSLV2_MASK },
@@ -172,8 +170,6 @@ static bool is_separator(char c)
 static CURLcode gskit_status(struct Curl_easy *data, int rc,
                              const char *procname, CURLcode defcode)
 {
-  CURLcode cc;
-
   /* Process GSKit status and map it to a CURLcode. */
   switch(rc) {
   case GSK_OK:
@@ -307,7 +303,7 @@ static CURLcode set_ciphers(struct connectdata *conn,
   int i;
   int l;
   bool unsupported;
-  CURLcode cc;
+  CURLcode result;
   struct {
     char *buf;
     char *ptr;
@@ -340,7 +336,7 @@ static CURLcode set_ciphers(struct connectdata *conn,
 
   /* Process each cipher in input string. */
   unsupported = FALSE;
-  cc = CURLE_OK;
+  result = CURLE_OK;
   for(;;) {
     for(clp = cipherlist; *cipherlist && !is_separator(*cipherlist);)
       cipherlist++;
@@ -353,7 +349,7 @@ static CURLcode set_ciphers(struct connectdata *conn,
         break;
     if(!ctp->name) {
       failf(data, "Unknown cipher %.*s", l, clp);
-      cc = CURLE_SSL_CIPHER;
+      result = CURLE_SSL_CIPHER;
     }
     else {
       unsupported |= !(ctp->versions & (CURL_GSKPROTO_SSLV2_MASK |
@@ -381,53 +377,53 @@ static CURLcode set_ciphers(struct connectdata *conn,
 
   /* Try to set-up TLSv1.1 and TLSv2.1 ciphers. */
   if(*protoflags & CURL_GSKPROTO_TLSV11_MASK) {
-    cc = set_buffer(data, h, GSK_TLSV11_CIPHER_SPECS,
-                    ciphers[CURL_GSKPROTO_TLSV11].buf, TRUE);
-    if(cc == CURLE_UNSUPPORTED_PROTOCOL) {
-      cc = CURLE_OK;
+    result = set_buffer(data, h, GSK_TLSV11_CIPHER_SPECS,
+                        ciphers[CURL_GSKPROTO_TLSV11].buf, TRUE);
+    if(result == CURLE_UNSUPPORTED_PROTOCOL) {
+      result = CURLE_OK;
       if(unsupported) {
         failf(data, "TLSv1.1-only ciphers are not yet supported");
-        cc = CURLE_SSL_CIPHER;
+        result = CURLE_SSL_CIPHER;
       }
     }
   }
-  if(cc == CURLE_OK && (*protoflags & CURL_GSKPROTO_TLSV12_MASK)) {
-    cc = set_buffer(data, h, GSK_TLSV12_CIPHER_SPECS,
-                    ciphers[CURL_GSKPROTO_TLSV12].buf, TRUE);
-    if(cc == CURLE_UNSUPPORTED_PROTOCOL) {
-      cc = CURLE_OK;
+  if(!result && (*protoflags & CURL_GSKPROTO_TLSV12_MASK)) {
+    result = set_buffer(data, h, GSK_TLSV12_CIPHER_SPECS,
+                        ciphers[CURL_GSKPROTO_TLSV12].buf, TRUE);
+    if(result == CURLE_UNSUPPORTED_PROTOCOL) {
+      result = CURLE_OK;
       if(unsupported) {
         failf(data, "TLSv1.2-only ciphers are not yet supported");
-        cc = CURLE_SSL_CIPHER;
+        result = CURLE_SSL_CIPHER;
       }
     }
   }
 
   /* Try to set-up TLSv1.0 ciphers. If not successful, concatenate them to
      the SSLv3 ciphers. OS/400 prior to version 7.1 will understand it. */
-  if(cc == CURLE_OK && (*protoflags & CURL_GSKPROTO_TLSV10_MASK)) {
-    cc = set_buffer(data, h, GSK_TLSV10_CIPHER_SPECS,
-                    ciphers[CURL_GSKPROTO_TLSV10].buf, TRUE);
-    if(cc == CURLE_UNSUPPORTED_PROTOCOL) {
-      cc = CURLE_OK;
+  if(!result && (*protoflags & CURL_GSKPROTO_TLSV10_MASK)) {
+    result = set_buffer(data, h, GSK_TLSV10_CIPHER_SPECS,
+                        ciphers[CURL_GSKPROTO_TLSV10].buf, TRUE);
+    if(result == CURLE_UNSUPPORTED_PROTOCOL) {
+      result = CURLE_OK;
       strcpy(ciphers[CURL_GSKPROTO_SSLV3].ptr,
              ciphers[CURL_GSKPROTO_TLSV10].ptr);
     }
   }
 
   /* Set-up other ciphers. */
-  if(cc == CURLE_OK &&  (*protoflags & CURL_GSKPROTO_SSLV3_MASK))
-    cc = set_buffer(data, h, GSK_V3_CIPHER_SPECS,
-                    ciphers[CURL_GSKPROTO_SSLV3].buf, FALSE);
-  if(cc == CURLE_OK && (*protoflags & CURL_GSKPROTO_SSLV2_MASK))
-    cc = set_buffer(data, h, GSK_V2_CIPHER_SPECS,
-                    ciphers[CURL_GSKPROTO_SSLV2].buf, FALSE);
+  if(!result && (*protoflags & CURL_GSKPROTO_SSLV3_MASK))
+    result = set_buffer(data, h, GSK_V3_CIPHER_SPECS,
+                        ciphers[CURL_GSKPROTO_SSLV3].buf, FALSE);
+  if(!result && (*protoflags & CURL_GSKPROTO_SSLV2_MASK))
+    result = set_buffer(data, h, GSK_V2_CIPHER_SPECS,
+                        ciphers[CURL_GSKPROTO_SSLV2].buf, FALSE);
 
   /* Clean-up. */
   for(i = 0; i < CURL_GSKPROTO_LAST; i++)
     free(ciphers[i].buf);
 
-  return cc;
+  return result;
 }
 
 
@@ -451,7 +447,7 @@ static CURLcode init_environment(struct Curl_easy *data,
                                  const char *password)
 {
   int rc;
-  CURLcode c;
+  CURLcode result;
   gsk_handle h;
 
   /* Creates the GSKit environment. */
@@ -467,29 +463,29 @@ static CURLcode init_environment(struct Curl_easy *data,
     return CURLE_SSL_CONNECT_ERROR;
   }
 
-  c = set_enum(data, h, GSK_SESSION_TYPE, GSK_CLIENT_SESSION, FALSE);
-  if(c == CURLE_OK && appid)
-    c = set_buffer(data, h, GSK_OS400_APPLICATION_ID, appid, FALSE);
-  if(c == CURLE_OK && file)
-    c = set_buffer(data, h, GSK_KEYRING_FILE, file, FALSE);
-  if(c == CURLE_OK && label)
-    c = set_buffer(data, h, GSK_KEYRING_LABEL, label, FALSE);
-  if(c == CURLE_OK && password)
-    c = set_buffer(data, h, GSK_KEYRING_PW, password, FALSE);
+  result = set_enum(data, h, GSK_SESSION_TYPE, GSK_CLIENT_SESSION, FALSE);
+  if(!result && appid)
+    result = set_buffer(data, h, GSK_OS400_APPLICATION_ID, appid, FALSE);
+  if(!result && file)
+    result = set_buffer(data, h, GSK_KEYRING_FILE, file, FALSE);
+  if(!result && label)
+    result = set_buffer(data, h, GSK_KEYRING_LABEL, label, FALSE);
+  if(!result && password)
+    result = set_buffer(data, h, GSK_KEYRING_PW, password, FALSE);
 
-  if(c == CURLE_OK) {
+  if(!result) {
     /* Locate CAs, Client certificate and key according to our settings.
        Note: this call may be blocking for some tenths of seconds. */
-    c = gskit_status(data, gsk_environment_init(h),
-                     "gsk_environment_init()", CURLE_SSL_CERTPROBLEM);
-    if(c == CURLE_OK) {
+    result = gskit_status(data, gsk_environment_init(h),
+                          "gsk_environment_init()", CURLE_SSL_CERTPROBLEM);
+    if(!result) {
       *envir = h;
-      return c;
+      return result;
     }
   }
   /* Error: rollback. */
   gsk_environment_close(&h);
-  return c;
+  return result;
 }
 
 
@@ -758,7 +754,7 @@ static CURLcode gskit_connect_step1(struct connectdata *conn, int sockindex)
   struct Curl_easy *data = conn->data;
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
   gsk_handle envir;
-  CURLcode cc;
+  CURLcode result;
   int rc;
   const char * const keyringfile = SSL_CONN_CONFIG(CAfile);
   const char * const keyringpwd = SSL_SET_OPTION(key_passwd);
@@ -805,18 +801,18 @@ static CURLcode gskit_connect_step1(struct connectdata *conn, int sockindex)
 
   if(!envir) {
     /* Use keyring mode. */
-    cc = init_environment(data, &envir, (const char *) NULL,
-                          keyringfile, keyringlabel, keyringpwd);
-    if(cc != CURLE_OK)
-      return cc;
+    result = init_environment(data, &envir, (const char *) NULL,
+                              keyringfile, keyringlabel, keyringpwd);
+    if(result)
+      return result;
   }
 
   /* Create secure session. */
-  cc = gskit_status(data, gsk_secure_soc_open(envir, &connssl->handle),
-                    "gsk_secure_soc_open()", CURLE_SSL_CONNECT_ERROR);
+  result = gskit_status(data, gsk_secure_soc_open(envir, &connssl->handle),
+                        "gsk_secure_soc_open()", CURLE_SSL_CONNECT_ERROR);
   gsk_environment_close(&envir);
-  if(cc != CURLE_OK)
-    return cc;
+  if(result)
+    return result;
 
   /* Establish a pipelining socket pair for SSL over SSL. */
   if(conn->proxy_ssl[sockindex].use) {
@@ -837,27 +833,15 @@ static CURLcode gskit_connect_step1(struct connectdata *conn, int sockindex)
   }
 
   /* Determine which SSL/TLS version should be enabled. */
-<<<<<<< HEAD
-  protoflags = CURL_GSKPROTO_SSLV3_MASK | CURL_GSKPROTO_TLSV10_MASK |
-               CURL_GSKPROTO_TLSV11_MASK | CURL_GSKPROTO_TLSV12_MASK;
-  sni = conn->host.name;
-  switch (data->set.ssl.version) {
-=======
   sni = hostname;
   switch(ssl_version) {
->>>>>>> origin/tomato-shibby-RT-AC
   case CURL_SSLVERSION_SSLv2:
     protoflags = CURL_GSKPROTO_SSLV2_MASK;
     sni = NULL;
     break;
   case CURL_SSLVERSION_SSLv3:
-<<<<<<< HEAD
-    protoflags = CURL_GSKPROTO_SSLV2_MASK;
-    sni = (char *) NULL;
-=======
     protoflags = CURL_GSKPROTO_SSLV3_MASK;
     sni = NULL;
->>>>>>> origin/tomato-shibby-RT-AC
     break;
   case CURL_SSLVERSION_DEFAULT:
   case CURL_SSLVERSION_TLSv1:
@@ -883,29 +867,23 @@ static CURLcode gskit_connect_step1(struct connectdata *conn, int sockindex)
 
   /* Process SNI. Ignore if not supported (on OS400 < V7R1). */
   if(sni) {
-    cc = set_buffer(data, connssl->handle,
-                    GSK_SSL_EXTN_SERVERNAME_REQUEST, sni, TRUE);
-    if(cc == CURLE_UNSUPPORTED_PROTOCOL)
-      cc = CURLE_OK;
+    result = set_buffer(data, connssl->handle,
+                        GSK_SSL_EXTN_SERVERNAME_REQUEST, sni, TRUE);
+    if(result == CURLE_UNSUPPORTED_PROTOCOL)
+      result = CURLE_OK;
   }
 
   /* Set session parameters. */
-  if(cc == CURLE_OK) {
+  if(!result) {
     /* Compute the handshake timeout. Since GSKit granularity is 1 second,
        we round up the required value. */
     timeout = Curl_timeleft(data, NULL, TRUE);
     if(timeout < 0)
-      cc = CURLE_OPERATION_TIMEDOUT;
+      result = CURLE_OPERATION_TIMEDOUT;
     else
-      cc = set_numeric(data, connssl->handle, GSK_HANDSHAKE_TIMEOUT,
-                       (timeout + 999) / 1000);
+      result = set_numeric(data, connssl->handle, GSK_HANDSHAKE_TIMEOUT,
+                           (timeout + 999) / 1000);
   }
-<<<<<<< HEAD
-  if(cc == CURLE_OK)
-    cc = set_numeric(data, connssl->handle, GSK_FD, conn->sock[sockindex]);
-  if(cc == CURLE_OK)
-    cc = set_ciphers(data, connssl->handle, &protoflags);
-=======
   if(!result)
     result = set_numeric(data, connssl->handle, GSK_OS400_READ_TIMEOUT, 1);
   if(!result)
@@ -913,68 +891,63 @@ static CURLcode gskit_connect_step1(struct connectdata *conn, int sockindex)
                          connssl->localfd: conn->sock[sockindex]);
   if(!result)
     result = set_ciphers(conn, connssl->handle, &protoflags);
->>>>>>> origin/tomato-shibby-RT-AC
   if(!protoflags) {
     failf(data, "No SSL protocol/cipher combination enabled");
-    cc = CURLE_SSL_CIPHER;
+    result = CURLE_SSL_CIPHER;
   }
-  if(cc == CURLE_OK)
-      cc = set_enum(data, connssl->handle, GSK_PROTOCOL_SSLV2,
-                    (protoflags & CURL_GSKPROTO_SSLV2_MASK)?
-                    GSK_PROTOCOL_SSLV2_ON: GSK_PROTOCOL_SSLV2_OFF, FALSE);
-  if(cc == CURLE_OK)
-    cc = set_enum(data, connssl->handle, GSK_PROTOCOL_SSLV3,
-                  (protoflags & CURL_GSKPROTO_SSLV3_MASK)?
-                  GSK_PROTOCOL_SSLV3_ON: GSK_PROTOCOL_SSLV3_OFF, FALSE);
-  if(cc == CURLE_OK)
-    cc = set_enum(data, connssl->handle, GSK_PROTOCOL_TLSV1,
-                  (protoflags & CURL_GSKPROTO_TLSV10_MASK)?
-                  GSK_PROTOCOL_TLSV1_ON: GSK_PROTOCOL_TLSV1_OFF, FALSE);
-  if(cc == CURLE_OK) {
-    cc = set_enum(data, connssl->handle, GSK_PROTOCOL_TLSV11,
-                   (protoflags & CURL_GSKPROTO_TLSV11_MASK)?
-                   GSK_TRUE: GSK_FALSE, TRUE);
-    if(cc == CURLE_UNSUPPORTED_PROTOCOL) {
-      cc = CURLE_OK;
+  if(!result)
+    result = set_enum(data, connssl->handle, GSK_PROTOCOL_SSLV2,
+                      (protoflags & CURL_GSKPROTO_SSLV2_MASK)?
+                      GSK_PROTOCOL_SSLV2_ON: GSK_PROTOCOL_SSLV2_OFF, FALSE);
+  if(!result)
+    result = set_enum(data, connssl->handle, GSK_PROTOCOL_SSLV3,
+                      (protoflags & CURL_GSKPROTO_SSLV3_MASK)?
+                      GSK_PROTOCOL_SSLV3_ON: GSK_PROTOCOL_SSLV3_OFF, FALSE);
+  if(!result)
+    result = set_enum(data, connssl->handle, GSK_PROTOCOL_TLSV1,
+                      (protoflags & CURL_GSKPROTO_TLSV10_MASK)?
+                      GSK_PROTOCOL_TLSV1_ON: GSK_PROTOCOL_TLSV1_OFF, FALSE);
+  if(!result) {
+    result = set_enum(data, connssl->handle, GSK_PROTOCOL_TLSV11,
+                      (protoflags & CURL_GSKPROTO_TLSV11_MASK)?
+                      GSK_TRUE: GSK_FALSE, TRUE);
+    if(result == CURLE_UNSUPPORTED_PROTOCOL) {
+      result = CURLE_OK;
       if(protoflags == CURL_GSKPROTO_TLSV11_MASK) {
         failf(data, "TLS 1.1 not yet supported");
-        cc = CURLE_SSL_CIPHER;
+        result = CURLE_SSL_CIPHER;
       }
     }
   }
-  if(cc == CURLE_OK) {
-    cc = set_enum(data, connssl->handle, GSK_PROTOCOL_TLSV12,
-                  (protoflags & CURL_GSKPROTO_TLSV12_MASK)?
-                  GSK_TRUE: GSK_FALSE, TRUE);
-    if(cc == CURLE_UNSUPPORTED_PROTOCOL) {
-      cc = CURLE_OK;
+  if(!result) {
+    result = set_enum(data, connssl->handle, GSK_PROTOCOL_TLSV12,
+                      (protoflags & CURL_GSKPROTO_TLSV12_MASK)?
+                      GSK_TRUE: GSK_FALSE, TRUE);
+    if(result == CURLE_UNSUPPORTED_PROTOCOL) {
+      result = CURLE_OK;
       if(protoflags == CURL_GSKPROTO_TLSV12_MASK) {
         failf(data, "TLS 1.2 not yet supported");
-        cc = CURLE_SSL_CIPHER;
+        result = CURLE_SSL_CIPHER;
       }
     }
   }
-<<<<<<< HEAD
-  if(cc == CURLE_OK)
-    cc = set_enum(data, connssl->handle, GSK_SERVER_AUTH_TYPE,
-                  data->set.ssl.verifypeer? GSK_SERVER_AUTH_FULL:
-                  GSK_SERVER_AUTH_PASSTHRU, FALSE);
-=======
   if(!result)
     result = set_enum(data, connssl->handle, GSK_SERVER_AUTH_TYPE,
                       verifypeer? GSK_SERVER_AUTH_FULL:
                       GSK_SERVER_AUTH_PASSTHRU, FALSE);
->>>>>>> origin/tomato-shibby-RT-AC
 
-  if(cc == CURLE_OK) {
+  if(!result) {
     /* Start handshake. Try asynchronous first. */
     memset(&commarea, 0, sizeof commarea);
     connssl->iocport = QsoCreateIOCompletionPort();
     if(connssl->iocport != -1) {
-      cc = gskit_status(data, gsk_secure_soc_startInit(connssl->handle,
-                        connssl->iocport, &commarea),
-                        "gsk_secure_soc_startInit()", CURLE_SSL_CONNECT_ERROR);
-      if(cc == CURLE_OK) {
+      result = gskit_status(data,
+                            gsk_secure_soc_startInit(connssl->handle,
+                                                     connssl->iocport,
+                                                     &commarea),
+                            "gsk_secure_soc_startInit()",
+                            CURLE_SSL_CONNECT_ERROR);
+      if(!result) {
         connssl->connecting_state = ssl_connect_2;
         return CURLE_OK;
       }
@@ -982,21 +955,17 @@ static CURLcode gskit_connect_step1(struct connectdata *conn, int sockindex)
         close_async_handshake(connssl);
     }
     else if(errno != ENOBUFS)
-<<<<<<< HEAD
-      cc = gskit_status(data, GSK_ERROR_IO, "QsoCreateIOCompletionPort()", 0);
-=======
       result = gskit_status(data, GSK_ERROR_IO,
                             "QsoCreateIOCompletionPort()", 0);
     else if(conn->proxy_ssl[sockindex].use) {
       /* Cannot pipeline while handshaking synchronously. */
       result = CURLE_SSL_CONNECT_ERROR;
     }
->>>>>>> origin/tomato-shibby-RT-AC
     else {
       /* No more completion port available. Use synchronous IO. */
-      cc = gskit_status(data, gsk_secure_soc_init(connssl->handle),
-                       "gsk_secure_soc_init()", CURLE_SSL_CONNECT_ERROR);
-      if(cc == CURLE_OK) {
+      result = gskit_status(data, gsk_secure_soc_init(connssl->handle),
+                            "gsk_secure_soc_init()", CURLE_SSL_CONNECT_ERROR);
+      if(!result) {
         connssl->connecting_state = ssl_connect_3;
         return CURLE_OK;
       }
@@ -1004,13 +973,8 @@ static CURLcode gskit_connect_step1(struct connectdata *conn, int sockindex)
   }
 
   /* Error: rollback. */
-<<<<<<< HEAD
-  close_one(connssl, data);
-  return cc;
-=======
   close_one(connssl, conn, sockindex);
   return result;
->>>>>>> origin/tomato-shibby-RT-AC
 }
 
 
@@ -1022,7 +986,7 @@ static CURLcode gskit_connect_step2(struct connectdata *conn, int sockindex,
   Qso_OverlappedIO_t cstat;
   long timeout_ms;
   struct timeval stmv;
-  CURLcode cc;
+  CURLcode result;
 
   /* Poll or wait for end of SSL asynchronous handshake. */
 
@@ -1057,12 +1021,12 @@ static CURLcode gskit_connect_step2(struct connectdata *conn, int sockindex,
     }
     break;
   }
-  cc = gskit_status(data, cstat.returnValue, "SSL handshake",
-                    CURLE_SSL_CONNECT_ERROR);
-  if(cc == CURLE_OK)
+  result = gskit_status(data, cstat.returnValue, "SSL handshake",
+                        CURLE_SSL_CONNECT_ERROR);
+  if(!result)
     connssl->connecting_state = ssl_connect_3;
   close_async_handshake(connssl);
-  return cc;
+  return result;
 }
 
 
@@ -1075,8 +1039,9 @@ static CURLcode gskit_connect_step3(struct connectdata *conn, int sockindex)
   const gsk_cert_data_elem *p;
   const char *cert = (const char *) NULL;
   const char *certend;
+  const char *ptr;
   int i;
-  CURLcode cc;
+  CURLcode result;
 
   /* SSL handshake done: gather certificate info and verify host. */
 
@@ -1109,9 +1074,9 @@ static CURLcode gskit_connect_step3(struct connectdata *conn, int sockindex)
   }
 
   /* Verify host. */
-  cc = Curl_verifyhost(conn, cert, certend);
-  if(cc != CURLE_OK)
-    return cc;
+  result = Curl_verifyhost(conn, cert, certend);
+  if(result)
+    return result;
 
   /* The only place GSKit can get the whole CA chain is a validation
      callback where no user data pointer is available. Therefore it's not
@@ -1119,14 +1084,11 @@ static CURLcode gskit_connect_step3(struct connectdata *conn, int sockindex)
      However the server certificate may be available, thus we can return
      info about it. */
   if(data->set.ssl.certinfo) {
-    if(Curl_ssl_init_certinfo(data, 1))
-      return CURLE_OUT_OF_MEMORY;
+    result = Curl_ssl_init_certinfo(data, 1);
+    if(result)
+      return result;
+
     if(cert) {
-<<<<<<< HEAD
-      cc = Curl_extract_certinfo(conn, 0, cert, certend);
-      if(cc != CURLE_OK)
-        return cc;
-=======
       result = Curl_extract_certinfo(conn, 0, cert, certend);
       if(result)
         return result;
@@ -1147,7 +1109,6 @@ static CURLcode gskit_connect_step3(struct connectdata *conn, int sockindex)
     if(result) {
       failf(data, "SSL: public key does not match pinned public key!");
       return result;
->>>>>>> origin/tomato-shibby-RT-AC
     }
   }
 
@@ -1163,7 +1124,7 @@ static CURLcode gskit_connect_common(struct connectdata *conn, int sockindex,
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
   long timeout_ms;
   Qso_OverlappedIO_t cstat;
-  CURLcode cc = CURLE_OK;
+  CURLcode result = CURLE_OK;
 
   *done = connssl->state == ssl_connection_complete;
   if(*done)
@@ -1177,10 +1138,10 @@ static CURLcode gskit_connect_common(struct connectdata *conn, int sockindex,
     if(timeout_ms < 0) {
       /* no need to continue if time already is up */
       failf(data, "SSL connection timeout");
-      cc = CURLE_OPERATION_TIMEDOUT;
+      result = CURLE_OPERATION_TIMEDOUT;
     }
     else
-      cc = gskit_connect_step1(conn, sockindex);
+      result = gskit_connect_step1(conn, sockindex);
   }
 
   /* Handle handshake pipelining. */
@@ -1189,17 +1150,17 @@ static CURLcode gskit_connect_common(struct connectdata *conn, int sockindex,
       result = CURLE_SSL_CONNECT_ERROR;
 
   /* Step 2: check if handshake is over. */
-  if(cc == CURLE_OK && connssl->connecting_state == ssl_connect_2) {
+  if(!result && connssl->connecting_state == ssl_connect_2) {
     /* check allowed time left */
     timeout_ms = Curl_timeleft(data, NULL, TRUE);
 
     if(timeout_ms < 0) {
       /* no need to continue if time already is up */
       failf(data, "SSL connection timeout");
-      cc = CURLE_OPERATION_TIMEDOUT;
+      result = CURLE_OPERATION_TIMEDOUT;
     }
     else
-      cc = gskit_connect_step2(conn, sockindex, nonblocking);
+      result = gskit_connect_step2(conn, sockindex, nonblocking);
   }
 
   /* Handle handshake pipelining. */
@@ -1208,16 +1169,11 @@ static CURLcode gskit_connect_common(struct connectdata *conn, int sockindex,
       result = CURLE_SSL_CONNECT_ERROR;
 
   /* Step 3: gather certificate info, verify host. */
-  if(cc == CURLE_OK && connssl->connecting_state == ssl_connect_3)
-    cc = gskit_connect_step3(conn, sockindex);
+  if(!result && connssl->connecting_state == ssl_connect_3)
+    result = gskit_connect_step3(conn, sockindex);
 
-<<<<<<< HEAD
-  if(cc != CURLE_OK)
-    close_one(connssl, data);
-=======
   if(result)
     close_one(connssl, conn, sockindex);
->>>>>>> origin/tomato-shibby-RT-AC
   else if(connssl->connecting_state == ssl_connect_done) {
     connssl->state = ssl_connection_complete;
     connssl->connecting_state = ssl_connect_1;
@@ -1226,7 +1182,7 @@ static CURLcode gskit_connect_common(struct connectdata *conn, int sockindex,
     *done = TRUE;
   }
 
-  return cc;
+  return result;
 }
 
 
@@ -1234,24 +1190,24 @@ CURLcode Curl_gskit_connect_nonblocking(struct connectdata *conn,
                                         int sockindex,
                                         bool *done)
 {
-  CURLcode cc;
+  CURLcode result;
 
-  cc = gskit_connect_common(conn, sockindex, TRUE, done);
-  if(*done || cc != CURLE_OK)
+  result = gskit_connect_common(conn, sockindex, TRUE, done);
+  if(*done || result)
     conn->ssl[sockindex].connecting_state = ssl_connect_1;
-  return cc;
+  return result;
 }
 
 
 CURLcode Curl_gskit_connect(struct connectdata *conn, int sockindex)
 {
-  CURLcode retcode;
+  CURLcode result;
   bool done;
 
   conn->ssl[sockindex].connecting_state = ssl_connect_1;
-  retcode = gskit_connect_common(conn, sockindex, FALSE, &done);
-  if(retcode)
-    return retcode;
+  result = gskit_connect_common(conn, sockindex, FALSE, &done);
+  if(result)
+    return result;
 
   DEBUGASSERT(done);
 
@@ -1263,14 +1219,6 @@ void Curl_gskit_close(struct connectdata *conn, int sockindex)
 {
   close_one(&conn->ssl[sockindex], conn, sockindex);
   close_one(&conn->proxy_ssl[sockindex], conn, sockindex);
-}
-
-
-int Curl_gskit_close_all(struct SessionHandle *data)
-{
-  /* Unimplemented. */
-  (void) data;
-  return 0;
 }
 
 

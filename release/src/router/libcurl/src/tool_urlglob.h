@@ -7,15 +7,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
-<<<<<<< HEAD
- * Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
-=======
  * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
->>>>>>> origin/tomato-shibby-RT-AC
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -55,7 +51,7 @@ typedef struct {
       int padlength;
       unsigned long ptr_n;
       unsigned long step;
-    } NumRange ;
+    } NumRange;
   } content;
 } URLPattern;
 
@@ -72,15 +68,9 @@ typedef struct {
   size_t pos;        /* column position of error or 0 */
 } URLGlob;
 
-<<<<<<< HEAD
-int glob_url(URLGlob**, char*, unsigned long *, FILE *);
-int glob_next_url(char **, URLGlob *);
-int glob_match_url(char **, char*, URLGlob *);
-=======
 CURLcode glob_url(URLGlob**, char *, unsigned long *, FILE *);
 CURLcode glob_next_url(char **, URLGlob *);
 CURLcode glob_match_url(char **, char *, URLGlob *);
->>>>>>> origin/tomato-shibby-RT-AC
 void glob_cleanup(URLGlob* glob);
 
 #endif /* HEADER_CURL_TOOL_URLGLOB_H */

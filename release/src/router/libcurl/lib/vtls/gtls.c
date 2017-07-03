@@ -5,15 +5,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
-<<<<<<< HEAD
- * Copyright (C) 1998 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
-=======
  * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
->>>>>>> origin/tomato-shibby-RT-AC
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -36,12 +32,14 @@
 
 #ifdef USE_GNUTLS
 
+#include <gnutls/abstract.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 
 #ifdef USE_GNUTLS_NETTLE
 #include <gnutls/crypto.h>
 #include <nettle/md5.h>
+#include <nettle/sha2.h>
 #else
 #include <gcrypt.h>
 #endif
@@ -54,24 +52,17 @@
 #include "parsedate.h"
 #include "connect.h" /* for the connect timeout */
 #include "select.h"
-<<<<<<< HEAD
-#include "rawstr.h"
-
-#define _MPRINTF_REPLACE /* use our functions only */
-#include <curl/mprintf.h>
-=======
 #include "strcase.h"
 #include "warnless.h"
 #include "x509asn1.h"
 #include "curl_printf.h"
->>>>>>> origin/tomato-shibby-RT-AC
 #include "curl_memory.h"
 /* The last #include file should be: */
 #include "memdebug.h"
 
 /*
  Some hackish cast macros based on:
- http://library.gnome.org/devel/glib/unstable/glib-Type-Conversion-Macros.html
+ https://developer.gnome.org/glib/unstable/glib-Type-Conversion-Macros.html
 */
 #ifndef GNUTLS_POINTER_TO_INT_CAST
 #define GNUTLS_POINTER_TO_INT_CAST(p) ((int) (long) (p))
@@ -101,23 +92,21 @@ static bool gtls_inited = FALSE;
 #    define GNUTLS_MAPS_WINSOCK_ERRORS 1
 #  endif
 
-<<<<<<< HEAD
-#  ifdef USE_NGHTTP2
-#    undef HAS_ALPN
-#    if (GNUTLS_VERSION_NUMBER >= 0x030200)
-#      define HAS_ALPN
-#    else
-#      error http2 builds require GnuTLS >= 3.2.0 for ALPN support
-#    endif
-=======
 #  if HAVE_GNUTLS_ALPN_SET_PROTOCOLS
 #    define HAS_ALPN
 #  endif
 
 #  if HAVE_GNUTLS_OCSP_REQ_INIT
 #    define HAS_OCSP
->>>>>>> origin/tomato-shibby-RT-AC
 #  endif
+
+#  if (GNUTLS_VERSION_NUMBER >= 0x030306)
+#    define HAS_CAPATH
+#  endif
+#endif
+
+#ifdef HAS_OCSP
+# include <gnutls/ocsp.h>
 #endif
 
 /*
@@ -234,7 +223,7 @@ static void showtime(struct Curl_easy *data,
 
   snprintf(data->state.buffer,
            BUFSIZE,
-           "\t %s: %s, %02d %s %4d %02d:%02d:%02d GMT\n",
+           "\t %s: %s, %02d %s %4d %02d:%02d:%02d GMT",
            text,
            Curl_wkday[tm->tm_wday?tm->tm_wday-1:6],
            tm->tm_mday,
@@ -246,23 +235,15 @@ static void showtime(struct Curl_easy *data,
   infof(data, "%s\n", data->state.buffer);
 }
 
-<<<<<<< HEAD
-static gnutls_datum load_file (const char *file)
-=======
 static gnutls_datum_t load_file(const char *file)
->>>>>>> origin/tomato-shibby-RT-AC
 {
   FILE *f;
-  gnutls_datum loaded_file = { NULL, 0 };
+  gnutls_datum_t loaded_file = { NULL, 0 };
   long filelen;
   void *ptr;
 
-<<<<<<< HEAD
-  if(!(f = fopen(file, "r")))
-=======
   f = fopen(file, "rb");
   if(!f)
->>>>>>> origin/tomato-shibby-RT-AC
     return loaded_file;
   if(fseek(f, 0, SEEK_END) != 0
      || (filelen = ftell(f)) < 0
@@ -281,12 +262,8 @@ out:
   return loaded_file;
 }
 
-<<<<<<< HEAD
-static void unload_file(gnutls_datum data) {
-=======
 static void unload_file(gnutls_datum_t data)
 {
->>>>>>> origin/tomato-shibby-RT-AC
   free(data.data);
 }
 
@@ -299,7 +276,7 @@ static CURLcode handshake(struct connectdata *conn,
 {
   struct Curl_easy *data = conn->data;
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
-  gnutls_session session = conn->ssl[sockindex].session;
+  gnutls_session_t session = conn->ssl[sockindex].session;
   curl_socket_t sockfd = conn->sock[sockindex];
   long timeout_ms;
   int rc;
@@ -351,8 +328,6 @@ static CURLcode handshake(struct connectdata *conn,
         gnutls_record_get_direction(session)?
         ssl_connect_2_writing:ssl_connect_2_reading;
       continue;
-      if(nonblocking)
-        return CURLE_OK;
     }
     else if((rc < 0) && !gnutls_error_is_fatal(rc)) {
       const char *strerr = NULL;
@@ -365,7 +340,8 @@ static CURLcode handshake(struct connectdata *conn,
       if(strerr == NULL)
         strerr = gnutls_strerror(rc);
 
-      failf(data, "gnutls_handshake() warning: %s", strerr);
+      infof(data, "gnutls_handshake() warning: %s\n", strerr);
+      continue;
     }
     else if(rc < 0) {
       const char *strerr = NULL;
@@ -388,7 +364,7 @@ static CURLcode handshake(struct connectdata *conn,
   }
 }
 
-static gnutls_x509_crt_fmt do_file_type(const char *type)
+static gnutls_x509_crt_fmt_t do_file_type(const char *type)
 {
   if(!type || !type[0])
     return GNUTLS_X509_FMT_PEM;
@@ -403,14 +379,9 @@ static CURLcode
 gtls_connect_step1(struct connectdata *conn,
                    int sockindex)
 {
-<<<<<<< HEAD
-  struct SessionHandle *data = conn->data;
-  gnutls_session session;
-=======
   struct Curl_easy *data = conn->data;
   unsigned int init_flags;
   gnutls_session_t session;
->>>>>>> origin/tomato-shibby-RT-AC
   int rc;
   bool sni = TRUE; /* default is SNI enabled */
   void *transport_ptr = NULL;
@@ -422,30 +393,28 @@ gtls_connect_step1(struct connectdata *conn,
   struct in_addr addr;
 #endif
 #ifndef USE_GNUTLS_PRIORITY_SET_DIRECT
-  static int cipher_priority[] = { GNUTLS_CIPHER_AES_128_GCM,
-    GNUTLS_CIPHER_AES_256_GCM, GNUTLS_CIPHER_AES_128_CBC,
-    GNUTLS_CIPHER_AES_256_CBC, GNUTLS_CIPHER_CAMELLIA_128_CBC,
-    GNUTLS_CIPHER_CAMELLIA_256_CBC, GNUTLS_CIPHER_3DES_CBC,
+  static const int cipher_priority[] = {
+  /* These two ciphers were added to GnuTLS as late as ver. 3.0.1,
+     but this code path is only ever used for ver. < 2.12.0.
+     GNUTLS_CIPHER_AES_128_GCM,
+     GNUTLS_CIPHER_AES_256_GCM,
+  */
+    GNUTLS_CIPHER_AES_128_CBC,
+    GNUTLS_CIPHER_AES_256_CBC,
+    GNUTLS_CIPHER_CAMELLIA_128_CBC,
+    GNUTLS_CIPHER_CAMELLIA_256_CBC,
+    GNUTLS_CIPHER_3DES_CBC,
   };
   static const int cert_type_priority[] = { GNUTLS_CRT_X509, 0 };
   static int protocol_priority[] = { 0, 0, 0, 0 };
 #else
 #define GNUTLS_CIPHERS "NORMAL:-ARCFOUR-128:-CTYPE-ALL:+CTYPE-X509"
-<<<<<<< HEAD
-  const char* prioritylist;
-  const char *err;
-#endif
-#ifdef HAS_ALPN
-  int protocols_size = 2;
-  gnutls_datum_t protocols[2];
-=======
 /* If GnuTLS was compiled without support for SRP it will error out if SRP is
    requested in the priority string, so treat it specially
  */
 #define GNUTLS_SRP "+SRP"
   const char *prioritylist;
   const char *err = NULL;
->>>>>>> origin/tomato-shibby-RT-AC
 #endif
 
   const char * const hostname = SSL_IS_PROXY() ? conn->http_proxy.host.name :
@@ -516,9 +485,6 @@ gtls_connect_step1(struct connectdata *conn,
             SSL_CONN_CONFIG(CAfile));
   }
 
-<<<<<<< HEAD
-  if(data->set.ssl.CRLfile) {
-=======
 #ifdef HAS_CAPATH
   if(SSL_CONN_CONFIG(CApath)) {
     /* set the trusted CA cert directory */
@@ -546,7 +512,6 @@ gtls_connect_step1(struct connectdata *conn,
 #endif
 
   if(SSL_SET_OPTION(CRLfile)) {
->>>>>>> origin/tomato-shibby-RT-AC
     /* set the CRL list file */
     rc = gnutls_certificate_set_x509_crl_file(conn->ssl[sockindex].cred,
                                               SSL_SET_OPTION(CRLfile),
@@ -641,34 +606,35 @@ gtls_connect_step1(struct connectdata *conn,
       return CURLE_SSL_CONNECT_ERROR;
   }
   rc = gnutls_protocol_set_priority(session, protocol_priority);
+  if(rc != GNUTLS_E_SUCCESS) {
+    failf(data, "Did you pass a valid GnuTLS cipher list?");
+    return CURLE_SSL_CONNECT_ERROR;
+  }
+
 #else
-<<<<<<< HEAD
-  switch (data->set.ssl.version) {
-=======
   /* Ensure +SRP comes at the *end* of all relevant strings so that it can be
    * removed if a run-time error indicates that SRP is not supported by this
    * GnuTLS version */
   switch(SSL_CONN_CONFIG(version)) {
->>>>>>> origin/tomato-shibby-RT-AC
     case CURL_SSLVERSION_SSLv3:
       prioritylist = GNUTLS_CIPHERS ":-VERS-TLS-ALL:+VERS-SSL3.0";
       sni = false;
       break;
     case CURL_SSLVERSION_DEFAULT:
     case CURL_SSLVERSION_TLSv1:
-      prioritylist = GNUTLS_CIPHERS ":-VERS-SSL3.0";
+      prioritylist = GNUTLS_CIPHERS ":-VERS-SSL3.0:" GNUTLS_SRP;
       break;
     case CURL_SSLVERSION_TLSv1_0:
       prioritylist = GNUTLS_CIPHERS ":-VERS-SSL3.0:-VERS-TLS-ALL:"
-                     "+VERS-TLS1.0";
+                     "+VERS-TLS1.0:" GNUTLS_SRP;
       break;
     case CURL_SSLVERSION_TLSv1_1:
       prioritylist = GNUTLS_CIPHERS ":-VERS-SSL3.0:-VERS-TLS-ALL:"
-                     "+VERS-TLS1.1";
+                     "+VERS-TLS1.1:" GNUTLS_SRP;
       break;
     case CURL_SSLVERSION_TLSv1_2:
       prioritylist = GNUTLS_CIPHERS ":-VERS-SSL3.0:-VERS-TLS-ALL:"
-                     "+VERS-TLS1.2";
+                     "+VERS-TLS1.2:" GNUTLS_SRP;
       break;
     case CURL_SSLVERSION_TLSv1_3:
       failf(data, "GnuTLS: TLS 1.3 is not yet supported");
@@ -681,43 +647,53 @@ gtls_connect_step1(struct connectdata *conn,
       return CURLE_SSL_CONNECT_ERROR;
   }
   rc = gnutls_priority_set_direct(session, prioritylist, &err);
+  if((rc == GNUTLS_E_INVALID_REQUEST) && err) {
+    if(!strcmp(err, GNUTLS_SRP)) {
+      /* This GnuTLS was probably compiled without support for SRP.
+       * Note that fact and try again without it. */
+      int validprioritylen = curlx_uztosi(err - prioritylist);
+      char *prioritycopy = strdup(prioritylist);
+      if(!prioritycopy)
+        return CURLE_OUT_OF_MEMORY;
+
+      infof(data, "This GnuTLS does not support SRP\n");
+      if(validprioritylen)
+        /* Remove the :+SRP */
+        prioritycopy[validprioritylen - 1] = 0;
+      rc = gnutls_priority_set_direct(session, prioritycopy, &err);
+      free(prioritycopy);
+    }
+  }
+  if(rc != GNUTLS_E_SUCCESS) {
+    failf(data, "Error %d setting GnuTLS cipher list starting with %s",
+          rc, err);
+    return CURLE_SSL_CONNECT_ERROR;
+  }
 #endif
 
 #ifdef HAS_ALPN
-  if(data->set.httpversion == CURL_HTTP_VERSION_2_0) {
-    if(data->set.ssl_enable_alpn) {
-      protocols[0].data = NGHTTP2_PROTO_VERSION_ID;
-      protocols[0].size = NGHTTP2_PROTO_VERSION_ID_LEN;
-      protocols[1].data = ALPN_HTTP_1_1;
-      protocols[1].size = ALPN_HTTP_1_1_LENGTH;
-      gnutls_alpn_set_protocols(session, protocols, protocols_size, 0);
-      infof(data, "ALPN, offering %s, %s\n", NGHTTP2_PROTO_VERSION_ID,
-            ALPN_HTTP_1_1);
+  if(conn->bits.tls_enable_alpn) {
+    int cur = 0;
+    gnutls_datum_t protocols[2];
+
+#ifdef USE_NGHTTP2
+    if(data->set.httpversion >= CURL_HTTP_VERSION_2) {
+      protocols[cur].data = (unsigned char *)NGHTTP2_PROTO_VERSION_ID;
+      protocols[cur].size = NGHTTP2_PROTO_VERSION_ID_LEN;
+      cur++;
+      infof(data, "ALPN, offering %s\n", NGHTTP2_PROTO_VERSION_ID);
     }
-    else {
-      infof(data, "SSL, can't negotiate HTTP/2.0 without ALPN\n");
-    }
+#endif
+
+    protocols[cur].data = (unsigned char *)ALPN_HTTP_1_1;
+    protocols[cur].size = ALPN_HTTP_1_1_LENGTH;
+    cur++;
+    infof(data, "ALPN, offering %s\n", ALPN_HTTP_1_1);
+
+    gnutls_alpn_set_protocols(session, protocols, cur, 0);
   }
 #endif
 
-  if(rc != GNUTLS_E_SUCCESS) {
-    failf(data, "Did you pass a valid GnuTLS cipher list?");
-    return CURLE_SSL_CONNECT_ERROR;
-  }
-
-
-<<<<<<< HEAD
-  if(data->set.str[STRING_CERT]) {
-    if(gnutls_certificate_set_x509_key_file(
-         conn->ssl[sockindex].cred,
-         data->set.str[STRING_CERT],
-         data->set.str[STRING_KEY] ?
-         data->set.str[STRING_KEY] : data->set.str[STRING_CERT],
-         do_file_type(data->set.str[STRING_CERT_TYPE]) ) !=
-       GNUTLS_E_SUCCESS) {
-      failf(data, "error reading X.509 key or certificate file");
-      return CURLE_SSL_CONNECT_ERROR;
-=======
   if(SSL_SET_OPTION(cert)) {
     if(SSL_SET_OPTION(key_passwd)) {
 #if HAVE_GNUTLS_CERTIFICATE_SET_X509_KEY_FILE2
@@ -756,7 +732,6 @@ gtls_connect_step1(struct connectdata *conn,
         failf(data, "error reading X.509 key or certificate file");
         return CURLE_SSL_CONNECT_ERROR;
       }
->>>>>>> origin/tomato-shibby-RT-AC
     }
   }
 
@@ -765,13 +740,21 @@ gtls_connect_step1(struct connectdata *conn,
   if(SSL_SET_OPTION(authtype) == CURL_TLSAUTH_SRP) {
     rc = gnutls_credentials_set(session, GNUTLS_CRD_SRP,
                                 conn->ssl[sockindex].srp_client_cred);
-    if(rc != GNUTLS_E_SUCCESS)
+    if(rc != GNUTLS_E_SUCCESS) {
       failf(data, "gnutls_credentials_set() failed: %s", gnutls_strerror(rc));
+      return CURLE_SSL_CONNECT_ERROR;
+    }
   }
   else
 #endif
+  {
     rc = gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
                                 conn->ssl[sockindex].cred);
+    if(rc != GNUTLS_E_SUCCESS) {
+      failf(data, "gnutls_credentials_set() failed: %s", gnutls_strerror(rc));
+      return CURLE_SSL_CONNECT_ERROR;
+    }
+  }
 
   if(conn->proxy_ssl[sockindex].use) {
     transport_ptr = conn->proxy_ssl[sockindex].session;
@@ -795,8 +778,6 @@ gtls_connect_step1(struct connectdata *conn,
   /* lowat must be set to zero when using custom push and pull functions. */
   gnutls_transport_set_lowat(session, 0);
 
-<<<<<<< HEAD
-=======
 #ifdef HAS_OCSP
   if(SSL_CONN_CONFIG(verifystatus)) {
     rc = gnutls_ocsp_status_request_enable_client(session, NULL, 0, NULL);
@@ -807,7 +788,6 @@ gtls_connect_step1(struct connectdata *conn,
   }
 #endif
 
->>>>>>> origin/tomato-shibby-RT-AC
   /* This might be a reconnect, so we check for a session ID in the cache
      to speed up things */
   if(data->set.general_ssl.sessionid) {
@@ -828,8 +808,6 @@ gtls_connect_step1(struct connectdata *conn,
   return CURLE_OK;
 }
 
-<<<<<<< HEAD
-=======
 static CURLcode pkp_pin_peer_pubkey(struct Curl_easy *data,
                                     gnutls_x509_crt_t cert,
                                     const char *pinnedpubkey)
@@ -887,7 +865,6 @@ static CURLcode pkp_pin_peer_pubkey(struct Curl_easy *data,
   return result;
 }
 
->>>>>>> origin/tomato-shibby-RT-AC
 static Curl_recv gtls_recv;
 static Curl_send gtls_send;
 
@@ -896,33 +873,23 @@ gtls_connect_step3(struct connectdata *conn,
                    int sockindex)
 {
   unsigned int cert_list_size;
-  const gnutls_datum *chainp;
-  unsigned int verify_status;
-  gnutls_x509_crt x509_cert,x509_issuer;
-  gnutls_datum issuerp;
-  char certbuf[256]; /* big enough? */
+  const gnutls_datum_t *chainp;
+  unsigned int verify_status = 0;
+  gnutls_x509_crt_t x509_cert, x509_issuer;
+  gnutls_datum_t issuerp;
+  char certbuf[256] = ""; /* big enough? */
   size_t size;
   unsigned int algo;
   unsigned int bits;
   time_t certclock;
   const char *ptr;
-<<<<<<< HEAD
-  struct SessionHandle *data = conn->data;
-  gnutls_session session = conn->ssl[sockindex].session;
-  int rc;
-  int incache;
-  void *ssl_sessionid;
-=======
   struct Curl_easy *data = conn->data;
   gnutls_session_t session = conn->ssl[sockindex].session;
   int rc;
->>>>>>> origin/tomato-shibby-RT-AC
 #ifdef HAS_ALPN
   gnutls_datum_t proto;
 #endif
   CURLcode result = CURLE_OK;
-<<<<<<< HEAD
-=======
   gnutls_protocol_t version = gnutls_protocol_get_version(session);
   const char * const hostname = SSL_IS_PROXY() ? conn->http_proxy.host.name :
     conn->host.name;
@@ -934,7 +901,6 @@ gtls_connect_step3(struct connectdata *conn,
 
   infof(data, "SSL connection using %s / %s\n",
         gnutls_protocol_get_name(version), ptr);
->>>>>>> origin/tomato-shibby-RT-AC
 
   /* This function will return the peer's raw certificate (chain) as sent by
      the peer. These certificates are in raw format (DER encoded for
@@ -966,9 +932,6 @@ gtls_connect_step3(struct connectdata *conn,
     infof(data, "\t common name: WARNING couldn't obtain\n");
   }
 
-<<<<<<< HEAD
-  if(data->set.ssl.verifypeer) {
-=======
   if(data->set.ssl.certinfo && chainp) {
     unsigned int i;
 
@@ -987,7 +950,6 @@ gtls_connect_step3(struct connectdata *conn,
   }
 
   if(SSL_CONN_CONFIG(verifypeer)) {
->>>>>>> origin/tomato-shibby-RT-AC
     /* This function will try to verify the peer's certificate and return its
        status (trusted, invalid etc.). The value of status should be one or
        more of the gnutls_certificate_status_t enumerated elements bitwise
@@ -1019,8 +981,6 @@ gtls_connect_step3(struct connectdata *conn,
   else
     infof(data, "\t server certificate verification SKIPPED\n");
 
-<<<<<<< HEAD
-=======
 #ifdef HAS_OCSP
   if(SSL_CONN_CONFIG(verifystatus)) {
     if(gnutls_ocsp_status_request_is_checked(session, 0) == 0) {
@@ -1126,7 +1086,6 @@ gtls_connect_step3(struct connectdata *conn,
     infof(data, "\t server certificate status verification SKIPPED\n");
 #endif
 
->>>>>>> origin/tomato-shibby-RT-AC
   /* initialize an X.509 certificate structure. */
   gnutls_x509_crt_init(&x509_cert);
 
@@ -1139,24 +1098,17 @@ gtls_connect_step3(struct connectdata *conn,
     gnutls_x509_crt_init(&x509_issuer);
     issuerp = load_file(SSL_SET_OPTION(issuercert));
     gnutls_x509_crt_import(x509_issuer, &issuerp, GNUTLS_X509_FMT_PEM);
-    rc = gnutls_x509_crt_check_issuer(x509_cert,x509_issuer);
+    rc = gnutls_x509_crt_check_issuer(x509_cert, x509_issuer);
+    gnutls_x509_crt_deinit(x509_issuer);
     unload_file(issuerp);
     if(rc <= 0) {
       failf(data, "server certificate issuer check failed (IssuerCert: %s)",
-<<<<<<< HEAD
-            data->set.ssl.issuercert?data->set.ssl.issuercert:"none");
-      return CURLE_SSL_ISSUER_ERROR;
-    }
-    infof(data,"\t server certificate issuer check OK (Issuer Cert: %s)\n",
-          data->set.ssl.issuercert?data->set.ssl.issuercert:"none");
-=======
             SSL_SET_OPTION(issuercert)?SSL_SET_OPTION(issuercert):"none");
       gnutls_x509_crt_deinit(x509_cert);
       return CURLE_SSL_ISSUER_ERROR;
     }
     infof(data, "\t server certificate issuer check OK (Issuer Cert: %s)\n",
           SSL_SET_OPTION(issuercert)?SSL_SET_OPTION(issuercert):"none");
->>>>>>> origin/tomato-shibby-RT-AC
   }
 
   size=sizeof(certbuf);
@@ -1175,9 +1127,6 @@ gtls_connect_step3(struct connectdata *conn,
      in RFC2818 (HTTPS), which takes into account wildcards, and the subject
      alternative name PKIX extension. Returns non zero on success, and zero on
      failure. */
-<<<<<<< HEAD
-  rc = gnutls_x509_crt_check_hostname(x509_cert, conn->host.name);
-=======
   rc = gnutls_x509_crt_check_hostname(x509_cert, hostname);
 #if GNUTLS_VERSION_NUMBER < 0x030306
   /* Before 3.3.6, gnutls_x509_crt_check_hostname() didn't check IP
@@ -1200,8 +1149,27 @@ gtls_connect_step3(struct connectdata *conn,
     else if(Curl_inet_pton(AF_INET6, hostname, addrbuf) > 0)
       addrlen = 16;
 #endif
->>>>>>> origin/tomato-shibby-RT-AC
 
+    if(addrlen) {
+      for(i=0; ; i++) {
+        certaddrlen = sizeof(certaddr);
+        ret = gnutls_x509_crt_get_subject_alt_name(x509_cert, i, certaddr,
+                                                   &certaddrlen, NULL);
+        /* If this happens, it wasn't an IP address. */
+        if(ret == GNUTLS_E_SHORT_MEMORY_BUFFER)
+          continue;
+        if(ret < 0)
+          break;
+        if(ret != GNUTLS_SAN_IPADDRESS)
+          continue;
+        if(certaddrlen == addrlen && !memcmp(addrbuf, certaddr, addrlen)) {
+          rc = 1;
+          break;
+        }
+      }
+    }
+  }
+#endif
   if(!rc) {
     const char * const dispname = SSL_IS_PROXY() ?
       conn->http_proxy.host.dispname : conn->host.dispname;
@@ -1223,16 +1191,6 @@ gtls_connect_step3(struct connectdata *conn,
   certclock = gnutls_x509_crt_get_expiration_time(x509_cert);
 
   if(certclock == (time_t)-1) {
-<<<<<<< HEAD
-    failf(data, "server cert expiration date verify failed");
-    return CURLE_SSL_CONNECT_ERROR;
-  }
-
-  if(certclock < time(NULL)) {
-    if(data->set.ssl.verifypeer) {
-      failf(data, "server certificate expiration date has passed.");
-      return CURLE_PEER_FAILED_VERIFICATION;
-=======
     if(SSL_CONN_CONFIG(verifypeer)) {
       failf(data, "server cert expiration date verify failed");
       gnutls_x509_crt_deinit(x509_cert);
@@ -1250,27 +1208,14 @@ gtls_connect_step3(struct connectdata *conn,
       }
       else
         infof(data, "\t server certificate expiration date FAILED\n");
->>>>>>> origin/tomato-shibby-RT-AC
     }
     else
-      infof(data, "\t server certificate expiration date FAILED\n");
+      infof(data, "\t server certificate expiration date OK\n");
   }
-  else
-    infof(data, "\t server certificate expiration date OK\n");
 
   certclock = gnutls_x509_crt_get_activation_time(x509_cert);
 
   if(certclock == (time_t)-1) {
-<<<<<<< HEAD
-    failf(data, "server cert activation date verify failed");
-    return CURLE_SSL_CONNECT_ERROR;
-  }
-
-  if(certclock > time(NULL)) {
-    if(data->set.ssl.verifypeer) {
-      failf(data, "server certificate not activated yet.");
-      return CURLE_PEER_FAILED_VERIFICATION;
-=======
     if(SSL_CONN_CONFIG(verifypeer)) {
       failf(data, "server cert activation date verify failed");
       gnutls_x509_crt_deinit(x509_cert);
@@ -1301,17 +1246,11 @@ gtls_connect_step3(struct connectdata *conn,
       failf(data, "SSL: public key does not match pinned public key!");
       gnutls_x509_crt_deinit(x509_cert);
       return result;
->>>>>>> origin/tomato-shibby-RT-AC
     }
-    else
-      infof(data, "\t server certificate activation date FAILED\n");
   }
-  else
-    infof(data, "\t server certificate activation date OK\n");
 
   /* Show:
 
-  - ciphers used
   - subject
   - start date
   - expire date
@@ -1351,34 +1290,28 @@ gtls_connect_step3(struct connectdata *conn,
   /* the *_get_name() says "NULL" if GNUTLS_COMP_NULL is returned */
   infof(data, "\t compression: %s\n", ptr);
 
-  /* the name of the cipher used. ie 3DES. */
-  ptr = gnutls_cipher_get_name(gnutls_cipher_get(session));
-  infof(data, "\t cipher: %s\n", ptr);
-
-  /* the MAC algorithms name. ie SHA1 */
-  ptr = gnutls_mac_get_name(gnutls_mac_get(session));
-  infof(data, "\t MAC: %s\n", ptr);
-
 #ifdef HAS_ALPN
-  if(data->set.ssl_enable_alpn) {
+  if(conn->bits.tls_enable_alpn) {
     rc = gnutls_alpn_get_selected_protocol(session, &proto);
     if(rc == 0) {
       infof(data, "ALPN, server accepted to use %.*s\n", proto.size,
           proto.data);
 
+#ifdef USE_NGHTTP2
       if(proto.size == NGHTTP2_PROTO_VERSION_ID_LEN &&
-        memcmp(NGHTTP2_PROTO_VERSION_ID, proto.data,
-        NGHTTP2_PROTO_VERSION_ID_LEN) == 0) {
-        conn->negnpn = NPN_HTTP2;
+         !memcmp(NGHTTP2_PROTO_VERSION_ID, proto.data,
+                 NGHTTP2_PROTO_VERSION_ID_LEN)) {
+        conn->negnpn = CURL_HTTP_VERSION_2;
       }
-      else if(proto.size == ALPN_HTTP_1_1_LENGTH && memcmp(ALPN_HTTP_1_1,
-          proto.data, ALPN_HTTP_1_1_LENGTH) == 0) {
-        conn->negnpn = NPN_HTTP1_1;
+      else
+#endif
+      if(proto.size == ALPN_HTTP_1_1_LENGTH &&
+         !memcmp(ALPN_HTTP_1_1, proto.data, ALPN_HTTP_1_1_LENGTH)) {
+        conn->negnpn = CURL_HTTP_VERSION_1_1;
       }
     }
-    else {
+    else
       infof(data, "ALPN, server did not agree to a protocol\n");
-    }
   }
 #endif
 
@@ -1394,7 +1327,7 @@ gtls_connect_step3(struct connectdata *conn,
     bool incache;
     void *ssl_sessionid;
     void *connect_sessionid;
-    size_t connect_idsize;
+    size_t connect_idsize = 0;
 
     /* get the session ID data size */
     gnutls_session_get_data(session, NULL, &connect_idsize);
@@ -1485,12 +1418,12 @@ Curl_gtls_connect(struct connectdata *conn,
                   int sockindex)
 
 {
-  CURLcode retcode;
+  CURLcode result;
   bool done = FALSE;
 
-  retcode = gtls_connect_common(conn, sockindex, FALSE, &done);
-  if(retcode)
-    return retcode;
+  result = gtls_connect_common(conn, sockindex, FALSE, &done);
+  if(result)
+    return result;
 
   DEBUGASSERT(done);
 
@@ -1519,7 +1452,7 @@ static ssize_t gtls_send(struct connectdata *conn,
 {
   ssize_t rc = gnutls_record_send(conn->ssl[sockindex].session, mem, len);
 
-  if(rc < 0 ) {
+  if(rc < 0) {
     *curlcode = (rc == GNUTLS_E_AGAIN)
       ? CURLE_AGAIN
       : CURLE_SEND_ERROR;
@@ -1530,18 +1463,7 @@ static ssize_t gtls_send(struct connectdata *conn,
   return rc;
 }
 
-<<<<<<< HEAD
-void Curl_gtls_close_all(struct SessionHandle *data)
-{
-  /* FIX: make the OpenSSL code more generic and use parts of it here */
-  (void)data;
-}
-
-static void close_one(struct connectdata *conn,
-                      int idx)
-=======
 static void close_one(struct ssl_connect_data *ssl)
->>>>>>> origin/tomato-shibby-RT-AC
 {
   if(ssl->session) {
     gnutls_bye(ssl->session, GNUTLS_SHUT_RDWR);
@@ -1657,10 +1579,10 @@ static ssize_t gtls_recv(struct connectdata *conn, /* connection data */
   if(ret == GNUTLS_E_REHANDSHAKE) {
     /* BLOCKING call, this is bad but a work-around for now. Fixing this "the
        proper way" takes a whole lot of work. */
-    CURLcode rc = handshake(conn, num, FALSE, FALSE);
-    if(rc)
+    CURLcode result = handshake(conn, num, FALSE, FALSE);
+    if(result)
       /* handshake() writes error message on its own */
-      *curlcode = rc;
+      *curlcode = result;
     else
       *curlcode = CURLE_AGAIN; /* then return as if this was a wouldblock */
     return -1;
@@ -1686,21 +1608,15 @@ size_t Curl_gtls_version(char *buffer, size_t size)
   return snprintf(buffer, size, "GnuTLS/%s", gnutls_check_version(NULL));
 }
 
-<<<<<<< HEAD
-int Curl_gtls_seed(struct SessionHandle *data)
-=======
 #ifndef USE_GNUTLS_NETTLE
 static int Curl_gtls_seed(struct Curl_easy *data)
->>>>>>> origin/tomato-shibby-RT-AC
 {
   /* we have the "SSL is seeded" boolean static to prevent multiple
      time-consuming seedings in vain */
   static bool ssl_seeded = FALSE;
 
   /* Quickly add a bit of entropy */
-#ifndef USE_GNUTLS_NETTLE
   gcry_fast_random_poll();
-#endif
 
   if(!ssl_seeded || data->set.str[STRING_SSL_RANDOM_FILE] ||
      data->set.str[STRING_SSL_EGDSOCKET]) {
@@ -1714,17 +1630,12 @@ static int Curl_gtls_seed(struct Curl_easy *data)
   }
   return 0;
 }
+#endif
 
-<<<<<<< HEAD
-void Curl_gtls_random(struct SessionHandle *data,
-                      unsigned char *entropy,
-                      size_t length)
-=======
 /* data might be NULL! */
 CURLcode Curl_gtls_random(struct Curl_easy *data,
                           unsigned char *entropy,
                           size_t length)
->>>>>>> origin/tomato-shibby-RT-AC
 {
 #if defined(USE_GNUTLS_NETTLE)
   int rc;
@@ -1732,13 +1643,11 @@ CURLcode Curl_gtls_random(struct Curl_easy *data,
   rc = gnutls_rnd(GNUTLS_RND_RANDOM, entropy, length);
   return rc?CURLE_FAILED_INIT:CURLE_OK;
 #elif defined(USE_GNUTLS)
-  Curl_gtls_seed(data); /* Initiate the seed if not already done */
+  if(data)
+    Curl_gtls_seed(data); /* Initiate the seed if not already done */
   gcry_randomize(entropy, length, GCRY_STRONG_RANDOM);
 #endif
-<<<<<<< HEAD
-=======
   return CURLE_OK;
->>>>>>> origin/tomato-shibby-RT-AC
 }
 
 void Curl_gtls_md5sum(unsigned char *tmp, /* input */
@@ -1760,8 +1669,6 @@ void Curl_gtls_md5sum(unsigned char *tmp, /* input */
 #endif
 }
 
-<<<<<<< HEAD
-=======
 void Curl_gtls_sha256sum(const unsigned char *tmp, /* input */
                       size_t tmplen,
                       unsigned char *sha256sum, /* output */
@@ -1790,5 +1697,4 @@ bool Curl_gtls_cert_status_request(void)
 #endif
 }
 
->>>>>>> origin/tomato-shibby-RT-AC
 #endif /* USE_GNUTLS */

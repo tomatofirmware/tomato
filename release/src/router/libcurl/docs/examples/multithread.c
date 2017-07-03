@@ -5,15 +5,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
-<<<<<<< HEAD
- * Copyright (C) 1998 - 2011, Daniel Stenberg, <daniel@haxx.se>, et al.
-=======
  * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
->>>>>>> origin/tomato-shibby-RT-AC
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -23,8 +19,10 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-/* A multi-threaded example that uses pthreads extensively to fetch
- * X remote files at once */
+/* <DESC>
+ * A multi-threaded example that uses pthreads to fetch several files at once
+ * </DESC>
+ */
 
 #include <stdio.h>
 #include <pthread.h>
@@ -38,15 +36,11 @@
   If you intend to use a SSL-based protocol here you might need to setup TLS
   library mutex callbacks as described here:
 
-<<<<<<< HEAD
-  http://www.openssl.org/docs/crypto/threads.html#DESCRIPTION
-=======
   https://curl.haxx.se/libcurl/c/threadsafe.html
->>>>>>> origin/tomato-shibby-RT-AC
 
 */
 const char * const urls[NUMT]= {
-  "http://curl.haxx.se/",
+  "https://curl.haxx.se/",
   "ftp://cool.haxx.se/",
   "http://www.contactor.se/",
   "www.haxx.se"

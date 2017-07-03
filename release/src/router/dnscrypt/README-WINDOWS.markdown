@@ -1,22 +1,18 @@
-Using DNSCrypt on Windows
-=========================
+Using the DNSCrypt client on Windows
+====================================
 
-On Windows, `dnscrypt-proxy` can be started from the command-line the same way
-as on other operating systems.
+`dnscrypt-proxy` is DNSCrypt client that works on many platforms,
+including Windows.
 
-Alternatively, it can run as a Windows Service.
+It doesn't provide any user interface, and has to be set up using the
+command-line.
 
-<<<<<<< HEAD
-Note: Also check out Dominus Temporis' excellent tutorial on
-[DNSCrypt on Windows](http://dominustemporis.com/2014/05/dnscrypt-on-windows-update/)
-=======
 Independent projects such as [Simple DNSCrypt](https://simplednscrypt.org/)
 provide a user interface on top of `dnscrypt-proxy`, so that the core
 client code can always be up-to-date, and the same as other platforms.
 
 However, using `dnscrypt-proxy` directly is fairly simple and opens a
 lot of options.
->>>>>>> origin/tomato-shibby-RT-AC
 
 Quickstart
 ----------
@@ -26,14 +22,10 @@ better/more up to date information is available online:
 [dnscrypt-proxy guide](https://github.com/jedisct1/dnscrypt-proxy/wiki).
 
 1) Download and extract the latest
-<<<<<<< HEAD
-[Windows package for dnscrypt](http://download.dnscrypt.org/dnscrypt-proxy/LATEST-win32-full.zip).
-=======
 [Windows package for dnscrypt](https://download.dnscrypt.org/dnscrypt-proxy/).
 
 2) Extract the `dnscrypt-proxy-win32` or `dnscrypt-proxy-win64` folder
 anywhere, but this has to be a permanent location.
->>>>>>> origin/tomato-shibby-RT-AC
 
 3) The `dnscrypt-resolver.csv` file includes a list of public DNS
 resolvers supporting the DNSCrypt protocol. The most recent version
@@ -42,12 +34,6 @@ can be previewed online:
 and downloaded:
 [dnscrypt-resolvers.csv](https://download.dnscrypt.org/dnscrypt-proxy/dnscrypt-resolvers.csv).
 
-<<<<<<< HEAD
-3) Open an elevated command prompt, enter the `dnscrypt-proxy-win32` folder
-and type:
-
-    dnscrypt-proxy.exe -R "name" --test=0
-=======
 Choose one that fits your needs. Its identifier ("resolver name") is in
 the first column (for example: `dnscrypt.org-fr`).
 
@@ -56,21 +42,13 @@ the first column (for example: `dnscrypt.org-fr`).
 5) Open an elevated command prompt (see below), enter the dnscrypt-proxy folder and type:
 
     .\dnscrypt-proxy.exe dnscrypt-proxy.conf --test=0
->>>>>>> origin/tomato-shibby-RT-AC
 
-Replace `name` with one of the resolvers from CSV file. The (possibly
-updated) file can also be viewed online:
-[public DNS resolvers supporting DNSCrypt](https://github.com/jedisct1/dnscrypt-proxy/blob/master/dnscrypt-resolvers.csv)
+This command just tests if everything is properly installed on your
+end, and if the resolver is properly working. If everything looks fine,
+the command should display the server key fingerprint and exit right away.
 
-This command should display the server key fingerprint and exit. If
-this is not the case, try a different server. If this is the case,
-install the service:
+If an error is displayed, retry with a different server.
 
-<<<<<<< HEAD
-    dnscrypt-proxy.exe -R "name" --install
-
-4) Change your DNS settings to `127.0.0.1`
-=======
 5) So far, so good? Now, enable the service for real:
 
     .\dnscrypt-proxy.exe --install-with-config-file=dnscrypt-proxy.conf
@@ -79,9 +57,24 @@ install the service:
 your network adapter and hit "Properties"). Then in the "Internet Protocol
 Version 4 (TCP/IPv4)" settings use `127.0.0.1` instead of the default DNS
 resolver address.
->>>>>>> origin/tomato-shibby-RT-AC
 
 Congratulations, you're now using DNSCrypt!
+
+IPv6
+----
+
+Do you have IPv6 connectivity? No problem!
+
+In the preferences pane for a given network connection, Windows has
+IPv6-specific settings under "Internet Protocol Version 6 (TCP/IPv6)".
+
+The DNS server addresses have to be IPv6 addresses, so enter the
+IPv6 representation of `127.0.0.1`:
+
+    ::FFFF:127.0.0.1
+
+Done. You can now enjoy the DNSCrypt proxy both for IPv4 and IPv6
+connections.
 
 How to open an elevated command prompt
 --------------------------------------
@@ -89,16 +82,37 @@ How to open an elevated command prompt
 On Windows 8.1 and Windows 10, press the Windows key + the X key and
 select "Windows Command Prompt (Admin)" or "Windows PowerShell (Admin)".
 
-Advanced usage
---------------
+If you get the message:
 
-The Windows build of `dnscrypt-proxy` adds the following command-line
-options:
+    [ERROR] Unable to bind (UDP) [Address already in use [WSAEADDRINUSE ]]
+
+chances are that you tried to start the proxy from a limited
+(non-elevated) command prompt.
+
+Temporarily disabling DNSCrypt
+------------------------------
+
+`dnscrypt-proxy` receives DNS queries from your applications on
+`127.0.0.1` (by default), wraps them into DNSCrypt queries, forwards
+them to the real DNS resolver, securely receives and verifies the
+responses, and forwards the legitimate ones to your client applications.
+
+If you changed the DNS settings for a given network interface to
+`127.0.0.1`, you can revert these settings to what they used to be (or
+to any non-DNSCrypt resolver) anytime in order to stop using DNSCrypt.
+Changing the address back to `127.0.0.1` makes the network interface
+use the DNSCrypt proxy again.
+
+The Windows service
+-------------------
+
+On Windows, `dnscrypt-proxy` can run as a Windows service, and this is how it
+was set up in the quickstart section above.
+
+In addition to the command-line switches available on other platforms,
+the Windows builds of the proxy add the following switches:
 
 - `--install`: install the proxy as a service.
-<<<<<<< HEAD
-- `--uninstall`: uninstall the service.
-=======
 - `--install-with-config-file=<config file>`: install the proxy as a
 service, using the provided configuration file (`dnscrypt-proxy.conf`).
 Double check that the configuration file is valid prior to installing
@@ -164,7 +178,6 @@ And delete the directory.
 
 Advanced configuration
 ----------------------
->>>>>>> origin/tomato-shibby-RT-AC
 
 Many additional features (logging, filtering...) can be enabled by
 loading a configuration file. This requires at least dnscrypt-proxy
@@ -197,13 +210,8 @@ Plugins
 Plugins should be listed as paths to the `.DLL` files, optionally
 followed by a coma and plugin-specific arguments:
 
-<<<<<<< HEAD
-    dnscrypt-proxy -R name --plugin=libdcplugin_example_ldns_aaaa_blocking.dll
-    dnscrypt-proxy -R name --plugin=libdcplugin_example_ldns_blocking.dll,--domains=C:/blacklisted-domains.txt
-=======
     .\dnscrypt-proxy -R <name> --plugin=libdcplugin_example_ldns_aaaa_blocking.dll
     .\dnscrypt-proxy -R <name> --plugin=libdcplugin_example_ldns_blocking.dll,--domains=C:\blacklisted-domains.txt
->>>>>>> origin/tomato-shibby-RT-AC
 
 The service should be restarted after the registry has been updated.
 

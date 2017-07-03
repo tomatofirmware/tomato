@@ -34,14 +34,8 @@
 typedef uint8_t u8;
 typedef uint64_t limb;
 typedef limb felem[5];
-<<<<<<< HEAD
-// This is a special gcc mode for 128-bit integers. It's implemented on 64-bit
-// platforms only as far as I know.
-typedef unsigned uint128_t __attribute__ ((mode(TI)));
-=======
 /* Special gcc mode for 128-bit integers */
 typedef unsigned uint128_t __attribute__((mode(TI)));
->>>>>>> origin/tomato-shibby-RT-AC
 
 /* Sum two numbers: output += in */
 static inline void
@@ -374,44 +368,6 @@ fmonty(limb *x2, limb *z2,         /* output 2Q */
        limb *x3, limb *z3,         /* output Q + Q' */
        limb *x, limb *z,           /* input Q */
        limb *xprime, limb *zprime, /* input Q' */
-<<<<<<< HEAD
-       const limb *qmqp /* input Q - Q' */) {
-  limb origx[5], origxprime[5], zzz[5], xx[5], zz[5], xxprime[5],
-        zzprime[5], zzzprime[5];
-
-  memcpy(origx, x, 5 * sizeof(limb));
-  fsum(x, z);
-  fdifference_backwards(z, origx);  // does x - z
-
-  memcpy(origxprime, xprime, sizeof(limb) * 5);
-  fsum(xprime, zprime);
-  fdifference_backwards(zprime, origxprime);
-  fmul(xxprime, xprime, z);
-  fmul(zzprime, x, zprime);
-  memcpy(origxprime, xxprime, sizeof(limb) * 5);
-  fsum(xxprime, zzprime);
-  fdifference_backwards(zzprime, origxprime);
-  fsquare_times(x3, xxprime, 1);
-  fsquare_times(zzzprime, zzprime, 1);
-  fmul(z3, zzzprime, qmqp);
-
-  fsquare_times(xx, x, 1);
-  fsquare_times(zz, z, 1);
-  fmul(x2, xx, zz);
-  fdifference_backwards(zz, xx);  // does zz = xx - zz
-  fscalar_product(zzz, zz, 121665);
-  fsum(zzz, xx);
-  fmul(z2, zz, zzz);
-}
-
-// -----------------------------------------------------------------------------
-// Maybe swap the contents of two limb arrays (@a and @b), each @len elements
-// long. Perform the swap iff @swap is non-zero.
-//
-// This function performs the swap without leaking any side-channel
-// information.
-// -----------------------------------------------------------------------------
-=======
        const limb *qmqp /* input Q - Q' */)
 {
     limb origx[5], origxprime[5], zzz[5], xx[5], zz[5], xxprime[5], zzprime[5],
@@ -450,7 +406,6 @@ fmonty(limb *x2, limb *z2,         /* output 2Q */
    information.
    -----------------------------------------------------------------------------
    */
->>>>>>> origin/tomato-shibby-RT-AC
 static void
 swap_conditional(limb a[5], limb b[5], limb iswap)
 {
@@ -514,38 +469,6 @@ cmult(limb *resultx, limb *resultz, const u8 *n, const limb *q)
     memcpy(resultz, nqz, sizeof(limb) * 5);
 }
 
-<<<<<<< HEAD
-
-// -----------------------------------------------------------------------------
-// Shamelessly copied from djb's code, tightened a little
-// -----------------------------------------------------------------------------
-static void
-crecip(felem out, const felem z) {
-  felem a,t0,b,c;
-
-  /* 2 */ fsquare_times(a, z, 1); // a = 2
-  /* 8 */ fsquare_times(t0, a, 2);
-  /* 9 */ fmul(b, t0, z); // b = 9
-  /* 11 */ fmul(a, b, a); // a = 11
-  /* 22 */ fsquare_times(t0, a, 1);
-  /* 2^5 - 2^0 = 31 */ fmul(b, t0, b);
-  /* 2^10 - 2^5 */ fsquare_times(t0, b, 5);
-  /* 2^10 - 2^0 */ fmul(b, t0, b);
-  /* 2^20 - 2^10 */ fsquare_times(t0, b, 10);
-  /* 2^20 - 2^0 */ fmul(c, t0, b);
-  /* 2^40 - 2^20 */ fsquare_times(t0, c, 20);
-  /* 2^40 - 2^0 */ fmul(t0, t0, c);
-  /* 2^50 - 2^10 */ fsquare_times(t0, t0, 10);
-  /* 2^50 - 2^0 */ fmul(b, t0, b);
-  /* 2^100 - 2^50 */ fsquare_times(t0, b, 50);
-  /* 2^100 - 2^0 */ fmul(c, t0, b);
-  /* 2^200 - 2^100 */ fsquare_times(t0, c, 100);
-  /* 2^200 - 2^0 */ fmul(t0, t0, c);
-  /* 2^250 - 2^50 */ fsquare_times(t0, t0, 50);
-  /* 2^250 - 2^0 */ fmul(t0, t0, b);
-  /* 2^255 - 2^5 */ fsquare_times(t0, t0, 5);
-  /* 2^255 - 21 */ fmul(out, t0, a);
-=======
 /* -----------------------------------------------------------------------------
    Shamelessly copied from djb's code, tightened a little
    -----------------------------------------------------------------------------
@@ -577,7 +500,6 @@ crecip(felem out, const felem z)
     /* 2^250 - 2^0 */ fmul(t0, t0, b);
     /* 2^255 - 2^5 */ fsquare_times(t0, t0, 5);
     /* 2^255 - 21 */ fmul(out, t0, a);
->>>>>>> origin/tomato-shibby-RT-AC
 }
 
 static const unsigned char basepoint[32] = { 9 };
