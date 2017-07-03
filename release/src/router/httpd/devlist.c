@@ -14,7 +14,29 @@
 #include <sys/types.h>
 
 #include <wlutils.h>
+#include <syslog.h>
 
+// Routine to execute an external shell command, using a string as input (command line) ... and outputs to a string
+int shellcmd(char * cmdstr, char * cmdoutput, int lenoutput)
+{
+	FILE *mypipe;
+	
+	//syslog(LOG_ERR, "shellcmd: Executing command = %s\n", cmdstr);
+	
+	// Set up pipe for command read, and execute command
+	if ((mypipe = popen(cmdstr, "r")) == NULL) {
+		syslog(LOG_ERR, "shellcmd: Could not open pipe for output. Command = %s\n", cmdstr);
+		return FALSE;
+	}
+
+	// Grab data from process execution, store to string (and remove trailing newline if needed)
+	fgets(cmdoutput, lenoutput , mypipe);
+	if (cmdoutput[strlen(cmdoutput)-1] == '\n')
+		cmdoutput[strlen(cmdoutput)-1] = 0;
+	
+	// And close pipe
+	return(pclose(mypipe));
+}
 
 void asp_arplist(int argc, char **argv)
 {
@@ -23,6 +45,8 @@ void asp_arplist(int argc, char **argv)
 	char ip[16];
 	char mac[18];
 	char dev[17];
+	char host[64];
+	char command[256];
 	char comma;
 	unsigned int flags;
 
@@ -40,7 +64,13 @@ void asp_arplist(int argc, char **argv)
 			if ((strlen(mac) != 17) || (strcmp(mac, "00:00:00:00:00:00") == 0)) continue;
 			if (flags == 0) continue;
 //			if ((nvram_match("wan_ifname", dev)) && (!nvram_match("wan_ipaddr", ip))) continue; // half
-			web_printf("%c['%s','%s','%s']", comma, ip, mac, dev);
+
+			// Get hostname, based on IP address (using nslookup + post-processing of output) - items in arp list have IP addresses
+			strcpy(host, "Unknown");
+			sprintf(command, "nslookup %s | grep %s | grep \"Address 1\" | cut -f 4 -d \" \" | cut -d \".\" -f 1", ip, ip);
+			shellcmd(command, host, 63);
+
+			web_printf("%c['%s','%s','%s','%s']", comma, ip, mac, dev, host);
 			comma = ',';
 		}
 		fclose(f);
@@ -89,6 +119,14 @@ static int get_wl_clients(int idx, int unit, int subunit, void *param)
 	struct maclist *mlist;
 	int mlsize;
 	char ifname[16];
+	char *arpargs;
+	char mac[18];
+	char ip[16];
+	char host[64];
+	char lease[16];
+	char leasestr[32];
+	char command[256];
+	char cmdoutput[128];
 
 	mlsize = sizeof(struct maclist) + (255 * sizeof(struct ether_addr));
 	if ((mlist = malloc(mlsize)) != NULL) {
@@ -116,12 +154,35 @@ static int get_wl_clients(int idx, int unit, int subunit, void *param)
 						if (get_wds_ifname(&rssi.ea, ifname)) p = ifname;
 					}
 
-					web_printf("%c['%s','%s',%d,%d,%d,%u,%d]",
+					// Get IP address and hostname, based on MAC address (using remote-arp) - items in this list have MAC addresses only (i.e. DHCP not handled by Tomato)
+  					arpargs = nvram_safe_get("wldev_MAC_arpargs");
+					strcpy(ip, "Unknown");
+					strcpy(host, "Unknown");
+					strcpy(leasestr, "---");
+					// Only process if arpargs (for remote-arp) is defined, not empty. arpargs = "server username password" (to get ARP info)
+					if (strcmp(arpargs, "") != 0) {
+						//syslog(LOG_INFO, "Getting wldev MAC details, using ARP args provided ...");
+						sprintf(mac, "%s", ether_etoa(rssi.ea.octet, buf));
+						sprintf(command, "remote-arp -ihlu %s %s", mac, arpargs);
+						//syslog(LOG_INFO, "   > Command: |%s|", command);
+						shellcmd(command, cmdoutput, 127);
+						//syslog(LOG_INFO, "   > Output: |%s|", cmdoutput);
+						if (strcmp(cmdoutput, "ARP parsing failed!") != 0) {
+							sscanf(cmdoutput, "%[^,],%[^,],%[^,],%*s", ip, host, lease);
+							sprintf(leasestr, "ARP: %s sec", lease); // Hard coded, add units to lease time (seconds)
+							//syslog(LOG_INFO, "   > Parsed: |%s|%s|%s|", ip, host, lease);
+						} //else
+							//syslog(LOG_INFO, "   > Parsed: Not done!");
+
+					} //else
+						//syslog(LOG_INFO, "Not getting wldev MAC details, no ARP args provided.");
+
+					web_printf("%c['%s','%s',%d,%u,%u,%u,%d,'%s','%s','%s']",
 						*comma,
 						p,
 						ether_etoa(rssi.ea.octet, buf),
 						rssi.val,
-						sti.tx_rate, sti.rx_rate, sti.in, unit);
+						sti.tx_rate, sti.rx_rate, sti.in, unit, ip, host, leasestr);
 					*comma = ',';
 				}
 			}
