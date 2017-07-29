@@ -1404,9 +1404,9 @@ endif
 wndr64:
 	@$(MAKE) bin MIPS32=r2 NVRAM_SIZE=64 WNDR=y OPENVPN=n NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y IPV6SUPP=y B=W BUILD_DESC="Std" USB="USB" SNMP=y DNSCRYPT=y PPTPD=y NO_HTTPS=y USBAP=y
 wndr64-sm:
-	@$(MAKE) bin MIPS32=r2 NVRAM_SIZE=64 WNDR=y OPENVPN=n NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y IPV6SUPP=n B=W BUILD_DESC="Sm" USB="USB" SNMP=y DNSCRYPT=y PPTPD=n NO_HTTPS=y USBAP=y
-wndr64-nousb:
-	@$(MAKE) bin MIPS32=r2 NVRAM_SIZE=64 WNDR=y OPENVPN=n NTFS=y BBEXTRAS=y USBEXTRAS=y EBTABLES=y IPV6SUPP=n B=W BUILD_DESC="NoUSB" USB="" SNMP=y DNSCRYPT=y PPTPD=n NO_HTTPS=y USBAP=y
+	@$(MAKE) bin MIPS32=r2 NVRAM_SIZE=64 WNDR=y OPENVPN=n NTFS=n BBEXTRAS=y USBEXTRAS=y EBTABLES=y IPV6SUPP=y B=W BUILD_DESC="Sm" USB="USB" SNMP=y DNSCRYPT=n PPTPD=n NO_HTTPS=y USBAP=y
+wndr64-https:
+	@$(MAKE) bin MIPS32=r2 NVRAM_SIZE=64 WNDR=y OPENVPN=n NTFS=n BBEXTRAS=y USBEXTRAS=y EBTABLES=y IPV6SUPP=y B=W BUILD_DESC="https" USB="USB" SNMP=y DNSCRYPT=n PPTPD=n NO_HTTPS=n USBAP=y
 # end of CONFIG_LINUX26
 endif
 
@@ -1551,7 +1551,7 @@ endif
 	@echo "       Netgear WNDR series with 64k Nvram/8MB Flash(WNDR4000/3700v3/3400)"
 	@echo "wndr64       Netgear WNDR series(64k Nvram) build, no VPN"
 	@echo "wndr64-sm    Netgear WNDR series(64k Nvram) build, Small"
-	@echo "wndr64-nousb Netgear WNDR series(64k Nvram) build, Small, No USB"
+	@echo "wndr64-https Netgear WNDR series(64k Nvram) build, Small, HTTPS support"
 
 endif
 	@echo ""
