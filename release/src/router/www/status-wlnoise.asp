@@ -16,11 +16,12 @@ No part of this file may be used without permission.
 <script type='text/javascript' src='tomato.js'></script>
 <!-- JavaScript Libraries: For Chart, where possible use hosted libraries to save router space ... like Google Developers -->
 <!-- HighCharts / HighStock requires FrameWork (jQuery, for example) -->
+<!-- NOTE: have to load over https, or https pages fail (but http pages OK with loading JavaScript over https ... so https only!) -->
 <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js'></script>
-<script type='text/javascript' src='http://code.highcharts.com/stock/highstock.js'></script>
-<script type='text/javascript' src='http://code.highcharts.com/modules/data.js'></script>
-<script type='text/javascript' src='http://code.highcharts.com/modules/exporting.js'></script>
-<script type='text/javascript' src='http://code.highcharts.com/modules/no-data-to-display.js'></script>
+<script type='text/javascript' src='https://code.highcharts.com/stock/highstock.js'></script>
+<script type='text/javascript' src='https://code.highcharts.com/modules/data.js'></script>
+<script type='text/javascript' src='https://code.highcharts.com/modules/exporting.js'></script>
+<script type='text/javascript' src='https://code.highcharts.com/modules/no-data-to-display.js'></script>
 <style type='text/css'>
 #txt {
 width: 550px;
