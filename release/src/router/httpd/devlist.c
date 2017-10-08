@@ -122,7 +122,7 @@ static int get_wl_clients(int idx, int unit, int subunit, void *param)
 	char *arpargs;
 	char mac[18];
 	char ip[16];
-	char host[64];
+	char host[64], *hostPtr;
 	char lease[16];
 	char leasestr[32];
 	char command[256];
@@ -169,6 +169,7 @@ static int get_wl_clients(int idx, int unit, int subunit, void *param)
 						//syslog(LOG_INFO, "   > Output: |%s|", cmdoutput);
 						if (strcmp(cmdoutput, "ARP parsing failed!") != 0) {
 							sscanf(cmdoutput, "%[^,],%[^,],%[^,],%*s", ip, host, lease);
+							hostPtr = strtok(host, ".");
 							sprintf(leasestr, "ARP: %s sec", lease); // Hard coded, add units to lease time (seconds)
 							//syslog(LOG_INFO, "   > Parsed: |%s|%s|%s|", ip, host, lease);
 						} //else
@@ -182,7 +183,7 @@ static int get_wl_clients(int idx, int unit, int subunit, void *param)
 						p,
 						ether_etoa(rssi.ea.octet, buf),
 						rssi.val,
-						sti.tx_rate, sti.rx_rate, sti.in, unit, ip, host, leasestr);
+						sti.tx_rate, sti.rx_rate, sti.in, unit, ip, hostPtr, leasestr);
 					*comma = ',';
 				}
 			}
