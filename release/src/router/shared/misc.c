@@ -850,6 +850,21 @@ void chld_reap(int sig)
 	while (waitpid(-1, NULL, WNOHANG) > 0) {}
 }
 
+// Write to console, and first pts (ssh shell)
+void write_console(char *stroutput) {
+	FILE *debug[2];
+	int iterfiles;
+
+	debug[0] = fopen("/dev/console", "w");
+	debug[1] = fopen("/dev/pts/0", "w");
+	for (iterfiles = 0; iterfiles <= 1; iterfiles++) {
+		if (debug[iterfiles] != NULL) {
+			fprintf(debug[iterfiles], stroutput);
+			fclose(debug[iterfiles]);
+		}
+	}
+}
+
 /*
 int time_ok(void)
 {
