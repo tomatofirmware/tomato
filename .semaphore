@@ -17,10 +17,10 @@ JOBS=(
   'TARGET=r2j DIR=src-rt KERN=K26 V1=RT-N5x- EXT=trx'
   'TARGET=r2f DIR=src-rt KERN=K26 V1=RT-N5x- EXT="{trx,bin}"'
   'TARGET=r2z DIR=src-rt KERN=K26 V1=RT-N5x- EXT=trx'
-  'TARGET=v2z DIR=src-rt KERN=K26 V1=RT-N5x- EXT=chk'
-  'TARGET=v2e DIR=src-rt KERN=K26 V1=RT-N5x- EXT=chk'
   'TARGET=r7000e DIR=src-rt-6.x.4708 V1=ARM EXT=trx'
 )
+  # 'TARGET=v2e DIR=src-rt KERN=K26 V1=RT-N5x- EXT=chk'
+  # 'TARGET=v2z DIR=src-rt KERN=K26 V1=RT-N5x- EXT=chk'
 
 setup() {
   [[ -e "${SETUP:=$HOME/setup-done}" ]] && return
